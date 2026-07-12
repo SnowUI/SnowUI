@@ -17,6 +17,7 @@
         type NumberFormatOptions,
         type RenderHints,
     } from "@snowui-design-system/components";
+    import type { MotionConfig } from "@snowui-design-system/components/logic/motion-config";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
     import {
         resolveChartColor,
@@ -235,13 +236,13 @@
     const SERIES_CLIP_Y_PADDING = 16;
     const LINE_CHART_HOVER_LABEL_MOTION_DURATION = 200;
     const LINE_CHART_HOVER_LABEL_SLIDE_DISTANCE = 2;
-    const LINE_CHART_HOVER_LABEL_APPEAR_MOTION = {
+    const LINE_CHART_HOVER_LABEL_APPEAR_MOTION: MotionConfig = {
         opacity: [0, 1],
         y: [LINE_CHART_HOVER_LABEL_SLIDE_DISTANCE, 0],
         duration: LINE_CHART_HOVER_LABEL_MOTION_DURATION,
         easing: "easeOut",
     };
-    const LINE_CHART_HOVER_LABEL_DISAPPEAR_MOTION = {
+    const LINE_CHART_HOVER_LABEL_DISAPPEAR_MOTION: MotionConfig = {
         opacity: [1, 0],
         y: [0, LINE_CHART_HOVER_LABEL_SLIDE_DISTANCE],
         duration: LINE_CHART_HOVER_LABEL_MOTION_DURATION,
@@ -540,7 +541,7 @@
                 ),
             ),
             ...normalizedSeries.map((item) => item.area?.gradient),
-        ].filter(Boolean),
+        ].filter((gradient): gradient is NonNullable<typeof gradient> => Boolean(gradient)),
     );
     const hoverPanelRows = $derived(resolveHoverPanelRows());
     const hoverPanelAnchor = $derived(resolveHoverPanelAnchor());
@@ -1686,7 +1687,15 @@
                 : svgOffset;
         const anchorBounds =
             "anchorBounds" in hoverPanelAnchor && hoverPanelAnchor.anchorBounds
-                ? offsetHoverPanelBounds(hoverPanelAnchor.anchorBounds, svgOffset)
+                ? offsetHoverPanelBounds(
+                      hoverPanelAnchor.anchorBounds as {
+                          left: number;
+                          top: number;
+                          width: number;
+                          height: number;
+                      },
+                      svgOffset,
+                  )
                 : undefined;
         return {
             label:

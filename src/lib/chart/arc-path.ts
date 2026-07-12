@@ -33,7 +33,7 @@ export function buildArcPath(
         .padAngle(padAngle)
         .padRadius(padRadius)
         .context(path as unknown as CanvasRenderingContext2D);
-    generator();
+    generator({} as never);
     return path.toString();
 }
 

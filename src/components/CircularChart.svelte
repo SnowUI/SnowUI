@@ -18,6 +18,7 @@
         type NumberFormatOptions,
         type RenderHints,
     } from "@snowui-design-system/components";
+    import type { MotionConfig } from "@snowui-design-system/components/logic/motion-config";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
     import { buildArcPath } from "../lib/chart/arc-path";
     import {
@@ -131,12 +132,12 @@
 
     const HOVER_MOTION_DURATION = 300;
     const CENTER_LABEL_MOTION_DURATION = 200;
-    const CENTER_LABEL_APPEAR_MOTION = {
+    const CENTER_LABEL_APPEAR_MOTION: MotionConfig = {
         opacity: [0, 1],
         duration: CENTER_LABEL_MOTION_DURATION,
         easing: "easeOut",
     };
-    const CENTER_LABEL_DISAPPEAR_MOTION = {
+    const CENTER_LABEL_DISAPPEAR_MOTION: MotionConfig = {
         opacity: [1, 0],
         duration: CENTER_LABEL_MOTION_DURATION,
         easing: "easeOut",

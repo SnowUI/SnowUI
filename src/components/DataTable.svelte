@@ -108,7 +108,7 @@
         filterer = undefined,
         rowKey = (_row, index) => index,
         defaultSort = undefined,
-        sort = $bindable(defaultSort),
+        sort = $bindable<TableSortState | undefined>(defaultSort),
         query = $bindable(""),
         filters = $bindable({}),
         page = $bindable(1),
@@ -191,8 +191,9 @@
 
     const resolvedSorter = $derived.by(() => {
         if (!sort) return undefined;
-        if (sorters[sort.columnId]) return sorters[sort.columnId];
-        return (row: any) => row?.[sort.columnId];
+        const columnId = sort.columnId;
+        if (sorters[columnId]) return sorters[columnId];
+        return (row: any) => row?.[columnId];
     });
     function defaultSearch(row: any, normalized: string) {
         if (!normalized) return true;
@@ -219,11 +220,11 @@
             return sourceRows;
         }
         const runSearch = searcher
-            ? (row: T) => searcher(row, query)
-            : (row: T) => defaultSearch(row, normalizedQuery);
+            ? (row: any) => searcher(row, query)
+            : (row: any) => defaultSearch(row, normalizedQuery);
         const runFilter = filterer
-            ? (row: T) => filterer(row, filters)
-            : (row: T) => defaultFilter(row, filterEntries);
+            ? (row: any) => filterer(row, filters)
+            : (row: any) => defaultFilter(row, filterEntries);
         // 搜索与筛选在同一轮完成，避免为中间结果再分配一次数组。
         return sourceRows.filter((row) => runSearch(row) && runFilter(row));
     });
@@ -446,9 +447,9 @@
         const reverseDirection = defaultDirection === "ascending" ? "descending" : "ascending";
         if (!sort || sort.columnId !== columnId) sort = { columnId, direction: defaultDirection };
         else if (sort.direction === defaultDirection) sort = { columnId, direction: reverseDirection };
-        else sort = isDefaultColumn && !resolvedDefaultSortActive
+        else sort = (isDefaultColumn && !resolvedDefaultSortActive
             ? { columnId, direction: defaultDirection }
-            : undefined;
+            : undefined) as TableSortState | undefined;
         page = 1;
         onSortChange?.(sort);
         onPageChange?.(page);
@@ -483,7 +484,7 @@
             if (!onRowPreview) return;
             const row = findRowById(rowId);
             if (row === undefined) return;
-            onRowPreview(row, renderState as DataTableRenderState<T>, event);
+            onRowPreview(row, renderState as DataTableRenderState<any>, event);
         },
         getRowAppearMotion: (rowId) => appearingRowIds.has(rowId)
             ? {
@@ -537,7 +538,7 @@
         getSelectedRowIds: () => selectedRowIds,
         clearSelection: () => updateSelectedRowIds([]),
         setSort: (nextSort) => {
-            sort = nextSort;
+            sort = nextSort as TableSortState | undefined;
             page = 1;
             onSortChange?.(sort);
             onPageChange?.(page);

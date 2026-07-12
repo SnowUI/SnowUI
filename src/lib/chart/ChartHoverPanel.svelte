@@ -177,7 +177,7 @@
         }
     }
 
-    function resolveViewportBounds(hostRect: DOMRect | undefined) {
+    function resolveViewportBounds(hostRect: ChartHoverPanelBounds | undefined) {
         if (!hostRect || typeof window === "undefined") {
             return undefined;
         }

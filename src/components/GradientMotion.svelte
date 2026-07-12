@@ -37,7 +37,7 @@
         type LoopMotionConfig,
     } from "./FramePro.svelte";
 
-    interface Props extends FrameProps {
+    interface Props extends Omit<FrameProps, "size" | "width" | "height" | "radius"> {
         variant?: GradientMotionVariant;
         seed?: string | number;
         speed?: number;
@@ -506,6 +506,9 @@ void main() {
             webglReady = false;
             return;
         }
+        const activeCanvas = canvas;
+        const activeGl = gl;
+        const activeProgram = program;
 
         const positionLocation = gl.getAttribLocation(program, "a_position");
         const positionBuffer = gl.createBuffer();
@@ -564,14 +567,14 @@ void main() {
 
         function resize() {
             const ratio = Math.min(window.devicePixelRatio || 1, 2);
-            const width = Math.max(1, Math.round(canvas.clientWidth * ratio));
-            const height = Math.max(1, Math.round(canvas.clientHeight * ratio));
-            if (canvas.width !== width || canvas.height !== height) {
-                canvas.width = width;
-                canvas.height = height;
-                gl.viewport(0, 0, width, height);
+            const width = Math.max(1, Math.round(activeCanvas.clientWidth * ratio));
+            const height = Math.max(1, Math.round(activeCanvas.clientHeight * ratio));
+            if (activeCanvas.width !== width || activeCanvas.height !== height) {
+                activeCanvas.width = width;
+                activeCanvas.height = height;
+                activeGl.viewport(0, 0, width, height);
             }
-            gl.uniform2f(uniforms.resolution, width, height);
+            activeGl.uniform2f(uniforms.resolution, width, height);
         }
 
         function render(now: number) {
@@ -589,38 +592,38 @@ void main() {
             const customColors = resolvedColors;
             const currentDirection = resolvedDirection;
 
-            gl.clearColor(0, 0, 0, 0);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            gl.useProgram(program);
-            gl.uniform1f(uniforms.time, time);
-            gl.uniform1f(uniforms.progress, progress);
-            gl.uniform1f(uniforms.alpha, resolvedIntensity);
-            gl.uniform1f(uniforms.bandTight, resolvedBandTight);
-            gl.uniform1f(uniforms.posStart, currentDirection.start);
-            gl.uniform1f(uniforms.posEnd, currentDirection.end);
-            gl.uniform1f(uniforms.hueShift, hueShift);
-            gl.uniform1f(uniforms.direction, currentDirection.axis);
-            gl.uniform1f(uniforms.waveAmount, resolvedWaveAmount);
-            gl.uniform1f(uniforms.rippleAmount, resolvedRippleAmount);
-            gl.uniform1f(uniforms.waveSpeed, resolvedSpeed);
-            gl.uniform1f(uniforms.brightness, resolvedBrightness);
-            gl.uniform1f(uniforms.swellAmount, 0.55);
-            gl.uniform1f(uniforms.continuousFill, isAvatarVariant ? 1 : 0);
-            gl.uniform1f(uniforms.avatarMode, isAvatarVariant ? 1 : 0);
-            gl.uniform3f(uniforms.paletteA, palette.a[0], palette.a[1], palette.a[2]);
-            gl.uniform3f(uniforms.paletteB, palette.b[0], palette.b[1], palette.b[2]);
-            gl.uniform3f(uniforms.paletteC, palette.c[0], palette.c[1], palette.c[2]);
-            gl.uniform3f(uniforms.paletteD, palette.d[0], palette.d[1], palette.d[2]);
-            gl.uniform1f(uniforms.customPalette, customColors ? 1 : 0);
-            gl.uniform1f(uniforms.colorSpeed, resolvedColorSpeed);
-            gl.uniform1f(uniforms.highlightIntensity, resolvedHighlightIntensity);
+            activeGl.clearColor(0, 0, 0, 0);
+            activeGl.clear(activeGl.COLOR_BUFFER_BIT);
+            activeGl.useProgram(activeProgram);
+            activeGl.uniform1f(uniforms.time, time);
+            activeGl.uniform1f(uniforms.progress, progress);
+            activeGl.uniform1f(uniforms.alpha, resolvedIntensity);
+            activeGl.uniform1f(uniforms.bandTight, resolvedBandTight);
+            activeGl.uniform1f(uniforms.posStart, currentDirection.start);
+            activeGl.uniform1f(uniforms.posEnd, currentDirection.end);
+            activeGl.uniform1f(uniforms.hueShift, hueShift);
+            activeGl.uniform1f(uniforms.direction, currentDirection.axis);
+            activeGl.uniform1f(uniforms.waveAmount, resolvedWaveAmount);
+            activeGl.uniform1f(uniforms.rippleAmount, resolvedRippleAmount);
+            activeGl.uniform1f(uniforms.waveSpeed, resolvedSpeed);
+            activeGl.uniform1f(uniforms.brightness, resolvedBrightness);
+            activeGl.uniform1f(uniforms.swellAmount, 0.55);
+            activeGl.uniform1f(uniforms.continuousFill, isAvatarVariant ? 1 : 0);
+            activeGl.uniform1f(uniforms.avatarMode, isAvatarVariant ? 1 : 0);
+            activeGl.uniform3f(uniforms.paletteA, palette.a[0], palette.a[1], palette.a[2]);
+            activeGl.uniform3f(uniforms.paletteB, palette.b[0], palette.b[1], palette.b[2]);
+            activeGl.uniform3f(uniforms.paletteC, palette.c[0], palette.c[1], palette.c[2]);
+            activeGl.uniform3f(uniforms.paletteD, palette.d[0], palette.d[1], palette.d[2]);
+            activeGl.uniform1f(uniforms.customPalette, customColors ? 1 : 0);
+            activeGl.uniform1f(uniforms.colorSpeed, resolvedColorSpeed);
+            activeGl.uniform1f(uniforms.highlightIntensity, resolvedHighlightIntensity);
             const fallbackColors: Vec3[] = [palette.a, palette.b, palette.c, palette.d];
             const activeColors = customColors ?? fallbackColors;
-            gl.uniform3f(uniforms.color0, activeColors[0][0], activeColors[0][1], activeColors[0][2]);
-            gl.uniform3f(uniforms.color1, activeColors[1][0], activeColors[1][1], activeColors[1][2]);
-            gl.uniform3f(uniforms.color2, activeColors[2][0], activeColors[2][1], activeColors[2][2]);
-            gl.uniform3f(uniforms.color3, activeColors[3][0], activeColors[3][1], activeColors[3][2]);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            activeGl.uniform3f(uniforms.color0, activeColors[0][0], activeColors[0][1], activeColors[0][2]);
+            activeGl.uniform3f(uniforms.color1, activeColors[1][0], activeColors[1][1], activeColors[1][2]);
+            activeGl.uniform3f(uniforms.color2, activeColors[2][0], activeColors[2][1], activeColors[2][2]);
+            activeGl.uniform3f(uniforms.color3, activeColors[3][0], activeColors[3][1], activeColors[3][2]);
+            activeGl.drawArrays(activeGl.TRIANGLE_STRIP, 0, 4);
 
             frame = requestAnimationFrame(render);
         }
@@ -630,8 +633,8 @@ void main() {
 
         return () => {
             cancelAnimationFrame(frame);
-            gl.deleteBuffer(positionBuffer);
-            gl.deleteProgram(program);
+            activeGl.deleteBuffer(positionBuffer);
+            activeGl.deleteProgram(activeProgram);
         };
     });
 </script>

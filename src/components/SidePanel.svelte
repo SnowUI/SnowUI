@@ -301,7 +301,7 @@
             disabled={action.disabled}
             aria-label={action.ariaLabel ?? action.label}
             class="snowui-side-panel-toolbar-button"
-            onclick={(event) => handleAction(action, event)}
+            onclick={(event: MouseEvent) => handleAction(action, event)}
         >
             {#if action.icon}
                 <ResourceIcon name={action.icon} size={16} aria-hidden="true" />

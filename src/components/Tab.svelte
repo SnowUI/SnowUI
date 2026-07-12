@@ -108,7 +108,7 @@
     );
     provideComponentParts(() => parts);
 
-    let rootEl = $state<HTMLElement | null>(null);
+    let rootEl = $state<HTMLElement>();
     let indicatorEl = $state<HTMLElement | null>(null);
     let initialized = $state(false);
     const resolvedDirection = $derived(row || !column ? "row" : "column");
