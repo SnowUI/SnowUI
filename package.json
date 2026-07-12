@@ -1,0 +1,42 @@
+{
+  "name": "@snowui-design-system/components-pro",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "packageManager": "pnpm@10.20.0",
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": ["src", "README.md"],
+  "scripts": {
+    "check": "svelte-check --workspace .",
+    "pack:check": "pnpm pack --dry-run"
+  },
+  "peerDependencies": {
+    "@snowui-design-system/components": ">=0.1.0 <1.0.0",
+    "@snowui-design-system/resource-svelte": ">=1.0.26 <2.0.0",
+    "svelte": "^5.0.0"
+  },
+  "dependencies": {
+    "d3-shape": "^3.2.0"
+  },
+  "devDependencies": {
+    "@snowui-design-system/components": "0.2.0-alpha.5",
+    "@snowui-design-system/resource-svelte": "1.0.26",
+    "@sveltejs/vite-plugin-svelte": "^4.0.4",
+    "@tsconfig/svelte": "^5.0.0",
+    "@types/d3-shape": "^3.1.8",
+    "svelte": "^5.45.2",
+    "svelte-check": "^4.3.4",
+    "typescript": "^5.0.0",
+    "vite": "^5.4.0"
+  }
+}
