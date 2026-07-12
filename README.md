@@ -1,6 +1,6 @@
 # SnowUI Pro
 
-SnowUI PRO 的私有源码仓库，对应 npm 私有包 `@snowui-design-system/components-pro`。
+SnowUI PRO 的私有源码仓库。PRO 不发布 npm，仅通过 `SnowUI/SnowUI-Pro` 私有 GitHub 仓库交付。
 
 仓库包含 PRO 组件、Blocks、logic、lib 与 motion。使用者还需要安装公开包 `@snowui-design-system/components` 与 `@snowui-design-system/resource-svelte`，并加载 SnowUI Styles CSS。
 
@@ -9,7 +9,6 @@ SnowUI PRO 的私有源码仓库，对应 npm 私有包 `@snowui-design-system/c
 ```bash
 pnpm install --frozen-lockfile
 pnpm check
-pnpm pack --dry-run
 ```
 
 ## 发布

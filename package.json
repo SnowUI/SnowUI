@@ -1,13 +1,9 @@
 {
   "name": "@snowui-design-system/components-pro",
   "version": "0.1.0",
-  "private": false,
+  "private": true,
   "type": "module",
   "packageManager": "pnpm@10.20.0",
-  "publishConfig": {
-    "access": "restricted",
-    "registry": "https://registry.npmjs.org/"
-  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -17,8 +13,7 @@
   },
   "files": ["src", "README.md"],
   "scripts": {
-    "check": "svelte-check --workspace .",
-    "pack:check": "npm pack --dry-run --cache /tmp/snowui-npm-cache"
+    "check": "svelte-check --workspace ."
   },
   "peerDependencies": {
     "@snowui-design-system/components": ">=0.1.0 <1.0.0",
