@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.DS_Store
+.claude/
+*.log
+vite_out*.log
+scripts/report.txt
+src/test/

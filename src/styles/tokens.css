@@ -1,0 +1,192 @@
+/*
+ * SnowUI Tokens
+ * v2.3.0 (Gradient Tokens)
+ * 组件几何样式统一使用梯度 Token（--border-*, --radius-*, --size-*, --padding-*, --gap-*）
+ * 文字使用 --text-* 与 --leading-* 配对。
+ */
+
+:root {
+
+   /* ==========================
+     1) 系数（默认全为 1）
+     ========================== */
+   --text-scale: 1;
+   --leading-scale: 1;
+   --border-scale: 1;
+   --radius-scale: 1;
+   --padding-scale: 1;
+   --gap-scale: 1;
+   --size-scale: 1;
+
+   /* ==========================
+     2) 文字梯度（rem 固定值）
+     映射 12/14/16/18/24/32/48/64
+     ========================== */
+   /* 12px */
+   --text-12: calc(0.75rem * var(--text-scale));
+   /* 14px */
+   --text-14: calc(0.875rem * var(--text-scale));
+   /* 16px */
+   --text-16: calc(1rem * var(--text-scale));
+   /* 18px */
+   --text-18: calc(1.125rem * var(--text-scale));
+   /* 24px */
+   --text-24: calc(1.5rem * var(--text-scale));
+   /* 32px */
+   --text-32: calc(2rem * var(--text-scale));
+   /* 48px */
+   --text-48: calc(3rem * var(--text-scale));
+   /* 64px */
+   --text-64: calc(4rem * var(--text-scale));
+
+   /* Line Heights */
+   /* 16px */
+   --leading-12: calc(1rem * var(--leading-scale));
+   /* 20px */
+   --leading-14: calc(1.25rem * var(--leading-scale));
+   /* 24px */
+   --leading-16: calc(1.5rem * var(--leading-scale));
+   /* 28px */
+   --leading-18: calc(1.75rem * var(--leading-scale));
+   /* 32px */
+   --leading-24: calc(2rem * var(--leading-scale));
+   /* 40px */
+   --leading-32: calc(2.5rem * var(--leading-scale));
+   /* 56px */
+   --leading-48: calc(3.5rem * var(--leading-scale));
+   /* 72px */
+   --leading-64: calc(4.5rem * var(--leading-scale));
+
+   /* ==========================
+     3) 边框梯度 (rem)
+     ========================== */
+   /* 0px */
+   --border-0: 0;
+   /* 0.5px */
+   --border-1: calc(0.03125rem * var(--border-scale));
+   /* 1px */
+   --border-2: calc(0.0625rem * var(--border-scale));
+   /* 2px */
+   --border-4: calc(0.125rem * var(--border-scale));
+   /* 4px */
+   --border-8: calc(0.25rem * var(--border-scale));
+
+   /* ==========================
+     4) 圆角梯度 (rem)
+     Base: 4px
+     ========================== */
+   /* 0px */
+   --radius-0: 0;
+   /* 4px */
+   --radius-1: calc(0.25rem * var(--radius-scale));
+   /* 8px */
+   --radius-2: calc(0.5rem * var(--radius-scale));
+   /* 12px */
+   --radius-3: calc(0.75rem * var(--radius-scale));
+   /* 16px */
+   --radius-4: calc(1rem * var(--radius-scale));
+   /* 20px */
+   --radius-5: calc(1.25rem * var(--radius-scale));
+   /* 24px */
+   --radius-6: calc(1.5rem * var(--radius-scale));
+   /* 28px */
+   --radius-7: calc(1.75rem * var(--radius-scale));
+   /* 32px */
+   --radius-8: calc(2rem * var(--radius-scale));
+   /* 40px */
+   --radius-10: calc(2.5rem * var(--radius-scale));
+   /* 48px */
+   --radius-12: calc(3rem * var(--radius-scale));
+   /* 80px */
+   --radius-20: calc(5rem * var(--radius-scale));
+   /* 9999px */
+   --radius-full: 9999px;
+
+   /* ==========================
+     5) 尺寸梯度 (Unified Size System, rem)
+     Base: 4px
+     Used for: width, height, min-width, min-height, etc.
+     ========================== */
+
+   /* 12px */
+   --size-3: calc(0.75rem * var(--size-scale));
+   /* 16px */
+   --size-4: calc(1rem * var(--size-scale));
+   /* 20px */
+   --size-5: calc(1.25rem * var(--size-scale));
+   /* 24px */
+   --size-6: calc(1.5rem * var(--size-scale));
+   /* 28px */
+   --size-7: calc(1.75rem * var(--size-scale));
+   /* 32px */
+   --size-8: calc(2rem * var(--size-scale));
+   /* 40px */
+   --size-10: calc(2.5rem * var(--size-scale));
+   /* 48px */
+   --size-12: calc(3rem * var(--size-scale));
+   /* 56px */
+   --size-14: calc(3.5rem * var(--size-scale));
+   /* 64px */
+   --size-16: calc(4rem * var(--size-scale));
+   /* 72px */
+   --size-18: calc(4.5rem * var(--size-scale));
+   /* 80px */
+   --size-20: calc(5rem * var(--size-scale));
+   /* 100% */
+   --size-full: 100%;
+
+   /* ==========================
+     6) 内边距 & 间距梯度 (rem)
+     ========================== */
+   /* 0px */
+   --padding-0: 0;
+   /* 4px */
+   --padding-1: calc(0.25rem * var(--padding-scale));
+   /* 8px */
+   --padding-2: calc(0.5rem * var(--padding-scale));
+   /* 12px */
+   --padding-3: calc(0.75rem * var(--padding-scale));
+   /* 16px */
+   --padding-4: calc(1rem * var(--padding-scale));
+   /* 20px */
+   --padding-5: calc(1.25rem * var(--padding-scale));
+   /* 24px */
+   --padding-6: calc(1.5rem * var(--padding-scale));
+   /* 28px */
+   --padding-7: calc(1.75rem * var(--padding-scale));
+   /* 40px */
+   --padding-10: calc(2.5rem * var(--padding-scale));
+   /* 48px */
+   --padding-12: calc(3rem * var(--padding-scale));
+
+   /* 0px */
+   --gap-0: 0;
+   /* 4px */
+   --gap-1: calc(0.25rem * var(--gap-scale));
+   /* 8px */
+   --gap-2: calc(0.5rem * var(--gap-scale));
+   /* 12px */
+   --gap-3: calc(0.75rem * var(--gap-scale));
+   /* 16px */
+   --gap-4: calc(1rem * var(--gap-scale));
+   /* 20px */
+   --gap-5: calc(1.25rem * var(--gap-scale));
+   /* 24px */
+   --gap-6: calc(1.5rem * var(--gap-scale));
+   /* 28px */
+   --gap-7: calc(1.75rem * var(--gap-scale));
+   /* 40px */
+   --gap-10: calc(2.5rem * var(--gap-scale));
+   /* 48px */
+   --gap-12: calc(3rem * var(--gap-scale));
+
+   /* ==========================
+     7) Orchestration Dynamic Vars
+     ========================== */
+   --drag-x: 0;
+   --drag-y: 0;
+   --parallax-x: 0;
+   --parallax-y: 0;
+   --parallax-scale: 1;
+   --parallax-opacity: 1;
+}

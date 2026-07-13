@@ -1,0 +1,15 @@
+/**
+ * rotate.css
+ * v1.0.0
+ * 旋转类默认动效关键帧资源：
+ * - snowui-frame-loop-rotate-clockwise: Frame loopMotion.preset 的内建连续旋转关键帧
+ */
+
+@keyframes snowui-frame-loop-rotate-clockwise {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

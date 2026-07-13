@@ -1,0 +1,61 @@
+{
+  "name": "@snowui-design-system/components",
+  "version": "0.2.0-alpha.7",
+  "private": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./keys": "./src/keys.ts",
+    "./context": "./src/context.ts",
+    "./lib/floating-position": "./src/lib/floating-position.ts",
+    "./lib/tooltip-behavior": "./src/lib/tooltip-behavior.ts",
+    "./lib/*.svelte": "./src/lib/*.svelte.ts",
+    "./lib/*": "./src/lib/*.ts",
+    "./internal/table-toolbar": "./src/components/TableToolbar.svelte",
+    "./logic/*.svelte": "./src/logic/*.svelte.ts",
+    "./logic/*": "./src/logic/*.ts",
+    "./motion/*.css": "./src/motion/*.css",
+    "./motion/*": "./src/motion/*.ts",
+    "./styles": "./src/styles/index.css",
+    "./styles/*": "./src/styles/*"
+  },
+  "files": [
+    "src",
+    "!src/demo",
+    "!src/playground",
+    "!src/test",
+    "README.md"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check:standards": "node ../scripts/check-standards.js",
+    "fix:standards": "node ../scripts/check-standards.js --fix",
+    "check:oss": "node scripts/check-oss-deps.mjs",
+    "verify:styles": "node scripts/verify-styles.mjs"
+  },
+  "peerDependencies": {
+    "@snowui-design-system/resource-svelte": ">=1.0.26 <2.0.0",
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@codemirror/lang-html": "^6.4.11",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/lang-json": "^6.0.2",
+    "@codemirror/theme-one-dark": "^6.1.3",
+    "@replit/codemirror-lang-svelte": "^6.0.0",
+    "@sveltejs/vite-plugin-svelte": "^7.2.0",
+    "@tsconfig/svelte": "^5.0.0",
+    "codemirror": "^6.0.2",
+    "svelte": "^5.56.4",
+    "svelte-check": "^4.3.4",
+    "svelte-codemirror-editor": "^2.1.0",
+    "typescript": "^5.0.0",
+    "vite": "^8.1.4"
+  }
+}

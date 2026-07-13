@@ -1,0 +1,45 @@
+# motion/tokens.ts 文档
+
+> **版本**: v1.6.0
+> **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
+
+`tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
+
+## 使用规则
+
+1. 基础 duration、easing、scale 起止值先进入 `tokens.ts`。
+2. 组件族 preset 再从 `tokens.ts` 组合出 MotionConfig。
+3. 组件 `.svelte` 引用 preset，不复制 token 数值。
+4. 新数值只有被组件族复用或需要长期维护时才进入本文件。
+
+## 现有 token 族
+
+| token 族 | 使用场景 |
+| :--- | :--- |
+| `MOTION_DURATION_BASE_MS` | Frame 常规状态动效与组件通用 preset 的统一基础时长，当前为 250ms |
+| `MOTION_DURATION_MOVE_MS` | Frame 默认 move spring 的轨迹窗口，当前为 500ms |
+| `MOTION_DURATION_STANDARD_*` | dropdown overlay、generic fallback、dialog 等标准进入 / 退出节奏 |
+| `MOTION_DURATION_RESIZE_MS` | Card、Accordion、Panel 等明确尺寸变化节奏 |
+| `MOTION_DURATION_TAB_INDICATOR_MS` | Tab / Segmented indicator 位置与尺寸同步变化 |
+| `MOTION_DURATION_*` / `MOTION_STAGGER_*` | 通用效果优先引用 250ms 基准；Badge、Tooltip、shake 等专项效果保留精确时长与 stagger |
+| `MOTION_EASING_*` | standard、in-out、linear 以及 Badge / Number / Check 各自精确 bounce 曲线 |
+| `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
+| `MOTION_DISTANCE_*` | text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
+| `MOTION_BLUR_*` | 2px、3px、10px 三档实际 blur 来源 |
+| `MOTION_DURATION_TOOLTIP_*` | Tooltip 专属出现 / 消失节奏 |
+| `MOTION_DELAY_TOOLTIP_APPEAR_MS` | Tooltip 出现动效内部 delay |
+| `MOTION_SCALE_DROPDOWN_*` | Popover、Listbox、Menu dropdown |
+| `MOTION_SCALE_TOOLTIP_*` | Tooltip |
+| `MOTION_SCALE_DIALOG_*` | Dialog / Modal 内容面板 |
+| `MOTION_SCALE_GENERIC_*` | 显式 scale-in 原语、replacement 等需要缩放的 preset；generic appear 本身不再默认消费 |
+| `MOTION_SCALE_ICON_SWAP_FROM` / `MOTION_SCALE_HOVER_*` | Icon 替换与 hover 放大 |
+
+## 变更记录
+
+- v1.6.0 (2026-07-12): 默认位移 damping 从 Rare UI 基线 30 调为临界阻尼 `2 * sqrt(300 * 1) = 34.6410161514`，保留 spring 加减速并去除回弹；基线参数 300 / 30 / 1 保留于本记录供恢复。
+- v1.5.0 (2026-07-12): 默认位移改为 Rare UI Sidebar 同参数 spring，新增 move duration 与 stiffness / damping / mass token。
+- v1.4.0 (2026-07-12): 曾新增默认位移 cubic-bezier；v1.5.0 起由真实 spring 取代。
+- v1.3.0 (2026-06-21): 新增 250ms 基础时长 token，统一 Frame 常规状态资源、尺寸变化、hover、panel 与 emphasis 节奏。
+- v1.2.0 (2026-06-21): 新增 Tab indicator 专属 duration token。
+- v1.1.0 (2026-06-18): 纳入 transitions.dev 精确 duration、easing、distance、blur 与 scale；不再用近似档位覆盖特殊值。
+- v1.0.0 (2026-06-18): 新增 motion token 单一来源。

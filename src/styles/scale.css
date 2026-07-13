@@ -1,0 +1,106 @@
+/*
+ * SnowUI Scale Utilities
+ * v1.5.0
+ *
+ * 目标:
+ * - 组件只需声明比例变量（text/icon/gap/radius/padding）
+ * - 统一计算在通用样式层完成
+ * - 支持 class > props > default 的统一优先级
+ * - 默认仅计算变量，不自动覆盖视觉样式（apply 模式才应用）
+ * - 支持 height / width / mixed / aspect 四种计算依据
+ */
+
+:global(:where(.snowui-scale)) {
+  /* 基础输入变量（组件设置） */
+  --snowui-scale-height-resolved: var(--snowui-scale-height,
+      var(--snowui-scale-height-runtime, 2.5rem));
+  --snowui-scale-width-resolved: var(--snowui-scale-width,
+      var(--snowui-scale-width-runtime, var(--snowui-scale-height-resolved)));
+  --snowui-scale-aspect-ratio-resolved: var(--snowui-scale-aspect-ratio,
+      var(--snowui-scale-aspect-ratio-runtime,
+        calc(var(--snowui-scale-width-resolved) / var(--snowui-scale-height-resolved))));
+  --snowui-scale-aspect-base-ratio-resolved: var(--snowui-scale-aspect-base-ratio,
+      var(--snowui-scale-aspect-base-ratio-prop, 1));
+  --snowui-scale-mix-height-weight-resolved: var(--snowui-scale-mix-height-weight,
+      var(--snowui-scale-mix-height-weight-prop, 0.5));
+  --snowui-scale-mix-width-weight-resolved: calc(1 - var(--snowui-scale-mix-height-weight-resolved));
+  --snowui-scale-basis-size-default: var(--snowui-scale-height-resolved);
+  --snowui-scale-basis-size-resolved: var(--snowui-scale-basis-size,
+      var(--snowui-scale-basis-size-default));
+  --snowui-scale-ratio-text: 0.4;
+  --snowui-scale-ratio-icon: 0.5;
+  --snowui-scale-ratio-gap: 0.2;
+  --snowui-scale-ratio-radius: 0.4;
+  --snowui-scale-ratio-padding-x: 0.4;
+  --snowui-scale-ratio-padding-y: 0.2;
+  --snowui-scale-ratio-border-width: 0.025;
+  --snowui-scale-size-resolved: var(--snowui-scale-size,
+      var(--snowui-scale-size-prop,
+        var(--snowui-scale-size-runtime, var(--snowui-scale-basis-size-resolved))));
+  --snowui-scale-size-ratio-resolved: var(--snowui-scale-size-ratio,
+      var(--snowui-scale-size-ratio-prop, 1));
+  --snowui-scale-icon-ratio-resolved: var(--snowui-scale-icon-ratio,
+      var(--snowui-scale-icon-ratio-prop, var(--snowui-scale-size-ratio-resolved)));
+  --snowui-scale-avatar-ratio-resolved: var(--snowui-scale-avatar-ratio,
+      var(--snowui-scale-avatar-ratio-prop, var(--snowui-scale-size-ratio-resolved)));
+
+  /* 统一计算（默认值） */
+  --snowui-scale-padding-x-default: calc(var(--snowui-scale-basis-size-resolved) * var(--snowui-scale-ratio-padding-x));
+  --snowui-scale-padding-y-default: calc(var(--snowui-scale-basis-size-resolved) * var(--snowui-scale-ratio-padding-y));
+  --snowui-scale-content-height: calc(var(--snowui-scale-basis-size-resolved) - (var(--snowui-scale-padding-y-default) * 2));
+  --snowui-scale-text-size-default: calc(var(--snowui-scale-content-height) * var(--snowui-scale-ratio-text));
+  --snowui-scale-icon-size-default: calc(var(--snowui-scale-size-resolved) * var(--snowui-scale-icon-ratio-resolved));
+  --snowui-scale-avatar-size-default: calc(var(--snowui-scale-size-resolved) * var(--snowui-scale-avatar-ratio-resolved));
+  --snowui-scale-gap-default: calc(var(--snowui-scale-content-height) * var(--snowui-scale-ratio-gap));
+  --snowui-scale-radius-default: calc(var(--snowui-scale-basis-size-resolved) * var(--snowui-scale-ratio-radius));
+  --snowui-scale-border-width-default: calc(var(--snowui-scale-basis-size-resolved) * var(--snowui-scale-ratio-border-width));
+
+  /* 覆盖入口：外部 class 设置这些变量后，默认计算失效 */
+  /* 注意：以下仅计算变量，不直接覆盖视觉属性。视觉属性在 apply 模式下才生效。 */
+}
+
+:global(:where(.snowui-scale[data-scale-apply="true"])),
+:global(:where(.snowui-scale.snowui-scale-apply)) {
+  padding-inline: var(--snowui-scale-padding-x, var(--snowui-scale-padding-x-default));
+  padding-block: var(--snowui-scale-padding-y, var(--snowui-scale-padding-y-default));
+  gap: var(--snowui-scale-gap, var(--snowui-scale-gap-default));
+  border-radius: var(--snowui-scale-radius, var(--snowui-scale-radius-default));
+  font-size: var(--snowui-scale-text-size, var(--snowui-scale-text-size-default));
+  min-height: var(--snowui-scale-min-height, var(--snowui-scale-basis-size-resolved));
+  min-width: var(--snowui-scale-min-width, var(--snowui-scale-basis-size-resolved));
+  box-shadow: inset 0 0 0 var(--snowui-scale-border-width, var(--snowui-scale-border-width-default)) var(--snowui-scale-border-color, transparent);
+  border: var(--snowui-scale-border, 0 solid transparent);
+  box-sizing: border-box;
+}
+
+:global(:where(.snowui-scale[data-scale-basis="width"])) {
+  --snowui-scale-basis-size-default: var(--snowui-scale-width-resolved);
+}
+
+:global(:where(.snowui-scale[data-scale-basis="mixed"])) {
+  --snowui-scale-basis-size-default: calc((var(--snowui-scale-height-resolved) * var(--snowui-scale-mix-height-weight-resolved)) + (var(--snowui-scale-width-resolved) * var(--snowui-scale-mix-width-weight-resolved)));
+}
+
+:global(:where(.snowui-scale[data-scale-basis="aspect"])) {
+  --snowui-scale-basis-size-default: calc(var(--snowui-scale-height-resolved) * (var(--snowui-scale-aspect-ratio-resolved) / var(--snowui-scale-aspect-base-ratio-resolved)));
+}
+
+:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(svg)),
+:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(img)),
+:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(.snowui-icon-wrapper)),
+:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(.snowui-icon)),
+:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(svg)),
+:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(img)),
+:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(.snowui-icon-wrapper)),
+:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(.snowui-icon)) {
+  width: var(--snowui-scale-icon-size, var(--snowui-scale-icon-size-default));
+  height: var(--snowui-scale-icon-size, var(--snowui-scale-icon-size-default));
+}
+
+:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(.snowui-avatar)),
+:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(.snowui-avatar)) {
+  --snowui-scale-avatar-size-resolved: var(--snowui-scale-avatar-size,
+      var(--snowui-scale-avatar-size-default));
+  width: var(--snowui-scale-avatar-size-resolved);
+  height: var(--snowui-scale-avatar-size-resolved);
+}

@@ -1,0 +1,66 @@
+name: Publish OSS
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-oss-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.SNOWUI_GITHUB_ACTIONS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Verify self-contained styles
+        run: pnpm verify:styles
+      - name: Check OSS boundary
+        run: pnpm check:oss
+      - name: Build components
+        run: pnpm build
+      - name: Verify npm package contents
+        run: npm pack --dry-run
+      - name: Verify npm authentication
+        run: npm whoami --registry=https://registry.npmjs.org/
+      - name: Publish components
+        shell: bash
+        run: |
+          set -euo pipefail
+          PACKAGE_NAME="@snowui-design-system/components"
+          VERSION="${GITHUB_REF_NAME#v}"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          if [[ "$VERSION" != "$PACKAGE_VERSION" ]]; then
+            echo "Tag version $VERSION does not match package version $PACKAGE_VERSION" >&2
+            exit 1
+          fi
+
+          if npm view "${PACKAGE_NAME}@${VERSION}" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
+            echo "${PACKAGE_NAME}@${VERSION} already exists; skipping publish."
+            exit 0
+          fi
+
+          case "$VERSION" in
+            *-alpha.*) NPM_TAG=alpha ;;
+            *-beta.*) NPM_TAG=beta ;;
+            *-*) NPM_TAG=next ;;
+            *) NPM_TAG=latest ;;
+          esac
+
+          pnpm publish --access public --no-git-checks --tag "$NPM_TAG"

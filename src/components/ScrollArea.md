@@ -1,0 +1,116 @@
+# ScrollArea（可滚动区域）
+
+> **版本**: v1.1.0
+> **更新**: 2026-06-21
+> **职责**: 提供隐藏原生滚动条、使用 SnowUI 自建滚动条的通用可滚动容器
+> **布局模型**: 复合管理布局
+> **文档**: ./ScrollArea.md
+
+ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步与拖动交互。页面和普通容器只需要声明滚动方向，不需要手写滚动条 DOM 或调用底层 hook。
+
+## 功能概览
+
+- 支持纵向、横向和双轴滚动
+- 隐藏浏览器原生滚动条
+- 内容溢出时启用对应 SnowUI overlay scrollbar；纵向条在鼠标移入区域时使用 Frame 默认动效渐显、移出时渐隐，横向条常显
+- Thumb 支持拖动并与原生滚动位置同步
+- 横向 Thumb 始终为 8px；纵向 Thumb 默认 4px，hover 为 8px
+- 继承 Frame 的布局、状态、动效、响应式和属性透传能力
+
+---
+
+## API 参考
+
+### 核心属性
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| :--- | :--- | :--- | :--- |
+| `axis` | `"vertical" \| "horizontal" \| "both"` | `"vertical"` | 允许滚动的方向 |
+| `ariaLabel` | `string` | `"Scrollable content"` | viewport 的无障碍标签；viewport 使用 `role="region"` |
+| `viewport` | `HTMLElement`（可绑定） | - | 暴露内部可滚动 viewport，供读取或设置原生滚动位置 |
+| `onscroll` | `(event: Event) => void` | - | viewport 原生 scroll 事件 |
+| `children` | `Snippet` | - | 任意可滚动内容 |
+| `...rest` | `FrameProps` | - | 透传到根 Frame，包括 `class`、`style`、尺寸、状态和动效关键字 |
+
+### 基础用法
+
+```svelte
+<ScrollArea style="height: 20rem;">
+    <Frame column>...</Frame>
+</ScrollArea>
+```
+
+### 双轴滚动
+
+```svelte
+<ScrollArea axis="both" style="width: 100%; height: 100dvh;">
+    <Frame width="max-content" minWidth="100%">...</Frame>
+</ScrollArea>
+```
+
+### 选择原则
+
+- 页面或普通容器需要 SnowUI 自建滚动条：使用 ScrollArea。
+- 只需要浏览器原生滚动：直接使用 `overflow`，无需 ScrollArea。
+- 组件内部有特殊 Portal、固定头部或 Pin 区域时，可以继续直接复用 `useOverlayScrollbar`；不得复制滚动条算法或视觉 CSS。
+
+---
+
+> **以下内容供 AI 阅读，用于维护代码与文档的关联**
+
+## 开发者指南 (AI)
+
+### 开发者关键字
+
+| 类别 | 关键字 | 描述 |
+| :--- | :--- | :--- |
+| CSS 根类 | `snowui-scroll-area` | 根 Frame |
+| CSS 宿主类 | `snowui-overlay-scrollbar-host` | 控制纵向滚动条的区域 hover 显隐 |
+| CSS viewport | `snowui-scroll-area-viewport` | 隐藏原生滚动条的实际滚动元素 |
+| CSS 共享类 | `snowui-overlay-scrollbar*` | 轨道与 Thumb 共享视觉 |
+| 通用逻辑 | `useOverlayScrollbar` | 尺寸、位置、滚动同步和拖动 |
+
+### 模块索引
+
+| 模块 | 文件 | 职责 |
+| :--- | :--- | :--- |
+| ScrollArea | [ScrollArea.svelte](./ScrollArea.svelte) | 声明式组件结构与双轴轨道布局 |
+| Overlay scrollbar | [overlay-scrollbar.svelte.ts](../lib/overlay-scrollbar.svelte.ts) | 跨组件共享滚动逻辑 |
+| Scrollbar styles | [scrollbar.css](../styles/scrollbar.css) | 跨组件共享视觉 |
+
+### 关键字映射
+
+| 关键字 | 处理方式 | 说明 |
+| :--- | :--- | :--- |
+| `axis` | `data-scroll-axis` + 条件轨道 | 控制 viewport overflow 与渲染的轨道 |
+| `ariaLabel` | viewport ARIA | 输出 `role="region"` 与 `aria-label` |
+| `viewport` | `$bindable` | 绑定内部滚动元素 |
+| `onscroll` | viewport 事件 | 不挂到根 Frame |
+| `...rest` | Frame 透传 | 根组件继续承接 Frame 能力 |
+
+### Frame 集成
+
+- 根层使用 OSS Frame。
+- `enableResponsive=true`、`enableContext=true`、`enableScaleObserver=false`、`enableDefaultMotion=true` 均显式设置。
+- 根 Frame 只管理组件级外层状态与动效；滚动 Thumb 属于共享专项内部能力。
+- ScrollArea 不使用三槽位布局，不创建 padding、gap 或 radius 默认值。
+
+### 关联关系
+
+- **依赖**: Frame、`useOverlayScrollbar`、`scrollbar.css`
+- **同类参考**: Card、Textarea、Listbox、CodeBlock
+
+---
+
+## 更新日志 (Changelog)
+
+### v1.1.0 (2026-06-21)
+
+- 纵向滚动条默认隐藏，鼠标移入 ScrollArea 区域时使用 Frame 默认动效渐显、移出时渐隐；横向滚动条保持溢出时常显。
+
+### v1.0.0 (2026-06-21)
+
+#### 新功能
+
+- 新增纵向、横向和双轴 SnowUI 自建滚动区域。
+- 将页面/容器使用所需的 viewport、轨道、Thumb 和拖动逻辑封装为声明式组件。

@@ -1,0 +1,147 @@
+/*
+ * SnowUI 主题同步文件。
+ * 仅允许项目所有者手动修改；每次必须同时修改以下两份文件并保持内容完全一致：
+ * - [项目目录]/snowui/styles/snowui-themes.css
+ * - [项目目录]/snowui/components/src/styles/themes.css
+ * AI、自动脚本和发布流程只能校验一致性，不得自动覆盖任一文件。
+ */
+
+/*
+  SnowUI 设计系统 CSS - Themes 模块 v1.2.0
+  包含所有颜色定义：Static, Default (Light), Dark, iOS
+
+  Changelog:
+  - 2026-03-21: 重构架构 (v1.2.0)，利用 CSS 层叠精简冗余，实现“基础+增量”声明模式。
+*/
+/*
+下一步:
+创建None, Small, Medium, Large圆角类型.
+创建以辅助色作为主色的颜色主题.
+创建字体主题. (Inter, Noto Sans, Nunito Sans, Figtree.)
+创建间距和大小主题.
+创建4-6种不同主题的组合风格.
+*/
+
+:root {
+    /* Font Families */
+    --font-mono: 'Menlo', 'Monaco', 'Courier New', monospace;
+    --font-inter: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-noto: 'Noto Sans', sans-serif;
+    --font-nunito: 'Nunito Sans', sans-serif;
+    --font-figtree: 'Figtree', sans-serif;
+
+    /* Font Family (Default) */
+    --font-family: var(--font-inter);
+
+    /* === Static Colors（固定颜色，不随主题变化） === */
+    --static-black-100: #000000FF;
+    --static-black-80: #000000CC;
+    --static-black-40: #00000066;
+    --static-black-20: #00000033;
+    --static-black-10: #0000001A;
+    --static-black-4: #0000000A;
+    --static-white-100: #FFFFFFFF;
+    --static-white-80: #FFFFFFCC;
+    --static-white-40: #FFFFFF66;
+    --static-white-20: #FFFFFF33;
+    --static-white-10: #FFFFFF1A;
+    --static-white-4: #FFFFFF0A;
+
+    /* === SnowUI Light 主题（默认） === */
+    --black-100: #000000FF;
+    --black-80: #000000CC;
+    --black-40: #00000066;
+    --black-20: #00000033;
+    --black-10: #0000001A;
+    --black-4: #0000000A;
+    --white-100: #FFFFFFFF;
+    --white-80: #FFFFFFCC;
+    --white-40: #FFFFFF66;
+    --white-20: #FFFFFF33;
+    --white-10: #FFFFFF1A;
+    --white-4: #FFFFFF0A;
+    --background-1: #FFFFFFFF;
+    --background-2: #F9F9FAFF;
+    --background-3: #FFFFFFE5;
+    --surface-1: #FFFFFFCC;
+    --surface-2: #00000008;
+    --surface-3: #00000005;
+    --secondary-purple: #B899EBFF;
+    --secondary-indigo: #ADADFBFF;
+    --secondary-blue: #7DBBFFFF;
+    --secondary-cyan: #A0BCE8FF;
+    --secondary-mint: #6BE6D3FF;
+    --secondary-green: #71DD8CFF;
+    --secondary-yellow: #FFCC00FF;
+    --secondary-orange: #FFB55BFF;
+    --secondary-red: #FF4747FF;
+    --foreground: var(--black-100);
+    --background: var(--background-1);
+    --primary: var(--black-100);
+    --logo-1: #4C98FDFF;
+    --logo-2: #4F507FFF;
+    --color-1: #E6F1FDFF;
+    --color-2: #EDEEFCFF;
+}
+
+/* === SnowUI Dark 主题 (通用暗色模式) === */
+[theme='dark'] {
+    --black-100: #FFFFFFFF;
+    --black-80: #FFFFFFCC;
+    --black-40: #FFFFFF66;
+    --black-20: #FFFFFF33;
+    --black-10: #FFFFFF26;
+    --black-4: #FFFFFF1A;
+    --white-100: #000000FF;
+    --white-80: #000000CC;
+    --white-40: #00000066;
+    --white-20: #00000033;
+    --white-10: #0000001A;
+    --white-4: #0000000A;
+    --background-1: #333333FF;
+    --background-2: #FFFFFF0A;
+    --background-3: #404040E5;
+    --surface-1: #FFFFFF0A;
+    --surface-2: #0000001A;
+    --surface-3: #FFFFFF0A;
+    --primary: var(--secondary-indigo);
+    --logo-2: #EDEDFFFF;
+    --color-1: #E6F1FDFF;
+    --color-2: #EDEEFCFF;
+}
+
+/* === iOS Light === */
+[mode='ios'] {
+    --background-1: #F5F5F6FF;
+    --background-2: #FFFFFFFF;
+    --surface-1: #FFFFFFFF;
+    --secondary-purple: #AF52DEFF;
+    --secondary-indigo: #5856D6FF;
+    --secondary-blue: #007AFFFF;
+    --secondary-cyan: #32ADE6FF;
+    --secondary-mint: #00C7BEFF;
+    --secondary-green: #34C759FF;
+    --secondary-orange: #FF9500FF;
+    --secondary-red: #FF3B30FF;
+    --primary: var(--secondary-blue);
+    --logo-1: var(--primary);
+    --color-1: #E7EBF5FF;
+    --color-2: #E7E7EEFF;
+}
+
+/* === iOS Dark === */
+[mode='ios'][theme='dark'] {
+    --secondary-purple: #BF5AF2FF;
+    --secondary-indigo: #5E5CE6FF;
+    --secondary-blue: #0A84FFFF;
+    --secondary-cyan: #64D2FFFF;
+    --secondary-mint: #63E6E2FF;
+    --secondary-green: #30D158FF;
+    --secondary-yellow: #FFD60AFF;
+    --secondary-orange: #FF9F0AFF;
+    --secondary-red: #FF453AFF;
+    --primary: var(--secondary-blue);
+    --logo-1: var(--primary);
+    --color-1: #E7EBF5FF;
+    --color-2: #E7E7EEFF;
+}

@@ -1,0 +1,281 @@
+<!-- 可排序、可调整列宽的表头单元格。文档: ./TableHead.md -->
+<script lang="ts">
+     import { untrack, type Snippet } from "svelte";
+    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import Frame, { type FrameProps } from "./Frame.svelte";
+    import Indicator from "./Indicator.svelte";
+    import Checkbox from "./Checkbox.svelte";
+    import { getTableContext, type TableColumnRegistration, type TableRoleLayout } from "../lib/table-context.svelte";
+    import { createProgressiveBlurStyles, createUniformBlurStyles, type ProgressiveBlurDirection } from "../lib/progressive-blur";
+    import {
+        type ComponentPartsOf,
+    } from "../logic/component-parts.svelte";
+    function columnScope(node: HTMLElement) {
+        node.setAttribute("scope", "col");
+    }
+    interface Props extends Omit<FrameProps, "children"> {
+        columnId?: string;
+        label?: string;
+        sortDirection?: "ascending" | "descending";
+        defaultSort?: "ascending" | "descending";
+        defaultSortActive?: boolean;
+        roleLayout?: TableRoleLayout;
+        onSortChange?: (direction: "ascending" | "descending" | undefined) => void;
+        resizable?: boolean;
+        minWidth?: number;
+        maxWidth?: number;
+        align?: "start" | "center" | "end";
+        children?: Snippet;
+        parts?: ComponentPartsOf<{
+            Indicator: typeof Indicator;
+            Checkbox: typeof Checkbox;
+        }>;
+        [key: string]: any;
+    }
+    let { columnId = undefined, label = undefined, as: role = undefined, sortDirection = undefined, defaultSort = undefined, defaultSortActive = false, roleLayout = undefined, onSortChange = undefined, resizable: canResize = false, minWidth = 64, maxWidth = Infinity, align = "start", children, parts = undefined, class: userClass = "", style: userStyle = "", use: userActions = [], enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
+    const table = getTableContext();
+    const selectionEnabled = $derived(table.isSelectionEnabled());
+    const actionsEnabled = $derived(table.isActionsEnabled());
+    /** DataTable 关闭对应角色列时，markup 中的 as=selection/actions 整列不渲染 */
+    const isRoleColumnHidden = $derived(
+        table.isDataTable()
+            && ((role === "selection" && !selectionEnabled)
+                || (role === "actions" && !actionsEnabled)),
+    );
+    const isSelectionRole = $derived(
+        table.isDataTable() && role === "selection" && selectionEnabled,
+    );
+    const isActionsRole = $derived(
+        table.isDataTable() && role === "actions" && actionsEnabled,
+    );
+    const resolvedColumnId = $derived(
+        isSelectionRole ? "__selection" : isActionsRole ? "__actions" : columnId,
+    );
+    const columnRegistration: TableColumnRegistration = {
+        get columnId() { return resolvedColumnId; },
+        get label() { return label ?? columnId; },
+        get sortable() { return isSortable; },
+        get role() { return isSelectionRole ? "selection" : isActionsRole ? "actions" : undefined; },
+        get align() { return align; },
+    };
+    // registerColumn 会读写 registeredColumns；必须 untrack，否则 $effect 自触发死循环
+    $effect(() => {
+        if (isRoleColumnHidden) return;
+        return untrack(() => table.registerColumn(columnRegistration));
+    });
+    const tableVariant = $derived(table.getVariant());
+    const resolvedRoleLayout = $derived(roleLayout ?? table.getRoleLayout());
+    const width = $derived(resolvedColumnId ? table.getColumnWidth(resolvedColumnId) : undefined);
+    const sort = $derived(table.getSort());
+    const selectionState = $derived(table.getSelectionState());
+    const contextDefaultSort = $derived(table.getDefaultSort());
+    const contextDefaultSortActive = $derived(table.getDefaultSortActive());
+    const isSortable = $derived(
+        !isSelectionRole
+        && !isActionsRole
+        && columnId !== undefined
+        && (defaultSort !== undefined
+        || sortDirection !== undefined
+        || onSortChange !== undefined
+        || table.isSortable(columnId)),
+    );
+    const direction = $derived(sortDirection ?? (columnId && sort?.columnId === columnId ? sort.direction : undefined));
+    const isDefaultSortColumn = $derived(contextDefaultSort?.columnId === columnId);
+    const isDefaultColumnBaseline = $derived(
+        isDefaultSortColumn && direction === contextDefaultSort?.direction,
+    );
+    const isSortActive = $derived(
+        direction !== undefined
+        && (!isDefaultColumnBaseline || contextDefaultSortActive),
+    );
+    const finalUse = $derived([
+        ...(Array.isArray(userActions) ? userActions : []),
+        columnScope,
+    ]);
+    const finalStyle = $derived(`${width ? `--snowui-table-head-width-runtime:${width}px;width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));min-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));max-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime))` : ""};text-align:${align};${userStyle}`);
+    $effect(() => {
+        const declaredDefaultSort = defaultSort;
+        const declaredColumnId = columnId;
+        const declaredDefaultSortActive = defaultSortActive;
+        if (!declaredDefaultSort || !declaredColumnId || isSelectionRole || isActionsRole) return;
+        return untrack(() =>
+            table.registerDefaultSort(
+                declaredColumnId,
+                declaredDefaultSort,
+                declaredDefaultSortActive,
+            ),
+        );
+    });
+    function toggleSort() {
+        if (!columnId) return;
+        if (onSortChange) {
+            onSortChange(direction === undefined ? "ascending" : direction === "ascending" ? "descending" : undefined);
+            return;
+        }
+        table.toggleSort(columnId);
+    }
+    function buildRoleOverlayBlur(direction: ProgressiveBlurDirection) {
+        const options = {
+            direction,
+            layerCount: table.getRoleOverlayLayers(),
+            width: "var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3))",
+            sampleExtension: "var(--snowui-table-role-overlay-sample-extension-override, 4rem)",
+            maxBlur: "var(--snowui-table-role-overlay-blur-override, 0rem)",
+            minBlur: "0rem",
+            leadWidthRatio: 0.1,
+            endRatio: 0.72,
+            featherRatio: 2.8,
+            tailOpacity: 0,
+            edgeFeatherRatio: table.getRoleOverlayUniformFeather(),
+            tintColor: "#ffffff",
+            tintOpacity: "var(--snowui-table-role-overlay-tint-opacity-override, 0%)",
+        };
+        return table.getRoleOverlayBlurMode() === "uniform"
+            ? createUniformBlurStyles(options)
+            : createProgressiveBlurStyles(options);
+    }
+    const selectionBlur = $derived(buildRoleOverlayBlur("left-to-right"));
+    const actionsBlur = $derived(buildRoleOverlayBlur("right-to-left"));
+    const selectionContentBlur = $derived(buildRoleOverlayBlur("left-to-right"));
+    const actionsContentBlur = $derived(buildRoleOverlayBlur("right-to-left"));
+</script>
+
+{#if !isRoleColumnHidden}
+<Frame tag="th" aria-sort={!isSelectionRole && !isActionsRole ? direction ?? (isSortable ? "none" : undefined) : undefined} data-column-id={resolvedColumnId} data-sort={direction} data-selected={selectionState.some || selectionState.all ? "true" : undefined} data-table-variant={tableVariant} data-role-layout={isSelectionRole || isActionsRole ? resolvedRoleLayout : undefined} as={isSelectionRole || isActionsRole ? role : undefined} class={`snowui-table-head ${userClass}`} style={finalStyle} use={finalUse} enableAutoLayout={false} enableResponsive={enableResponsive} enableContext={enableContext} enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
+    {#if isSelectionRole}
+        <span class="snowui-table-selection-control">
+            <span class="snowui-table-role-blur-layer" style={selectionBlur.containerStyle} aria-hidden="true">
+                {#each selectionBlur.layers as layer (layer.index)}
+                    <span style={layer.style}></span>
+                {/each}
+            </span>
+            <Checkbox
+                size={16}
+                checked={selectionState.all}
+                indeterminate={selectionState.some}
+                ariaLabel="选择全部当前行"
+                onCheckedChange={(checked) => table.setAllRowsSelected(checked)}
+            />
+        </span>
+    {:else if isActionsRole}
+        {#if children}<span class="snowui-table-head-content snowui-table-head-content-static">
+            <span class="snowui-table-role-blur-layer" style={actionsBlur.containerStyle} aria-hidden="true">
+                {#each actionsBlur.layers as layer (layer.index)}
+                    <span style={layer.style}></span>
+                {/each}
+            </span>
+            {@render children()}
+        </span>{/if}
+    {:else if isSortable}
+        <button class="snowui-table-sort" type="button" data-active={isSortActive ? "true" : undefined} onclick={toggleSort}>
+            <span class="snowui-table-head-content">{#if children}{@render children()}{/if}</span>
+            {#if isSortActive && direction === "ascending"}
+                <ResourceIcon name="arrows-up" class="snowui-table-sort-icon" size={16} aria-hidden="true" />
+            {:else if isSortActive && direction === "descending"}
+                <ResourceIcon name="arrows-down" class="snowui-table-sort-icon" size={16} aria-hidden="true" />
+            {/if}
+        </button>
+    {:else}
+        <span class="snowui-table-head-content snowui-table-head-content-static">{#if children}{@render children()}{/if}</span>
+    {/if}
+    {#if !isSelectionRole && !isActionsRole}
+        <span class="snowui-table-head-selection-blur-proxy" style={selectionContentBlur.containerStyle} aria-hidden="true">
+            {#each selectionContentBlur.layers as layer (layer.index)}
+                <span style={layer.style}></span>
+            {/each}
+        </span>
+        <span class="snowui-table-head-actions-blur-proxy" style={actionsContentBlur.containerStyle} aria-hidden="true">
+            {#each actionsContentBlur.layers as layer (layer.index)}
+                <span style={layer.style}></span>
+            {/each}
+        </span>
+    {/if}
+    {#if canResize && resolvedColumnId && !isSelectionRole && !isActionsRole}
+        <Indicator
+            class="snowui-table-head-indicator"
+            axis="width"
+            value={width}
+            minSize={minWidth}
+            maxSize={maxWidth}
+            applySize={false}
+            ariaLabel={`调整 ${resolvedColumnId} 列宽`}
+            onSizeChange={(next) => table.setColumnWidth(resolvedColumnId, next)}
+        />
+    {/if}
+</Frame>
+{/if}
+
+<style>
+    :global(:where(.snowui-table-head)) { position: relative; box-sizing: border-box; height: var(--size-10, 2.5rem); padding: var(--snowui-table-head-padding-override, var(--padding-2, .5rem) var(--padding-3, .75rem)); border-bottom: var(--border-1, .5px) solid var(--black-20, #0003); color: var(--black-100, #000); font-size: var(--text-12, .75rem); line-height: var(--leading-12, 1rem); font-weight: 400; vertical-align: middle; overflow: visible; }
+    :global(:where(.snowui-table-head[data-as="selection"])) { width: var(--size-10); padding: var(--snowui-table-head-selection-padding-override, var(--padding-2) var(--padding-3)); }
+    :global(:where(.snowui-table-head[data-as="actions"])) { width: var(--size-10); padding: var(--snowui-table-head-actions-padding-override, var(--padding-2) var(--padding-3)); text-align: end; }
+    :global(:where(.snowui-table-selection-control)) { display: flex; width: 100%; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
+    :global(:where(.snowui-table-head[data-as="selection"]:not([data-role-layout="overlay"]):hover, .snowui-table-head[data-as="selection"]:not([data-role-layout="overlay"]):has(:focus-visible)) .snowui-table-selection-control) { opacity: 1; pointer-events: auto; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"])),
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="actions"])) { position: sticky; width: 0; min-width: 0; max-width: 0; padding: 0; overflow: visible; background: transparent; z-index: 4; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"])) { left: 0; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="actions"])) { right: 0; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"] .snowui-table-selection-control)),
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="actions"] .snowui-table-head-content-static)) { position: absolute; inset-block: 0 calc(-1 * var(--border-1, .5px)); display: flex; width: var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3)); align-items: center; overflow: visible; pointer-events: none; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"] .snowui-table-selection-control)) { width: var(--size-10, 2.5rem); inset-inline-start: 0; justify-content: flex-start; padding-inline: var(--padding-3); border-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)); }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="actions"] .snowui-table-head-content-static)) { inset-inline-end: 0; justify-content: flex-end; padding-inline: var(--padding-3); border-radius: 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"] .snowui-table-selection-control)),
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="actions"] .snowui-table-head-content-static)) { opacity: 1; pointer-events: none; transition: none; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"] .snowui-table-role-blur-layer)) { opacity: 0; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
+    :global(:where(.snowui-table-header:hover) .snowui-table-head[data-role-layout="overlay"] .snowui-table-role-blur-layer) { opacity: 0; }
+    :global(:where(.snowui-table-head-selection-blur-proxy)),
+    :global(:where(.snowui-table-head-actions-blur-proxy)) { opacity: 0; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
+    :global(:where(.snowui-table-header:hover) .snowui-table-head[data-role-layout="overlay"][data-as="selection"] + .snowui-table-head .snowui-table-head-selection-blur-proxy),
+    :global(:where(.snowui-table-header:hover) .snowui-table-head:has(+ .snowui-table-head[data-role-layout="overlay"][data-as="actions"]) .snowui-table-head-actions-blur-proxy) { opacity: 1; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"] .snowui-table-selection-control) > :not(.snowui-table-role-blur-layer)),
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="actions"] .snowui-table-head-content-static) > :not(.snowui-table-role-blur-layer)) { position: relative; z-index: 1; }
+    :global(:where(.snowui-table-head[data-role-layout="overlay"] .snowui-table-selection-control) > :not(.snowui-table-role-blur-layer)),
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="actions"] .snowui-table-head-content-static) > :not(.snowui-table-role-blur-layer)) { opacity: 0; pointer-events: none; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
+    /* overlay 全选 Checkbox 只在 hover 第一列可见表头时显示；直接 hover / 聚焦
+       Checkbox 浮层时继续保持显示，避免指针从标题移入控件时闪退。 */
+    :global(:where(.snowui-table-header .snowui-table-row:has(> .snowui-table-head[data-role-layout="overlay"][data-as="selection"] + .snowui-table-head:hover)) .snowui-table-head[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control > :not(.snowui-table-role-blur-layer)),
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"]:hover, .snowui-table-head[data-role-layout="overlay"][data-as="selection"]:has(:focus-visible)) .snowui-table-selection-control > :not(.snowui-table-role-blur-layer)) { opacity: 1; pointer-events: auto; }
+    :global(:where(.snowui-table-sort)) { display: flex; width: 100%; min-width: 0; align-items: center; justify-content: inherit; gap: 0; padding: 0; border: 0; color: inherit; font: inherit; text-align: inherit; background: transparent; opacity: .4; cursor: pointer; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
+    :global(:where(.snowui-table-sort:hover)),
+    :global(:where(.snowui-table-sort:focus-visible)),
+    :global(:where(.snowui-table-sort[data-active="true"])) { opacity: 1; }
+    :global(:where(.snowui-table-head-content)) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    :global(:where(.snowui-table-head-content-static)) { opacity: .4; }
+    :global(:where(.snowui-table-sort-icon)) { display: block; flex: 0 0 auto; width: var(--size-4, 1rem); height: var(--size-4, 1rem); color: inherit; }
+    /*
+     * 命中带沿用 Indicator line 全高协议；视觉恢复表头规格：
+     * 1px × 16px、贴列右缘、垂直居中；hover/drag 加粗到 2px（与改前一致）。
+     * 保持 Level 2 :where() 低权重约束；由组件样式加载顺序覆盖 Indicator 默认视觉。
+     */
+    :global(:where(.snowui-table-head > .snowui-table-head-indicator)) {
+        z-index: 1;
+    }
+
+    :global(:where(.snowui-table-head > .snowui-table-head-indicator > .snowui-indicator-visual)) {
+        top: 50%;
+        right: 0;
+        left: auto;
+        width: calc(var(--size-3, 0.75rem) / 12);
+        height: var(--size-4, 1rem);
+        transform: translateY(-50%);
+    }
+
+    :global(:where(.snowui-table-head > .snowui-table-head-indicator:hover > .snowui-indicator-visual)),
+    :global(:where(.snowui-table-head > .snowui-table-head-indicator:focus-visible > .snowui-indicator-visual)) {
+        width: calc(var(--size-3, 0.75rem) / 6);
+    }
+    :global(:where(.snowui-table-head[data-table-variant="striped"])) { border-bottom-color: transparent; }
+    :global(:where(.snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"]):hover), .snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"])[data-force-hover="true"])) .snowui-table-head:not([data-table-variant="striped"])) { border-bottom-color: transparent; }
+    /* 表头内容渐隐过渡（mask-image），触发条件见下方规则。 */
+    :global(:where(.snowui-table-head-content)) {
+        transition:
+            -webkit-mask-image var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out),
+            mask-image var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out);
+    }
+    /* overlay 模式下，第一列标题的渐隐与全选 Checkbox 使用同一触发条件。 */
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"] + .snowui-table-head:hover) .snowui-table-head-content),
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"]:hover, .snowui-table-head[data-role-layout="overlay"][data-as="selection"]:has(:focus-visible)) + .snowui-table-head .snowui-table-head-content) {
+        -webkit-mask-image: var(--snowui-table-head-fade-mask);
+        mask-image: var(--snowui-table-head-fade-mask);
+    }
+</style>

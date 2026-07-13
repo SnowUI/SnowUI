@@ -1,0 +1,164 @@
+<!-- CopyButton：以真实 Button 为宿主的剪贴板复制按钮。 -->
+<script lang="ts">
+    import { onDestroy, type ComponentProps, type Snippet } from "svelte";
+    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import Button from "./Button.svelte";
+    import Frame from "./Frame.svelte";
+    import { writeClipboardText } from "../lib/clipboard";
+    import {
+        mergeComponentPartProps,
+        useComponentPart,
+    } from "../logic/component-parts.svelte";
+
+    type ButtonProps = ComponentProps<typeof Button>;
+    interface Props extends Omit<
+        ButtonProps,
+        | "children"
+        | "onclick"
+        | "disabled"
+        | "currentState"
+        | "stateContent"
+        | "whileActive"
+        | "Click"
+        | "Active"
+    > {
+        text?: string;
+        getText?: () => string | Promise<string>;
+        feedbackDuration?: number;
+        showText?: boolean;
+        ariaLabel?: string;
+        disabled?: boolean;
+        children?: Snippet;
+        icon?: Snippet;
+        successIcon?: Snippet;
+        successContent?: Snippet;
+        onCopy?: (text: string) => void;
+        onCopyError?: (error: unknown) => void;
+        onclick?: (event: MouseEvent) => void;
+        [key: string]: any;
+    }
+
+    const inheritedCopyButtonPart = useComponentPart<Props>("CopyButton");
+    let explicitProps: Props = $props();
+    let {
+        text = undefined,
+        getText = undefined,
+        feedbackDuration = 1600,
+        showText = true,
+        ariaLabel = undefined,
+        disabled = false,
+        children,
+        icon,
+        successIcon,
+        successContent,
+        onCopy,
+        onCopyError,
+        onclick,
+        whileClick: userWhileClick = undefined,
+        ...rest
+    }: Props = $derived(
+        mergeComponentPartProps(
+            inheritedCopyButtonPart.current,
+            explicitProps,
+        ),
+    );
+
+    let status = $state<"idle" | "pending" | "success" | "error">("idle");
+    let resetTimer: ReturnType<typeof setTimeout> | undefined;
+    const iconFrameProps = { "aria-hidden": "true" as const };
+
+    async function handleClick(event: MouseEvent) {
+        if (disabled || status !== "idle") {
+            event.preventDefault();
+            return;
+        }
+        onclick?.(event);
+        status = "pending";
+        try {
+            const resolvedText = getText ? await getText() : (text ?? "");
+            await writeClipboardText(resolvedText);
+            status = "success";
+            onCopy?.(resolvedText);
+        } catch (error) {
+            status = "error";
+            onCopyError?.(error);
+        }
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => {
+            status = "idle";
+        }, Math.max(0, feedbackDuration));
+    }
+
+    onDestroy(() => clearTimeout(resetTimer));
+</script>
+
+{#snippet idleIcon()}
+    {#if icon}
+        {@render icon()}
+    {:else}
+        <ResourceIcon name="copy" size={16} aria-hidden="true" />
+    {/if}
+{/snippet}
+
+{#snippet copiedIcon()}
+    {#if successIcon}
+        {@render successIcon()}
+    {:else if successContent}
+        {@render successContent()}
+    {:else}
+        <ResourceIcon name="check" size={16} aria-hidden="true" />
+    {/if}
+{/snippet}
+
+<Button
+    {...rest}
+    {disabled}
+    data-copy-button
+    data-copy-status={status}
+    aria-label={ariaLabel ??
+        (showText ? undefined : status === "success" ? "已复制" : "复制")}
+    aria-live="polite"
+    aria-busy={status === "pending" ? "true" : undefined}
+    whileClick={status === "idle" ? userWhileClick : false}
+    onclick={handleClick}
+>
+    <Frame
+        {...iconFrameProps}
+        tag="span"
+        enableResponsive={false}
+        enableContext={false}
+        enableScaleObserver={false}
+        currentState={status === "success" ? "Active" : "Idle"}
+        whileActive={{ duration: feedbackDuration, opacity: [1, 1] }}
+        stateContent={{
+            Idle: idleIcon,
+            Active: copiedIcon,
+        }}
+    />
+    {#if showText}
+        {#if children}
+            {@render children()}
+        {:else}
+            复制
+        {/if}
+    {/if}
+</Button>
+
+<style>
+    /* CopyButton 自己管理 bare 状态的透明度与交互光标。反馈期内即使仍被
+       hover，也保持常态透明度，避免复制成功时按钮突然闪亮。 */
+    :global(:where(.snowui-button)[data-copy-button]) {
+        cursor: pointer;
+    }
+
+    :global(
+        :where(.snowui-button.snowui-button-bare)[data-copy-button][data-copy-status]:not(
+                [data-copy-status="idle"]
+            )
+    ) {
+        opacity: var(
+            --snowui-copy-button-feedback-opacity,
+            var(--snowui-state-opacity, 0.4)
+        );
+    }
+</style>

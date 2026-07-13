@@ -1,0 +1,287 @@
+# Listbox.svelte 文档
+
+## 默认内置模式 / 显式组合模式
+
+- 默认内置模式（推荐）：`items` 自动生成固定搜索框与 `<MenuItem as="item">`，默认最大高度为 `200px`，内容溢出时显示浮层滚动条；通过 `parts.Input` / `parts.MenuItem` 配置内置组件。
+- 显式组合模式：显式书写 MenuItem，用于复杂内容或逐项 Props 差异；存在 children 时不再生成 items。
+
+默认内置模式可用 `search={false}` 隐藏搜索框、`maxHeight` 修改最大高度、`scrollbar={false}` 隐藏浮层滚动条。搜索框默认 placeholder 为“搜索”，有搜索框时面板默认最小宽度为 160px。显式组合模式使用 `search` 时同样自动插入 Input；不设置时也可手动书写 `<Input as="search">`。`maxHeight` 与 `scrollbar` 始终作为 Listbox 面板能力生效。
+
+> **版本**: v1.2.2
+> **状态**: 已实现
+> **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局；补充关键字表格、用户定义区与更新日志，以满足组件开发链路检查。
+> **职责**: 浮层选项列表面板，作为 Select 的下拉面板。Portal 到 body，position:fixed 定位，选中项中心对齐 Trigger，遵循 Quick Action 视觉规范。支持内嵌 `<Input as="search">` 搜索/过滤。
+
+**2026-04-24 更新（v1.2.0）**: 滚动条间距规范化 — `.snowui-listbox` 使用 `overflow-y: scroll` + `scrollbar-width: none` 隐藏原生滚动条，并通过 `.snowui-listbox-body` 内的自定义浮层滚动条显示滚动位置。MenuItem 背景左右间距保持 8px；滚动条覆盖在右侧，不占布局宽度，右边缘距面板右边框 4px。带搜索 Input 时，滚动条只出现在 Input 下方的 MenuItem 滚动区域。Thumb 支持鼠标拖拽；打开定位用选中项相对 portal 的真实视觉中心计算，兼容有无顶部 Input 的结构。
+
+**2026-04-20 更新**: 搜索/自定义值支持 — `<Input as="search">` 放入 `<Listbox>` 可自动接入过滤逻辑；`allowCustomValue` 允许添加自定义项并支持 hover 删除。移除 Combobox 依赖，`Combobox.svelte` 已废弃。
+
+**自动布局协议**: Listbox 外层 portal anchor 只负责 `position:fixed` 定位与尺寸注入；真正的浮层面板由内层 `Frame column` 承担，使用 `.snowui-quick-action-panel` 共享视觉基类，并显式引用 `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION`。该 preset 只包含 opacity，不包含 scale；具体 duration / easing 以 motion preset catalog 为准，关闭时保留面板到 disappear preset 完成后再卸载。portal 通过 `LISTBOX_HEADER_PORTAL_KEY` context 暴露 `headerEl` 引用；`Input as="search"` 挂载后自动移入 `headerEl`（`.snowui-listbox-header.snowui-quick-action-panel-header`），不参与滚动。Listbox 与 QuickAction 共用同一套 `header + scroll-body` 结构与间距规则；唯一视觉差异只保留在外层面板 padding。为避免 `Frame column` 的 auto-layout 默认 `gap: 8px` 干扰浮层布局，Listbox 根层和 QuickAction 一样显式覆盖为 `gap: 0`。MenuItem 留在 `.snowui-listbox-body.snowui-quick-action-panel-scroll-body > .snowui-listbox`（flex:1; min-height:0; overflow-y:scroll; scrollbar-width:none）独立滚动。自定义浮层滚动条挂载在 `.snowui-listbox-body` 内，定位只覆盖实际滚动的 MenuItem 区域，不进入 Input 区域；滚动条覆盖在右侧，不占布局宽度。间距分工明确：面板 padding 定位 Input 与列表外边距，共享 header 规则负责搜索框与列表的内部衔接，MenuItem 自身 padding 定位选项背景和内容间距。无重复，无冲突。浮层滚动条默认可见宽 4px、距面板右边框 4px、thumb hover 时可见宽 8px 并从右向左增粗。
+
+---
+
+## 布局模型
+
+主布局模型：复合管理布局。
+
+- Listbox 的区域结构为 portal anchor / panel / header / scroll body / option list / overlay scrollbar。
+- Header 与滚动体复用 QuickAction 的面板区域规范；选项行优先复用 `MenuItem` 的槽位宿主布局。
+- `Input as="search"` 只作为固定 header 内容移入，不参与滚动列表布局。
+- Listbox 不注册为三槽位宿主，也不把 Portal 定位、滚动条和搜索区抽象成通用布局；这些都属于复合组件私有管理逻辑。
+
+## 架构
+
+Listbox 是纯 UI 浮层组件，不感知 `name` / `form` / `required` 等表单属性。通过 `ListboxOwnerContext`（由 Select 通过 `setContext` 提供）获取展开状态、定位锚点、选项数据等信息。
+
+```
+Portal anchor div (position:fixed; width/max-height only)
+└── Frame column (.snowui-listbox-portal .snowui-quick-action-panel, dropdown overlay preset)
+    ├── .snowui-listbox-header .snowui-quick-action-panel-header  ← Input 挂载后自动移入此处，不参与滚动
+    └── .snowui-listbox-body .snowui-quick-action-panel-scroll-body
+        ├── Frame column (snowui-listbox, flex:1, min-height:0, overflow-y:scroll, scrollbar-width:none)
+        │   ├── MenuItem (role="option")
+        │   ├── MenuItem (role="option")
+        │   └── ...（用户自定义项排在静态项之后）
+        └── .snowui-listbox-scrollbar (position:absolute; top:0; bottom:0)
+```
+
+### 定位逻辑
+
+- Portal 到 `document.body`，`position: fixed` 逃出 overflow:hidden
+- 宽度：与锚点（Field 或 Select 容器）等宽
+- `matchTriggerWidth={false}` 时不继承锚点宽度，浮层按最长选项 Hug；所有选项在确定的面板宽度内 fill
+- 垂直：选中项中心与 Trigger 中心对齐（无选中值时取中间项）；计算基于 `getBoundingClientRect()` 的真实视觉位置，兼容有无搜索 Input
+- 最大高度：默认 `200px`；通过 `maxHeight` 配置，并继续兼容 inline `style="max-height: ..."` 覆盖
+- 每次打开前重新计算位置
+
+### 与宿主的关系
+
+| 宿主 | Context 提供者 | 通信方式 |
+| :--- | :--- | :--- |
+| Select | Select 通过 `setContext(LISTBOX_OWNER_CONTEXT_KEY, ...)` | `ListboxOwnerContext` |
+
+---
+
+## 组件 Props（草案）
+
+| 属性 | 类型 | 默认值 | 描述 |
+| :--- | :--- | :--- | :--- |
+| `open` | `boolean` | `false` | 控制浮层显示，可 `bind:open` |
+| `options` | `ListboxOption[]` | `[]` | 选项数据（与 children 二选一）|
+| `value` | `string \| string[]` | — | 当前选中值 |
+| `multiple` | `boolean` | `false` | 多选模式 |
+| `placement` | `'top' \| 'bottom'` | `'bottom'` | 浮层方向 |
+| `children` | `Snippet` | — | 自定义选项内容（传入 `<ListboxOption>` 子项）|
+| `items` | `ListboxItem[]` | `[]` | 默认内置模式的稳定选项数据 |
+| `search` | `boolean` | `true` | 默认内置模式是否生成固定搜索框 |
+| `maxHeight` | `number \| string` | `200` | 面板最大高度；数字按 px 处理 |
+| `scrollbar` | `boolean` | `true` | 溢出时是否显示浮层滚动条 |
+| `parts` | `{ Input?, MenuItem? }` | — | 配置默认内置的搜索 Input 与 MenuItem |
+| `matchTriggerWidth` | `boolean` | `true` | 是否与触发锚点等宽；`false` 时浮层及选项按内容 Hug |
+| `minWidth` | `number \| string` | 有搜索框时 `160`，否则 `0` | 面板最小宽度；数字按 px 处理 |
+| `showCheck` | `boolean` | `false` | 是否为选中项显示 trailing check；Select 会默认开启 |
+
+---
+
+## 关键字 (Keyword)
+
+Listbox 自身不接受外部 props — 所有状态通过 `ListboxOwnerContext` 从宿主获取。
+
+| 关键字 | 类型 | 默认值 | 说明 |
+| :--- | :--- | :--- | :--- |
+| `children` | `Snippet` | - | 选项内容，通常为 `MenuItem` |
+| `class` | `string` | `""` | 面板 class 透传 |
+| `style` | `string` | `""` | 面板尺寸与定位补充样式 |
+| `enableAutoLayout` | `boolean` | `true` | 内部 `Frame column` 是否启用自动布局 |
+
+### ListboxOwnerContext 字段
+
+| 字段 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| `open` | `boolean` | 浮层是否展开 |
+| `selectedValue` | `string \| undefined` | 当前选中值 |
+| `activeIndex` | `number` | 当前高亮项索引 |
+| `showCheck` | `boolean \| undefined` | 宿主要求的选中勾选显示状态；Select 默认为 `true` |
+| `triggerEl` | `HTMLElement \| null` | Trigger 按钮元素（焦点还原目标） |
+| `anchorEl` | `HTMLElement \| null` | 定位锚点元素（宽度对齐目标） |
+| `listboxId` | `string` | `id`，用于 `aria-controls` |
+| `triggerId` | `string` | Trigger `id`，用于 `aria-labelledby` |
+| `options` | `ListboxOptionRegistration[]` | 过滤后的静态选项列表（filterText 为空时为全量） |
+| `filterText` | `string` | 当前搜索过滤文本（由 `Input as="search"` 写入） |
+| `customOptions` | `ListboxOptionRegistration[]` | 用户通过 `allowCustomValue` 添加的自定义选项 |
+| `registerOption(reg)` | `function` | 静态选项注册回调（MenuItem onMount 调用） |
+| `unregisterOption(value)` | `function` | 静态选项注销回调（MenuItem onDestroy 调用） |
+| `selectOption(value)` | `function` | 选中某选项 |
+| `setActiveIndex(index)` | `function` | 设置高亮索引 |
+| `setOpen(open)` | `function` | 控制展开/关闭 |
+| `setShowCheck(showCheck)` | `function` | Listbox 将最终勾选配置同步给宿主，供显式组合 MenuItem 读取 |
+| `setFilterText(v)` | `function` | 更新搜索文本（由 `Input as="search"` 的 oninput 调用） |
+| `addCustomOption(value)` | `function` | 添加自定义选项（由 `Input allowCustomValue` 的 Enter 调用） |
+| `removeCustomOption(value)` | `function` | 删除自定义选项（由 MenuItem 的删除按钮调用） |
+
+---
+
+## 样式规范
+
+### 浮层容器 (Quick Action 规范)
+
+| 属性 | 值 |
+| :--- | :--- |
+| 背景 | `rgba(255,255,255,0.72)` / dark `rgba(30,30,30,0.72)` + `backdrop-filter: blur(1.25rem)` |
+| 圆角 | `radius-4` (16px) |
+| 阴影 | `0 8px 32px rgba(0,0,0,0.12)` |
+| 边框 | `none` |
+| padding | portal：`8px`，四周统一；header：底部 `4px` |
+| 滚动 | `.snowui-listbox` 使用 `overflow-y: scroll` + `scrollbar-width: none` 隐藏原生滚动条 |
+| 最大高度 | 默认 `200px`，由 `maxHeight` 设置，JS 再按可用视口高度收窄；inline `style="max-height:">` 可覆盖 |
+| 滚动条样式 | 自定义浮层滚动条（透明轨道，默认 4px，hover 后 8px 并向左增粗，支持拖拽），挂载在 `.snowui-listbox-body`，不覆盖 Input 区域 |
+| 宽度 | 与锚点元素等宽 |
+
+### 选项 Item
+
+| 属性 | 值 |
+| :--- | :--- |
+| padding | `8px` |
+| 圆角 | `radius-3` (12px) |
+| 字号 / 行高 | `14px / 20px` |
+| hover 背景 | `Black/4%` |
+| 选中标记 | Listbox 默认不渲染；`showCheck=true` 时使用 trailing check icon 16px，`opacity: 0` → `1` |
+| 禁用状态 | `opacity: 0.4; pointer-events: none` |
+| 过滤隐藏 | `data-filtered="true"` → `display: none` |
+
+### 自定义项删除按钮
+
+hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × 圆形按钮（复用 Input 清除按钮的 SVG），点击删除该自定义项。
+
+### 搜索框间距
+
+`.snowui-listbox-header` 直接复用 `../styles/layout.css` 的 `.snowui-quick-action-panel-header`，与 QuickAction 保持完全一致。搜索框与下方 MenuItem 的内部间距不再由 Listbox 私有规则控制；根因是 Listbox 根层先前漏掉了对 auto-layout 默认 `gap: 8px` 的覆盖，修复后与 QuickAction 一样由共享 header 规则接管。
+
+---
+
+## 键盘交互
+
+| 按键 | 行为 |
+| :--- | :--- |
+| `↑` / `↓` | 上下移动高亮选项（含自定义项） |
+| `Enter` / `Space` | 确认选择高亮项并关闭 |
+| `Enter`（搜索框无匹配 + `allowCustomValue`） | 添加当前输入为自定义项并选中 |
+| `Escape` | 关闭浮层，焦点还原至 Trigger |
+| `Tab` | 关闭浮层 |
+
+---
+
+## ARIA
+
+| 元素 | 属性 |
+| :--- | :--- |
+| 浮层容器 | `role="listbox"`, `aria-labelledby={triggerId}` |
+| 每个选项 | `role="option"`, `aria-selected` |
+| 高亮项 | `data-highlighted="true"` |
+
+---
+
+## 使用示例
+
+### 默认内置模式（推荐）
+
+```svelte
+<Select placeholder="请选择框架">
+  <Listbox
+    items={[
+      { value: "svelte", label: "Svelte" },
+      { value: "react", label: "React" },
+      { value: "vue", label: "Vue" }
+    ]}
+    parts={{ Input: { placeholder: "搜索框架..." } }}
+  />
+</Select>
+```
+
+### 基础用法（在 Select 中）
+
+```svelte
+<Select bind:value={country} name="country">
+  <Listbox>
+    <MenuItem value="us">United States</MenuItem>
+    <MenuItem value="cn">China</MenuItem>
+    <MenuItem value="jp">Japan</MenuItem>
+  </Listbox>
+</Select>
+```
+
+### 带搜索过滤
+
+```svelte
+<Select placeholder="请选择城市">
+  <Listbox>
+    <Input as="search" placeholder="搜索..." />
+    <MenuItem value="beijing">北京</MenuItem>
+    <MenuItem value="shanghai">上海</MenuItem>
+    <MenuItem value="hangzhou">杭州</MenuItem>
+  </Listbox>
+</Select>
+```
+
+### 搜索 + 允许自定义输入
+
+```svelte
+<Select placeholder="请选择或输入">
+  <Listbox>
+    <Input as="search" allowCustomValue placeholder="搜索或输入新选项..." />
+    <MenuItem value="tag-a">Tag A</MenuItem>
+    <MenuItem value="tag-b">Tag B</MenuItem>
+  </Listbox>
+</Select>
+```
+
+---
+
+
+- Listbox 面板视觉与 QuickAction 对齐，但外层 padding 保持 8px。
+- 搜索框固定在 header；选项滚动区域单独承载 overlay scrollbar。
+
+
+> **以下内容供 AI 阅读，用于维护代码与文档的关联**
+
+## 开发者指南 (AI)
+
+### 模块索引
+
+| 文件 | 说明 |
+| :--- | :--- |
+| `Listbox.svelte` | 浮层容器 — portal + fixed 定位 + Frame column + scrollbar |
+| `MenuItem.svelte` | 选项 — Frame row + label fill + check/delete trailing |
+| `../context.ts` | `ListboxOwnerContext` / `getListboxOwner()` |
+| `../keys.ts` | `LISTBOX_OWNER_CONTEXT_KEY` |
+
+### 参考实现
+- **W3C 规范**: [ARIA Listbox Pattern](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/)
+- **shadcn-ui**: `@radix-ui/react-select` — portal + 自定义浮层
+- **HeroUI**: `react-aria-components` Select primitive
+
+### 关联关系
+- **父级布局**: [Frame.svelte](./Frame.svelte) — 使用 `<Frame column>` 作为内容容器
+- **子组件**: [MenuItem.svelte](./MenuItem.svelte)
+- **宿主组件**: [Select.svelte](./Select.svelte)、[Pagination.svelte](./Pagination.svelte)
+- **自动布局协议**: [../../../specs/LayoutProtocol.md](../../../specs/LayoutProtocol.md)
+- **关联规范**: [../../../specs/HTMLSpec.md](../../../specs/HTMLSpec.md)
+
+## 更新日志 (Changelog)
+
+### v1.2.2 (2026-07-05)
+
+#### 修复
+- `matchTriggerWidth` 改为“至少与触发器等宽”；当触发器过窄时，Listbox 按最长选项文字、勾选槽、gap 与 padding 的完整宽度扩展，避免文字、勾选重叠或右侧间距消失。
+
+### v1.2.1 (2026-07-05)
+
+#### 修复
+- Portal 浮层隔离外层 Field Context，避免 Select 位于 Field 内时，搜索 Input 被误判为 embedded host 而丢失独立背景、边框、padding 与圆角。
+
+### v1.2.0 (2026-04-24)
+
+#### 调整
+- 滚动条间距规范化，Listbox 与 QuickAction 对齐 header + scroll body 区域结构。
+- 外部点击判断统一使用 `ListboxOwnerContext` 的 `triggerEl` / `anchorEl`，不再依赖 Select 私有 class，因此 Pagination 等其他 owner 也能复用同一套 Listbox。
+- 默认出现 / 消失动效与 Popover、Menu 共用 opacity-only dropdown preset，移除 scale 通道。

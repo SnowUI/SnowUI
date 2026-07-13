@@ -1,0 +1,659 @@
+/* Layout Utility Styles */
+/* v1.1.0 */
+/* Log (2026-02-22): 收敛 Surface hover 覆写能力，仅保留 --snowui-frame-hover-image-override 作为声明式覆盖入口。 */
+/* Log (2026-03-10): Avatar / Image 的 hover 回收至组件内，layout.css 不再承接媒体类组件的专用 hover 细节。 */
+/* Log (2026-03-16): 新增 Field 文本高亮变量，供日期字段分段焦点样式等输入型场景复用。 */
+/* Log (2026-03-17): 按最新交互需求将全局文字与输入选中背景统一调整为 Secondary/Indigo 40%。 */
+/* Log (2026-06-18): 新增通用错误反馈 shake 类，供 Frame stateClass 在 Input / Field 等表单场景复用。 */
+
+/**
+ * Hover Overlay 动效：注册可动画化的自定义属性，让 hover overlay 透明度平滑过渡。
+ * CSS 无法对 background-image 在 none/不同结构间插值；通过 @property 动画 opacity 变量，
+ * background-image 中的 color-mix() 引用该变量，自动随之平滑更新。
+ */
+@property --snowui-hover-overlay-opacity {
+    syntax: '<percentage>';
+    inherits: false;
+    initial-value: 0%;
+}
+
+/**
+ * SnowUI 行为工具类
+ * 组件按需主动声明交互行为。
+ * 优先级：Level 1 (最低)，使用 :where() 将权重降为 0。
+ */
+
+/* === 全局基准重置 === */
+:where(html) {
+    --snowui-selection-bg: color-mix(
+        in srgb,
+        var(--secondary-indigo, #5856d6ff) 40%,
+        transparent
+    );
+    --snowui-selection-color: var(--black-100, #000000);
+    --snowui-selection-radius: var(--radius-2, 0.5rem);
+}
+
+::selection {
+    background-color: var(--snowui-selection-bg);
+    color: var(--snowui-selection-color);
+    -webkit-text-fill-color: var(--snowui-selection-color);
+}
+
+
+
+/* === Frame Level 0 默认动效代理承接 (Default Motion Fallback) === */
+/* 由 Frame 组件的 motionConfigToStyle 内联推入 --su-motion-* 变量，在此以 (0,0,0) 优先级实际渲染 */
+/* 注意：只消费 transform 和 transition，避免 background-color/opacity 回退值产生副作用 */
+:where([data-snowui-frame]) {
+    transform: var(--su-motion-transform, none);
+    transition: var(--su-motion-transition, none);
+}
+
+/* === Hoverable 工具类 (hover 叠加反馈 + 交互态手形指针) ===
+   语义:hoverable 表示该元素响应 hover、属于可交互元素。
+   消费方(Avatar / Image / Button 等)只需条件加 .snowui-hoverable,
+   即可同时获得 hover overlay 与 cursor: pointer,不再单独声明。 */
+:where(.snowui-hoverable) {
+    cursor: pointer;
+    --snowui-hover-overlay-opacity: 0%;
+    /* background-image 引用 --snowui-hover-overlay-opacity，通过 @property 动画该变量实现平滑过渡 */
+    background-image:
+        var(--snowui-frame-hover-image-override,
+            linear-gradient(
+                color-mix(in srgb, var(--snowui-hover-color, currentColor) var(--snowui-hover-overlay-opacity), transparent),
+                color-mix(in srgb, var(--snowui-hover-color, currentColor) var(--snowui-hover-overlay-opacity), transparent)
+            ));
+    transition:
+        background-color 0.2s,
+        --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
+        opacity 0.2s,
+        transform 0.2s;
+}
+
+:where(.snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled)) {
+    /* 仅更新 overlay 透明度变量；background-image 引用它自动更新，无需重新声明 background-image */
+    --snowui-hover-overlay-opacity: var(--snowui-hover-opacity, var(--snowui-frame-hover-opacity, 4%));
+}
+
+/* Dark Mode 补偿 */
+:where([theme="dark"] .snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled)) {
+    --snowui-frame-hover-opacity: 10%;
+}
+
+/* === Media Hoverable 工具类 (媒体型可交互组件 hover 反馈) ===
+   语义:用于 Avatar / Image / 视频缩略图 / NFT card 等显示媒体内容的可交互组件。
+   - 自带 cursor: pointer(语义上 hoverable 即可交互)
+   - 不使用 .snowui-hoverable 的灰底叠加(媒体上灰底视觉脏)
+   - hover 通过子层 brightness 滤镜 / background-color 加深来反馈
+   - 与 .snowui-hoverable 互斥:消费方只挂 .snowui-media-hoverable,不再叠加 .snowui-hoverable
+
+   消费方约定:
+   - 根元素**条件**挂 .snowui-media-hoverable(disabled / non-interactive 时不挂,关闭 hover)
+   - 根元素根据当前显示状态再挂以下其中一个标志(可不挂,即空 fallback):
+     · .snowui-media-hoverable-has-visual    → hover 时 visual 层 brightness 压暗(适合图片/视频已显示场景)
+     · .snowui-media-hoverable-tinted-bg     → hover 时 background 层 brightness 压暗(适合 Avatar initials 等有色填充背景)
+   - 内部分层加对应辅助类:
+     · .snowui-media-hoverable-visual        → 媒体显示层(承载 img / initials / video)
+     · .snowui-media-hoverable-background    → 背景填充层(承载空状态灰底 / 首字母彩色背景)
+
+   三种 hover 模式视觉技术对比:
+   · has-visual    → visual 层 brightness filter(媒体本身压暗 0.92)
+   · tinted-bg     → background 层 brightness filter(有色填充背景压暗)
+   · 空 fallback   → background 层 background-color 加深(灰底变深)
+   前两种用 brightness 滤镜(适用于有内容/有色的层);空 fallback 用背景色改色(灰底直接改最直接)。
+   Avatar / Image 默认头像与无图占位都走"空 fallback"分支。
+
+   覆盖入口:--snowui-media-hover-brightness(默认 0.92) */
+:where(.snowui-media-hoverable) {
+    cursor: pointer;
+    --snowui-media-hover-brightness: 0.92;
+}
+
+/* 子层基线:为 brightness / background-color 过渡做准备 */
+:where(.snowui-media-hoverable .snowui-media-hoverable-visual) {
+    filter: brightness(1);
+    transition: filter 0.5s;
+}
+
+:where(.snowui-media-hoverable .snowui-media-hoverable-background) {
+    transition:
+        background-color 0.5s,
+        filter 0.5s;
+}
+
+/* hover: visual 层 brightness 压暗(根挂 -has-visual) */
+.snowui-media-hoverable.snowui-media-hoverable-has-visual:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled) .snowui-media-hoverable-visual {
+    filter: brightness(var(--snowui-media-hover-brightness));
+}
+
+/* hover: tinted background 层 brightness 压暗(根挂 -tinted-bg) */
+.snowui-media-hoverable.snowui-media-hoverable-tinted-bg:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled) .snowui-media-hoverable-background {
+    filter: brightness(var(--snowui-media-hover-brightness));
+}
+
+/* hover: 空 fallback background 层 background-color 加深(根未挂 -has-visual 与 -tinted-bg) */
+.snowui-media-hoverable:not(.snowui-media-hoverable-has-visual):not(.snowui-media-hoverable-tinted-bg):hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled) .snowui-media-hoverable-background {
+    background-color: var(--black-10, #0000001a);
+}
+
+/* === Field Bordered 工具类 (输入型边框 / focus ring) === */
+:where(.snowui-field-bordered) {
+    --snowui-field-selection-bg: var(
+        --snowui-selection-bg,
+        var(--black-4, #0000000a)
+    );
+    --snowui-field-selection-color: var(
+        --snowui-selection-color,
+        var(--black-100, #000000)
+    );
+    --snowui-field-selection-radius: var(
+        --snowui-selection-radius,
+        var(--radius-2, 0.5rem)
+    );
+    box-shadow: inset 0 0 0 var(--snowui-field-border-width, 0.03125rem) var(--snowui-field-border-color, var(--black-20, #00000033));
+    transition: box-shadow 0.2s;
+}
+
+:where(.snowui-field-bordered:hover) {
+    box-shadow: inset 0 0 0 var(--snowui-field-border-width, 0.03125rem) var(--snowui-field-hover-border-color, var(--black-20, #00000033));
+}
+
+:where(.snowui-field-bordered:focus-within) {
+    box-shadow:
+        inset 0 0 0 var(--snowui-field-border-width, 0.03125rem) var(--snowui-field-focus-border-color, var(--black-40, #00000066)),
+        0 0 0 var(--snowui-field-focus-ring-width, 0.25rem) var(--snowui-field-focus-ring-color, var(--black-4, #0000000a));
+}
+
+/* === Feedback Error Shake ===
+   语义:一次性错误反馈动效。错误视觉仍由 invalid / data-invalid 管理。
+   默认接入:Field、独立 Input、独立 Textarea、独立 Select。
+   嵌入在 Field 内的 host 不单独抖动,由 Field 汇总后整体反馈。
+   仅反馈 transform 动效,不触发 focus,也不模拟 focus-within。 */
+:where(
+        .snowui-feedback-error-shake,
+        .snowui-field[data-invalid="true"],
+        .snowui-field:has(.snowui-field-host[data-invalid="true"]),
+        .snowui-input[data-invalid="true"]:not([data-embedded="true"]),
+        .snowui-textarea[data-invalid="true"]:not([data-embedded="true"]),
+        .snowui-select[data-invalid="true"]:not([data-embedded="true"])
+    ) {
+    --snowui-feedback-error-shake-distance: 0.375rem;
+    --snowui-feedback-error-shake-overshoot: 0.25rem;
+    --snowui-feedback-error-shake-duration-a: 80ms;
+    --snowui-feedback-error-shake-duration-b: 60ms;
+    --snowui-feedback-error-shake-easing: cubic-bezier(0.22, 1, 0.36, 1);
+    animation: snowui-feedback-error-shake calc(
+            var(--snowui-feedback-error-shake-duration-a) * 2 +
+                var(--snowui-feedback-error-shake-duration-b) * 2
+        )
+        linear;
+    will-change: transform;
+}
+
+@keyframes snowui-feedback-error-shake {
+    0% {
+        transform: translateX(0);
+        animation-timing-function: var(--snowui-feedback-error-shake-easing);
+    }
+    28.57% {
+        transform: translateX(var(--snowui-feedback-error-shake-distance));
+        animation-timing-function: var(--snowui-feedback-error-shake-easing);
+    }
+    57.14% {
+        transform: translateX(
+            calc(var(--snowui-feedback-error-shake-distance) * -1)
+        );
+        animation-timing-function: var(--snowui-feedback-error-shake-easing);
+    }
+    78.57% {
+        transform: translateX(var(--snowui-feedback-error-shake-overshoot));
+        animation-timing-function: var(--snowui-feedback-error-shake-easing);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :where(
+            .snowui-feedback-error-shake,
+            .snowui-field[data-invalid="true"],
+            .snowui-field:has(.snowui-field-host[data-invalid="true"]),
+            .snowui-input[data-invalid="true"]:not([data-embedded="true"]),
+            .snowui-textarea[data-invalid="true"]:not([data-embedded="true"]),
+            .snowui-select[data-invalid="true"]:not([data-embedded="true"])
+        ) {
+        animation: none;
+        transform: none;
+    }
+}
+
+/**
+ * Utility Classes
+ */
+:disabled {
+    cursor: default;
+}
+
+:where(.snowui-disabled) {
+    --snowui-state-opacity: 0.2;
+    --snowui-state-cursor: default;
+    cursor: default;
+    opacity: 0.2;
+}
+
+:where(.snowui-loading) {
+    pointer-events: none;
+}
+
+:where(.snowui-sr-only) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* === Edge Mask 工具类（内容渐隐层 · CSS 静态形态） ===
+   语义：只改变元素 alpha 通道，不绘制任何可见色块。
+   这是「内容渐隐层」OSS 通用能力的 CSS 静态形态（能力总览见 components/src/lib/edge-fade.md；
+   动态/按实测尺寸计算的形态用 lib/edge-fade.ts）。消费方加 .snowui-scroll-mask 并通过
+   data-scroll-mask="top|bottom|both" 声明当前需要渐隐的边缘。
+   参数：
+   - --snowui-scroll-mask-size：默认渐隐带高度（上下共用）
+   - --snowui-scroll-mask-top-size / --snowui-scroll-mask-bottom-size：可分别覆盖上下高度
+   - --snowui-scroll-mask-top-solid-ratio / --snowui-scroll-mask-bottom-solid-ratio：
+     从外缘起的「实心全透明」占比（0–1）。0 = 整带线性过渡（Textarea/CodeBlock 默认）；
+     0.8 = 前 80% 实心、后 20% 过渡（SidePanel 上下工具栏：对齐 Figma 80%→100% 色标）。
+   现有消费者：Textarea / Text(lines=0) / CodeBlock / SidePanel。参考 HeroUI ScrollShadow。 */
+:where(.snowui-scroll-mask) {
+    --snowui-scroll-mask-size: var(
+        --snowui-scroll-mask-size-override,
+        var(
+            --snowui-code-block-scroll-mask-size,
+            var(
+                --snowui-textarea-scroll-mask-size,
+                var(--snowui-text-mask-height, 32px)
+            )
+        )
+    );
+    --snowui-scroll-mask-top-size: var(
+        --snowui-scroll-mask-top-size-override,
+        var(--snowui-scroll-mask-size)
+    );
+    --snowui-scroll-mask-bottom-size: var(
+        --snowui-scroll-mask-bottom-size-override,
+        var(--snowui-scroll-mask-size)
+    );
+    --snowui-scroll-mask-top-solid-ratio: var(
+        --snowui-scroll-mask-top-solid-ratio-override,
+        0
+    );
+    --snowui-scroll-mask-bottom-solid-ratio: var(
+        --snowui-scroll-mask-bottom-solid-ratio-override,
+        0
+    );
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+:where(.snowui-scroll-mask[data-scroll-mask="top"]) {
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(
+            var(--snowui-scroll-mask-top-size) * var(--snowui-scroll-mask-top-solid-ratio)
+        ),
+        #000 var(--snowui-scroll-mask-top-size),
+        #000 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(
+            var(--snowui-scroll-mask-top-size) * var(--snowui-scroll-mask-top-solid-ratio)
+        ),
+        #000 var(--snowui-scroll-mask-top-size),
+        #000 100%
+    );
+}
+
+:where(.snowui-scroll-mask[data-scroll-mask="bottom"]) {
+    -webkit-mask-image: linear-gradient(
+        to top,
+        transparent 0,
+        transparent calc(
+            var(--snowui-scroll-mask-bottom-size) * var(--snowui-scroll-mask-bottom-solid-ratio)
+        ),
+        #000 var(--snowui-scroll-mask-bottom-size),
+        #000 100%
+    );
+    mask-image: linear-gradient(
+        to top,
+        transparent 0,
+        transparent calc(
+            var(--snowui-scroll-mask-bottom-size) * var(--snowui-scroll-mask-bottom-solid-ratio)
+        ),
+        #000 var(--snowui-scroll-mask-bottom-size),
+        #000 100%
+    );
+}
+
+:where(.snowui-scroll-mask[data-scroll-mask="both"]) {
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(
+            var(--snowui-scroll-mask-top-size) * var(--snowui-scroll-mask-top-solid-ratio)
+        ),
+        #000 var(--snowui-scroll-mask-top-size),
+        #000 calc(100% - var(--snowui-scroll-mask-bottom-size)),
+        transparent calc(
+            100% - var(--snowui-scroll-mask-bottom-size) *
+                var(--snowui-scroll-mask-bottom-solid-ratio)
+        ),
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(
+            var(--snowui-scroll-mask-top-size) * var(--snowui-scroll-mask-top-solid-ratio)
+        ),
+        #000 var(--snowui-scroll-mask-top-size),
+        #000 calc(100% - var(--snowui-scroll-mask-bottom-size)),
+        transparent calc(
+            100% - var(--snowui-scroll-mask-bottom-size) *
+                var(--snowui-scroll-mask-bottom-solid-ratio)
+        ),
+        transparent 100%
+    );
+}
+
+/* 单行横向滚动内容渐隐。与纵向 .snowui-scroll-mask 使用同一 alpha-only
+   mask 能力，但独立命名，避免输入控件同时消费纵向遮罩时互相覆盖。
+   data-scroll-mask-x 由消费方按实际 scrollLeft 状态切换。 */
+:where(.snowui-horizontal-scroll-mask) {
+    --snowui-horizontal-scroll-mask-size: var(
+        --snowui-horizontal-scroll-mask-size-override,
+        var(--snowui-text-mask-height, 32px)
+    );
+    --snowui-horizontal-scroll-mask-left-transparent: 0px;
+    --snowui-horizontal-scroll-mask-left-visible: 0px;
+    --snowui-horizontal-scroll-mask-right-transparent: var(
+        --snowui-input-horizontal-scroll-mask-right-transparent,
+        0px
+    );
+    --snowui-horizontal-scroll-mask-right-visible: var(
+        --snowui-input-horizontal-scroll-mask-right-visible,
+        0px
+    );
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent var(--snowui-horizontal-scroll-mask-left-transparent),
+        #000 var(--snowui-horizontal-scroll-mask-left-visible),
+        #000 calc(100% - var(--snowui-horizontal-scroll-mask-right-visible)),
+        transparent calc(100% - var(--snowui-horizontal-scroll-mask-right-transparent))
+    );
+    mask-image: linear-gradient(
+        to right,
+        transparent var(--snowui-horizontal-scroll-mask-left-transparent),
+        #000 var(--snowui-horizontal-scroll-mask-left-visible),
+        #000 calc(100% - var(--snowui-horizontal-scroll-mask-right-visible)),
+        transparent calc(100% - var(--snowui-horizontal-scroll-mask-right-transparent))
+    );
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+:where(.snowui-horizontal-scroll-mask[data-scroll-mask-x="left"], .snowui-horizontal-scroll-mask[data-scroll-mask-x="both"]) {
+    --snowui-horizontal-scroll-mask-left-visible: var(--snowui-horizontal-scroll-mask-size);
+}
+
+:where(.snowui-horizontal-scroll-mask[data-scroll-mask-x="right"], .snowui-horizontal-scroll-mask[data-scroll-mask-x="both"]) {
+    --snowui-horizontal-scroll-mask-right-visible: var(
+        --snowui-input-horizontal-scroll-mask-right-visible,
+        var(--snowui-horizontal-scroll-mask-size)
+    );
+}
+
+/* === 悬浮操作层（Floating Action Overlay）通用基类 ===
+   语义：让操作控件（删除 X / 操作按钮 / 复选框等）浮在内容之上，容器 hover 或内部聚焦时显现；
+   配合「内容边缘渐隐」（同文件 .snowui-scroll-mask 或 lib/edge-fade.ts）让控件下方内容朝控件一侧渐隐，
+   保证控件清晰可读、内容不被硬切。规范：specs/StyleSpec.md §2.4；能力：components/src/lib/edge-fade.md。
+   用法：宿主加 .snowui-overlay-action-host（建立定位上下文），浮动控件加 .snowui-overlay-action 并自行声明
+   inset / 贴哪条边 / 尺寸。简单就地浮动（如 Tag 删除 X）用本类即可；需要随行 sticky / fixed 跟踪
+   （如 Table 数据行操作列）的复杂定位由组件自管，不走本类。 */
+:where(.snowui-overlay-action-host) {
+    position: relative;
+}
+:where(.snowui-overlay-action) {
+    position: absolute;
+    opacity: var(--snowui-overlay-action-opacity-override, 0);
+    pointer-events: none;
+    transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
+        var(--snowui-frame-color-motion-easing, ease-out);
+}
+:where(.snowui-overlay-action-host:hover) .snowui-overlay-action,
+:where(.snowui-overlay-action-host:focus-within) .snowui-overlay-action {
+    opacity: var(--snowui-overlay-action-reveal-opacity-override, 1);
+    pointer-events: auto;
+}
+
+/**
+ * Truncation Styles
+ * 核心截断与展开逻辑样式。
+ */
+
+/* 单行截断 */
+:where(.snowui-line-clamp-1) {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 多行截断基础 */
+:where([class*="snowui-line-clamp-"]) {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+/* 多行截断分级 */
+:where(.snowui-line-clamp-2) {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+:where(.snowui-line-clamp-3) {
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+/* 可展开模式容器 */
+:where(.snowui-truncate-container) {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+/* 底部透明渐变遮罩 */
+:where(.snowui-truncate-mask) {
+    --snowui-frame-mask-height: 2em;
+    -webkit-mask-image: linear-gradient(to bottom,
+            black calc(100% - var(--snowui-frame-mask-height)),
+            rgba(0, 0, 0, 0) 100%);
+    mask-image: linear-gradient(to bottom,
+            black calc(100% - var(--snowui-frame-mask-height)),
+            rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+}
+
+
+/* inline-block 单行截断优化 */
+:where(.snowui-text-inline-block.snowui-line-clamp-1) {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+
+/**
+ * Morph Container
+ * 用于状态切换时的 CSS Grid Stacking，防止尺寸跳动。
+ * 所有子元素重叠在同一网格区域中心。
+ */
+:where(.snowui-morph-container) {
+    display: grid;
+    place-items: center;
+}
+
+:where(.snowui-morph-container)>* {
+    grid-area: 1 / 1;
+}
+
+/**
+ * Direction Classes
+ * 布局方向类
+ */
+:where(.snowui-direction-row) {
+    display: flex;
+    flex-direction: row;
+}
+
+:where(.snowui-direction-row-reverse) {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+:where(.snowui-direction-column) {
+    display: flex;
+    flex-direction: column;
+}
+
+:where(.snowui-direction-column-reverse) {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+:where(.snowui-direction-grid) {
+    display: grid;
+}
+
+:where(.snowui-direction-grid-reverse) {
+    display: grid;
+    direction: rtl;
+}
+
+/**
+ * Quick Action 通用设计规范变量
+ * 适用于 Select Listbox、Popover、ContextMenu 等浮动快捷操作层。
+ * 对应 Figma "Glass 2" 效果：drop-shadow(0 8px 28px rgba(0,0,0,0.1)) + backdrop-blur(40px)
+ * 组件中直接引用这些变量，不依赖 .shadow-glass-2 utility 类。
+ *
+ * Log (2026-04-16): 提取 Quick Action 阴影与背景变量，作为 Listbox / 浮层类组件通用规范。
+ */
+:where(html) {
+    --snowui-shadow-quick-action: 0 0.5rem 1.75rem 0 rgba(0, 0, 0, 0.10);
+    --snowui-backdrop-quick-action: blur(var(--size-10));
+    --snowui-border-quick-action: none;
+    --snowui-background-quick-action: var(--background-3, rgba(255, 255, 255, 0.9));
+}
+
+/* Quick Action 浮层面板视觉基类
+ * 共享给 Listbox、Popover、ContextMenu 等所有浮层面板。
+ * 仅含视觉规则（背景、毛玻璃、圆角、阴影、边框、内边距），
+ * 定位（position/z-index）和结构（overflow/animation）由各组件自行声明。
+ * 当前引用：Listbox.svelte、Popover.svelte（v3.0.0 起合并 QuickAction / SearchPopup）
+ * 规范：specs/StyleSpec.md §2.6.3 第 4 类（跨组件共享视觉基类）
+ */
+:where(.snowui-quick-action-panel) {
+    background-color: var(--snowui-background-quick-action);
+    backdrop-filter: var(--snowui-backdrop-quick-action);
+    -webkit-backdrop-filter: var(--snowui-backdrop-quick-action);
+    border-radius: var(--radius-4);
+    box-shadow: var(--snowui-shadow-quick-action);
+    border: var(--snowui-border-quick-action);
+    padding: var(--padding-3);
+    gap: 0;
+    box-sizing: border-box;
+}
+
+/* Quick Action 浮层固定头部 + 滚动内容区结构
+ * 共享给 Listbox、Popover 等需要顶部搜索/输入区固定、下方选项独立滚动的浮层。
+ * 视觉仍由 .snowui-quick-action-panel 承载，滚动条视觉由 scrollbar.css 承载。
+ */
+:where(.snowui-quick-action-panel-header) {
+    flex-shrink: 0;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+:where(.snowui-quick-action-panel-header):not(:empty) {
+    padding-bottom: var(--padding-1);
+}
+
+:where(.snowui-quick-action-panel-scroll-body) {
+    position: relative;
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+/* X 关闭/清除图标共享视觉基类
+ * 共享给 Input.snowui-input-clear-btn / Tag.snowui-tag-close /
+ * MenuItem.snowui-menu-item-delete / SearchBox.snowui-search-box-clear-btn /
+ * Toast.snowui-toast-close-btn 等所有"灰→黑 X"按钮。
+ * 仅含视觉规则（尺寸、颜色、opacity、圆角、过渡、button 重置、内部 svg 100% 填充）；
+ * 显示/隐藏时机（display none / focus-within 显示 / hover 容器才显示）由各组件自行声明。
+ * 内部图标统一使用 resource-svelte 的既有图标资源：
+ * <XCircle weight="fill" />（圆形清除）或 <Close />（Tag 紧凑关闭 X）。
+ * Tag 的 Close regular 形状来自 close-regular.svg，对齐 Workshop node-id=11898-37771 的 12×12 plain X。
+ * 规范：specs/StyleSpec.md §2.6.3 第 5 类（共享 X 图标按钮基类）
+ */
+:where(.snowui-clear-icon-btn) {
+    box-sizing: border-box;
+    width: var(--snowui-clear-icon-size-override, var(--size-4));
+    height: var(--snowui-clear-icon-size-override, var(--size-4));
+    flex: 0 0 var(--snowui-clear-icon-size-override, var(--size-4));
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--snowui-clear-icon-color-override, var(--black-100, #000));
+    opacity: var(--snowui-clear-icon-opacity-override, 0.4);
+    cursor: pointer;
+    line-height: 0;
+    transition:
+        color var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out),
+        opacity var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
+}
+
+:where(.snowui-clear-icon-btn:hover) {
+    opacity: var(--snowui-clear-icon-hover-opacity-override, 1);
+}
+
+:where(.snowui-clear-icon-btn > svg) {
+    display: block;
+    width: 100%;
+    height: 100%;
+}

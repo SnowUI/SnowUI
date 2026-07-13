@@ -1,0 +1,238 @@
+/* Scrollbar Styles */
+/* v1.3.0 */
+/* Log (2026-04-17): 从 Textarea 组件提炼为通用共享样式，任何可滚动元素挂 .snowui-scrollbar 即生效。 */
+/* Log (2026-04-24): 新增 .snowui-scrollbar--edge 修饰类，落地「不占宽度·紧贴边缘」规范。 */
+/* Log (2026-04-24): 从 Textarea / Listbox 提炼 .snowui-overlay-scrollbar 浮层滚动条通用样式。 */
+/* Log (2026-06-21): 纵向 overlay scrollbar 改为宿主区域 hover 时以 Frame 默认动效渐显/渐隐；横向溢出时保持常显。 */
+
+/*
+ * ⚠️ ::-webkit-scrollbar 不可嵌套于 :where()，必须使用直接选择器。
+ * 规范来源：specs/StyleGuide.md §11
+ *
+ * ── 基础模式（.snowui-scrollbar）──
+ * 轨道宽/高 12px = 最大视觉宽 8px + 4px 固定边距（右侧/底部）。
+ * 默认：border 4px → 视觉宽 4px。
+ * 竖向 Hover：border-width 2px 4px 2px 0 → 从左向右展宽至 8px，右侧保持 4px 边距。
+ * 横向 Hover：border-width 0 2px 4px 2px → 从下往上展高至 8px，底部保持 4px 边距。
+ * Hover border-radius 补偿：确保内圆角四角均为 4×4 对称。
+ *
+ * ── 不占宽度·紧贴边缘模式（.snowui-scrollbar--edge）──
+ * 适用于需要滚动条不挤占内容宽度的场景（如 Listbox、Panel 等）。
+ * 实现原理：容器设 overflow-y: auto + margin-right: -8px + padding-right: 8px。
+ *   外层需有 overflow: clip 或 overflow: hidden 将超出的滚动条裁切。
+ *   margin-right 将滚动条推入外层 padding 区，padding-right 维持内容对齐。
+ *   内容区宽度在有无滚动条时始终一致（不抖动）。
+ * 轨道宽/高 8px，thumb 紧贴右边缘（无 border-right），从右侧内缘向左展宽。
+ * 默认：border-left 4px → 视觉宽 4px，紧贴右边缘。
+ * 竖向 Hover：border-left 2px → 从右向左展宽至 6px，右边缘不变。
+ *
+ * ── 浮层滚动条模式（.snowui-overlay-scrollbar）──
+ * 适用于使用 useOverlayScrollbar 的组件。
+ * Viewport 挂 .snowui-overlay-scrollbar-viewport 隐藏原生滚动条。
+ * 自定义轨道挂 .snowui-overlay-scrollbar，Thumb 挂 .snowui-overlay-scrollbar-thumb。
+ * 轨道绝对定位，不占布局宽度；具体 top/bottom/right/z-index 由组件按容器结构声明。
+ * 纵向 Thumb 默认右对齐 4px，hover 从右向左展宽到 8px，右边缘不移动。
+ * 横向 Thumb 始终为 8px，hover 只改变颜色。
+ * 轨道默认距容器右侧/底部 4px；双轴时横向轨道为纵向轨道预留交叉区域。
+ */
+
+.snowui-scrollbar,
+.snowui-scrollbar--edge,
+.snowui-overlay-scrollbar {
+    --snowui-scrollbar-size: 12px;
+    --snowui-scrollbar-edge-gap: 4px;
+    --snowui-overlay-scrollbar-size: 8px;
+    --snowui-overlay-scrollbar-thumb-width: 4px;
+    --snowui-overlay-scrollbar-thumb-hover-width: 8px;
+}
+
+.snowui-scrollbar {
+    overflow-x: scroll;
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+}
+
+@supports (-moz-appearance: none) {
+    .snowui-scrollbar {
+        scrollbar-color: var(--black-10, rgba(0, 0, 0, 0.1)) transparent;
+    }
+}
+
+.snowui-scrollbar::-webkit-scrollbar {
+    width: var(--snowui-scrollbar-size);
+    height: var(--snowui-scrollbar-size);
+    background: transparent;
+}
+
+.snowui-scrollbar::-webkit-scrollbar-track,
+.snowui-scrollbar::-webkit-scrollbar-track-piece {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.snowui-scrollbar::-webkit-scrollbar-button {
+    display: none;
+    height: 0;
+    width: 0;
+}
+
+.snowui-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+.snowui-scrollbar::-webkit-scrollbar-thumb {
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    background-color: var(--black-10, rgba(0, 0, 0, 0.1));
+    border-radius: 99px;
+    transition:
+        background-color 150ms ease-out,
+        border-width 150ms ease-out;
+}
+
+/* 横向始终使用展开后的 8px 视觉厚度。 */
+.snowui-scrollbar::-webkit-scrollbar-thumb:horizontal {
+    border-width: 0 2px 4px 2px;
+    border-radius: 6px / 4px 4px 8px 8px;
+}
+
+/* 竖向：从左向右展宽，右侧 4px 边距不变 */
+.snowui-scrollbar::-webkit-scrollbar-thumb:vertical:hover {
+    border-width: 2px 4px 2px 0;
+    border-radius: 4px 8px 8px 4px / 6px;
+    background-color: var(--black-20, rgba(0, 0, 0, 0.2));
+}
+
+/* 横向：从下往上展高，底部 4px 边距不变 */
+.snowui-scrollbar::-webkit-scrollbar-thumb:horizontal:hover {
+    background-color: var(--black-20, rgba(0, 0, 0, 0.2));
+}
+
+/* ════════════════════════════════════════════════════════════════
+   不占宽度·紧贴边缘模式
+   用法：在可滚动容器上同时挂 .snowui-scrollbar .snowui-scrollbar--edge
+         并设置 overflow-y: auto; margin-right: -8px; padding-right: 8px;
+         外层容器须有 overflow: clip 裁切超出部分。
+   ════════════════════════════════════════════════════════════════ */
+
+.snowui-scrollbar--edge::-webkit-scrollbar {
+    width: var(--snowui-overlay-scrollbar-size);
+    height: var(--snowui-overlay-scrollbar-size);
+}
+
+.snowui-scrollbar--edge::-webkit-scrollbar-thumb {
+    /* 右侧无 border，紧贴容器右边缘；左侧 4px 透明边作为内间距 */
+    border: 4px solid transparent;
+    border-right: none;
+    background-clip: padding-box;
+    background-color: var(--black-10, rgba(0, 0, 0, 0.1));
+    border-radius: 99px;
+}
+
+/* 竖向 Hover：从右向左展宽至 6px，右边缘不变 */
+.snowui-scrollbar--edge::-webkit-scrollbar-thumb:vertical:hover {
+    border-width: 2px 0 2px 2px;
+    border-radius: 8px 4px 4px 8px / 6px;
+    background-color: var(--black-20, rgba(0, 0, 0, 0.2));
+}
+
+/* 横向 Hover：从下向上展高至 6px，底边缘不变 */
+.snowui-scrollbar--edge::-webkit-scrollbar-thumb:horizontal:hover {
+    border-width: 2px 2px 0 2px;
+    border-radius: 6px / 8px 8px 4px 4px;
+    background-color: var(--black-20, rgba(0, 0, 0, 0.2));
+}
+
+/* ════════════════════════════════════════════════════════════════
+   浮层滚动条模式
+   配合 components/src/lib/overlay-scrollbar.svelte.ts 使用。
+   组件只负责轨道定位；尺寸、可见性、Thumb 视觉和 hover 统一在这里定义。
+   ════════════════════════════════════════════════════════════════ */
+
+.snowui-overlay-scrollbar-viewport {
+    overflow-y: scroll;
+    scrollbar-width: none;
+}
+
+.snowui-overlay-scrollbar-viewport[data-scroll-axis="both"] {
+    overflow: auto;
+}
+
+.snowui-overlay-scrollbar-viewport::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
+
+:where(.snowui-overlay-scrollbar) {
+    position: absolute;
+    right: var(--snowui-scrollbar-edge-gap);
+    width: var(--snowui-overlay-scrollbar-size);
+    background: transparent;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
+        var(--snowui-frame-color-motion-easing, ease-out);
+}
+
+.snowui-overlay-scrollbar[data-axis="horizontal"][data-visible="true"],
+.snowui-overlay-scrollbar-host:hover
+    > .snowui-overlay-scrollbar:not([data-axis="horizontal"])[data-visible="true"] {
+    opacity: 1;
+}
+
+.snowui-overlay-scrollbar-thumb {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: var(--snowui-overlay-scrollbar-thumb-width);
+    border-radius: 99px;
+    background-color: var(--black-10, rgba(0, 0, 0, 0.1));
+    cursor: default;
+    touch-action: none;
+    user-select: none;
+    transition:
+        width var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out),
+        background-color var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
+    will-change: transform;
+    pointer-events: auto;
+}
+
+.snowui-overlay-scrollbar-thumb:hover {
+    width: var(--snowui-overlay-scrollbar-thumb-hover-width);
+    background-color: var(--black-20, rgba(0, 0, 0, 0.2));
+}
+
+.snowui-overlay-scrollbar[data-axis="horizontal"] {
+    right: calc(
+        var(--snowui-overlay-scrollbar-size) +
+            var(--snowui-scrollbar-edge-gap) +
+            var(--snowui-scrollbar-edge-gap)
+    );
+    bottom: var(--snowui-scrollbar-edge-gap);
+    left: var(--snowui-scrollbar-edge-gap);
+    width: auto;
+    height: var(--snowui-overlay-scrollbar-size);
+}
+
+.snowui-overlay-scrollbar[data-axis="horizontal"]
+    .snowui-overlay-scrollbar-thumb {
+    top: auto;
+    right: auto;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: var(--snowui-overlay-scrollbar-size);
+    transition:
+        background-color var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
+}
+
+.snowui-overlay-scrollbar[data-axis="horizontal"]
+    .snowui-overlay-scrollbar-thumb:hover {
+    width: auto;
+    height: var(--snowui-overlay-scrollbar-size);
+}

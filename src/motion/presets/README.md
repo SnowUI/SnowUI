@@ -1,0 +1,50 @@
+# Motion Preset Catalog
+
+> **版本**: v1.5.0
+> **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
+
+组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
+
+| preset | 适用 | 不适用 | 来源 |
+| :--- | :--- | :--- | :--- |
+| `GENERIC_APPEAR_MOTION` / `GENERIC_DISAPPEAR_MOTION` | Frame fallback、普通内容进入 / 退出 | 语义明确的 overlay、Tooltip、Dialog | SnowUI generic default |
+| `GENERIC_SCALE_APPEAR_MOTION` | 普通组件显式 opt-in 保留 generic opacity + scale 进入 | Frame 默认 fallback、语义明确的 overlay / Tooltip / Dialog | SnowUI 旧 generic appear 组合的兼容显式 preset |
+| `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION` | Popover、Listbox、Menu dropdown，仅 opacity | Tooltip、Dialog、普通内容替换 | SnowUI dropdown overlay |
+| `TOOLTIP_APPEAR_MOTION` / `TOOLTIP_DISAPPEAR_MOTION` | Tooltip portal 内容 | Dropdown、Dialog | transitions.dev Tooltip |
+| `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION` | Dialog / Modal 内容面板 | Tooltip、Dropdown | transitions.dev Modal open / close |
+| `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION` | Dialog 遮罩 opacity | 内容面板 scale | SnowUI Dialog 当前遮罩行为 |
+| `REPLACEMENT_APPEAR_MOTION` | Icon / Text / CodeBlock 等内容替换 | Overlay、Dialog | SnowUI replacement default |
+| `RESIZE_MOTION` | Accordion、Card、Panel 及后续组件的宽高、padding 等尺寸变化 | 生命周期进入、内容替换 | transitions.dev Card resize |
+| `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
+| `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
+| `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
+| `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
+| `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |
+| `ICON_SWAP_APPEAR_MOTION` | Icon 状态替换 | Dialog、普通 hover | transitions.dev Icon swap |
+| `PANEL_REVEAL_APPEAR_MOTION` / `PANEL_REVEAL_DISAPPEAR_MOTION` | 抽屉、大面板从下方浮现 / 退出 | Dropdown、Tooltip | transitions.dev Panel reveal |
+| `SIDE_PANEL_APPEAR_MOTION` / `SIDE_PANEL_DISAPPEAR_MOTION` | 右侧 SidePanel / 抽屉的浮层与内嵌进退场：复用 Frame 默认高阻尼 move spring，仅 x 从右滑入/滑出；页面兄弟宽度变化由 `createSidePanelLayoutMotionStyle()` 解析同一 timing | Dialog 居中放大、Dropdown | Rare UI Sidebar / SidePanel 浮层 |
+| `PAGE_SLIDE_FROM_LEFT_MOTION` / `PAGE_SLIDE_FROM_RIGHT_MOTION` | 页面或同级视图轻微滑入 | 小组件内容替换 | transitions.dev Page side-by-side |
+| `TEXT_REVEAL_APPEAR_MOTION` | 标题、Hero 文案或文字组浮现 | 单个 Icon、Tooltip | transitions.dev Texts reveal |
+
+## 规则
+
+1. 命中已有 preset 时，组件只能引用 preset，不复制 duration / easing / scale / delay。
+2. 第二个组件复用同一语义值时，必须抽到 preset。
+3. 组件文档应引用 preset 名称；如写具体数字，必须注明以本 catalog 为准。
+4. 触发延迟不是 MotionConfig，归共享 lib 管理。
+5. 自然语言出现“放大”时必须结合触发语义选择：hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
+6. 自然语言出现“尺寸变化 / 展开 / 收起 / 高度变化 / 宽度变化”时，优先使用 `RESIZE_MOTION`；只有语义明确不同且已存在专项 preset 时例外。
+7. Tab / Segmented indicator 同时移动和变形时必须使用 `TAB_INDICATOR_MOTION`，不得使用普通 `RESIZE_MOTION` 或分别维护 transform / size 时序。
+8. `GENERIC_APPEAR_MOTION` 默认只包含 opacity；需要生命周期缩放时必须显式声明 scale 或选择含 scale 的组件族 preset。
+9. 显式 `while*` 对象是完整视觉通道声明，不会自动混入 preset 中未声明于对象的视觉通道；默认时序仍可继承。
+10. SnowUI 组件源码拥有明确默认视觉时必须显式引用 preset，不得写 `whileXxx={true}` 绑定可变的 Frame 默认值；旧 generic opacity + scale 视觉统一迁移到 `GENERIC_SCALE_APPEAR_MOTION`。
+
+## 变更记录
+
+- v1.6.0 (2026-07-01): Popover、Listbox、Menu dropdown 统一移除 scale，共用 opacity-only dropdown overlay preset。
+- v1.5.0 (2026-06-30): 新增显式 opt-in 的 `GENERIC_SCALE_APPEAR_MOTION`，供组件迁移旧 generic opacity + scale 视觉；组件源码禁止继续依赖 boolean 默认视觉。
+- v1.4.0 (2026-06-30): generic appear 改为仅 opacity，并登记显式 while* 对象的完整通道语义。
+- v1.3.0 (2026-06-21): 新增 `TAB_INDICATOR_MOTION`，统一 Tabs sliding 的位置与尺寸时序。
+- v1.2.0 (2026-06-18): 尺寸变化统一使用 `RESIZE_MOTION`，删除旧 Card 限定导出。
+- v1.1.0 (2026-06-18): 新增 transitions.dev 通用效果 preset 与自然语言选择规则。
+- v1.0.0 (2026-06-18): 新增 generic、overlay、tooltip、dialog、replacement preset catalog。

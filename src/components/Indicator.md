@@ -1,0 +1,92 @@
+# Indicator（尺寸指示手柄）
+
+> **版本**: v1.0.1
+> **更新**: 2026-07-12
+> **职责**: 提供宿主 hover 显示、Pointer / 键盘拖动与统一视觉反馈的通用尺寸手柄
+> **布局模型**: Pin 布局
+> **文档**: ./Indicator.md
+
+Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一个可交互组件。它默认调整直接父元素，也可以通过 `target` 显式关联任意祖先宿主。鼠标位于 reveal host 的任意普通后代上时，Indicator 都会显示；只有进入 Indicator **命中带**时才会加深、变粗并开始拖动。
+
+**命中带（line）**：视觉条与命中区分层。line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条中心落在 `pinOffset`（SidePanel 为 4px），默认 2×40 / 40×2。corner 仍用 `pin-bottom-right` + 局部命中。消费方若只改视觉尺寸，应覆盖 `.snowui-indicator-visual`。
+
+## API 参考
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| :--- | :--- | :--- | :--- |
+| `axis` | `"width" \| "height" \| "both"` | line 为 `"width"`；corner 为 `"height"` | 调整宿主宽度、高度或同时调整；`both` 只用于 corner |
+| `edge` | `"start" \| "end" \| "top" \| "bottom"` | 根据 axis 推导 | 拖动方向与默认定位边缘 |
+| `appearance` | `"line" \| "corner"` | `"line"` | 线形或右下角图标视觉 |
+| `target` | `HTMLElement` | 直接父元素 | resize target；可显式关联页面中的任意元素，不要求 Indicator 是其 DOM 后代 |
+| `revealTarget` | `HTMLElement` | target | 控制显隐的 hover 宿主 |
+| `value` | `number` | 实测 target 尺寸 | 当前受控尺寸基线，并同步为 ARIA 当前值 |
+| `minSize` / `maxSize` | `number` | `0 / Infinity` | 尺寸边界 |
+| `minWidth` / `maxWidth` | `number` | - | width / both 模式的独立宽度边界，优先于 minSize / maxSize |
+| `minHeight` / `maxHeight` | `number` | - | height / both 模式的独立高度边界，优先于 minSize / maxSize |
+| `step` / `largeStep` | `number` | `8 / 32` | 键盘普通步长与 Shift 步长 |
+| `applySize` | `boolean` | `true` | 是否直接写入 target 的 width / height |
+| `disabled` | `boolean` | `false` | 禁止 Pointer 和键盘调整 |
+| `ariaLabel` | `string` | `"调整宽度" / "调整高度"` | 无障碍名称 |
+| `onResizeStart` | `(size: number) => void` | - | 开始调整回调 |
+| `onSizeChange` | `(size: number) => void` | - | 尺寸变化回调 |
+| `onResizeEnd` | `(size: number) => void` | - | 结束调整回调 |
+| `...rest` | `FrameProps` | - | 透传到根 Frame |
+
+## 视觉状态
+
+- 颜色与 overlay 滚动条 thumb 一致：默认 `Black/10`，hover / focus / dragging 为 `Black/20`。
+- line + width：命中带 = 父级全高 × 8px（`top/bottom:0`）；视觉默认 2px × **16px**，hover / focus / dragging 时视觉宽变为 4px；沿边长度可用 `--snowui-indicator-visual-length` 覆盖。
+- line + height：命中带 = 父级全宽 × 8px（`left/right:0`）；视觉默认 **16px** × 2px，hover / focus / dragging 时视觉高变为 4px；沿边长度同上变量。
+- line 与 Scrollbar 一致通过实际 width / height 变化而非 transform 缩放，使用 `var(--radius-full, 9999px)`，端点始终为完整胶囊圆角。
+- corner：固定 16px 视觉盒；图形作为 Indicator 私有内置 SVG，使用单条 round cap / round join stroke，避免小尺寸实心复合路径的内外沿子像素不一致，不依赖资源包 RoundedCorner。宿主 hover 时为 1px、Black/20%，自身 hover / focus-visible / dragging 时为 2px、Black/40%。
+- corner 固定在右下角；默认 `axis="height"`，使用 `ns-resize` 上下双箭头并只调整高度。
+- corner 显式 `axis="both"` 时使用 `nwse-resize` 对角双箭头，同时调整宽度和高度。
+- 定位：line 自管 absolute 贴边（不用 pin 居中）；corner 默认 `as="pin-bottom-right"` + `pinOffset="var(--padding-1)"` + `z-index: 4`。
+- 默认隐藏；宿主 hover、focus-visible 或 dragging 时显示。
+- 视觉与命中区分层；line 命中带铺满所在边缘全高/全宽。
+- 动效消费与 overlay scrollbar 相同的 Frame color motion bridge。
+
+## 示例
+
+```svelte
+<Frame style="position: relative; width: 16rem; height: 10rem;">
+    内容
+    <Indicator axis="width" />
+</Frame>
+```
+
+```svelte
+<Frame bind:element={panel} style="position: relative;">
+    内容
+    <Indicator
+        target={panel}
+        axis="height"
+        appearance="corner"
+        minSize={60}
+    />
+</Frame>
+```
+
+---
+
+> **以下内容供 AI 阅读，用于维护代码与文档的关联**
+
+## 开发者指南 (AI)
+
+- 根层使用 OSS Frame，拖动算法复用 `lib/resizable.ts`。
+- Indicator 将 handle 元素直接交给 resizable；pointerdown / keyboard 从手柄本身起始，并使用 pointer capture + window capture 持续跟踪 move / up / cancel。禁止父组件复制 pointer / keyboard 算法。
+- resizable action 的创建 effect 只跟踪 target / handle / axis；`value`、边界和 callback 使用独立 effect 调用 `action.update()`。创建时必须使用 `untrack()` 读取 options，禁止尺寸写回触发 action destroy，导致拖拽在第一次 pointermove 后中断。
+- width 对应 resizable horizontal axis 与 ARIA vertical orientation；height 对应相反组合。
+- corner 使用 resource-svelte RoundedCorner；hover 通过 path stroke 扩粗，不缩放图标。
+- 不接入 Skeleton：手柄没有加载占位意义。
+
+## 更新日志 (Changelog)
+
+### v1.0.1 (2026-07-12)
+
+- line 命中带默认铺满所在边缘全高（width）/ 全宽（height）：改为 absolute + top/bottom 或 left/right 贴边，不再用 pin 居中；视觉短条与命中带分层。
+
+### v1.0.0 (2026-06-21)
+
+- 合并 WidthIndicator、HeightIndicator 与 ResizeHandle。
+- 新增宿主 hover 显隐、line / corner 视觉、Pointer / 键盘 / ARIA 完整协议。

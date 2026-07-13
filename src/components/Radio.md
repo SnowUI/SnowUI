@@ -1,0 +1,316 @@
+# Radio 组件
+
+> **版本**: v1.3.10
+> **变更记录 (2026-03-10)**: 撤回单层边框粗细过渡尝试，恢复常驻细边框 + 叠加选中环层方案。
+> **职责**: 单选按钮控件，用于在多个选项中选择一个。
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+
+## 关键字
+
+| Keyword | Type | Default | Description |
+|:---|:---|:---|:---|
+| `checked` | `boolean` | `false` | 选中状态（双向绑定），支持再次点击取消 |
+| `group` | `any` | - | 分组值（双向绑定），当前项再次点击会清空分组值 |
+| `value` | `any` | - | 单选按钮的值 |
+| `size` | `ResourceSize \| number` | `16` | 组件尺寸（标准梯度: 12/16/20/24/28/32/40/48/80） |
+| `disabled` | `boolean` | `false` | 禁用状态 |
+| `variant` | `"outline" \| "filled"` | `"filled"` | 视觉变体 |
+| `children` | `Snippet` | - | 标签内容 |
+| `enableResponsive` | `boolean` | `false` | 启用响应式 |
+| `enableContext` | `boolean` | `false` | 启用上下文 |
+| `as` | `'badge'` | - | 角色化：作为 `Image` 角标挂件 |
+
+## 布局模型
+
+主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
+
+Radio 属于“控件视觉体 + label”的内联外壳子类：
+
+- 根节点保持 `inline-flex`，内容整体 Hug。
+- `.snowui-radio-visual` 是固定 Hug 的控件视觉体。
+- `.snowui-radio-label` 是可选 label，默认 Hug，不承担 Fill。
+- visual 与 label 的距离由 `--snowui-radio-gap` 管理，可通过 `--snowui-radio-gap-override` 覆盖。
+- `size` 只影响视觉体尺寸，不改变 label 的布局策略。
+- `as="badge"` 只表示 Radio 作为 Image 的角标挂件，不改变 Radio 内部布局模型。
+
+---
+
+## 更新日志 (Changelog)
+
+- **Radio-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v1.3.10 (2026-04-28)
+
+#### 调整
+- **RD-Layout.1** 按 `LayoutProtocol.md` 将组件注册为内联外壳布局，补充 visual + label 的布局边界说明，并将 gap 收敛到 `--snowui-radio-gap` / `--snowui-radio-gap-override` 链路。
+
+### v1.3.9 (2026-03-10)
+
+#### 调整
+- **RD-Adjust.8** 撤回单层边框直接变粗的尝试，恢复常驻细边框 + 叠加选中环层方案，保持上一版的边框结构与动效路径。
+
+### v1.3.8 (2026-03-10)
+
+#### 调整
+- **RD-Adjust.7** 尝试将 Filled 恢复为单层边框直接变粗/变细，不再保留叠加选中环层；该方案随后撤回。
+
+### v1.3.7 (2026-03-10)
+
+#### 调整
+- **RD-Adjust.6** Filled 选中环不再使用“缩放 + 淡出”近似粗细变化；改为常驻选中环层直接过渡边框宽度与颜色，恢复真实的粗细变化动效，并避免末段换层断点。
+
+### v1.3.6 (2026-03-10)
+
+#### 调整
+- **RD-Adjust.5** Filled 选中环从“仅透明度淡出”调整为“缩放 + 淡出”，恢复边框由粗到细的观感，同时继续避开小尺寸 inset 宽度插值带来的闪动。
+
+### v1.3.5 (2026-03-10)
+
+#### 修复
+- **RD-Fix.16** 小尺寸 Filled 退选时不再对粗边框做 inset 宽度插值；改为稳定细边框常驻，粗边框独立选中环只做透明度过渡，避免末段突然掉到未选中态。
+
+### v1.3.4 (2026-03-10)
+
+#### 修复
+- **RD-Fix.15** 默认 Filled 形态退选时保留常驻细边框，选中态粗边框作为独立内层收回，避免边框缩到某个节点后突然掉到未选中视觉。
+
+### v1.3.3 (2026-03-10)
+
+#### 修复
+- **RD-Fix.14** 默认 Filled 形态的未选中 hover 不再使用独立 overlay 层，改为在 `.snowui-radio-visual` 同层直接过渡边框与背景变量，消除“粗边框收完后新层闪现”的闪动。
+
+### v1.3.2 (2026-03-10)
+
+#### 修复
+- **RD-Fix.13** 默认 Filled 形态的未选中 hover 恢复为“常驻 0% overlay 基线，hover 仅切换透明度”，进一步消除 checked -> unchecked 时的闪动。
+
+### v1.3.1 (2026-03-10)
+
+#### 修复
+- **RD-Fix.12** 取消选中时的视觉层补齐 `background-color` 过渡，避免 hover 背景在 checked -> unchecked 切换时瞬时跳变。
+
+### v1.3.0 (2026-03-10)
+
+#### 新功能
+- **RD-Behavior.1** Radio 支持点击当前已选项取消选中；键盘 `Space` 也遵循同样行为。
+- **RD-Behavior.2** `bind:group` 场景下取消当前项会把 `group` 清空为 `undefined`，并保持后续组联动继续可用。
+- **RD-Fix.11** 移除 checked 态 `cursor: default`，避免与“可取消选中”交互冲突。
+
+### v1.2.15 (2026-03-10)
+
+#### 新功能
+- **RD-Role.1** Radio 新增 `as="badge"` 角色，可在 `Image` 宿主中作为右上角角标组合使用。
+
+### v1.2.14 (2026-03-06)
+
+#### 调整
+- **RD-Bridge.1** Radio 内部 Dot 与 Filled 描边过渡改为消费 Frame 通用时序桥接变量；组件仅定义最终描边粗细，不再内置独立默认时间曲线。
+
+### v1.2.13 (2026-02-23)
+
+#### 修复
+- **RD-Fix.10** 修复 checked 态光标语义：选中项输出 `data-checked="true"` 并在组件层设置 `cursor: default`，避免 hover 时出现 pointer 误导。
+
+### v1.2.12 (2026-02-18)
+
+#### 修复
+- **RD-Fix.9** 按历史稳定策略修复 hover 闪动：unchecked hover 不再改变边框，仅保留背景混色。
+- **RD-Adj.4** 保留默认 filled 激活态“边框加粗”过渡，仅对 checked 状态应用边框动效。
+
+### v1.2.11 (2026-02-18)
+
+#### 修复
+- **RD-Fix.8** 进一步修复 hover 闪动：移除 visual 的 `background-image` 叠加链路，改为直接 `background-color` 混色。
+
+### v1.2.10 (2026-02-18)
+
+#### 修复
+- **RD-Fix.7** 修复 hover 闪动：状态与 hover 选择器从 `:has(...)` 切换为 sibling 链路（`input + visual`）。
+
+### v1.2.9 (2026-02-18)
+
+#### 修复
+- **RD-Fix.6** 修复默认（filled）形态激活动效缺失：选中时“边框加粗”补齐平滑过渡。
+- **RD-Adj.3** 与 Checkbox/Switch 统一动效时间与缓动曲线（`0.2s` + `cubic-bezier(0.4, 0, 0.2, 1)`）。
+
+### v1.2.8 (2026-02-18)
+
+#### 调整
+- **RD-Adj.2** 默认颜色链路改为主色：未设置颜色类时激活态使用 `--primary`（行为对齐 Filled Button）。
+
+### v1.2.7 (2026-02-18)
+
+#### 修复
+- **RD-Fix.5** 进一步修复 hover 闪动：移除视觉层颜色过渡，避免颜色链插值抖动。
+
+### v1.2.6 (2026-02-18)
+
+#### 修复
+- **RD-Fix.4** 修复 hover 进出时的消失闪动：overlay 改为固定 gradient，通过变量切换透明度，避免 hover 时切换 `background-image`。
+
+### v1.2.5 (2026-02-18)
+
+#### 修复
+- **RD-Fix.3** 修复 hover 闪动：视觉层改为常驻 0% overlay 基线，hover 仅切换 overlay 强度；并收敛过渡属性避免重绘抖动。
+
+### v1.2.4 (2026-02-18)
+
+#### 调整
+- **RD-Color.1** 组件颜色统一改为 `currentColor` 链路，支持 `class="text-*"` 覆盖整组件。
+- **RD-Color.2** 原灰阶层改为同色透明度层（20%/40%），激活与未激活统一同色体系。
+
+### v1.2.3 (2026-02-18)
+
+#### 调整
+- **RD-Adj.1** 默认 `variant` 从 `outline` 调整为 `filled`。
+
+### v1.2.2 (2026-02-18)
+
+#### 优化
+- **RD-Opt.1** 尺寸梯度与 Icon 组件对齐：`16/20/24/28/32/40/48/80`。
+- **RD-Opt.2** 尺寸链路改为 `--size-*` token，并补齐 `override -> internal -> token` 变量桥接。
+
+### v1.2.1 (2026-02-18)
+
+#### 修复
+- **RD-Fix.2** 移除组件内 `cursor: pointer`，禁用态 cursor 统一由 Frame `Surface` + `.snowui-disabled` 通用链路控制。
+
+### v1.2.0 (2026-02-03)
+
+#### 修复
+- **RD-Fix.1** 补齐 Frame 能力开关显式传参与内部变量命名规范
+
+---
+
+---
+
+> **以下内容供 AI 阅读，用于维护代码与文档的关联**
+
+## 开发者指南 (AI)
+
+### 模块索引 (Module Index)
+
+- **Radio 组件**: [./Radio.svelte](./Radio.svelte)
+
+### 关联关系
+
+- **父组件**: [Frame.svelte](./Frame.svelte)
+
+---
+
+## 使用示例
+
+```svelte
+<script>
+  import { Radio } from '@snowui-design-system/components';
+  let selected = $state('option1');
+</script>
+
+<!-- 单选模式 -->
+<Radio bind:checked>单个选项</Radio>
+
+<!-- 分组模式 -->
+<Radio bind:group={selected} value="option1">选项 1</Radio>
+<Radio bind:group={selected} value="option2">选项 2</Radio>
+<Radio bind:group={selected} value="option3">选项 3</Radio>
+
+<!-- Filled 变体 -->
+<Radio bind:group={selected} value="filled" variant="filled">填充样式</Radio>
+
+<!-- 自定义尺寸 -->
+<Radio bind:checked size={20}>大号单选</Radio>
+```
+
+## 变体
+
+### Outline
+- 未选中：灰色边框，透明背景
+- 选中：主题色圆点，灰色边框
+
+### Filled（默认）
+- 未选中：灰色边框，透明背景
+- 选中：主题色背景，白色圆点
+
+## 状态
+
+- **unchecked**: 未选中状态
+- **checked**: 选中状态
+- **disabled**: 禁用状态
+
+## 分组行为
+
+当使用 `group` 属性时：
+- 自动管理同组内的单选逻辑
+- 选中一个会自动取消其他选项
+- 再次点击当前选中项会取消选中
+- 取消当前选中项后，`group` 值会被清空为 `undefined`
+- `group` 值等于选中项的 `value`
+
+## 无障碍性
+
+- 使用原生 `<input type="radio">` 作为基础语义，并在组件内补充“再次点击可取消”逻辑
+- 支持 Tab 键聚焦
+- 支持 Space 键选中与取消
+- 支持方向键在同组内切换
+- 禁用状态下 `tabindex=-1`
+
+## 样式规范 (Style Spec)
+
+
+| 属性 | 值 | 说明 |
+|:---|:---|:---|
+| **Class** | `.snowui-radio` | 组件根类名 |
+| **CSS 行为** | 组件自管 | hover 视觉由组件内部选择器声明 |
+| **Tag** | `label` | 语义化标签，点击区域包含文字 |
+
+### 2. 默认样式 (Defaults)
+
+- **Display**: `inline-flex`, `align-items: center`
+- **Gap**: `var(--gap-1)` (4px) - 图标与文字间距
+- **Cursor**: 由 Frame `Surface` 通用规则控制（可交互时 pointer，Disabled 时 default）
+- **Font**: `var(--text-14)` (14px), `line-height: var(--leading-14)` (20px)
+
+### 3. CSS 变量 (Variables)
+
+组件使用 CSS 变量实现等比缩放：
+
+```css
+--snowui-radio-size: var(--size-4); /* 基准 16px */
+--snowui-radio-border-width: calc(var(--snowui-radio-size) * 0.0625); /* 1px */
+--snowui-radio-dot-size: calc(var(--snowui-radio-size) * 0.5); /* 8px */
+--snowui-radio-filled-border: calc(var(--snowui-radio-size) * 0.3); /* 4px */
+--snowui-radio-primary: var(--primary, var(--black-100, #000000)); /* 使用全局 Primary Token */
+```
+
+### 4. 状态样式 (States)
+
+#### Unchecked
+- **Visual**: 透明背景 + `var(--black-20)` 边框
+- **Border Radius**: `var(--radius-full, 50%)` (圆形)
+- **Hover**: 在 `.snowui-radio-visual` 同层直接切换背景变量到 `4%` 主色混合值，避免边框收缩结束后出现独立层闪现
+
+#### Checked (Outline 变体)
+- **触发**: 根节点 `[data-checked="true"]` 驱动
+- **Visual**: 边框不变，内部显示 `--radio-primary` 色 Dot
+- **Dot**: `scale(1)` (弹性过渡)
+- **交互**: 允许再次点击取消，不再把 checked 态视为不可操作状态
+
+#### Checked (Filled 变体)
+- **触发**: `[data-variant="filled"][data-checked="true"]`
+- **Visual**: 边框加粗 `--radio-filled-border` 并变色为 `--radio-primary`
+- **Background**: `transparent` (中空效果)
+- **实现细节**: 组件始终保留一层细边框；选中态粗边框作为独立选中环层叠加，退选时通过缩放 + 透明度过渡回收，不再执行 inset 宽度收缩动画
+
+#### Disabled
+- **Attr**: `[data-disabled="true"]`
+- **Style**: `opacity: 0.5`, `pointer-events: none`, `cursor: default`
+
+### 5. 交互细节
+
+- **点击区域**: 原生 `<input>` 使用 `position: absolute; inset: 0` 覆盖整个 label 区域
+- **取消选中逻辑**: 组件拦截 click / `Space`，统一走内部 `toggle` 逻辑，而不是完全依赖原生 radio 的不可取消行为
+- **Focus**: 支持键盘导航，聚焦时显示 `4% currentColor` 的 Ring
+- **动画**: Dot 与 Filled 描边默认继承 Frame `control / border` 通用时序（默认 `300ms ease-out`），外部仍可通过组件 CSS 变量覆写。
+- **选中态无 Hover**: 用户要求选中态不响应 hover
