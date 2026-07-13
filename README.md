@@ -1,7 +1,7 @@
 # SnowUI Components 项目说明
 
-> **版本**: v1.1.0
-> **更新**: 2026-02-05
+> **版本**: v2.0.0
+> **更新**: 2026-07-13
 > **职责**: 项目结构与开发环境说明
 
 ## 1. 项目概览
@@ -9,15 +9,15 @@
 ### 技术方案
 - **框架**: Svelte 5 (Runes API)
 - **构建**: Vite + TypeScript
-- **包管理**: npm workspaces
-- **样式**: 原生 CSS + `snowui.css` (Design System)
+- **包管理**: pnpm 独立 workspace
+- **样式**: 包内 `src/styles/`，不依赖 `SnowUI/home` 或上级 `styles/`
 
 ### 依赖关系
 - **@snowui-design-system/resource-svelte**: 
   - **用途**: 提供图标、头像、插画等静态资源组件。
   - **引用方式**: 
     - 生产代码: `import { IconName } from "@snowui-design-system/resource-svelte";`
-    - Vite 配置: 开发环境已通过 `alias` 映射到本地 workspace 源码。
+    - Vite 配置: 使用已发布 npm 包。
 
 ---
 
@@ -28,8 +28,8 @@
 | `src/components/` | 组件源码 (`.svelte`)、文档 (`.md`)、测试 (`.test.ts`) |
 | `src/logic/` | 共享 TypeScript 逻辑 (`Frame Context`, `Context`) |
 | `src/styles/` | Components 完整共享 CSS（含 `themes.css`、`components.css`、layout、tokens、scale、scrollbar） |
-| `src/test/` | 组件预览和测试环境 |
-| `src/demo/` | AI 调试用 Demo 文件 (不提交生产) |
+| `.github/workflows/` | 独立 CI 与 npm tag 发布流程 |
+| `scripts/` | OSS 边界与样式自包含检查 |
 
 ---
 
@@ -44,27 +44,32 @@ Frame 是所有 SnowUI 组件的基石。**开发任何组件前，必须了解 
 
 ## 4. 开发规范
 
-> **核心文档**: 所有开发活动必须遵循 [AI_GUIDELINES.md](../AI_GUIDELINES.md) 和 [ComponentGuidelines.md](../specs/ComponentGuidelines.md)。
+> **核心文档**: 完整规范位于本机聚合目录的 `../specs/`，不属于本 GitHub 仓库。
 
-### 样式系统 (snowui.css)
+### 样式系统
 
-本项目**严禁使用 Tailwind CSS**。必须使用 `snowui.css` 提供的 Token 变量与工具类。
+本项目**严禁使用 Tailwind CSS**。组件样式只消费 `src/styles/`。
 
-- **Token 映射**: 参考 [FigmaToSnowUI.md](../specs/FigmaToSnowUI.md)
-- **样式规范**: 参考 [StyleGuide.md](../specs/StyleGuide.md)
+消费方引入完整组件样式：
+
+```css
+@import "@snowui-design-system/components/styles";
+```
+
+- `src/styles/themes.css`：包内主题；只允许项目所有者与 `../styles/snowui-themes.css` 手工同步。
+- `src/styles/components.css`：公开 override 变量入口。
+- AI、CI 与脚本只能验证主题一致性，不得自动复制或覆盖。
 
 ---
 
 ## 5. 测试与验证
 
-### 测试项目 (`src/test`)
-- **启动**: `npm run dev`
-- **组件注册**: 新组件必须在 `src/test/component-registry.ts` 注册，并在 `src/index.ts` 导出
-
-### 调试 Playground
-- **用户测试**: `src/Playground.svelte` (不要修改)
-- **AI 调试**: `src/demo/Demo.svelte` (不提交生产)
-- **测试列表**: 访问 `/?page=test-list`
+- **安装**: `pnpm install --frozen-lockfile`
+- **样式自包含**: `pnpm verify:styles`
+- **OSS 边界**: `pnpm check:oss`
+- **类型检查**: `node_modules/.bin/svelte-check --tsconfig tsconfig.json`
+- **构建**: `pnpm build`
+- **打包预览**: `npm pack --dry-run`
 
 ---
 
@@ -78,4 +83,4 @@ Frame 是所有 SnowUI 组件的基石。**开发任何组件前，必须了解 
 ## 7. 评审与发布
 
 - **Review**: 组件开发完成后，调用 `review` 技能进行自我审查
-- **发布**: 遵循语义化版本 (SemVer)
+- **发布**: 在本仓库推送与 `package.json` 一致的 `v*` tag，由 GitHub Actions 发布 npm。
