@@ -22,11 +22,11 @@ function* walk(dir) {
     }
 }
 
-const forbidden = /(?:\.\.\/){2,}styles(?:\/|\b)|\/Users\/yuan\/Project\/snowui\/styles\//;
+const forbidden = /snowui-components\.css|snowui-themes\.css|(?:\.\.\/){2,}styles(?:\/|\b)|\/Users\/yuan\/Project\/snowui\/styles\//;
 for (const file of walk("src")) {
-    if (!/\.(?:css|ts|svelte|md)$/.test(file)) continue;
+    if (!/\.(?:css|ts|js|mjs|svelte)$/.test(file)) continue;
     const source = readFileSync(file, "utf8");
-    if (forbidden.test(source) && !file.endsWith("src/styles/themes.css")) {
+    if (forbidden.test(source)) {
         console.error(`❌ external styles dependency found in ${file}`);
         process.exit(1);
     }
