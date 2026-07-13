@@ -759,7 +759,7 @@
    仅在浏览器支持 CSS corner-shape 时，为已有圆角的组件启用 squircle 圆角。
    不修改任何 border-radius 数值；不支持的浏览器会忽略本段。
 ───────────────────────────────────────── */
-@supports (corner-shape: squircle) {
+/* @supports (corner-shape: squircle) {
     :where(
         .snowui-accordion-item,
         .snowui-avatar,
@@ -820,4 +820,4 @@
     ) {
         corner-shape: squircle;
     }
-}
+} */
