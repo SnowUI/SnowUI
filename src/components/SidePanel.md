@@ -1,6 +1,6 @@
 # SidePanel
 
-> **版本**: v1.3.0  
+> **版本**: v1.3.1
 > **包归属**: PRO  
 > **职责**: 右侧详情弹出窗，支持浮层与页面右侧内嵌两种预览形态。
 
@@ -13,6 +13,7 @@
 - 默认宽度为 `460px`，圆角 `20px`（`--radius-5`）；浮层模式与页面上、右、下边缘保持 16px 间距；宽度通过左边缘 `Indicator` 调整（`pinOffset` 4px）；命中带遵循 Indicator line 全高协议（视觉默认 16px）。
 - 内嵌模式（`placement="inline"`）默认去掉浮层阴影，使用真实边框 `border: var(--border-1) solid var(--black-10)`（1px / Black/10%），保证圆角边缘连续可见；高度默认 `100dvh - 32px`，可用根 `style` / `class` 或 `--snowui-side-panel-height-override` 覆盖。
 - 浮层以及独立内嵌模式的面板本体使用 `SIDE_PANEL_APPEAR_MOTION` / `SIDE_PANEL_DISAPPEAR_MOTION`。SidePanel 的**默认内嵌集成效果**以 `SidePanel-Demo.svelte` 为基准：面板仍浮在页面内容上方，由页面常驻 fixed rail 承载；指定内容区同步让出 `panelWidth + 16px`，形成“浮动停靠 + 挤压指定内容”的效果。
+- 浮层 / 内嵌切换复用同一个稳定渲染宿主；组件只把该宿主在 `document.body` 与原 rail 位置之间迁移，不销毁并重建内容子树，避免切换时面板丢失或未提交的表单 DOM 状态被清空。
 - 默认内嵌集成必须传 `inlineMotionOwner="layout"`，由页面常驻 rail 接管面板位移，避免与内容收缩形成两个启动时钟。页面使用 `createSidePanelLayoutMotionStyle()` 让被挤压区域的 `padding-right` 与 rail 的 `transform` 复用同一 spring timing；内嵌关闭时仍保留 presence 至退场完成。
 - SidePanel 不查询或改写页面兄弟 DOM。哪些元素被挤压由页面把哪些元素放入 `data-side-panel-layout` / `data-side-panel-main` 决定；未进入该预留空间链路的 header、导航、悬浮控件或其他区域会保持原宽度，并由 SidePanel 覆盖。
 - 内容区默认不生成业务内容；调用方显式写入 children。
@@ -286,6 +287,7 @@ SidePanel 本身提供高度能力，但页面负责决定它相对于哪个空�
 
 ## Changelog
 
+- **SP-Init.29 / v1.3.1 (2026-07-20)**：修复从浮层切换到内嵌预览时，Portal 分支切换可能导致 SidePanel 消失的问题；改为迁移稳定渲染宿主并保留内容子树。
 - **SP-Init.28 / v1.3.0 (2026-07-13)**：将 SidePanel-Demo 的实现确立为默认内嵌布局协议；定义“浮动停靠 + 挤压指定内容”的语义、页面/组件职责、被挤压与被覆盖区域的选择方式、同步动效不变量、fixed rail 完整写法，以及高度与视口间距的单一事实来源。
 - **SP-Init.27 (2026-07-13)**：内嵌边框由 inset box-shadow 改为真实 1px border，修复圆角边缘缺线；SidePanel-Demo 的协调式 rail 改为视口固定并保持上、右、下 16px，长页面不再拉大可视区域底部间距。
 - **SP-Init.26 (2026-07-13)**：对照 RareUI 网站与开源源码，将协调式内嵌动效改为常驻 rail `transform` + 主内容 `padding-right` 同状态启动；新增 `inlineMotionOwner="layout"` 防止 SidePanel 重复位移。继续使用 SnowUI 临界阻尼，不恢复 RareUI 回弹。

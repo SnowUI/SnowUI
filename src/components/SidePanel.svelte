@@ -219,11 +219,31 @@
             (editable || !hasBottomLeadingCustom ? defaultBottomTrailingActions : []),
     );
 
-    function portal(node: HTMLElement) {
-        document.body.appendChild(node);
+    /**
+     * 在浮层与内嵌模式之间迁移同一个渲染宿主。
+     * 保留原位 marker，避免切换 placement 时销毁 / 重建面板子树。
+     */
+    function portal(node: HTMLElement, enabled: boolean) {
+        const home = node.parentNode;
+        const marker = document.createComment("side-panel-render-home");
+        home?.insertBefore(marker, node);
+
+        function place(nextEnabled: boolean) {
+            if (nextEnabled) {
+                document.body.appendChild(node);
+                return;
+            }
+            marker.parentNode?.insertBefore(node, marker.nextSibling);
+        }
+
+        place(enabled);
         return {
+            update(nextEnabled: boolean) {
+                place(nextEnabled);
+            },
             destroy() {
                 node.remove();
+                marker.remove();
             },
         };
     }
@@ -441,12 +461,16 @@
     </FramePro>
 {/snippet}
 
-{#if placement === "floating" && presence.present}
-    <div use:portal class="snowui-side-panel-layer" aria-hidden={open ? undefined : "true"}>
+{#if presence.present}
+    <div
+        use:portal={placement === "floating"}
+        class={placement === "floating"
+            ? "snowui-side-panel-layer"
+            : "snowui-side-panel-inline-layer"}
+        aria-hidden={open ? undefined : "true"}
+    >
         {@render panelContent()}
     </div>
-{:else if placement === "inline" && presence.present}
-    {@render panelContent()}
 {/if}
 
 <style>
@@ -457,6 +481,18 @@
         display: flex;
         align-items: stretch;
         justify-content: flex-end;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-side-panel-inline-layer)) {
+        display: flex;
+        align-items: stretch;
+        justify-content: flex-end;
+        width: fit-content;
+        max-width: 100%;
+        height: 100%;
+        min-width: 0;
+        flex: 0 0 auto;
         pointer-events: none;
     }
 

@@ -75,8 +75,8 @@ export const examples = [
         expected: {
             render: "SidePanel 作为页面右侧内嵌栏渲染",
             layout: "页面主内容 padding 与常驻 rail transform 同步变化并保留 16px 间距；SidePanel 不修改兄弟 DOM",
-            interaction: "inlineMotionOwner=layout 时页面用同一 spring 驱动面板和 Table；上工具栏第一个按钮可切回浮层模式",
-            performance: "无 Portal layer；关闭后等待退场完成再卸载",
+            interaction: "inlineMotionOwner=layout 时页面用同一 spring 驱动面板和 Table；上工具栏第一个按钮可在浮层 / 内嵌之间稳定往返",
+            performance: "切换 placement 时迁移同一个渲染宿主，不销毁内容子树；关闭后等待退场完成再卸载",
             responsive: "面板宽度仍遵循最大视口约束",
         },
         logic: ["SP-Init.26"],
