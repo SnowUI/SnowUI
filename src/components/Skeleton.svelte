@@ -1,6 +1,6 @@
 <!--
  Skeleton 骨架屏组件
- v1.3.6
+ v1.3.8
 
  变更记录 (2026-03-14):
  - Input 骨架高度同步到 44px，和 Input 默认 14 字号 + 12/16 padding 样式保持一致
@@ -64,6 +64,7 @@
         [/\bsnowui-image-viewer\b/, "image-viewer"],
         [/\bsnowui-image-group\b/, "image-group"],
         [/\bsnowui-image\b/, "image"],
+        [/\bsnowui-gradient\b/, "gradient"],
         [/\bsnowui-avatar-group\b/, "avatar-group"],
         [/\bsnowui-avatar\b/, "avatar"],
         [/\bsnowui-flow-text\b/, "flow-text"],
@@ -666,6 +667,17 @@
                         "rect",
                         fit("2.5rem"),
                         fit("2.5rem"),
+                    ),
+                    options.renderHints,
+                    options,
+                );
+            case "gradient":
+                return applyRenderHints(
+                    createSingleLayout(
+                        componentKey,
+                        "rect",
+                        fit("calc(var(--size-4) * 355 / 16)"),
+                        fit("calc(var(--size-4) * 355 / 16)"),
                     ),
                     options.renderHints,
                     options,

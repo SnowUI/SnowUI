@@ -93,6 +93,7 @@ export {
 } from "./logic/dialog.svelte";
 export { default as Avatar } from "./components/Avatar.svelte";
 export { default as AvatarGroup } from "./components/AvatarGroup.svelte";
+export { default as Gradient } from "./components/Gradient.svelte";
 export { default as Image } from "./components/Image.svelte";
 export { default as ImageGroup } from "./components/ImageGroup.svelte";
 export { default as Icon } from './components/Icon.svelte'

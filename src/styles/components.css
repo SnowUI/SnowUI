@@ -420,6 +420,11 @@
     /* --snowui-gradient-motion-size-override: ; */    /* 整体尺寸（默认值见组件源码） */
     /* --snowui-gradient-motion-radius-override: ; */  /* 圆角 / 裁切半径（默认 inherit） */
 
+    /* Gradient */
+    /* --snowui-gradient-width-override: ; */   /* 宽度（默认 355px） */
+    /* --snowui-gradient-height-override: ; */  /* 高度（默认 355px） */
+    /* --snowui-gradient-radius-override: ; */  /* 圆角 / 裁切半径（默认 var(--radius-5) = 20px） */
+
     /* AvatarGroup */
     /* --snowui-avatar-group-size-override: ; */       /* 整体尺寸（尺寸 px，默认值见组件源码） */
     /* --snowui-avatar-group-item-size-override: ; */  /* 单个 item 尺寸（尺寸 px，默认值见组件源码） */
