@@ -1,9 +1,10 @@
 /* Scrollbar Styles */
-/* v1.3.0 */
+/* v1.4.0 */
 /* Log (2026-04-17): 从 Textarea 组件提炼为通用共享样式，任何可滚动元素挂 .snowui-scrollbar 即生效。 */
 /* Log (2026-04-24): 新增 .snowui-scrollbar--edge 修饰类，落地「不占宽度·紧贴边缘」规范。 */
 /* Log (2026-04-24): 从 Textarea / Listbox 提炼 .snowui-overlay-scrollbar 浮层滚动条通用样式。 */
 /* Log (2026-06-21): 纵向 overlay scrollbar 改为宿主区域 hover 时以 Frame 默认动效渐显/渐隐；横向溢出时保持常显。 */
+/* Log (2026-07-22): 纵向 overlay Thumb 常态视觉维持 4px，透明 hover 命中区扩大为 8px。 */
 
 /*
  * ⚠️ ::-webkit-scrollbar 不可嵌套于 :where()，必须使用直接选择器。
@@ -31,7 +32,7 @@
  * Viewport 挂 .snowui-overlay-scrollbar-viewport 隐藏原生滚动条。
  * 自定义轨道挂 .snowui-overlay-scrollbar，Thumb 挂 .snowui-overlay-scrollbar-thumb。
  * 轨道绝对定位，不占布局宽度；具体 top/bottom/right/z-index 由组件按容器结构声明。
- * 纵向 Thumb 默认右对齐 4px，hover 从右向左展宽到 8px，右边缘不移动。
+ * 纵向 Thumb 默认右对齐且视觉宽 4px；透明 hover 命中区保持 8px，命中后从右向左展宽到 8px，右边缘不移动。
  * 横向 Thumb 始终为 8px，hover 只改变颜色。
  * 轨道默认距容器右侧/底部 4px；双轴时横向轨道为纵向轨道预留交叉区域。
  */
@@ -180,28 +181,45 @@
 .snowui-overlay-scrollbar-host:hover
     > .snowui-overlay-scrollbar:not([data-axis="horizontal"])[data-visible="true"] {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .snowui-overlay-scrollbar-thumb {
     position: absolute;
     top: 0;
     right: 0;
-    width: var(--snowui-overlay-scrollbar-thumb-width);
+    width: var(--snowui-overlay-scrollbar-thumb-hover-width);
     border-radius: 99px;
-    background-color: var(--black-10, rgba(0, 0, 0, 0.1));
+    background-color: transparent;
     cursor: default;
     touch-action: none;
     user-select: none;
+    will-change: transform;
+    pointer-events: auto;
+}
+
+/* 纵向 Thumb 本体始终提供 8px 真实命中区；内部视觉层常态只显示右侧 4px。 */
+.snowui-overlay-scrollbar:not([data-axis="horizontal"])
+    > .snowui-overlay-scrollbar-thumb::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--snowui-overlay-scrollbar-thumb-width);
+    border-radius: inherit;
+    background-color: var(--black-10, rgba(0, 0, 0, 0.1));
     transition:
         width var(--snowui-frame-color-motion-duration, 0.15s)
             var(--snowui-frame-color-motion-easing, ease-out),
         background-color var(--snowui-frame-color-motion-duration, 0.15s)
             var(--snowui-frame-color-motion-easing, ease-out);
-    will-change: transform;
-    pointer-events: auto;
 }
 
-.snowui-overlay-scrollbar-thumb:hover {
+.snowui-overlay-scrollbar:not([data-axis="horizontal"])
+    > .snowui-overlay-scrollbar-thumb:hover::before,
+.snowui-overlay-scrollbar:not([data-axis="horizontal"])
+    > .snowui-overlay-scrollbar-thumb[data-dragging="true"]::before {
     width: var(--snowui-overlay-scrollbar-thumb-hover-width);
     background-color: var(--black-20, rgba(0, 0, 0, 0.2));
 }
@@ -226,6 +244,7 @@
     left: 0;
     width: auto;
     height: var(--snowui-overlay-scrollbar-size);
+    background-color: var(--black-10, rgba(0, 0, 0, 0.1));
     transition:
         background-color var(--snowui-frame-color-motion-duration, 0.15s)
             var(--snowui-frame-color-motion-easing, ease-out);
@@ -235,4 +254,5 @@
     .snowui-overlay-scrollbar-thumb:hover {
     width: auto;
     height: var(--snowui-overlay-scrollbar-size);
+    background-color: var(--black-20, rgba(0, 0, 0, 0.2));
 }

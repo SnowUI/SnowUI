@@ -1,7 +1,8 @@
 /**
  * ScrollArea.test.ts
- * v1.0.0
+ * v1.1.0
  * 变更记录 (2026-06-21): 新增纵向、横向、双轴与组合示例。
+ * 变更记录 (2026-07-22): 明确纵向 Thumb 常态 8px hover 命中宽度。
  */
 export const examples = [
     {
@@ -17,7 +18,7 @@ export const examples = [
         expected: {
             render: "高度受限时显示 SnowUI 纵向自建滚动条。",
             layout: "viewport 填满 ScrollArea，内容自然纵向溢出。",
-            interaction: "支持滚轮、键盘、触控和 Thumb 拖动；hover 时纵向 Thumb 从 4px 展宽到 8px。",
+            interaction: "支持滚轮、键盘、触控和 Thumb 拖动；纵向 Thumb 常态视觉宽 4px、hover 命中宽 8px，hover 后视觉展宽到 8px。",
             performance: "复用 useOverlayScrollbar 与共享 resizeManager。",
             responsive: "容器尺寸改变后自动重算 Thumb。",
         },
