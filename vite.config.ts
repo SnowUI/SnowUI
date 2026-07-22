@@ -19,8 +19,8 @@ function injectPreludeIntoSfc(source: string, prelude: string) {
   return source.slice(0, insertAt) + `\n${prelude}\n` + source.slice(insertAt)
 }
 
-const sandboxPrelude = `import { Accordion, AccordionItem, Button, SelectButton, CopyButton, ExpandButton, ButtonGroup, Breadcrumb, Card, ScrollArea, Indicator, Pagination, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, resizable, Separator, Progress, Slider, Input, SearchInput, Textarea, Select, Listbox, MenuItem, Frame, LocaleProvider, Text, Tooltip, Badge, Chip, Link, Tag, Kbd, CodeBlock, Popover, showPopover, hidePopover, togglePopover, Dialog, showDialog, hideDialog, Avatar, AvatarGroup, Gradient, Logo, Icon, Skeleton, Spinner, Radio, Checkbox, Switch, Image, ImageGroup } from "/src/index";
-import LogoHoverController from "/src/test/LogoHoverController.svelte";
+const sandboxPrelude = `import { Accordion, AccordionItem, Button, SelectButton, CopyButton, ExpandButton, ButtonGroup, Breadcrumb, Card, ScrollArea, Indicator, Pagination, Table, TableHeader, TableBody, TableRow, TableHead, TableCell, resizable, Separator, Progress, Slider, Input, SearchInput, Textarea, Select, Listbox, MenuItem, Frame, LocaleProvider, Text, Tooltip, Badge, Chip, Link, Tag, Kbd, CodeBlock, Popover, showPopover, hidePopover, togglePopover, Dialog, showDialog, hideDialog, Avatar, AvatarGroup, Gradient, SnowUILogo, Icon, Skeleton, Spinner, Radio, Checkbox, Switch, Image, ImageGroup } from "/src/index";
+import SnowUILogoHoverController from "/src/test/SnowUILogoHoverController.svelte";
 import { Field, FlowText, NumberFlow, NumericText, ScrambleText, SlotText, GradientMotion, SplitText, ImageViewer, SidePanel, SearchBox, CircularChart, GaugeChart, ChartGroup, LineChart, BarChart, Tab, Segmented, Toast, Toaster, DataTable, toast, dismissToast, dismissAllToasts, FramePro, initMotion, getMotion } from "@snowui-design-system/components-pro";
 import { fade, fly, slide } from "svelte/transition";
 

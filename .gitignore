@@ -6,4 +6,4 @@ dist/
 vite_out*.log
 scripts/report.txt
 src/test/*
-!src/test/LogoHoverController.svelte
+!src/test/SnowUILogoHoverController.svelte
