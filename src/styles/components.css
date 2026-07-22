@@ -425,6 +425,12 @@
     /* --snowui-gradient-height-override: ; */  /* 高度（默认 355px） */
     /* --snowui-gradient-radius-override: ; */  /* 圆角 / 裁切半径（默认 var(--radius-5) = 20px） */
 
+    /* Logo */
+    /* --snowui-logo-icon-size-override: ; */       /* 图标尺寸（默认 horizontal/icon 28px，vertical 64px） */
+    /* --snowui-logo-wordmark-width-override: ; */  /* 字标宽度（默认 71px） */
+    /* --snowui-logo-wordmark-height-override: ; */ /* 字标高度（默认 12px） */
+    /* --snowui-logo-gap-override: ; */              /* 组合间距（默认 horizontal 6px，vertical 8px） */
+
     /* AvatarGroup */
     /* --snowui-avatar-group-size-override: ; */       /* 整体尺寸（尺寸 px，默认值见组件源码） */
     /* --snowui-avatar-group-item-size-override: ; */  /* 单个 item 尺寸（尺寸 px，默认值见组件源码） */

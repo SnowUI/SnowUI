@@ -5,4 +5,5 @@ dist/
 *.log
 vite_out*.log
 scripts/report.txt
-src/test/
+src/test/*
+!src/test/LogoHoverController.svelte

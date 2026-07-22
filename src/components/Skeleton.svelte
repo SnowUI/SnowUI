@@ -65,6 +65,7 @@
         [/\bsnowui-image-group\b/, "image-group"],
         [/\bsnowui-image\b/, "image"],
         [/\bsnowui-gradient\b/, "gradient"],
+        [/\bsnowui-logo\b/, "logo"],
         [/\bsnowui-avatar-group\b/, "avatar-group"],
         [/\bsnowui-avatar\b/, "avatar"],
         [/\bsnowui-flow-text\b/, "flow-text"],
@@ -678,6 +679,17 @@
                         "rect",
                         fit("calc(var(--size-4) * 355 / 16)"),
                         fit("calc(var(--size-4) * 355 / 16)"),
+                    ),
+                    options.renderHints,
+                    options,
+                );
+            case "logo":
+                return applyRenderHints(
+                    createSingleLayout(
+                        componentKey,
+                        "rect",
+                        fit("calc(var(--size-4) * 105 / 16)"),
+                        fit("calc(var(--size-4) * 28 / 16)"),
                     ),
                     options.renderHints,
                     options,
