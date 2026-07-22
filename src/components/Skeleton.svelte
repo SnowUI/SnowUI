@@ -65,7 +65,7 @@
         [/\bsnowui-image-group\b/, "image-group"],
         [/\bsnowui-image\b/, "image"],
         [/\bsnowui-gradient\b/, "gradient"],
-        [/\bsnowui-logo\b/, "logo"],
+        [/\bsnowui-snow-ui-logo\b/, "snow-uilogo"],
         [/\bsnowui-avatar-group\b/, "avatar-group"],
         [/\bsnowui-avatar\b/, "avatar"],
         [/\bsnowui-flow-text\b/, "flow-text"],
@@ -683,7 +683,7 @@
                     options.renderHints,
                     options,
                 );
-            case "logo":
+            case "snow-uilogo":
                 return applyRenderHints(
                     createSingleLayout(
                         componentKey,
