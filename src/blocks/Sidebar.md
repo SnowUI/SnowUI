@@ -1,6 +1,6 @@
 # Sidebar（PRO Block）
 
-> **版本**: v1.4.1
+> **版本**: v1.4.2
 > **职责**: 提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。
 > **归属**: PRO Blocks / Template Block
 
@@ -45,7 +45,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 - 展开默认宽度 `220px`，折叠宽度 `60px`，高度 `100%`。展开宽度可通过右边缘 `Indicator` 在默认 `160px`～`480px` 范围内拖拽，并通过 `width` / `bind:width` 与 `onWidthChange` 对外同步。
 - 折叠与展开以 Sidebar 根宽度为主时间轴：展开宽度 → 60px 使用 `SIDE_PANEL_DISAPPEAR_MOTION` 的临界阻尼 spring timing，60px → 上次展开宽度使用 `SIDE_PANEL_APPEAR_MOTION` 的同系 timing；该 timing 复用 Frame 默认 move spring。拖拽期间临时关闭宽度 transition，使边缘与指针同步；`enableDefaultMotion={false}` 与系统 reduced motion 均关闭该过渡。
-- 右侧宽度 Indicator 仅在展开态存在，视觉中心默认距右边缘 `4px`；默认 16px 高视觉条的命中范围只覆盖视觉条上下各 `4px`，合计 24px，不再沿 Sidebar 全高截获指针。Indicator 与 Sidebar 的 overlay scrollbar 重叠时由 Indicator 通用能力自动隐藏，只保留滚动条。折叠不会覆盖已调整的展开宽度，再次展开时恢复该宽度。
+- 右侧宽度 Indicator 仅在展开态存在，鼠标进入 Sidebar 任意区域即显示；视觉中心默认距右边缘 `4px`，默认 16px 高视觉条的命中范围只覆盖视觉条上下各 `4px`，合计 24px，不再沿 Sidebar 全高截获指针。Indicator 与 Sidebar 的可见 overlay scrollbar Thumb 重叠时由 Indicator 通用能力自动隐藏，并关闭自身 Pointer、hover、拖拽与键盘命中，只保留滚动条交互。折叠不会覆盖已调整的展开宽度，再次展开时恢复该宽度。
 - 根容器默认 padding 为左右 `12px`（`var(--padding-3)`）、上下 `16px`（`var(--padding-4)`）；这是 Sidebar 组件默认值，不由使用方重复补 class 或 style。
 - Header 固定，`ScrollArea` 独立滚动并延伸到 Sidebar 底部；Footer 固定覆盖在 Body 之上。Sidebar 根的 Header / Body 默认 gap 为 `var(--gap-3)`（12px），即 Logo 区域与下方导航区域之间的默认间距；它与 Body 内相邻导航内容的 4px gap 是两个独立层级。
 - Body 纵向 overlay scrollbar 根据根横向 padding 自动外移，轨道右边缘始终距 Sidebar 右边框 `4px`；默认 12px 横向 padding 时其 `right` 偏移为 `-8px`。
@@ -105,6 +105,11 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
 ## 更新日志 (Changelog)
+
+### v1.4.2 (2026-07-28)
+
+#### 修复
+- Sidebar 任意区域 hover 继续显示宽度 Indicator；与可见 scrollbar Thumb 重叠时，Indicator 完全退出 Pointer、hover、拖拽和键盘命中，只允许滚动条响应。
 
 ### v1.4.1 (2026-07-28)
 

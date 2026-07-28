@@ -25,7 +25,7 @@ export const examples = [
         expected: {
             render: "默认 Logo 由 SnowUILogo icon/text 变体组成，分类标题、active Dashboard、Saved 更新圆点与 Footer 均可见",
             layout: "Sidebar 展开默认宽 220px、折叠宽 60px，根 padding 左右 12px / 上下 16px；Section 标题行 padding 左右 8px / 上下 4px；Logo host 左右 padding 4px；Header/Footer 固定，Body 可滚动且纵向滚动条可见并距 Sidebar 右边框 4px",
-            interaction: "Sidebar hover 显示位于 Logo 区域右边的默认变体 icon-only 折叠按钮与右侧宽度 Indicator；折叠按钮不内置 Tooltip，通过动态 aria-label 保留名称，并以 Frame 默认 move spring 跟随 Sidebar 平移；Indicator 只在 16px 视觉条上下各 4px 的局部范围内激活，默认允许 160px～480px 拖拽且拖拽期间无宽度 transition；Indicator 与滚动条重叠时隐藏；分类标题文字与箭头共同点击折叠且标题无 Tooltip",
+            interaction: "Sidebar 任意区域 hover 显示位于 Logo 区域右边的默认变体 icon-only 折叠按钮与右侧宽度 Indicator；折叠按钮不内置 Tooltip，通过动态 aria-label 保留名称，并以 Frame 默认 move spring 跟随 Sidebar 平移；Indicator 只在 16px 视觉条上下各 4px 的局部范围内激活，默认允许 160px～480px 拖拽且拖拽期间无宽度 transition；Indicator 与可见 scrollbar Thumb 重叠时隐藏并完全退出 Pointer、hover、拖拽和键盘命中，只允许滚动条响应；分类标题文字与箭头共同点击折叠且标题无 Tooltip",
             performance: "as=footer 与 sections 同时传入时不抑制默认导航节点",
             responsive: "固定宽度、左对齐 Test 宿主保持 Sidebar 左边缘不动；折叠时根宽度、Item 文字与标题渐隐同时开始，Item Icon 保持横向位置，标题完全渐隐后 Item 才上移；Footer 固定展开态宽度与底部位置且只渐隐 / 渐显，不随根宽度压缩或位移；折叠后 Item 保持默认 36px 高度，Logo Icon 不跳动，Logo host 保持单行且透明 wordmark 不得换行撑高容器；默认 Logo 只保留 as=logo-icon，同时隐藏宽度 Indicator",
         },
