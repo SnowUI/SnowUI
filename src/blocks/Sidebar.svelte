@@ -1,14 +1,19 @@
-<!-- Sidebar PRO Block v1.0.5. 文档: ./Sidebar.md -->
+<!-- Sidebar PRO Block v1.4.1. 文档: ./Sidebar.md -->
 <script lang="ts">
-    import { onMount, setContext, untrack, type Snippet } from "svelte";
+    import { onMount, setContext, tick, untrack, type Snippet } from "svelte";
     import {
         Button,
+        Indicator,
         ScrollArea,
         SnowUILogo,
-        Tooltip,
         type FrameProps,
     } from "@snowui-design-system/components";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
+    import {
+        SIDE_PANEL_APPEAR_MOTION,
+        SIDE_PANEL_DISAPPEAR_MOTION,
+    } from "@snowui-design-system/components/motion/presets/effects";
+    import { resolveMotionCssTiming } from "@snowui-design-system/components/motion/spring";
     import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
     import FramePro from "../components/FramePro.svelte";
     import SidebarSection from "./SidebarSection.svelte";
@@ -30,16 +35,29 @@
         content?: Snippet;
     }
 
-    interface Props extends Omit<FrameProps, "children"> {
+    const sidebarExpandTiming = resolveMotionCssTiming(
+        SIDE_PANEL_APPEAR_MOTION,
+    );
+    const sidebarCollapseTiming = resolveMotionCssTiming(
+        SIDE_PANEL_DISAPPEAR_MOTION,
+    );
+
+    interface Props extends Omit<FrameProps, "children" | "width"> {
         sections?: SidebarSectionData[];
+        navigationVariant?: "icon" | "text";
         collapsed?: boolean;
         defaultCollapsed?: boolean;
+        width?: number;
+        minWidth?: number;
+        maxWidth?: number;
         activeItemId?: string;
         ariaLabel?: string;
         onCollapsedChange?: (collapsed: boolean) => void;
+        onWidthChange?: (width: number) => void;
         onActiveItemChange?: (itemId: string) => void;
         children?: Snippet;
         parts?: ComponentPartsOf<{
+            Indicator: typeof Indicator;
             SnowUILogo: typeof SnowUILogo;
             SidebarSection: typeof SidebarSection;
             SidebarItem: typeof SidebarItem;
@@ -49,11 +67,16 @@
 
     let {
         sections = [],
+        navigationVariant = "icon",
         collapsed = $bindable<boolean | undefined>(undefined),
         defaultCollapsed = false,
+        width = $bindable(220),
+        minWidth = 160,
+        maxWidth = 480,
         activeItemId = undefined,
         ariaLabel = "Primary navigation",
         onCollapsedChange = undefined,
+        onWidthChange = undefined,
         onActiveItemChange = undefined,
         children,
         parts = undefined,
@@ -75,7 +98,24 @@
     let footerElement = $state<HTMLElement>();
     let hasExternalLogo = $state(false);
     let hasExternalFooter = $state(false);
+    let resizing = $state(false);
     let footerMeasureFrame = 0;
+    let resizeEndFrame = 0;
+    let logoPlacementFrame = 0;
+    const resolvedWidth = $derived(
+        Math.min(Math.max(Number(width) || 220, minWidth), maxWidth),
+    );
+    const widthMotionTiming = $derived(
+        isCollapsed ? sidebarCollapseTiming : sidebarExpandTiming,
+    );
+    const rootStyle = $derived(
+        [
+            `--snowui-sidebar-width: ${resolvedWidth}px`,
+            `--snowui-sidebar-width-motion-duration: ${enableDefaultMotion ? widthMotionTiming.duration : 0}ms`,
+            `--snowui-sidebar-width-motion-easing: ${widthMotionTiming.easing}`,
+            userStyle,
+        ].filter(Boolean).join("; "),
+    );
 
     const context: SidebarContext = {
         get collapsed() {
@@ -97,6 +137,27 @@
         onCollapsedChange?.(next);
     }
 
+    function handleWidthChange(next: number) {
+        const resolved = Math.min(Math.max(Math.round(next), minWidth), maxWidth);
+        width = resolved;
+        onWidthChange?.(resolved);
+    }
+
+    function startWidthResize() {
+        cancelAnimationFrame(resizeEndFrame);
+        resizing = true;
+    }
+
+    async function finishWidthResize(next: number) {
+        handleWidthChange(next);
+        await tick();
+        cancelAnimationFrame(resizeEndFrame);
+        rootElement?.getBoundingClientRect();
+        resizeEndFrame = requestAnimationFrame(() => {
+            resizing = false;
+        });
+    }
+
     function syncExternalLogo() {
         if (!headerElement || !rootElement) return;
         let logo = headerElement.querySelector<HTMLElement>(
@@ -107,15 +168,22 @@
                 ':scope > [data-as="logo"]',
             );
         }
-        if (logo) {
-            const collapseButton = headerElement.querySelector<HTMLElement>(
+        hasExternalLogo = !!logo;
+        if (!logo || logo.parentElement === headerElement) return;
+
+        cancelAnimationFrame(logoPlacementFrame);
+        logoPlacementFrame = requestAnimationFrame(() => {
+            const collapseButton = headerElement?.querySelector<HTMLElement>(
                 ':scope > .snowui-sidebar-collapse-button',
             );
-            if (logo.nextElementSibling !== collapseButton) {
-                headerElement.insertBefore(logo, collapseButton);
+            if (
+                headerElement &&
+                logo?.isConnected &&
+                logo.nextElementSibling !== collapseButton
+            ) {
+                headerElement.insertBefore(logo, collapseButton ?? null);
             }
-        }
-        hasExternalLogo = !!logo;
+        });
     }
 
     function syncExternalFooter() {
@@ -186,6 +254,8 @@
         scheduleFooterSafeAreaSync();
         return () => {
             cancelAnimationFrame(footerMeasureFrame);
+            cancelAnimationFrame(resizeEndFrame);
+            cancelAnimationFrame(logoPlacementFrame);
             observer.disconnect();
             resizeObserver.disconnect();
         };
@@ -198,8 +268,10 @@
     column
     enableAutoLayout={false}
     class={["snowui-sidebar", userClass].filter(Boolean).join(" ")}
-    style={userStyle}
+    style={rootStyle}
     data-collapsed={isCollapsed ? "true" : "false"}
+    data-navigation-variant={navigationVariant}
+    data-resizing={resizing ? "true" : undefined}
     data-has-footer={hasExternalFooter ? "true" : undefined}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
@@ -230,14 +302,12 @@
             </div>
         {/if}
         <Button
-            bare
             size="sm"
             class="snowui-sidebar-collapse-button"
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             onclick={toggleCollapsed}
         >
             <ResourceIcon name="rightbar" collection="snowui" size={16} aria-hidden="true" />
-            <Tooltip as="tooltip">{isCollapsed ? "Expand sidebar" : "Collapse sidebar"}</Tooltip>
         </Button>
     </header>
 
@@ -276,7 +346,30 @@
         bind:this={footerElement}
         class="snowui-sidebar-footer"
         data-has-footer={hasExternalFooter ? "true" : undefined}
+        aria-hidden={isCollapsed ? "true" : undefined}
+        inert={isCollapsed}
     ></footer>
+
+    {#if !isCollapsed}
+        <Indicator
+            {...parts?.Indicator}
+            target={rootElement}
+            revealTarget={rootElement}
+            axis="width"
+            edge="end"
+            pinOffset="var(--snowui-sidebar-resize-indicator-offset-override, var(--padding-1))"
+            hitAreaPadding="var(--padding-1)"
+            class="snowui-sidebar-resize-indicator"
+            value={resolvedWidth}
+            minSize={minWidth}
+            maxSize={maxWidth}
+            applySize={false}
+            ariaLabel="调整侧边栏宽度"
+            onResizeStart={startWidthResize}
+            onSizeChange={handleWidthChange}
+            onResizeEnd={(next: number) => void finishWidthResize(next)}
+        />
+    {/if}
 </FramePro>
 
 <style>
@@ -298,11 +391,15 @@
             var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
         color: var(--black-100, #000);
         background: transparent;
-        transition: width var(--snowui-frame-size-motion-duration, 0.25s)
-            var(--snowui-frame-size-motion-easing, ease-out);
+        transition: width
+            var(--snowui-sidebar-width-motion-duration, 500ms)
+            var(--snowui-sidebar-width-motion-easing, ease-out);
     }
     :global(:where(.snowui-sidebar[data-collapsed="true"])) {
         width: var(--snowui-sidebar-collapsed-width-override, var(--snowui-sidebar-collapsed-width));
+    }
+    :global(:where(.snowui-sidebar[data-resizing="true"])) {
+        transition: none;
     }
     :global(:where(.snowui-sidebar-header)) {
         display: flex;
@@ -310,22 +407,25 @@
         min-height: 28px;
         box-sizing: border-box;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-start;
+        gap: var(--snowui-sidebar-collapsed-header-gap-override, var(--gap-1));
         overflow: visible;
         padding-block: var(
             --snowui-sidebar-logo-padding-y-override,
             var(--padding-1)
         );
     }
-    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-header)) {
-        justify-content: flex-start;
-        gap: var(--snowui-sidebar-collapsed-header-gap-override, var(--gap-1));
-    }
     :global(:where(.snowui-sidebar-header > [data-as="logo"])) {
         max-width: 100%;
-        min-width: 0;
+        min-width: var(
+            --snowui-sidebar-collapsed-logo-slot-width-override,
+            36px
+        );
         box-sizing: border-box;
-        flex: 0 0 auto;
+        flex: 1 1 auto;
+        flex-wrap: nowrap;
+        overflow: hidden;
+        white-space: nowrap;
         padding-inline: var(
             --snowui-sidebar-logo-padding-x-override,
             var(--padding-1)
@@ -333,18 +433,27 @@
     }
     :global(:where(.snowui-sidebar-default-logo)) {
         display: inline-flex;
-        flex: 0 0 auto;
         align-items: center;
         gap: var(
             --snowui-sidebar-default-logo-gap-override,
             calc(var(--gap-1) * 1.5)
         );
     }
-    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))) {
-        display: none;
+    :global(:where(.snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))) {
+        opacity: 1;
+        transition: opacity
+            var(--snowui-sidebar-width-motion-duration, 500ms)
+            var(--snowui-sidebar-width-motion-easing, ease-out);
     }
-    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-header > [data-as="logo"] > [data-as="logo-icon"])) {
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="icon"] .snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))) {
+        opacity: 0;
+        pointer-events: none;
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="icon"] .snowui-sidebar-header > [data-as="logo"] > [data-as="logo-icon"])) {
         flex: 0 0 auto;
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-header > [data-as="logo"])) {
+        display: none;
     }
     :global(:where(.snowui-sidebar-navigation > [data-as="logo"])) {
         display: none;
@@ -361,6 +470,11 @@
         visibility: visible;
         pointer-events: auto;
     }
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-collapse-button)) {
+        margin-inline: auto;
+        visibility: visible;
+        pointer-events: auto;
+    }
     :global(:where(.snowui-sidebar-body)) {
         --snowui-scroll-mask-top-size-override: var(
             --snowui-sidebar-logo-scroll-mask-size-override,
@@ -371,6 +485,9 @@
         flex: 1 1 auto;
         min-height: 0;
         overflow: visible;
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-body)) {
+        display: none;
     }
     :global(:where(.snowui-sidebar-body > .snowui-scroll-area-scrollbar[data-axis="vertical"])) {
         right: calc(
@@ -404,10 +521,19 @@
         position: absolute;
         z-index: 1;
         display: flex;
-        right: var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
         bottom: var(--snowui-sidebar-padding-y-override, var(--snowui-sidebar-padding-y));
         left: var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
-        width: auto;
+        width: calc(
+            var(--snowui-sidebar-width-override, var(--snowui-sidebar-width)) -
+                var(
+                    --snowui-sidebar-padding-x-override,
+                    var(--snowui-sidebar-padding-x)
+                ) -
+                var(
+                    --snowui-sidebar-padding-x-override,
+                    var(--snowui-sidebar-padding-x)
+                )
+        );
         box-sizing: border-box;
         align-items: flex-start;
         justify-content: flex-start;
@@ -432,6 +558,10 @@
         backdrop-filter: blur(
             var(--snowui-sidebar-footer-background-blur-override, 20px)
         );
+        opacity: 1;
+        transition: opacity
+            var(--snowui-sidebar-width-motion-duration, 500ms)
+            var(--snowui-sidebar-width-motion-easing, ease-out);
     }
     :global(:where(.snowui-sidebar-footer > [data-as="footer"])) {
         display: flex;
@@ -442,8 +572,18 @@
         justify-content: flex-start;
         gap: var(--snowui-sidebar-footer-gap-override, var(--gap-2));
     }
-    :global(:where(.snowui-sidebar-footer:not([data-has-footer="true"]))),
-    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-footer)) {
+    :global(:where(.snowui-sidebar-footer:not([data-has-footer="true"]))) {
         display: none;
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-footer)) {
+        opacity: 0;
+        pointer-events: none;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-sidebar)),
+        :global(:where(.snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))),
+        :global(:where(.snowui-sidebar-footer)) {
+            transition: none;
+        }
     }
 </style>

@@ -1,4 +1,4 @@
-<!-- SidebarSection PRO Block v1.0.0. 文档: ./SidebarSection.md -->
+<!-- SidebarSection PRO Block v1.2.0. 文档: ./SidebarSection.md -->
 <script lang="ts">
     import { untrack, type Snippet } from "svelte";
     import { Button, Text, Tooltip, type FrameProps } from "@snowui-design-system/components";
@@ -60,8 +60,12 @@
     data-sidebar-collapsed={sidebar?.collapsed ? "true" : "false"}
     {...rest}
 >
-    {#if title && !sidebar?.collapsed}
-        <div class="snowui-sidebar-section-header">
+    {#if title}
+        <div
+            class="snowui-sidebar-section-header"
+            aria-hidden={sidebar?.collapsed ? "true" : undefined}
+            inert={sidebar?.collapsed ? true : undefined}
+        >
             {#if canCollapse}
                 <Button
                     bare
@@ -76,7 +80,6 @@
                     <span class="snowui-sidebar-section-toggle-icon">
                         <ResourceIcon name="arrow-line-down" collection="snowui" size={12} aria-hidden="true" />
                     </span>
-                    <Tooltip as="tooltip">{isCollapsed ? `Expand ${title}` : `Collapse ${title}`}</Tooltip>
                 </Button>
             {:else}
                 <Text class="snowui-sidebar-section-title snowui-sidebar-section-static-title">
@@ -98,7 +101,7 @@
                                 onclick={() => action.onSelect?.(id)}
                             >
                                 <ResourceIcon name={action.icon} collection={action.iconCollection} size={12} aria-hidden="true" />
-                                <Tooltip as="tooltip">{action.label}</Tooltip>
+                                <Tooltip as="tooltip" position="right">{action.label}</Tooltip>
                             </Button>
                         {/each}
                     {/if}
@@ -122,9 +125,12 @@
         min-width: 0;
         flex-direction: column;
         gap: var(--snowui-sidebar-section-gap-override, var(--gap-1));
+        transition: gap var(--snowui-frame-size-motion-duration, 0.25s)
+            var(--snowui-frame-size-motion-easing, ease-out);
     }
     :global(:where(.snowui-sidebar-section-header)) {
         display: flex;
+        max-height: var(--size-6);
         min-height: var(--size-6);
         box-sizing: border-box;
         align-items: center;
@@ -138,6 +144,19 @@
                 --snowui-sidebar-section-title-padding-x-override,
                 var(--padding-2)
             );
+        overflow: hidden;
+        opacity: 1;
+        visibility: visible;
+        transition:
+            opacity var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out),
+            max-height var(--snowui-frame-size-motion-duration, 0.25s)
+                var(--snowui-frame-size-motion-easing, ease-out),
+            min-height var(--snowui-frame-size-motion-duration, 0.25s)
+                var(--snowui-frame-size-motion-easing, ease-out),
+            padding-block var(--snowui-frame-size-motion-duration, 0.25s)
+                var(--snowui-frame-size-motion-easing, ease-out),
+            visibility 0s linear;
     }
     :global(:where(.snowui-sidebar-section-title)) {
         font-size: var(--snowui-sidebar-section-title-font-size-override, var(--text-12));
@@ -186,5 +205,32 @@
     }
     :global(:where(.snowui-sidebar-section[data-sidebar-collapsed="true"] .snowui-sidebar-section-content > :not(.snowui-sidebar-item):not(.snowui-sidebar-section):not(.snowui-separator))) {
         display: none;
+    }
+    :global(:where(.snowui-sidebar-section[data-sidebar-collapsed="true"])) {
+        gap: 0;
+        transition-delay: var(--snowui-frame-color-motion-duration, 0.15s);
+    }
+    :global(:where(.snowui-sidebar-section[data-sidebar-collapsed="true"] .snowui-sidebar-section-header)) {
+        max-height: 0;
+        min-height: 0;
+        padding-block: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition:
+            opacity var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out),
+            max-height var(--snowui-frame-size-motion-duration, 0.25s)
+                var(--snowui-frame-size-motion-easing, ease-out)
+                var(--snowui-frame-color-motion-duration, 0.15s),
+            min-height var(--snowui-frame-size-motion-duration, 0.25s)
+                var(--snowui-frame-size-motion-easing, ease-out)
+                var(--snowui-frame-color-motion-duration, 0.15s),
+            padding-block var(--snowui-frame-size-motion-duration, 0.25s)
+                var(--snowui-frame-size-motion-easing, ease-out)
+                var(--snowui-frame-color-motion-duration, 0.15s),
+            visibility 0s linear
+                var(--snowui-frame-color-motion-duration, 0.15s);
     }
 </style>

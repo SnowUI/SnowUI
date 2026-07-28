@@ -1,4 +1,4 @@
-<!-- SidebarItem PRO Block v1.0.1. 文档: ./SidebarItem.md -->
+<!-- SidebarItem PRO Block v1.2.1. 文档: ./SidebarItem.md -->
 <script lang="ts">
     import type { Snippet } from "svelte";
     import {
@@ -94,20 +94,21 @@
                 {/if}
             </span>
         {/if}
-        {#if !collapsed}
-            <span class="snowui-sidebar-item-content">
-                <span class="snowui-sidebar-item-label">{label}</span>
-                {#if updated}
-                    <Badge
-                        {...parts?.Badge}
-                        as="badge"
-                        dot
-                        class="snowui-sidebar-item-badge"
-                        aria-label="Updated"
-                    />
-                {/if}
-            </span>
-        {/if}
+        <span
+            class="snowui-sidebar-item-content"
+            aria-hidden={collapsed ? "true" : undefined}
+        >
+            <span class="snowui-sidebar-item-label">{label}</span>
+            {#if updated}
+                <Badge
+                    {...parts?.Badge}
+                    as="badge"
+                    dot
+                    class="snowui-sidebar-item-badge"
+                    aria-label="Updated"
+                />
+            {/if}
+        </span>
         {#if collapsed}<Tooltip as="tooltip" position="right">{label}</Tooltip>{/if}
     {/snippet}
 
@@ -146,8 +147,12 @@
         </Button>
     {/if}
 
-    {#if !collapsed && (actionsSnippet || actionList.length)}
-        <div class="snowui-sidebar-item-actions">
+    {#if actionsSnippet || actionList.length}
+        <div
+            class="snowui-sidebar-item-actions"
+            aria-hidden={collapsed ? "true" : undefined}
+            inert={collapsed ? true : undefined}
+        >
             {#if actionsSnippet}
                 {@render actionsSnippet()}
             {:else}
@@ -161,7 +166,7 @@
                         onclick={(event: MouseEvent) => runAction(event, action)}
                     >
                         <ResourceIcon name={action.icon} collection={action.iconCollection} size={16} aria-hidden="true" />
-                        <Tooltip as="tooltip">{action.label}</Tooltip>
+                        <Tooltip as="tooltip" position="right">{action.label}</Tooltip>
                     </Button>
                 {/each}
             {/if}
@@ -187,6 +192,7 @@
         min-width: 0;
         min-height: var(--size-9);
         box-sizing: border-box;
+        flex-wrap: nowrap;
         align-items: center;
         justify-content: flex-start;
         gap: var(--snowui-sidebar-item-gap-override, var(--gap-2));
@@ -209,9 +215,7 @@
         flex: 0 0 var(--size-5);
         align-items: center;
         justify-content: center;
-        opacity: var(--snowui-sidebar-item-content-opacity);
-        transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
-            var(--snowui-frame-color-motion-easing, ease-out);
+        opacity: 1;
     }
     :global(:where(.snowui-sidebar-item-content)) {
         display: inline-flex;
@@ -219,6 +223,11 @@
         align-items: center;
         gap: var(--snowui-sidebar-item-gap-override, var(--gap-2));
         opacity: var(--snowui-sidebar-item-content-opacity);
+        visibility: visible;
+        transition:
+            opacity var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out),
+            visibility 0s linear;
     }
     :global(:where(.snowui-sidebar-item-label)) {
         display: block;
@@ -254,11 +263,22 @@
         opacity: 1;
         pointer-events: auto;
     }
-    :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-main)) {
-        justify-content: center;
-        padding-inline: var(--padding-2);
+    :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-content)) {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition:
+            opacity var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out),
+            visibility 0s linear
+                var(--snowui-frame-color-motion-duration, 0.15s);
     }
-    :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-leading)) {
-        opacity: var(--snowui-sidebar-item-content-opacity);
+    :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-main)) {
+        overflow: hidden;
+    }
+    :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-actions)) {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
     }
 </style>

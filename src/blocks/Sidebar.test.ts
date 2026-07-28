@@ -2,7 +2,7 @@ export const examples = [
     {
         name: "SB-01：默认数据模式与固定三区",
         code: `SB-01
-<Frame style="height: 28rem;">
+<Frame style="width: 220px; height: 28rem; align-items: flex-start;">
     <Sidebar
         activeItemId="dashboard"
         sections={[
@@ -24,17 +24,17 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "默认 Logo 由 SnowUILogo icon/text 变体组成，分类标题、active Dashboard、Saved 更新圆点与 Footer 均可见",
-            layout: "Sidebar 宽 220px，根 padding 左右 12px / 上下 16px；Section 标题行 padding 左右 8px / 上下 4px；Logo host 左右 padding 4px；Header/Footer 固定，Body 可滚动且纵向滚动条可见并距 Sidebar 右边框 4px",
-            interaction: "Sidebar hover 只控制折叠按钮显形；按钮常态与自身 hover 使用 Button bare 默认颜色；分类标题文字与箭头共同点击折叠",
+            layout: "Sidebar 展开默认宽 220px、折叠宽 60px，根 padding 左右 12px / 上下 16px；Section 标题行 padding 左右 8px / 上下 4px；Logo host 左右 padding 4px；Header/Footer 固定，Body 可滚动且纵向滚动条可见并距 Sidebar 右边框 4px",
+            interaction: "Sidebar hover 显示位于 Logo 区域右边的默认变体 icon-only 折叠按钮与右侧宽度 Indicator；折叠按钮不内置 Tooltip，通过动态 aria-label 保留名称，并以 Frame 默认 move spring 跟随 Sidebar 平移；Indicator 只在 16px 视觉条上下各 4px 的局部范围内激活，默认允许 160px～480px 拖拽且拖拽期间无宽度 transition；Indicator 与滚动条重叠时隐藏；分类标题文字与箭头共同点击折叠且标题无 Tooltip",
             performance: "as=footer 与 sections 同时传入时不抑制默认导航节点",
-            responsive: "折叠后默认 Logo 只保留 as=logo-icon，图形与折叠按钮保持 8px 视觉间距；组件高度随宿主变化",
+            responsive: "固定宽度、左对齐 Test 宿主保持 Sidebar 左边缘不动；折叠时根宽度、Item 文字与标题渐隐同时开始，Item Icon 保持横向位置，标题完全渐隐后 Item 才上移；Footer 固定展开态宽度与底部位置且只渐隐 / 渐显，不随根宽度压缩或位移；折叠后 Item 保持默认 36px 高度，Logo Icon 不跳动，Logo host 保持单行且透明 wordmark 不得换行撑高容器；默认 Logo 只保留 as=logo-icon，同时隐藏宽度 Indicator",
         },
         logic: ["SB-Init.1", "SB-Init.2", "SB-Init.5"],
     },
     {
         name: "SB-02：显式组合与 Logo 替换",
         code: `SB-02
-<Frame style="height: 28rem;">
+<Frame style="width: 220px; height: 28rem; align-items: flex-start;">
     <Sidebar activeItemId="dashboard">
         <Frame as="logo" row class="items-center gap-8">
             <SnowUILogo as="logo-icon" variant="icon" />
@@ -46,7 +46,7 @@ export const examples = [
             <SidebarItem id="dashboard" label="Dashboard" icon="gauge" />
             <SidebarItem id="social" label="Social media" icon="chat" />
         </SidebarSection>
-        <SidebarSection id="tags" title="Tags" collapsible={false}>
+        <SidebarSection id="tags" title="Tags">
             <Frame row wrap class="gap-4">
                 <Tag>Overview</Tag><Tag>Settings</Tag><Tag>Billing</Tag>
             </Frame>
@@ -56,7 +56,7 @@ export const examples = [
         expected: {
             render: "Workshop 显式 Logo 完整替换默认横向 SnowUILogo，导航与 Tags 自由混排",
             layout: "as=logo 节点位于固定 Header 且左右 padding 4px；Header 与下方 Body 的根级 gap 为 12px；直接子节点 as=logo-icon 定义折叠保留图形",
-            interaction: "折叠按钮使用 Button bare 默认常态与 hover 颜色；Page 标题可展开收起，Tags 无折叠按钮",
+            interaction: "折叠按钮使用 Button bare 默认常态与 hover 颜色；Page 与 Tags 标题默认均可展开收起且标题无需 Tooltip",
             performance: "未传 sections 时只渲染显式 Body 内容",
             responsive: "折叠后只保留 as=logo-icon 图形，图形与折叠按钮间距 8px，并隐藏 Workshop、分类标题和 Tags 内容",
         },
@@ -65,7 +65,7 @@ export const examples = [
     {
         name: "SB-03：60px 折叠态与折叠 Footer",
         code: `SB-03
-<Frame style="height: 28rem;">
+<Frame style="width: 220px; height: 28rem; align-items: flex-start;">
     <Sidebar defaultCollapsed activeItemId="saved">
         <SidebarItem id="saved" label="Saved" icon="bookmark" updated />
         <SidebarItem id="hot" label="Hot" icon="fire" />
@@ -77,14 +77,14 @@ export const examples = [
             layout: "根宽度严格为 60px，展开态直接 SidebarItem 间距默认 4px；Badge 跟随 leading icon 且不占隐藏文字空间",
             interaction: "hover 显示展开按钮；图标导航通过 aria-label 保留名称，label Tooltip 默认显示在 Icon 右侧",
             performance: "折叠态由 Sidebar 内置机制隐藏 Footer",
-            responsive: "窄栏仍保持 12px 横向 padding",
+            responsive: "窄栏仍保持 12px 横向 padding；Footer 保持展开态几何宽度与底部位置，仅以 opacity 隐藏并退出交互",
         },
         logic: ["SB-Init.2", "SB-Init.7"],
     },
     {
         name: "SB-04：长列表滚动与覆盖 Footer",
         code: `SB-04
-<Frame style="height: 28rem;">
+<Frame style="width: 220px; height: 28rem; align-items: flex-start;">
     <Sidebar activeItemId="dashboard">
         <SidebarItem id="saved" label="Saved" icon="bookmark" updated />
         <SidebarItem id="dashboard" label="Dashboard" icon="gauge" />
@@ -116,5 +116,26 @@ export const examples = [
             responsive: "Sidebar 高度由 28rem 宿主约束，内容溢出仅产生纵向滚动；Footer 内容高度变化时底部安全区自动更新",
         },
         logic: ["SB-Init.1", "SB-Init.2", "SB-Init.7"],
+    },
+    {
+        name: "SB-05：无 Icon 导航变体",
+        code: `SB-05
+<Frame style="width: 220px; height: 28rem; align-items: flex-start;">
+    <Sidebar navigationVariant="text" defaultCollapsed activeItemId="overview">
+        <SidebarSection id="workspace" title="Workspace">
+            <SidebarItem id="overview" label="Overview" />
+            <SidebarItem id="projects" label="Projects" />
+            <SidebarItem id="settings" label="Settings" />
+        </SidebarSection>
+    </Sidebar>
+</Frame>`,
+        expected: {
+            render: "text 变体折叠后只显示内置展开按钮，不显示 Logo、导航 Item 或 Footer",
+            layout: "展开按钮在 60px 折叠栏的内容区域水平居中，左对齐 Test 宿主保持 Sidebar 左边缘稳定",
+            interaction: "折叠状态无需 hover 即可看到展开按钮；按钮不内置 Tooltip，并通过 aria-label 保留名称；展开后标题默认可折叠且无 Tooltip",
+            performance: "不扫描 children 或 sections 判断是否存在 Icon，变体完全由 navigationVariant 显式决定",
+            responsive: "隐藏导航内容后不存在不可见的键盘焦点；展开恢复完整文本导航",
+        },
+        logic: ["SB-Init.2", "SB-Init.6", "NavigationVariant"],
     },
 ] as const;
