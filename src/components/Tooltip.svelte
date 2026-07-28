@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.6.16
+ Tooltip 文字提示组件 v1.6.17
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-07-28): Tooltip 默认外观变体由 dark 改为 light。
  变更 (2026-06-06): Tooltip 首次定位使用测量后的目标宽高计算坐标，避免第一次出现时与触发按钮间距偏小。
  变更 (2026-06-06): Tooltip 尺寸 shell 改用静态 transform 负责锚点居中，避免多次切换时 translate 过渡残留导致位置偏移。
  变更 (2026-06-06): Tooltip Portal 层移除 Frame Active 全属性 transition，避免 snap 定位仍被 top/left 过渡影响。
@@ -148,7 +149,7 @@
     let {
         position = "top",
         offset = 4,
-        variant = undefined,
+        variant = "light",
         class: className = "",
         style: userStyle = "",
         as = undefined,
@@ -176,7 +177,7 @@
         const explicitSkeleton = (rest as Record<string, any>).skeleton;
         return explicitSkeleton ?? skeletonCtx?.skeleton ?? false;
     });
-    let finalVariant = $derived(variant ?? "dark");
+    let finalVariant = $derived(variant ?? "light");
 
     // 自动内容逻辑
     let fallbackContent = $state("");

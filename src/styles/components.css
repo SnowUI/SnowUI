@@ -523,9 +523,9 @@
     /* PRO Block Sidebar */
     /* --snowui-sidebar-width-override: ; */                         /* 展开宽度（默认 220px） */
     /* --snowui-sidebar-collapsed-width-override: ; */               /* 折叠宽度（默认 60px） */
-    /* --snowui-sidebar-padding-x-override: ; */                     /* 根横向 padding（默认 var(--padding-3)） */
-    /* --snowui-sidebar-padding-y-override: ; */                     /* 根纵向 padding（默认 var(--padding-4)） */
-    /* --snowui-sidebar-gap-override: ; */                           /* 根与导航间距（默认 var(--gap-3)） */
+    /* --snowui-sidebar-padding-x-override: ; */                     /* 根横向 padding（默认 var(--padding-3) = 12px；Body 滚动条据此保持距 Sidebar 右边框 4px） */
+    /* --snowui-sidebar-padding-y-override: ; */                     /* 根纵向 padding（默认 var(--padding-4) = 16px） */
+    /* --snowui-sidebar-gap-override: ; */                           /* 根级 Header / Body 间距（默认 var(--gap-3) = 12px） */
     /* --snowui-sidebar-navigation-gap-override: ; */                /* Body 相邻导航内容间距（默认 var(--gap-1)） */
     /* --snowui-sidebar-logo-padding-x-override: ; */                /* 默认/自定义 Logo host 横向 padding（默认 var(--padding-1)） */
     /* --snowui-sidebar-logo-padding-y-override: ; */                /* Logo 所在 Header 区域纵向 padding（默认 var(--padding-1) = 4px） */
@@ -533,10 +533,13 @@
     /* --snowui-sidebar-collapsed-header-gap-override: ; */          /* 折叠态 Logo host 与折叠按钮间距（默认 var(--gap-1)） */
     /* --snowui-sidebar-default-logo-gap-override: ; */              /* 默认 Logo icon / wordmark 间距（默认 calc(var(--gap-1) * 1.5)） */
     /* --snowui-sidebar-footer-padding-y-override: ; */              /* 覆盖 Footer 纵向 padding（默认 var(--padding-2) = 8px） */
-    /* --snowui-sidebar-footer-padding-x-override: ; */              /* 覆盖 Footer 横向 padding（默认 var(--padding-5) = 20px） */
+    /* --snowui-sidebar-footer-padding-x-override: ; */              /* 覆盖 Footer 横向 padding（默认 var(--padding-2) = 8px） */
+    /* --snowui-sidebar-footer-gap-override: ; */                    /* Footer 内容间距（默认 var(--gap-2) = 8px） */
     /* --snowui-sidebar-footer-radius-override: ; */                 /* 覆盖 Footer 圆角（默认 var(--radius-3) = 12px） */
     /* --snowui-sidebar-footer-background-blur-override: ; */        /* 透明覆盖 Footer 背景模糊（默认 20px） */
     /* --snowui-sidebar-section-gap-override: ; */                   /* 分类内部间距（默认 var(--gap-1)） */
+    /* --snowui-sidebar-section-title-padding-x-override: ; */       /* 分类标题行横向 padding（默认 var(--padding-2) = 8px） */
+    /* --snowui-sidebar-section-title-padding-y-override: ; */       /* 分类标题行纵向 padding（默认 var(--padding-1) = 4px） */
     /* --snowui-sidebar-section-title-font-size-override: ; */       /* 分类标题字号（默认 var(--text-12)） */
     /* --snowui-sidebar-section-title-line-height-override: ; */     /* 分类标题行高（默认 var(--leading-12)） */
     /* --snowui-sidebar-item-padding-x-override: ; */                /* 导航项横向 padding（默认 var(--padding-2)） */

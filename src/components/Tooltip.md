@@ -1,6 +1,6 @@
 # Tooltip.svelte 文档
 
-> **版本**: v1.6.16
+> **版本**: v1.6.17
 > **职责**: 文字提示组件，在悬停时显示额外信息。
 
 **能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
@@ -14,7 +14,7 @@
 | position | 'top'\|'bottom'\|'left'\|'right' | 'top' | 弹出方向 |
 | open | boolean | undefined | 手动控制显示状态 (可绑定) |
 | offset | number | 4 | 与触发器的距离 (px) |
-| variant | 'dark'\|'light' | 'dark' | Tooltip 外观变体，默认 dark，支持 light |
+| variant | 'dark'\|'light' | 'light' | Tooltip 外观变体，默认 light，可显式切换为 dark |
 
 ## 关键字 (Keyword)
 
@@ -91,10 +91,10 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 - `font-size/line-height`: `--snowui-tooltip-font-size` / `--snowui-tooltip-line-height` → `var(--text-12)` / `var(--leading-12)`
 
 ### 3) 视觉主题
-- 默认 `variant="dark"`（通过 `data-variant` 驱动）：
+- `variant="dark"`（通过 `data-variant` 驱动）：
   - 背景：`Static Black/80%` + `Static White/10%` 叠加
   - 文字：`Static White/100%`
-- `variant="light"`：
+- 默认 `variant="light"`：
   - 背景：`Black/4%`
   - 文字：`Black/100%`
 
@@ -142,6 +142,9 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.6.17 (2026-07-28)
+- Tooltip 默认外观变体由 `dark` 改为 `light`；仍可显式传入 `variant="dark"`。
 
 ### v1.6.16 (2026-06-30)
 - 删除 inner Frame 中未进入 Active、也未解析出任何视觉的 `whileActive={true}` 占位；生命周期与尺寸动效继续分别由 Tooltip preset 和显式 `effectiveSizeMotion` 承担，运行时视觉不变。

@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.3.0
+ * v1.3.1
  */
 export const examples = [
     {
@@ -38,14 +38,17 @@ export const examples = [
         name: "C1: 静态模式 (Static Mode)",
         code: `C1
 <div>
-    <Tooltip open variant="light">Tooltip</Tooltip>
+    <Tooltip open>Default Light Tooltip</Tooltip>
 </div>
 <br />
 <br />
 <div>
-    <Tooltip open>Tooltip</Tooltip>
+    <Tooltip open variant="dark">Dark Tooltip</Tooltip>
 </div>`,
 
+        expected: {
+            render: "未传 variant 时使用 light 外观；显式 variant=dark 时保留 dark 外观",
+        },
         logic: ["Static"],
     },
     {
