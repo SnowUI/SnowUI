@@ -1,6 +1,6 @@
 # SidebarItem（PRO Block）
 
-> **版本**: v1.0.0
+> **版本**: v1.0.1
 > **职责**: Sidebar 普通导航项，支持 active、更新 Badge、leading icon 与可选操作区。
 
 ## API 参考
@@ -18,7 +18,7 @@
 | `onSelect` | `(id: string) => void` | — | 本项选择回调 |
 | `parts` | `ComponentPartsOf` | — | 配置内置 Badge 与数据生成的 Button |
 
-主导航操作与末尾操作是并列节点，不产生交互元素嵌套。`updated` 使用 `<Badge as="badge" dot />`，不继承主 Button 的尺寸，直接采用 Badge dot 默认尺寸 `calc(var(--size-4) * 1.5 / 4)`，即默认 scale 下的 6px × 6px；展开态位于 label 后，折叠态跟随 leading icon。主项始终保持完整不透明度；hover / active 只显示统一背景高亮，leading Icon 与 label 不变色。末尾操作仍保留自身的 bare hover 反馈。
+主导航操作与末尾操作是并列节点，不产生交互元素嵌套。`updated` 使用 `<Badge as="badge" dot />`，不继承主 Button 的尺寸，直接采用 Badge dot 默认尺寸 `calc(var(--size-4) * 1.5 / 4)`，即默认 scale 下的 6px × 6px；展开态位于 label 后，折叠态跟随 leading icon。折叠态 label Tooltip 由 SidebarItem 内置设置为 `position="right"`，默认显示在 Icon 右侧，不要求使用方逐项配置。主项始终保持完整不透明度；hover / active 只显示统一背景高亮，leading Icon 与 label 不变色。末尾操作仍保留自身的 bare hover 反馈。
 
 ---
 
@@ -39,6 +39,11 @@
 | SidebarItem | [SidebarItem.svelte](./SidebarItem.svelte) | 导航语义与状态视觉 |
 
 ## 更新日志 (Changelog)
+
+### v1.0.1 (2026-07-28)
+
+#### 变更
+- 折叠态 label Tooltip 默认显示在 Icon 右侧。
 
 ### v1.0.0 (2026-07-23)
 

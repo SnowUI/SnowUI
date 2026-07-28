@@ -126,9 +126,18 @@
     :global(:where(.snowui-sidebar-section-header)) {
         display: flex;
         min-height: var(--size-6);
+        box-sizing: border-box;
         align-items: center;
         justify-content: space-between;
         gap: var(--gap-1);
+        padding: var(
+                --snowui-sidebar-section-title-padding-y-override,
+                var(--padding-1)
+            )
+            var(
+                --snowui-sidebar-section-title-padding-x-override,
+                var(--padding-2)
+            );
     }
     :global(:where(.snowui-sidebar-section-title)) {
         font-size: var(--snowui-sidebar-section-title-font-size-override, var(--text-12));

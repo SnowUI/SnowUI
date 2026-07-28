@@ -1,6 +1,6 @@
 # Sidebar（PRO Block）
 
-> **版本**: v1.0.0
+> **版本**: v1.0.5
 > **职责**: 提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。
 > **归属**: PRO Blocks / Template Block
 
@@ -39,13 +39,17 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 ## 布局与行为
 
 - 展开宽度 `220px`，折叠宽度 `60px`，高度 `100%`。
-- Header 固定，`ScrollArea` 独立滚动并延伸到 Sidebar 底部；Footer 固定覆盖在 Body 之上。
+- 根容器默认 padding 为左右 `12px`（`var(--padding-3)`）、上下 `16px`（`var(--padding-4)`）；这是 Sidebar 组件默认值，不由使用方重复补 class 或 style。
+- Header 固定，`ScrollArea` 独立滚动并延伸到 Sidebar 底部；Footer 固定覆盖在 Body 之上。Sidebar 根的 Header / Body 默认 gap 为 `var(--gap-3)`（12px），即 Logo 区域与下方导航区域之间的默认间距；它与 Body 内相邻导航内容的 4px gap 是两个独立层级。
+- Body 纵向 overlay scrollbar 根据根横向 padding 自动外移，轨道右边缘始终距 Sidebar 右边框 `4px`；默认 12px 横向 padding 时其 `right` 偏移为 `-8px`。
 - Logo 所在 Header 区域使用 `4px` 上下 padding；Body 向下滚动后在 Logo 下方启用通用 `.snowui-scroll-mask` 顶部渐隐，渐隐带同样限制为 `4px` 且不增加布局高度，回到顶部时移除遮罩。
 - Body 导航内容默认使用 `var(--gap-1)`（4px）间距，直接组合的 SidebarItem 与 SidebarSection 内部列表保持一致。
 - 默认与自定义 `as="logo"` host 均使用 `4px` 左右 padding，使 Logo 图形与 SidebarItem 图标垂直对齐。
 - 折叠按钮是内置 `Button bare`，与 Logo 位于同一 Header 水平线上，仅在 Sidebar hover / focus-within 时通过 `visibility` 显形；Sidebar 不覆盖按钮 opacity，因此常态与按钮自身 hover 颜色均沿用 bare 默认值。折叠态下 Logo host 禁止 flex shrink，Logo 图形与按钮图标的视觉间距稳定为 `8px`。
+- 折叠态 SidebarItem 的 label Tooltip 由组件族内置为 Icon 右侧（`position="right"`）；使用方无需为每个 Item 重复配置。
 - 默认不设置背景色。
-- Footer 只内置底部覆盖区域，不内置业务文案；区域默认左右 padding `20px`、上下 padding `8px`、圆角 `12px`、透明背景与 `backdrop-filter: blur(20px)`，直接子节点 `as="footer"` 提供业务内容，折叠态由 Sidebar 内置隐藏。
+- Footer 只内置底部覆盖区域，不内置业务文案；区域默认使用 Figma Auto Layout 的 Align top left：内容整体位于容器左上方，内部横向排列并在同一水平线上垂直居中，内容 gap 与四边 padding 均为 `8px`。区域保持 `12px` 圆角、透明背景与 `backdrop-filter: blur(20px)`。直接子节点 `as="footer"` 提供业务内容，折叠态由 Sidebar 内置隐藏。
+- 存在 Footer 时，Sidebar 通过 `ResizeObserver` 跟踪 Footer 实际高度，并为 Navigation 的滚动末端增加“Footer 实际高度 + 固定 `12px`”安全区；滚动到底后最后一个 Item 完整停在 Footer 上方。此 `12px` 是 Footer 遮挡保护契约，不跟随外部 `--snowui-sidebar-navigation-gap-override`、Section gap 或 Item gap 改变。
 
 ---
 
@@ -90,6 +94,31 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
 ## 更新日志 (Changelog)
+
+### v1.0.5 (2026-07-28)
+
+#### 变更
+- 确认 Sidebar 根 Header / Body 默认 gap 为 12px，并将折叠态 SidebarItem Tooltip 的默认位置设为 Icon 右侧。
+
+### v1.0.4 (2026-07-28)
+
+#### 修复
+- 根据 Footer 实际高度动态增加滚动末端安全区，最后一个 Item 与 Footer 固定保持 12px，不受外部列表 gap 覆盖影响。
+
+### v1.0.3 (2026-07-28)
+
+#### 变更
+- Footer 四边默认 padding 统一为 8px；内容整体采用 Align top left，内部横向排列并沿同一水平线居中。
+
+### v1.0.2 (2026-07-28)
+
+#### 变更
+- Footer 默认采用左上对齐与 8px 内容间距；SB-04 移除 Footer 节点的全部自定义布局样式。
+
+### v1.0.1 (2026-07-28)
+
+#### 变更
+- 明确根组件默认 padding 为左右 12px、上下 16px，并将 Body 纵向滚动条对齐到距 Sidebar 右边框 4px。
 
 ### v1.0.0 (2026-07-23)
 

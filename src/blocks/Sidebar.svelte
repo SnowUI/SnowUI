@@ -1,4 +1,4 @@
-<!-- Sidebar PRO Block v1.0.0. 文档: ./Sidebar.md -->
+<!-- Sidebar PRO Block v1.0.5. 文档: ./Sidebar.md -->
 <script lang="ts">
     import { onMount, setContext, untrack, type Snippet } from "svelte";
     import {
@@ -75,6 +75,7 @@
     let footerElement = $state<HTMLElement>();
     let hasExternalLogo = $state(false);
     let hasExternalFooter = $state(false);
+    let footerMeasureFrame = 0;
 
     const context: SidebarContext = {
         get collapsed() {
@@ -131,6 +132,27 @@
         hasExternalFooter = !!footer;
     }
 
+    function syncFooterSafeArea() {
+        if (!rootElement || !footerElement) return;
+        const footerHeight = footerElement.getBoundingClientRect().height;
+        const nextHeight = `${footerHeight}px`;
+        if (
+            rootElement.style.getPropertyValue(
+                "--snowui-sidebar-footer-measured-height",
+            ) !== nextHeight
+        ) {
+            rootElement.style.setProperty(
+                "--snowui-sidebar-footer-measured-height",
+                nextHeight,
+            );
+        }
+    }
+
+    function scheduleFooterSafeAreaSync() {
+        cancelAnimationFrame(footerMeasureFrame);
+        footerMeasureFrame = requestAnimationFrame(syncFooterSafeArea);
+    }
+
     function syncBodyScrollMask() {
         if (!bodyViewport) return;
         bodyViewport.classList.add("snowui-scroll-mask");
@@ -149,14 +171,21 @@
             syncExternalLogo();
             syncExternalFooter();
             syncBodyScrollMask();
+            scheduleFooterSafeAreaSync();
         });
-        const resizeObserver = new ResizeObserver(syncBodyScrollMask);
+        const resizeObserver = new ResizeObserver(() => {
+            syncBodyScrollMask();
+            syncFooterSafeArea();
+        });
         if (navigationElement) observer.observe(navigationElement, { childList: true });
         if (headerElement) observer.observe(headerElement, { childList: true });
         if (footerElement) observer.observe(footerElement, { childList: true });
         if (bodyViewport) resizeObserver.observe(bodyViewport);
         if (navigationElement) resizeObserver.observe(navigationElement);
+        if (footerElement) resizeObserver.observe(footerElement);
+        scheduleFooterSafeAreaSync();
         return () => {
+            cancelAnimationFrame(footerMeasureFrame);
             observer.disconnect();
             resizeObserver.disconnect();
         };
@@ -171,6 +200,7 @@
     class={["snowui-sidebar", userClass].filter(Boolean).join(" ")}
     style={userStyle}
     data-collapsed={isCollapsed ? "true" : "false"}
+    data-has-footer={hasExternalFooter ? "true" : undefined}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
@@ -340,28 +370,55 @@
         width: 100%;
         flex: 1 1 auto;
         min-height: 0;
+        overflow: visible;
+    }
+    :global(:where(.snowui-sidebar-body > .snowui-scroll-area-scrollbar[data-axis="vertical"])) {
+        right: calc(
+            var(--snowui-scrollbar-edge-gap) -
+                var(
+                    --snowui-sidebar-padding-x-override,
+                    var(--snowui-sidebar-padding-x)
+                )
+        );
     }
     :global(:where(.snowui-sidebar-navigation)) {
         display: flex;
         min-width: 0;
+        box-sizing: border-box;
         flex-direction: column;
         gap: var(--snowui-sidebar-navigation-gap-override, var(--gap-1));
+    }
+    :global(:where(.snowui-sidebar[data-has-footer="true"]:not([data-collapsed="true"]) .snowui-sidebar-navigation)) {
+        padding-bottom: calc(
+            var(--snowui-sidebar-footer-measured-height, 0px) +
+                var(--gap-3)
+        );
+    }
+    :global(:where(.snowui-sidebar[data-has-footer="true"]:not([data-collapsed="true"]) .snowui-sidebar-body > .snowui-scroll-area-viewport)) {
+        scroll-padding-bottom: calc(
+            var(--snowui-sidebar-footer-measured-height, 0px) +
+                var(--gap-3)
+        );
     }
     :global(:where(.snowui-sidebar-footer)) {
         position: absolute;
         z-index: 1;
+        display: flex;
         right: var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
         bottom: var(--snowui-sidebar-padding-y-override, var(--snowui-sidebar-padding-y));
         left: var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
         width: auto;
         box-sizing: border-box;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: var(--snowui-sidebar-footer-gap-override, var(--gap-2));
         padding: var(
                 --snowui-sidebar-footer-padding-y-override,
                 var(--padding-2)
             )
             var(
                 --snowui-sidebar-footer-padding-x-override,
-                var(--padding-5)
+                var(--padding-2)
             );
         overflow: hidden;
         border-radius: var(
@@ -375,6 +432,15 @@
         backdrop-filter: blur(
             var(--snowui-sidebar-footer-background-blur-override, 20px)
         );
+    }
+    :global(:where(.snowui-sidebar-footer > [data-as="footer"])) {
+        display: flex;
+        width: 100%;
+        min-width: 0;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: var(--snowui-sidebar-footer-gap-override, var(--gap-2));
     }
     :global(:where(.snowui-sidebar-footer:not([data-has-footer="true"]))),
     :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-footer)) {

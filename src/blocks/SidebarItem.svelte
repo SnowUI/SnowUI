@@ -1,4 +1,4 @@
-<!-- SidebarItem PRO Block v1.0.0. 文档: ./SidebarItem.md -->
+<!-- SidebarItem PRO Block v1.0.1. 文档: ./SidebarItem.md -->
 <script lang="ts">
     import type { Snippet } from "svelte";
     import {
@@ -108,7 +108,7 @@
                 {/if}
             </span>
         {/if}
-        {#if collapsed}<Tooltip as="tooltip">{label}</Tooltip>{/if}
+        {#if collapsed}<Tooltip as="tooltip" position="right">{label}</Tooltip>{/if}
     {/snippet}
 
     {#if href}
