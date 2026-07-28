@@ -1,0 +1,383 @@
+<!-- Sidebar PRO Block v1.0.0. 文档: ./Sidebar.md -->
+<script lang="ts">
+    import { onMount, setContext, untrack, type Snippet } from "svelte";
+    import {
+        Button,
+        ScrollArea,
+        SnowUILogo,
+        Tooltip,
+        type FrameProps,
+    } from "@snowui-design-system/components";
+    import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
+    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import FramePro from "../components/FramePro.svelte";
+    import SidebarSection from "./SidebarSection.svelte";
+    import SidebarItem from "./SidebarItem.svelte";
+    import {
+        SIDEBAR_CONTEXT_KEY,
+        type SidebarActionData,
+        type SidebarContext,
+        type SidebarItemData,
+    } from "./sidebar-context.svelte";
+
+    export interface SidebarSectionData {
+        id: string;
+        title?: string;
+        collapsible?: boolean;
+        defaultCollapsed?: boolean;
+        actions?: SidebarActionData[];
+        items?: SidebarItemData[];
+        content?: Snippet;
+    }
+
+    interface Props extends Omit<FrameProps, "children"> {
+        sections?: SidebarSectionData[];
+        collapsed?: boolean;
+        defaultCollapsed?: boolean;
+        activeItemId?: string;
+        ariaLabel?: string;
+        onCollapsedChange?: (collapsed: boolean) => void;
+        onActiveItemChange?: (itemId: string) => void;
+        children?: Snippet;
+        parts?: ComponentPartsOf<{
+            SnowUILogo: typeof SnowUILogo;
+            SidebarSection: typeof SidebarSection;
+            SidebarItem: typeof SidebarItem;
+        }>;
+        [key: string]: any;
+    }
+
+    let {
+        sections = [],
+        collapsed = $bindable<boolean | undefined>(undefined),
+        defaultCollapsed = false,
+        activeItemId = undefined,
+        ariaLabel = "Primary navigation",
+        onCollapsedChange = undefined,
+        onActiveItemChange = undefined,
+        children,
+        parts = undefined,
+        class: userClass = "",
+        style: userStyle = "",
+        enableResponsive = false,
+        enableContext = true,
+        enableScaleObserver = false,
+        enableDefaultMotion = true,
+        ...rest
+    }: Props = $props();
+
+    let internalCollapsed = $state(untrack(() => defaultCollapsed));
+    const isCollapsed = $derived(collapsed ?? internalCollapsed);
+    let rootElement = $state<HTMLElement>();
+    let headerElement = $state<HTMLElement>();
+    let bodyViewport = $state<HTMLElement>();
+    let navigationElement = $state<HTMLElement>();
+    let footerElement = $state<HTMLElement>();
+    let hasExternalLogo = $state(false);
+    let hasExternalFooter = $state(false);
+
+    const context: SidebarContext = {
+        get collapsed() {
+            return isCollapsed;
+        },
+        get activeItemId() {
+            return activeItemId;
+        },
+        select(itemId: string) {
+            onActiveItemChange?.(itemId);
+        },
+    };
+    setContext(SIDEBAR_CONTEXT_KEY, context);
+
+    function toggleCollapsed() {
+        const next = !isCollapsed;
+        internalCollapsed = next;
+        collapsed = next;
+        onCollapsedChange?.(next);
+    }
+
+    function syncExternalLogo() {
+        if (!headerElement || !rootElement) return;
+        let logo = headerElement.querySelector<HTMLElement>(
+            ':scope > [data-as="logo"]:not(.snowui-sidebar-default-logo)',
+        );
+        if (!logo && navigationElement) {
+            logo = navigationElement.querySelector<HTMLElement>(
+                ':scope > [data-as="logo"]',
+            );
+        }
+        if (logo) {
+            const collapseButton = headerElement.querySelector<HTMLElement>(
+                ':scope > .snowui-sidebar-collapse-button',
+            );
+            if (logo.nextElementSibling !== collapseButton) {
+                headerElement.insertBefore(logo, collapseButton);
+            }
+        }
+        hasExternalLogo = !!logo;
+    }
+
+    function syncExternalFooter() {
+        if (!footerElement || !navigationElement) return;
+        let footer = footerElement.querySelector<HTMLElement>(
+            ':scope > [data-as="footer"]',
+        );
+        if (!footer) {
+            footer = navigationElement.querySelector<HTMLElement>(
+                ':scope > [data-as="footer"]',
+            );
+            if (footer) footerElement.appendChild(footer);
+        }
+        hasExternalFooter = !!footer;
+    }
+
+    function syncBodyScrollMask() {
+        if (!bodyViewport) return;
+        bodyViewport.classList.add("snowui-scroll-mask");
+        if (bodyViewport.scrollTop > 1) {
+            bodyViewport.dataset.scrollMask = "top";
+        } else {
+            bodyViewport.removeAttribute("data-scroll-mask");
+        }
+    }
+
+    onMount(() => {
+        syncExternalLogo();
+        syncExternalFooter();
+        syncBodyScrollMask();
+        const observer = new MutationObserver(() => {
+            syncExternalLogo();
+            syncExternalFooter();
+            syncBodyScrollMask();
+        });
+        const resizeObserver = new ResizeObserver(syncBodyScrollMask);
+        if (navigationElement) observer.observe(navigationElement, { childList: true });
+        if (headerElement) observer.observe(headerElement, { childList: true });
+        if (footerElement) observer.observe(footerElement, { childList: true });
+        if (bodyViewport) resizeObserver.observe(bodyViewport);
+        if (navigationElement) resizeObserver.observe(navigationElement);
+        return () => {
+            observer.disconnect();
+            resizeObserver.disconnect();
+        };
+    });
+</script>
+
+<FramePro
+    bind:element={rootElement}
+    tag="aside"
+    column
+    enableAutoLayout={false}
+    class={["snowui-sidebar", userClass].filter(Boolean).join(" ")}
+    style={userStyle}
+    data-collapsed={isCollapsed ? "true" : "false"}
+    enableResponsive={enableResponsive}
+    enableContext={enableContext}
+    enableScaleObserver={enableScaleObserver}
+    enableDefaultMotion={enableDefaultMotion}
+    {...rest}
+>
+    <header bind:this={headerElement} class="snowui-sidebar-header">
+        {#if !hasExternalLogo}
+            <div
+                data-as="logo"
+                class="snowui-sidebar-default-logo"
+                role="img"
+                aria-label="SnowUI"
+            >
+                <SnowUILogo
+                    {...parts?.SnowUILogo}
+                    as="logo-icon"
+                    variant="icon"
+                    decorative
+                />
+                <SnowUILogo
+                    {...parts?.SnowUILogo}
+                    as="logo-wordmark"
+                    variant="text"
+                    decorative
+                />
+            </div>
+        {/if}
+        <Button
+            bare
+            size="sm"
+            class="snowui-sidebar-collapse-button"
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            onclick={toggleCollapsed}
+        >
+            <ResourceIcon name="rightbar" collection="snowui" size={16} aria-hidden="true" />
+            <Tooltip as="tooltip">{isCollapsed ? "Expand sidebar" : "Collapse sidebar"}</Tooltip>
+        </Button>
+    </header>
+
+    <ScrollArea
+        bind:viewport={bodyViewport}
+        class="snowui-sidebar-body"
+        ariaLabel={ariaLabel}
+        onscroll={syncBodyScrollMask}
+    >
+        <nav bind:this={navigationElement} class="snowui-sidebar-navigation" aria-label={ariaLabel}>
+            {#each sections as section (section.id)}
+                <SidebarSection
+                    {...parts?.SidebarSection}
+                    id={section.id}
+                    title={section.title}
+                    collapsible={section.collapsible}
+                    defaultCollapsed={section.defaultCollapsed}
+                    actions={section.actions}
+                >
+                    {#if section.content}
+                        {@render section.content()}
+                    {:else}
+                        {#each section.items ?? [] as item (item.id)}
+                            <SidebarItem {...parts?.SidebarItem} {...item} />
+                        {/each}
+                    {/if}
+                </SidebarSection>
+            {/each}
+            {#if children}
+                {@render children()}
+            {/if}
+        </nav>
+    </ScrollArea>
+
+    <footer
+        bind:this={footerElement}
+        class="snowui-sidebar-footer"
+        data-has-footer={hasExternalFooter ? "true" : undefined}
+    ></footer>
+</FramePro>
+
+<style>
+    :global(:where(.snowui-sidebar)) {
+        --snowui-sidebar-width: 220px;
+        --snowui-sidebar-collapsed-width: 60px;
+        --snowui-sidebar-padding-x: var(--padding-3);
+        --snowui-sidebar-padding-y: var(--padding-4);
+        --snowui-sidebar-gap: var(--gap-3);
+        position: relative;
+        display: flex;
+        width: var(--snowui-sidebar-width-override, var(--snowui-sidebar-width));
+        height: 100%;
+        min-height: 0;
+        box-sizing: border-box;
+        flex-direction: column;
+        gap: var(--snowui-sidebar-gap-override, var(--snowui-sidebar-gap));
+        padding: var(--snowui-sidebar-padding-y-override, var(--snowui-sidebar-padding-y))
+            var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
+        color: var(--black-100, #000);
+        background: transparent;
+        transition: width var(--snowui-frame-size-motion-duration, 0.25s)
+            var(--snowui-frame-size-motion-easing, ease-out);
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"])) {
+        width: var(--snowui-sidebar-collapsed-width-override, var(--snowui-sidebar-collapsed-width));
+    }
+    :global(:where(.snowui-sidebar-header)) {
+        display: flex;
+        width: 100%;
+        min-height: 28px;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: space-between;
+        overflow: visible;
+        padding-block: var(
+            --snowui-sidebar-logo-padding-y-override,
+            var(--padding-1)
+        );
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-header)) {
+        justify-content: flex-start;
+        gap: var(--snowui-sidebar-collapsed-header-gap-override, var(--gap-1));
+    }
+    :global(:where(.snowui-sidebar-header > [data-as="logo"])) {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        flex: 0 0 auto;
+        padding-inline: var(
+            --snowui-sidebar-logo-padding-x-override,
+            var(--padding-1)
+        );
+    }
+    :global(:where(.snowui-sidebar-default-logo)) {
+        display: inline-flex;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: var(
+            --snowui-sidebar-default-logo-gap-override,
+            calc(var(--gap-1) * 1.5)
+        );
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))) {
+        display: none;
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-header > [data-as="logo"] > [data-as="logo-icon"])) {
+        flex: 0 0 auto;
+    }
+    :global(:where(.snowui-sidebar-navigation > [data-as="logo"])) {
+        display: none;
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-navigation > :not(.snowui-sidebar-item):not(.snowui-sidebar-section):not(.snowui-separator):not([data-as="logo"]))) {
+        display: none;
+    }
+    :global(:where(.snowui-sidebar-collapse-button)) {
+        flex: 0 0 auto;
+        visibility: hidden;
+        pointer-events: none;
+    }
+    :global(:where(.snowui-sidebar:hover, .snowui-sidebar:focus-within) .snowui-sidebar-collapse-button) {
+        visibility: visible;
+        pointer-events: auto;
+    }
+    :global(:where(.snowui-sidebar-body)) {
+        --snowui-scroll-mask-top-size-override: var(
+            --snowui-sidebar-logo-scroll-mask-size-override,
+            var(--padding-1)
+        );
+        --snowui-scroll-mask-top-solid-ratio-override: 0;
+        width: 100%;
+        flex: 1 1 auto;
+        min-height: 0;
+    }
+    :global(:where(.snowui-sidebar-navigation)) {
+        display: flex;
+        min-width: 0;
+        flex-direction: column;
+        gap: var(--snowui-sidebar-navigation-gap-override, var(--gap-1));
+    }
+    :global(:where(.snowui-sidebar-footer)) {
+        position: absolute;
+        z-index: 1;
+        right: var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
+        bottom: var(--snowui-sidebar-padding-y-override, var(--snowui-sidebar-padding-y));
+        left: var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
+        width: auto;
+        box-sizing: border-box;
+        padding: var(
+                --snowui-sidebar-footer-padding-y-override,
+                var(--padding-2)
+            )
+            var(
+                --snowui-sidebar-footer-padding-x-override,
+                var(--padding-5)
+            );
+        overflow: hidden;
+        border-radius: var(
+            --snowui-sidebar-footer-radius-override,
+            var(--radius-3)
+        );
+        background: transparent;
+        -webkit-backdrop-filter: blur(
+            var(--snowui-sidebar-footer-background-blur-override, 20px)
+        );
+        backdrop-filter: blur(
+            var(--snowui-sidebar-footer-background-blur-override, 20px)
+        );
+    }
+    :global(:where(.snowui-sidebar-footer:not([data-has-footer="true"]))),
+    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-footer)) {
+        display: none;
+    }
+</style>
