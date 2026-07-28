@@ -89,6 +89,7 @@ createEdgeFadeMaskStyle(options): string   // 返回 "-webkit-mask-image:...;mas
 | Text（`lines={0}`） | `.snowui-scroll-mask`（内置展开按钮启用时为 bottom 截断渐隐；未启用时按滚动位置切换 top/bottom/both） | — |
 | CodeBlock | `.snowui-scroll-mask`（top/bottom 滚动渐隐） | — |
 | SidePanel | `.snowui-scroll-mask`（内容区 top/bottom 滚动渐隐） | — |
+| Sidebar | `.snowui-scroll-mask`（Body 向下滚动后在 Logo 下方显示 top 渐隐） | — |
 | Input / Listbox 搜索 Input / SearchInput | `.snowui-horizontal-scroll-mask`；发生横向溢出后持续显示左右渐隐。清除 X 以 overlay 覆盖文字，并从 X 最右边缘复用 Table 表头 checkbox 的 14px → 26px 参数 | X 为 Input trailing overlay 控件 |
 | Tag（删除 X，规划中） | 可选：删除 X 浮起后内容右侧渐隐 | `.snowui-overlay-action` 就地浮动 |
 
