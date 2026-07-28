@@ -1,14 +1,16 @@
 # Indicator（尺寸指示手柄）
 
-> **版本**: v1.0.1
-> **更新**: 2026-07-12
+> **版本**: v1.1.0
+> **更新**: 2026-07-28
 > **职责**: 提供宿主 hover 显示、Pointer / 键盘拖动与统一视觉反馈的通用尺寸手柄
 > **布局模型**: Pin 布局
 > **文档**: ./Indicator.md
 
 Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一个可交互组件。它默认调整直接父元素，也可以通过 `target` 显式关联任意祖先宿主。鼠标位于 reveal host 的任意普通后代上时，Indicator 都会显示；只有进入 Indicator **命中带**时才会加深、变粗并开始拖动。
 
-**命中带（line）**：视觉条与命中区分层。line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条中心落在 `pinOffset`（SidePanel 为 4px），默认 2×40 / 40×2。corner 仍用 `pin-bottom-right` + 局部命中。消费方若只改视觉尺寸，应覆盖 `.snowui-indicator-visual`。
+**命中带（line）**：视觉条与命中区分层。默认情况下 line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条中心落在 `pinOffset`（SidePanel 为 4px），默认 2×16 / 16×2。消费方可传 `hitAreaPadding`，将沿边命中范围收窄为“视觉长度 + 两端 padding”；例如 Sidebar 传 4px 后，16px 视觉条只有上下各 4px、合计 24px 的纵向激活范围。corner 仍用 `pin-bottom-right` + 局部命中。
+
+Indicator 会在准备显示时检查同一 resize target 内可见的 SnowUI overlay scrollbar。若 Indicator 命中区与滚动条轨道发生矩形重叠，则 Indicator 整体隐藏并停止截获指针，只保留滚动条；检测只在宿主 hover、Indicator focus 或 dragging 期间启用，并清理所有观察器。
 
 ## API 参考
 
@@ -17,6 +19,7 @@ Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一�
 | `axis` | `"width" \| "height" \| "both"` | line 为 `"width"`；corner 为 `"height"` | 调整宿主宽度、高度或同时调整；`both` 只用于 corner |
 | `edge` | `"start" \| "end" \| "top" \| "bottom"` | 根据 axis 推导 | 拖动方向与默认定位边缘 |
 | `appearance` | `"line" \| "corner"` | `"line"` | 线形或右下角图标视觉 |
+| `hitAreaPadding` | `number \| string` | — | line 沿边命中范围两端相对视觉条增加的 padding；未传时继续铺满整条边 |
 | `target` | `HTMLElement` | 直接父元素 | resize target；可显式关联页面中的任意元素，不要求 Indicator 是其 DOM 后代 |
 | `revealTarget` | `HTMLElement` | target | 控制显隐的 hover 宿主 |
 | `value` | `number` | 实测 target 尺寸 | 当前受控尺寸基线，并同步为 ARIA 当前值 |
@@ -42,7 +45,7 @@ Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一�
 - corner 固定在右下角；默认 `axis="height"`，使用 `ns-resize` 上下双箭头并只调整高度。
 - corner 显式 `axis="both"` 时使用 `nwse-resize` 对角双箭头，同时调整宽度和高度。
 - 定位：line 自管 absolute 贴边（不用 pin 居中）；corner 默认 `as="pin-bottom-right"` + `pinOffset="var(--padding-1)"` + `z-index: 4`。
-- 默认隐藏；宿主 hover、focus-visible 或 dragging 时显示。
+- 默认隐藏；宿主 hover、focus-visible 或 dragging 时显示；与同一 target 内可见 overlay scrollbar 重叠时继续隐藏并禁用命中。
 - 视觉与命中区分层；line 命中带铺满所在边缘全高/全宽。
 - 动效消费与 overlay scrollbar 相同的 Frame color motion bridge。
 
@@ -81,6 +84,11 @@ Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一�
 - 不接入 Skeleton：手柄没有加载占位意义。
 
 ## 更新日志 (Changelog)
+
+### v1.1.0 (2026-07-28)
+
+- line 新增 `hitAreaPadding`，允许消费方把全边命中带收窄为视觉条附近的局部范围。
+- Indicator 与同一 resize target 内的可见 SnowUI overlay scrollbar 重叠时自动隐藏并停止截获指针。
 
 ### v1.0.1 (2026-07-12)
 

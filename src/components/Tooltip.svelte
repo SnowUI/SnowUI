@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.6.17
+ Tooltip 文字提示组件 v1.7.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-07-28): 默认感知触发元素及祖先的几何动效，并在首帧位移前立即关闭。
  变更 (2026-07-28): Tooltip 默认外观变体由 dark 改为 light。
  变更 (2026-06-06): Tooltip 首次定位使用测量后的目标宽高计算坐标，避免第一次出现时与触发按钮间距偏小。
  变更 (2026-06-06): Tooltip 尺寸 shell 改用静态 transform 负责锚点居中，避免多次切换时 translate 过渡残留导致位置偏移。
@@ -101,12 +102,15 @@
     } from "../lib/floating-position";
     import { getTooltipBehaviorEnhancement } from "../lib/tooltip-behavior";
     import {
+        dismissTooltipOverlayImmediately,
         hideTooltipOverlay,
         scheduleTooltipOverlayHide,
         showTooltipOverlay,
         tooltipOverlay,
+        tooltipOverlayImmediateDismissRevision,
         type TooltipOverlayState,
     } from "../lib/tooltip-overlay";
+    import { registerTooltipMotionDismiss } from "../lib/tooltip-motion-dismiss";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Skeleton from "./Skeleton.svelte";
     import {
@@ -137,6 +141,7 @@
         open?: boolean;
         offset?: number;
         variant?: "dark" | "light";
+        dismissOnMotion?: boolean;
         children?: Snippet;
         [key: string]: any;
     }
@@ -150,6 +155,7 @@
         position = "top",
         offset = 4,
         variant = "light",
+        dismissOnMotion = true,
         class: className = "",
         style: userStyle = "",
         as = undefined,
@@ -202,6 +208,10 @@
     let isOverlayHost = $state(false);
     let controlledVisible = $derived(open !== undefined ? open : false);
     let currentOverlay = $derived($tooltipOverlay);
+    let immediateDismissRevision = $derived(
+        $tooltipOverlayImmediateDismissRevision,
+    );
+    let handledImmediateDismissRevision = 0;
     let renderedOverlay = $state<TooltipOverlayState | null>(null);
     let overlayVisible = $derived(isOverlayHost && renderedOverlay !== null);
     let portalLifecycleState = $state<CoreState>("Idle");
@@ -289,6 +299,17 @@
 
     $effect(() => {
         const overlayState = currentOverlay;
+        const dismissRevision = immediateDismissRevision;
+
+        if (dismissRevision !== handledImmediateDismissRevision) {
+            handledImmediateDismissRevision = dismissRevision;
+            clearOverlayLifecycleTimers();
+            overlayWasVisible = false;
+            renderedOverlay = null;
+            portalLifecycleState = "Idle";
+            resetMotionBaseline();
+            return;
+        }
 
         if (!overlayState) {
             if (
@@ -338,6 +359,22 @@
             }
         }
         overlayWasVisible = true;
+    });
+
+    $effect(() => {
+        if (!dismissOnMotion || currentOverlay?.id !== tooltipId || !triggerEl) {
+            return;
+        }
+
+        return registerTooltipMotionDismiss({
+            id: tooltipId,
+            triggerEl,
+            onDismiss: () => {
+                clearHoverShowTimer();
+                dismissTooltipOverlayImmediately(tooltipId);
+                scheduleTooltipWarmupReset();
+            },
+        });
     });
 
     $effect(() => {

@@ -18,6 +18,7 @@ export interface TooltipOverlayState {
 }
 
 export const tooltipOverlay = writable<TooltipOverlayState | null>(null);
+export const tooltipOverlayImmediateDismissRevision = writable(0);
 
 let activeTooltipId: string | undefined;
 let hideTimer: ReturnType<typeof setTimeout> | undefined;
@@ -60,5 +61,13 @@ export function hideTooltipOverlay(id: string): void {
     if (activeTooltipId !== id) return;
     clearHideTimer();
     activeTooltipId = undefined;
+    tooltipOverlay.set(null);
+}
+
+export function dismissTooltipOverlayImmediately(id: string): void {
+    if (activeTooltipId !== id) return;
+    clearHideTimer();
+    activeTooltipId = undefined;
+    tooltipOverlayImmediateDismissRevision.update((revision) => revision + 1);
     tooltipOverlay.set(null);
 }

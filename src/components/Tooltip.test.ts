@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.3.1
+ * v1.4.0
  */
 export const examples = [
     {
@@ -125,5 +125,26 @@ export const examples = [
                 "任一 Tooltip 成功显示后，300ms 内 hover 另一个 Tooltip 时立即显示；共享外框保持挂载，内容更新并移动到当前按钮上方；等待超过 300ms 后恢复 600ms 首次延迟",
         },
         logic: ["Warmup", "Cooldown", "SharedDelay", "SharedOverlay"],
+    },
+    {
+        name: "F1: 动效感知立即关闭 (Dismiss On Motion)",
+        code: `F1
+<Frame
+    style="width: 160px; transition: width 500ms ease-out;"
+>
+    <Button onclick={(event) => {
+        const host = event.currentTarget.parentElement;
+        if (host) host.style.width = host.offsetWidth < 200 ? "240px" : "160px";
+    }}>
+        切换容器宽度
+        <Tooltip position="right">动效开始前关闭</Tooltip>
+    </Button>
+</Frame>`,
+        expected: {
+            render: "Tooltip 默认显示在按钮右侧",
+            interaction: "Tooltip 已显示时点击按钮，祖先 Frame 的 width transition 开始即立即卸载 Tooltip，不播放退出动效",
+            performance: "仅 Tooltip 显示期间启用 document 级共享监听；无逐帧布局读取、ResizeObserver 或 MutationObserver；颜色和背景过渡不会触发关闭",
+        },
+        logic: ["DismissOnMotion", "ImmediateDismiss", "Performance"],
     },
 ] as const;

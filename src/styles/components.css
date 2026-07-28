@@ -523,6 +523,7 @@
     /* PRO Block Sidebar */
     /* --snowui-sidebar-width-override: ; */                         /* 展开宽度（默认 220px） */
     /* --snowui-sidebar-collapsed-width-override: ; */               /* 折叠宽度（默认 60px） */
+    /* --snowui-sidebar-resize-indicator-offset-override: ; */       /* 展开态右侧宽度 Indicator 视觉中心距右边缘（默认 var(--padding-1) = 4px） */
     /* --snowui-sidebar-padding-x-override: ; */                     /* 根横向 padding（默认 var(--padding-3) = 12px；Body 滚动条据此保持距 Sidebar 右边框 4px） */
     /* --snowui-sidebar-padding-y-override: ; */                     /* 根纵向 padding（默认 var(--padding-4) = 16px） */
     /* --snowui-sidebar-gap-override: ; */                           /* 根级 Header / Body 间距（默认 var(--gap-3) = 12px） */
@@ -531,6 +532,7 @@
     /* --snowui-sidebar-logo-padding-y-override: ; */                /* Logo 所在 Header 区域纵向 padding（默认 var(--padding-1) = 4px） */
     /* --snowui-sidebar-logo-scroll-mask-size-override: ; */         /* Body 向下滚动时 Logo 下方顶部渐隐尺寸（默认 var(--padding-1) = 4px，不占布局高度） */
     /* --snowui-sidebar-collapsed-header-gap-override: ; */          /* 折叠态 Logo host 与折叠按钮间距（默认 var(--gap-1)） */
+    /* --snowui-sidebar-collapsed-logo-slot-width-override: ; */     /* icon 变体折叠态 Logo leading slot 宽度（默认 36px） */
     /* --snowui-sidebar-default-logo-gap-override: ; */              /* 默认 Logo icon / wordmark 间距（默认 calc(var(--gap-1) * 1.5)） */
     /* --snowui-sidebar-footer-padding-y-override: ; */              /* 覆盖 Footer 纵向 padding（默认 var(--padding-2) = 8px） */
     /* --snowui-sidebar-footer-padding-x-override: ; */              /* 覆盖 Footer 横向 padding（默认 var(--padding-2) = 8px） */

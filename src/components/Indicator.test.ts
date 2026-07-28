@@ -54,4 +54,29 @@ export const examples = [
         },
         logic: ["Corner", "BothAxes", "Pointer", "Keyboard"],
     },
+    {
+        name: "IN-04: 局部命中与滚动条避让",
+        code: `IN-04
+<Frame style="position: relative; width: 10rem; height: 6rem;">
+    <ScrollArea style="height: 100%;">
+        <Frame column class="gap-8" style="height: 12rem;">
+            <Text>滚动内容</Text>
+            <Text>Indicator 与滚动条重叠时只显示滚动条</Text>
+        </Frame>
+    </ScrollArea>
+    <Indicator
+        axis="width"
+        pinOffset="var(--padding-1)"
+        hitAreaPadding="var(--padding-1)"
+    />
+</Frame>`,
+        expected: {
+            render: "宿主存在纵向 overlay scrollbar，Indicator 与滚动条轨道重叠时不显示。",
+            layout: "16px 视觉条的纵向命中范围为上下各 4px，合计 24px。",
+            interaction: "重叠时 Indicator 不截获滚动条附近的 Pointer，只允许操作滚动条。",
+            performance: "重叠检测只在宿主 hover、Indicator focus 或 dragging 期间启用，并在结束后清理观察器。",
+            responsive: "移除滚动溢出或使二者不再相交后，Indicator 恢复普通显隐与拖动。",
+        },
+        logic: ["LocalHitArea", "ScrollbarOverlap", "PointerPriority"],
+    },
 ] as const;

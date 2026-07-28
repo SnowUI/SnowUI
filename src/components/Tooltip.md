@@ -1,6 +1,6 @@
 # Tooltip.svelte 文档
 
-> **版本**: v1.6.17
+> **版本**: v1.7.0
 > **职责**: 文字提示组件，在悬停时显示额外信息。
 
 **能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
@@ -15,6 +15,7 @@
 | open | boolean | undefined | 手动控制显示状态 (可绑定) |
 | offset | number | 4 | 与触发器的距离 (px) |
 | variant | 'dark'\|'light' | 'light' | Tooltip 外观变体，默认 light，可显式切换为 dark |
+| dismissOnMotion | boolean | true | 非受控 hover 模式下，触发元素或其祖先开始位置、尺寸动效时立即隐藏 Tooltip |
 
 ## 关键字 (Keyword)
 
@@ -75,6 +76,7 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 5. **重新出现规则**: 外框已经隐藏后，不论间隔多久再次 hover，都重置上一次的坐标、尺寸和触发器记录；新一轮 Tooltip 首帧先完成不可见测量和定位，再直接从当前 hover 位置出现，不做位移动效和宽度变化动效。
 6. **冷却恢复**: 离开 Tooltip 触发器超过 `300ms` 后，恢复首次 hover 的 `450ms` 延迟。未成功显示就移开时，不进入立即显示模式。
 7. **边界碰撞**: 自动翻转位置避免溢出视口。
+8. **动效感知关闭**: 默认只在 Tooltip 已显示期间，以页面级单例监听触发元素及其祖先的几何 transition / animation；开始后立即卸载 Tooltip 并跳过退出动效。颜色、背景与透明度过渡不会触发关闭；可通过 `dismissOnMotion={false}` 显式关闭。
 
 ## 样式逻辑（实现对照）
 
@@ -142,6 +144,10 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.7.0 (2026-07-28)
+- 新增默认开启的 `dismissOnMotion`。触发元素或其祖先开始几何动效时，Tooltip 会在第一帧位移前立即卸载，避免 Portal 跟随定位产生跳动。
+- 动效监听按需启停并由同一 document 共享，不使用逐帧布局读取或常驻 Observer。
 
 ### v1.6.17 (2026-07-28)
 - Tooltip 默认外观变体由 `dark` 改为 `light`；仍可显式传入 `variant="dark"`。
