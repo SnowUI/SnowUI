@@ -71,10 +71,10 @@ export const examples = [
     />
 </Frame>`,
         expected: {
-            render: "宿主存在纵向 overlay scrollbar，Indicator 与滚动条轨道重叠时不显示。",
+            render: "鼠标进入宿主任意区域后显示 Indicator；存在纵向 overlay scrollbar 且 Indicator 与实际 Thumb 重叠时不显示 Indicator。",
             layout: "16px 视觉条的纵向命中范围为上下各 4px，合计 24px。",
-            interaction: "重叠时 Indicator 不截获滚动条附近的 Pointer，只允许操作滚动条。",
-            performance: "重叠检测只在宿主 hover、Indicator focus 或 dragging 期间启用，并在结束后清理观察器。",
+            interaction: "重叠时 Indicator 关闭 Pointer、hover、拖拽和键盘命中，只允许操作滚动条；Thumb 移出后恢复 Indicator。",
+            performance: "重叠检测只在宿主 hover、Indicator focus 或 dragging 期间启用，响应 ScrollArea hover、scroll、Thumb 位移与 opacity transition，并在结束后清理监听和观察器。",
             responsive: "移除滚动溢出或使二者不再相交后，Indicator 恢复普通显隐与拖动。",
         },
         logic: ["LocalHitArea", "ScrollbarOverlap", "PointerPriority"],

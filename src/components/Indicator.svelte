@@ -226,19 +226,28 @@
             '.snowui-overlay-scrollbar[data-visible="true"]',
         );
         overlapsScrollbar = Array.from(scrollbars).some((scrollbar) => {
+            const thumb = scrollbar.querySelector<HTMLElement>(
+                ".snowui-overlay-scrollbar-thumb",
+            );
+            if (!thumb) return false;
+
             const style = getComputedStyle(scrollbar);
+            const thumbStyle = getComputedStyle(thumb);
             const scrollbarHost = scrollbar.closest(
                 ".snowui-overlay-scrollbar-host",
             );
             const isRendered =
                 style.display !== "none" &&
                 style.visibility !== "hidden" &&
+                thumbStyle.display !== "none" &&
+                thumbStyle.visibility !== "hidden" &&
                 (scrollbar.dataset.axis === "horizontal" ||
                     scrollbarHost?.matches(":hover") ||
+                    thumb.dataset.dragging === "true" ||
                     Number(style.opacity) > 0);
             if (!isRendered) return false;
 
-            const scrollbarRect = scrollbar.getBoundingClientRect();
+            const scrollbarRect = thumb.getBoundingClientRect();
             return (
                 handleRect.left < scrollbarRect.right &&
                 handleRect.right > scrollbarRect.left &&
@@ -292,25 +301,60 @@
         const scrollbars = resizeTarget.querySelectorAll<HTMLElement>(
             ".snowui-overlay-scrollbar",
         );
+        const thumbs = Array.from(scrollbars)
+            .map((scrollbar) =>
+                scrollbar.querySelector<HTMLElement>(
+                    ".snowui-overlay-scrollbar-thumb",
+                ),
+            )
+            .filter((thumb): thumb is HTMLElement => Boolean(thumb));
         const resizeCleanups = [
             resizeManager.watch(handle, scheduleSync),
             resizeManager.watch(resizeTarget, scheduleSync),
             ...Array.from(scrollbars, (scrollbar) =>
                 resizeManager.watch(scrollbar, scheduleSync),
             ),
+            ...thumbs.map((thumb) => resizeManager.watch(thumb, scheduleSync)),
         ];
+        const eventCleanups: Array<() => void> = [];
+        const listen = (
+            target: EventTarget | null | undefined,
+            type: string,
+            options?: AddEventListenerOptions,
+        ) => {
+            if (!target) return;
+            target.addEventListener(type, scheduleSync, options);
+            eventCleanups.push(() =>
+                target.removeEventListener(type, scheduleSync, options),
+            );
+        };
+
+        scrollbars.forEach((scrollbar) => {
+            const scrollbarHost = scrollbar.closest<HTMLElement>(
+                ".snowui-overlay-scrollbar-host",
+            );
+            const viewport = scrollbarHost?.querySelector<HTMLElement>(
+                ".snowui-overlay-scrollbar-viewport",
+            );
+            listen(scrollbarHost, "pointerenter");
+            listen(scrollbarHost, "pointerleave");
+            listen(scrollbar, "transitionrun");
+            listen(scrollbar, "transitionend");
+            listen(viewport, "scroll", { passive: true });
+        });
 
         mutationObserver.observe(resizeTarget, {
             subtree: true,
             childList: true,
             attributes: true,
-            attributeFilter: ["data-visible"],
+            attributeFilter: ["data-visible", "data-dragging", "style"],
         });
         syncScrollbarOverlap();
 
         return () => {
             cancelAnimationFrame(frame);
             resizeCleanups.forEach((cleanup) => cleanup());
+            eventCleanups.forEach((cleanup) => cleanup());
             mutationObserver.disconnect();
             overlapsScrollbar = false;
         };
