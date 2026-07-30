@@ -54,6 +54,12 @@
     [key: string]: any;
   }
 
+  // 跨独立仓库源码检查时，Svelte 的 Snippet nominal symbol 可能来自不同物理安装。
+  // 此处只归一化传给 Frame 的类型身份，不改变 snippet 本身或运行时调用。
+  function normalizeFrameSnippet(snippet: unknown): Snippet<[any]> {
+    return snippet as Snippet<[any]>;
+  }
+
   const inheritedButtonPart = useComponentPart<Props>("Button");
   let explicitProps: Props = $props();
   let {
@@ -570,7 +576,7 @@
   {...clickProps}
   {...frameRestProps}
   use={[detectIconOnly]}
-  children={buttonChildren}
+  children={normalizeFrameSnippet(buttonChildren)}
 />
 
 <style>

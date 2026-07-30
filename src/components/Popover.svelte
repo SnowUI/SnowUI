@@ -45,6 +45,8 @@
         type PopoverSize,
         type PopoverTrigger,
     } from "../logic/popover.svelte";
+    import { ContinuousHoverController } from "../logic/continuous-hover.svelte";
+    import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
 
     function portal(node: HTMLElement) {
         document.body.appendChild(node);
@@ -67,6 +69,8 @@
         closeOn?: PopoverCloseMode;
         closeOnEscape?: boolean;
         closeOnSelect?: boolean;
+        /** 直接 MenuItem 间是否使用容器级连续 hover 背景。 */
+        continuousHover?: boolean;
         open?: boolean;
         onOpenChange?: (open: boolean) => void;
         /** as="popover" 启用内嵌模式:自动发现宿主父元素为 anchor */
@@ -85,6 +89,7 @@
         closeOn = "outside",
         closeOnEscape = true,
         closeOnSelect = undefined,
+        continuousHover = true,
         /** 面板模式默认 open=true 直接渲染;模版 / 内嵌模式 open 不参与控制 */
         open = $bindable(true),
         onOpenChange = undefined,
@@ -175,6 +180,17 @@
     // ── 自定义浮层滚动条:仅作用于 body,不进入 header ──
     let scrollViewportEl = $state<HTMLElement | undefined>(undefined);
     let scrollbarEl = $state<HTMLDivElement | undefined>(undefined);
+    const continuousHoverController = new ContinuousHoverController();
+    $effect(() => {
+        if (!scrollViewportEl) return;
+        return continuousHoverController.attach(scrollViewportEl, {
+            selector: ":scope > .snowui-menu-item",
+            layerClass: "snowui-popover-continuous-hover-layer",
+            axis: "y",
+            enabled: continuousHover,
+        });
+    });
+    $effect(() => continuousHoverController.setEnabled(continuousHover));
     const sb = useOverlayScrollbar(
         () => scrollViewportEl,
         () => scrollbarEl,
@@ -502,6 +518,7 @@
             <div
                 bind:this={scrollViewportEl}
                 class="snowui-popover-scroll-content snowui-overlay-scrollbar-viewport"
+                style={CONTINUOUS_HOVER_MOTION_STYLE}
             >
                 {@render children?.()}
             </div>
@@ -540,6 +557,14 @@
 
     :global(:where(.snowui-popover[data-closing="true"])) {
         pointer-events: none;
+    }
+    :global(:where(.snowui-popover-scroll-content > .snowui-menu-item)) {
+        position: relative;
+        z-index: 1;
+    }
+    :global(:where(.snowui-popover-continuous-hover-layer)) {
+        border-radius: var(--snowui-menu-item-radius-override, var(--radius-3, 0.75rem));
+        background: var(--black-4, #0000000a);
     }
 
     :global(:where(.snowui-popover[data-placement="top"])) {

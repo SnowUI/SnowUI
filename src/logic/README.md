@@ -47,6 +47,7 @@
 | `frame-responsive.svelte.ts` | 基于共享 `ResizeObserver` 计算容器断点 | `containerWidth`、`breakpoint` |
 | `frame-perception.svelte.ts` | 向子组件透出 `FRAME_CONTEXT_KEY`、旧交互上下文、Skeleton 上下文和尺寸上下文 | 父级状态/断点/编排能力的上下文感知 |
 | `component-parts.svelte.ts` | `parts.ComponentName` 直接所有权边界、默认 Props 读取、class/style 合并 | 复合组件默认内置 + `as` 外置双模式 |
+| `continuous-hover.svelte.ts` | 容器唯一背景层在候选项之间连续移动 | 连续列表、菜单、导航和行 hover |
 | `frame-actions.svelte.ts` | 统一拼装并挂载用户 action 与内部 action | `buildFrameActions()`、`mountFrameActions()` |
 | `frame-dom-runtime.svelte.ts` | 组装 DOM props、disabled/aria、capture handlers、原生事件包装器、运行时 `data-*` 属性 | `domProps`、`nativeHandlers`、`dataAttrs` |
 | `frame-class-state.svelte.ts` | 解析 `stateVars / stateClass / stateStyle`，并生成 `computedClass` 与 `childrenRenderContext` | 状态映射 class/style 与子内容上下文 |

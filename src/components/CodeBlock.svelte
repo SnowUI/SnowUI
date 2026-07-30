@@ -138,6 +138,12 @@
         [key: string]: any;
     }
 
+    // 归一化跨独立仓库源码检查产生的 Snippet nominal identity。
+    // 输入和输出仍是同一个函数，运行时不包装、不重建。
+    function normalizeActionSnippet(snippet: unknown): Snippet {
+        return snippet as Snippet;
+    }
+
     let {
         code = "",
         language = "",
@@ -549,9 +555,11 @@
                         bare
                         showText={false}
                         feedbackDuration={copyTimeout}
-                        icon={hasCustomCopyIcon ? copyIconSnippet : undefined}
+                        icon={hasCustomCopyIcon
+                            ? normalizeActionSnippet(copyIconSnippet)
+                            : undefined}
                         successIcon={hasCustomCopiedIcon
-                            ? copiedIconSnippet
+                            ? normalizeActionSnippet(copiedIconSnippet)
                             : undefined}
                         class="snowui-code-block-btn snowui-hoverable"
                         ariaLabel="复制代码"
@@ -567,8 +575,12 @@
                         ariaLabel="全屏查看"
                         collapseAriaLabel="退出全屏"
                         onclick={toggleFullscreen}
-                        icon={hasCustomExpandIcon ? expandIconSnippet : undefined}
-                        collapseIcon={hasCustomCollapseIcon ? collapseIconSnippet : undefined}
+                        icon={hasCustomExpandIcon
+                            ? normalizeActionSnippet(expandIconSnippet)
+                            : undefined}
+                        collapseIcon={hasCustomCollapseIcon
+                            ? normalizeActionSnippet(collapseIconSnippet)
+                            : undefined}
                     />
                 {/if}
             {/if}
@@ -670,9 +682,11 @@
                         bare
                         showText={false}
                         feedbackDuration={copyTimeout}
-                        icon={hasCustomCopyIcon ? copyIconSnippet : undefined}
+                        icon={hasCustomCopyIcon
+                            ? normalizeActionSnippet(copyIconSnippet)
+                            : undefined}
                         successIcon={hasCustomCopiedIcon
-                            ? copiedIconSnippet
+                            ? normalizeActionSnippet(copiedIconSnippet)
                             : undefined}
                         class="snowui-code-block-btn snowui-hoverable"
                         ariaLabel="复制代码"
@@ -687,7 +701,9 @@
                         ariaLabel="全屏查看"
                         collapseAriaLabel="退出全屏"
                         onclick={exitFullscreen}
-                        collapseIcon={hasCustomCollapseIcon ? collapseIconSnippet : undefined}
+                        collapseIcon={hasCustomCollapseIcon
+                            ? normalizeActionSnippet(collapseIconSnippet)
+                            : undefined}
                     />
                 {/if}
             </div>

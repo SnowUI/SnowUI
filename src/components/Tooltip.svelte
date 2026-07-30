@@ -225,10 +225,10 @@
     let portalReady = $state(false);
     let portalMotionReady = $state(false);
     let sizeMotionEnabled = $state(false);
-    let hoverShowTimer: ReturnType<typeof window.setTimeout> | undefined;
-    let overlayAppearTimer: ReturnType<typeof window.setTimeout> | undefined;
-    let overlayDisappearTimer: ReturnType<typeof window.setTimeout> | undefined;
-    let sizeMotionTimer: ReturnType<typeof window.setTimeout> | undefined;
+    let hoverShowTimer: number | undefined;
+    let overlayAppearTimer: number | undefined;
+    let overlayDisappearTimer: number | undefined;
+    let sizeMotionTimer: number | undefined;
     let unregisterOverlayHost: (() => void) | undefined;
     const tooltipBehavior = getTooltipBehaviorEnhancement();
 

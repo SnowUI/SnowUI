@@ -7,9 +7,13 @@
     import Spinner from "./Spinner.svelte";
     import { getTableContext, type TableColumnRegistration } from "../lib/table-context.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import { ContinuousHoverController } from "../logic/continuous-hover.svelte";
+    import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
     interface Props extends Omit<FrameProps, "children"> {
         loading?: boolean;
         loadingSpinner?: boolean;
+        /** 数据行之间是否使用容器级连续 hover 背景。 */
+        continuousHover?: boolean;
         children?: Snippet;
         parts?: ComponentPartsOf<{
             TableRow: typeof TableRow;
@@ -18,7 +22,7 @@
         }>;
         [key: string]: any;
     }
-    let { loading = undefined, loadingSpinner = undefined, children, parts = undefined, class: userClass = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
+    let { loading = undefined, loadingSpinner = undefined, continuousHover = true, children, parts = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
     const table = getTableContext();
     const fallbackColumns: readonly TableColumnRegistration[] = [{ align: "start" }];
     const resolvedLoading = $derived(loading ?? table.getLoading());
@@ -32,11 +36,26 @@
         table.getColumns().length > 0 ? table.getColumns() : fallbackColumns,
     );
     const skeletonWidths = ["62%", "76%", "54%", "68%"];
+    let bodyElement = $state<HTMLElement | undefined>(undefined);
+    const continuousHoverController = new ContinuousHoverController();
+    $effect(() => {
+        if (!bodyElement) return;
+        const overlayHost = bodyElement.closest<HTMLElement>(".snowui-table-viewport");
+        if (!overlayHost) return;
+        return continuousHoverController.attach(bodyElement, {
+            selector: ":scope > .snowui-table-row",
+            layerClass: "snowui-table-continuous-hover-layer",
+            axis: "y",
+            enabled: continuousHover,
+            overlayHost,
+        });
+    });
+    $effect(() => continuousHoverController.setEnabled(continuousHover));
     function getSkeletonWidth(rowIndex: number, columnIndex: number) {
         return skeletonWidths[(rowIndex + columnIndex * 2) % skeletonWidths.length];
     }
 </script>
-<Frame tag="tbody" data-loading={resolvedLoading ? "true" : undefined} class={`snowui-table-body ${userClass}`} enableAutoLayout={false} enableResponsive={enableResponsive} enableContext={enableContext} enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
+<Frame bind:element={bodyElement} tag="tbody" data-loading={resolvedLoading ? "true" : undefined} class={`snowui-table-body ${userClass}`} style={[CONTINUOUS_HOVER_MOTION_STYLE, userStyle].filter(Boolean).join("; ")} enableAutoLayout={false} enableResponsive={enableResponsive} enableContext={enableContext} enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
     {#if resolvedLoading}
         {#each Array(resolvedLoadingRowCount) as _, rowIndex (rowIndex)}
             <TableRow data-skeleton="true" aria-hidden="true">
@@ -75,4 +94,8 @@
     :global(:where(.snowui-table-loading-cell)) { text-align: center; }
     :global(:where(.snowui-table-loading-indicator)) { display: flex; width: 100%; align-items: center; justify-content: center; font-size: var(--text-12); line-height: var(--leading-12); }
     :global(:where(.snowui-table-row[data-loading-spinner="true"] > .snowui-table-cell)) { border-radius: 0; border-bottom-color: var(--black-10, #0000001a); background: transparent; }
+    :global(:where(.snowui-table-continuous-hover-layer)) {
+        border-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem));
+        background: var(--snowui-table-row-hover-background-override, var(--black-4, #0000000a));
+    }
 </style>

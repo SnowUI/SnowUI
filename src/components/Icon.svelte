@@ -101,7 +101,9 @@
 
     setContext(RESOURCE_ICON_CONTEXT_KEY, {
         size: "100%",
-        weight: weight,
+        get weight() {
+            return weight;
+        },
         registerChildSize: (next?: number | string) => {
             childSize = next;
         },

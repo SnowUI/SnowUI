@@ -275,6 +275,7 @@
     <div
         bind:this={backdropEl}
         use:portal
+        role="presentation"
         class="snowui-dialog-backdrop"
         data-backdrop={backdrop}
         data-open={presence.closing ? undefined : "true"}

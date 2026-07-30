@@ -341,6 +341,7 @@
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell[data-table-variant="striped"]) { border-radius: var(--radius-3) 0 0 var(--radius-3); }
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell[data-table-variant="striped"]:has(+ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"])) { border-radius: 0 var(--radius-3) var(--radius-3) 0; }
     :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"]):hover, .snowui-table-body .snowui-table-row:not([data-skeleton="true"])[data-force-hover="true"]) > .snowui-table-cell) { background: var(--snowui-table-row-hover-background-override, var(--black-4, #0000000a)); border-bottom-color: transparent; }
+    :global(:where(.snowui-table-body[data-continuous-hover-enabled="true"] .snowui-table-row:not([data-force-hover="true"]):hover) > .snowui-table-cell) { background: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row:has(+ .snowui-table-row:not([data-skeleton="true"]):hover), .snowui-table-body .snowui-table-row:has(+ .snowui-table-row:not([data-skeleton="true"])[data-force-hover="true"])) > .snowui-table-cell) { border-bottom-color: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row:hover) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }

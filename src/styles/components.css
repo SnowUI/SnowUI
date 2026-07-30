@@ -51,9 +51,9 @@
 
 
     /* ─────────────────────────────────────────
-       Badge（内容模式）
+       Badge（filled / border 内容模式）
     ───────────────────────────────────────── */
-    /* --snowui-badge-padding-override: ; */     /* padding y+x（默认 calc(--padding-1 * 0.75) calc(--padding-1 * 1.5)） */
+    /* --snowui-badge-padding-override: ; */     /* padding y+x（filled 默认 calc(--padding-1 * 0.75) calc(--padding-1 * 1.5)；border 默认 0 var(--padding-1)） */
 
 
     /* ─────────────────────────────────────────
@@ -705,8 +705,8 @@
 
     /* Badge */
     /* --snowui-badge-font-size-override: ; */    /* font-size（默认值见组件源码） */
-    /* --snowui-badge-line-height-override: ; */  /* line-height（默认值见组件源码） */
-    /* --snowui-badge-radius-override: ; */       /* border-radius（默认值见组件源码） */
+    /* --snowui-badge-line-height-override: ; */  /* line-height（filled 默认 1；border 默认 var(--leading-12)） */
+    /* --snowui-badge-radius-override: ; */       /* border-radius（filled 默认 var(--radius-full)；border 默认 calc(var(--radius-1) * 1.5)） */
 
     /* Button */
     /* --snowui-button-font-size-override: ; */    /* font-size（默认值见组件源码） */

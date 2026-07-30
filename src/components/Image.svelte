@@ -59,14 +59,17 @@
 
     // 过滤掉已移除的 Props 和组件内部逻辑 Props，避免透传到 DOM
     // 对齐 Avatar / Frame 的过滤规范
-    const {
-        alt: _alt,
-        previewMode: _previewMode,
-        onOpen: _oo,
-        badgePosition: _bp,
-        variant: _variant,
-        ...cleanRest
-    } = rest as Record<string, any>;
+    const cleanRest = $derived.by(() => {
+        const {
+            alt: _alt,
+            previewMode: _previewMode,
+            onOpen: _oo,
+            badgePosition: _bp,
+            variant: _variant,
+            ...forwardedProps
+        } = rest as Record<string, any>;
+        return forwardedProps;
+    });
 
     getSize();
     const sizeCtx = getSizeContext();

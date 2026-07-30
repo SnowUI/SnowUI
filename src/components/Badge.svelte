@@ -1,5 +1,5 @@
 <!--
- Badge 组件：徽标组件 v1.2.8
+ Badge 组件：徽标组件 v1.3.1
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
  详见：Badge.md
@@ -74,6 +74,7 @@
     }
 
     interface Props extends FrameProps {
+        variant?: "filled" | "border";
         count?: number | string;
         stateCount?: StateValueMap<number | string>;
         dot?: boolean;
@@ -86,6 +87,7 @@
     }
 
     let {
+        variant = "filled",
         count = undefined,
         stateCount = undefined,
         dot = undefined,
@@ -349,6 +351,7 @@
     });
 
     const badgeFixedSizeToken = $derived.by(() => {
+        if (variant === "border") return undefined;
         // Resolve Size:
         // If it's a badge role (inside Avatar/Icon), we don't want the parent Group's size as our FIXED size
         // unless it's explicitly passed as a prop.
@@ -389,7 +392,9 @@
                 : "",
             dimStyle,
             fontInheritStyle,
-            `--snowui-badge-background: ${resolveSnowUIColor(color)}`,
+            variant !== "border" || effectiveDot
+                ? `--snowui-badge-background: ${resolveSnowUIColor(color)}`
+                : "",
             userStyle,
         ]
             .filter(Boolean)
@@ -400,6 +405,13 @@
     );
     const badgeRenderHints = $derived.by(() => {
         const base = (() => {
+            if (variant === "border") {
+                return {
+                    variant: "line" as const,
+                    height: "var(--leading-12)",
+                    radius: "calc(var(--radius-1) * 1.5)",
+                };
+            }
             if (effectiveDot) {
                 const dotSize = badgeFixedSizeToken ??
                     "calc(var(--size-4) * 1.5 / 4)";
@@ -451,6 +463,9 @@
             className,
             isBadgeRole ? "snowui-badge-role" : "",
             effectiveDot ? "snowui-badge-dot" : "",
+            variant === "border" && !effectiveDot
+                ? "snowui-badge-border"
+                : "",
             "snowui-badge-motion",
             shouldBindBadgeFixedSize ? "snowui-badge-size-bound" : "",
         ]
@@ -507,6 +522,8 @@
         --snowui-badge-radius: var(--radius-full);
         --snowui-badge-font-size: var(--text-12);
         --snowui-badge-line-height: 1;
+        --snowui-badge-foreground: var(--static-white-100, #ffffffff);
+        --snowui-badge-shadow: none;
 
     }
 
@@ -519,7 +536,7 @@
             --snowui-badge-background,
             var(--secondary-indigo, #adadfbff)
         );
-        color: var(--static-white-100, #ffffffff);
+        color: var(--snowui-badge-foreground);
         width: fit-content;
         height: auto;
         min-width: var(
@@ -542,7 +559,25 @@
             --snowui-badge-radius-override,
             var(--snowui-badge-radius)
         );
+        box-shadow: var(--snowui-badge-shadow);
         white-space: nowrap;
+    }
+
+    /* Level 4: Border 变体确权（与 Kbd 默认 border 视觉一致，仅更新变量） */
+    :global(:where(.snowui-badge).snowui-badge-border) {
+        --snowui-badge-padding: var(--padding-0) var(--padding-1);
+        --snowui-badge-radius: calc(var(--radius-1) * 1.5);
+        --snowui-badge-font-size: var(--text-12);
+        --snowui-badge-line-height: var(--leading-12);
+        --snowui-badge-background: transparent;
+        --snowui-badge-foreground: inherit;
+        --snowui-badge-shadow: inset 0 0 0 var(--border-1)
+            var(--black-10, rgba(0, 0, 0, 0.1));
+    }
+
+    /* Border 文本层继承 16px 行高，避免通用 morph-item 的紧凑 line-height: 1 将高度压回 12px。 */
+    :global(:where(.snowui-badge-border) .snowui-morph-item) {
+        line-height: inherit;
     }
 
     /* transitions.dev Notification badge：Frame 根层滑动，视觉 surface 整体 pop。 */

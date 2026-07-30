@@ -49,6 +49,8 @@
         type ComponentPartsOf,
         useComponentPart,
     } from "../logic/component-parts.svelte";
+    import { ContinuousHoverController } from "../logic/continuous-hover.svelte";
+    import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
 
     export interface ListboxItem {
         value: string;
@@ -82,6 +84,8 @@
         align?: "start" | "end";
         /** 是否为选中项预留并显示勾选图标。 */
         showCheck?: boolean;
+        /** 选项间是否使用容器级连续 hover 背景。 */
+        continuousHover?: boolean;
         [key: string]: any;
     }
 
@@ -101,6 +105,7 @@
         placementMode = "selected",
         align = "start",
         showCheck = false,
+        continuousHover = true,
         enableAutoLayout = true,
         enableResponsive = false,
         enableContext = true,
@@ -157,6 +162,20 @@
     let listboxEl = $state<HTMLDivElement | undefined>(undefined);
     let scrollListboxEl = $state<HTMLElement | undefined>(undefined);
     let scrollbarEl = $state<HTMLDivElement | undefined>(undefined);
+    const continuousHoverController = new ContinuousHoverController();
+
+    $effect(() => {
+        if (!scrollListboxEl) return;
+        return continuousHoverController.attach(scrollListboxEl, {
+            selector: ":scope > .snowui-menu-item",
+            layerClass: "snowui-listbox-continuous-hover-layer",
+            axis: "y",
+            enabled: continuousHover,
+            followActive: true,
+        });
+    });
+
+    $effect(() => continuousHoverController.setEnabled(continuousHover));
 
     // ── 自定义浮层滚动条（通用 hook，内部使用 resizeManager） ──────────────
     const sb = useOverlayScrollbar(
@@ -423,6 +442,7 @@
                     tag="div"
                     column
                     class={`snowui-listbox snowui-overlay-scrollbar-viewport${userClass ? ` ${userClass}` : ""}`}
+                    style={CONTINUOUS_HOVER_MOTION_STYLE}
                     id={owner?.listboxId}
                     role="listbox"
                     tabindex={-1}
@@ -530,8 +550,14 @@
         min-height: 0;
     }
     :global(:where(.snowui-listbox > [data-as="item"])) {
+        position: relative;
+        z-index: 1;
         width: 100%;
         white-space: nowrap;
+    }
+    :global(:where(.snowui-listbox-continuous-hover-layer)) {
+        border-radius: var(--snowui-menu-item-radius-override, var(--radius-3, 0.75rem));
+        background: var(--black-4, #0000000a);
     }
     /* 组件只声明轨道定位；视觉样式由 scrollbar.css 的 .snowui-overlay-scrollbar 承接。 */
     :global(:where(.snowui-listbox-scrollbar)) {

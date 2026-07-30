@@ -374,4 +374,18 @@ export const examples = [
         },
         logic: ["Inline", "ManualClose", "LargeSize"],
     },
+    {
+        name: "P12：MenuItem 连续 Hover",
+        code: `P12
+<Popover><MenuItem>One</MenuItem><MenuItem active>Two</MenuItem></Popover>
+<Popover continuousHover={false}><MenuItem>Fallback</MenuItem></Popover>`,
+        expected: {
+            render: "默认 Popover 的直接 MenuItem 共用一个 hover 层。",
+            layout: "共享层限制在滚动内容区。",
+            interaction: "背景连续移动；hover active 项时背景叠加加深；false 恢复逐项 hover。",
+            performance: "不为每个 MenuItem 创建背景节点。",
+            responsive: "滚动内容变化后重新测量。",
+        },
+        logic: ["ContinuousHover", "ActiveLayering", "OptOut"],
+    },
 ] as const;

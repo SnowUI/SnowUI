@@ -288,3 +288,8 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中�
 
 ### v1.1.1 (2026-02-03)
 - 初始版本
+## 连续 Hover
+
+`continuousHover` 默认 `true`，作用于滚动内容区的直接 `MenuItem`。单一背景层在
+菜单项之间连续移动；`false` 恢复 MenuItem 原有逐项 hover。嵌套 Listbox 使用自己
+最近的连续 hover 容器，不由 Popover 越界接管。

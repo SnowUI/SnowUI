@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.6.0
+> **版本**: v1.7.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -21,6 +21,7 @@
 | `MOTION_DURATION_STANDARD_*` | dropdown overlay、generic fallback、dialog 等标准进入 / 退出节奏 |
 | `MOTION_DURATION_RESIZE_MS` | Card、Accordion、Panel 等明确尺寸变化节奏 |
 | `MOTION_DURATION_TAB_INDICATOR_MS` | Tab / Segmented indicator 位置与尺寸同步变化 |
+| `MOTION_DURATION_CONTINUOUS_HOVER_MS` / `MOTION_DURATION_CONTINUOUS_HOVER_RESPONSE_MS` | 连续悬停背景移动 / 变形 60ms，首次显隐响应 0ms |
 | `MOTION_DURATION_*` / `MOTION_STAGGER_*` | 通用效果优先引用 250ms 基准；Badge、Tooltip、shake 等专项效果保留精确时长与 stagger |
 | `MOTION_EASING_*` | standard、in-out、linear 以及 Badge / Number / Check 各自精确 bounce 曲线 |
 | `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
@@ -36,6 +37,7 @@
 
 ## 变更记录
 
+- v1.7.0 (2026-07-30): 新增连续悬停背景专项移动与响应时长 token，避免沿用偏慢的 250ms 基础节奏。
 - v1.6.0 (2026-07-12): 默认位移 damping 从 Rare UI 基线 30 调为临界阻尼 `2 * sqrt(300 * 1) = 34.6410161514`，保留 spring 加减速并去除回弹；基线参数 300 / 30 / 1 保留于本记录供恢复。
 - v1.5.0 (2026-07-12): 默认位移改为 Rare UI Sidebar 同参数 spring，新增 move duration 与 stiffness / damping / mass token。
 - v1.4.0 (2026-07-12): 曾新增默认位移 cubic-bezier；v1.5.0 起由真实 spring 取代。

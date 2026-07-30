@@ -296,6 +296,9 @@
     :global(:where(.snowui-menu-item:hover)) {
         background-color: var(--black-4, #0000000a);
     }
+    :global(:where([data-continuous-hover-enabled="true"] > .snowui-menu-item:hover)) {
+        background-color: transparent;
+    }
 
     /* 选中态 */
     :global(:where(.snowui-menu-item[aria-selected="true"])) {
@@ -309,6 +312,9 @@
     /* 活跃态（键盘导航高亮） */
     :global(:where(.snowui-menu-item[data-active="true"])) {
         background-color: var(--black-4, #0000000a);
+    }
+    :global(:where(.snowui-listbox[data-continuous-hover-enabled="true"] > .snowui-menu-item[data-active="true"])) {
+        background-color: transparent;
     }
 
     /* 禁用态 */

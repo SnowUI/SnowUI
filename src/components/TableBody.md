@@ -61,3 +61,8 @@ DataTable 在 `loading` 或 `refreshing` 且当前存在可见 rows 时，通过
 - 2026-06-30：v1.1.1，移除独立 `skeletonRows` 配置；骨架行数继承 DataTable `pageSize`，无法读取时回退 10 行。
 - 2026-06-30：v1.1.0，新增 `loading` / `skeletonRows` 与 Table Context 列注册消费协议，首次空数据加载时自动生成语义化 Skeleton rows。
 - 2026-06-19：v1.0.0，首次发布。
+## 连续 Hover
+
+`continuousHover` 默认 `true`。视觉层挂在合法的 Table viewport 中，但测量和
+交互由 `tbody` 管理；它只跟随真实数据行，跳过 Skeleton 与 loading-spinner 行。
+关闭后恢复 TableRow / TableCell 原有逐行 hover 背景。
