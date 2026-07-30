@@ -1119,6 +1119,7 @@
                 height={numericHeight}
                 fill="transparent"
                 pointer-events="all"
+                role="presentation"
                 onpointerenter={handleCellPointerMove}
                 onpointermove={handleCellPointerMove}
                 onpointerleave={() => setHoveredSegmentIndex(null)}

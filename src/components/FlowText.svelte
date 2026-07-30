@@ -626,7 +626,7 @@
             flowTextWheelRuntimes.get(wheel)?.cancel();
             jumpFlowTextWheelValue(wheel, from);
 
-            let frame: ReturnType<typeof window.setTimeout> | undefined;
+            let frame: number | undefined;
             let cancelled = false;
             const startTime =
                 (typeof performance !== "undefined"

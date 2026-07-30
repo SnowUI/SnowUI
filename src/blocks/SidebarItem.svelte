@@ -1,4 +1,4 @@
-<!-- SidebarItem PRO Block v1.2.1. 文档: ./SidebarItem.md -->
+<!-- SidebarItem PRO Block v1.3.0. 文档: ./SidebarItem.md -->
 <script lang="ts">
     import type { Snippet } from "svelte";
     import {
@@ -20,6 +20,7 @@
         iconCollection?: string;
         href?: string;
         updated?: boolean;
+        tags?: Snippet;
         disabled?: boolean;
         actions?: SidebarActionData[] | Snippet;
         onSelect?: (id: string) => void;
@@ -34,6 +35,7 @@
         iconCollection = undefined,
         href = undefined,
         updated = false,
+        tags = undefined,
         disabled = false,
         actions = [],
         onSelect = undefined,
@@ -99,6 +101,7 @@
             aria-hidden={collapsed ? "true" : undefined}
         >
             <span class="snowui-sidebar-item-label">{label}</span>
+            {@render tags?.()}
             {#if updated}
                 <Badge
                     {...parts?.Badge}

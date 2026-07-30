@@ -122,8 +122,12 @@
         ...rest
     }: Props = $props();
 
+    function resolveInitialActiveCellIndex() {
+        return defaultActiveCellIndex;
+    }
+
     let internalActiveCellIndex = $state<{ value: number | null }>({
-        value: defaultActiveCellIndex,
+        value: resolveInitialActiveCellIndex(),
     });
     let hoverPanelEntries = $state<Record<string, ChartHoverPanelData>>({});
     let hoverPanelPointer = $state({ x: 0, y: 0 });
@@ -487,6 +491,8 @@
             viewBox={`0 0 ${numericWidth} ${numericHeight}`}
             width={numericWidth}
             height={numericHeight}
+            role="group"
+            aria-label="组合图表数据单元格"
             onpointerleave={() => setActiveCellIndex(null)}
         >
             {#each Array(cellCount) as _, index}
