@@ -174,7 +174,13 @@
         reduceMotion ? 0 : (MORPH_MOTION.duration ?? 300),
     );
     const widthSlowOffset = 500;
-    let widthTransitionDurationMs = $state(widthMotionDuration);
+    function resolveInitialWidthMotionDuration() {
+        return widthMotionDuration;
+    }
+
+    let widthTransitionDurationMs = $state(
+        resolveInitialWidthMotionDuration(),
+    );
     let isRapidCalculation = $state(false);
     let lastNumericChangeAt = 0;
     let rapidCalculationTimer: ReturnType<typeof setTimeout> | null = null;

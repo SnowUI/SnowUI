@@ -155,4 +155,18 @@ export const examples = [
         },
         logic: ["BuiltInMode", "IconToggle", "Icon", "Text"],
     },
+    {
+        name: "TB-11:连续 Hover 与关闭开关",
+        code: `TB-11
+<Tab value="one" items={[{ value: "one", label: "One" }, { value: "two", label: "Two" }]} />
+<Tab continuousHover={false} value="one" items={[{ value: "one", label: "One" }, { value: "two", label: "Two" }]} />`,
+        expected: {
+            render: "默认实例生成共享 hover 层，关闭实例只保留 active indicator。",
+            layout: "共享层按排列方向匹配直接 Item 的几何与圆角。",
+            interaction: "背景连续滑动，hover active 时叠加 indicator；false 关闭共享层。",
+            performance: "容器只有一个 hover 视觉节点。",
+            responsive: "row / column 切换时同步移动轴。",
+        },
+        logic: ["ContinuousHover", "ActiveLayering", "OptOut"],
+    },
 ];

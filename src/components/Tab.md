@@ -307,3 +307,8 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 
 #### 修正
 - `variant="underline"` 容器默认圆角为 0;下划线 / 竖线尺寸由组件计算,不依赖 CSS 强制覆盖内联尺寸
+## 连续 Hover
+
+`continuousHover` 默认 `true`，根据 row / column 方向移动共享 hover 背景。
+active indicator 始终保留，因此 hover active 项时两层视觉叠加。关闭后不生成共享
+hover 背景。Segmented 透传并继承相同默认值。

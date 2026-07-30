@@ -104,10 +104,14 @@
 
     // === Orchestration Setup ===
     // If 'styles' is provided, we act as a root orchestrator provider
-    let orchestrator = getOrchestrator();
-    if (rawProps.styles) {
-        orchestrator = initOrchestrator();
+    function resolveInitialOrchestrator() {
+        if (rawProps.styles) {
+            return initOrchestrator();
+        }
+        return getOrchestrator();
     }
+
+    const orchestrator = resolveInitialOrchestrator();
 
     // Sync rules if this is the root
     $effect(() => {

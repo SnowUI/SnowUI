@@ -23,9 +23,10 @@
 
 <script lang="ts">
     import { setContext, type Component, type Snippet } from "svelte";
-    import { Button, Frame, Icon, Text, type FrameProps } from "@snowui-design-system/components";
+    import { Button, ContinuousHoverController, Frame, Icon, Text, type FrameProps } from "@snowui-design-system/components";
     import { BUTTON_SIZE_CONTEXT_KEY } from "@snowui-design-system/components/keys";
     import { TAB_INDICATOR_MOTION_STYLE } from "@snowui-design-system/components/motion/presets/tab";
+    import { CONTINUOUS_HOVER_MOTION_STYLE } from "@snowui-design-system/components/motion/presets/continuous-hover";
     import {
         mergeComponentPartProps,
         provideComponentParts,
@@ -59,6 +60,8 @@
         onChange?: (value: string) => void;
         /** 方向键是否直接激活(Tab 默认 false 仅切焦点 + Enter 激活;Segmented 默认 true 直切) */
         selectionFollowsFocus?: boolean;
+        /** 项之间是否使用容器级连续 hover 背景。 */
+        continuousHover?: boolean;
         /** ARIA role:Tab 默认 tablist;Segmented 传入 radiogroup */
         role?: string;
         /** 子项 ARIA role:tablist→tab(Button 自身已是 button);radiogroup→radio */
@@ -88,6 +91,7 @@
         fill = false,
         onChange,
         selectionFollowsFocus = false,
+        continuousHover = true,
         role = "tablist",
         itemRole = undefined,
         children,
@@ -111,7 +115,19 @@
     let rootEl = $state<HTMLElement>();
     let indicatorEl = $state<HTMLElement | null>(null);
     let initialized = $state(false);
+    const continuousHoverController = new ContinuousHoverController();
     const resolvedDirection = $derived(row || !column ? "row" : "column");
+
+    $effect(() => {
+        if (!rootEl) return;
+        return continuousHoverController.attach(rootEl, {
+            selector: ':scope > [data-as="item"][value]',
+            layerClass: "snowui-tab-continuous-hover-layer",
+            axis: resolvedDirection === "row" ? "x" : "y",
+            enabled: continuousHover,
+        });
+    });
+    $effect(() => continuousHoverController.setEnabled(continuousHover));
 
     setContext(BUTTON_SIZE_CONTEXT_KEY, {
         present: true,
@@ -308,7 +324,7 @@
     ]
         .filter(Boolean)
         .join(" ")}
-    style={[TAB_INDICATOR_MOTION_STYLE, userStyle].filter(Boolean).join("; ")}
+    style={[TAB_INDICATOR_MOTION_STYLE, CONTINUOUS_HOVER_MOTION_STYLE, userStyle].filter(Boolean).join("; ")}
     onclick={handleClick}
     onkeydown={handleKeydown}
     {...rest}
@@ -433,6 +449,10 @@
             box-shadow
                 var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
+    }
+    :global(:where(.snowui-tab) > .snowui-tab-continuous-hover-layer) {
+        border-radius: var(--snowui-tab-item-radius, var(--radius-3));
+        background: var(--black-4, rgba(0, 0, 0, 0.04));
     }
 
     /* 初始化前不显示 indicator,避免从 (0,0) 飞过来 */

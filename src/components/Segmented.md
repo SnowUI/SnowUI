@@ -186,3 +186,7 @@ Segmented 是 Tab 的宿主组件特化：真实 Tab 是主要视觉表面、交
 - 初始实现:基于 Tab 的薄封装,固定 `role="radiogroup"` / `itemRole="radio"` / `selectionFollowsFocus=true`
 - 支持 `name` 属性接入 Form,内部渲染 hidden input 暴露 value 给原生表单提交
 - 支持 `fill` Figma fill 宽度,与 Tab 共享等宽子项样式
+## 连续 Hover
+
+继承 Tab 的 `continuousHover` 能力与默认值 `true`；可在 Segmented 实例上直接
+传入 `continuousHover={false}` 关闭。

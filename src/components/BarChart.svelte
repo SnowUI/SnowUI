@@ -2084,6 +2084,8 @@
         {#if effectiveHoverMode === "cell"}
             <g
                 class="snowui-bar-chart-cell-hit-layer"
+                role="group"
+                aria-label="柱状图数据单元格"
                 onpointerleave={() => hideCellHover(effectiveActiveCellIndex ?? -1)}
             >
                 {#each visibleLabels as label, index}

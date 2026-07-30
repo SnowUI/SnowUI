@@ -1,4 +1,4 @@
-<!-- SidebarItem PRO Block v1.2.1. 文档: ./SidebarItem.md -->
+<!-- SidebarItem PRO Block v1.3.0. 文档: ./SidebarItem.md -->
 <script lang="ts">
     import type { Snippet } from "svelte";
     import {
@@ -20,6 +20,7 @@
         iconCollection?: string;
         href?: string;
         updated?: boolean;
+        tags?: Snippet;
         disabled?: boolean;
         actions?: SidebarActionData[] | Snippet;
         onSelect?: (id: string) => void;
@@ -34,6 +35,7 @@
         iconCollection = undefined,
         href = undefined,
         updated = false,
+        tags = undefined,
         disabled = false,
         actions = [],
         onSelect = undefined,
@@ -99,6 +101,7 @@
             aria-hidden={collapsed ? "true" : undefined}
         >
             <span class="snowui-sidebar-item-label">{label}</span>
+            {@render tags?.()}
             {#if updated}
                 <Badge
                     {...parts?.Badge}
@@ -203,7 +206,12 @@
         --snowui-button-opacity-override: 1;
         text-decoration: none;
     }
-    :global(:where(.snowui-sidebar-item):not([data-disabled="true"]):hover),
+    :global(:where(.snowui-sidebar-item):not([data-disabled="true"]):hover) {
+        background: var(--snowui-sidebar-item-background-override, var(--black-4, #0000000a));
+    }
+    :global(:where(.snowui-sidebar-navigation[data-continuous-hover-enabled="true"] .snowui-sidebar-item):not([data-disabled="true"]):not([data-active="true"]):hover) {
+        background: transparent;
+    }
     :global(:where(.snowui-sidebar-item[data-active="true"])) {
         background: var(--snowui-sidebar-item-background-override, var(--black-4, #0000000a));
     }

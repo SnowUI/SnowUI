@@ -643,7 +643,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
             return;
         }
         let finished = false;
-        let fallbackTimer: ReturnType<typeof window.setTimeout>;
+        let fallbackTimer: number;
         const finish = () => {
             if (finished) return;
             finished = true;

@@ -6,6 +6,7 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable", "ES2022.Intl"],
     "moduleResolution": "bundler",
     "customConditions": ["svelte"],
+    "types": ["vite/client"],
     "verbatimModuleSyntax": true
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte"]

@@ -925,7 +925,6 @@
     function resolveXLabelCellX(
         center: number,
         labelWidth: number,
-        index: number,
         count: number,
         left: number,
         chartPlotWidth: number,
@@ -1879,7 +1878,7 @@
                     {/each}
                 </linearGradient>
             {/each}
-            {#each normalizedSeries as item, index}
+            {#each normalizedSeries as _item, index}
                 <clipPath id={resolveSeriesClipId(index)}>
                     <rect
                         x={bounds.left - SERIES_CLIP_X_PADDING}
@@ -2013,6 +2012,8 @@
         {#if effectiveHoverMode === "cell"}
             <g
                 class="snowui-line-chart-cell-hit-layer"
+                role="group"
+                aria-label="折线图数据单元格"
                 onpointerleave={() => hideCellHover(effectiveActiveCellIndex ?? -1)}
             >
                 {#each resolvedXLabels as label, index}
@@ -2091,6 +2092,7 @@
                                 cx={point.x}
                                 cy={point.y}
                                 r={hoverMarker.hitRadius}
+                                role="presentation"
                                 onpointerenter={() =>
                                     showPointHoverLabel(
                                         labelKey,
@@ -2099,18 +2101,6 @@
                                     )}
                                 onpointermove={updateHoverPanelPointer}
                                 onpointerleave={() =>
-                                    hidePointHoverLabel(
-                                        labelKey,
-                                        pointIndex,
-                                        "pointer",
-                                    )}
-                                onmouseover={() =>
-                                    showPointHoverLabel(
-                                        labelKey,
-                                        pointIndex,
-                                        "pointer",
-                                    )}
-                                onmouseout={() =>
                                     hidePointHoverLabel(
                                         labelKey,
                                         pointIndex,
@@ -2224,7 +2214,6 @@
                     {@const cellX = resolveXLabelCellX(
                         cellCenter,
                         xLabelDisplayWidth,
-                        index,
                         xCellCount,
                         bounds.left,
                         plotWidth,

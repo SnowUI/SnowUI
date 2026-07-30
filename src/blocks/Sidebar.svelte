@@ -6,6 +6,7 @@
         Indicator,
         ScrollArea,
         SnowUILogo,
+        ContinuousHoverController,
         type FrameProps,
     } from "@snowui-design-system/components";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
@@ -14,6 +15,7 @@
         SIDE_PANEL_DISAPPEAR_MOTION,
     } from "@snowui-design-system/components/motion/presets/effects";
     import { resolveMotionCssTiming } from "@snowui-design-system/components/motion/spring";
+    import { CONTINUOUS_HOVER_MOTION_STYLE } from "@snowui-design-system/components/motion/presets/continuous-hover";
     import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
     import FramePro from "../components/FramePro.svelte";
     import SidebarSection from "./SidebarSection.svelte";
@@ -52,6 +54,8 @@
         maxWidth?: number;
         activeItemId?: string;
         ariaLabel?: string;
+        /** 导航项之间是否使用容器级连续 hover 背景。 */
+        continuousHover?: boolean;
         onCollapsedChange?: (collapsed: boolean) => void;
         onWidthChange?: (width: number) => void;
         onActiveItemChange?: (itemId: string) => void;
@@ -75,6 +79,7 @@
         maxWidth = 480,
         activeItemId = undefined,
         ariaLabel = "Primary navigation",
+        continuousHover = true,
         onCollapsedChange = undefined,
         onWidthChange = undefined,
         onActiveItemChange = undefined,
@@ -95,6 +100,17 @@
     let headerElement = $state<HTMLElement>();
     let bodyViewport = $state<HTMLElement>();
     let navigationElement = $state<HTMLElement>();
+    const continuousHoverController = new ContinuousHoverController();
+    $effect(() => {
+        if (!navigationElement) return;
+        return continuousHoverController.attach(navigationElement, {
+            selector: ".snowui-sidebar-item",
+            layerClass: "snowui-sidebar-continuous-hover-layer",
+            axis: "y",
+            enabled: continuousHover,
+        });
+    });
+    $effect(() => continuousHoverController.setEnabled(continuousHover));
     let footerElement = $state<HTMLElement>();
     let hasExternalLogo = $state(false);
     let hasExternalFooter = $state(false);
@@ -317,7 +333,7 @@
         ariaLabel={ariaLabel}
         onscroll={syncBodyScrollMask}
     >
-        <nav bind:this={navigationElement} class="snowui-sidebar-navigation" aria-label={ariaLabel}>
+        <nav bind:this={navigationElement} class="snowui-sidebar-navigation" style={CONTINUOUS_HOVER_MOTION_STYLE} aria-label={ariaLabel}>
             {#each sections as section (section.id)}
                 <SidebarSection
                     {...parts?.SidebarSection}
@@ -504,6 +520,13 @@
         box-sizing: border-box;
         flex-direction: column;
         gap: var(--snowui-sidebar-navigation-gap-override, var(--gap-1));
+    }
+    :global(:where(.snowui-sidebar-navigation .snowui-sidebar-item)) {
+        z-index: 1;
+    }
+    :global(:where(.snowui-sidebar-continuous-hover-layer)) {
+        border-radius: var(--snowui-sidebar-item-radius-override, var(--radius-3));
+        background: var(--snowui-sidebar-item-background-override, var(--black-4, #0000000a));
     }
     :global(:where(.snowui-sidebar[data-has-footer="true"]:not([data-collapsed="true"]) .snowui-sidebar-navigation)) {
         padding-bottom: calc(
