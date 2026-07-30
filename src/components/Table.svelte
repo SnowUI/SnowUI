@@ -126,6 +126,10 @@
         min-width: 0;
         overflow: visible;
     }
+    :global(:where(.snowui-table-viewport[data-continuous-hover-overlay-host="true"] > .snowui-table)) {
+        position: relative;
+        z-index: 1;
+    }
     :global(:where(.snowui-table)) {
         width: max-content;
         min-width: 100%;

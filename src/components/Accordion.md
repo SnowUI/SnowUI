@@ -216,3 +216,7 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 
 #### 新功能
 - 新增 Accordion OSS 组件，支持单开 / 多开、受控 / 非受控、禁用项、视觉形态与三档尺寸。
+## 连续 Hover
+
+`continuousHover` 默认 `true`，共享背景层只跟随各 AccordionItem 的 title，
+不覆盖 content。disabled title 被跳过；设为 `false` 可关闭该能力。

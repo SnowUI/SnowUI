@@ -123,4 +123,18 @@ export const examples = [
 </Accordion>`,
         logic: ["disabled-item"],
     },
+    {
+        name: "AC-08：标题连续 Hover",
+        code: `AC-08
+<Accordion items={[{ title: "One", content: "A" }, { title: "Two", content: "B" }]} />
+<Accordion continuousHover={false} items={[{ title: "Fallback", content: "C" }]} />`,
+        expected: {
+            render: "默认实例生成一个共享 hover 层。",
+            layout: "背景只匹配 title，不覆盖展开内容。",
+            interaction: "标题间连续移动；false 关闭。",
+            performance: "容器单层。",
+            responsive: "展开和内容尺寸变化后保持对齐。",
+        },
+        logic: ["ContinuousHover", "OptOut"],
+    },
 ] as const;

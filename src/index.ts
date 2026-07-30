@@ -105,6 +105,11 @@ export { default as Switch } from './components/Switch.svelte'
 
 export { default as Skeleton, getSkeletonComponentKey } from './components/Skeleton.svelte'
 export * from "./logic/component-parts.svelte";
+export {
+    ContinuousHoverController,
+    type ContinuousHoverAxis,
+    type ContinuousHoverOptions,
+} from "./logic/continuous-hover.svelte";
 
 // SplitText / splitText 已于 2026-05-07 迁入 PRO（复杂动效归 PRO 原则）
 

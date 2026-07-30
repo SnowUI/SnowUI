@@ -196,3 +196,8 @@ MenuItem 的根布局固定按 Leading / Label / Trailing 三段组织：
 - 统一 `MenuItem` 与 `QuickActionItem` 为单一 `MenuItem` 组件
 - 自动感知 `ListboxOwnerContext`：有 context 时注册并派生状态，无 context 时使用 Props
 - Listbox 与 QuickAction 场景统一使用 8px padding
+## 连续 Hover 宿主
+
+MenuItem 在支持连续 hover 的 Listbox / Popover 中由宿主的唯一背景层表达 hover。
+独立使用或宿主 `continuousHover={false}` 时仍使用自身即时背景。独立 `active`
+背景保持持久，hover 到 active 项时与宿主背景叠加并加深。

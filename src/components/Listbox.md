@@ -285,3 +285,8 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 - 滚动条间距规范化，Listbox 与 QuickAction 对齐 header + scroll body 区域结构。
 - 外部点击判断统一使用 `ListboxOwnerContext` 的 `triggerEl` / `anchorEl`，不再依赖 Select 私有 class，因此 Pagination 等其他 owner 也能复用同一套 Listbox。
 - 默认出现 / 消失动效与 Popover、Menu 共用 opacity-only dropdown preset，移除 scale 通道。
+## 连续 Hover
+
+`continuousHover` 默认 `true`。开启时 Listbox 只使用一个容器级背景层在直接
+`MenuItem` 之间移动，键盘 active 项也复用该层；关闭后恢复 MenuItem 原有的即时
+hover / active 背景。disabled、filtered 项不会成为目标。

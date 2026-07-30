@@ -10,4 +10,7 @@ export const examples = [
 <Table><TableHeader><TableRow><TableHead>名称</TableHead></TableRow></TableHeader><TableBody loadingSpinner><TableRow><TableCell>SnowUI</TableCell></TableRow></TableBody></Table>`, expected: { render: "保留业务行并在末尾追加 Spinner 行。", layout: "Spinner 单元格跨越全部已注册列并居中，默认尺寸 16×16px。", interaction: "Spinner 通过 role=status 表达加载状态。", performance: "复用 SnowUI Spinner。", responsive: "加载行宽度跟随整张表格。" }, logic: ["LoadingSpinner", "ColumnSpan", "DefaultSpinnerSize"] },
     { name: "A4: parts 统一配置加载子组件", code: `A4
 <Table><TableHeader><TableRow><TableHead>名称</TableHead></TableRow></TableHeader><TableBody loading parts={{ TableRow: { class: "opacity-100" }, TableCell: { align: "center" } }} /></Table>`, expected: { render: "加载行继续由内置 TableRow/TableCell 生成。", layout: "所有直接 TableCell 统一居中。", interaction: "Skeleton 行不可交互。", performance: "parts 不递归穿透 TableCell 内部。", responsive: "保持表格布局。" }, logic: ["Parts", "DirectOwnership"] },
+    { name: "A5: 连续 Hover 与关闭开关", code: `A5
+<Table><TableBody><TableRow><TableCell>One</TableCell></TableRow><TableRow><TableCell>Two</TableCell></TableRow></TableBody></Table>
+<Table><TableBody continuousHover={false}><TableRow><TableCell>Fallback</TableCell></TableRow></TableBody></Table>`, expected: { render: "默认表体在合法 viewport 中生成一个共享背景层。", layout: "背景匹配整行几何与圆角。", interaction: "数据行间连续移动；Skeleton 与 Spinner 行跳过；false 恢复逐行 hover。", performance: "tbody 不插入非法 div，复用共享 ResizeObserver。", responsive: "横向滚动和行尺寸变化后重新测量。" }, logic: ["ContinuousHover", "SemanticOverlayHost", "OptOut"] },
 ];

@@ -179,4 +179,18 @@ export const examples = [
         },
         logic: ["BuiltInMode", "Parts", "Search", "MaxHeight", "Scroll"],
     },
+    {
+        name: "B14：连续 Hover 与关闭开关",
+        code: `B14
+<Listbox items={[{ value: "one", label: "One" }, { value: "two", label: "Two" }]} />
+<Listbox continuousHover={false} items={[{ value: "one", label: "One" }, { value: "two", label: "Two" }]} />`,
+        expected: {
+            render: "默认实例生成一个共享背景层，关闭实例使用 MenuItem 原有背景。",
+            layout: "背景匹配直接 MenuItem 的宽高和圆角。",
+            interaction: "指针跨过项间隙时背景连续移动；disabled / filtered 项被跳过。",
+            performance: "容器级 rAF 与共享 ResizeObserver。",
+            responsive: "滚动和尺寸变化时重新测量。",
+        },
+        logic: ["ContinuousHover", "OptOut"],
+    },
 ] as const;
