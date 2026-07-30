@@ -1,7 +1,7 @@
 /**
  * CodeBlock.test.ts
- * v1.1.0
- * 变更记录 (2026-05-01): 支持 children 直接写代码，外置动作槽改为 as="trailing"。
+ * v1.2.0
+ * 变更记录 (2026-07-30): 增加全屏布局转场回归示例，验证代码字形不缩放且末帧不横跳。
  */
 export const examples = [
     {
@@ -104,6 +104,28 @@ pnpm preview\`}
     }}
 />`,
         logic: ["rest", "as"],
+    },
+    {
+        name: "CB-06：全屏布局转场保持代码字号",
+        code: `CB-06
+<CodeBlock
+    language="ts"
+    visibleLines={4}
+    code={\`const transition = {
+    strategy: "layout",
+    preservesGlyphScale: true,
+};
+
+function resizeViewport(width: number) {
+    return Math.max(320, width);
+}\`}
+    style="width: 22rem;"
+/>`,
+        logic: [
+            "fullscreenLayoutTransition",
+            "showLineNumbers",
+            "visibleLines",
+        ],
     },
 
     {

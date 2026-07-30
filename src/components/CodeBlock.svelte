@@ -1,6 +1,6 @@
 <!--
   CodeBlock 组件：代码块显示，支持行号、复制、全屏放大
-  v1.4.7
+  v1.5.0
 
   布局模型：复合管理布局（固定工具栏 + 可滚动代码区 + 全屏覆盖层）
 
@@ -8,9 +8,9 @@
   - 根层：enableDefaultMotion=true
   - 复制按钮：Frame stateContent 驱动 Copy ↔ Check 图标交叉淡化（内置 150ms crossfade）
   - 全屏按钮：内置 bare ExpandButton 负责图标与内容替换动效
-  - 全屏覆盖层：layoutId + Frame controller 共享元素 FLIP 布局转场
-      进入：captureLayout 记录卡片位置，全屏层挂载后 FLIP 从卡片位置放大到全屏
-      退出：playLayoutTo 将全屏层从全屏位置缩回卡片位置后卸载
+  - 全屏覆盖层：共享元素 layout 布局转场
+      进入：captureFlipRect 记录卡片位置，全屏层只过渡位置与尺寸，不缩放代码字形
+      退出：applyFlipExit 将全屏层缩回卡片位置后卸载
 
   外置 Icon 替换（ComponentGuidelines §2.7.1）：
   - as="trailing" / data-as="trailing" 替换默认右侧动作区
@@ -30,7 +30,11 @@
     import { resizeManager } from "../logic/observer.svelte";
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
-    import { captureFlipRect, applyFlipExit } from "../logic/layout-flip";
+    import {
+        captureFlipRect,
+        beginFlipEnter,
+        applyFlipExit,
+    } from "../logic/layout-flip";
     import ExpandButton from "./ExpandButton.svelte";
     import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
     import type { Snippet } from "svelte";
@@ -119,7 +123,7 @@
         language?: string;
         /** 是否显示语言标识 */
         showLanguage?: boolean;
-        /** 是否显示行号（全屏模式下强制显示） */
+        /** 是否显示行号；普通态与全屏态保持一致 */
         showLineNumbers?: boolean;
         /** 是否显示复制按钮 */
         showCopyButton?: boolean;
@@ -195,7 +199,6 @@
     /* ─── 计算属性 ─── */
     const resolvedCode = $derived(code || childCode);
     const lines = $derived(resolvedCode ? resolvedCode.split("\n") : []);
-    const resolvedShowLineNumbers = $derived(showLineNumbers || isFullscreen);
     const resolvedVisibleLines = $derived(Math.max(1, visibleLines || 15));
     const autoVisibleLines = $derived(
         Math.min(Math.max(lines.length || 1, 1), resolvedVisibleLines),
@@ -311,20 +314,28 @@
         return tokens.length > 0 ? tokens : [{ text: " ", kind: "plain" }];
     }
 
-    /* ─── 全屏切换（FLIP 由 layout-flip.ts 工具函数驱动） ─── */
+    /* ─── 全屏切换（layout-flip.ts 的 layout 策略驱动） ─── */
     function enterFullscreen() {
-        /* captureFlipRect 将卡片位置写入模块级注册表；
-           全屏 Frame 挂载后其 layoutId 触发 Frame $effect 中的 beginFlipEnter，自动读取起点放大到全屏。 */
+        /* 捕获普通态矩形；全屏层挂载后只过渡实际位置与尺寸。 */
         if (hostElement) captureFlipRect(fullscreenMotionId, hostElement);
         isFullscreen = true;
     }
 
     function exitFullscreen() {
         if (!isFullscreen || isExitingFullscreen) return;
-        if (!fullscreenElement || !hostElement) { isFullscreen = false; return; }
+        if (!fullscreenElement || !hostElement) {
+            isFullscreen = false;
+            return;
+        }
         isExitingFullscreen = true;
-        const done = () => { isFullscreen = false; isExitingFullscreen = false; };
-        applyFlipExit(fullscreenElement, hostElement, { onComplete: done });
+        const done = () => {
+            isFullscreen = false;
+            isExitingFullscreen = false;
+        };
+        applyFlipExit(fullscreenElement, hostElement, {
+            strategy: "layout",
+            onComplete: done,
+        });
     }
 
     function toggleFullscreen() {
@@ -437,6 +448,14 @@
     $effect(() => {
         highlightedLines;
         updateScrollFade();
+    });
+
+    $effect(() => {
+        const element = fullscreenElement;
+        if (!element || !isFullscreen || isExitingFullscreen) return;
+        beginFlipEnter(fullscreenMotionId, element, {
+            strategy: "layout",
+        });
     });
 
     $effect(() => {
@@ -594,7 +613,7 @@
             class="snowui-code-block-body snowui-overlay-scrollbar-viewport snowui-scroll-mask"
             data-scroll-mask={resolveScrollMask(showTopFade, showBottomFade)}
         >
-            {#if resolvedShowLineNumbers && lines.length > 0}
+            {#if showLineNumbers && lines.length > 0}
                 <div class="snowui-code-block-gutter" aria-hidden="true">
                     {#each lines as _, i}
                         <span class="snowui-code-block-line-number"
@@ -646,12 +665,11 @@
     {/if}
 </Frame>
 
-<!-- 全屏覆盖层：layoutId 触发 Frame 内置 FLIP 进场；bind:element 用于 applyFlipExit 退出 -->
+<!-- 全屏覆盖层：手动使用 layout 策略进出，代码字形不参与 scale -->
 {#if isFullscreen || isExitingFullscreen}
     <Frame
         bind:element={fullscreenElement}
         tag="div"
-        layoutId={fullscreenMotionId}
         role="dialog"
         aria-modal="true"
         aria-label="全屏代码查看"
@@ -709,7 +727,7 @@
             </div>
         </div>
 
-        <!-- 全屏代码区（强制行号） -->
+        <!-- 全屏代码区：与普通态共同遵循 showLineNumbers -->
         <div
             class="snowui-code-block-scroll-shell snowui-code-block-scroll-shell-fullscreen"
         >
@@ -721,7 +739,7 @@
                     showFullscreenBottomFade,
                 )}
             >
-                {#if lines.length > 0}
+                {#if showLineNumbers && lines.length > 0}
                     <div class="snowui-code-block-gutter" aria-hidden="true">
                         {#each lines as _, i}
                             <span class="snowui-code-block-line-number"
