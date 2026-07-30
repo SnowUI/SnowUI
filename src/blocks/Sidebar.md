@@ -185,3 +185,8 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 #### 新功能
 - 初始 PRO Block 版本：默认 Logo、`as="logo"` 替换、整体折叠、数据/显式组合、覆盖 Footer 与滚动 Body。
+## 连续 Hover
+
+`continuousHover` 默认 `true`。导航容器拥有唯一背景层，在所有可用
+SidebarItem（包括 Section 内项目）之间连续移动。active 项的持久背景不被替换，
+hover 到 active 项时两个背景叠加形成更深颜色。设为 `false` 恢复逐项 hover。

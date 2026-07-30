@@ -206,7 +206,12 @@
         --snowui-button-opacity-override: 1;
         text-decoration: none;
     }
-    :global(:where(.snowui-sidebar-item):not([data-disabled="true"]):hover),
+    :global(:where(.snowui-sidebar-item):not([data-disabled="true"]):hover) {
+        background: var(--snowui-sidebar-item-background-override, var(--black-4, #0000000a));
+    }
+    :global(:where(.snowui-sidebar-navigation[data-continuous-hover-enabled="true"] .snowui-sidebar-item):not([data-disabled="true"]):not([data-active="true"]):hover) {
+        background: transparent;
+    }
     :global(:where(.snowui-sidebar-item[data-active="true"])) {
         background: var(--snowui-sidebar-item-background-override, var(--black-4, #0000000a));
     }

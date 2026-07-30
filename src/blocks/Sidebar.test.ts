@@ -138,4 +138,26 @@ export const examples = [
         },
         logic: ["SB-Init.2", "SB-Init.6", "NavigationVariant"],
     },
+    {
+        name: "SB-06：连续 Hover 与关闭开关",
+        code: `SB-06
+<Frame style="width: 220px; height: 20rem;">
+    <Sidebar activeItemId="overview">
+        <SidebarItem id="overview" label="Overview" />
+        <SidebarItem id="projects" label="Projects" />
+        <SidebarItem id="settings" label="Settings" />
+    </Sidebar>
+</Frame>
+<Sidebar continuousHover={false}>
+    <SidebarItem id="fallback" label="Fallback" />
+</Sidebar>`,
+        expected: {
+            render: "默认实例仅生成一个共享 hover 背景层；关闭实例不生成可见共享层。",
+            layout: "背景层匹配当前 SidebarItem 的位置、宽高与圆角。",
+            interaction: "背景在项目间连续移动；hover active 项时与 active 背景叠加加深；关闭后恢复逐项 hover。",
+            performance: "容器级 rAF 与共享 ResizeObserver，不为每项创建动画节点。",
+            responsive: "折叠、展开和尺寸变化后重新测量当前项。",
+        },
+        logic: ["ContinuousHover", "ActiveLayering", "OptOut"],
+    },
 ] as const;
