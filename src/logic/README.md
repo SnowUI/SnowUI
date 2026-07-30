@@ -1,6 +1,6 @@
 # 通用逻辑模块总览
 
-> **版本**: v1.6.0
+> **版本**: v1.7.0
 > **目录**: `src/logic/`
 
 本目录不是“零散工具箱”，而是 SnowUI 组件运行时的共享基础设施。新组件在实现前必须先检查这里是否已经提供相同能力，尤其是 `Frame` 外壳、动效、响应式、骨架、截断、图片预览、样式编排相关需求。
@@ -77,6 +77,7 @@
 | `timeline.svelte.ts` | 时间轴播放、暂停、结束、区间控制 | `Motion` 的时间轴引擎 |
 | `frame-motion.svelte.ts` | `Frame` 和全局 Motion 之间的桥；把状态/断点变化上报给编排器 | `controller.play/reset/pause` |
 | `frame-motion-defaults.ts` | 默认 `while*` 动效的统一真相来源，负责默认注入、合并、关闭、按 `stateStyle` 差异推导动效 | 新组件不要在组件内重复声明默认 hover/active/morph 动效 |
+| `layout-flip.ts` | 共享元素位置/尺寸转场；默认 `transform` FLIP，也可用 `layout` 策略保持文字字形不缩放 | 卡片↔全屏、文字排版需要保持字号的形态切换 |
 | `morph.ts` | 通用 morph 过渡常量 | 给折叠/形态变化场景兜底 |
 | `frame-orchestrator.svelte.ts` | 高优先级样式编排器，支持 `$#target.prop` 和 `$self.prop` 表达式联动 | 复杂跨组件样式联动优先复用这里 |
 
@@ -125,6 +126,7 @@
 | 需要图片预览/查看器联动 | `image-preview.ts` |
 | 需要浮层边缘碰撞/边界夹取 | `../lib/floating-position.ts` |
 | 需要 Tooltip 首次延迟/快速切换时序 | `../lib/tooltip-delay.ts` |
+| 需要共享元素转场，且文字不能随容器缩放 | `layout-flip.ts` 的 `strategy: "layout"` |
 | 需要跨组件样式联动 | `frame-orchestrator.svelte.ts` |
 
 ### 2. 最常见的重复造轮子场景

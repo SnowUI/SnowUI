@@ -5,12 +5,12 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.4.7
-> **更新**: 2026-07-08
+> **版本**: v1.5.0
+> **更新**: 2026-07-30
 > **布局模型**: 复合管理布局（Composite Management Layout）
 > **文档**: ./CodeBlock.md
 
-代码块组件，支持语法显示、基础语法着色、行号、复制到剪贴板与全屏放大。全屏放大/缩小使用 Frame controller 的共享元素 FLIP 布局转场；图标切换动效使用 `REPLACEMENT_APPEAR_MOTION`，避免继承浮层类动效语义。
+代码块组件，支持语法显示、基础语法着色、行号、复制到剪贴板与全屏放大。全屏放大/缩小使用共享元素转场的 `layout` 策略：实际过渡位置与尺寸，不缩放代码字形；图标切换动效使用 `REPLACEMENT_APPEAR_MOTION`，避免继承浮层类动效语义。
 
 
 > **以下内容供 AI 阅读，用户可忽略。**
@@ -38,7 +38,7 @@
 | `code` | `string` | `""` | 要显示的代码字符串 |
 | `language` | `string` | — | 语言标识，显示在工具栏（如 `"tsx"`, `"css"`） |
 | `showLanguage` | `boolean` | `true` | 是否显示语言标识 |
-| `showLineNumbers` | `boolean` | `false` | 是否显示代码行号。全屏模式下强制显示 |
+| `showLineNumbers` | `boolean` | `false` | 是否显示代码行号；普通态与全屏态保持一致，避免切换末帧发生代码横向跳变 |
 | `showCopyButton` | `boolean` | `true` | 是否显示复制按钮 |
 | `showExpandButton` | `boolean` | `true` | 是否显示全屏放大按钮 |
 | `visibleLines` | `number` | `15` | 默认状态最多显示几行代码；内容不足时自适应高度，超出后滚动；全屏模式不受此限制 |
@@ -118,8 +118,8 @@
 | 复制超时 | Check 消失 → Copy 出现（同上） |
 | 点击放大 | ArrowsOutSimple 消失 → ArrowsInSimple 出现（同上） |
 | 点击缩小 / Esc | ArrowsInSimple 消失 → ArrowsOutSimple 出现（同上） |
-| 全屏进入 | 根 Frame 先 `captureLayout` 普通态位置，全屏覆盖层以相同 `layoutId` 挂载，Frame 共享元素 FLIP 动效放大到视口尺寸 |
-| 全屏退出 | 全屏覆盖层调用 `playLayoutTo(rootElement)`，Frame 共享元素 FLIP 动效缩回普通态位置后卸载 |
+| 全屏进入 | 先捕获普通态位置；全屏覆盖层使用共享元素 `layout` 策略实际过渡 `top / left / width / height`，代码字号和行高保持不变 |
+| 全屏退出 | 全屏覆盖层以同一 `layout` 策略缩回普通态位置后卸载；普通态代码结构始终保持最终布局，不在末帧增删行号 |
 
 图标替换进入动效引用 `REPLACEMENT_APPEAR_MOTION`。具体 duration / easing / scale 以 motion preset catalog 为准，Frame appear 桥接变量名仅作为兼容入口保留。
 
@@ -155,7 +155,7 @@ CodeBlock 只声明轨道定位，滚动条尺寸、显隐、hover 形态与鼠�
 | `enableScaleObserver` | 根 Frame | 默认 `false` |
 | `enableDefaultMotion` | 根 Frame | 默认 `true` |
 | `stateContent` | 复制按钮内部 Frame | 驱动 Copy ↔ Check 图标交叉淡化 |
-| `layoutId` | 根 Frame / 全屏覆盖层 Frame | 全屏放大与缩小共享元素转场 |
+| 共享元素布局转场 | 根 Frame / 全屏覆盖层 Frame | 捕获普通态矩形，并使用 `strategy: "layout"` 实际过渡位置和尺寸；避免 `scale()` 缩放代码 |
 | `Appear` | 全屏覆盖层 Frame | 提供布局转场时序桥接变量 |
 | Icon 按钮 | `<button>` 直接渲染 | 不使用 Button 组件（内置 Icon 规范 §2.7） |
 
@@ -235,6 +235,7 @@ pnpm build`}
 
 | 日期 | 版本 | 说明 |
 |:---|:---|:---|
+| 2026-07-30 | v1.5.0 | 全屏展开/收起改用共享元素 `layout` 策略，实际过渡位置与尺寸，代码字形不参与缩放；普通态与全屏态统一遵循 `showLineNumbers`，消除退出末帧横向突变 |
 | 2026-07-08 | v1.4.7 | 顶部操作按钮容器的 `pin-top-right` 偏移从 `--padding-2`（8px）调整为 `--padding-3`（12px），普通态与全屏态保持一致 |
 | 2026-07-08 | v1.4.6 | 顶部复制 / 放大操作按钮统一使用 Button bare 默认 16×16 尺寸；移除 CodeBlock 私有按钮外壳尺寸，按钮组间距改为 `--gap-2`（8px）并接入 `--snowui-code-block-gap-override` |
 | 2026-06-21 | v1.4.4 | 右下角私有 resize icon 与 pointer 算法迁移到统一 Indicator corner；复用宿主 hover、1px→2px、颜色、键盘和 ARIA 协议 |

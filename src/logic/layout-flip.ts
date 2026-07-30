@@ -1,6 +1,6 @@
 /**
  * layout-flip.ts
- * v1.0.0
+ * v1.1.0
  * 模块级 FLIP 布局转场工具。
  * 独立于 Motion 编排上下文，无需 initMotion() 即可使用。
  * Frame controller 通过此模块暴露 captureFlip / playFlipTo 能力，
@@ -10,6 +10,11 @@
 export interface FlipTransitionOptions {
     duration?: number;
     easing?: string;
+    /**
+     * transform：默认高性能 FLIP，使用 translate + scale。
+     * layout：实际过渡位置与尺寸，内容不会随容器缩放，适合文字排版需要保持字号的场景。
+     */
+    strategy?: "transform" | "layout";
     onComplete?: () => void;
 }
 
@@ -18,6 +23,163 @@ const FLIP_EASING = "ease-out";
 
 /** 模块级 DOMRect 注册表，键为 layoutId，无需 initMotion 上下文。 */
 const flipRegistry = new Map<string, DOMRect>();
+
+const LAYOUT_STYLE_PROPERTIES = [
+    "inset",
+    "top",
+    "right",
+    "bottom",
+    "left",
+    "width",
+    "height",
+    "transition",
+    "transform",
+    "transform-origin",
+    "will-change",
+] as const;
+
+type InlineStyleSnapshot = Map<
+    (typeof LAYOUT_STYLE_PROPERTIES)[number],
+    { value: string; priority: string }
+>;
+
+function captureInlineStyles(element: HTMLElement): InlineStyleSnapshot {
+    return new Map(
+        LAYOUT_STYLE_PROPERTIES.map((property) => [
+            property,
+            {
+                value: element.style.getPropertyValue(property),
+                priority: element.style.getPropertyPriority(property),
+            },
+        ]),
+    );
+}
+
+function restoreInlineStyles(
+    element: HTMLElement,
+    snapshot: InlineStyleSnapshot,
+) {
+    for (const [property, { value, priority }] of snapshot) {
+        if (value) {
+            element.style.setProperty(property, value, priority);
+        } else {
+            element.style.removeProperty(property);
+        }
+    }
+}
+
+function setLayoutRect(element: HTMLElement, rect: DOMRect) {
+    element.style.setProperty("inset", "auto");
+    element.style.setProperty("top", `${rect.top}px`);
+    element.style.setProperty("left", `${rect.left}px`);
+    element.style.setProperty("right", "auto");
+    element.style.setProperty("bottom", "auto");
+    element.style.setProperty("width", `${rect.width}px`);
+    element.style.setProperty("height", `${rect.height}px`);
+}
+
+function layoutTransitionValue(duration: number, easing: string) {
+    return [
+        `top ${duration}ms ${easing}`,
+        `left ${duration}ms ${easing}`,
+        `width ${duration}ms ${easing}`,
+        `height ${duration}ms ${easing}`,
+    ].join(", ");
+}
+
+function waitForTransition(
+    element: HTMLElement,
+    duration: number,
+    properties: ReadonlySet<string>,
+    onComplete: () => void,
+) {
+    let done = false;
+    const finish = () => {
+        if (done) return;
+        done = true;
+        element.removeEventListener("transitionend", onEnd);
+        clearTimeout(fallback);
+        onComplete();
+    };
+    const onEnd = (event: TransitionEvent) => {
+        if (event.target === element && properties.has(event.propertyName)) {
+            finish();
+        }
+    };
+    const fallback = setTimeout(finish, Math.max(0, duration) + 50);
+    element.addEventListener("transitionend", onEnd);
+    return finish;
+}
+
+function beginLayoutEnter(
+    element: HTMLElement,
+    fromRect: DOMRect,
+    toRect: DOMRect,
+    options?: FlipTransitionOptions,
+) {
+    const duration = options?.duration ?? FLIP_DURATION;
+    const easing = options?.easing ?? FLIP_EASING;
+    const previousStyles = captureInlineStyles(element);
+
+    element.style.setProperty("transition", "none");
+    element.style.setProperty("transform", "none");
+    element.style.setProperty("will-change", "top, left, width, height");
+    setLayoutRect(element, fromRect);
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            const finish = waitForTransition(
+                element,
+                duration,
+                new Set(["top", "left", "width", "height"]),
+                () => {
+                    restoreInlineStyles(element, previousStyles);
+                    options?.onComplete?.();
+                },
+            );
+            element.style.setProperty(
+                "transition",
+                layoutTransitionValue(duration, easing),
+            );
+            setLayoutRect(element, toRect);
+            if (duration <= 0) finish();
+        });
+    });
+}
+
+function applyLayoutExit(
+    element: HTMLElement,
+    fromRect: DOMRect,
+    toRect: DOMRect,
+    options?: FlipTransitionOptions,
+) {
+    const duration = options?.duration ?? FLIP_DURATION;
+    const easing = options?.easing ?? FLIP_EASING;
+    const previousStyles = captureInlineStyles(element);
+
+    element.style.setProperty("transition", "none");
+    element.style.setProperty("transform", "none");
+    element.style.setProperty("will-change", "top, left, width, height");
+    setLayoutRect(element, fromRect);
+    // 固化退出起点，避免同一任务内写入终点时浏览器合并两次布局。
+    element.getBoundingClientRect();
+
+    const finish = waitForTransition(
+        element,
+        duration,
+        new Set(["top", "left", "width", "height"]),
+        () => {
+            restoreInlineStyles(element, previousStyles);
+            options?.onComplete?.();
+        },
+    );
+    element.style.setProperty(
+        "transition",
+        layoutTransitionValue(duration, easing),
+    );
+    setLayoutRect(element, toRect);
+    if (duration <= 0) finish();
+}
 
 /**
  * 捕获元素当前位置并写入注册表，供后续 beginFlipEnter 读取起点。
@@ -35,7 +197,11 @@ export function captureFlipRect(id: string, element: HTMLElement): void {
  * 注册表条目消费后自动删除，重复调用安全。
  * 返回 true 表示找到起点并启动了动效。
  */
-export function beginFlipEnter(id: string, element: HTMLElement, options?: FlipTransitionOptions): boolean {
+export function beginFlipEnter(
+    id: string,
+    element: HTMLElement,
+    options?: FlipTransitionOptions,
+): boolean {
     const fromRect = flipRegistry.get(id);
     if (!fromRect) return false;
     flipRegistry.delete(id);
@@ -45,6 +211,10 @@ export function beginFlipEnter(id: string, element: HTMLElement, options?: FlipT
 
     const duration = options?.duration ?? FLIP_DURATION;
     const easing = options?.easing ?? FLIP_EASING;
+    if (options?.strategy === "layout") {
+        beginLayoutEnter(element, fromRect, toRect, options);
+        return true;
+    }
     const dx = fromRect.left - toRect.left;
     const dy = fromRect.top - toRect.top;
     const scaleX = fromRect.width / toRect.width;
@@ -76,7 +246,8 @@ export function applyFlipExit(
     options?: FlipTransitionOptions,
 ): void {
     const fromRect = element.getBoundingClientRect();
-    const toRect = target instanceof HTMLElement ? target.getBoundingClientRect() : target;
+    const toRect =
+        target instanceof HTMLElement ? target.getBoundingClientRect() : target;
     if (fromRect.width <= 0 || toRect.width <= 0) {
         options?.onComplete?.();
         return;
@@ -84,6 +255,10 @@ export function applyFlipExit(
 
     const duration = options?.duration ?? FLIP_DURATION;
     const easing = options?.easing ?? FLIP_EASING;
+    if (options?.strategy === "layout") {
+        applyLayoutExit(element, fromRect, toRect, options);
+        return;
+    }
     const dx = toRect.left - fromRect.left;
     const dy = toRect.top - fromRect.top;
     const scaleX = toRect.width / fromRect.width;
@@ -96,8 +271,10 @@ export function applyFlipExit(
         element.removeEventListener("transitionend", onEnd);
         options?.onComplete?.();
     };
-    const onEnd = (e: TransitionEvent) => {
-        if (e.target === element && e.propertyName === "transform") finish();
+    const onEnd = (event: TransitionEvent) => {
+        if (event.target === element && event.propertyName === "transform") {
+            finish();
+        }
     };
 
     element.style.transformOrigin = "top left";
