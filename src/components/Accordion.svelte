@@ -90,7 +90,11 @@
         return type === "multiple" ? values : (values[0] ?? "");
     }
 
-    let internalValues = $state<string[]>(normalizeValue(defaultValue));
+    function resolveInitialValues() {
+        return normalizeValue(defaultValue);
+    }
+
+    let internalValues = $state<string[]>(resolveInitialValues());
     const selectedValues = $derived(normalizeValue(value ?? internalValues));
 
     function isOpen(itemValue: string): boolean {

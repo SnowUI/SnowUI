@@ -95,9 +95,14 @@
     const initialSort = table.getSort();
     let query = $state(table.getQuery());
     let sortValue = $state(initialSort ? `${initialSort.columnId}:${initialSort.direction}` : "default");
-    let filterValue = $state(filterKey && table.getFilters()[filterKey] !== undefined
-        ? String(table.getFilters()[filterKey])
-        : "default");
+
+    function resolveInitialFilterValue() {
+        return filterKey && table.getFilters()[filterKey] !== undefined
+            ? String(table.getFilters()[filterKey])
+            : "default";
+    }
+
+    let filterValue = $state(resolveInitialFilterValue());
 
     const resolvedSelectedCount = $derived(
         selectedCount ?? table.getSelectedRowIds().length,

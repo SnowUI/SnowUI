@@ -794,7 +794,11 @@
         ...rest
     }: Props = $props();
 
-    const responsiveController = new ResponsiveController(responsive ?? {});
+    function createResponsiveController() {
+        return new ResponsiveController(responsive ?? {});
+    }
+
+    const responsiveController = createResponsiveController();
 
     $effect(() => {
         responsiveController.updateConfig(responsive ?? {});

@@ -1,6 +1,6 @@
 /**
  * Badge.test.ts
- * v1.2.0
+ * v1.3.1
  * 
  * 测试覆盖：Badge.md 定义的所有功能点
  */
@@ -61,6 +61,19 @@ export const examples = [
             render: "五个 Badge 分别使用 Blue、Green、Orange、Red、Purple 语意色作为填充色，数字文字保持白色。",
         },
         logic: ["Color", "SemanticColor", "Dot"],
+    },
+    {
+        name: "A6: 描边状态标签 (Border)",
+        code: `A6
+<div class="flex-row gap-8 items-center">
+    <Kbd>PRO</Kbd>
+    <Badge count="PRO" variant="border" />
+    <Badge count="updated" variant="border" />
+</div>`,
+        expected: {
+            render: "Kbd 与两个 Badge 使用一致的 12/16px 排版、16px 可见高度、透明背景、内描边、继承文字色、0×4px padding 与 6px 圆角。",
+        },
+        logic: ["Variant", "Border", "Status"],
     },
     // === C: 组合模式 ===
     {

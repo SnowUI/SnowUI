@@ -1,6 +1,6 @@
 # Badge.svelte 文档
 
-> **版本**: v1.2.8
+> **版本**: v1.3.1
 > **职责**: 徽标组件，用于显示数字或状态指示。
 
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
@@ -10,6 +10,7 @@
 
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
+| variant | `"filled" \| "border"` | `"filled"` | 视觉变体。`border` 与 Kbd 默认 `border` 视觉一致：透明背景、内描边、继承文字色、0×4px padding 与 6px 圆角 |
 | count | number \| string | undefined | 显示的数字或文本。默认 count 模式仅在值大于等于 1 时出现，`0` 不显示 |
 | stateCount | `StateValueMap<number \| string>` | undefined | 根据最近父级 Frame 状态映射 `count`，用于声明式控制 Badge 显隐 |
 | dot | boolean | false | 是否显示为小圆点模式 |
@@ -48,12 +49,26 @@ Badge 的根节点是 inline-level 定位外壳，内容整体 Hug：
 | `--snowui-badge-dot-size` | `calc(var(--size-4) * 1.5 / 4)` | 点模式尺寸 |
 | `--snowui-badge-background` | `resolveSnowUIColor(color)` | 数字和 Dot 模式的填充色 |
 
+`variant="border"` 复用 Kbd 默认描边视觉的同一组 Token 值，但仍保持 Badge 的状态标签语义与 `<span>`/Frame 外壳：
+
+| 属性 | `border` 值 |
+| :--- | :--- |
+| Padding | `var(--padding-0) var(--padding-1)`（0px 4px） |
+| Radius | `calc(var(--radius-1) * 1.5)`（6px） |
+| Font / Line height | `var(--text-12)` / `var(--leading-12)` |
+| Background / Color | `transparent` / `inherit` |
+| Border | `inset 0 0 0 var(--border-1) var(--black-10)` |
+
+`border` 只作用于文本内容模式；`dot` 继续使用 Dot 视觉。作为 Button、SidebarItem 等宿主的后代时，`border` 保持文本 Hug，不继承宿主的固定方形尺寸上下文。
+`border` 的内部 morph 文字层继承 `var(--leading-12)`，不使用 filled Badge 的紧凑 `line-height: 1`；因此可见高度与 Kbd 默认 border 一致。
+
 `color` 使用 SnowUI 公共语意色协议，严格区分大小写：
 
 ```svelte
 <Badge count={1} color="Blue" />
 <Badge count={2} color="Red" />
 <Badge dot color="Green" />
+<Badge count="PRO" variant="border" />
 ```
 
 ## 角色化组合
@@ -125,6 +140,10 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 | **Min Width** | `1.125rem` | 18px |
 | **Z-Index** | `10` | 确保在父元素上方 |
 
+### 1.1 描边样式 (`variant="border"`)
+
+描边样式与 Kbd 默认 `border` 视觉保持一致，但 Badge 继续表达状态/分类，不输出 `<kbd>` 语义。背景透明、文字继承父级颜色，并使用 1px inset shadow 表达不占布局空间的边框。
+
 ### 2. 点模式 (Dot Mode)
 
 当 `dot` 属性启用时，Badge 切换为小圆点模式：
@@ -142,7 +161,7 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 组件内部使用 `Grid Stacking` (Morph Container) 确保布局稳定性：
 
 - **Container**: `display: grid; width: 100%; height: 100%;`
-- **Item**: `display: flex; align-items: center; justify-content: center; line-height: 1;`
+- **Item**: `display: flex; align-items: center; justify-content: center;`；filled / dot 使用 `line-height: 1`，border 继承 surface 的 `var(--leading-12)`
 
 ---
 
@@ -161,6 +180,16 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.1 (2026-07-30)
+
+#### 修复
+- Border 变体内部文字层改为继承 16px 行高，避免通用 morph-item 将实际高度压缩到 12px；PRO 标签现在与 Kbd 默认 border 高度一致。
+
+### v1.3.0 (2026-07-30)
+
+#### 新功能
+- 新增 `variant="border"`，复用 Kbd 默认描边视觉的 Token、padding、圆角、字号与行高，用于 PRO、updated 等状态/分类标签；默认 `filled` 行为不变。
 
 - **Badge-Motion.2026-06-18** 按 transitions.dev Notification badge 的双层结构还原默认动效：Frame 根层执行左下偏移进场，完整视觉 surface 执行中心 scale / opacity / blur；退场时 surface 整体缩小，而不是只缩放数字内容。
 - **Badge-Motion.2026-06-30** 统一 `while*` 完整视觉通道语义：显式对象不再浅合并 Badge 默认 x / y / scale / opacity，只继承默认时序 / 动力学参数。

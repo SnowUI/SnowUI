@@ -97,15 +97,23 @@
               ? multiLineContentElement
               : element,
     );
-    const truncation = new TextTruncation(
-        lines,
-        () => truncationElement,
-        onTruncate,
-    );
+    function createTruncation() {
+        return new TextTruncation(
+            lines,
+            () => truncationElement,
+            onTruncate,
+        );
+    }
+
+    function resolveInitialMoreState() {
+        return more;
+    }
+
+    const truncation = createTruncation();
     let isExpanding = $state(false);
     let truncateWrapperElement = $state<HTMLElement>();
     let scrollbarElement = $state<HTMLDivElement>();
-    let hasMoreButton = $state(more);
+    let hasMoreButton = $state(resolveInitialMoreState());
     let showTopFade = $state(false);
     let showBottomFade = $state(false);
     const scrollMode = $derived(lines === 0 && !hasMoreButton);

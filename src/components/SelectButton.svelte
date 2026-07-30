@@ -72,6 +72,12 @@
         [key: string]: any;
     }
 
+    // SelectButton 与 Select 可能由跨仓库检查器使用不同的 Svelte 物理安装展开。
+    // 保留完整的触发器参数类型，只归一化 Snippet 的 nominal identity。
+    function normalizeTriggerSnippet(snippet: unknown): Snippet<[SelectTriggerContext]> {
+        return snippet as Snippet<[SelectTriggerContext]>;
+    }
+
     let {
         value = $bindable(),
         defaultValue = undefined,
@@ -155,7 +161,7 @@
         {onkeydown}
         buttonTrigger
         buttonBare={bare}
-        triggerContent={renderTrigger}
+        triggerContent={normalizeTriggerSnippet(renderTrigger)}
         parts={selectParts}
     >
         {@render children()}
@@ -180,7 +186,7 @@
         {onkeydown}
         buttonTrigger
         buttonBare={bare}
-        triggerContent={renderTrigger}
+        triggerContent={normalizeTriggerSnippet(renderTrigger)}
         parts={selectParts}
     />
 {/if}
