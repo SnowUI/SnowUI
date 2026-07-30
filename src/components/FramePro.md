@@ -1,6 +1,6 @@
 # FramePro.svelte（PRO）
 
-> **版本**: v4.0.1（职责边界补充，2026-06-14）
+> **版本**: v4.0.2（共享元素布局策略补充，2026-07-30）
 > **职责**: OSS Frame 的超集。在 OSS Frame 全部能力之上叠加**跨组件协调**：编排模式、联动控制、样式编排。
 > **样式规范**: 详见 [StyleSpec.md](../../../specs/StyleSpec.md)
 > **包归属**: `@snowui-design-system/components-pro`（PRO，私有）
@@ -828,6 +828,15 @@ SnowUI 组件内部若拥有明确默认视觉，应直接引用组件族 preset
 
 通过 `layoutId` / `itemId` 实现跨状态或跨挂载周期的无缝形变转场（FLIP：First → Last → Invert → Play）。时序与系统其他动效统一，默认 **300ms ease-out**。
 
+共享 `layout-flip.ts` 提供两种转场策略：
+
+| `strategy` | 实现 | 适用场景 |
+| :--- | :--- | :--- |
+| `"transform"`（默认） | 过渡 `translate + scale` | 图片、卡片、无需保持内部字形尺寸的高性能共享元素转场 |
+| `"layout"` | 实际过渡 `top / left / width / height` | 代码、正文等字体大小前后一致的排版内容；内部字形不参与缩放，宽高变化由浏览器实时重排 |
+
+`layout` 策略属于共享模块能力。进入时由组件在目标挂载后调用 `beginFlipEnter(id, element, { strategy: "layout" })`；退出时可调用 `applyFlipExit(element, target, { strategy: "layout" })`，或把同一选项传给 Frame controller 的 `playFlipTo`。未声明策略的既有 `layoutId` 自动进场保持默认 `transform` 行为。
+
 **自动触发（挂载即播放）**：只需在目标 Frame 声明相同 `layoutId`，Frame 在 `$effect` 中自动从模块注册表读取起点并播放进场动效：
 
 ```svelte
@@ -1292,6 +1301,11 @@ fontSize: "12 + Math.floor($self.width / 100)"
 ---
 
 ## 更新日志 (Changelog)
+
+### v4.0.2 (2026-07-30)
+
+#### 文档
+- **Shared Element Layout Strategy**: 记录 `layout-flip.ts` 新增的 `strategy: "layout"`，用于实际过渡位置与尺寸并保持文字字形不缩放；默认 `transform` 策略不变。
 
 ### v4.0.1 (2026-06-14)
 
