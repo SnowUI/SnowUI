@@ -447,6 +447,11 @@
     /* --snowui-gradient-avatar-hover-entry-easing: ; */ /* Avatar 多色叠加缓动（默认 cubic-bezier(0.4, 0, 0.2, 1)） */
     /* --snowui-gradient-avatar-hover-color-duration: ; */ /* Avatar 五色循环时长（默认 10s） */
     /* --snowui-gradient-avatar-hover-color-opacity: ; */ /* Avatar 单个 Overlay pass 峰值（认可版本默认 0.58） */
+    /* --snowui-gradient-avatar-hover-motion-easing-override: ; */ /* Avatar 按需水波形变缓动（默认 linear） */
+    /* --snowui-gradient-avatar-hover-motion-vector-4-duration-override: ; */ /* Avatar Vector 4 水波周期（默认 6.4s） */
+    /* --snowui-gradient-avatar-hover-motion-vector-3-duration-override: ; */ /* Avatar Vector 3 水波周期（默认 7.2s） */
+    /* --snowui-gradient-avatar-hover-motion-subtract-duration-override: ; */ /* Avatar Subtract 水波周期（默认 8.4s） */
+    /* --snowui-gradient-avatar-hover-motion-subtract-2-duration-override: ; */ /* Avatar Subtract 2 水波周期（默认 6.8s） */
 
     /* SnowUILogo */
     /* --snowui-snow-ui-logo-icon-size-override: ; */       /* 图标尺寸（默认 horizontal/icon 28px，vertical 64px） */

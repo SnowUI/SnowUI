@@ -1,7 +1,7 @@
 # Avatar.svelte 文档
 
-> **版本**: v2.9.1
-> **变更记录 (2026-08-02)**: 默认 Gradient 头像关闭基础矢量形变；新增 `gradientMotion` 显式开关，原五色 Overlay hover 保持不变。
+> **版本**: v2.10.0
+> **变更记录 (2026-08-02)**: 默认 Gradient 头像常态关闭基础矢量形变；hover 时按需淡入四层错峰水波形变，离开后恢复缓存静态图；`gradientMotion` 仍用于显式常驻开启。
 > **变更记录 (2026-08-02)**: 默认头像改为随机 Gradient；原灰色用户图标改为 `empty` 空头像变体；Avatar 单色 hover 通过像素 alpha 仅叠加实际图形。
 > **变更记录 (2026-08-02)**: Avatar 默认 hover 使用单层 Overlay；每次进入随机六色之一，同一次 hover 内颜色不变，默认文字与用户图标位于叠加层上方。
 > **变更记录 (2026-06-10)**: 新增 `fallback` 组件入口，允许 PRO `GradientMotion` 等视觉组件作为默认头像；补充 `as="avatar-image"` 头像图片层组合规则。
@@ -32,7 +32,7 @@
 | size | 12\|16\|20\|24\|28\|32\|40\|48\|80 | 16 | 头像尺寸。未显式设置时，自动继承父级 `Frame` (如 `AvatarGroup`) 提供的尺寸上下文。 |
 | fallback | Component | undefined | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与基于名称的 `seed`。 |
 | variant | `'default' \| 'empty'` | `'default'` | `default` 使用按实例 / 名称稳定分散的 Gradient 配色；`empty` 使用灰色背景与默认用户图标。 |
-| gradientMotion | boolean | false | 是否运行默认 Gradient fallback 的四层基础矢量形变；不影响 Gradient 自有的多色 hover |
+| gradientMotion | boolean | false | 是否常驻运行默认 Gradient fallback 的四层基础矢量形变；为 false 时 Gradient 仍会在 hover 期间按需运行水波形变和多色 Overlay |
 | badgePosition | 'top'\|'bottom' | 'top' | 徽章位置 |
 
 ## 关键字 (Keyword)
@@ -78,12 +78,12 @@
 
 ## 智能行为
 
-1. **默认回退**: 无图片或图片加载失败时，优先显示显式 `fallback` 组件；未传时 `default` 使用 Gradient，`empty` 使用灰色用户图标。名称只作为 Gradient seed，不再生成首字母；Gradient 基础形变默认关闭，可用 `gradientMotion` 开启。
+1. **默认回退**: 无图片或图片加载失败时，优先显示显式 `fallback` 组件；未传时 `default` 使用 Gradient，`empty` 使用灰色用户图标。名称只作为 Gradient seed，不再生成首字母；Gradient 常态基础形变默认关闭，可用 `gradientMotion` 常驻开启，或由 hover 按需运行。
 2. **回退延迟**: 内部固定延迟显示回退图标，减少加载闪烁。
 3. **角色识别**: 内部组件 (`Badge`, `Icon`) 若设置 `as="badge"` 将自动获得定位与尺寸逻辑。
 4. **子组件定位**: 提供基于 `em` 的自适应 Context 渲染样式。
 5. **智能分辨率选择**: 自动将解析后的尺寸（Resolved Size）传递给资源组件（如 `AvatarByewind`），资源组件会根据该尺寸选择 **3x 分辨率** 的高精图片（例如 80px 尺寸选择 240px 图片）。
-6. **默认 Hover**: 非 disabled 图片与普通组件头像每次进入时随机选择 blue / cyan / green / red / orange / purple 之一，并只对实际图形 alpha 单层叠加；Gradient fallback 无论基础形变是否开启，都保持原有五色循环 hover。
+6. **默认 Hover**: 非 disabled 图片与普通组件头像每次进入时随机选择 blue / cyan / green / red / orange / purple 之一，并只对实际图形 alpha 单层叠加；Gradient fallback 无论常态基础形变是否开启，都保持原有五色循环，并按需运行不同周期的四层水波形变。
 
 ## 样式规范 (Style Spec)
 
@@ -151,7 +151,7 @@
 - Overlay 位于 `.snowui-avatar-container` 内、完整视觉内容上方和外部 Badge 下方，继承头像圆角与裁切。
 - 每次 pointer enter 从六种 Gradient 中心主色中等概率随机选择一种；同一次 hover 内不运行颜色变化动画。
 - Avatar 单色 Overlay 通过 SVG alpha composite 只作用于图片或组件实际绘制的非透明图形，透明区域保持不变；fallbackText 与 empty 用户图标不参与染色。
-- Gradient fallback 自行拥有多色循环 hover，Avatar 不再对其重复叠加单色层。
+- Gradient fallback 自行拥有多色循环 hover，并在常态静态模式下按需淡入实时 SVG 水波形变；Avatar 不再对其重复叠加单色层。
 - 只过渡一个小画布纯色层的 opacity，默认峰值 `58%`、入口 / 退出 `0.5s`。
 - 所有 hover 规则排除 `.snowui-disabled`、`[data-disabled="true"]` 与 `:disabled`；reduced-motion 下关闭淡入淡出并保留静态随机色反馈。
 
@@ -201,6 +201,11 @@
 ---
 
 ## 更新日志
+
+### v2.10.0 (2026-08-02)
+
+- 默认 Gradient Avatar 常态继续使用缓存静态图，hover 时由 Gradient 按需淡入四层独立周期的水波形变；离开后释放实时 SVG 与 filter。
+- `gradientMotion` 语义收窄为“是否常驻运行”，不再阻止默认 hover 的按需水波形变。
 
 ### v2.9.1 (2026-08-02)
 

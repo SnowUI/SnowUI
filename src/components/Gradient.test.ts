@@ -1,6 +1,6 @@
 /**
  * Gradient.test.ts
- * v2.9.0
+ * v2.10.0
  */
 export const examples = [
     {
@@ -57,8 +57,8 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "以三列两行依次渲染 blue、cyan、green、red、orange、purple 六个 80 × 80 Gradient Avatar；圆形外壳裁切无有色毛边，内部矢量不溢出。",
-            interaction: "每个头像 hover 时排除当前 variant，并按实例随机顺序在其余五种 Gradient 中心色之间持续交叉过渡；每种颜色使用两个独立 HTML overlay pass，单层峰值固定为 58%，10s 完成一轮，以 1s 缓冲进入、0.5s 缓冲退出；循环边界不闪烁。",
-            performance: "Avatar Gradient 基础矢量形变默认关闭；六种静态 SVG 图片资源跨实例复用且与实时 SVG 像素一致；未 hover 时无颜色层，hover 时仅挂载五色 × 两层 Overlay并在淡出后卸载。",
+            interaction: "每个头像 hover 时排除当前 variant，并按实例随机顺序在其余五种 Gradient 中心色之间持续交叉过渡；同时按需淡入实时 SVG，四个图层以 6.4s / 7.2s / 8.4s / 6.8s 不同周期、线性错峰持续流动，位移、旋转和形变幅度增强；颜色 Overlay 保持双层、58% 峰值、10s 循环、1s 进入和0.5s退出。",
+            performance: "Avatar 常态基础矢量形变关闭并复用六份静态 SVG 图片资源；hover 时才为当前头像挂载一份实时 SVG、四组 filter 与五色 × 两层 Overlay，淡出后全部卸载。",
             accessibility: "prefers-reduced-motion: reduce 下停止颜色循环，并以随机序列首色保留静态 hover 反馈。",
         },
         logic: ["SixVariants", "Avatar", "SeedPalette", "RandomColorCycle", "OverlayBlend", "ReducedMotion"],

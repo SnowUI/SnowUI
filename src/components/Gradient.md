@@ -1,6 +1,6 @@
 # Gradient 矢量渐变
 
-> **版本**: v2.9.0
+> **版本**: v2.10.0
 > **职责**: 以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
 > **包归属**: OSS
 
@@ -18,10 +18,10 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 - SVG 使用 `viewBox="0 0 360 360"` 与 `preserveAspectRatio="none"` 填满画布。
 - 四个 `feGaussianBlur` 使用 `filterUnits="userSpaceOnUse"`。图形通过 SVG viewport 缩放时，模糊标准差与几何一起按比例缩放，不使用固定屏幕像素模糊，也不需要尺寸观察器。
 - 根层使用纯 alpha mask 将圆角与 SVG filter 固定在同一合成裁切层，避免圆角最外圈露出渐变底色毛边。
-- 普通 Gradient 默认开启四层 `15s` 闭环动效；Avatar fallback 默认关闭基础形变，可通过 `motion` / `gradientMotion` 显式开启。
+- 普通 Gradient 默认开启四层 `15s` 闭环动效；Avatar fallback 常态关闭基础形变，可通过 `motion` / `gradientMotion` 显式常驻开启，或在 hover 期间按需运行水波形变。
 - 作为 `Avatar fallback` 渲染时，Gradient 根据 Avatar 传入的 `seed` 稳定选择六种配色；若 seed 本身是 `blue / cyan / green / red / orange / purple`，则直接命中对应配色。
 - Avatar hover 状态由 Avatar 的统一 `.snowui-media-hoverable` 协议提供；Gradient 自己排除当前 variant，将其余五种 Gradient 的中心主色按实例稳定打乱，并以双层同色 `overlay` 持续交叉过渡。
-- 头像变色不复制完整 Gradient：hover 时按需创建五色 × 两层 HTML 纯色 Overlay，覆盖在完整静态图形之上并分别执行混合；五色循环仍为 `10s`，入口缓冲延长为 `1s`，退出保持 `0.5s`，离开完成淡出后销毁 Overlay DOM。
+- 头像 hover 以缓存静态图为底，按需创建一份实时 SVG 和五色 × 两层 HTML 纯色 Overlay；实时 SVG 四层采用 `6.4s / 7.2s / 8.4s / 6.8s` 的独立线性周期、负延迟错峰和增强幅度持续流动，颜色循环仍为 `10s`。两者以 `1s` 淡入、`0.5s` 淡出，离开后连同四组 filter 一起销毁。
 - `prefers-reduced-motion: reduce` 下停止内部循环并恢复未经 transform 的静态设计基线。
 
 ## API
@@ -34,7 +34,7 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 | `width` | `number \| string` | `360` | 宽度；数字值按 px 处理 |
 | `height` | `number \| string` | `360` | 高度；数字值按 px 处理 |
 | `radius` | `number \| string` | `0` | 外部裁切圆角；数字值按 px 处理 |
-| `motion` | `boolean` | 普通 Gradient 为 `true`；`as="avatar-image"` 为 `false` | 控制四个 SVG 有色图层的持续 transform 动效；不影响 Avatar hover 的多色 Overlay |
+| `motion` | `boolean` | 普通 Gradient 为 `true`；`as="avatar-image"` 为 `false` | 控制四个 SVG 有色图层是否常驻运行；Avatar 为 false 时仍会在 hover 期间按需运行水波形变，不影响多色 Overlay |
 | `decorative` | `boolean` | `true` | 装饰图默认隐藏于无障碍树；设为 `false` 时应同时提供 `aria-label` |
 | `as` | `string` | - | Frame 角色声明；Avatar 场景可使用 `as="avatar-image"` |
 
@@ -55,6 +55,11 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 | `--snowui-gradient-motion-subtract-2-scale-amplitude-override` | `0.25` | Subtract 2 放大 / 缩小幅度 |
 | `--snowui-gradient-avatar-hover-entry-duration` | `1s` | Gradient Avatar 颜色 Overlay 的入口缓冲时长 |
 | `--snowui-gradient-avatar-hover-exit-duration` | `0.5s` | Gradient Avatar 颜色 Overlay 的退出缓冲时长 |
+| `--snowui-gradient-avatar-hover-motion-easing-override` | `linear` | Avatar 按需水波形变的连续时间函数 |
+| `--snowui-gradient-avatar-hover-motion-vector-4-duration-override` | `6.4s` | Avatar hover Vector 4 独立周期 |
+| `--snowui-gradient-avatar-hover-motion-vector-3-duration-override` | `7.2s` | Avatar hover Vector 3 独立周期 |
+| `--snowui-gradient-avatar-hover-motion-subtract-duration-override` | `8.4s` | Avatar hover Subtract 独立周期 |
+| `--snowui-gradient-avatar-hover-motion-subtract-2-duration-override` | `6.8s` | Avatar hover Subtract 2 独立周期 |
 
 `motion` 只决定基础矢量形变是否运行。Test 的 GD-05 提供 19 条控制条：时长、整体速度、四项缓动坐标以及四层全部 13 项幅度参数；控制条以四列网格排列在图形下方，并以每条控制的可调上限初始化。
 
@@ -92,7 +97,7 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 <Avatar gradientMotion data-name="Animated Gradient avatar" size={80} />
 ```
 
-Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gradientMotion` 开关。默认头像的基础矢量形变关闭，但 hover 的颜色序列和 Overlay 绘制仍由 Gradient 完整负责；hover 时会在圆形裁切内持续过渡到当前 variant 之外的五种颜色。
+Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gradientMotion` 开关。默认头像常态使用缓存静态图；hover 时 Gradient 在圆形裁切内按需淡入实时 SVG 水波形变，并持续过渡到当前 variant 之外的五种颜色。`gradientMotion` 只决定实时 SVG 是否常驻。
 
 ## 矢量与缩放
 
@@ -101,7 +106,7 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 - 椭圆模糊：`stdDeviation=60 / 60`。
 - 路径模糊：`stdDeviation=40 / 50`。
 - 每个实例通过 `$props.id()` 生成独立的 clipPath / filter ID，页面同时出现多个 variant 时不会串用滤镜。
-- Avatar 基础形变关闭时复用六份 data URI SVG 资源；相同 variant 不再为每个头像重复创建四组 filter / clip / path DOM，浏览器可共享解码与栅格缓存。
+- Avatar 常态基础形变关闭时复用六份 data URI SVG 资源；相同 variant 不再为每个头像重复创建四组 filter / clip / path DOM，浏览器可共享解码与栅格缓存。hover 只为当前头像按需创建一份实时 SVG，离开淡出后释放。
 - 静态 Avatar 与原实时 SVG 使用同一套 palette、路径、滤镜区域和 blur 参数；24px 基线截图逐像素一致。
 - Avatar 模式继续使用浏览器原生 `content-visibility: auto` 与布局 / 绘制 containment，跳过长列表视口外子树绘制，不创建逐实例观察器。
 - SVG viewport 负责统一缩放全部几何与 filter region；组件不读取实际像素尺寸，也不重新计算 blur。
@@ -112,9 +117,10 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 - 底色矩形和 SVG 根层保持静止；开启 `motion` 后，单个实例只在四个有色 `<g>` 上运行 CSS transform keyframes。
 - 动画只使用 `translate3d + rotate + scale / scaleX / scaleY`，并仅在 `motion` 开启时为这四个活动图层使用 `will-change: transform`。
 - 四个 `feGaussianBlur` 的标准差、滤镜区域、SVG 路径与固定颜色在循环中保持不变。
-- Avatar 未 hover 时不创建颜色 Overlay；hover 时使用五种候选色 × 两层结构，离开0.5秒淡出后卸载。
+- Avatar 未 hover 时不创建实时 SVG、filter 或颜色 Overlay；hover 时使用一份实时 SVG 与五种候选色 × 两层结构，离开0.5秒淡出后全部卸载。
+- 默认 Avatar hover 的四层周期分别为 `6.4s / 7.2s / 8.4s / 6.8s`，使用线性时间函数、独立负延迟、`18%` 位移、`30deg` 旋转与 `32%` 缩放 / 形变幅度，避免多层同步减速造成的视觉停顿。
 - 原始五层不动画 `fill`、`mix-blend-mode`、`feBlend` 或 Gaussian Blur；Avatar hover 只在五组双层同色纯色 Overlay 间交叉动画 opacity。每层使用独立 HTML 合成元素执行 `overlay`，确保 backdrop 是已经完整渲染的 Gradient 图形。
-- 颜色顺序仅在组件求值时由 seed 与实例 ID 稳定打乱；运行期间不使用 JavaScript 动画、`requestAnimationFrame`、Canvas、ResizeObserver 或计时器。
+- 颜色顺序仅在组件求值时由 seed 与实例 ID 稳定打乱；所有逐帧运动都由 CSS 完成。JavaScript 只在 hover 边界使用一次 `requestAnimationFrame` 分离挂载与淡入，并以退出计时器在0.5秒淡出后回收 DOM；不使用 JavaScript 动画循环、Canvas 或 ResizeObserver。
 - `0%` 与 `100%` 使用完全相同的 transform，保证持续循环时不跳帧。
 - 图层原始几何和 filter region 均大于画布；动效幅度限制在安全范围内并继续由固定 clipPath 裁切。
 
@@ -140,7 +146,7 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 
 - 根 Frame 固定 `enableDefaultMotion={false}`。
 - 普通 Gradient 默认播放四个有色 SVG 图层的独立 transform 动效；Avatar fallback 默认关闭，可由 Gradient `motion` 或 Avatar `gradientMotion` 开启。
-- 基础形变开关不参与 Avatar hover 颜色 Overlay；关闭基础形变时使用五色双层 Overlay、10s 循环、1s 入口 / 0.5s 退出缓冲和 58% 单层峰值。
+- 基础形变开关不参与 Avatar hover 颜色 Overlay；关闭常驻形变时，hover 按需挂载实时 SVG 水波形变和五色双层 Overlay，使用10s颜色循环、1s入口 / 0.5s退出缓冲和58%单层峰值。
 - 不使用 Svelte transition、WAAPI、Canvas、JavaScript 动画循环或定时器。
 - 常态动效不得改变已确认的六种配色、路径、图层顺序和 blur 基线；Avatar hover 允许通过独立 Overlay 改变合成后的可见色调。
 - reduced-motion 是“始终运动”的无障碍例外，系统请求减少动态时必须停止。
@@ -148,6 +154,12 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.10.0 (2026-08-02)
+
+- 默认 Gradient Avatar 常态继续使用缓存静态图，hover 时才按需挂载一份实时 SVG；离开以0.5秒淡出并连同四组 filter 与 Overlay 一起释放。
+- 四个内部图层改用 `6.4s / 7.2s / 8.4s / 6.8s` 独立线性周期与负延迟错峰，hover 幅度提升到18%位移、30度旋转和32%缩放 / 形变，消除同步缓动造成的长停顿感。
+- 修正按需 hover 生命周期接入 Frame 支持的 `mouseenter / mouseleave`，同时保留外部 pointer 回调透传。
 
 ### v2.9.0 (2026-08-02)
 

@@ -1,6 +1,6 @@
 <!--
   Gradient 矢量渐变组件
-  v2.9.0
+  v2.10.0
 
   职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
   文档：./Gradient.md
@@ -250,6 +250,13 @@
     let avatarOverlayReady = $state(false);
     let avatarOverlayFrame: number | undefined;
     let avatarOverlayUnmountTimer: ReturnType<typeof setTimeout> | undefined;
+    const hoverMotionMounted = $derived(
+        isAvatarVariant && !motionEnabled && avatarOverlayMounted,
+    );
+    const motionRunning = $derived(motionEnabled || hoverMotionMounted);
+    const renderLiveGradient = $derived(
+        !isAvatarVariant || motionEnabled || avatarOverlayMounted,
+    );
 
     function clearAvatarOverlaySchedule() {
         if (avatarOverlayFrame !== undefined) {
@@ -262,7 +269,7 @@
         }
     }
 
-    function handlePointerEnter(event: PointerEvent) {
+    function handleMouseEnter(event: MouseEvent) {
         if (
             isAvatarVariant &&
             !(event.currentTarget as HTMLElement).closest(
@@ -277,10 +284,9 @@
                 avatarOverlayFrame = undefined;
             });
         }
-        userPointerEnter?.(event);
     }
 
-    function handlePointerLeave(event: PointerEvent) {
+    function handleMouseLeave() {
         if (isAvatarVariant) {
             if (avatarOverlayFrame !== undefined) {
                 cancelAnimationFrame(avatarOverlayFrame);
@@ -292,7 +298,6 @@
                 avatarOverlayUnmountTimer = undefined;
             }, 550);
         }
-        userPointerLeave?.(event);
     }
 
     onDestroy(clearAvatarOverlaySchedule);
@@ -308,7 +313,8 @@
         "snowui-gradient",
         `snowui-gradient-${resolvedVariant}`,
         isAvatarVariant ? "snowui-gradient-avatar" : "",
-        motionEnabled ? "snowui-gradient-motion-enabled" : "",
+        motionRunning ? "snowui-gradient-motion-enabled" : "",
+        hoverMotionMounted ? "snowui-gradient-hover-motion-enabled" : "",
         className,
     ]
         .filter(Boolean)
@@ -322,8 +328,10 @@
     aria-label={decorative ? undefined : ariaLabel}
     aria-hidden={decorative ? "true" : undefined}
     renderHints={gradientRenderHints}
-    onpointerenter={handlePointerEnter}
-    onpointerleave={handlePointerLeave}
+    onmouseenter={handleMouseEnter}
+    onmouseleave={handleMouseLeave}
+    onpointerenter={userPointerEnter}
+    onpointerleave={userPointerLeave}
     {...rest}
 >
     {#if isAvatarVariant && !motionEnabled}
@@ -335,9 +343,10 @@
             draggable="false"
             aria-hidden="true"
         />
-    {:else}
+    {/if}
+    {#if renderLiveGradient}
         <svg
-        class="snowui-gradient-svg"
+        class={`snowui-gradient-svg ${hoverMotionMounted ? "snowui-gradient-hover-motion-svg" : ""}`}
         viewBox="0 0 360 360"
         preserveAspectRatio="none"
         aria-hidden="true"
@@ -551,6 +560,26 @@
         object-fit: fill;
     }
 
+    :global(:where(.snowui-gradient-hover-motion-svg)) {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transition: opacity
+            var(--snowui-gradient-avatar-hover-exit-duration, 0.5s)
+            cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled[data-avatar-overlay-ready="true"])
+                :where(.snowui-gradient-hover-motion-svg)
+        ) {
+        opacity: 1;
+        transition-duration: var(
+            --snowui-gradient-avatar-hover-entry-duration,
+            1s
+        );
+    }
+
     :global(:where(.snowui-gradient-avatar)) {
         contain: layout paint style;
         content-visibility: auto;
@@ -603,6 +632,76 @@
                 :where(.snowui-gradient-layer-subtract-2)
         ) {
         animation-name: snowui-gradient-subtract-2-motion;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled)
+                :where(.snowui-gradient-layer)
+        ) {
+        animation-timing-function: var(
+            --snowui-gradient-avatar-hover-motion-easing-override,
+            linear
+        );
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled)
+                :where(.snowui-gradient-layer-vector-4)
+        ) {
+        animation-duration: var(
+            --snowui-gradient-avatar-hover-motion-vector-4-duration-override,
+            6.4s
+        );
+        animation-delay: -1.7s;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled)
+                :where(.snowui-gradient-layer-vector-3)
+        ) {
+        animation-duration: var(
+            --snowui-gradient-avatar-hover-motion-vector-3-duration-override,
+            7.2s
+        );
+        animation-delay: -4.1s;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled)
+                :where(.snowui-gradient-layer-subtract)
+        ) {
+        animation-duration: var(
+            --snowui-gradient-avatar-hover-motion-subtract-duration-override,
+            8.4s
+        );
+        animation-delay: -2.8s;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled)
+                :where(.snowui-gradient-layer-subtract-2)
+        ) {
+        animation-duration: var(
+            --snowui-gradient-avatar-hover-motion-subtract-2-duration-override,
+            6.8s
+        );
+        animation-delay: -5.3s;
+    }
+
+    :global(:where(.snowui-gradient-hover-motion-enabled)) {
+        --snowui-gradient-motion-vector-4-x-amplitude-override: 18%;
+        --snowui-gradient-motion-vector-4-y-amplitude-override: 18%;
+        --snowui-gradient-motion-vector-4-rotate-amplitude-override: 30deg;
+        --snowui-gradient-motion-vector-3-x-amplitude-override: 18%;
+        --snowui-gradient-motion-vector-3-y-amplitude-override: 18%;
+        --snowui-gradient-motion-vector-3-scale-amplitude-override: 0.32;
+        --snowui-gradient-motion-subtract-x-amplitude-override: 18%;
+        --snowui-gradient-motion-subtract-y-amplitude-override: 18%;
+        --snowui-gradient-motion-subtract-deform-amplitude-override: 0.32;
+        --snowui-gradient-motion-subtract-2-x-amplitude-override: 18%;
+        --snowui-gradient-motion-subtract-2-y-amplitude-override: 18%;
+        --snowui-gradient-motion-subtract-2-rotate-amplitude-override: 30deg;
+        --snowui-gradient-motion-subtract-2-scale-amplitude-override: 0.32;
     }
 
     :global(:where(.snowui-gradient-avatar-overlay)) {
