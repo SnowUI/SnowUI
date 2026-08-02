@@ -1,11 +1,12 @@
 /**
  * Avatar.test.ts
- * v2.9.1
+ * v2.9.2
  *
  * 变更记录 (2026-02-03):
  * - 示例1覆盖全部尺寸
  * - 示例2覆盖全部尺寸与不同默认 Gradient 配色
  * - 示例3覆盖全部尺寸与不同徽标组合
+ * - 示例3验证 Badge / Icon 子内容进入 DOM；示例5验证 empty 与其他头像同排中线对齐
  */
 export const examples = [
     {
@@ -64,6 +65,10 @@ export const examples = [
 <Avatar size={80}>
     <Badge as="badge" count={99} />
 </Avatar>`,
+        expected: {
+            layout: "8 个 Avatar 的 Badge / Icon 均渲染在头像裁切容器之外；不同尺寸按统一中线排列。",
+        },
+        logic: ["BadgeChildren", "BadgeCutout", "InlineMiddleAlignment"],
     },
     {
         name: "4: 角色与位置",
@@ -86,7 +91,7 @@ export const examples = [
             performance: "Gradient Avatar 常态基础形变默认关闭；gradientMotion=true 时常驻运行四层 transform，默认头像只在 hover 期间挂载实时 SVG、四组 filter 与 transform，退出淡出后恢复缓存静态图。",
             accessibility: "prefers-reduced-motion: reduce 下关闭淡入淡出，保留静态随机颜色反馈。",
         },
-        logic: ["DefaultGradient", "GradientMotionOptIn", "ApprovedGradientHover", "MediaHoverableVisual", "EmptyVariant", "AlphaOnlyOverlay", "GradientOwnedHover", "Disabled", "ReducedMotion"],
+        logic: ["DefaultGradient", "GradientMotionOptIn", "ApprovedGradientHover", "MediaHoverableVisual", "EmptyVariant", "InlineMiddleAlignment", "AlphaOnlyOverlay", "GradientOwnedHover", "Disabled", "ReducedMotion"],
     },
 
     {

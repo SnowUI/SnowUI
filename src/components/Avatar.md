@@ -1,6 +1,7 @@
 # Avatar.svelte 文档
 
-> **版本**: v2.11.0
+> **版本**: v2.11.1
+> **变更记录 (2026-08-03)**: 修复外部 Badge / Icon 子内容被内部 Frame 片段遮蔽的问题；Avatar 根盒统一使用中线对齐，确保 `empty` 与图片、Gradient 头像同排等高。
 > **变更记录 (2026-08-03)**: 默认 Gradient 头像 hover 使用七段非对称路径；每次进入随机切换且不重复上一组相位 / 方向配置。
 > **变更记录 (2026-08-02)**: 默认头像改为随机 Gradient；原灰色用户图标改为 `empty` 空头像变体；Avatar 单色 hover 通过像素 alpha 仅叠加实际图形。
 > **变更记录 (2026-08-02)**: Avatar 默认 hover 使用单层 Overlay；每次进入随机六色之一，同一次 hover 内颜色不变，默认文字与用户图标位于叠加层上方。
@@ -20,6 +21,7 @@
 主布局模型：内禀原子布局。
 
 - Avatar 的根节点只暴露一个由 `size` / 父级尺寸上下文 / `renderHints` 决定的头像盒，作为 Button、MenuItem、Field 等外部布局的子项时表现为 Hug。
+- Avatar 作为 inline-level 原子盒时统一使用中线对齐，内部图片、Gradient 与 `empty` 图标不得改变同排头像的垂直位置。
 - 内部图片层、默认 Gradient / empty 图标层、hover 滤镜与 badge 切割遮罩都属于 Avatar 私有布局，不对外暴露 Leading / Content / Trailing 槽位。
 - `as="badge"` 只用于 Avatar 内部识别角标角色；Avatar 自身不会输出 `data-auto-layout`，也不会接管子组件的通用排列能力。
 - 外部需要排列多个头像时应使用 `AvatarGroup`，不要把 Avatar 改造成集合布局。
@@ -201,6 +203,11 @@
 ---
 
 ## 更新日志
+
+### v2.11.1 (2026-08-03)
+
+- 修复外部传入的 Badge / Icon 子内容被内部 Frame `children` 片段同名遮蔽、未进入 DOM 的问题。
+- Avatar 根盒统一使用 `vertical-align: middle`，使 `empty`、图片与 Gradient 头像在同一行保持一致的垂直位置。
 
 ### v2.11.0 (2026-08-03)
 
