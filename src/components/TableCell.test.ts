@@ -24,14 +24,14 @@ export const examples = [
         name: "A4: 选择与行动单元格角色",
         code: `A4
 <Table selectedRowIds={["one"]}><TableBody><TableRow rowId="one"><TableCell as="selection" /><TableCell as="actions"><Button bare>更多</Button></TableCell></TableRow></TableBody></Table>`,
-        expected: { render: "selection 内置行 Checkbox；actions 渲染调用方按钮。", layout: "actions 横向排列且 gap 8px。", interaction: "Checkbox 在 hover/focus/selected 时显示；actions 只在 hover 时显示。", performance: "无 DOM 身份猜测。", responsive: "角色列保持窄宽。" },
+        expected: { render: "selection 内置行 Checkbox；actions 渲染调用方按钮。", layout: "selection Checkbox 默认 17px，在奇数高度行内上下留白对称；actions 横向排列且 gap 8px。", interaction: "Checkbox 在 hover/focus/selected 时显示；actions 只在 hover 时显示。", performance: "无 DOM 身份猜测。", responsive: "角色列保持窄宽。" },
         logic: ["Selection", "Actions"],
     },
     {
         name: "A5: 覆盖式角色单元格",
         code: `A5
 <Table roleLayout="overlay" selectedRowIds={["one"]}><TableBody><TableRow rowId="one"><TableCell as="selection" /><TableCell>SnowUI</TableCell><TableCell as="actions"><Button bare>更多</Button></TableCell></TableRow></TableBody></Table>`,
-        expected: { render: "selection/actions 仍保持合法 td。", layout: "角色 td 宽度归零，覆盖块 sticky 到行左右边缘并用透明模糊渐变柔化后方内容。", interaction: "已选行 Checkbox 保持显示，actions 仍只在行 hover 时显示。", performance: "选择状态直接来自 rowId + Table Context，不创建逐单元格 MutationObserver。", responsive: "不改变普通内容列宽。" },
+        expected: { render: "selection/actions 仍保持合法 td。", layout: "角色 td 宽度归零，17px Checkbox 在覆盖块内垂直居中，覆盖块 sticky 到行左右边缘并用透明模糊渐变柔化后方内容。", interaction: "已选行 Checkbox 保持显示，actions 仍只在行 hover 时显示。", performance: "选择状态直接来自 rowId + Table Context，不创建逐单元格 MutationObserver。", responsive: "不改变普通内容列宽。" },
         logic: ["Selection", "Actions", "OverlayRoleLayout"],
     },
     {

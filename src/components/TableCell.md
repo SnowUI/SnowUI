@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
 - Skeleton 是加载基础设施，不作为公开 part。
 
-> **版本**: v1.7.3
+> **版本**: v1.7.4
 > **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。
 
 默认单元格高度为 40px，内边距为上下 8px、左右 12px；首尾单元格也保持相同的 12px 外缘 padding。Table 使用原生相邻列布局，列与列之间没有额外 gap；视觉间距来自左右 cell padding。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。
@@ -39,7 +39,7 @@
 
 `as="actions"` 不内置默认按钮，children 可放任意行动按钮。内容距角色列右边缘 8px，并与数据行水平中线垂直居中对齐；只在行 hover 时显示。内部横向排列、gap 为 8px，padding 为 `8px 8px 8px 0`。
 
-`roleLayout="overlay"` 时，selection/actions 单元格自身宽度归零并 sticky 到表格左右边缘。selection 的真实 `<td>` 只保留 table 语义和定位锚点；Checkbox 与渐进式模糊层都放在 `.snowui-table-selection-control` 中，并由运行时同步为 `position: fixed`，固定到当前行左上角。该覆盖块宽度为 `--size-8`（32px），高度等于当前行高度，Checkbox 居中显示，相当于 16px Checkbox 四周各有 8px 可点击区域。覆盖块不推开第一列内容，而是直接压在第一列之上。
+`roleLayout="overlay"` 时，selection/actions 单元格自身宽度归零并 sticky 到表格左右边缘。selection 的真实 `<td>` 只保留 table 语义和定位锚点；Checkbox 与渐进式模糊层都放在 `.snowui-table-selection-control` 中，并由运行时同步为 `position: fixed`，固定到当前行左上角。Checkbox 默认使用 `calc(var(--size-4) + var(--border-2))`（17px），在当前奇数像素行高内上下各留 16px；这是 Table selection 的组合特化，不改变独立 Checkbox 的 16px 默认值。覆盖块不推开第一列内容，而是直接压在第一列之上。
 
 selection 覆盖块的层级必须高于第一列内容：它使用最高 `z-index`，并要求使用方不要再给第一列链接或图标额外提升 `z-index`。Checkbox 本体是真实交互控件，`onCheckedChange` 直接写入 Table 选择状态并停止冒泡；TableRow 同时对行左侧 32px 点击做兜底，确保浏览器即使命中到底下第一列内容，也会优先切换行选中并阻止底层链接跳转。
 
@@ -64,6 +64,7 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 
 ## Changelog
 
+- 2026-08-03：v1.7.4，selection 内置 Checkbox 默认尺寸改为 Token 计算的 17px，并新增 `--snowui-table-selection-checkbox-size-override`；`parts.Checkbox.size` 显式配置仍优先。
 - 2026-08-03：v1.7.3，删除 TableCell 自身的行 hover 背景，仅保留上下分割线避让；striped hover 时单元格透明，由 TableBody 唯一连续移动层显示颜色。
 - 2026-08-02：v1.7.2，selection / actions 覆盖块直接消费响应式选中状态，删除每个角色单元格的 `MutationObserver`；长表格空闲时不再常驻数百个属性观察器。
 - 2026-07-08：v1.7.1，actions 按钮列源码默认 gap 从 `--gap-3` 修正为 `--gap-2`（8px），与文档和多 Icon 按钮排列规范保持一致。

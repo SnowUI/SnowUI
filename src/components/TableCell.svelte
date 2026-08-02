@@ -233,6 +233,11 @@
     }
     const selectionBlur = $derived(buildRoleOverlayBlur("left-to-right"));
     const actionsBlur = $derived(buildRoleOverlayBlur("right-to-left"));
+    const selectionCheckboxSizeStyle = $derived(
+        parts?.Checkbox?.size === undefined
+            ? "--snowui-checkbox-size-override: var(--snowui-table-selection-checkbox-size-override, calc(var(--size-4, 1rem) + var(--border-2, 0.0625rem)))"
+            : undefined,
+    );
 </script>
 
 {#if !isRoleColumnHidden}
@@ -248,6 +253,7 @@
             bind:this={roleOverlayElement}
             class="snowui-table-selection-control"
             data-selected={isSelected ? "true" : undefined}
+            style={selectionCheckboxSizeStyle}
         >
             <span class="snowui-table-role-blur-layer" style={selectionBlur.containerStyle} aria-hidden="true">
                 {#each selectionBlur.layers as layer (layer.index)}
@@ -255,7 +261,6 @@
                 {/each}
             </span>
             <Checkbox
-                size={16}
                 checked={isSelected}
                 ariaLabel="选择当前行"
                 onclick={(event: MouseEvent) => event.stopPropagation()}

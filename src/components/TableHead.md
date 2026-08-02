@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v1.9.0  
+> **版本**: v1.9.1
 > **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -98,6 +98,8 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 - `resizable` 使用通用 Indicator；命中带沿用 line 全高协议（表头单元格右缘全高）；常态视觉线为 **1px × 16px**、贴列右缘、垂直居中（TableHead 覆盖 `.snowui-indicator-visual`）；进入命中带时加粗到 2px。
 
 ## Changelog
+
+- 2026-08-03：v1.9.1，selection 全选 Checkbox 与数据行统一使用 Token 计算的 17px Table 组合尺寸；独立 Checkbox 默认值不变。
 
 - 2026-07-12：v2.0.1，适配 Indicator line 全高命中带；表头视觉恢复 1×16 贴右缘。
 - 2026-07-01：v2.0.0，新增 `label` 并把可排序列元数据注册给 DataTable / TableToolbar。

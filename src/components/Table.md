@@ -1,6 +1,6 @@
 # Table（语义表格）
 
-> **版本**: v2.1.0
+> **版本**: v2.1.1
 > **职责**: 提供 OSS 原生表格语义、列宽与加载展示；宽表参与页面固有宽度计算，由页面容器负责横向滚动。
 
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
@@ -43,7 +43,7 @@ gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell paddin
 
 普通 Table 不提供 checkbox 选择列或按钮操作列。`TableHead/TableCell as="selection|actions"` 只有位于 PRO DataTable Context 中才激活；选择状态、角色布局与批量操作均由 DataTable 持有。
 
-DataTable selection 角色中，TableHead 的全选 Checkbox 与 TableCell 的行 Checkbox 均固定使用 16×16px。
+DataTable selection 角色中，TableHead 的全选 Checkbox 与 TableCell 的行 Checkbox 默认使用 `calc(var(--size-4) + var(--border-2))`，即 17×17px。该值是 Table 组合场景的垂直居中特化，不改变 Checkbox 组件自身的 16px 默认值；可通过 `--snowui-table-selection-checkbox-size-override` 覆盖。
 
 首次加载列协议：TableHead 通过 Table Context 显式注册列结构；TableBody 在 `loading` 生效时按该结构生成真实 `tr / td` Skeleton rows。Table 只协调同一语义表格内部的列注册，不读取子组件私有 class 或内部 DOM。DataTable 可通过继承的同一 Context 提供“首次加载且 rows 为空”状态与规范化后的 `pageSize`；独立 Table 也可由 TableBody 显式启用，无法读取分页行数时回退 10 行。
 
@@ -189,6 +189,8 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 - 列宽持久化属于页面层，Table 只发出变化。
 
 ## Changelog
+
+- 2026-08-03：v2.1.1，Table selection 内置 Checkbox 改为 Token 计算的 17px 组合特化，使奇数高度数据行内上下各留 16px；Checkbox 组件全局默认仍为 16px。
 
 - 2026-08-03：TableRow 新增外部受控 `active` 激活态；持久 `--black-4` 背景可与连续 hover 层叠加，不与 selected / Checkbox 选中状态绑定。
 - 2026-07-07：减少首屏工作量：普通单元格挂载不再额外排队逐格 rAF；overlay 角色块仅在 hover、focus、选中或强制预览时测量与监听位置，空闲行不触发布局读取。
