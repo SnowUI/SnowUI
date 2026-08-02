@@ -788,7 +788,7 @@
     /* Table / DataTable */
     /* --snowui-table-font-size-override: ; */ /* default: --text-12 */
     /* --snowui-table-line-height-override: ; */ /* default: --leading-12 */
-    /* --snowui-table-selection-checkbox-size-override: ; */ /* default: calc(var(--size-4) + var(--border-2)) = 17px；仅作用于 selection 全选 / 行 Checkbox */
+    /* --snowui-table-selection-checkbox-size-override: ; */ /* default: calc(var(--size-4) + 0.0625rem) = 17px；StyleSpec §2.2.2 登记特例，仅作用于 selection 全选 / 行 Checkbox */
     /* --snowui-table-role-overlay-width-override: ; */ /* default: calc((--size-12 + --size-14) / 3) */
     /* --snowui-table-selection-overlay-width-override: ; */ /* default: calc((--size-12 + --size-14) / 3) */
     /* --snowui-table-role-overlay-blur-override: ; */ /* default: 0rem（默认关闭背景模糊，仅保留边缘渐隐；设 >0 开启渐进式模糊） */

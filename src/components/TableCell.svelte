@@ -235,7 +235,7 @@
     const actionsBlur = $derived(buildRoleOverlayBlur("right-to-left"));
     const selectionCheckboxSizeStyle = $derived(
         parts?.Checkbox?.size === undefined
-            ? "--snowui-checkbox-size-override: var(--snowui-table-selection-checkbox-size-override, calc(var(--size-4, 1rem) + var(--border-2, 0.0625rem)))"
+            ? "--snowui-checkbox-size-override: var(--snowui-table-selection-checkbox-size-override, calc(var(--size-4, 1rem) + 0.0625rem))"
             : undefined,
     );
 </script>

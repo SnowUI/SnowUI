@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v1.9.1
+> **版本**: v1.9.2
 > **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -99,6 +99,7 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 ## Changelog
 
+- 2026-08-03：v1.9.2，selection Checkbox 的 1px 增量改为固定 `0.0625rem` 特例，不再复用边框 Token。
 - 2026-08-03：v1.9.1，selection 全选 Checkbox 与数据行统一使用 Token 计算的 17px Table 组合尺寸；独立 Checkbox 默认值不变。
 
 - 2026-07-12：v2.0.1，适配 Indicator line 全高命中带；表头视觉恢复 1×16 贴右缘。
