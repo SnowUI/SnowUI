@@ -57,9 +57,6 @@
     :global(:where(.snowui-table-row[data-skeleton="true"])) { pointer-events: none; }
     :global(:where(.snowui-table-row[data-loading-spinner="true"])) { pointer-events: none; }
     :global(:where(.snowui-table-row) > :is(.snowui-table-cell, .snowui-table-head)) { transition: none; }
-    :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"]):not([data-loading-spinner="true"])):is(:hover, [data-force-hover="true"]) > .snowui-table-cell) { transition: background-color var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
     :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"]):not([data-loading-spinner="true"])):is(:hover, [data-force-hover="true"]) > .snowui-table-cell:first-child) { border-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)); }
     :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"]):not([data-loading-spinner="true"])):is(:hover, [data-force-hover="true"]) > .snowui-table-cell:last-child) { border-radius: 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0; }
-    :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"]):not([data-loading-spinner="true"])):is(:hover, [data-force-hover="true"]) > .snowui-table-cell:not(.snowui-role-selection):not(.snowui-role-actions)) { background: var(--snowui-table-row-hover-background-override, var(--black-4, #0000000a)); }
-    :global(:where(.snowui-table-body[data-continuous-hover-enabled="true"] .snowui-table-row:not([data-force-hover="true"]):hover) > .snowui-table-cell) { background: transparent; }
 </style>

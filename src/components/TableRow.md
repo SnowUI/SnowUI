@@ -1,9 +1,9 @@
 # TableRow
 
-> **版本**: v1.4.0  
-> **职责**: 表头或表体的 `<tr>`，统一整行 hover。
+> **版本**: v1.6.0
+> **职责**: 表头或表体的 `<tr>`，统一整行 hover 几何与交互状态。
 
-`rowId` 会映射为 `data-row-id`，并注册到 Table 的当前渲染行集合。选中时输出 `data-selected="true"`，供 selection 角色列保持 Checkbox 可见；选中本身不额外改变行背景，actions 仍只在行 hover 时显示。默认 `divided` 变体的静态行两端无圆角；hover（含 `data-force-hover="true"` 静态预览）时首尾单元格形成 12px 外缘圆角，并隐藏 hover 行上下相邻的分割线。鼠标移出时背景立即退场，避免背景淡出期间出现圆角变直角的残影。`striped` 所有数据行始终保持 12px 外缘圆角，hover 前后不改变几何形状。
+`rowId` 会映射为 `data-row-id`，并注册到 Table 的当前渲染行集合。选中时输出 `data-selected="true"`，供 selection 角色列保持 Checkbox 可见；选中本身不额外改变行背景，actions 仍只在行 hover 时显示。默认 `divided` 变体的静态行两端无圆角；hover（含 `data-force-hover="true"` 静态预览）时首尾单元格形成 12px 外缘圆角，并隐藏 hover 行上下相邻的分割线。背景只由 TableBody 的连续 hover 移动层绘制，TableRow 不再向单元格写入背景。`striped` 所有数据行始终保持12px外缘圆角，hover 时临时让条纹单元格透明以露出同一个移动层。
 
 位于 DataTable 的内部 `loadMore` 管线时，TableRow 只提供稳定 `rowId`；内部 opacity 渐显由普通 TableCell 消费，避免 selection/actions overlay 被整行透明度压暗。业务显式传给 TableRow 的 `whileAppear / currentState` 仍按正常 Frame 行级动效执行。
 
@@ -25,6 +25,7 @@
 
 ## Changelog
 
+- 2026-08-03：v1.6.0，删除 TableRow 的单元格 hover 背景与背景过渡；颜色统一由 TableBody 的唯一连续移动层绘制。
 - 2026-07-08：v1.5.0，行内空白点击改为可选行预览协议；未配置 DataTable `onRowPreview` 时不响应，选择只由 selection 角色列触发。
 - 2026-06-30：v1.4.0，DataTable 内部新增行动效从 TableRow 迁移到普通 TableCell；TableRow 仅保留业务显式行级 whileAppear。
 - 2026-06-30：v1.3.2，TableRow 在存在 `whileAppear` 时同步进入 Frame `Appear` 状态，修复只传动效配置但状态仍为 Idle、实际不执行渐显的问题。
