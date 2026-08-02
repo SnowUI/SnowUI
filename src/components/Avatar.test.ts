@@ -82,7 +82,7 @@ export const examples = [
 <Avatar src={SnowLogo} data-name="logo" size={80} />
 <Avatar fallback={Gradient} data-name="purple" size={80} disabled />`,
         expected: {
-            interaction: "图片与普通组件头像每次 pointer enter 随机一种单色，只对实际非透明图形叠加；Gradient 默认头像自行播放五色循环，并按需淡入四层错峰水波形变。第二项常态基础形变关闭，第三项用 gradientMotion 显式常驻开启；aria-label 不再生成首字母，第四项为显式 empty 灰色用户图标；disabled 不响应。",
+            interaction: "图片与普通组件头像每次 pointer enter 随机一种单色，只对实际非透明图形叠加；Gradient 默认头像自行播放五色循环，并按需淡入四层七段非对称水波形变，每次进入随机更换且不重复上一组相位 / 方向。第二项常态基础形变关闭，第三项用 gradientMotion 显式常驻开启；aria-label 不再生成首字母，第四项为显式 empty 灰色用户图标；disabled 不响应。",
             performance: "Gradient Avatar 常态基础形变默认关闭；gradientMotion=true 时常驻运行四层 transform，默认头像只在 hover 期间挂载实时 SVG、四组 filter 与 transform，退出淡出后恢复缓存静态图。",
             accessibility: "prefers-reduced-motion: reduce 下关闭淡入淡出，保留静态随机颜色反馈。",
         },

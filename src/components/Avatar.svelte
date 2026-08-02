@@ -1,6 +1,6 @@
 <!--
  Avatar 头像组件
-  v2.10.0
+  v2.11.0
 
  1. 核心能力 (Features):
     - 多样形态: 支持 circular, rounded, square 三种形状

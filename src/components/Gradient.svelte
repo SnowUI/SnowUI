@@ -1,6 +1,6 @@
 <!--
   Gradient 矢量渐变组件
-  v2.10.0
+  v2.11.0
 
   职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
   文档：./Gradient.md
@@ -248,6 +248,7 @@
 
     let avatarOverlayMounted = $state(false);
     let avatarOverlayReady = $state(false);
+    let avatarMotionProfile = $state(0);
     let avatarOverlayFrame: number | undefined;
     let avatarOverlayUnmountTimer: ReturnType<typeof setTimeout> | undefined;
     const hoverMotionMounted = $derived(
@@ -277,6 +278,11 @@
             )
         ) {
             clearAvatarOverlaySchedule();
+            const nextProfile = Math.floor(Math.random() * 5);
+            avatarMotionProfile =
+                nextProfile >= avatarMotionProfile
+                    ? nextProfile + 1
+                    : nextProfile;
             avatarOverlayMounted = true;
             avatarOverlayReady = false;
             avatarOverlayFrame = requestAnimationFrame(() => {
@@ -322,6 +328,9 @@
     data-variant={resolvedVariant}
     data-avatar={isAvatarVariant ? "true" : undefined}
     data-motion={motionEnabled ? "true" : "false"}
+    data-avatar-motion-profile={isAvatarVariant
+        ? avatarMotionProfile
+        : undefined}
     data-avatar-overlay-ready={avatarOverlayReady ? "true" : undefined}
     style={gradientStyle}
     role={decorative ? undefined : (role ?? "img")}
@@ -610,6 +619,18 @@
             :where(.snowui-gradient-motion-enabled)
                 :where(.snowui-gradient-layer-vector-4)
         ) {
+        --snowui-gradient-layer-x: var(
+            --snowui-gradient-motion-vector-4-x-amplitude-override,
+            12%
+        );
+        --snowui-gradient-layer-y: var(
+            --snowui-gradient-motion-vector-4-y-amplitude-override,
+            12%
+        );
+        --snowui-gradient-layer-rotate: var(
+            --snowui-gradient-motion-vector-4-rotate-amplitude-override,
+            20deg
+        );
         animation-name: snowui-gradient-vector-4-motion;
     }
 
@@ -617,6 +638,18 @@
             :where(.snowui-gradient-motion-enabled)
                 :where(.snowui-gradient-layer-vector-3)
         ) {
+        --snowui-gradient-layer-x: var(
+            --snowui-gradient-motion-vector-3-x-amplitude-override,
+            12%
+        );
+        --snowui-gradient-layer-y: var(
+            --snowui-gradient-motion-vector-3-y-amplitude-override,
+            12%
+        );
+        --snowui-gradient-layer-scale: var(
+            --snowui-gradient-motion-vector-3-scale-amplitude-override,
+            0.25
+        );
         animation-name: snowui-gradient-vector-3-motion;
     }
 
@@ -624,6 +657,18 @@
             :where(.snowui-gradient-motion-enabled)
                 :where(.snowui-gradient-layer-subtract)
         ) {
+        --snowui-gradient-layer-x: var(
+            --snowui-gradient-motion-subtract-x-amplitude-override,
+            12%
+        );
+        --snowui-gradient-layer-y: var(
+            --snowui-gradient-motion-subtract-y-amplitude-override,
+            12%
+        );
+        --snowui-gradient-layer-scale: var(
+            --snowui-gradient-motion-subtract-deform-amplitude-override,
+            0.25
+        );
         animation-name: snowui-gradient-subtract-motion;
     }
 
@@ -631,6 +676,22 @@
             :where(.snowui-gradient-motion-enabled)
                 :where(.snowui-gradient-layer-subtract-2)
         ) {
+        --snowui-gradient-layer-x: var(
+            --snowui-gradient-motion-subtract-2-x-amplitude-override,
+            12%
+        );
+        --snowui-gradient-layer-y: var(
+            --snowui-gradient-motion-subtract-2-y-amplitude-override,
+            12%
+        );
+        --snowui-gradient-layer-rotate: var(
+            --snowui-gradient-motion-subtract-2-rotate-amplitude-override,
+            20deg
+        );
+        --snowui-gradient-layer-scale: var(
+            --snowui-gradient-motion-subtract-2-scale-amplitude-override,
+            0.25
+        );
         animation-name: snowui-gradient-subtract-2-motion;
     }
 
@@ -652,7 +713,14 @@
             --snowui-gradient-avatar-hover-motion-vector-4-duration-override,
             6.4s
         );
-        animation-delay: -1.7s;
+        animation-delay: var(
+            --snowui-gradient-avatar-hover-motion-vector-4-delay,
+            -1.7s
+        );
+        animation-direction: var(
+            --snowui-gradient-avatar-hover-motion-vector-4-direction,
+            normal
+        );
     }
 
     :global(
@@ -663,7 +731,14 @@
             --snowui-gradient-avatar-hover-motion-vector-3-duration-override,
             7.2s
         );
-        animation-delay: -4.1s;
+        animation-delay: var(
+            --snowui-gradient-avatar-hover-motion-vector-3-delay,
+            -4.1s
+        );
+        animation-direction: var(
+            --snowui-gradient-avatar-hover-motion-vector-3-direction,
+            normal
+        );
     }
 
     :global(
@@ -674,7 +749,14 @@
             --snowui-gradient-avatar-hover-motion-subtract-duration-override,
             8.4s
         );
-        animation-delay: -2.8s;
+        animation-delay: var(
+            --snowui-gradient-avatar-hover-motion-subtract-delay,
+            -2.8s
+        );
+        animation-direction: var(
+            --snowui-gradient-avatar-hover-motion-subtract-direction,
+            normal
+        );
     }
 
     :global(
@@ -685,7 +767,14 @@
             --snowui-gradient-avatar-hover-motion-subtract-2-duration-override,
             6.8s
         );
-        animation-delay: -5.3s;
+        animation-delay: var(
+            --snowui-gradient-avatar-hover-motion-subtract-2-delay,
+            -5.3s
+        );
+        animation-direction: var(
+            --snowui-gradient-avatar-hover-motion-subtract-2-direction,
+            normal
+        );
     }
 
     :global(:where(.snowui-gradient-hover-motion-enabled)) {
@@ -702,6 +791,63 @@
         --snowui-gradient-motion-subtract-2-y-amplitude-override: 18%;
         --snowui-gradient-motion-subtract-2-rotate-amplitude-override: 30deg;
         --snowui-gradient-motion-subtract-2-scale-amplitude-override: 0.32;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled[data-avatar-motion-profile="1"])
+        ) {
+        --snowui-gradient-avatar-hover-motion-vector-4-delay: -4.9s;
+        --snowui-gradient-avatar-hover-motion-vector-3-delay: -1.3s;
+        --snowui-gradient-avatar-hover-motion-subtract-delay: -6.6s;
+        --snowui-gradient-avatar-hover-motion-subtract-2-delay: -2.1s;
+        --snowui-gradient-avatar-hover-motion-vector-3-direction: reverse;
+        --snowui-gradient-avatar-hover-motion-subtract-2-direction: reverse;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled[data-avatar-motion-profile="2"])
+        ) {
+        --snowui-gradient-avatar-hover-motion-vector-4-delay: -0.8s;
+        --snowui-gradient-avatar-hover-motion-vector-3-delay: -5.7s;
+        --snowui-gradient-avatar-hover-motion-subtract-delay: -3.9s;
+        --snowui-gradient-avatar-hover-motion-subtract-2-delay: -6.2s;
+        --snowui-gradient-avatar-hover-motion-vector-4-direction: reverse;
+        --snowui-gradient-avatar-hover-motion-subtract-direction: reverse;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled[data-avatar-motion-profile="3"])
+        ) {
+        --snowui-gradient-avatar-hover-motion-vector-4-delay: -3.2s;
+        --snowui-gradient-avatar-hover-motion-vector-3-delay: -2.6s;
+        --snowui-gradient-avatar-hover-motion-subtract-delay: -7.5s;
+        --snowui-gradient-avatar-hover-motion-subtract-2-delay: -0.9s;
+        --snowui-gradient-avatar-hover-motion-vector-4-direction: reverse;
+        --snowui-gradient-avatar-hover-motion-vector-3-direction: reverse;
+        --snowui-gradient-avatar-hover-motion-subtract-2-direction: reverse;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled[data-avatar-motion-profile="4"])
+        ) {
+        --snowui-gradient-avatar-hover-motion-vector-4-delay: -5.8s;
+        --snowui-gradient-avatar-hover-motion-vector-3-delay: -3.4s;
+        --snowui-gradient-avatar-hover-motion-subtract-delay: -1.1s;
+        --snowui-gradient-avatar-hover-motion-subtract-2-delay: -4.6s;
+        --snowui-gradient-avatar-hover-motion-vector-3-direction: reverse;
+        --snowui-gradient-avatar-hover-motion-subtract-direction: reverse;
+    }
+
+    :global(
+            :where(.snowui-gradient-hover-motion-enabled[data-avatar-motion-profile="5"])
+        ) {
+        --snowui-gradient-avatar-hover-motion-vector-4-delay: -2.4s;
+        --snowui-gradient-avatar-hover-motion-vector-3-delay: -6.5s;
+        --snowui-gradient-avatar-hover-motion-subtract-delay: -5.2s;
+        --snowui-gradient-avatar-hover-motion-subtract-2-delay: -3.3s;
+        --snowui-gradient-avatar-hover-motion-vector-4-direction: reverse;
+        --snowui-gradient-avatar-hover-motion-vector-3-direction: reverse;
+        --snowui-gradient-avatar-hover-motion-subtract-direction: reverse;
     }
 
     :global(:where(.snowui-gradient-avatar-overlay)) {
@@ -786,66 +932,66 @@
         0%,
         100% {
             transform: translate3d(
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-vector-4-x-amplitude-override,
-                                12%
-                            )
-                    ),
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-vector-4-y-amplitude-override,
-                                12%
-                            )
-                    ),
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    0%,
                     0
                 )
                 rotate(
-                    calc(
-                        0deg -
-                            var(
-                                --snowui-gradient-motion-vector-4-rotate-amplitude-override,
-                                20deg
-                            )
-                    )
+                    calc(0deg - var(--snowui-gradient-layer-rotate))
                 );
         }
 
-        42% {
+        11% {
             transform: translate3d(
-                    var(
-                        --snowui-gradient-motion-vector-4-x-amplitude-override,
-                        12%
-                    ),
-                    var(
-                        --snowui-gradient-motion-vector-4-y-amplitude-override,
-                        12%
-                    ),
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    calc(0% - var(--snowui-gradient-layer-y)),
+                    0
+                )
+                rotate(0deg);
+        }
+
+        27% {
+            transform: translate3d(
+                    0%,
+                    calc(0% - var(--snowui-gradient-layer-y)),
+                    0
+                )
+                rotate(var(--snowui-gradient-layer-rotate));
+        }
+
+        43% {
+            transform: translate3d(
+                    var(--snowui-gradient-layer-x),
+                    0%,
+                    0
+                )
+                rotate(var(--snowui-gradient-layer-rotate));
+        }
+
+        58% {
+            transform: translate3d(
+                    0%,
+                    var(--snowui-gradient-layer-y),
+                    0
+                )
+                rotate(0deg);
+        }
+
+        74% {
+            transform: translate3d(
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    var(--snowui-gradient-layer-y),
                     0
                 )
                 rotate(
-                    var(
-                        --snowui-gradient-motion-vector-4-rotate-amplitude-override,
-                        20deg
-                    )
+                    calc(0deg - var(--snowui-gradient-layer-rotate))
                 );
         }
 
-        73% {
+        89% {
             transform: translate3d(
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-vector-4-x-amplitude-override,
-                                12%
-                            )
-                    ),
-                    var(
-                        --snowui-gradient-motion-vector-4-y-amplitude-override,
-                        12%
-                    ),
+                    var(--snowui-gradient-layer-x),
+                    var(--snowui-gradient-layer-y),
                     0
                 )
                 rotate(0deg);
@@ -856,69 +1002,63 @@
         0%,
         100% {
             transform: translate3d(
-                    var(
-                        --snowui-gradient-motion-vector-3-x-amplitude-override,
-                        12%
-                    ),
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-vector-3-y-amplitude-override,
-                                12%
-                            )
-                    ),
+                    var(--snowui-gradient-layer-x),
+                    0%,
                     0
                 )
                 scale(1);
         }
 
-        36% {
+        14% {
             transform: translate3d(
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-vector-3-x-amplitude-override,
-                                12%
-                            )
-                    ),
-                    var(
-                        --snowui-gradient-motion-vector-3-y-amplitude-override,
-                        12%
-                    ),
+                    0%,
+                    calc(0% - var(--snowui-gradient-layer-y)),
                     0
                 )
                 scale(
-                    calc(
-                        1 +
-                            var(
-                                --snowui-gradient-motion-vector-3-scale-amplitude-override,
-                                0.25
-                            )
-                    )
+                    calc(1 + var(--snowui-gradient-layer-scale))
                 );
         }
 
-        68% {
+        31% {
             transform: translate3d(
-                    var(
-                        --snowui-gradient-motion-vector-3-x-amplitude-override,
-                        12%
-                    ),
-                    var(
-                        --snowui-gradient-motion-vector-3-y-amplitude-override,
-                        12%
-                    ),
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    calc(0% - var(--snowui-gradient-layer-y)),
                     0
                 )
-                scale(
-                    calc(
-                        1 -
-                            var(
-                                --snowui-gradient-motion-vector-3-scale-amplitude-override,
-                                0.25
-                            )
-                    )
-                );
+                scale(1);
+        }
+
+        47% {
+            transform: translate3d(
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    var(--snowui-gradient-layer-y),
+                    0
+                )
+                scale(calc(1 - var(--snowui-gradient-layer-scale)));
+        }
+
+        62% {
+            transform: translate3d(
+                    var(--snowui-gradient-layer-x),
+                    var(--snowui-gradient-layer-y),
+                    0
+                )
+                scale(1);
+        }
+
+        79% {
+            transform: translate3d(0%, 0%, 0)
+                scale(calc(1 + var(--snowui-gradient-layer-scale)));
+        }
+
+        92% {
+            transform: translate3d(
+                    0%,
+                    calc(0% - var(--snowui-gradient-layer-y)),
+                    0
+                )
+                scale(calc(1 - var(--snowui-gradient-layer-scale)));
         }
     }
 
@@ -926,90 +1066,64 @@
         0%,
         100% {
             transform: translate3d(
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-subtract-x-amplitude-override,
-                                12%
-                            )
-                    ),
-                    var(
-                        --snowui-gradient-motion-subtract-y-amplitude-override,
-                        12%
-                    ),
+                    0%,
+                    var(--snowui-gradient-layer-y),
                     0
                 )
-                scaleX(
-                    calc(
-                        1 +
-                            var(
-                                --snowui-gradient-motion-subtract-deform-amplitude-override,
-                                0.25
-                            )
-                    )
-                )
-                scaleY(
-                    calc(
-                        1 -
-                            var(
-                                --snowui-gradient-motion-subtract-deform-amplitude-override,
-                                0.25
-                            )
-                    )
-                );
+                scaleX(calc(1 + var(--snowui-gradient-layer-scale)))
+                scaleY(calc(1 - var(--snowui-gradient-layer-scale)));
         }
 
-        48% {
+        9% {
             transform: translate3d(
-                    var(
-                        --snowui-gradient-motion-subtract-x-amplitude-override,
-                        12%
-                    ),
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-subtract-y-amplitude-override,
-                                12%
-                            )
-                    ),
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    var(--snowui-gradient-layer-y),
                     0
                 )
-                scaleX(
-                    calc(
-                        1 -
-                            var(
-                                --snowui-gradient-motion-subtract-deform-amplitude-override,
-                                0.25
-                            )
-                    )
-                )
-                scaleY(
-                    calc(
-                        1 +
-                            var(
-                                --snowui-gradient-motion-subtract-deform-amplitude-override,
-                                0.25
-                            )
-                    )
-                );
+                scaleX(1)
+                scaleY(1);
         }
 
-        76% {
+        26% {
             transform: translate3d(
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-subtract-x-amplitude-override,
-                                12%
-                            )
-                    ),
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-subtract-y-amplitude-override,
-                                12%
-                            )
-                    ),
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    calc(0% - var(--snowui-gradient-layer-y)),
+                    0
+                )
+                scaleX(calc(1 - var(--snowui-gradient-layer-scale)))
+                scaleY(calc(1 + var(--snowui-gradient-layer-scale)));
+        }
+
+        44% {
+            transform: translate3d(
+                    var(--snowui-gradient-layer-x),
+                    calc(0% - var(--snowui-gradient-layer-y)),
+                    0
+                )
+                scaleX(1)
+                scaleY(1);
+        }
+
+        57% {
+            transform: translate3d(
+                    var(--snowui-gradient-layer-x),
+                    var(--snowui-gradient-layer-y),
+                    0
+                )
+                scaleX(calc(1 + var(--snowui-gradient-layer-scale)))
+                scaleY(calc(1 - var(--snowui-gradient-layer-scale)));
+        }
+
+        73% {
+            transform: translate3d(0%, 0%, 0)
+                scaleX(calc(1 - var(--snowui-gradient-layer-scale)))
+                scaleY(calc(1 + var(--snowui-gradient-layer-scale)));
+        }
+
+        91% {
+            transform: translate3d(
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    0%,
                     0
                 )
                 scaleX(1)
@@ -1021,84 +1135,68 @@
         0%,
         100% {
             transform: translate3d(
-                    var(
-                        --snowui-gradient-motion-subtract-2-x-amplitude-override,
-                        12%
-                    ),
-                    var(
-                        --snowui-gradient-motion-subtract-2-y-amplitude-override,
-                        12%
-                    ),
+                    var(--snowui-gradient-layer-x),
+                    0%,
                     0
                 )
-                rotate(
-                    var(
-                        --snowui-gradient-motion-subtract-2-rotate-amplitude-override,
-                        20deg
-                    )
-                )
-                scale(
-                    calc(
-                        1 +
-                            var(
-                                --snowui-gradient-motion-subtract-2-scale-amplitude-override,
-                                0.25
-                            )
-                    )
-                );
+                rotate(var(--snowui-gradient-layer-rotate))
+                scale(calc(1 + var(--snowui-gradient-layer-scale)));
         }
 
-        31% {
+        16% {
             transform: translate3d(
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-subtract-2-x-amplitude-override,
-                                12%
-                            )
-                    ),
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-subtract-2-y-amplitude-override,
-                                12%
-                            )
-                    ),
+                    var(--snowui-gradient-layer-x),
+                    calc(0% - var(--snowui-gradient-layer-y)),
                     0
                 )
-                rotate(
-                    calc(
-                        0deg -
-                            var(
-                                --snowui-gradient-motion-subtract-2-rotate-amplitude-override,
-                                20deg
-                            )
-                    )
-                )
-                scale(
-                    calc(
-                        1 -
-                            var(
-                                --snowui-gradient-motion-subtract-2-scale-amplitude-override,
-                                0.25
-                            )
-                    )
-                );
+                rotate(0deg)
+                scale(1);
         }
 
-        64% {
+        34% {
             transform: translate3d(
-                    var(
-                        --snowui-gradient-motion-subtract-2-x-amplitude-override,
-                        12%
-                    ),
-                    calc(
-                        0% -
-                            var(
-                                --snowui-gradient-motion-subtract-2-y-amplitude-override,
-                                12%
-                            )
-                    ),
+                    0%,
+                    calc(0% - var(--snowui-gradient-layer-y)),
+                    0
+                )
+                rotate(calc(0deg - var(--snowui-gradient-layer-rotate)))
+                scale(calc(1 - var(--snowui-gradient-layer-scale)));
+        }
+
+        49% {
+            transform: translate3d(
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    0%,
+                    0
+                )
+                rotate(0deg)
+                scale(calc(1 + var(--snowui-gradient-layer-scale)));
+        }
+
+        63% {
+            transform: translate3d(
+                    0%,
+                    var(--snowui-gradient-layer-y),
+                    0
+                )
+                rotate(var(--snowui-gradient-layer-rotate))
+                scale(1);
+        }
+
+        81% {
+            transform: translate3d(
+                    var(--snowui-gradient-layer-x),
+                    var(--snowui-gradient-layer-y),
+                    0
+                )
+                rotate(calc(0deg - var(--snowui-gradient-layer-rotate)))
+                scale(calc(1 - var(--snowui-gradient-layer-scale)));
+        }
+
+        93% {
+            transform: translate3d(
+                    calc(0% - var(--snowui-gradient-layer-x)),
+                    calc(0% - var(--snowui-gradient-layer-y)),
                     0
                 )
                 rotate(0deg)

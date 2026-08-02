@@ -1,6 +1,6 @@
 # Gradient 矢量渐变
 
-> **版本**: v2.10.0
+> **版本**: v2.11.0
 > **职责**: 以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
 > **包归属**: OSS
 
@@ -21,7 +21,7 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 - 普通 Gradient 默认开启四层 `15s` 闭环动效；Avatar fallback 常态关闭基础形变，可通过 `motion` / `gradientMotion` 显式常驻开启，或在 hover 期间按需运行水波形变。
 - 作为 `Avatar fallback` 渲染时，Gradient 根据 Avatar 传入的 `seed` 稳定选择六种配色；若 seed 本身是 `blue / cyan / green / red / orange / purple`，则直接命中对应配色。
 - Avatar hover 状态由 Avatar 的统一 `.snowui-media-hoverable` 协议提供；Gradient 自己排除当前 variant，将其余五种 Gradient 的中心主色按实例稳定打乱，并以双层同色 `overlay` 持续交叉过渡。
-- 头像 hover 以缓存静态图为底，按需创建一份实时 SVG 和五色 × 两层 HTML 纯色 Overlay；实时 SVG 四层采用 `6.4s / 7.2s / 8.4s / 6.8s` 的独立线性周期、负延迟错峰和增强幅度持续流动，颜色循环仍为 `10s`。两者以 `1s` 淡入、`0.5s` 淡出，离开后连同四组 filter 一起销毁。
+- 头像 hover 以缓存静态图为底，按需创建一份实时 SVG 和五色 × 两层 HTML 纯色 Overlay；实时 SVG 四层采用 `6.4s / 7.2s / 8.4s / 6.8s` 的独立线性周期、七段非对称路径和增强幅度持续流动。每次进入从六组相位 / 方向配置中随机选择且不与上次重复，颜色循环仍为 `10s`。两者以 `1s` 淡入、`0.5s` 淡出，离开后连同四组 filter 一起销毁。
 - `prefers-reduced-motion: reduce` 下停止内部循环并恢复未经 transform 的静态设计基线。
 
 ## API
@@ -118,9 +118,9 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 - 动画只使用 `translate3d + rotate + scale / scaleX / scaleY`，并仅在 `motion` 开启时为这四个活动图层使用 `will-change: transform`。
 - 四个 `feGaussianBlur` 的标准差、滤镜区域、SVG 路径与固定颜色在循环中保持不变。
 - Avatar 未 hover 时不创建实时 SVG、filter 或颜色 Overlay；hover 时使用一份实时 SVG 与五种候选色 × 两层结构，离开0.5秒淡出后全部卸载。
-- 默认 Avatar hover 的四层周期分别为 `6.4s / 7.2s / 8.4s / 6.8s`，使用线性时间函数、独立负延迟、`18%` 位移、`30deg` 旋转与 `32%` 缩放 / 形变幅度，避免多层同步减速造成的视觉停顿。
+- 默认 Avatar hover 的四层周期分别为 `6.4s / 7.2s / 8.4s / 6.8s`，使用线性时间函数、七个不等时非镜像途经点、独立负延迟、`18%` 位移、`30deg` 旋转与 `32%` 缩放 / 形变幅度，避免多层同步减速或沿原路返回。
 - 原始五层不动画 `fill`、`mix-blend-mode`、`feBlend` 或 Gaussian Blur；Avatar hover 只在五组双层同色纯色 Overlay 间交叉动画 opacity。每层使用独立 HTML 合成元素执行 `overlay`，确保 backdrop 是已经完整渲染的 Gradient 图形。
-- 颜色顺序仅在组件求值时由 seed 与实例 ID 稳定打乱；所有逐帧运动都由 CSS 完成。JavaScript 只在 hover 边界使用一次 `requestAnimationFrame` 分离挂载与淡入，并以退出计时器在0.5秒淡出后回收 DOM；不使用 JavaScript 动画循环、Canvas 或 ResizeObserver。
+- 颜色顺序仅在组件求值时由 seed 与实例 ID 稳定打乱；每次 hover 只用一次随机数选择与上次不同的六组运动相位 / 方向配置，所有逐帧运动仍由 CSS 完成。JavaScript 只在 hover 边界使用一次 `requestAnimationFrame` 分离挂载与淡入，并以退出计时器在0.5秒淡出后回收 DOM；不使用 JavaScript 动画循环、Canvas 或 ResizeObserver。
 - `0%` 与 `100%` 使用完全相同的 transform，保证持续循环时不跳帧。
 - 图层原始几何和 filter region 均大于画布；动效幅度限制在安全范围内并继续由固定 clipPath 裁切。
 
@@ -154,6 +154,12 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.11.0 (2026-08-03)
+
+- 四层 transform 从2–3个姿态扩展为各自七个不等时、非镜像途经点，闭环末段不再沿上一段原路返回。
+- 新增六组相位 / 方向组合；每次 Avatar hover 随机选择且避开上一次组合，使相同头像重复进入时也不会从同一状态、同一方向开始。
+- 随机只发生在 hover 边界；活动图层数量、filter 数量、CSS逐帧执行方式和退出回收策略保持不变。
 
 ### v2.10.0 (2026-08-02)
 
