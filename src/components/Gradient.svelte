@@ -1,6 +1,6 @@
 <!--
   Gradient 矢量渐变组件
-  v2.8.6
+  v2.9.0
 
   职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
   文档：./Gradient.md
@@ -74,6 +74,18 @@
             center: "#F935FC",
         },
     };
+
+    function createStaticGradientSource(palette: GradientPalette) {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360" preserveAspectRatio="none"><defs><filter id="v4" x="-245.611" y="-286.49" width="921.128" height="796.487" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="b"/><feBlend mode="normal" in="SourceGraphic" in2="b" result="s"/><feGaussianBlur stdDeviation="60"/></filter><filter id="v3" x="-29.5047" y="-133.435" width="624.294" height="621.927" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="b"/><feBlend mode="normal" in="SourceGraphic" in2="b" result="s"/><feGaussianBlur stdDeviation="60"/></filter><filter id="s1" x="-16.1127" y="-99.2028" width="555.729" height="639.235" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="b"/><feBlend mode="normal" in="SourceGraphic" in2="b" result="s"/><feGaussianBlur stdDeviation="40"/></filter><filter id="s2" x="-93.4444" y="-230.518" width="734.724" height="616.471" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feFlood flood-opacity="0" result="b"/><feBlend mode="normal" in="SourceGraphic" in2="b" result="s"/><feGaussianBlur stdDeviation="50"/></filter><clipPath id="c"><rect width="360" height="360"/></clipPath></defs><g clip-path="url(#c)"><rect width="360" height="360" fill="${palette.background}"/><g filter="url(#v4)"><ellipse cx="214.952" cy="111.754" rx="384.575" ry="213.162" transform="rotate(-146.037 214.952 111.754)" fill="${palette.vector4}"/></g><g filter="url(#v3)"><ellipse cx="282.642" cy="177.528" rx="223.026" ry="153.731" transform="rotate(-135.496 282.642 177.528)" fill="${palette.vector3}"/></g><g filter="url(#s1)"><path d="M63.8873 -19.2028C116.398 1.25526 169.035 25.0829 221.278 52.3178C285.966 86.04 346.709 123.243 403 163.081C584.414 291.473 271.178 628.302 278.61 357.5C282.932 200.002 197.822 55.4726 63.8873 -19.2028Z" fill="${palette.subtract}"/></g><g filter="url(#s2)"><path d="M417.77 -97.6118C594.82 20.5018 571.194 414.723 412.576 243.5C361.565 188.436 300.326 136.413 230.397 90.6631C173.62 53.5181 115.35 23.2776 57.5 0.00434098C-138.842 -78.9842 286.515 -185.174 417.77 -97.6118Z" fill="${palette.subtract2}"/></g></g></svg>`;
+        return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    }
+
+    const STATIC_GRADIENT_SOURCES = Object.fromEntries(
+        Object.entries(GRADIENT_PALETTES).map(([variant, palette]) => [
+            variant,
+            createStaticGradientSource(palette),
+        ]),
+    ) as Record<GradientVariant, string>;
 
     const GRADIENT_VARIANTS = Object.keys(
         GRADIENT_PALETTES,
@@ -208,6 +220,10 @@
     const palette = $derived(
         GRADIENT_PALETTES[resolvedVariant] ?? GRADIENT_PALETTES.blue,
     );
+    const staticAvatarSource = $derived(
+        STATIC_GRADIENT_SOURCES[resolvedVariant] ??
+            STATIC_GRADIENT_SOURCES.blue,
+    );
     const avatarColorCycle = $derived(
         isAvatarVariant
             ? resolveAvatarColorCycle(resolvedVariant, seed, instanceId)
@@ -310,7 +326,17 @@
     onpointerleave={handlePointerLeave}
     {...rest}
 >
-    <svg
+    {#if isAvatarVariant && !motionEnabled}
+        <img
+            class="snowui-gradient-svg snowui-gradient-static-image"
+            src={staticAvatarSource}
+            alt=""
+            decoding="async"
+            draggable="false"
+            aria-hidden="true"
+        />
+    {:else}
+        <svg
         class="snowui-gradient-svg"
         viewBox="0 0 360 360"
         preserveAspectRatio="none"
@@ -455,11 +481,12 @@
                 />
             </g>
         </g>
-    </svg>
+        </svg>
+    {/if}
     {#if isAvatarVariant && avatarOverlayMounted}
         <div class="snowui-gradient-avatar-overlay" aria-hidden="true">
             {#each avatarColorCycle as targetVariant, index}
-                {#each [0, 1, 2, 3] as overlayLayer}
+                {#each [0, 1] as overlayLayer}
                     <div
                         class="snowui-gradient-avatar-color-pass"
                         data-color={targetVariant}
@@ -518,6 +545,10 @@
         height: 100%;
         pointer-events: none;
         user-select: none;
+    }
+
+    :global(:where(.snowui-gradient-static-image)) {
+        object-fit: fill;
     }
 
     :global(:where(.snowui-gradient-avatar)) {
@@ -588,7 +619,7 @@
         opacity: 0;
         mix-blend-mode: overlay;
         transition: opacity
-            var(--snowui-gradient-avatar-hover-entry-duration, 0.5s)
+            var(--snowui-gradient-avatar-hover-exit-duration, 0.5s)
             var(
                 --snowui-gradient-avatar-hover-entry-easing,
                 cubic-bezier(0.4, 0, 0.2, 1)
@@ -616,6 +647,10 @@
                 .snowui-gradient-avatar-color-pass
         ) {
         opacity: 1;
+        transition-duration: var(
+            --snowui-gradient-avatar-hover-entry-duration,
+            1s
+        );
     }
 
     :global(

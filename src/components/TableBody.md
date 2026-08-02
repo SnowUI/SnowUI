@@ -6,7 +6,7 @@
 - `parts.Spinner`：配置已有数据加载状态的 Spinner。
 - parts 不递归进入 TableCell 内部；更深层配置必须通过对应子组件自己的 parts。
 
-> **版本**: v1.3.0  
+> **版本**: v1.3.1
 > **职责**: Table 的 `<tbody>` 语义容器。
 
 ```svelte
@@ -56,6 +56,7 @@ DataTable 在 `loading` 或 `refreshing` 且当前存在可见 rows 时，通过
 
 ## Changelog
 
+- 2026-08-02：v1.3.1，连续 hover 改用 direct 几何模式，移除长表格逐行 ResizeObserver 和 pointermove 全量行扫描。
 - 2026-06-30：v1.3.0，明确手动按钮仍可作为 TableBody child；auto 模式哨兵改由 DataTable 根层内部管理，避免向原生 tbody 注入观察器结构。
 - 2026-06-30：v1.2.0，新增 `loadingSpinner`：已有数据加载时追加跨列居中的通用 Spinner 行。
 - 2026-06-30：v1.1.1，移除独立 `skeletonRows` 配置；骨架行数继承 DataTable `pageSize`，无法读取时回退 10 行。
@@ -65,4 +66,6 @@ DataTable 在 `loading` 或 `refreshing` 且当前存在可见 rows 时，通过
 
 `continuousHover` 默认 `true`。视觉层挂在合法的 Table viewport 中，但测量和
 交互由 `tbody` 管理；它只跟随真实数据行，跳过 Skeleton 与 loading-spinner 行。
-关闭后恢复 TableRow / TableCell 原有逐行 hover 背景。
+Table 行没有间隙，因此使用 direct 几何模式：pointer 直接命中当前行，不登记逐行
+ResizeObserver，也不在 pointermove 时扫描全部行。关闭后恢复 TableRow / TableCell
+原有逐行 hover 背景。

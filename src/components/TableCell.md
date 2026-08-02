@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
 - Skeleton 是加载基础设施，不作为公开 part。
 
-> **版本**: v1.7.1
+> **版本**: v1.7.2
 > **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。
 
 默认单元格高度为 40px，内边距为上下 8px、左右 12px；首尾单元格也保持相同的 12px 外缘 padding。Table 使用原生相邻列布局，列与列之间没有额外 gap；视觉间距来自左右 cell padding。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。
@@ -64,6 +64,7 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 
 ## Changelog
 
+- 2026-08-02：v1.7.2，selection / actions 覆盖块直接消费响应式选中状态，删除每个角色单元格的 `MutationObserver`；长表格空闲时不再常驻数百个属性观察器。
 - 2026-07-08：v1.7.1，actions 按钮列源码默认 gap 从 `--gap-3` 修正为 `--gap-2`（8px），与文档和多 Icon 按钮排列规范保持一致。
 - 2026-07-01：v1.7.0，静态 TableCell 文本关闭逐单元格 MutationObserver；overlay 角色块改为仅在行 hover、聚焦、选中或强制 hover 时激活尺寸观察和滚动定位，降低大 pageSize 翻页时的挂载成本。
 - 2026-06-30：v1.6.0，DataTable 新行 opacity 渐显迁移到普通 TableCell；selection/actions overlay 排除在内部渐显之外，修复加载期间 hover Checkbox 偶尔近乎不可见。

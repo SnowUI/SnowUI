@@ -46,6 +46,7 @@
             selector: ":scope > .snowui-table-row",
             layerClass: "snowui-table-continuous-hover-layer",
             axis: "y",
+            geometryMode: "direct",
             enabled: continuousHover,
             overlayHost,
         });

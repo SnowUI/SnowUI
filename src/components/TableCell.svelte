@@ -94,6 +94,7 @@
     $effect(() => {
         const node = roleOverlayElement;
         if (!node || resolvedRoleLayout !== "overlay" || (!isSelectionRole && !isActionsRole)) return;
+        const selected = isSelected;
         let frame = 0;
         const rowElement = node.closest<HTMLElement>(".snowui-table-row");
         const layoutElement = rowElement?.closest<HTMLElement>(".snowui-data-table")
@@ -155,8 +156,9 @@
         };
         const shouldStayActive = () =>
             Boolean(
+                selected ||
                 rowElement?.matches(
-                    ':hover, [data-force-hover="true"], [data-selected="true"]',
+                    ':hover, [data-force-hover="true"]',
                 ) || rowElement?.contains(document.activeElement),
             );
         const deactivate = () => {
@@ -178,18 +180,8 @@
         rowElement?.addEventListener("pointerleave", scheduleDeactivate);
         rowElement?.addEventListener("focusin", activate);
         rowElement?.addEventListener("focusout", scheduleDeactivate);
-        const selectedObserver = rowElement
-            ? new MutationObserver(() => {
-                if (shouldStayActive()) activate();
-                else scheduleDeactivate();
-            })
-            : undefined;
-        selectedObserver?.observe(rowElement!, {
-            attributes: true,
-            attributeFilter: ["data-selected"],
-        });
         // 空闲行不做同步布局测量；hover / focus / selected / force-hover 时再激活。
-        // 批量选择会先触发 data-selected observer，activate() 在控件显现前写入坐标。
+        // selected 直接消费 Svelte 派生状态，不再为每个角色单元格创建 MutationObserver。
         // 激活后额外监听 DataTable/Table 容器尺寸，覆盖内置工具栏出现/消失导致的整表位移。
         if (shouldStayActive()) activate();
         return () => {
@@ -202,7 +194,6 @@
             rowElement?.removeEventListener("pointerleave", scheduleDeactivate);
             rowElement?.removeEventListener("focusin", activate);
             rowElement?.removeEventListener("focusout", scheduleDeactivate);
-            selectedObserver?.disconnect();
             reset();
         };
     });

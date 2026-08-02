@@ -31,7 +31,7 @@ export const examples = [
         name: "A5: 覆盖式角色单元格",
         code: `A5
 <Table roleLayout="overlay" selectedRowIds={["one"]}><TableBody><TableRow rowId="one"><TableCell as="selection" /><TableCell>SnowUI</TableCell><TableCell as="actions"><Button bare>更多</Button></TableCell></TableRow></TableBody></Table>`,
-        expected: { render: "selection/actions 仍保持合法 td。", layout: "角色 td 宽度归零，覆盖块 sticky 到行左右边缘并用透明模糊渐变柔化后方内容。", interaction: "已选行 Checkbox 保持显示，actions 仍只在行 hover 时显示。", performance: "选择状态来自 rowId + Table Context。", responsive: "不改变普通内容列宽。" },
+        expected: { render: "selection/actions 仍保持合法 td。", layout: "角色 td 宽度归零，覆盖块 sticky 到行左右边缘并用透明模糊渐变柔化后方内容。", interaction: "已选行 Checkbox 保持显示，actions 仍只在行 hover 时显示。", performance: "选择状态直接来自 rowId + Table Context，不创建逐单元格 MutationObserver。", responsive: "不改变普通内容列宽。" },
         logic: ["Selection", "Actions", "OverlayRoleLayout"],
     },
     {

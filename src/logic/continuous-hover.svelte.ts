@@ -10,6 +10,8 @@ export interface ContinuousHoverOptions {
     overlayHost?: HTMLElement;
     /** 是否让 data-active="true" 项驱动同一视觉层（Listbox 键盘高亮场景）。 */
     followActive?: boolean;
+    /** 连续排列且 pointer 总能直接命中 item 时，可关闭全量几何缓存与逐项 ResizeObserver。 */
+    geometryMode?: "all" | "direct";
 }
 
 type MeasuredItem = {
@@ -34,10 +36,12 @@ export class ContinuousHoverController {
     private overlayHost?: HTMLElement;
     private layer?: HTMLDivElement;
     private selector = "";
+    private closestSelector = "";
     private layerClass = "";
     private axis: ContinuousHoverAxis = "xy";
     private enabled = true;
     private followActive = false;
+    private geometryMode: "all" | "direct" = "all";
     private activeItem?: HTMLElement;
     private items: HTMLElement[] = [];
     private measuredItems: MeasuredItem[] = [];
@@ -56,10 +60,15 @@ export class ContinuousHoverController {
         this.host = host;
         this.overlayHost = options.overlayHost ?? host;
         this.selector = options.selector;
+        this.closestSelector = options.selector.replace(
+            /^:scope\s*>\s*/,
+            "",
+        );
         this.layerClass = options.layerClass ?? "";
         this.axis = options.axis ?? "xy";
         this.enabled = options.enabled ?? true;
         this.followActive = options.followActive ?? false;
+        this.geometryMode = options.geometryMode ?? "all";
 
         if (this.enabled) this.ensureLayer();
 
@@ -207,14 +216,15 @@ export class ContinuousHoverController {
 
     private resolveItem(target: EventTarget | null): HTMLElement | undefined {
         if (!(target instanceof Element) || !this.host) return undefined;
-        const item = target.closest<HTMLElement>(this.selector);
-        return item && this.host.contains(item) && isEligibleItem(item)
+        const item = target.closest<HTMLElement>(this.closestSelector);
+        return item && this.items.includes(item) && isEligibleItem(item)
             ? item
             : undefined;
     }
 
     private updateFromPoint(x: number, y: number) {
         if (!this.enabled || !this.host) return;
+        if (this.geometryMode === "direct") return this.clear();
         if (this.measuredItems.length === 0) return this.clear();
 
         let nearest: HTMLElement | undefined;
@@ -335,7 +345,7 @@ export class ContinuousHoverController {
                     this.moveTo(directItem, directItem.getBoundingClientRect());
                 } else {
                     // 间隙命中才扫描集合，并在扫描前刷新位置，避免祖先位移未触发 ResizeObserver。
-                    this.measureItems();
+                    if (this.geometryMode === "all") this.measureItems();
                     this.updateFromPoint(pointer.x, pointer.y);
                 }
                 return;
@@ -359,14 +369,22 @@ export class ContinuousHoverController {
 
         this.items = nextItems;
         this.itemResizeCleanups.splice(0).forEach((cleanup) => cleanup());
-        for (const item of this.items) {
-            this.itemResizeCleanups.push(
-                resizeManager.watch(item, () => this.requestGeometryRefresh()),
-            );
+        if (this.geometryMode === "all") {
+            for (const item of this.items) {
+                this.itemResizeCleanups.push(
+                    resizeManager.watch(item, () =>
+                        this.requestGeometryRefresh(),
+                    ),
+                );
+            }
         }
     }
 
     private measureItems() {
+        if (this.geometryMode === "direct") {
+            this.measuredItems = [];
+            return;
+        }
         this.measuredItems = this.items
             .filter((item) => item.isConnected && isEligibleItem(item))
             .map((element) => ({
