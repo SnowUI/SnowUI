@@ -265,7 +265,7 @@
         width: calc(var(--size-3, 0.75rem) / 6);
     }
     :global(:where(.snowui-table-head[data-table-variant="striped"])) { border-bottom-color: transparent; }
-    :global(:where(.snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"]):hover), .snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"])[data-force-hover="true"])) .snowui-table-head:not([data-table-variant="striped"])) { border-bottom-color: transparent; }
+    :global(:where(.snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"]):hover), .snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"])[data-active="true"]), .snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"])[data-force-hover="true"])) .snowui-table-head:not([data-table-variant="striped"])) { border-bottom-color: transparent; }
     /* 表头内容渐隐过渡（mask-image），触发条件见下方规则。 */
     :global(:where(.snowui-table-head-content)) {
         transition:

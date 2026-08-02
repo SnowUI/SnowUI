@@ -799,7 +799,7 @@
     /* --snowui-table-role-overlay-blur-lg-override: ; */ /* default: .875rem */
     /* --snowui-table-role-overlay-tint-override: ; */ /* default: --background-1 */
     /* --snowui-table-role-overlay-tint-opacity-override: ; */ /* default: .1% */
-    /* --snowui-table-row-hover-background-override: ; */ /* default: --black-4 */
+    /* --snowui-table-row-hover-background-override: ; */ /* 连续 hover 移动层 + TableRow active 持久背景；default: --black-4 */
     /* --snowui-table-row-radius-override: ; */ /* default: --radius-3 */
     /* --snowui-table-body-skeleton-width-override: ; */ /* default: 54%–76% staggered by row and column */
     /* --snowui-table-head-padding-override: ; */ /* default: --padding-2 --padding-3 */
