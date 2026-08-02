@@ -1,6 +1,6 @@
 <!--
  Avatar 头像组件
-  v2.11.0
+  v2.11.1
 
  1. 核心能力 (Features):
     - 多样形态: 支持 circular, rounded, square 三种形状
@@ -74,7 +74,7 @@
         class: className = "",
         style: userStyle = "",
         renderHints: userRenderHints = undefined,
-        children,
+        children: badgeChildren,
         ...rest
     }: Props = $derived(
         mergeComponentPartProps(inheritedAvatarPart.current, explicitProps),
@@ -216,7 +216,7 @@
     // Mask Generation
     // Uses standard CSS Mask with calc() strings.
     let maskStyle = $derived.by(() => {
-        if (!children || badgeType !== "dot") return "";
+        if (!badgeChildren || badgeType !== "dot") return "";
 
         // 1. Dot 尺寸（按头像容器尺寸等比）
         const dotSize = `calc(var(--snowui-avatar-size-step) * var(--snowui-avatar-container-unit-factor) * ${DOT_SIZE_RATIO})`;
@@ -331,7 +331,7 @@
     {...cleanRest}
 >
     {#snippet children()}
-        <!-- Container applies mask if children exist (assuming children = badge) -->
+        <!-- Container applies mask if badge children exist -->
         <div
             class={[
                 "snowui-avatar-container",
@@ -478,8 +478,8 @@
             {/if}
         </div>
         <!-- Children (Badge/Icon) rendered OUTSIDE masked container -->
-        {#if children}
-            {@render children({})}
+        {#if badgeChildren}
+            {@render badgeChildren({})}
         {/if}
     {/snippet}
 </Frame>
@@ -498,6 +498,7 @@
         box-sizing: border-box;
         font-size: var(--text-16);
         line-height: 1;
+        vertical-align: middle;
         --snowui-avatar-size-step: calc(var(--size-4) / 4);
         --snowui-avatar-container-unit-factor: 4;
         --snowui-avatar-text-unit-factor: 0.375;
