@@ -415,6 +415,9 @@
     /* Avatar */
     /* --snowui-avatar-size-override: ; */               /* 整体尺寸（尺寸 px，默认值见组件源码） */
     /* --snowui-avatar-default-icon-size-override: ; */  /* 默认图标尺寸（尺寸 px，默认值见组件源码） */
+    /* --snowui-avatar-hover-entry-duration: ; */        /* alpha 单色叠加入口 / 退出时长（默认 0.5s） */
+    /* --snowui-avatar-hover-entry-easing: ; */          /* alpha 单色叠加缓动（默认 cubic-bezier(0.4, 0, 0.2, 1)） */
+    /* --snowui-avatar-hover-color-opacity: ; */         /* alpha 单色叠加峰值（默认 0.58） */
 
     /* GradientMotion */
     /* --snowui-gradient-motion-size-override: ; */    /* 整体尺寸（默认值见组件源码） */
@@ -439,6 +442,10 @@
     /* --snowui-gradient-motion-subtract-2-y-amplitude-override: ; */ /* Subtract 2 Y 位移幅度（默认 12%） */
     /* --snowui-gradient-motion-subtract-2-rotate-amplitude-override: ; */ /* Subtract 2 旋转幅度（默认 20deg） */
     /* --snowui-gradient-motion-subtract-2-scale-amplitude-override: ; */ /* Subtract 2 缩放幅度（默认 0.25，即 25%） */
+    /* --snowui-gradient-avatar-hover-entry-duration: ; */ /* Avatar 多色叠加入口 / 退出时长（默认 0.5s） */
+    /* --snowui-gradient-avatar-hover-entry-easing: ; */ /* Avatar 多色叠加缓动（默认 cubic-bezier(0.4, 0, 0.2, 1)） */
+    /* --snowui-gradient-avatar-hover-color-duration: ; */ /* Avatar 五色循环时长（默认 10s） */
+    /* --snowui-gradient-avatar-hover-color-opacity: ; */ /* Avatar 单个 Overlay pass 峰值（认可版本默认 0.58） */
 
     /* SnowUILogo */
     /* --snowui-snow-ui-logo-icon-size-override: ; */       /* 图标尺寸（默认 horizontal/icon 28px，vertical 64px） */

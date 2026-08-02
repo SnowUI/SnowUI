@@ -1,6 +1,6 @@
 <!--
  Avatar 头像组件
-  v2.4.19
+  v2.9.0
 
  1. 核心能力 (Features):
     - 多样形态: 支持 circular, rounded, square 三种形状
@@ -21,6 +21,7 @@
     import { setContext, type Component, type Snippet } from "svelte";
     import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
+    import Gradient from "./Gradient.svelte";
     import {
         AVATAR_CONTEXT_KEY,
         getSizeContext,
@@ -32,11 +33,28 @@
         useComponentPart,
     } from "../logic/component-parts.svelte";
 
+    type AvatarHoverColor = {
+        name: "blue" | "cyan" | "green" | "red" | "orange" | "purple";
+        value: string;
+    };
+
+    type AvatarVariant = "default" | "empty";
+
+    const AVATAR_HOVER_COLORS: AvatarHoverColor[] = [
+        { name: "blue", value: "#6560FF" },
+        { name: "cyan", value: "#00A5BE" },
+        { name: "green", value: "#16B335" },
+        { name: "red", value: "#FC3551" },
+        { name: "orange", value: "#FF6C04" },
+        { name: "purple", value: "#F935FC" },
+    ];
+
     interface Props extends FrameProps {
         src?: string | Component;
         size?: ResourceSize;
         fallback?: Component;
         fallbackText?: string;
+        variant?: AvatarVariant;
         children?: Snippet;
         badgePosition?: "top" | "bottom";
         [key: string]: any;
@@ -49,6 +67,7 @@
         size = undefined,
         fallback = undefined,
         fallbackText = undefined,
+        variant = "default",
         badgePosition = "top",
         class: className = "",
         style: userStyle = "",
@@ -115,43 +134,25 @@
         }
     });
 
-    // 1.1 首字母回退规则（无图片时）
+    const avatarInstanceId = $props.id();
+    const avatarColorFilterId = `snowui-avatar-color-${avatarInstanceId}`;
+
+    // 名称只用于默认 Gradient seed，不再生成首字母。
     const labelSource = $derived(
         (rest["aria-label"] || rest["data-name"] || rest.title || "") as string,
     );
     const explicitFallbackText = $derived(
         typeof fallbackText === "string" ? fallbackText.trim() : "",
     );
+    let avatarHoverColorIndex = $state(0);
     const hasExplicitFallbackText = $derived(explicitFallbackText.length > 0);
-    const initials = $derived.by(() => {
-        if (hasExplicitFallbackText) return "";
-        const text = labelSource.trim();
-        if (!text) return "";
-        const parts = text.split(/\s+/).filter(Boolean);
-        const first = parts[0]?.[0] || "";
-        return first.toUpperCase().slice(0, 1);
-    });
-
-    const secondaryColors = [
-        "var(--secondary-purple, #7c3aed)",
-        "var(--secondary-indigo, #4f46e5)",
-        "var(--secondary-blue, #3b82f6)",
-        "var(--secondary-cyan, #06b6d4)",
-        "var(--secondary-mint, #10b981)",
-        "var(--secondary-green, #22c55e)",
-        "var(--secondary-yellow, #eab308)",
-        "var(--secondary-orange, #f97316)",
-        "var(--secondary-red, #ef4444)",
-    ];
-    const initialsBg = $derived.by(() => {
-        if (!initials) return "";
-        let hash = 0;
-        for (let i = 0; i < labelSource.length; i += 1) {
-            hash = (hash * 31 + labelSource.charCodeAt(i)) | 0;
-        }
-        const index = Math.abs(hash) % secondaryColors.length;
-        return secondaryColors[index];
-    });
+    const defaultGradientSeed = $derived(labelSource || avatarInstanceId);
+    const resolvedFallback = $derived(
+        fallback ??
+            (variant === "default" && !hasExplicitFallbackText
+                ? Gradient
+                : undefined),
+    );
 
     // State for Component Types
     let badgeType = $state<"dot" | "content" | "icon" | undefined>(undefined);
@@ -252,11 +253,13 @@
 
     // 判断是否显示彩色背景（图片或Initials）
     let hasComponentFallback = $derived(
-        !!fallback && !(imageStatus === "loaded" && src),
+        !!resolvedFallback && !(imageStatus === "loaded" && src),
     );
     let isColored = $derived(!!(imageStatus === "loaded" && src) || hasComponentFallback);
     let isImageMode = $derived(!!(imageStatus === "loaded" && src));
-    let hasInitials = $derived(!!initials && !isImageMode && !hasComponentFallback);
+    const hasGradientFallback = $derived(
+        hasComponentFallback && resolvedFallback === Gradient,
+    );
 
     // Container Style (Background, Mask, etc.)
     let containerStyle = $derived.by(() => {
@@ -276,16 +279,31 @@
             alt: _alt,
             fallback: _fallback,
             delayMs: _delayMs,
-            variant: _variant,
+            onpointerenter: _onpointerenter,
             ...filtered
         } = rest as Record<string, any>;
         return filtered;
     });
-    // Avatar 默认是点击语义组件;非 disabled 时挂 .snowui-media-hoverable(layout.css)
-    // 一次性获得 cursor: pointer + 子层 hover 反馈(图片 brightness 压暗 / initials 背景
-    // brightness 压暗 / 空 fallback 背景色加深),不再在组件内重复定义 hover 选择器。
-    // disabled 时由 .snowui-disabled / [data-disabled] / :disabled 全局规则把 cursor 重置为 default。
+    // Avatar 默认是点击语义组件；非 disabled 时由组件自身提供 cursor 与单层随机颜色 Overlay hover。
+    // 不再消费共享 media-hoverable brightness，避免默认颜色叠加被二次压暗。
     const isInteractive = $derived(!cleanRest.disabled);
+    const usesAvatarColorFilter = $derived(
+        isInteractive &&
+            !hasGradientFallback &&
+            (isImageMode || hasComponentFallback),
+    );
+
+    function handlePointerEnter(event: PointerEvent) {
+        if (isInteractive) {
+            avatarHoverColorIndex = Math.floor(
+                Math.random() * AVATAR_HOVER_COLORS.length,
+            );
+        }
+        const userHandler = rest.onpointerenter as
+            | ((event: PointerEvent) => void)
+            | undefined;
+        userHandler?.(event);
+    }
 </script>
 
 <Frame
@@ -294,16 +312,18 @@
     enableScaleObserver={false}
     class={[
         "snowui-avatar",
-        isInteractive ? "snowui-media-hoverable" : "",
-        isInteractive && (isImageMode || hasComponentFallback) ? "snowui-media-hoverable-has-visual" : "",
-        isInteractive && hasInitials && !isImageMode ? "snowui-media-hoverable-tinted-bg" : "",
+        isInteractive ? "snowui-avatar-interactive" : "",
+        isInteractive && hasGradientFallback
+            ? "snowui-media-hoverable snowui-media-hoverable-has-visual"
+            : "",
         isImageMode ? "snowui-avatar-image-mode" : "",
-        hasInitials ? "snowui-avatar-has-initials" : "",
+        variant === "empty" ? "snowui-avatar-empty" : "",
         className,
     ]
         .filter(Boolean)
         .join(" ")}
     data-disabled={cleanRest.disabled ? "true" : undefined}
+    onpointerenter={handlePointerEnter}
     style={rootStyleFinal}
     renderHints={avatarRenderHints}
     {...cleanRest}
@@ -314,23 +334,69 @@
             class={[
                 "snowui-avatar-container",
                 isColored ? "snowui-avatar-has-image" : "",
-                hasInitials ? "snowui-avatar-has-initials" : "",
             ]
                 .filter(Boolean)
                 .join(" ")}
             style={containerStyle}
         >
-            <div
-                class="snowui-avatar-background snowui-media-hoverable-background"
-                aria-hidden="true"
-                style={initialsBg
-                    ? `--snowui-avatar-bg: ${initialsBg};`
-                    : undefined}
-            ></div>
+            <div class="snowui-avatar-background" aria-hidden="true"></div>
+            {#if usesAvatarColorFilter}
+                <svg
+                    class="snowui-avatar-color-filter-defs"
+                    width="0"
+                    height="0"
+                    aria-hidden="true"
+                    focusable="false"
+                >
+                    <defs>
+                        <filter
+                            id={avatarColorFilterId}
+                            x="0"
+                            y="0"
+                            width="100%"
+                            height="100%"
+                            color-interpolation-filters="sRGB"
+                        >
+                            <feFlood
+                                class="snowui-avatar-color-flood"
+                                flood-color={AVATAR_HOVER_COLORS[
+                                    avatarHoverColorIndex
+                                ].value}
+                                result="avatarColor"
+                            />
+                            <feComposite
+                                in="avatarColor"
+                                in2="SourceGraphic"
+                                operator="in"
+                                result="avatarColorIn"
+                            />
+                            <feBlend
+                                in="SourceGraphic"
+                                in2="avatarColorIn"
+                                mode="overlay"
+                            />
+                        </filter>
+                    </defs>
+                </svg>
+            {/if}
             {#if imageStatus === "loaded" && src}
-                <div class="snowui-avatar-visual snowui-media-hoverable-visual">
+                <div class="snowui-avatar-visual">
                     {#if typeof src === "string"}
-                        <img {src} alt="" class="snowui-avatar-visual-media" />
+                        <img
+                            {src}
+                            alt=""
+                            class={[
+                                "snowui-avatar-visual-media",
+                                usesAvatarColorFilter
+                                    ? "snowui-avatar-color-filtered"
+                                    : "",
+                            ]
+                                .filter(Boolean)
+                                .join(" ")}
+                            style={usesAvatarColorFilter
+                                ? `--snowui-avatar-color-filter: url(#${avatarColorFilterId})`
+                                : undefined}
+                        />
                     {:else}
                         <!-- svelte-ignore svelte_component_deprecated -->
                         <svelte:component
@@ -338,32 +404,61 @@
                             size={typeof resolvedSize === "number"
                                 ? Math.round(resolvedSize)
                                 : resolvedSize}
-                            class="snowui-avatar-visual-media"
+                            class={[
+                                "snowui-avatar-visual-media",
+                                usesAvatarColorFilter
+                                    ? "snowui-avatar-color-filtered"
+                                    : "",
+                            ]
+                                .filter(Boolean)
+                                .join(" ")}
+                            style={usesAvatarColorFilter
+                                ? `--snowui-avatar-color-filter: url(#${avatarColorFilterId})`
+                                : undefined}
                             width="100%"
                             height="100%"
                         />
                     {/if}
                 </div>
-            {:else if hasComponentFallback && fallback}
-                <div class="snowui-avatar-visual snowui-media-hoverable-visual">
+            {:else if hasComponentFallback && resolvedFallback}
+                <div
+                    class={[
+                        "snowui-avatar-visual",
+                        hasGradientFallback
+                            ? "snowui-media-hoverable-visual"
+                            : "",
+                    ]
+                        .filter(Boolean)
+                        .join(" ")}
+                >
                     <!-- svelte-ignore svelte_component_deprecated -->
                     <svelte:component
-                        this={fallback}
+                        this={resolvedFallback}
                         as="avatar-image"
-                        seed={labelSource || explicitFallbackText}
+                        seed={labelSource ||
+                            explicitFallbackText ||
+                            defaultGradientSeed}
                         size="100%"
                         radius="inherit"
-                        class="snowui-avatar-visual-media"
+                        class={[
+                            "snowui-avatar-visual-media",
+                            usesAvatarColorFilter
+                                ? "snowui-avatar-color-filtered"
+                                : "",
+                        ]
+                            .filter(Boolean)
+                            .join(" ")}
+                        style={usesAvatarColorFilter
+                            ? `--snowui-avatar-color-filter: url(#${avatarColorFilterId})`
+                            : undefined}
                     />
                 </div>
             {:else if showFallback}
-                <div class="snowui-avatar-visual">
+                <div class="snowui-avatar-visual snowui-avatar-visual-foreground">
                     {#if hasExplicitFallbackText}
                         <span class="snowui-avatar-text"
                             >{explicitFallbackText}</span
                         >
-                    {:else if initials}
-                        <span class="snowui-avatar-initials">{initials}</span>
                     {:else}
                         <span class="snowui-avatar-fallback">
                             <ResourceIcon
@@ -417,6 +512,10 @@
         );
     }
 
+    :global(:where(.snowui-avatar-interactive)) {
+        cursor: pointer;
+    }
+
     :global(:where(.snowui-avatar-container)) {
         width: 100%;
         height: 100%;
@@ -440,7 +539,6 @@
         border-radius: inherit;
         background-color: var(--snowui-avatar-bg, var(--black-4, #0000000a));
         z-index: 0;
-        /* filter / transition 由 .snowui-media-hoverable-background 工具类提供 */
     }
 
     :global(
@@ -460,8 +558,11 @@
         position: relative;
         border-radius: inherit;
         z-index: 1;
-        /* filter / transition 由 .snowui-media-hoverable-visual 工具类提供(仅有图态生效) */
         /* 继承根部 font-size，此处无需重复计算 */
+    }
+
+    :global(:where(.snowui-avatar-visual-foreground)) {
+        z-index: 3;
     }
 
     :global(:where(.snowui-avatar-visual-media)) {
@@ -472,11 +573,41 @@
         display: block;
     }
 
-    /* hover 反馈全部由 .snowui-media-hoverable 工具类家族接管:
-       - imageMode → 根挂 .snowui-media-hoverable-has-visual → visual 层 brightness 压暗
-       - hasInitials → 根挂 .snowui-media-hoverable-tinted-bg → background 层 brightness 压暗
-       - 空 fallback → 根无标志 → background 层 background-color 加深
-       详见 components/src/styles/layout.css §"Media Hoverable 工具类"。 */
+    :global(:where(.snowui-avatar-color-filter-defs)) {
+        position: absolute;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-avatar-color-filtered)) {
+        filter: var(--snowui-avatar-color-filter);
+    }
+
+    :global(:where(.snowui-avatar-color-flood)) {
+        flood-opacity: 0;
+        transition: flood-opacity
+            var(
+                --snowui-avatar-hover-entry-duration,
+                var(--snowui-frame-color-motion-duration, 0.5s)
+            )
+            var(
+                --snowui-avatar-hover-entry-easing,
+                var(
+                    --snowui-frame-color-motion-easing,
+                    cubic-bezier(0.4, 0, 0.2, 1)
+                )
+            );
+    }
+
+    :global(
+            .snowui-avatar-interactive:hover:not(.snowui-disabled):not(
+                    [data-disabled="true"]
+                ):not(:disabled)
+                .snowui-avatar-color-flood
+        ) {
+        flood-opacity: var(--snowui-avatar-hover-color-opacity, 0.58);
+    }
 
     :global(:where(.snowui-avatar-fallback)) {
         display: flex; /* Ensure centralized internal content */
@@ -484,18 +615,6 @@
         justify-content: center;
         width: 100%;
         height: 100%;
-        font-size: calc(var(--text-16) * var(--snowui-avatar-text-unit-factor));
-        line-height: 1;
-    }
-
-    :global(:where(.snowui-avatar-initials)) {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--static-white-100, #ffffff);
-        text-transform: uppercase;
         font-size: calc(var(--text-16) * var(--snowui-avatar-text-unit-factor));
         line-height: 1;
     }
@@ -536,5 +655,11 @@
         height: 100%;
         border-radius: inherit;
         overflow: hidden;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-avatar-color-flood)) {
+            transition: none;
+        }
     }
 </style>

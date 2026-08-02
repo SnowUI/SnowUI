@@ -1,6 +1,8 @@
 # Avatar.svelte 文档
 
-> **版本**: v2.4.19
+> **版本**: v2.9.0
+> **变更记录 (2026-08-02)**: 默认头像改为随机 Gradient；原灰色用户图标改为 `empty` 空头像变体；Avatar 单色 hover 通过像素 alpha 仅叠加实际图形。
+> **变更记录 (2026-08-02)**: Avatar 默认 hover 使用单层 Overlay；每次进入随机六色之一，同一次 hover 内颜色不变，默认文字与用户图标位于叠加层上方。
 > **变更记录 (2026-06-10)**: 新增 `fallback` 组件入口，允许 PRO `GradientMotion` 等视觉组件作为默认头像；补充 `as="avatar-image"` 头像图片层组合规则。
 > **变更记录 (2026-05-20)**: 点击型 Avatar 补齐 `cursor: pointer`，与 hover 视觉反馈保持一致。
 > **变更记录 (2026-03-10)**: 补全文档中的 hover 实现方式与样式定义，明确有图 / 首字母 / 默认回退三种 hover 分支。
@@ -17,7 +19,7 @@
 主布局模型：内禀原子布局。
 
 - Avatar 的根节点只暴露一个由 `size` / 父级尺寸上下文 / `renderHints` 决定的头像盒，作为 Button、MenuItem、Field 等外部布局的子项时表现为 Hug。
-- 内部图片层、首字母层、默认图标层、hover 层与 badge 切割遮罩都属于 Avatar 私有布局，不对外暴露 Leading / Content / Trailing 槽位。
+- 内部图片层、默认 Gradient / empty 图标层、hover 滤镜与 badge 切割遮罩都属于 Avatar 私有布局，不对外暴露 Leading / Content / Trailing 槽位。
 - `as="badge"` 只用于 Avatar 内部识别角标角色；Avatar 自身不会输出 `data-auto-layout`，也不会接管子组件的通用排列能力。
 - 外部需要排列多个头像时应使用 `AvatarGroup`，不要把 Avatar 改造成集合布局。
 
@@ -27,7 +29,8 @@
 | :--- | :--- | :--- | :--- |
 | src | string \| Component | undefined | 头像图片 URL 或图标组件 |
 | size | 12\|16\|20\|24\|28\|32\|40\|48\|80 | 16 | 头像尺寸。未显式设置时，自动继承父级 `Frame` (如 `AvatarGroup`) 提供的尺寸上下文。 |
-| fallback | Component | undefined | 无 `src` 或图片不可用时渲染的默认头像组件。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与基于名称的 `seed`。 |
+| fallback | Component | undefined | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与基于名称的 `seed`。 |
+| variant | `'default' \| 'empty'` | `'default'` | `default` 使用按实例 / 名称稳定分散的 Gradient 配色；`empty` 使用灰色背景与默认用户图标。 |
 | badgePosition | 'top'\|'bottom' | 'top' | 徽章位置 |
 
 ## 关键字 (Keyword)
@@ -47,8 +50,11 @@
 <!-- 使用图标资源 -->
 <Avatar src={User} />
 
-<!-- 无 src：显示默认头像图标 -->
+<!-- 无 src：显示默认随机 Gradient 头像 -->
 <Avatar />
+
+<!-- 空头像：显示灰色背景与用户图标 -->
+<Avatar variant="empty" />
 
 <!-- PRO 默认头像：使用 GradientMotion 作为默认头像 -->
 <Avatar fallback={GradientMotion} data-name="Ada Lovelace" />
@@ -67,12 +73,12 @@
 
 ## 智能行为
 
-1. **默认回退**: 无图片或图片加载失败时，优先显示 `fallback` 组件；未传 `fallback` 时显示首字母；无首字母时显示默认用户图标。
+1. **默认回退**: 无图片或图片加载失败时，优先显示显式 `fallback` 组件；未传时 `default` 使用 Gradient，`empty` 使用灰色用户图标。名称只作为 Gradient seed，不再生成首字母。
 2. **回退延迟**: 内部固定延迟显示回退图标，减少加载闪烁。
 3. **角色识别**: 内部组件 (`Badge`, `Icon`) 若设置 `as="badge"` 将自动获得定位与尺寸逻辑。
 4. **子组件定位**: 提供基于 `em` 的自适应 Context 渲染样式。
 5. **智能分辨率选择**: 自动将解析后的尺寸（Resolved Size）传递给资源组件（如 `AvatarByewind`），资源组件会根据该尺寸选择 **3x 分辨率** 的高精图片（例如 80px 尺寸选择 240px 图片）。
-6. **Hover 分支**: Avatar 的 hover 由组件自身维护，不走全局统一样式；根据有图、首字母、默认回退三种状态命中不同节点。
+6. **默认 Hover**: 非 disabled 图片与普通组件头像每次进入时随机选择 blue / cyan / green / red / orange / purple 之一，并只对实际图形 alpha 单层叠加；Gradient fallback 自行运行五色循环。
 
 ## 样式规范 (Style Spec)
 
@@ -135,63 +141,29 @@
 - 默认文字颜色：`color: currentColor`
 - 图片模式（`snowui-avatar-has-image`）：`background-color: transparent`
 
-**Frame Hover 集成**
-- Avatar 保留默认 `.snowui-hoverable`，继续继承点击型语义与默认点击动效。
-- 组件通过自身 hover 选择器关闭 `Surface` 的默认 hover 背景叠加层，不再在 Avatar 内部定义 Frame 命名空间变量。
-- Avatar 的 hover 视觉规则定义在组件内，不再放在 `src/styles/layout.css`。
-- Avatar 的 hover 视觉只作用于内部视觉层或背景层，不直接改写根节点几何属性，也不使用命令式 JS 状态。
-- 所有 hover 规则必须排除 `.snowui-disabled`、`[data-disabled="true"]` 与 `:disabled`。
+**Avatar Hover 集成**
+- 非 disabled 根节点挂 `.snowui-avatar-interactive`，由 Avatar 自身提供 pointer cursor 与单层颜色 Overlay；默认 Gradient 头像是唯一例外，恢复认可版本的 `.snowui-media-hoverable` / `.snowui-media-hoverable-has-visual` 与 `brightness(0.92)` 组合。
+- Overlay 位于 `.snowui-avatar-container` 内、完整视觉内容上方和外部 Badge 下方，继承头像圆角与裁切。
+- 每次 pointer enter 从六种 Gradient 中心主色中等概率随机选择一种；同一次 hover 内不运行颜色变化动画。
+- Avatar 单色 Overlay 通过 SVG alpha composite 只作用于图片或组件实际绘制的非透明图形，透明区域保持不变；fallbackText 与 empty 用户图标不参与染色。
+- Gradient fallback 自行拥有多色循环 hover，Avatar 不再对其重复叠加单色层。
+- 只过渡一个小画布纯色层的 opacity，默认峰值 `58%`、入口 / 退出 `0.5s`。
+- 所有 hover 规则排除 `.snowui-disabled`、`[data-disabled="true"]` 与 `:disabled`；reduced-motion 下关闭淡入淡出并保留静态随机色反馈。
 
-**首字母回退 `.snowui-avatar-initials`**
-- 触发条件：无图片且具备 `aria-label` / `data-name` / `title`
-- 仅显示 **1 个首字母**（大写）
-- 字体大小：`0.375em`（与默认图标大小一致）
-- 字重：`600`
-- 字体颜色：`var(--static-white-100, #ffffff)`
-- 背景色：从次要色 token 随机选择（见下方 `secondaryColors` 列表）
-
-**次要色候选 `secondaryColors`**
-- `var(--secondary-purple, #7c3aed)`
-- `var(--secondary-indigo, #4f46e5)`
-- `var(--secondary-blue, #3b82f6)`
-- `var(--secondary-cyan, #06b6d4)`
-- `var(--secondary-mint, #10b981)`
-- `var(--secondary-green, #22c55e)`
-- `var(--secondary-yellow, #eab308)`
-- `var(--secondary-orange, #f97316)`
-- `var(--secondary-red, #ef4444)`
+**默认 / 空头像**
+- `default`：内部直接渲染 Gradient，seed 优先使用 `aria-label` / `data-name` / `title`，无名称时使用实例 ID，使同屏默认头像自然分散到六种配色。
+- `empty`：保留 `var(--black-4)` 灰色背景与 resource-svelte `user` 图标，明确表达尚无头像内容。
 
 ### 5. Hover 规范 (Hover Spec)
 
-> **v2026-05-20 起 Hover 实现迁移至共享工具类**:Avatar 与 Image 共用 [`components/src/styles/layout.css`](../styles/layout.css) 中的 `.snowui-media-hoverable` 工具类家族,组件不再在 .svelte 内自定义 hover 选择器。具体行为由根类组合决定。
-
-**根类组合规则(由组件 JS 条件挂载)**
-
-| Avatar 状态 | 根挂的工具类组合 | hover 视觉效果(由工具类提供) |
-| :--- | :--- | :--- |
-| 有图模式(`isImageMode`) | `.snowui-media-hoverable` + `.snowui-media-hoverable-has-visual` | `.snowui-avatar-visual` 层 `filter: brightness(0.92)`(媒体本身压暗) |
-| 首字母模式(`hasInitials` 且非有图) | `.snowui-media-hoverable` + `.snowui-media-hoverable-tinted-bg` | `.snowui-avatar-background` 层 `filter: brightness(0.92)`(有色填充背景压暗) |
-| 默认回退(空 fallback) | 只挂 `.snowui-media-hoverable` | `.snowui-avatar-background` 层 `background-color: var(--black-10)`(灰底变深) |
-| fallback 组件模式 | `.snowui-media-hoverable` + `.snowui-media-hoverable-has-visual` | fallback 组件作为 `.snowui-avatar-visual` 内容，视觉层 `filter: brightness(0.92)` |
-| disabled | 都不挂 | 无 hover 反馈 + cursor: default |
-
-> **两种技术分工**:`has-visual` 和 `tinted-bg` 用 `filter: brightness(0.92)` 压暗目标层(媒体或有色背景);空 fallback 用 `background-color: var(--black-10)` 替换灰底色(灰底直接改背景色最直接,brightness 在浅灰上几乎不可见)。三者完全由 layout.css 工具类家族统一管理,Avatar 组件不再自定义 hover 选择器。
-
-**内部分层标记(由组件模板始终挂载)**
-
-| 内部层 | 工具类标记 |
+| 状态 | 默认效果 |
 | :--- | :--- |
-| `.snowui-avatar-background` | 同时挂 `.snowui-media-hoverable-background` |
-| `.snowui-avatar-visual`(仅有图态 `imageStatus === "loaded"`) | 同时挂 `.snowui-media-hoverable-visual` |
+| 图片 / Component src | 每次进入随机六色之一，通过 alpha composite 只叠加实际非透明图形 |
+| fallback 组件 | Avatar 单色层只染实际图形；Gradient fallback 改由 Gradient 自身播放多色循环 |
+| fallbackText / empty 用户图标 | 不叠加颜色，保持原色 |
+| disabled | 不创建可运行 hover 状态，不显示 Overlay，cursor 为 default |
 
-**目的**:
-- 兼容规则和不规则图片(brightness filter 不会染色透明区)
-- 避免黑色遮罩把透明区域整块盖黑
-- 只影响头像视觉层,不影响角标区域
-- 首字母文本本身不变色,只让背景变暗
-- 默认头像图标或回退文本不变色,只让背景加深
-
-**覆盖入口**:`--snowui-media-hover-brightness`(默认 `0.92`,同时用于 has-visual 与 tinted-bg)
+覆盖入口：`--snowui-avatar-hover-entry-duration`（默认 `0.5s`）、`--snowui-avatar-hover-entry-easing`、`--snowui-avatar-hover-color-opacity`（默认 `0.58`）。
 
 **图片层 `.snowui-avatar-image`**
 - `width/height: 100%`，`object-fit: cover`
@@ -225,7 +197,38 @@
 
 ## 更新日志
 
+### v2.9.0 (2026-08-02)
+
+- 根据认可版本的原始运行条件，默认 Gradient 头像恢复 `.snowui-media-hoverable`、`.snowui-media-hoverable-has-visual` 与 `.snowui-media-hoverable-visual` 三层契约。
+- Gradient 重新位于普通 visual 容器内并同时获得旧版 `brightness(0.92)` 反馈；仍跳过 Avatar 当前的单色 alpha filter，图片、Logo 与其他 fallback 保持现状。
+
+### v2.8.0 (2026-08-02)
+
+- 默认 Gradient fallback 改用专用直连渲染路径，不再经过普通 `.snowui-avatar-visual` 与 Avatar SVG 单色滤镜合成层。
+- Gradient 直接成为圆形裁切容器的视觉内容；Avatar 只负责尺寸、最外层裁切、hover 状态与 Badge，Gradient 自行管理 SVG、颜色顺序和双层 Overlay。
+- 图片、Logo 与其他组件 fallback 继续使用 Avatar 原有 visual / alpha filter hover，不受此分支影响。
+
 - **Avatar-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v2.7.0 (2026-08-02)
+
+- 删除自动首字母生成；无显式图片 / fallback / fallbackText 时默认渲染按名称或实例 seed 分散配色的 Gradient。
+- 新增 `variant="empty"`，承接原灰色背景与用户图标空头像视觉。
+- Avatar 单色随机 hover 改用 SVG flood + alpha composite，只染图片或普通组件实际绘制的非透明像素。
+- Gradient fallback 恢复自身多色循环，Avatar 对其跳过单色滤镜，避免双重叠加。
+
+### v2.6.0 (2026-08-02)
+
+- 默认 hover 从五色双层持续循环简化为单层 Overlay；每次 pointer enter 随机六色之一，同一次 hover 内颜色固定。
+- 每次 pointer enter 都独立从六种颜色中等概率抽取，同一次 hover 内颜色固定。
+- 默认首字母、fallbackText 和用户图标提升到 Overlay 上方，避免文字与图标被染色。
+- 删除十层 opacity 动画，只保留一个 0.5s opacity 过渡层。
+
+### v2.5.0 (2026-08-02)
+
+- 将 Gradient avatar-image 专用 hover 完整迁移到 Avatar，作为所有 Avatar 视觉状态的默认 hover。
+- 删除 Avatar 对共享 media-hoverable brightness / 背景加深分支的消费，避免双重反馈。
+- Avatar 自行管理随机五色、双层 Overlay、10s 循环、0.5s 入口缓冲、disabled 与 reduced-motion。
 
 ### v2.4.19 (2026-06-10)
 

@@ -1,6 +1,6 @@
 /**
  * Gradient.test.ts
- * v2.5.0
+ * v2.8.4
  */
 export const examples = [
     {
@@ -45,17 +45,23 @@ export const examples = [
         logic: ["NonSquare", "FigmaFill", "BlurScaling"],
     },
     {
-        name: "GD-04：裁切与 Avatar 组合",
+        name: "GD-04：六种 Avatar Hover",
         code: `GD-04
-<Frame row gap={2}>
-    <Gradient variant="purple" size={160} radius={32} />
-    <Avatar fallback={Gradient} data-name="Gradient avatar" size={80} />
+<Frame style="display: grid; grid-template-columns: repeat(3, 5rem); gap: var(--gap-2);">
+    <Avatar fallback={Gradient} data-name="blue" size={80} />
+    <Avatar fallback={Gradient} data-name="cyan" size={80} />
+    <Avatar fallback={Gradient} data-name="green" size={80} />
+    <Avatar fallback={Gradient} data-name="red" size={80} />
+    <Avatar fallback={Gradient} data-name="orange" size={80} />
+    <Avatar fallback={Gradient} data-name="purple" size={80} />
 </Frame>`,
         expected: {
-            render: "Gradient 可由 radius 裁切为无有色毛边的圆角矩形，并可作为 Avatar fallback 被圆形外壳裁切；内部矢量不溢出。",
-            interaction: "Gradient 只播放内部低频漂移动效，不叠加 Frame 默认动效。",
+            render: "以三列两行依次渲染 blue、cyan、green、red、orange、purple 六个 80 × 80 Gradient Avatar；圆形外壳裁切无有色毛边，内部矢量不溢出。",
+            interaction: "每个头像 hover 时排除当前 variant，并按实例随机顺序在其余五种 Gradient 中心色之间持续交叉过渡；每种颜色使用两个位于完整 SVG 上方的独立 HTML overlay pass，单层峰值固定为 58%，10s 完成一轮并以 0.5s 缓冲进入；每层 0% / 100% opacity 完全一致，循环边界不闪烁。",
+            performance: "hover 仅动画十个 80px 纯色 Overlay 的 opacity；不复制 Gradient Gaussian Blur 图层，也不逐帧修改原始路径、颜色或滤镜。",
+            accessibility: "prefers-reduced-motion: reduce 下停止颜色循环，并以随机序列首色保留静态 hover 反馈。",
         },
-        logic: ["Radius", "Avatar", "Composition", "AlwaysMoving"],
+        logic: ["SixVariants", "Avatar", "SeedPalette", "RandomColorCycle", "OverlayBlend", "ReducedMotion"],
     },
     {
         name: "GD-05：全部动效参数控制台",

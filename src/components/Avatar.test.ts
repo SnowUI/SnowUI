@@ -1,10 +1,10 @@
 /**
  * Avatar.test.ts
- * v2.1.8
+ * v2.9.0
  *
  * 变更记录 (2026-02-03):
  * - 示例1覆盖全部尺寸
- * - 示例2覆盖全部尺寸与不同首字母
+ * - 示例2覆盖全部尺寸与不同默认 Gradient 配色
  * - 示例3覆盖全部尺寸与不同徽标组合
  */
 export const examples = [
@@ -22,7 +22,7 @@ export const examples = [
 <Avatar src={AvatarByewind} size={12} />`,
     },
     {
-        name: "2: 首字母与尺寸",
+        name: "2: 默认 Gradient 与尺寸",
         code: `2
 <Avatar aria-label="A" size={16} />
 <Avatar aria-label="B" size={20} />
@@ -71,6 +71,22 @@ export const examples = [
 <Avatar src={AvatarByewind} size={48} badgePosition="bottom">
     <Badge as="badge" dot />
 </Avatar>`,
+    },
+    {
+        name: "5: 默认头像与 Hover",
+        code: `5
+<Avatar src={AvatarByewind} data-name="image" size={80} />
+<Avatar fallback={Gradient} data-name="blue" size={80} />
+<Avatar aria-label="A" size={80} />
+<Avatar variant="empty" size={80} />
+<Avatar src={SnowLogo} data-name="logo" size={80} />
+<Avatar fallback={Gradient} data-name="purple" size={80} disabled />`,
+        expected: {
+            interaction: "图片与普通组件头像每次 pointer enter 随机一种单色，只对实际非透明图形叠加；Gradient 默认头像自行播放五色循环。aria-label 不再生成首字母，第四项为显式 empty 灰色用户图标；disabled 不响应。",
+            performance: "Avatar 单色 hover 通过一组 SVG flood/composite 处理原图 alpha，不复制图片或组件；Gradient 默认头像恢复认可版本的 media-hoverable visual + 自有 Overlay 组合，不进入 Avatar 单色滤镜。",
+            accessibility: "prefers-reduced-motion: reduce 下关闭淡入淡出，保留静态随机颜色反馈。",
+        },
+        logic: ["DefaultGradient", "ApprovedGradientHover", "MediaHoverableVisual", "EmptyVariant", "AlphaOnlyOverlay", "GradientOwnedHover", "Disabled", "ReducedMotion"],
     },
 
     {
