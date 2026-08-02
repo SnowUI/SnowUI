@@ -1,6 +1,6 @@
 <!--
   Gradient 矢量渐变组件
-  v2.8.5
+  v2.8.6
 
   职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
   文档：./Gradient.md
@@ -128,6 +128,7 @@
 </script>
 
 <script lang="ts">
+    import { onDestroy } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { getSize } from "../context";
 
@@ -166,6 +167,8 @@
         class: className = "",
         style: userStyle = "",
         renderHints: userRenderHints = undefined,
+        onpointerenter: userPointerEnter = undefined,
+        onpointerleave: userPointerLeave = undefined,
         enableResponsive = false,
         enableContext = false,
         enableScaleObserver = false,
@@ -226,6 +229,57 @@
         height: userRenderHints?.height ?? resolvedHeight,
         radius: userRenderHints?.radius ?? resolvedRadius,
     });
+
+    let avatarOverlayMounted = $state(false);
+    let avatarOverlayReady = $state(false);
+    let avatarOverlayFrame: number | undefined;
+    let avatarOverlayUnmountTimer: ReturnType<typeof setTimeout> | undefined;
+
+    function clearAvatarOverlaySchedule() {
+        if (avatarOverlayFrame !== undefined) {
+            cancelAnimationFrame(avatarOverlayFrame);
+            avatarOverlayFrame = undefined;
+        }
+        if (avatarOverlayUnmountTimer !== undefined) {
+            clearTimeout(avatarOverlayUnmountTimer);
+            avatarOverlayUnmountTimer = undefined;
+        }
+    }
+
+    function handlePointerEnter(event: PointerEvent) {
+        if (
+            isAvatarVariant &&
+            !(event.currentTarget as HTMLElement).closest(
+                ".snowui-disabled, [data-disabled='true'], :disabled",
+            )
+        ) {
+            clearAvatarOverlaySchedule();
+            avatarOverlayMounted = true;
+            avatarOverlayReady = false;
+            avatarOverlayFrame = requestAnimationFrame(() => {
+                avatarOverlayReady = true;
+                avatarOverlayFrame = undefined;
+            });
+        }
+        userPointerEnter?.(event);
+    }
+
+    function handlePointerLeave(event: PointerEvent) {
+        if (isAvatarVariant) {
+            if (avatarOverlayFrame !== undefined) {
+                cancelAnimationFrame(avatarOverlayFrame);
+                avatarOverlayFrame = undefined;
+            }
+            avatarOverlayReady = false;
+            avatarOverlayUnmountTimer = setTimeout(() => {
+                avatarOverlayMounted = false;
+                avatarOverlayUnmountTimer = undefined;
+            }, 550);
+        }
+        userPointerLeave?.(event);
+    }
+
+    onDestroy(clearAvatarOverlaySchedule);
 </script>
 
 <Frame
@@ -246,11 +300,14 @@
     data-variant={resolvedVariant}
     data-avatar={isAvatarVariant ? "true" : undefined}
     data-motion={motionEnabled ? "true" : "false"}
+    data-avatar-overlay-ready={avatarOverlayReady ? "true" : undefined}
     style={gradientStyle}
     role={decorative ? undefined : (role ?? "img")}
     aria-label={decorative ? undefined : ariaLabel}
     aria-hidden={decorative ? "true" : undefined}
     renderHints={gradientRenderHints}
+    onpointerenter={handlePointerEnter}
+    onpointerleave={handlePointerLeave}
     {...rest}
 >
     <svg
@@ -399,7 +456,7 @@
             </g>
         </g>
     </svg>
-    {#if isAvatarVariant}
+    {#if isAvatarVariant && avatarOverlayMounted}
         <div class="snowui-gradient-avatar-overlay" aria-hidden="true">
             {#each avatarColorCycle as targetVariant, index}
                 {#each [0, 1, 2, 3] as overlayLayer}
@@ -461,6 +518,11 @@
         height: 100%;
         pointer-events: none;
         user-select: none;
+    }
+
+    :global(:where(.snowui-gradient-avatar)) {
+        contain: layout paint style;
+        content-visibility: auto;
     }
 
     :global(:where(.snowui-gradient-layer)) {
@@ -550,7 +612,7 @@
 
     :global(
             .snowui-media-hoverable:hover:not(.snowui-disabled)
-                .snowui-gradient-avatar
+                .snowui-gradient-avatar[data-avatar-overlay-ready="true"]
                 .snowui-gradient-avatar-color-pass
         ) {
         opacity: 1;
@@ -558,7 +620,7 @@
 
     :global(
             .snowui-media-hoverable:hover:not(.snowui-disabled)
-                .snowui-gradient-avatar
+                .snowui-gradient-avatar[data-avatar-overlay-ready="true"]
                 .snowui-gradient-avatar-color
         ) {
         animation-play-state: running;

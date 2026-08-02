@@ -1,6 +1,6 @@
 # Gradient 矢量渐变
 
-> **版本**: v2.8.5
+> **版本**: v2.8.6
 > **职责**: 以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
 > **包归属**: OSS
 
@@ -21,7 +21,7 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 - 普通 Gradient 默认开启四层 `15s` 闭环动效；Avatar fallback 默认关闭基础形变，可通过 `motion` / `gradientMotion` 显式开启。
 - 作为 `Avatar fallback` 渲染时，Gradient 根据 Avatar 传入的 `seed` 稳定选择六种配色；若 seed 本身是 `blue / cyan / green / red / orange / purple`，则直接命中对应配色。
 - Avatar hover 状态由 Avatar 的统一 `.snowui-media-hoverable` 协议提供；Gradient 自己排除当前 variant，将其余五种 Gradient 的中心主色按实例稳定打乱，并以双层同色 `overlay` 持续交叉过渡。
-- 头像变色不复制完整 Gradient：每个候选色使用两个同步的 HTML 纯色 Overlay pass，覆盖在完整 SVG 之上并分别执行混合；单层峰值限制为 `58%`，五色循环为 `10s`，通过 `0.5s` 渐显缓冲进入。
+- 头像变色不复制完整 Gradient：hover 时按需创建原有五色 × 四层 HTML 纯色 Overlay，覆盖在完整 SVG 之上并分别执行混合；五色循环仍为 `10s`，通过 `0.5s` 渐显缓冲进入，离开完成淡出后销毁 Overlay DOM。
 - `prefers-reduced-motion: reduce` 下停止内部循环并恢复未经 transform 的静态设计基线。
 
 ## API
@@ -99,6 +99,7 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 - 椭圆模糊：`stdDeviation=60 / 60`。
 - 路径模糊：`stdDeviation=40 / 50`。
 - 每个实例通过 `$props.id()` 生成独立的 clipPath / filter ID，页面同时出现多个 variant 时不会串用滤镜。
+- Avatar 模式使用浏览器原生 `content-visibility: auto` 与布局 / 绘制 containment，跳过长列表视口外 SVG 子树的绘制，不创建逐实例观察器。
 - SVG viewport 负责统一缩放全部几何与 filter region；组件不读取实际像素尺寸，也不重新计算 blur。
 - 非正方形宽高按 Figma Fill 行为分别缩放 X / Y 轴。
 
@@ -107,6 +108,7 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 - 底色矩形和 SVG 根层保持静止；开启 `motion` 后，单个实例只在四个有色 `<g>` 上运行 CSS transform keyframes。
 - 动画只使用 `translate3d + rotate + scale / scaleX / scaleY`，并仅在 `motion` 开启时为这四个活动图层使用 `will-change: transform`。
 - 四个 `feGaussianBlur` 的标准差、滤镜区域、SVG 路径与固定颜色在循环中保持不变。
+- Avatar 未 hover 时不创建颜色 Overlay；hover 时仍使用认可版本的五种候选色 × 四层结构，离开淡出后卸载。
 - 原始五层不动画 `fill`、`mix-blend-mode`、`feBlend` 或 Gaussian Blur；Avatar hover 只在五组双层同色的 80px 纯色 Overlay 间交叉动画 opacity。每层使用独立 HTML 合成元素执行 `overlay`，确保 backdrop 是已经完整渲染的 Gradient SVG，而不是 SVG 内部隔离的滤镜子树。
 - 颜色顺序仅在组件求值时由 seed 与实例 ID 稳定打乱；运行期间不使用 JavaScript 动画、`requestAnimationFrame`、Canvas、ResizeObserver 或计时器。
 - `0%` 与 `100%` 使用完全相同的 transform，保证持续循环时不跳帧。
@@ -142,6 +144,11 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.8.6 (2026-08-02)
+
+- 保留认可版本 hover 的五色 × 四层 Overlay、`overlay` 混合、10s 循环、0.5s 缓冲与颜色参数，只将完整结构改为 hover 按需挂载、离开淡出后卸载。
+- Avatar 模式增加原生 `content-visibility: auto` 与绘制 containment，长列表视口外不绘制静态 SVG；不使用逐头像 IntersectionObserver。
 
 ### v2.8.5 (2026-08-02)
 
