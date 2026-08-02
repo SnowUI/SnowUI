@@ -5,8 +5,7 @@ export const examples = [
 <div class="flex-col gap-12" style="width: 240px;">
   <Slider value={60} aria-label="默认滑动条" />
   <Slider value={60} thickness={8} color="Red" aria-label="红色滑动条" />
-  <Slider value={60} thickness={2} background="Black10" aria-label="2px 滑动条" />
-  <Slider value={60} thickness={1} background="Black10" aria-label="1px 滑动条" />
+  <Slider value={60} thickness={2} background="Black10" aria-label="细滑动条" />
 </div>`,
         logic: ["value", "thickness", "background", "color"],
     },

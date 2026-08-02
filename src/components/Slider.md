@@ -1,6 +1,6 @@
 # Slider 滑动输入组件
 
-> **版本**: v1.1.3
+> **版本**: v1.1.0
 > **职责**: 提供单值、区间、水平、纵向与可切割 steps 的滑动输入。
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -10,7 +10,7 @@
 
 主布局模型：**复合管理布局**。
 
-- 轨道和填充统一使用 SVG line 绘制：默认粗细 4px、轨道 `Black4`、填充 `Primary`，通过 `stroke-linecap="round"` 保证任意粗细均有真实圆头；组件会根据实际设备像素比把描边中心吸附到正确的物理像素相位，避免 1px 被拆成两行灰色像素。
+- 轨道、填充条与拖动块规则复用 Progress：默认粗细 4px、轨道 `Black4`、填充 `Primary`、全圆角。
 - 拖动块固定为 `20px × 14px`，默认使用固定白色与 `0 1px 2px rgba(0, 0, 0, 0.4)` 阴影。
 - 鼠标常态隐藏拖动块；hover、`focus-visible`、拖动中显示；触控设备常驻显示。
 - label 采用默认内置模式，默认不显示；`showLabel=true` 时自动生成 Text，并显示对应拖动块的实时值。Range 自动生成两个 Text。
@@ -29,7 +29,7 @@
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | 轨道方向 |
 | `showSteps` | `boolean` | `false` | 使用 1px 透明缝隙按照 step 切割轨道与填充条 |
 | `showLabel` | `boolean` | `false` | 是否生成跟随拖动块的内置 Text label；Range 自动生成两个 |
-| `thickness` | `number \| string` | `4` | SVG 轨道与填充描边粗细；`1` 与 `2` 分别输出 1px、2px 实色描边 |
+| `thickness` | `number \| string` | `4` | 轨道粗细 |
 | `background` | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
 | `color` | `SnowUIColor \| string` | `"Primary"` | 填充条颜色 |
 | `thumbColor` | `SnowUIColor \| string` | `"StaticWhite100"` | 拖动块颜色 |
@@ -77,18 +77,6 @@
 - steps 只在固定尺寸的 track 上使用 CSS mask 生成 1px 透明缝隙；父级 mask 同时裁切内部 fill，切割线不会随填充宽度移动，也不假设页面背景色。
 
 ## 更新日志 (Changelog)
-
-### v1.1.3 (2026-08-03)
-
-- SVG 轨道根据 `devicePixelRatio`、实际 stroke-width 奇偶和屏幕坐标计算像素相位偏移；1px 描边边缘落在完整物理像素边界，避免被抗锯齿拆成两行并变灰，2px 圆头也保持清晰。尺寸变化复用共享 `resizeManager`。
-
-### v1.1.2 (2026-08-03)
-
-- 轨道与填充全部改为 SVG line，以 `stroke-width` 直接消费 `thickness`、以 `stroke-linecap="round"` 绘制圆头；1px 与 2px 不再受 HTML 极细矩形圆角栅格化影响，颜色保持原始实色。
-
-### v1.1.1 (2026-08-03)
-
-- 曾尝试仅对数字 `thickness={1}` 特化极细轨道；该实现已由 v1.1.2 的统一 SVG line 绘制替代。
 
 ### v1.1.0 (2026-07-04)
 

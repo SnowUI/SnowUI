@@ -1,6 +1,6 @@
 <!--
   Slider 滑动输入组件
-  v1.1.3
+  v1.1.0
 
   文档: ./Slider.md
 -->
@@ -15,7 +15,6 @@
     } from "../lib/color";
     import { splitFrameHostProps } from "../logic/frame-prop-filter";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
-    import { resizeManager } from "../logic/observer.svelte";
 
     type SliderOrientation = "horizontal" | "vertical";
 
@@ -71,12 +70,9 @@
     }: Props = $props();
 
     let controlRef = $state<HTMLElement>();
-    let trackRef = $state<HTMLElement>();
     let labelsRef = $state<HTMLElement>();
     let activeIndex = $state(0);
     let dragging = $state(false);
-    let pixelSnapX = $state(0);
-    let pixelSnapY = $state(0);
 
     function toCssLength(value: number | string) {
         return typeof value === "number" ? `${value}px` : value;
@@ -154,8 +150,6 @@
             `--snowui-slider-start: ${startPercent}%`,
             `--snowui-slider-end: ${endPercent}%`,
             `--snowui-slider-step-percent: ${stepPercent}%`,
-            `--snowui-slider-pixel-snap-x: ${pixelSnapX}px`,
-            `--snowui-slider-pixel-snap-y: ${pixelSnapY}px`,
             userStyle,
         ]
             .filter(Boolean)
@@ -177,65 +171,6 @@
                 resolvedValues[index] ?? resolvedValues[0] ?? minValue,
             );
         });
-    });
-
-    $effect(() => {
-        const control = controlRef;
-        const track = trackRef;
-        orientation;
-        thickness;
-        if (!control || !track || typeof window === "undefined") return;
-
-        let frame = 0;
-        const syncPixelPhase = () => {
-            const line = track.querySelector<SVGLineElement>("line");
-            if (!line) return;
-
-            const rect = track.getBoundingClientRect();
-            const strokeWidth = Number.parseFloat(
-                getComputedStyle(line).strokeWidth,
-            );
-            const dpr = window.devicePixelRatio || 1;
-            if (!Number.isFinite(strokeWidth) || strokeWidth <= 0) return;
-
-            const vertical = orientation === "vertical";
-            const currentSnap = vertical ? pixelSnapX : pixelSnapY;
-            const currentCenter = vertical
-                ? rect.left + rect.width / 2
-                : rect.top + rect.height / 2;
-            const baseCenter = currentCenter - currentSnap;
-            const physicalStroke = Math.max(
-                1,
-                Math.round(strokeWidth * dpr),
-            );
-            const centerPhase = physicalStroke % 2 === 1 ? 0.5 : 0;
-            const basePhysical = baseCenter * dpr;
-            const snappedPhysical =
-                Math.round(basePhysical - centerPhase) + centerPhase;
-            const nextSnap = (snappedPhysical - basePhysical) / dpr;
-
-            if (vertical) {
-                pixelSnapX = nextSnap;
-                pixelSnapY = 0;
-            } else {
-                pixelSnapX = 0;
-                pixelSnapY = nextSnap;
-            }
-        };
-        const schedule = () => {
-            cancelAnimationFrame(frame);
-            frame = requestAnimationFrame(syncPixelPhase);
-        };
-
-        const unwatch = resizeManager.watch(control, schedule);
-        window.addEventListener("resize", schedule);
-        schedule();
-
-        return () => {
-            cancelAnimationFrame(frame);
-            unwatch();
-            window.removeEventListener("resize", schedule);
-        };
     });
 
     function commitValue(index: number, nextValue: number) {
@@ -318,7 +253,6 @@
     style={sliderStyle}
     data-orientation={orientation}
     data-range={isRange || undefined}
-    data-hairline={thickness === 1 || undefined}
     data-show-steps={showSteps || undefined}
     data-dragging={dragging || undefined}
     data-disabled={disabled ? "true" : undefined}
@@ -351,53 +285,8 @@
             </div>
         {/if}
 
-        <div
-            bind:this={trackRef}
-            class="snowui-slider-track"
-            aria-hidden="true"
-        >
-            <svg
-                class="snowui-slider-track-graphic"
-                aria-hidden="true"
-                focusable="false"
-                preserveAspectRatio="none"
-            >
-                {#if orientation === "vertical"}
-                    <line
-                        class="snowui-slider-track-background"
-                        x1="50%"
-                        x2="50%"
-                        y1="100%"
-                        y2="0%"
-                    />
-                    {#if endPercent > startPercent}
-                        <line
-                            class="snowui-slider-track-fill"
-                            x1="50%"
-                            x2="50%"
-                            y1={`${100 - startPercent}%`}
-                            y2={`${100 - endPercent}%`}
-                        />
-                    {/if}
-                {:else}
-                    <line
-                        class="snowui-slider-track-background"
-                        x1="0%"
-                        x2="100%"
-                        y1="50%"
-                        y2="50%"
-                    />
-                    {#if endPercent > startPercent}
-                        <line
-                            class="snowui-slider-track-fill"
-                            x1={`${startPercent}%`}
-                            x2={`${endPercent}%`}
-                            y1="50%"
-                            y2="50%"
-                        />
-                    {/if}
-                {/if}
-            </svg>
+        <div class="snowui-slider-track" aria-hidden="true">
+            <div class="snowui-slider-fill"></div>
         </div>
 
         {#each resolvedValues as resolvedValue, index}
@@ -477,9 +366,7 @@
             --snowui-slider-background-override,
             var(--snowui-slider-background, var(--black-4, #0000000a))
         );
-        transform: translateY(
-            calc(-50% + var(--snowui-slider-pixel-snap-y, 0px))
-        );
+        transform: translateY(-50%);
     }
 
     :global(:where(.snowui-slider[data-orientation="vertical"] .snowui-slider-track)) {
@@ -492,116 +379,7 @@
             var(--snowui-slider-thickness, calc(var(--size-4) / 4))
         );
         height: auto;
-        transform: translateX(
-            calc(-50% + var(--snowui-slider-pixel-snap-x, 0px))
-        );
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track)) {
-        overflow: visible;
-        border-radius: 0;
-        background-color: transparent;
-        background-image: linear-gradient(
-            var(
-                    --snowui-slider-background-override,
-                    var(
-                        --snowui-slider-background,
-                        var(--black-4, #0000000a)
-                    )
-                ),
-            var(
-                    --snowui-slider-background-override,
-                    var(
-                        --snowui-slider-background,
-                        var(--black-4, #0000000a)
-                    )
-                )
-        );
-        background-position: center;
-        background-size: calc(100% - var(--snowui-slider-thickness)) 100%;
-        background-repeat: no-repeat;
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::before,
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::after,
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::before,
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::after {
-        position: absolute;
-        top: 0;
-        width: var(--snowui-slider-thickness);
-        height: var(--snowui-slider-thickness);
-        border-radius: var(--radius-full);
-        content: "";
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::before,
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::before {
-        left: 0;
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::after,
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::after {
-        right: 0;
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::before,
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::after {
-        background-color: var(
-            --snowui-slider-background-override,
-            var(--snowui-slider-background, var(--black-4, #0000000a))
-        );
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill)) {
-        border-radius: 0;
-        background-color: transparent;
-        background-image: linear-gradient(
-            var(
-                    --snowui-slider-color-override,
-                    var(--snowui-slider-color, var(--primary, #000000))
-                ),
-            var(
-                    --snowui-slider-color-override,
-                    var(--snowui-slider-color, var(--primary, #000000))
-                )
-        );
-        background-position: center;
-        background-size: calc(100% - var(--snowui-slider-thickness)) 100%;
-        background-repeat: no-repeat;
-        overflow: visible;
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::before,
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::after {
-        background-color: var(
-            --snowui-slider-color-override,
-            var(--snowui-slider-color, var(--primary, #000000))
-        );
-    }
-
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track)),
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill)) {
-        background-size: 100% calc(100% - var(--snowui-slider-thickness));
-    }
-
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track))::before,
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track))::after,
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill))::before,
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill))::after {
-        position: absolute;
-        right: auto;
-        left: 0;
-    }
-
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track))::before,
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill))::before {
-        top: 0;
-    }
-
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track))::after,
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill))::after {
-        top: auto;
-        bottom: 0;
+        transform: translateX(-50%);
     }
 
     :global(:where(.snowui-slider-fill)) {
@@ -625,56 +403,6 @@
         left: 0;
         width: auto;
         height: calc(var(--snowui-slider-end, 0%) - var(--snowui-slider-start, 0%));
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill)) {
-        overflow: visible;
-        border-radius: 0;
-        background-color: transparent;
-    }
-
-    :global(:where(.snowui-slider-track)) {
-        overflow: visible;
-        border-radius: 0;
-        background: transparent;
-    }
-
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::before,
-    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::after {
-        content: none;
-    }
-
-    :global(:where(.snowui-slider-track-graphic)) {
-        position: absolute;
-        inset: 0;
-        display: block;
-        width: 100%;
-        height: 100%;
-        overflow: visible;
-        pointer-events: none;
-    }
-
-    :global(:where(.snowui-slider-track-graphic line)) {
-        vector-effect: non-scaling-stroke;
-        stroke-linecap: round;
-        stroke-width: var(
-            --snowui-slider-thickness-override,
-            var(--snowui-slider-thickness, calc(var(--size-4) / 4))
-        );
-    }
-
-    :global(:where(.snowui-slider-track-background)) {
-        stroke: var(
-            --snowui-slider-background-override,
-            var(--snowui-slider-background, var(--black-4, #0000000a))
-        );
-    }
-
-    :global(:where(.snowui-slider-track-fill)) {
-        stroke: var(
-            --snowui-slider-color-override,
-            var(--snowui-slider-color, var(--primary, #000000))
-        );
     }
 
     :global(:where(.snowui-slider[data-show-steps="true"] .snowui-slider-track)) {
