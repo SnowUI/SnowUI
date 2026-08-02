@@ -7,3 +7,4 @@ vite_out*.log
 scripts/report.txt
 src/test/*
 !src/test/SnowUILogoHoverController.svelte
+!src/test/GradientMotionController.svelte
