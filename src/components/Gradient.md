@@ -1,6 +1,6 @@
 # Gradient 矢量渐变
 
-> **版本**: v2.8.4
+> **版本**: v2.8.5
 > **职责**: 以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
 > **包归属**: OSS
 
@@ -18,7 +18,7 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 - SVG 使用 `viewBox="0 0 360 360"` 与 `preserveAspectRatio="none"` 填满画布。
 - 四个 `feGaussianBlur` 使用 `filterUnits="userSpaceOnUse"`。图形通过 SVG viewport 缩放时，模糊标准差与几何一起按比例缩放，不使用固定屏幕像素模糊，也不需要尺寸观察器。
 - 根层使用纯 alpha mask 将圆角与 SVG filter 固定在同一合成裁切层，避免圆角最外圈露出渐变底色毛边。
-- 四个有色图层以 `15s` 完成一次闭环：Vector 4 位移并旋转、Vector 3 位移并缩放、Subtract 位移并非等比形变、Subtract 2 位移并旋转缩放；各自使用不同关键帧节奏。
+- 普通 Gradient 默认开启四层 `15s` 闭环动效；Avatar fallback 默认关闭基础形变，可通过 `motion` / `gradientMotion` 显式开启。
 - 作为 `Avatar fallback` 渲染时，Gradient 根据 Avatar 传入的 `seed` 稳定选择六种配色；若 seed 本身是 `blue / cyan / green / red / orange / purple`，则直接命中对应配色。
 - Avatar hover 状态由 Avatar 的统一 `.snowui-media-hoverable` 协议提供；Gradient 自己排除当前 variant，将其余五种 Gradient 的中心主色按实例稳定打乱，并以双层同色 `overlay` 持续交叉过渡。
 - 头像变色不复制完整 Gradient：每个候选色使用两个同步的 HTML 纯色 Overlay pass，覆盖在完整 SVG 之上并分别执行混合；单层峰值限制为 `58%`，五色循环为 `10s`，通过 `0.5s` 渐显缓冲进入。
@@ -34,6 +34,7 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 | `width` | `number \| string` | `360` | 宽度；数字值按 px 处理 |
 | `height` | `number \| string` | `360` | 高度；数字值按 px 处理 |
 | `radius` | `number \| string` | `0` | 外部裁切圆角；数字值按 px 处理 |
+| `motion` | `boolean` | 普通 Gradient 为 `true`；`as="avatar-image"` 为 `false` | 控制四个 SVG 有色图层的持续 transform 动效；不影响 Avatar hover 的多色 Overlay |
 | `decorative` | `boolean` | `true` | 装饰图默认隐藏于无障碍树；设为 `false` 时应同时提供 `aria-label` |
 | `as` | `string` | - | Frame 角色声明；Avatar 场景可使用 `as="avatar-image"` |
 
@@ -53,7 +54,7 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 | `--snowui-gradient-motion-subtract-2-rotate-amplitude-override` | `20deg` | Subtract 2 旋转幅度 |
 | `--snowui-gradient-motion-subtract-2-scale-amplitude-override` | `0.25` | Subtract 2 放大 / 缩小幅度 |
 
-组件不提供暂停或随机动效 Prop。Test 的 GD-05 提供 19 条控制条：时长、整体速度、四项缓动坐标以及四层全部 13 项幅度参数；控制条以四列网格排列在图形下方，并以每条控制的可调上限初始化。
+`motion` 只决定基础矢量形变是否运行。Test 的 GD-05 提供 19 条控制条：时长、整体速度、四项缓动坐标以及四层全部 13 项幅度参数；控制条以四列网格排列在图形下方，并以每条控制的可调上限初始化。
 
 ## 六种配色
 
@@ -84,9 +85,12 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 
 ```svelte
 <Avatar fallback={Gradient} data-name="Gradient avatar" size={80} />
+
+<!-- 需要基础矢量持续形变时显式开启 -->
+<Avatar gradientMotion data-name="Animated Gradient avatar" size={80} />
 ```
 
-Avatar 会向 fallback 传入 `as="avatar-image"` 与稳定 seed。Avatar 只提供 hover 状态，颜色序列和 Overlay 绘制由 Gradient 负责；该模式会在圆形裁切内持续过渡到当前 variant 之外的五种颜色，普通 Gradient 不创建头像专用叠加层。
+Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gradientMotion` 开关。默认头像的基础矢量形变关闭，但 hover 的颜色序列和 Overlay 绘制仍由 Gradient 完整负责；hover 时会在圆形裁切内持续过渡到当前 variant 之外的五种颜色。
 
 ## 矢量与缩放
 
@@ -100,8 +104,8 @@ Avatar 会向 fallback 传入 `as="avatar-image"` 与稳定 seed。Avatar 只提
 
 ## 动效与性能
 
-- 底色矩形和 SVG 根层保持静止；单个实例只在四个有色 `<g>` 上运行 CSS transform keyframes。
-- 动画只使用 `translate3d + rotate + scale / scaleX / scaleY`，并仅在这四个活动图层使用 `will-change: transform`。
+- 底色矩形和 SVG 根层保持静止；开启 `motion` 后，单个实例只在四个有色 `<g>` 上运行 CSS transform keyframes。
+- 动画只使用 `translate3d + rotate + scale / scaleX / scaleY`，并仅在 `motion` 开启时为这四个活动图层使用 `will-change: transform`。
 - 四个 `feGaussianBlur` 的标准差、滤镜区域、SVG 路径与固定颜色在循环中保持不变。
 - 原始五层不动画 `fill`、`mix-blend-mode`、`feBlend` 或 Gaussian Blur；Avatar hover 只在五组双层同色的 80px 纯色 Overlay 间交叉动画 opacity。每层使用独立 HTML 合成元素执行 `overlay`，确保 backdrop 是已经完整渲染的 Gradient SVG，而不是 SVG 内部隔离的滤镜子树。
 - 颜色顺序仅在组件求值时由 seed 与实例 ID 稳定打乱；运行期间不使用 JavaScript 动画、`requestAnimationFrame`、Canvas、ResizeObserver 或计时器。
@@ -129,7 +133,8 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 ### 动效边界
 
 - 根 Frame 固定 `enableDefaultMotion={false}`。
-- 内部四个有色 SVG 图层固定持续播放独立合成 transform 动效；底色和 SVG 根层不动，不提供 `speed`、`paused`、`seed` 等运行时 Props。
+- 普通 Gradient 默认播放四个有色 SVG 图层的独立 transform 动效；Avatar fallback 默认关闭，可由 Gradient `motion` 或 Avatar `gradientMotion` 开启。
+- 基础形变开关不参与 Avatar hover 颜色 Overlay；关闭基础形变时，认可版本的五色四层同色 Overlay 结构、10s 循环、0.5s 入口缓冲和 58% 峰值保持不变。
 - 不使用 Svelte transition、WAAPI、Canvas、JavaScript 动画循环或定时器。
 - 常态动效不得改变已确认的六种配色、路径、图层顺序和 blur 基线；Avatar hover 允许通过独立 Overlay 改变合成后的可见色调。
 - reduced-motion 是“始终运动”的无障碍例外，系统请求减少动态时必须停止。
@@ -137,6 +142,11 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.8.5 (2026-08-02)
+
+- 新增 `motion` 基础形变开关：普通 Gradient 默认开启，Avatar fallback 默认关闭。
+- 关闭基础形变时不挂载 transform animation 与 `will-change`；Avatar hover 的认可版本多色 Overlay 保持不变。
 
 ### v2.8.4 (2026-08-02)
 

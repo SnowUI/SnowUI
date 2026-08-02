@@ -1,6 +1,6 @@
 /**
  * Gradient.test.ts
- * v2.8.4
+ * v2.8.5
  */
 export const examples = [
     {
@@ -58,7 +58,7 @@ export const examples = [
         expected: {
             render: "以三列两行依次渲染 blue、cyan、green、red、orange、purple 六个 80 × 80 Gradient Avatar；圆形外壳裁切无有色毛边，内部矢量不溢出。",
             interaction: "每个头像 hover 时排除当前 variant，并按实例随机顺序在其余五种 Gradient 中心色之间持续交叉过渡；每种颜色使用两个位于完整 SVG 上方的独立 HTML overlay pass，单层峰值固定为 58%，10s 完成一轮并以 0.5s 缓冲进入；每层 0% / 100% opacity 完全一致，循环边界不闪烁。",
-            performance: "hover 仅动画十个 80px 纯色 Overlay 的 opacity；不复制 Gradient Gaussian Blur 图层，也不逐帧修改原始路径、颜色或滤镜。",
+            performance: "Avatar Gradient 基础矢量形变默认关闭；hover 仍按认可版本仅动画二十个 80px 纯色 Overlay 的 opacity，不逐帧修改原始路径、颜色或滤镜。",
             accessibility: "prefers-reduced-motion: reduce 下停止颜色循环，并以随机序列首色保留静态 hover 反馈。",
         },
         logic: ["SixVariants", "Avatar", "SeedPalette", "RandomColorCycle", "OverlayBlend", "ReducedMotion"],

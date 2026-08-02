@@ -1,6 +1,7 @@
 # Avatar.svelte 文档
 
-> **版本**: v2.9.0
+> **版本**: v2.9.1
+> **变更记录 (2026-08-02)**: 默认 Gradient 头像关闭基础矢量形变；新增 `gradientMotion` 显式开关，原五色 Overlay hover 保持不变。
 > **变更记录 (2026-08-02)**: 默认头像改为随机 Gradient；原灰色用户图标改为 `empty` 空头像变体；Avatar 单色 hover 通过像素 alpha 仅叠加实际图形。
 > **变更记录 (2026-08-02)**: Avatar 默认 hover 使用单层 Overlay；每次进入随机六色之一，同一次 hover 内颜色不变，默认文字与用户图标位于叠加层上方。
 > **变更记录 (2026-06-10)**: 新增 `fallback` 组件入口，允许 PRO `GradientMotion` 等视觉组件作为默认头像；补充 `as="avatar-image"` 头像图片层组合规则。
@@ -31,6 +32,7 @@
 | size | 12\|16\|20\|24\|28\|32\|40\|48\|80 | 16 | 头像尺寸。未显式设置时，自动继承父级 `Frame` (如 `AvatarGroup`) 提供的尺寸上下文。 |
 | fallback | Component | undefined | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与基于名称的 `seed`。 |
 | variant | `'default' \| 'empty'` | `'default'` | `default` 使用按实例 / 名称稳定分散的 Gradient 配色；`empty` 使用灰色背景与默认用户图标。 |
+| gradientMotion | boolean | false | 是否运行默认 Gradient fallback 的四层基础矢量形变；不影响 Gradient 自有的多色 hover |
 | badgePosition | 'top'\|'bottom' | 'top' | 徽章位置 |
 
 ## 关键字 (Keyword)
@@ -53,6 +55,9 @@
 <!-- 无 src：显示默认随机 Gradient 头像 -->
 <Avatar />
 
+<!-- 显式开启默认 Gradient 的基础矢量形变 -->
+<Avatar gradientMotion />
+
 <!-- 空头像：显示灰色背景与用户图标 -->
 <Avatar variant="empty" />
 
@@ -73,12 +78,12 @@
 
 ## 智能行为
 
-1. **默认回退**: 无图片或图片加载失败时，优先显示显式 `fallback` 组件；未传时 `default` 使用 Gradient，`empty` 使用灰色用户图标。名称只作为 Gradient seed，不再生成首字母。
+1. **默认回退**: 无图片或图片加载失败时，优先显示显式 `fallback` 组件；未传时 `default` 使用 Gradient，`empty` 使用灰色用户图标。名称只作为 Gradient seed，不再生成首字母；Gradient 基础形变默认关闭，可用 `gradientMotion` 开启。
 2. **回退延迟**: 内部固定延迟显示回退图标，减少加载闪烁。
 3. **角色识别**: 内部组件 (`Badge`, `Icon`) 若设置 `as="badge"` 将自动获得定位与尺寸逻辑。
 4. **子组件定位**: 提供基于 `em` 的自适应 Context 渲染样式。
 5. **智能分辨率选择**: 自动将解析后的尺寸（Resolved Size）传递给资源组件（如 `AvatarByewind`），资源组件会根据该尺寸选择 **3x 分辨率** 的高精图片（例如 80px 尺寸选择 240px 图片）。
-6. **默认 Hover**: 非 disabled 图片与普通组件头像每次进入时随机选择 blue / cyan / green / red / orange / purple 之一，并只对实际图形 alpha 单层叠加；Gradient fallback 自行运行五色循环。
+6. **默认 Hover**: 非 disabled 图片与普通组件头像每次进入时随机选择 blue / cyan / green / red / orange / purple 之一，并只对实际图形 alpha 单层叠加；Gradient fallback 无论基础形变是否开启，都保持原有五色循环 hover。
 
 ## 样式规范 (Style Spec)
 
@@ -196,6 +201,11 @@
 ---
 
 ## 更新日志
+
+### v2.9.1 (2026-08-02)
+
+- 默认 Gradient fallback 的四层基础矢量形变改为关闭，新增 `gradientMotion` 显式开启入口。
+- Gradient 自有的认可版本五色 Overlay hover 不受基础形变开关影响。
 
 ### v2.9.0 (2026-08-02)
 

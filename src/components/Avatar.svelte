@@ -1,6 +1,6 @@
 <!--
  Avatar 头像组件
-  v2.9.0
+  v2.9.1
 
  1. 核心能力 (Features):
     - 多样形态: 支持 circular, rounded, square 三种形状
@@ -55,6 +55,7 @@
         fallback?: Component;
         fallbackText?: string;
         variant?: AvatarVariant;
+        gradientMotion?: boolean;
         children?: Snippet;
         badgePosition?: "top" | "bottom";
         [key: string]: any;
@@ -68,6 +69,7 @@
         fallback = undefined,
         fallbackText = undefined,
         variant = "default",
+        gradientMotion = false,
         badgePosition = "top",
         class: className = "",
         style: userStyle = "",
@@ -440,6 +442,9 @@
                             defaultGradientSeed}
                         size="100%"
                         radius="inherit"
+                        motion={hasGradientFallback
+                            ? gradientMotion
+                            : undefined}
                         class={[
                             "snowui-avatar-visual-media",
                             usesAvatarColorFilter

@@ -1,6 +1,6 @@
 <!--
   Gradient 矢量渐变组件
-  v2.8.4
+  v2.8.5
 
   职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
   文档：./Gradient.md
@@ -147,6 +147,7 @@
         width?: number | string;
         height?: number | string;
         radius?: number | string;
+        motion?: boolean;
         decorative?: boolean;
         [key: string]: any;
     }
@@ -158,6 +159,7 @@
         width = undefined,
         height = undefined,
         radius = undefined,
+        motion = undefined,
         decorative = true,
         role = undefined,
         "aria-label": ariaLabel = undefined,
@@ -196,6 +198,7 @@
         radius === undefined ? DEFAULT_RADIUS : toCssLength(radius),
     );
     const isAvatarVariant = $derived(rest.as === "avatar-image");
+    const motionEnabled = $derived(motion ?? !isAvatarVariant);
     const resolvedVariant = $derived(
         variant ?? (isAvatarVariant ? resolveSeedVariant(seed) : "blue"),
     );
@@ -235,12 +238,14 @@
         "snowui-gradient",
         `snowui-gradient-${resolvedVariant}`,
         isAvatarVariant ? "snowui-gradient-avatar" : "",
+        motionEnabled ? "snowui-gradient-motion-enabled" : "",
         className,
     ]
         .filter(Boolean)
         .join(" ")}
     data-variant={resolvedVariant}
     data-avatar={isAvatarVariant ? "true" : undefined}
+    data-motion={motionEnabled ? "true" : "false"}
     style={gradientStyle}
     role={decorative ? undefined : (role ?? "img")}
     aria-label={decorative ? undefined : ariaLabel}
@@ -461,6 +466,12 @@
     :global(:where(.snowui-gradient-layer)) {
         transform-box: view-box;
         transform-origin: center;
+    }
+
+    :global(
+            :where(.snowui-gradient-motion-enabled)
+                :where(.snowui-gradient-layer)
+        ) {
         will-change: transform;
         animation-duration: var(
             --snowui-gradient-motion-duration-override,
@@ -473,19 +484,31 @@
         animation-iteration-count: infinite;
     }
 
-    :global(:where(.snowui-gradient-layer-vector-4)) {
+    :global(
+            :where(.snowui-gradient-motion-enabled)
+                :where(.snowui-gradient-layer-vector-4)
+        ) {
         animation-name: snowui-gradient-vector-4-motion;
     }
 
-    :global(:where(.snowui-gradient-layer-vector-3)) {
+    :global(
+            :where(.snowui-gradient-motion-enabled)
+                :where(.snowui-gradient-layer-vector-3)
+        ) {
         animation-name: snowui-gradient-vector-3-motion;
     }
 
-    :global(:where(.snowui-gradient-layer-subtract)) {
+    :global(
+            :where(.snowui-gradient-motion-enabled)
+                :where(.snowui-gradient-layer-subtract)
+        ) {
         animation-name: snowui-gradient-subtract-motion;
     }
 
-    :global(:where(.snowui-gradient-layer-subtract-2)) {
+    :global(
+            :where(.snowui-gradient-motion-enabled)
+                :where(.snowui-gradient-layer-subtract-2)
+        ) {
         animation-name: snowui-gradient-subtract-2-motion;
     }
 
