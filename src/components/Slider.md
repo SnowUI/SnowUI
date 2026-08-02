@@ -1,6 +1,6 @@
 # Slider 滑动输入组件
 
-> **版本**: v1.1.0
+> **版本**: v1.1.1
 > **职责**: 提供单值、区间、水平、纵向与可切割 steps 的滑动输入。
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -29,7 +29,7 @@
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | 轨道方向 |
 | `showSteps` | `boolean` | `false` | 使用 1px 透明缝隙按照 step 切割轨道与填充条 |
 | `showLabel` | `boolean` | `false` | 是否生成跟随拖动块的内置 Text label；Range 自动生成两个 |
-| `thickness` | `number \| string` | `4` | 轨道粗细 |
+| `thickness` | `number \| string` | `4` | 轨道粗细；数字 `1` 使用 0.5 CSS px 的 Retina hairline 渲染并保留圆头，字符串 `"1px"` 表示字面 1 CSS px |
 | `background` | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
 | `color` | `SnowUIColor \| string` | `"Primary"` | 填充条颜色 |
 | `thumbColor` | `SnowUIColor \| string` | `"StaticWhite100"` | 拖动块颜色 |
@@ -77,6 +77,10 @@
 - steps 只在固定尺寸的 track 上使用 CSS mask 生成 1px 透明缝隙；父级 mask 同时裁切内部 fill，切割线不会随填充宽度移动，也不假设页面背景色。
 
 ## 更新日志 (Changelog)
+
+### v1.1.1 (2026-08-03)
+
+- 数字 `thickness={1}` 改为先按 1px 圆角轨道绘制、再沿厚度轴缩放到 0.5 CSS px，得到 Retina 屏幕上的单物理像素 hairline，并保留比直接绘制 0.5px 更稳定的圆头；`thickness="1px"` 继续表示字面 1 CSS px。
 
 ### v1.1.0 (2026-07-04)
 

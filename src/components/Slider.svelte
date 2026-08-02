@@ -1,6 +1,6 @@
 <!--
   Slider 滑动输入组件
-  v1.1.0
+  v1.1.1
 
   文档: ./Slider.md
 -->
@@ -253,6 +253,7 @@
     style={sliderStyle}
     data-orientation={orientation}
     data-range={isRange || undefined}
+    data-hairline={thickness === 1 || undefined}
     data-show-steps={showSteps || undefined}
     data-dragging={dragging || undefined}
     data-disabled={disabled ? "true" : undefined}
@@ -366,7 +367,9 @@
             --snowui-slider-background-override,
             var(--snowui-slider-background, var(--black-4, #0000000a))
         );
-        transform: translateY(-50%);
+        transform: translateY(-50%)
+            scaleY(var(--snowui-slider-hairline-scale, 1));
+        transform-origin: center;
     }
 
     :global(:where(.snowui-slider[data-orientation="vertical"] .snowui-slider-track)) {
@@ -379,7 +382,13 @@
             var(--snowui-slider-thickness, calc(var(--size-4) / 4))
         );
         height: auto;
-        transform: translateX(-50%);
+        transform: translateX(-50%)
+            scaleX(var(--snowui-slider-hairline-scale, 1));
+        transform-origin: center;
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"])) {
+        --snowui-slider-hairline-scale: 0.5;
     }
 
     :global(:where(.snowui-slider-fill)) {
