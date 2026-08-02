@@ -1,6 +1,6 @@
 <!--
   Slider 滑动输入组件
-  v1.1.1
+  v1.1.2
 
   文档: ./Slider.md
 -->
@@ -287,7 +287,48 @@
         {/if}
 
         <div class="snowui-slider-track" aria-hidden="true">
-            <div class="snowui-slider-fill"></div>
+            <svg
+                class="snowui-slider-track-graphic"
+                aria-hidden="true"
+                focusable="false"
+                preserveAspectRatio="none"
+            >
+                {#if orientation === "vertical"}
+                    <line
+                        class="snowui-slider-track-background"
+                        x1="50%"
+                        x2="50%"
+                        y1="100%"
+                        y2="0%"
+                    />
+                    {#if endPercent > startPercent}
+                        <line
+                            class="snowui-slider-track-fill"
+                            x1="50%"
+                            x2="50%"
+                            y1={`${100 - startPercent}%`}
+                            y2={`${100 - endPercent}%`}
+                        />
+                    {/if}
+                {:else}
+                    <line
+                        class="snowui-slider-track-background"
+                        x1="0%"
+                        x2="100%"
+                        y1="50%"
+                        y2="50%"
+                    />
+                    {#if endPercent > startPercent}
+                        <line
+                            class="snowui-slider-track-fill"
+                            x1={`${startPercent}%`}
+                            x2={`${endPercent}%`}
+                            y1="50%"
+                            y2="50%"
+                        />
+                    {/if}
+                {/if}
+            </svg>
         </div>
 
         {#each resolvedValues as resolvedValue, index}
@@ -517,6 +558,50 @@
         overflow: visible;
         border-radius: 0;
         background-color: transparent;
+    }
+
+    :global(:where(.snowui-slider-track)) {
+        overflow: visible;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::before,
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::after {
+        content: none;
+    }
+
+    :global(:where(.snowui-slider-track-graphic)) {
+        position: absolute;
+        inset: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-slider-track-graphic line)) {
+        vector-effect: non-scaling-stroke;
+        stroke-linecap: round;
+        stroke-width: var(
+            --snowui-slider-thickness-override,
+            var(--snowui-slider-thickness, calc(var(--size-4) / 4))
+        );
+    }
+
+    :global(:where(.snowui-slider-track-background)) {
+        stroke: var(
+            --snowui-slider-background-override,
+            var(--snowui-slider-background, var(--black-4, #0000000a))
+        );
+    }
+
+    :global(:where(.snowui-slider-track-fill)) {
+        stroke: var(
+            --snowui-slider-color-override,
+            var(--snowui-slider-color, var(--primary, #000000))
+        );
     }
 
     :global(:where(.snowui-slider[data-show-steps="true"] .snowui-slider-track)) {
