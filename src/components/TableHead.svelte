@@ -138,19 +138,26 @@
     const actionsBlur = $derived(buildRoleOverlayBlur("right-to-left"));
     const selectionContentBlur = $derived(buildRoleOverlayBlur("left-to-right"));
     const actionsContentBlur = $derived(buildRoleOverlayBlur("right-to-left"));
+    const selectionCheckboxSizeStyle = $derived(
+        parts?.Checkbox?.size === undefined
+            ? "--snowui-checkbox-size-override: var(--snowui-table-selection-checkbox-size-override, calc(var(--size-4, 1rem) + 0.0625rem))"
+            : undefined,
+    );
 </script>
 
 {#if !isRoleColumnHidden}
 <Frame tag="th" aria-sort={!isSelectionRole && !isActionsRole ? direction ?? (isSortable ? "none" : undefined) : undefined} data-column-id={resolvedColumnId} data-sort={direction} data-selected={selectionState.some || selectionState.all ? "true" : undefined} data-table-variant={tableVariant} data-role-layout={isSelectionRole || isActionsRole ? resolvedRoleLayout : undefined} as={isSelectionRole || isActionsRole ? role : undefined} class={`snowui-table-head ${userClass}`} style={finalStyle} use={finalUse} enableAutoLayout={false} enableResponsive={enableResponsive} enableContext={enableContext} enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
     {#if isSelectionRole}
-        <span class="snowui-table-selection-control">
+        <span
+            class="snowui-table-selection-control"
+            style={selectionCheckboxSizeStyle}
+        >
             <span class="snowui-table-role-blur-layer" style={selectionBlur.containerStyle} aria-hidden="true">
                 {#each selectionBlur.layers as layer (layer.index)}
                     <span style={layer.style}></span>
                 {/each}
             </span>
             <Checkbox
-                size={16}
                 checked={selectionState.all}
                 indeterminate={selectionState.some}
                 ariaLabel="选择全部当前行"
