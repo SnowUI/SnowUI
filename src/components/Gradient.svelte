@@ -1,6 +1,6 @@
 <!--
   Gradient 矢量渐变组件
-  v2.5.0
+  v2.8.4
 
   职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
   文档：./Gradient.md
@@ -21,6 +21,7 @@
         vector3: string;
         subtract: string;
         subtract2: string;
+        center: string;
     };
 
     const GRADIENT_PALETTES: Record<GradientVariant, GradientPalette> = {
@@ -30,6 +31,7 @@
             vector3: "#6560FF",
             subtract: "#3AF2FC",
             subtract2: "#D4E6FE",
+            center: "#6560FF",
         },
         cyan: {
             background: "#0B005A",
@@ -37,6 +39,7 @@
             vector3: "#00A5BE",
             subtract: "#31FF83",
             subtract2: "#D4FEEF",
+            center: "#00A5BE",
         },
         green: {
             background: "#000A4E",
@@ -44,6 +47,7 @@
             vector3: "#16B335",
             subtract: "#C6F94F",
             subtract2: "#DFFED4",
+            center: "#16B335",
         },
         red: {
             background: "#320061",
@@ -51,6 +55,7 @@
             vector3: "#FC3551",
             subtract: "#F9E84F",
             subtract2: "#FED4D5",
+            center: "#FC3551",
         },
         orange: {
             background: "#EC2300",
@@ -58,6 +63,7 @@
             vector3: "#FF6C04",
             subtract: "#FF14AD",
             subtract2: "#FEF0D4",
+            center: "#FF6C04",
         },
         purple: {
             background: "#1E0069",
@@ -65,8 +71,60 @@
             vector3: "#F935FC",
             subtract: "#FFF78E",
             subtract2: "#FED4F5",
+            center: "#F935FC",
         },
     };
+
+    const GRADIENT_VARIANTS = Object.keys(
+        GRADIENT_PALETTES,
+    ) as GradientVariant[];
+
+    function resolveSeedVariant(seed: string | number | undefined) {
+        const normalizedSeed = String(seed ?? "").trim().toLowerCase();
+        if (GRADIENT_VARIANTS.includes(normalizedSeed as GradientVariant)) {
+            return normalizedSeed as GradientVariant;
+        }
+
+        let hash = 0;
+        for (let index = 0; index < normalizedSeed.length; index += 1) {
+            hash = (hash * 31 + normalizedSeed.charCodeAt(index)) | 0;
+        }
+        return (
+            GRADIENT_VARIANTS[Math.abs(hash) % GRADIENT_VARIANTS.length] ??
+            "blue"
+        );
+    }
+
+    function hashString(value: string) {
+        let hash = 2166136261;
+        for (let index = 0; index < value.length; index += 1) {
+            hash ^= value.charCodeAt(index);
+            hash = Math.imul(hash, 16777619);
+        }
+        return hash >>> 0;
+    }
+
+    function resolveAvatarColorCycle(
+        currentVariant: GradientVariant,
+        seed: string | number | undefined,
+        instanceId: string,
+    ) {
+        const variants = GRADIENT_VARIANTS.filter(
+            (candidate) => candidate !== currentVariant,
+        );
+        let state = hashString(`${String(seed ?? currentVariant)}:${instanceId}`);
+
+        for (let index = variants.length - 1; index > 0; index -= 1) {
+            state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
+            const targetIndex = state % (index + 1);
+            [variants[index], variants[targetIndex]] = [
+                variants[targetIndex],
+                variants[index],
+            ];
+        }
+
+        return variants;
+    }
 </script>
 
 <script lang="ts">
@@ -84,6 +142,7 @@
             | "enableDefaultMotion"
         > {
         variant?: GradientVariant;
+        seed?: string | number;
         size?: number | string;
         width?: number | string;
         height?: number | string;
@@ -93,7 +152,8 @@
     }
 
     let {
-        variant = "blue",
+        variant = undefined,
+        seed = undefined,
         size = undefined,
         width = undefined,
         height = undefined,
@@ -135,8 +195,17 @@
     const resolvedRadius = $derived(
         radius === undefined ? DEFAULT_RADIUS : toCssLength(radius),
     );
+    const isAvatarVariant = $derived(rest.as === "avatar-image");
+    const resolvedVariant = $derived(
+        variant ?? (isAvatarVariant ? resolveSeedVariant(seed) : "blue"),
+    );
     const palette = $derived(
-        GRADIENT_PALETTES[variant] ?? GRADIENT_PALETTES.blue,
+        GRADIENT_PALETTES[resolvedVariant] ?? GRADIENT_PALETTES.blue,
+    );
+    const avatarColorCycle = $derived(
+        isAvatarVariant
+            ? resolveAvatarColorCycle(resolvedVariant, seed, instanceId)
+            : [],
     );
     const gradientStyle = $derived(
         [
@@ -164,12 +233,14 @@
     enableDefaultMotion={false}
     class={[
         "snowui-gradient",
-        `snowui-gradient-${variant}`,
+        `snowui-gradient-${resolvedVariant}`,
+        isAvatarVariant ? "snowui-gradient-avatar" : "",
         className,
     ]
         .filter(Boolean)
         .join(" ")}
-    data-variant={variant}
+    data-variant={resolvedVariant}
+    data-avatar={isAvatarVariant ? "true" : undefined}
     style={gradientStyle}
     role={decorative ? undefined : (role ?? "img")}
     aria-label={decorative ? undefined : ariaLabel}
@@ -323,10 +394,30 @@
             </g>
         </g>
     </svg>
+    {#if isAvatarVariant}
+        <div class="snowui-gradient-avatar-overlay" aria-hidden="true">
+            {#each avatarColorCycle as targetVariant, index}
+                {#each [0, 1] as overlayLayer}
+                    <div
+                        class="snowui-gradient-avatar-color-pass"
+                        data-color={targetVariant}
+                        data-overlay-layer={overlayLayer + 1}
+                    >
+                        <div
+                            class="snowui-gradient-avatar-color"
+                            data-color={targetVariant}
+                            style={`--snowui-gradient-avatar-color-index: ${index}; --snowui-gradient-avatar-color: ${GRADIENT_PALETTES[targetVariant].center}`}
+                        ></div>
+                    </div>
+                {/each}
+            {/each}
+        </div>
+    {/if}
 </Frame>
 
 <style>
     :global(:where(.snowui-gradient)) {
+        position: relative;
         display: inline-flex;
         flex: none;
         width: var(
@@ -356,6 +447,7 @@
         -webkit-mask-image: linear-gradient(black, black);
         mask-image: linear-gradient(black, black);
         box-sizing: border-box;
+        isolation: isolate;
     }
 
     :global(:where(.snowui-gradient-svg)) {
@@ -395,6 +487,80 @@
 
     :global(:where(.snowui-gradient-layer-subtract-2)) {
         animation-name: snowui-gradient-subtract-2-motion;
+    }
+
+    :global(:where(.snowui-gradient-avatar-overlay)) {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+        border-radius: inherit;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-gradient-avatar-color-pass)) {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        mix-blend-mode: overlay;
+        transition: opacity
+            var(--snowui-gradient-avatar-hover-entry-duration, 0.5s)
+            var(
+                --snowui-gradient-avatar-hover-entry-easing,
+                cubic-bezier(0.4, 0, 0.2, 1)
+            );
+        will-change: opacity;
+    }
+
+    :global(:where(.snowui-gradient-avatar-color)) {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        background: var(--snowui-gradient-avatar-color);
+        animation: snowui-gradient-avatar-color-cycle
+            var(--snowui-gradient-avatar-hover-color-duration, 10s)
+            linear infinite;
+        animation-delay: calc(
+            var(--snowui-gradient-avatar-color-index) * -2s
+        );
+        animation-play-state: paused;
+    }
+
+    :global(
+            .snowui-media-hoverable:hover:not(.snowui-disabled)
+                .snowui-gradient-avatar
+                .snowui-gradient-avatar-color-pass
+        ) {
+        opacity: 1;
+    }
+
+    :global(
+            .snowui-media-hoverable:hover:not(.snowui-disabled)
+                .snowui-gradient-avatar
+                .snowui-gradient-avatar-color
+        ) {
+        animation-play-state: running;
+    }
+
+    @keyframes snowui-gradient-avatar-color-cycle {
+        0%,
+        10% {
+            opacity: var(
+                --snowui-gradient-avatar-hover-color-opacity,
+                0.58
+            );
+        }
+
+        20%,
+        90% {
+            opacity: 0;
+        }
+
+        100% {
+            opacity: var(
+                --snowui-gradient-avatar-hover-color-opacity,
+                0.58
+            );
+        }
     }
 
     @keyframes snowui-gradient-vector-4-motion {
@@ -726,6 +892,33 @@
             animation: none;
             transform: none;
             will-change: auto;
+        }
+
+        :global(:where(.snowui-gradient-avatar-overlay)) {
+            will-change: auto;
+        }
+
+        :global(:where(.snowui-gradient-avatar-color-pass)) {
+            transition: none;
+            will-change: auto;
+        }
+
+        :global(:where(.snowui-gradient-avatar-color)) {
+            animation: none;
+            opacity: 0;
+            will-change: auto;
+        }
+
+        :global(
+                :where(
+                        .snowui-gradient-avatar-color-pass:nth-child(-n + 2)
+                            .snowui-gradient-avatar-color
+                    )
+            ) {
+            opacity: var(
+                --snowui-gradient-avatar-hover-color-opacity,
+                0.58
+            );
         }
     }
 </style>

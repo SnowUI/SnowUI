@@ -1,6 +1,6 @@
 # Gradient 矢量渐变
 
-> **版本**: v2.5.0
+> **版本**: v2.8.4
 > **职责**: 以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
 > **包归属**: OSS
 
@@ -19,6 +19,9 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 - 四个 `feGaussianBlur` 使用 `filterUnits="userSpaceOnUse"`。图形通过 SVG viewport 缩放时，模糊标准差与几何一起按比例缩放，不使用固定屏幕像素模糊，也不需要尺寸观察器。
 - 根层使用纯 alpha mask 将圆角与 SVG filter 固定在同一合成裁切层，避免圆角最外圈露出渐变底色毛边。
 - 四个有色图层以 `15s` 完成一次闭环：Vector 4 位移并旋转、Vector 3 位移并缩放、Subtract 位移并非等比形变、Subtract 2 位移并旋转缩放；各自使用不同关键帧节奏。
+- 作为 `Avatar fallback` 渲染时，Gradient 根据 Avatar 传入的 `seed` 稳定选择六种配色；若 seed 本身是 `blue / cyan / green / red / orange / purple`，则直接命中对应配色。
+- Avatar hover 状态由 Avatar 的统一 `.snowui-media-hoverable` 协议提供；Gradient 自己排除当前 variant，将其余五种 Gradient 的中心主色按实例稳定打乱，并以双层同色 `overlay` 持续交叉过渡。
+- 头像变色不复制完整 Gradient：每个候选色使用两个同步的 HTML 纯色 Overlay pass，覆盖在完整 SVG 之上并分别执行混合；单层峰值限制为 `58%`，五色循环为 `10s`，通过 `0.5s` 渐显缓冲进入。
 - `prefers-reduced-motion: reduce` 下停止内部循环并恢复未经 transform 的静态设计基线。
 
 ## API
@@ -26,6 +29,7 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | `variant` | `"blue" \| "cyan" \| "green" \| "red" \| "orange" \| "purple"` | `"blue"` | 选择 Frame 200 从左到右对应的六种固定配色 |
+| `seed` | `string \| number` | - | 仅在 `as="avatar-image"` 且未显式传 `variant` 时用于稳定选择六种配色；配色名可直接命中对应 variant |
 | `size` | `number \| string` | - | 同时设置宽高；优先级高于 `width` / `height` |
 | `width` | `number \| string` | `360` | 宽度；数字值按 px 处理 |
 | `height` | `number \| string` | `360` | 高度；数字值按 px 处理 |
@@ -82,6 +86,8 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 <Avatar fallback={Gradient} data-name="Gradient avatar" size={80} />
 ```
 
+Avatar 会向 fallback 传入 `as="avatar-image"` 与稳定 seed。Avatar 只提供 hover 状态，颜色序列和 Overlay 绘制由 Gradient 负责；该模式会在圆形裁切内持续过渡到当前 variant 之外的五种颜色，普通 Gradient 不创建头像专用叠加层。
+
 ## 矢量与缩放
 
 - 画布：`360 × 360`。
@@ -97,8 +103,8 @@ Gradient 完全重写为六种 SVG 矢量渐变。六种配色共用同一套 `3
 - 底色矩形和 SVG 根层保持静止；单个实例只在四个有色 `<g>` 上运行 CSS transform keyframes。
 - 动画只使用 `translate3d + rotate + scale / scaleX / scaleY`，并仅在这四个活动图层使用 `will-change: transform`。
 - 四个 `feGaussianBlur` 的标准差、滤镜区域、SVG 路径与固定颜色在循环中保持不变。
-- 不动画 `fill`、`mix-blend-mode`、`feBlend` 或 Gaussian Blur；这些变化会带来持续重绘，已从方案中去除。
-- 不使用 JavaScript、Svelte effect、`requestAnimationFrame`、Canvas、ResizeObserver、计时器或随机数。
+- 原始五层不动画 `fill`、`mix-blend-mode`、`feBlend` 或 Gaussian Blur；Avatar hover 只在五组双层同色的 80px 纯色 Overlay 间交叉动画 opacity。每层使用独立 HTML 合成元素执行 `overlay`，确保 backdrop 是已经完整渲染的 Gradient SVG，而不是 SVG 内部隔离的滤镜子树。
+- 颜色顺序仅在组件求值时由 seed 与实例 ID 稳定打乱；运行期间不使用 JavaScript 动画、`requestAnimationFrame`、Canvas、ResizeObserver 或计时器。
 - `0%` 与 `100%` 使用完全相同的 transform，保证持续循环时不跳帧。
 - 图层原始几何和 filter region 均大于画布；动效幅度限制在安全范围内并继续由固定 clipPath 裁切。
 
@@ -125,12 +131,50 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 - 根 Frame 固定 `enableDefaultMotion={false}`。
 - 内部四个有色 SVG 图层固定持续播放独立合成 transform 动效；底色和 SVG 根层不动，不提供 `speed`、`paused`、`seed` 等运行时 Props。
 - 不使用 Svelte transition、WAAPI、Canvas、JavaScript 动画循环或定时器。
-- 动效不得改变已确认的六种配色、路径、图层顺序和 blur 基线。
+- 常态动效不得改变已确认的六种配色、路径、图层顺序和 blur 基线；Avatar hover 允许通过独立 Overlay 改变合成后的可见色调。
 - reduced-motion 是“始终运动”的无障碍例外，系统请求减少动态时必须停止。
 
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.8.4 (2026-08-02)
+
+- 修复 Avatar hover 颜色层在循环边界反复闪烁：关键帧 `100%` opacity 从错误的 `1` 恢复为与 `0%` 相同的 `0.58`。
+- 五组错峰颜色层现在均以完全相同的起止状态闭环，相邻颜色仍保持连续交叉淡化。
+
+### v2.8.3 (2026-08-02)
+
+- 修复 SVG clip / filter 合成上下文导致 `mix-blend-mode: overlay` 退化为近似纯色染色的问题。
+- 双层颜色 Overlay 从 SVG `<g>` 移到完整 SVG 上方的 HTML 合成层，使每次混合都以原 Gradient 图形作为 backdrop，保留其明暗与渐变纹理。
+
+### v2.8.2 (2026-08-02)
+
+- 修复双层纯色峰值为 100% 时压平原 Gradient 纹理的问题：两层改为独立 Overlay pass，单层峰值限制为 58%。
+- 根据“颜色变化太快”将五色循环时长由 `5s` 增加为 `10s`；每个相邻颜色拥有更长的交叉淡化时间，不发生离散跳色。
+
+### v2.8.1 (2026-08-02)
+
+- Avatar hover Overlay 的显现时长由 `0.15s` 调整为 `0.5s`，使用标准 ease-in-out 缓动，让双层颜色强度与 5s 循环运动自然渐入。
+- 动画仍在 hover 时直接以目标速度运行，但由合成层渐显遮蔽启动跳变，不增加 JavaScript 调速、计时器或逐帧计算。
+
+### v2.8.0 (2026-08-02)
+
+- Avatar 每个候选色从单层 Overlay 改为两层完全同步的同色 Overlay，每层分别使用 `overlay` 混合，增强色调变化。
+- 五色循环由 `10s` 缩短为 `5s`，颜色过渡速度提高至 2 倍。
+- 单个头像仅增加到十个纯色 opacity 层，仍不复制 Gaussian Blur 图形。
+
+### v2.7.0 (2026-08-02)
+
+- Avatar 继续统一提供 hover 状态，Gradient 改为自行管理颜色变化：排除当前 variant 后，将其余五色按实例打乱并持续交叉过渡。
+- 删除旋转 / 缩放的 `screen` 渐变带，改用六种 Gradient 的中心主色作为固定 `overlay` 叠加色。
+- 为避免复制完整静态 Gradient 带来的 Gaussian Blur 开销，候选色只渲染为五个 80px 纯色矩形且仅动画 opacity。
+
+### v2.6.0 (2026-08-02)
+
+- GD-04 改为六个 `80 × 80` Avatar，逐一展示 blue、cyan、green、red、orange、purple 六种 Gradient fallback。
+- Gradient 在 Avatar fallback 模式下按 seed 稳定选择配色；显式 variant 仍拥有最高优先级。
+- Avatar hover 新增持续的 `screen` 颜色叠加带，只动画小尺寸叠加层的 transform；reduced-motion 下停止循环并保留静态颜色反馈。
 
 ### v2.5.0 (2026-08-02)
 
