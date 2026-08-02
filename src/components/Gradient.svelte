@@ -397,7 +397,7 @@
     {#if isAvatarVariant}
         <div class="snowui-gradient-avatar-overlay" aria-hidden="true">
             {#each avatarColorCycle as targetVariant, index}
-                {#each [0, 1] as overlayLayer}
+                {#each [0, 1, 2, 3] as overlayLayer}
                     <div
                         class="snowui-gradient-avatar-color-pass"
                         data-color={targetVariant}
