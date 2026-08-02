@@ -1,6 +1,6 @@
 <!--
   Slider 滑动输入组件
-  v1.1.2
+  v1.1.3
 
   文档: ./Slider.md
 -->
@@ -15,6 +15,7 @@
     } from "../lib/color";
     import { splitFrameHostProps } from "../logic/frame-prop-filter";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import { resizeManager } from "../logic/observer.svelte";
 
     type SliderOrientation = "horizontal" | "vertical";
 
@@ -70,9 +71,12 @@
     }: Props = $props();
 
     let controlRef = $state<HTMLElement>();
+    let trackRef = $state<HTMLElement>();
     let labelsRef = $state<HTMLElement>();
     let activeIndex = $state(0);
     let dragging = $state(false);
+    let pixelSnapX = $state(0);
+    let pixelSnapY = $state(0);
 
     function toCssLength(value: number | string) {
         return typeof value === "number" ? `${value}px` : value;
@@ -150,6 +154,8 @@
             `--snowui-slider-start: ${startPercent}%`,
             `--snowui-slider-end: ${endPercent}%`,
             `--snowui-slider-step-percent: ${stepPercent}%`,
+            `--snowui-slider-pixel-snap-x: ${pixelSnapX}px`,
+            `--snowui-slider-pixel-snap-y: ${pixelSnapY}px`,
             userStyle,
         ]
             .filter(Boolean)
@@ -171,6 +177,65 @@
                 resolvedValues[index] ?? resolvedValues[0] ?? minValue,
             );
         });
+    });
+
+    $effect(() => {
+        const control = controlRef;
+        const track = trackRef;
+        orientation;
+        thickness;
+        if (!control || !track || typeof window === "undefined") return;
+
+        let frame = 0;
+        const syncPixelPhase = () => {
+            const line = track.querySelector<SVGLineElement>("line");
+            if (!line) return;
+
+            const rect = track.getBoundingClientRect();
+            const strokeWidth = Number.parseFloat(
+                getComputedStyle(line).strokeWidth,
+            );
+            const dpr = window.devicePixelRatio || 1;
+            if (!Number.isFinite(strokeWidth) || strokeWidth <= 0) return;
+
+            const vertical = orientation === "vertical";
+            const currentSnap = vertical ? pixelSnapX : pixelSnapY;
+            const currentCenter = vertical
+                ? rect.left + rect.width / 2
+                : rect.top + rect.height / 2;
+            const baseCenter = currentCenter - currentSnap;
+            const physicalStroke = Math.max(
+                1,
+                Math.round(strokeWidth * dpr),
+            );
+            const centerPhase = physicalStroke % 2 === 1 ? 0.5 : 0;
+            const basePhysical = baseCenter * dpr;
+            const snappedPhysical =
+                Math.round(basePhysical - centerPhase) + centerPhase;
+            const nextSnap = (snappedPhysical - basePhysical) / dpr;
+
+            if (vertical) {
+                pixelSnapX = nextSnap;
+                pixelSnapY = 0;
+            } else {
+                pixelSnapX = 0;
+                pixelSnapY = nextSnap;
+            }
+        };
+        const schedule = () => {
+            cancelAnimationFrame(frame);
+            frame = requestAnimationFrame(syncPixelPhase);
+        };
+
+        const unwatch = resizeManager.watch(control, schedule);
+        window.addEventListener("resize", schedule);
+        schedule();
+
+        return () => {
+            cancelAnimationFrame(frame);
+            unwatch();
+            window.removeEventListener("resize", schedule);
+        };
     });
 
     function commitValue(index: number, nextValue: number) {
@@ -286,7 +351,11 @@
             </div>
         {/if}
 
-        <div class="snowui-slider-track" aria-hidden="true">
+        <div
+            bind:this={trackRef}
+            class="snowui-slider-track"
+            aria-hidden="true"
+        >
             <svg
                 class="snowui-slider-track-graphic"
                 aria-hidden="true"
@@ -408,7 +477,9 @@
             --snowui-slider-background-override,
             var(--snowui-slider-background, var(--black-4, #0000000a))
         );
-        transform: translateY(-50%);
+        transform: translateY(
+            calc(-50% + var(--snowui-slider-pixel-snap-y, 0px))
+        );
     }
 
     :global(:where(.snowui-slider[data-orientation="vertical"] .snowui-slider-track)) {
@@ -421,7 +492,9 @@
             var(--snowui-slider-thickness, calc(var(--size-4) / 4))
         );
         height: auto;
-        transform: translateX(-50%);
+        transform: translateX(
+            calc(-50% + var(--snowui-slider-pixel-snap-x, 0px))
+        );
     }
 
     :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track)) {
