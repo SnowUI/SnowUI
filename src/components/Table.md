@@ -102,7 +102,8 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 > 三处渐隐的 `mask-image` 均复用 OSS 通用能力 [`edge-fade`](../lib/edge-fade.md)（`createEdgeFadeMaskImage`）生成并存到 CSS 变量，TableCell / TableHead 的 hover 状态规则只 `mask-image: var(...)` 消费。selection / head 的固定参数遮罩由 Table 根生成；actions 遮罩依赖每行实测按钮宽度，因此由相邻内容 TableCell 在自身作用域生成，确保能够读取行级 `--snowui-table-role-overlay-content-width`。上面这些 `*-override` 变量即该能力对表格暴露的可配置参数。「悬浮操作层」本身的定位（sticky / fixed + JS 测量）属于表格布局职责，不在通用能力范围内。
 - **不影响点击**：`mask` 只改变可见度，不改变命中测试；被渐隐内容里的链接、按钮等仍可正常点击。
 - **与 blur 的关系**：边缘渐隐与 `.snowui-table-role-blur-layer` 背景模糊是两套独立机制。需要只保留渐隐时，把 `--snowui-table-role-overlay-blur-override` 设为 `0rem` 关闭背景模糊即可。
-- **静态 hover 预览**：在某个 `<TableRow>` 上加 `data-force-hover="true"`，可让该行在不实际 hover 的情况下恒定呈现 hover 态（行 checkbox / 行动按钮 / 两侧渐隐 / 表头全选与表头渐隐均会按该行触发），用于文档截图与视觉走查。
+- **激活行**：`<TableRow active>` 由使用方或外部条件持续写入，默认绘制 `--black-4` 背景。它不是 hover 或 selected，不会改变 Checkbox 的选中状态；真实 hover 到激活行时，连续 hover 移动层与激活背景叠加。
+- **静态 hover 预览**：在某个 `<TableRow>` 上加 `data-force-hover="true"`，可让该行在不实际 hover 的情况下恒定呈现 hover 态（背景 / 行 checkbox / 行动按钮 / 两侧渐隐 / 表头全选与表头渐隐均会按该行触发），用于文档截图与视觉走查；业务持久态应使用 `active` Prop。
 
 关键代码（落地于 `TableCell.svelte` / `TableHead.svelte`，均为 `:global(:where(...))` 0 权重选择器）：
 
@@ -189,6 +190,7 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 ## Changelog
 
+- 2026-08-03：TableRow 新增外部受控 `active` 激活态；持久 `--black-4` 背景可与连续 hover 层叠加，不与 selected / Checkbox 选中状态绑定。
 - 2026-07-07：减少首屏工作量：普通单元格挂载不再额外排队逐格 rAF；overlay 角色块仅在 hover、focus、选中或强制预览时测量与监听位置，空闲行不触发布局读取。
 
 - 2026-07-07：v2.1.0，明确 OSS Table 只负责表格数据展示；加载更多、selection/actions 角色列、排序筛选、分页和搜索统一归 PRO DataTable。
