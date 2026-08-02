@@ -29,7 +29,7 @@
 | `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | 轨道方向 |
 | `showSteps` | `boolean` | `false` | 使用 1px 透明缝隙按照 step 切割轨道与填充条 |
 | `showLabel` | `boolean` | `false` | 是否生成跟随拖动块的内置 Text label；Range 自动生成两个 |
-| `thickness` | `number \| string` | `4` | 轨道粗细；数字 `1` 使用 0.5 CSS px 的 Retina hairline 渲染并保留圆头，字符串 `"1px"` 表示字面 1 CSS px |
+| `thickness` | `number \| string` | `4` | 轨道粗细；数字 `1` 使用 1 CSS px 的实色 SVG 圆头描边，避免半像素抗锯齿导致颜色变淡与圆角消失 |
 | `background` | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
 | `color` | `SnowUIColor \| string` | `"Primary"` | 填充条颜色 |
 | `thumbColor` | `SnowUIColor \| string` | `"StaticWhite100"` | 拖动块颜色 |
@@ -80,7 +80,7 @@
 
 ### v1.1.1 (2026-08-03)
 
-- 数字 `thickness={1}` 改为先按 1px 圆角轨道绘制、再沿厚度轴缩放到 0.5 CSS px，得到 Retina 屏幕上的单物理像素 hairline，并保留比直接绘制 0.5px 更稳定的圆头；`thickness="1px"` 继续表示字面 1 CSS px。
+- 数字 `thickness={1}` 使用 1 CSS px SVG 实色描边与 `round` line-cap 绘制轨道和填充，避免半像素缩放把黑色混成灰色，并保证细轨道两端保持可见圆头。
 
 ### v1.1.0 (2026-07-04)
 

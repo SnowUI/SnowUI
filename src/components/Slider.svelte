@@ -367,9 +367,7 @@
             --snowui-slider-background-override,
             var(--snowui-slider-background, var(--black-4, #0000000a))
         );
-        transform: translateY(-50%)
-            scaleY(var(--snowui-slider-hairline-scale, 1));
-        transform-origin: center;
+        transform: translateY(-50%);
     }
 
     :global(:where(.snowui-slider[data-orientation="vertical"] .snowui-slider-track)) {
@@ -382,13 +380,114 @@
             var(--snowui-slider-thickness, calc(var(--size-4) / 4))
         );
         height: auto;
-        transform: translateX(-50%)
-            scaleX(var(--snowui-slider-hairline-scale, 1));
-        transform-origin: center;
+        transform: translateX(-50%);
     }
 
-    :global(:where(.snowui-slider[data-hairline="true"])) {
-        --snowui-slider-hairline-scale: 0.5;
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track)) {
+        overflow: visible;
+        border-radius: 0;
+        background-color: transparent;
+        background-image: linear-gradient(
+            var(
+                    --snowui-slider-background-override,
+                    var(
+                        --snowui-slider-background,
+                        var(--black-4, #0000000a)
+                    )
+                ),
+            var(
+                    --snowui-slider-background-override,
+                    var(
+                        --snowui-slider-background,
+                        var(--black-4, #0000000a)
+                    )
+                )
+        );
+        background-position: center;
+        background-size: calc(100% - var(--snowui-slider-thickness)) 100%;
+        background-repeat: no-repeat;
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::before,
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::after,
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::before,
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::after {
+        position: absolute;
+        top: 0;
+        width: var(--snowui-slider-thickness);
+        height: var(--snowui-slider-thickness);
+        border-radius: var(--radius-full);
+        content: "";
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::before,
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::before {
+        left: 0;
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::after,
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::after {
+        right: 0;
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::before,
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-track))::after {
+        background-color: var(
+            --snowui-slider-background-override,
+            var(--snowui-slider-background, var(--black-4, #0000000a))
+        );
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill)) {
+        border-radius: 0;
+        background-color: transparent;
+        background-image: linear-gradient(
+            var(
+                    --snowui-slider-color-override,
+                    var(--snowui-slider-color, var(--primary, #000000))
+                ),
+            var(
+                    --snowui-slider-color-override,
+                    var(--snowui-slider-color, var(--primary, #000000))
+                )
+        );
+        background-position: center;
+        background-size: calc(100% - var(--snowui-slider-thickness)) 100%;
+        background-repeat: no-repeat;
+        overflow: visible;
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::before,
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill))::after {
+        background-color: var(
+            --snowui-slider-color-override,
+            var(--snowui-slider-color, var(--primary, #000000))
+        );
+    }
+
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track)),
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill)) {
+        background-size: 100% calc(100% - var(--snowui-slider-thickness));
+    }
+
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track))::before,
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track))::after,
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill))::before,
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill))::after {
+        position: absolute;
+        right: auto;
+        left: 0;
+    }
+
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track))::before,
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill))::before {
+        top: 0;
+    }
+
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-track))::after,
+    :global(:where(.snowui-slider[data-orientation="vertical"][data-hairline="true"] .snowui-slider-fill))::after {
+        top: auto;
+        bottom: 0;
     }
 
     :global(:where(.snowui-slider-fill)) {
@@ -412,6 +511,12 @@
         left: 0;
         width: auto;
         height: calc(var(--snowui-slider-end, 0%) - var(--snowui-slider-start, 0%));
+    }
+
+    :global(:where(.snowui-slider[data-hairline="true"] .snowui-slider-fill)) {
+        overflow: visible;
+        border-radius: 0;
+        background-color: transparent;
     }
 
     :global(:where(.snowui-slider[data-show-steps="true"] .snowui-slider-track)) {
