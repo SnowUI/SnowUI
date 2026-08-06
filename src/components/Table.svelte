@@ -5,6 +5,7 @@
     import type { ResourceSize } from "../context";
     import { getTableContext, provideTableContext, type TableColumnRegistration } from "../lib/table-context.svelte";
     import { createEdgeFadeMaskImage } from "../lib/edge-fade";
+    import { TableTruncationManager } from "../lib/table-truncation";
     interface Props extends Omit<FrameProps, "children"> {
         columnWidths?: Record<string, number>;
         minWidth?: number | string;
@@ -34,15 +35,18 @@
     // deep-state proxy against its source object.
     let registeredColumns = $state.raw<TableColumnRegistration[]>([]);
     let tableElement = $state<HTMLElement>();
+    let viewportElement = $state<HTMLElement>();
     let autoLockedColumnWidths = $state<Record<string, number>>({});
     let hasAutoLockedColumnWidths = $state(false);
     const parentTable = getTableContext();
+    const truncationManager = new TableTruncationManager();
 
     provideTableContext({
         getColumnWidth: (columnId) => columnWidths[columnId] ?? autoLockedColumnWidths[columnId],
         setColumnWidth: (columnId, width) => {
             columnWidths = { ...columnWidths, [columnId]: Math.round(width) };
             onColumnWidthsChange?.(columnWidths);
+            truncationManager.schedule();
         },
         getLoadingSpinnerSize: () => loadingSpinnerSize,
         registerColumn: (column) => {
@@ -54,7 +58,16 @@
             };
         },
         getColumns: () => registeredColumns,
+        registerTruncationTarget: (node, target) =>
+            truncationManager.register(node, target),
+        requestTruncationMeasure: () => truncationManager.schedule(),
     });
+
+    $effect(() => {
+        if (!viewportElement || !tableElement) return;
+        return truncationManager.observe(viewportElement, tableElement);
+    });
+    $effect(() => () => truncationManager.destroy());
 
     // 增量加载第一次开始前锁定当前自然列宽。后续新行即使出现更宽内容，也只在已有列宽内
     // 截断，不再触发原生 table-layout:auto 重新分配整表列宽并带动已有行横向晃动。
@@ -97,6 +110,7 @@
 </script>
 
 <Frame
+    bind:element={viewportElement}
     class={`snowui-table-viewport ${userClass}`}
     data-role-layout={parentTable.isDataTable() ? parentTable.getRoleLayout() : undefined}
     style={fadeMaskVars}

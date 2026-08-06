@@ -1,6 +1,6 @@
 # TableRow
 
-> **版本**: v1.8.0
+> **版本**: v1.9.0
 > **职责**: 表头或表体的 `<tr>`，统一整行 hover 几何与交互状态。
 
 `rowId` 会映射为 `data-row-id`。仅当 DataTable 开启 selection 时，行才注册到当前渲染行集合，供全选和部分选中状态使用；只读表、排序表与行预览不维护无用的选择注册。`active` 是完全受外部控制的持久视觉状态：开启后输出 `data-active="true"`，使用 `var(--snowui-table-row-hover-background-override, var(--black-4))` 作为静态背景；真实 hover 到激活行时，TableBody 的连续 hover 移动层会再叠加一层同色背景。组件自身不通过点击、hover 或其他交互切换 `active`。
@@ -31,6 +31,7 @@
 
 ## Changelog
 
+- 2026-08-06：v1.9.0，默认普通 Row 使用保持同一 DOM 状态、事件与语义的原生 tr 快路径；声明高级 Frame 能力时自动回退完整路径。
 - 2026-08-06：v1.8.0，仅在 DataTable 开启 selection 时注册 `rowId`；只读、排序与行预览表不再维护无用的行选择集合。
 - 2026-08-03：v1.7.0，新增外部受控 `active` 激活态；默认使用 `--black-4` 持久背景，允许与 TableBody 连续 hover 层叠加，且不会改变 Checkbox / selected 状态。
 - 2026-08-03：v1.6.0，删除 TableRow 的单元格 hover 背景与背景过渡；颜色统一由 TableBody 的唯一连续移动层绘制。

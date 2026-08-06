@@ -1,6 +1,7 @@
 import { getContext, setContext } from "svelte";
 import type { ResourceSize } from "../context";
 import type { MotionConfig } from "../logic/motion-config";
+import type { TableTruncationResult } from "./table-truncation";
 
 export type TableSortDirection = "ascending" | "descending";
 export type TableRoleLayout = "column" | "overlay";
@@ -71,6 +72,14 @@ export interface TableContext {
     registerSelectionController: (
         controller: TableSelectionController,
     ) => () => void;
+    registerTruncationTarget: (
+        node: HTMLElement,
+        target: {
+            isEnabled: () => boolean;
+            notify: (result: TableTruncationResult) => void;
+        },
+    ) => () => void;
+    requestTruncationMeasure: () => void;
 }
 
 export const TABLE_CONTEXT_KEY = Symbol.for("snowui.table");
@@ -115,6 +124,8 @@ const fallback: TableContext = {
     getSelectedRowIds: () => [],
     clearSelection: () => {},
     registerSelectionController: () => () => {},
+    registerTruncationTarget: () => () => {},
+    requestTruncationMeasure: () => {},
 };
 
 export function provideTableContext(context: Partial<TableContext>) {

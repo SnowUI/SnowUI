@@ -6,7 +6,7 @@
 - `parts.Spinner`：配置已有数据加载状态的 Spinner。
 - parts 不递归进入 TableCell 内部；更深层配置必须通过对应子组件自己的 parts。
 
-> **版本**: v1.4.0
+> **版本**: v1.5.0
 > **职责**: Table 的 `<tbody>` 语义容器。
 
 ```svelte
@@ -57,6 +57,7 @@ DataTable 在 `loading` 或 `refreshing` 且当前存在可见 rows 时，通过
 
 ## Changelog
 
+- 2026-08-06：v1.5.0，`continuousHover=false` 时不再实例化或挂载连续 hover 控制器；开启时保持原有唯一移动层、direct 命中与视觉不变。
 - 2026-08-03：v1.4.0，Table 行背景收敛为 TableBody 唯一连续 hover 移动层；TableRow / TableCell 不再绘制第二层背景，关闭 `continuousHover` 后不显示行背景。
 - 2026-08-02：v1.3.1，连续 hover 改用 direct 几何模式，移除长表格逐行 ResizeObserver 和 pointermove 全量行扫描。
 - 2026-06-30：v1.3.0，明确手动按钮仍可作为 TableBody child；auto 模式哨兵改由 DataTable 根层内部管理，避免向原生 tbody 注入观察器结构。

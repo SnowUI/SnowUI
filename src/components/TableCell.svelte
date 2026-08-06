@@ -1,16 +1,24 @@
 <!-- 默认单行截断、接受任意内容的表格单元格。文档: ./TableCell.md -->
+<script module lang="ts">
+    import { createEdgeFadeMaskImage } from "../lib/edge-fade";
+
+    const actionsFadeMask = createEdgeFadeMaskImage({
+        direction: "to left",
+        fadeStart: "var(--snowui-table-cell-actions-fade-width)",
+        fadeEnd: "calc(var(--snowui-table-cell-actions-fade-width) * var(--snowui-table-actions-fade-feather-override, 3))",
+    });
+</script>
 <script lang="ts">
-    import type { Snippet } from "svelte";
+    import { getContext, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Tooltip from "./Tooltip.svelte";
     import Checkbox from "./Checkbox.svelte";
     import Skeleton from "./Skeleton.svelte";
-    import { TruncationController } from "../logic/frame-truncation.svelte";
     import { resizeManager } from "../logic/observer.svelte";
     import { getTableContext, type TableRoleLayout } from "../lib/table-context.svelte";
     import { getTableRowContext } from "../lib/table-row-context.svelte";
-    import { createEdgeFadeMaskImage } from "../lib/edge-fade";
-    import { createProgressiveBlurStyles, createUniformBlurStyles, type ProgressiveBlurDirection } from "../lib/progressive-blur";
+    import { SKELETON_CONTEXT_KEY } from "../keys";
+    import { getTableRoleBlurStyles } from "../lib/table-role-blur";
     import {
         mergeComponentPartProps,
         useComponentPart,
@@ -36,11 +44,11 @@
     const inheritedTableCellPart = useComponentPart<Props>("TableCell");
     let explicitProps: Props = $props();
     let { columnId, as: role = undefined, lines = 1, tooltip = true, onTruncate = undefined, align = "start", roleLayout = undefined, row = false, gap = 2, nowrap = false, skeleton = false, children, parts = undefined, whileAppear: userWhileAppear = undefined, currentState: userCurrentState = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $derived(mergeComponentPartProps(inheritedTableCellPart.current, explicitProps));
-    let contentElement = $state<HTMLElement>();
     let roleOverlayElement = $state<HTMLElement>();
     let hasNestedTruncationOwner = $state(false);
     const table = getTableContext();
     const rowContext = getTableRowContext();
+    const parentSkeletonContext = getContext(SKELETON_CONTEXT_KEY);
     const rowId = $derived(rowContext?.getRowId());
     const selectionEnabled = $derived(table.isSelectionEnabled());
     const actionsEnabled = $derived(table.isActionsEnabled());
@@ -61,6 +69,9 @@
     const isSelected = $derived(rowId !== undefined && table.isRowSelected(rowId));
     const tableVariant = $derived(table.getVariant());
     const resolvedRoleLayout = $derived(roleLayout ?? table.getRoleLayout());
+    const hasActionsOverlay = $derived(
+        table.isDataTable() && actionsEnabled && resolvedRoleLayout === "overlay",
+    );
     const width = $derived(resolvedColumnId ? table.getColumnWidth(resolvedColumnId) : undefined);
     const resolvedLines = $derived(skeleton || isSelectionRole || isActionsRole || lines === false ? undefined : lines);
     const contextRowAppearMotion = $derived(
@@ -72,25 +83,42 @@
     const resolvedCurrentState = $derived(
         userCurrentState ?? (resolvedWhileAppear === undefined ? undefined : "Appear"),
     );
-    // Table rows are replaced as keyed units during pagination, so cell text is
-    // static for the lifetime of a mounted cell. Avoid one MutationObserver per
-    // cell; resize-based truncation detection remains shared through resizeManager.
-    const truncation = new TruncationController(
-        undefined,
-        () => contentElement,
-        undefined,
-        { observeTextMutations: false },
-    );
-    $effect(() => truncation.update(resolvedLines, onTruncate));
-    $effect(() => {
-        if (!contentElement) return;
-        const sync = () => {
-            hasNestedTruncationOwner = Boolean(
-                contentElement?.querySelector(':scope > [data-as="truncation-owner"]'),
-            );
+    let isTruncated = $state(false);
+    let fullText = $state("");
+    function registerTruncation(
+        node: HTMLElement,
+        initial: { enabled: boolean; onChange?: (isTruncated: boolean) => void },
+    ) {
+        let options = initial;
+        const cleanup = table.registerTruncationTarget(node, {
+            isEnabled: () => options.enabled,
+            notify: (result) => {
+                if (result.isTruncated !== isTruncated) {
+                    isTruncated = result.isTruncated;
+                    options.onChange?.(result.isTruncated);
+                }
+                if (result.fullText !== fullText) fullText = result.fullText;
+                if (result.hasNestedOwner !== hasNestedTruncationOwner) {
+                    hasNestedTruncationOwner = result.hasNestedOwner;
+                }
+            },
+        });
+        return {
+            update(next: typeof initial) {
+                const wasEnabled = options.enabled;
+                const previousOnChange = options.onChange;
+                options = next;
+                if (!next.enabled && wasEnabled) {
+                    if (isTruncated) previousOnChange?.(false);
+                    isTruncated = false;
+                    fullText = "";
+                    hasNestedTruncationOwner = false;
+                }
+                table.requestTruncationMeasure();
+            },
+            destroy: cleanup,
         };
-        sync();
-    });
+    }
     $effect(() => {
         const node = roleOverlayElement;
         if (!node || resolvedRoleLayout !== "overlay" || (!isSelectionRole && !isActionsRole)) return;
@@ -200,48 +228,35 @@
     const finalStyle = $derived(`${width ? `--snowui-table-cell-width-runtime:${width}px;width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime));min-width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime));max-width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime))` : ""};text-align:${align};${userStyle}`);
     // actions 的遮罩依赖每行实测后写入的宽度变量，必须在内容单元格自身计算。
     // 若把这条表达式定义在 Table 根上，根节点无法读取后代行上的变量，整条 mask 会失效。
-    const actionsFadeMask = createEdgeFadeMaskImage({
-        direction: "to left",
-        fadeStart: "var(--snowui-table-cell-actions-fade-width)",
-        fadeEnd: "calc(var(--snowui-table-cell-actions-fade-width) * var(--snowui-table-actions-fade-feather-override, 3))",
-    });
     const contentStyle = $derived(
         `${gap === undefined
             ? ""
             : `gap:${typeof gap === "number" ? `var(--gap-${gap}, calc(var(--gap-1) * ${gap}))` : gap};`}` +
-        `--snowui-table-cell-actions-fade-mask:${actionsFadeMask};`,
+        `${hasActionsOverlay ? `--snowui-table-cell-actions-fade-mask:${actionsFadeMask};` : ""}`,
     );
-    function buildRoleOverlayBlur(direction: ProgressiveBlurDirection) {
-        const options = {
-            direction,
-            layerCount: table.getRoleOverlayLayers(),
-            width: "var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3))",
-            sampleExtension: "var(--snowui-table-role-overlay-sample-extension-override, 4rem)",
-            maxBlur: "var(--snowui-table-role-overlay-blur-override, 0rem)",
-            minBlur: "0rem",
-            leadWidthRatio: 0.1,
-            endRatio: 0.72,
-            featherRatio: 2.8,
-            tailOpacity: 0,
-            edgeFeatherRatio: table.getRoleOverlayUniformFeather(),
-            tintColor: "#ffffff",
-            tintOpacity: "var(--snowui-table-role-overlay-tint-opacity-override, 0%)",
-        };
-        return table.getRoleOverlayBlurMode() === "uniform"
-            ? createUniformBlurStyles(options)
-            : createProgressiveBlurStyles(options);
-    }
-    const selectionBlur = $derived(buildRoleOverlayBlur("left-to-right"));
-    const actionsBlur = $derived(buildRoleOverlayBlur("right-to-left"));
+    const selectionBlur = $derived(getTableRoleBlurStyles(table, "left-to-right"));
+    const actionsBlur = $derived(getTableRoleBlurStyles(table, "right-to-left"));
     const selectionCheckboxSizeStyle = $derived(
         parts?.Checkbox?.size === undefined
             ? "--snowui-checkbox-size-override: var(--snowui-table-selection-checkbox-size-override, calc(var(--size-4, 1rem) + 0.0625rem))"
             : undefined,
     );
+    const useSemanticFastPath = $derived(
+        !skeleton
+        && !isSelectionRole
+        && !isActionsRole
+        && resolvedWhileAppear === undefined
+        && userCurrentState === undefined
+        && parts === undefined
+        && parentSkeletonContext === undefined
+        && !enableResponsive
+        && !enableContext
+        && !enableScaleObserver
+        && Object.keys(rest).length === 0,
+    );
 </script>
 
-{#if !isRoleColumnHidden}
-<Frame tag="td" data-column-id={resolvedColumnId} data-table-variant={tableVariant} data-role-layout={isSelectionRole || isActionsRole ? resolvedRoleLayout : undefined} data-skeleton={skeleton ? "true" : undefined} as={isSelectionRole || isActionsRole ? role : undefined} class={`snowui-table-cell ${userClass}`} style={finalStyle} whileAppear={resolvedWhileAppear} currentState={resolvedCurrentState} enableAutoLayout={false} enableResponsive={enableResponsive} enableContext={enableContext} enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
+{#snippet renderCellContent()}
     {#if skeleton}
         <span class="snowui-table-cell-content snowui-table-cell-skeleton" aria-hidden="true">
             {#if !isSelectionRole && !isActionsRole}
@@ -277,15 +292,34 @@
             </span>
         <span class="snowui-table-role-overlay-controls">{#if children}{@render children()}{/if}</span>
     </span>
-    {:else}<span bind:this={contentElement} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : undefined} data-lines={resolvedLines} data-truncated={truncation.isTruncated ? "true" : "false"} style={contentStyle}>
+    {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : undefined} data-lines={resolvedLines} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
         {#if children}{@render children()}{/if}
-        {#if tooltip && !hasNestedTruncationOwner && truncation.isTruncated && truncation.fullText}
+        {#if tooltip && !hasNestedTruncationOwner && isTruncated && fullText}
             <Tooltip>
-                {#if typeof tooltip === "string"}{tooltip}{:else if typeof tooltip === "function"}{@render tooltip()}{:else}{truncation.fullText}{/if}
+                {#if typeof tooltip === "string"}{tooltip}{:else if typeof tooltip === "function"}{@render tooltip()}{:else}{fullText}{/if}
             </Tooltip>
         {/if}
     </span>{/if}
+{/snippet}
+
+{#if !isRoleColumnHidden}
+{#if useSemanticFastPath}
+<td
+    data-column-id={resolvedColumnId}
+    data-table-variant={tableVariant}
+    class={`snowui-frame snowui-table-cell ${userClass}`}
+    data-snowui-frame="true"
+    data-content-width="hug"
+    data-state="Idle"
+    style={finalStyle}
+>
+    {@render renderCellContent()}
+</td>
+{:else}
+<Frame tag="td" data-column-id={resolvedColumnId} data-table-variant={tableVariant} data-role-layout={isSelectionRole || isActionsRole ? resolvedRoleLayout : undefined} data-skeleton={skeleton ? "true" : undefined} as={isSelectionRole || isActionsRole ? role : undefined} class={`snowui-table-cell ${userClass}`} style={finalStyle} whileAppear={resolvedWhileAppear} currentState={resolvedCurrentState} enableAutoLayout={false} enableResponsive={enableResponsive} enableContext={enableContext} enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
+    {@render renderCellContent()}
 </Frame>
+{/if}
 {/if}
 
 <style>

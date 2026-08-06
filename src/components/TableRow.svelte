@@ -1,9 +1,10 @@
 <!-- Table 行；圆角由首尾单元格自动完成。文档: ./TableRow.md -->
 <script lang="ts">
-    import type { Snippet } from "svelte";
+    import { getContext, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { getTableContext } from "../lib/table-context.svelte";
     import { provideTableRowContext } from "../lib/table-row-context.svelte";
+    import { SKELETON_CONTEXT_KEY } from "../keys";
     import {
         mergeComponentPartProps,
         useComponentPart,
@@ -13,16 +14,29 @@
     let explicitProps: Props = $props();
     let { rowId, active = false, children, onclick, whileAppear: userWhileAppear = undefined, currentState: userCurrentState = undefined, class: userClass = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $derived(mergeComponentPartProps(inheritedTableRowPart.current, explicitProps));
     const table = getTableContext();
-    const isSelected = $derived(rowId !== undefined && table.isRowSelected(rowId));
+    const parentSkeletonContext = getContext(SKELETON_CONTEXT_KEY);
+    const selectionEnabled = $derived(table.isSelectionEnabled());
+    const isSelected = $derived(
+        selectionEnabled && rowId !== undefined && table.isRowSelected(rowId),
+    );
     const resolvedWhileAppear = $derived(userWhileAppear);
     // DataTable 内部的新行动效由普通 TableCell 消费，避免整行 opacity 压暗 overlay 控件。
     // TableRow 仅保留使用方显式声明的行级 whileAppear。
     const resolvedCurrentState = $derived(
         userCurrentState ?? (resolvedWhileAppear === undefined ? undefined : "Appear"),
     );
+    const useSemanticFastPath = $derived(
+        resolvedWhileAppear === undefined
+        && userCurrentState === undefined
+        && parentSkeletonContext === undefined
+        && !enableResponsive
+        && !enableContext
+        && !enableScaleObserver
+        && Object.keys(rest).length === 0,
+    );
     provideTableRowContext({ getRowId: () => rowId });
     $effect(() => {
-        if (rowId === undefined || !table.isSelectionEnabled()) return;
+        if (rowId === undefined || !selectionEnabled) return;
         return table.registerRow(rowId);
     });
     function handleClick(event: MouseEvent) {
@@ -53,9 +67,24 @@
         }
     }
 </script>
+{#if useSemanticFastPath}
+<tr
+    data-row-id={rowId}
+    data-active={active ? "true" : undefined}
+    data-selected={isSelected ? "true" : undefined}
+    class={`snowui-frame snowui-table-row ${userClass}`}
+    data-snowui-frame="true"
+    data-content-width="hug"
+    data-state="Idle"
+    onclick={handleClick}
+>
+    {#if children}{@render children()}{/if}
+</tr>
+{:else}
 <Frame tag="tr" data-row-id={rowId} data-active={active ? "true" : undefined} data-selected={isSelected ? "true" : undefined} class={`snowui-table-row ${userClass}`} onclick={handleClick} whileAppear={resolvedWhileAppear} currentState={resolvedCurrentState} enableAutoLayout={false} enableResponsive={enableResponsive} enableContext={enableContext} enableScaleObserver={enableScaleObserver} {...rest} data-skeleton={rest["data-skeleton"]} data-loading-spinner={rest["data-loading-spinner"]}>
     {#if children}{@render children()}{/if}
 </Frame>
+{/if}
 <style>
     :global(:where(.snowui-table-row[data-skeleton="true"])) { pointer-events: none; }
     :global(:where(.snowui-table-row[data-loading-spinner="true"])) { pointer-events: none; }
