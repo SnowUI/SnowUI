@@ -1,6 +1,6 @@
 # Slider 滑动输入组件
 
-> **版本**: v1.2.4
+> **版本**: v1.3.0
 > **职责**: 提供单值、区间、水平、纵向、可切割 steps 与填充式视觉变体的滑动输入。
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -19,6 +19,7 @@
 - Range Slider 使用两个直系 `as="label"` 内容时，按顺序分别跟随起点和终点拖动块。
 - `filled` 变体还原 Workshop `14458:37835`：水平容器默认高 32px、圆角 8px，填充区域扩展为完整高度且左右两端均保留圆角；`title` 是左侧内置标题，默认 `"Text"`，不属于 label。
 - `filled` 右侧数值复用其他变体的 label 协议：默认不显示，`showLabel=true` 时生成实时百分比，继续支持 `parts.Text` 与显式 label。数值 label 始终使用 100% 基色（灰色轨道上为 `Black/100%`，黑色填充上为 `Static White/100%`），常态通过独立 `opacity: 0.4` 显示，hover、focus 或拖动时提升到 `opacity: 0.8`；不使用 40% / 80% 颜色 token。
+- `filled` 的 title 与数值 label 使用与 Slider 等宽、分界绑定 `--snowui-slider-end` 的文字背景裁切：被黑色填充覆盖的字形区域实时显示 `Static White/100%`，未覆盖区域保持 `Black/100%`。分界可穿过单个字形并随点击、拖动连续移动，不使用整段文字阈值切换。
 - `filled` 的拖动块改为“可拖动”指示器，位于填充右缘内侧 4px；值为 0 时位于 Slider 左边框内侧 4px。指示器为全圆角，处于黑色填充内时使用 `Static White/100%`。鼠标常态隐藏，hover、focus 或拖动时以中心点为动效中心渐显、短变长、细变粗，退出时执行反向动效；时序与 easing 引用 generic Frame preset，减少动效偏好下取消缩放与过渡。
 - `thickness` 同时控制 `filled` 的整体高度；默认变体仍为 4px，`filled` 默认 32px。
 - `filled + showSteps` 使用设计稿中的 2px 圆点分段样式；该视觉变体当前只定义水平布局，纵向 Slider 继续使用 `default` 视觉。
@@ -90,6 +91,10 @@
 - steps 只在固定尺寸的 track 上使用 CSS mask 生成 1px 透明缝隙；父级 mask 同时裁切内部 fill，切割线不会随填充宽度移动，也不假设页面背景色。
 
 ## 更新日志 (Changelog)
+
+### v1.3.0 (2026-08-06)
+
+- `filled` title 与数值 label 改为实时逐像素分色：黑色填充覆盖区域为白色，未覆盖区域为黑色，文字分界与填充右缘共用实时百分比并随拖动连续移动。
 
 ### v1.2.4 (2026-08-06)
 

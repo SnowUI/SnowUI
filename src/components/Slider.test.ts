@@ -87,4 +87,16 @@ export const examples = [
         },
         logic: ["variant", "title", "thickness", "showLabel", "zero-indicator"],
     },
+    {
+        name: "F4: Filled 实时文字分色",
+        code: `F4
+<div style="width: 160px;">
+  <Slider value={88} variant="filled" title="Text" showLabel aria-label="实时分色百分比" />
+</div>`,
+        expected: {
+            render: "黑色填充覆盖到 title 或数值 label 的哪一部分，该部分文字即为白色；未覆盖部分保持黑色。",
+            interaction: "点击或拖动时，文字黑白分界与填充右缘使用同一个实时百分比连续移动，不做整段文字阈值切换。",
+        },
+        logic: ["variant", "title", "showLabel", "live-contrast", "background-clip"],
+    },
 ] as const;

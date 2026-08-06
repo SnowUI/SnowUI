@@ -1,6 +1,6 @@
 <!--
   Slider 滑动输入组件
-  v1.2.4
+  v1.3.0
 
   文档: ./Slider.md
 -->
@@ -170,8 +170,6 @@
     const resolvedThickness = $derived(
         thickness ?? (variant === "filled" ? 32 : 4),
     );
-    const filledTitleIsOnFill = $derived(endPercent >= 25);
-    const filledValueIsOnFill = $derived(endPercent >= 100);
     const filledIndicatorMotionStyle = [
         `--snowui-slider-indicator-appear-duration: ${motionMsVar(GENERIC_SCALE_APPEAR_MOTION.duration, MOTION_DURATION_STANDARD_APPEAR_MS)}`,
         `--snowui-slider-indicator-appear-easing: ${GENERIC_SCALE_APPEAR_MOTION.easing ?? MOTION_EASING_STANDARD}`,
@@ -310,12 +308,6 @@
     data-orientation={orientation}
     data-range={isRange || undefined}
     data-show-steps={showSteps || undefined}
-    data-title-on-fill={variant === "filled" && filledTitleIsOnFill
-        ? "true"
-        : undefined}
-    data-value-on-fill={variant === "filled" && filledValueIsOnFill
-        ? "true"
-        : undefined}
     data-dragging={dragging || undefined}
     data-disabled={disabled ? "true" : undefined}
     {disabled}
@@ -680,14 +672,8 @@
     }
 
     :global(:where(.snowui-slider-filled[data-orientation="horizontal"] .snowui-slider-labels)) {
-        top: var(--padding-2);
-        bottom: var(--padding-2);
-        inset-inline-start: var(--padding-2);
-        inset-inline-end: var(--padding-2);
+        inset: 0;
         z-index: 3;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
         min-width: 0;
         overflow: hidden;
     }
@@ -713,27 +699,49 @@
     }
 
     :global(:where(.snowui-slider-filled[data-orientation="horizontal"]) .snowui-slider-labels > *) {
-        position: static;
+        position: absolute;
+        inset: 0;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        width: 100%;
+        height: 100%;
+        padding-inline: var(--padding-2);
         overflow: hidden;
         opacity: 0.4;
-        color: var(--black-100, #000000);
+        color: transparent;
+        background-image: linear-gradient(
+            to right,
+            var(--static-white-100, #ffffff) 0
+                var(--snowui-slider-end, 0%),
+            var(--black-100, #000000) var(--snowui-slider-end, 0%) 100%
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         text-overflow: ellipsis;
         white-space: nowrap;
         translate: none;
-        transition: color
+        transition: opacity
             var(--snowui-frame-color-motion-duration, 0.15s)
             var(--snowui-frame-color-motion-easing, ease-out);
     }
 
-    :global(:where(.snowui-slider-filled[data-orientation="horizontal"][data-value-on-fill="true"]) .snowui-slider-labels > *) {
-        color: var(--static-white-100, #ffffff);
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"]:dir(rtl)) .snowui-slider-labels > *) {
+        background-image: linear-gradient(
+            to left,
+            var(--static-white-100, #ffffff) 0
+                var(--snowui-slider-end, 0%),
+            var(--black-100, #000000) var(--snowui-slider-end, 0%) 100%
+        );
     }
 
-    :global(:where(.snowui-slider[data-range="true"]) .snowui-slider-labels > :first-child) {
+    :global(:where(.snowui-slider:not(.snowui-slider-filled)[data-range="true"]) .snowui-slider-labels > :first-child) {
         inset-inline-start: var(--snowui-slider-start, 0%);
     }
 
-    :global(:where(.snowui-slider:dir(rtl)) .snowui-slider-labels > *) {
+    :global(:where(.snowui-slider:not(.snowui-slider-filled):dir(rtl)) .snowui-slider-labels > *) {
         translate: 50% 0;
     }
 
@@ -768,25 +776,39 @@
 
     :global(:where(.snowui-slider-title)) {
         position: absolute;
-        top: 50%;
-        inset-inline-start: var(--padding-2);
+        inset: 0;
         z-index: 3;
-        max-width: calc(100% - var(--size-9));
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        height: 100%;
+        padding-inline: var(--padding-2);
         overflow: hidden;
-        color: var(--black-100, #000000);
+        color: transparent;
+        background-image: linear-gradient(
+            to right,
+            var(--static-white-100, #ffffff) 0
+                var(--snowui-slider-end, 0%),
+            var(--black-100, #000000) var(--snowui-slider-end, 0%) 100%
+        );
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         font-size: var(--text-12);
         line-height: var(--leading-12);
         text-overflow: ellipsis;
         white-space: nowrap;
-        translate: 0 -50%;
         pointer-events: none;
-        transition: color
-            var(--snowui-frame-color-motion-duration, 0.15s)
-            var(--snowui-frame-color-motion-easing, ease-out);
     }
 
-    :global(:where(.snowui-slider-filled[data-title-on-fill="true"] .snowui-slider-title)) {
-        color: var(--static-white-100, #ffffff);
+    :global(:where(.snowui-slider-filled:dir(rtl) .snowui-slider-title)) {
+        background-image: linear-gradient(
+            to left,
+            var(--static-white-100, #ffffff) 0
+                var(--snowui-slider-end, 0%),
+            var(--black-100, #000000) var(--snowui-slider-end, 0%) 100%
+        );
     }
 
     :global(:where(.snowui-slider-filled:not([data-disabled="true"]):hover) .snowui-slider-labels > *),
