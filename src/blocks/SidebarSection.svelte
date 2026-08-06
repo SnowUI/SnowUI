@@ -1,4 +1,4 @@
-<!-- SidebarSection PRO Block v1.2.0. 文档: ./SidebarSection.md -->
+<!-- SidebarSection PRO Block v1.3.0. 文档: ./SidebarSection.md -->
 <script lang="ts">
     import { untrack, type Snippet } from "svelte";
     import { Button, Text, Tooltip, type FrameProps } from "@snowui-design-system/components";
@@ -36,7 +36,10 @@
 
     const sidebar = getSidebarContext();
     let internalCollapsed = $state(untrack(() => defaultCollapsed));
-    const isCollapsed = $derived(collapsed ?? internalCollapsed);
+    const persistedCollapsed = $derived(sidebar?.getSectionCollapsed(id));
+    const isCollapsed = $derived(
+        collapsed ?? persistedCollapsed ?? internalCollapsed,
+    );
     const canCollapse = $derived(collapsible ?? !!title);
     const contentId = $derived(`snowui-sidebar-section-${id}-content`);
     const actionList = $derived(Array.isArray(actions) ? actions : []);
@@ -47,6 +50,7 @@
         const next = !isCollapsed;
         internalCollapsed = next;
         collapsed = next;
+        sidebar?.setSectionCollapsed(id, next);
         onCollapsedChange?.(next);
     }
 </script>
@@ -56,6 +60,7 @@
     column
     enableAutoLayout={false}
     class={["snowui-sidebar-section", userClass].filter(Boolean).join(" ")}
+    data-sidebar-section-id={id}
     data-collapsed={isCollapsed ? "true" : "false"}
     data-sidebar-collapsed={sidebar?.collapsed ? "true" : "false"}
     {...rest}

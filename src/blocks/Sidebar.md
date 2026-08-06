@@ -1,6 +1,6 @@
 # Sidebar（PRO Block）
 
-> **版本**: v1.4.2
+> **版本**: v1.5.2
 > **职责**: 提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。
 > **归属**: PRO Blocks / Template Block
 
@@ -18,6 +18,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 | `minWidth` | `number` | `160` | 可拖拽展开宽度下限 |
 | `maxWidth` | `number` | `480` | 可拖拽展开宽度上限 |
 | `activeItemId` | `string` | — | 唯一 active item 来源 |
+| `persistenceKey` | `string` | — | 显式启用 localStorage 状态记忆并提供实例命名空间；存储 active item 与各 Section 折叠状态 |
 | `onCollapsedChange` | `(collapsed: boolean) => void` | — | 折叠状态变化回调 |
 | `onWidthChange` | `(width: number) => void` | — | 展开宽度变化回调 |
 | `onActiveItemChange` | `(itemId: string) => void` | — | 导航选择回调 |
@@ -27,7 +28,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 默认 Logo 的 host 为 `as="logo"`，内部以 `SnowUILogo as="logo-icon" variant="icon"` 与 `SnowUILogo as="logo-wordmark" variant="text"` 明确区分图形和字标。直接子节点 `as="logo"` 会被安置到 Header 并完整替换默认 Logo；自定义 Logo 同样必须用它的直接子节点 `as="logo-icon"` 标记折叠后保留的图形，其余直接子节点视为展开态文字或字标并在折叠时隐藏。直接子节点 `as="footer"` 会被安置到底部覆盖 Footer。它们不抑制 `sections` 生成的 Body 内容，其余显式子节点会与 `sections` 依次渲染在 Body。第三方内容不支持 `as` 时，用对应角色的 `Frame` 包裹。Sidebar 根输出 `data-collapsed`，并提供 Sidebar Context。
 
 ```svelte
-<Sidebar activeItemId="dashboard">
+<Sidebar activeItemId="dashboard" persistenceKey="workspace-primary">
   <Frame as="logo" row>
     <BrandIcon as="logo-icon" />
     <Text>Brand</Text>
@@ -51,9 +52,12 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - Body 纵向 overlay scrollbar 根据根横向 padding 自动外移，轨道右边缘始终距 Sidebar 右边框 `4px`；默认 12px 横向 padding 时其 `right` 偏移为 `-8px`。
 - Logo 所在 Header 区域使用 `4px` 上下 padding；Body 向下滚动后在 Logo 下方启用通用 `.snowui-scroll-mask` 顶部渐隐，渐隐带同样限制为 `4px` 且不增加布局高度，回到顶部时移除遮罩。
 - Body 导航内容默认使用 `var(--gap-1)`（4px）间距，直接组合的 SidebarItem 与 SidebarSection 内部列表保持一致。
+- 状态记忆默认关闭，因为实例必须由宿主提供稳定且唯一的命名空间，避免多个 Sidebar 或共享设备上的状态互相污染。`persistenceKey` 未传时不访问本地存储；传入后使用 `snowui:sidebar:<persistenceKey>` 保存 active item 与各 Section 的折叠状态。恢复时若 active item 位于已折叠 Section，Sidebar 强制展开该 Section，并将修正后的展开状态重新保存。
+- 恢复 active item 后，仅当 Body 确实存在纵向溢出时才定位：以“active item 中心 = 扣除 Footer 覆盖安全区后的可视区域中心”为目标，首尾位置按可滚动边界夹紧。恢复后立即定位一次，并在默认 Section 布局动效结束后再次校正，避免折叠布局变化造成偏移。
+- active 视觉状态由 Sidebar 管理；宿主仍通过 `activeItemId` / `onActiveItemChange` 持有实际导航与内容切换。恢复合法的持久化 active item 时，Sidebar 会调用 `onActiveItemChange` 通知宿主。
 - 默认与自定义 `as="logo"` host 均使用 `4px` 左右 padding，使 Logo 图形与 SidebarItem 图标垂直对齐。
 - Header 在展开 / 折叠状态使用同一套起始对齐结构，Logo Icon 保持固定 leading slot；Test 示例以固定宽度左对齐宿主承载 Sidebar，避免居中宿主在根宽度变化时带动整个 Logo 位移。Logo host 强制保持单行，wordmark 通过 host 裁切与透明度收起，不会在窄宽度下换行并撑高 Logo，也不在动效起点直接切换整体 Header 对齐。
-- 折叠按钮是内置默认变体的 icon-only `Button`，与 Logo 位于同一 Header 水平线上，并始终位于 Logo host 分配区域的右边。Logo host 填充按钮之前的剩余 Header 宽度，只设置稳定的 36px 最小 leading slot；按钮会跟随 Sidebar 宽度以 Frame 默认 move spring 从 Logo 区域右侧平移到折叠位置，不发生瞬移。默认 `navigationVariant="icon"` 时仅在 Sidebar hover / focus-within 显形；`navigationVariant="text"` 的折叠态隐藏 Logo、Body 和 Footer，只保留水平居中且始终可见的展开按钮。
+- 折叠按钮是内置默认变体的 icon-only `Button`，与 Logo 位于同一 Header 水平线上，并始终位于 Logo host 分配区域的右边。Logo host 填充按钮之前的剩余 Header 宽度，只设置稳定的 36px 最小 leading slot；按钮会跟随 Sidebar 宽度以 Frame 默认 move spring 从 Logo 区域右侧平移到折叠位置，不发生瞬移。按钮外层保留同尺寸透明命中 host，因此鼠标进入 Sidebar，或直接进入按钮应出现的位置（包括折叠态超出根视觉边界的部分）时都能显示按钮。默认 `navigationVariant="icon"` 时按上述 hover / focus-within 规则显形；`navigationVariant="text"` 的折叠态隐藏 Logo、Body 和 Footer，只保留水平居中且始终可见的展开按钮。
 - 折叠开始时，Sidebar 宽度、Item 文字与 Section 标题同时开始变化：宽度收窄，Item 文字和标题消费 Frame color bridge 渐隐；Item leading Icon 保持原横向位置。标题透明度归零后，标题高度、padding 与 Section gap 才消费 Frame size bridge 收起，Item 随后上移。展开时按同一组 bridge 平滑恢复。
 - 折叠按钮不内置 Tooltip，通过随状态更新的 `aria-label` 保留“展开 / 折叠侧边栏”可访问名称。其余内置 Tooltip（折叠态 Item label、Item action、Section action）统一位于对应元素右侧（`position="right"`）。Section 标题默认可折叠但不显示 Tooltip。
 - 默认不设置背景色。
@@ -92,6 +96,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 | `navigationVariant` | `data-navigation-variant` | `icon` 保留折叠图标轨；`text` 折叠后只保留展开按钮 |
 | `width` | bindable + Indicator | 右边缘拖拽更新展开宽度；折叠后保留 |
 | `activeItemId` | Context | SidebarItem 推导 active |
+| `persistenceKey` | localStorage + Context | 记忆 active 与 Section 折叠状态；恢复 active Section 并居中定位 |
 | `as="logo"` | 稳定 Header host | 替换默认 SnowUILogo |
 | `as="logo-icon"` | 自定义 Logo 的直接子节点 | 折叠后唯一保留的 Logo 图形 |
 | `as="footer"` | 稳定底部覆盖 Footer host | 折叠态自动隐藏 |
@@ -105,6 +110,26 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
 ## 更新日志 (Changelog)
+
+### v1.5.2 (2026-08-06)
+
+#### 修复
+- 折叠态不再误隐藏 continuous hover 背景层，Item hover 与展开态保持相同背景效果。
+- 折叠按钮新增透明命中 host；鼠标直接移动到按钮预期位置时也会显示按钮。
+
+### v1.5.1 (2026-08-06)
+
+#### 修复
+- Section 标题除了直接命中会阻断连续 hover，在标题相邻空隙中也参与最近距离判断，避免两个折叠标题之间的鼠标位置错误点亮下方 Table。
+
+### v1.5.0 (2026-08-06)
+
+#### 新功能
+- 新增可选 `persistenceKey`：记忆 active item 与 Section 折叠状态，刷新后恢复；active 所在 Section 强制展开。
+- 长列表恢复时将 active item 尽量定位到扣除 Footer 覆盖后的可视中心，并在布局动效结束后校正。
+
+#### 修复
+- Section 标题被 hover 时阻断连续 hover 最近项推断，避免已折叠标题下方的 SidebarItem 错误出现 hover 背景。
 
 ### v1.4.2 (2026-07-28)
 
@@ -189,4 +214,5 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 `continuousHover` 默认 `true`。导航容器拥有唯一背景层，在所有可用
 SidebarItem（包括 Section 内项目）之间连续移动。active 项的持久背景不被替换，
-hover 到 active 项时两个背景叠加形成更深颜色。设为 `false` 恢复逐项 hover。
+hover 到 active 项时两个背景叠加形成更深颜色。Section 标题属于明确阻断区域：
+pointer 位于标题时共享层隐藏，不把标题当作相邻 Item 间隙。设为 `false` 恢复逐项 hover。

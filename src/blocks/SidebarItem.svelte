@@ -1,4 +1,4 @@
-<!-- SidebarItem PRO Block v1.3.0. 文档: ./SidebarItem.md -->
+<!-- SidebarItem PRO Block v1.4.0. 文档: ./SidebarItem.md -->
 <script lang="ts">
     import type { Snippet } from "svelte";
     import {
@@ -73,6 +73,7 @@
     enableAutoLayout={false}
     class={["snowui-sidebar-item", userClass].filter(Boolean).join(" ")}
     data-active={active ? "true" : "false"}
+    data-sidebar-item-id={id}
     data-collapsed={collapsed ? "true" : "false"}
     data-disabled={disabled ? "true" : undefined}
     {...rest}

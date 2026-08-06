@@ -6,6 +6,8 @@ export interface SidebarContext {
     readonly collapsed: boolean;
     readonly activeItemId: string | undefined;
     select(itemId: string): void;
+    getSectionCollapsed(sectionId: string): boolean | undefined;
+    setSectionCollapsed(sectionId: string, collapsed: boolean): void;
 }
 
 export function getSidebarContext(): SidebarContext | undefined {

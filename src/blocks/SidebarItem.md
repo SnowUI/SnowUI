@@ -1,6 +1,6 @@
 # SidebarItem（PRO Block）
 
-> **版本**: v1.3.0
+> **版本**: v1.4.0
 > **职责**: Sidebar 普通导航项，支持 active、状态标签、更新 Badge、leading icon 与可选操作区。
 
 ## API 参考
@@ -40,6 +40,11 @@
 | SidebarItem | [SidebarItem.svelte](./SidebarItem.svelte) | 导航语义与状态视觉 |
 
 ## 更新日志 (Changelog)
+
+### v1.4.0 (2026-08-06)
+
+#### 变更
+- 输出稳定的 `data-sidebar-item-id`，供 Sidebar 在持久化恢复后识别 active item、展开所属 Section 并完成滚动定位。
 
 ### v1.3.0 (2026-07-30)
 

@@ -160,4 +160,37 @@ export const examples = [
         },
         logic: ["ContinuousHover", "ActiveLayering", "OptOut"],
     },
+    {
+        name: "SB-07：状态记忆与 active 定位",
+        code: `SB-07
+<Frame style="width: 220px; height: 20rem;">
+    <Sidebar persistenceKey="test-sb-07-persistence">
+        <SidebarSection id="top" title="Top">
+            <SidebarItem id="overview" label="Overview" />
+            <SidebarItem id="projects" label="Projects" />
+            <SidebarItem id="activity" label="Activity" />
+            <SidebarItem id="members" label="Members" />
+        </SidebarSection>
+        <SidebarSection id="middle" title="Middle">
+            <SidebarItem id="reports" label="Reports" />
+            <SidebarItem id="comments" label="Comments" />
+            <SidebarItem id="drafts" label="Drafts" />
+            <SidebarItem id="archive" label="Archive" />
+        </SidebarSection>
+        <SidebarSection id="bottom" title="Bottom">
+            <SidebarItem id="table" label="Table" />
+            <SidebarItem id="settings" label="Settings" />
+            <SidebarItem id="billing" label="Billing" />
+        </SidebarSection>
+    </Sidebar>
+</Frame>`,
+        expected: {
+            render: "刷新后恢复各 Section 的展开 / 折叠状态与最后选中的 active item。",
+            layout: "列表可滚动时，恢复后的 active item 尽量位于扣除 Footer 安全区后的可视中心；首尾按滚动边界夹紧。",
+            interaction: "若 active item 所属 Section 上次被折叠，刷新后该 Section 自动展开；hover Section 标题或两个折叠标题之间的空隙时共享 hover 层隐藏，不点亮下方最近 Item；整体折叠后 Item 仍显示连续 hover 背景，直接进入折叠按钮预期位置也会显示按钮。",
+            performance: "只在提供 persistenceKey 时读写命名空间隔离的 localStorage；恢复后进行即时与动效结束后的两次定位校正。",
+            responsive: "Section 内容折叠时卸载；active item 的 Section 归属由 Sidebar 独立记忆。",
+        },
+        logic: ["Persistence", "ActiveReveal", "SectionRecovery", "HoverBlocker"],
+    },
 ] as const;

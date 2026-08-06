@@ -1,4 +1,4 @@
-<!-- Sidebar PRO Block v1.4.1. 文档: ./Sidebar.md -->
+<!-- Sidebar PRO Block v1.5.2. 文档: ./Sidebar.md -->
 <script lang="ts">
     import { onMount, setContext, tick, untrack, type Snippet } from "svelte";
     import {
@@ -37,6 +37,13 @@
         content?: Snippet;
     }
 
+    interface PersistedSidebarState {
+        version: 1;
+        activeItemId?: string;
+        activeItemSectionId?: string;
+        collapsedSections: Record<string, boolean>;
+    }
+
     const sidebarExpandTiming = resolveMotionCssTiming(
         SIDE_PANEL_APPEAR_MOTION,
     );
@@ -53,6 +60,8 @@
         minWidth?: number;
         maxWidth?: number;
         activeItemId?: string;
+        /** 显式启用本地状态记忆，并作为 localStorage 命名空间。 */
+        persistenceKey?: string;
         ariaLabel?: string;
         /** 导航项之间是否使用容器级连续 hover 背景。 */
         continuousHover?: boolean;
@@ -78,6 +87,7 @@
         minWidth = 160,
         maxWidth = 480,
         activeItemId = undefined,
+        persistenceKey = undefined,
         ariaLabel = "Primary navigation",
         continuousHover = true,
         onCollapsedChange = undefined,
@@ -96,6 +106,13 @@
 
     let internalCollapsed = $state(untrack(() => defaultCollapsed));
     const isCollapsed = $derived(collapsed ?? internalCollapsed);
+    let internalActiveItemId = $state<string | undefined>(undefined);
+    let activeItemSectionId = $state<string | undefined>(undefined);
+    const resolvedActiveItemId = $derived(
+        activeItemId ?? internalActiveItemId,
+    );
+    let collapsedSections = $state<Record<string, boolean>>({});
+    let persistenceReady = $state(false);
     let rootElement = $state<HTMLElement>();
     let headerElement = $state<HTMLElement>();
     let bodyViewport = $state<HTMLElement>();
@@ -108,6 +125,7 @@
             layerClass: "snowui-sidebar-continuous-hover-layer",
             axis: "y",
             enabled: continuousHover,
+            blockedSelector: ".snowui-sidebar-section-header",
         });
     });
     $effect(() => continuousHoverController.setEnabled(continuousHover));
@@ -118,6 +136,8 @@
     let footerMeasureFrame = 0;
     let resizeEndFrame = 0;
     let logoPlacementFrame = 0;
+    let activeRevealFrame = 0;
+    let activeRevealTimer = 0;
     const resolvedWidth = $derived(
         Math.min(Math.max(Number(width) || 220, minWidth), maxWidth),
     );
@@ -138,10 +158,28 @@
             return isCollapsed;
         },
         get activeItemId() {
-            return activeItemId;
+            return resolvedActiveItemId;
         },
         select(itemId: string) {
+            internalActiveItemId = itemId;
+            activeItemSectionId = findItemSectionId(itemId);
             onActiveItemChange?.(itemId);
+        },
+        getSectionCollapsed(sectionId: string) {
+            return collapsedSections[sectionId];
+        },
+        setSectionCollapsed(sectionId: string, nextCollapsed: boolean) {
+            if (
+                nextCollapsed &&
+                resolvedActiveItemId &&
+                findItemSectionId(resolvedActiveItemId) === sectionId
+            ) {
+                activeItemSectionId = sectionId;
+            }
+            collapsedSections = {
+                ...collapsedSections,
+                [sectionId]: nextCollapsed,
+            };
         },
     };
     setContext(SIDEBAR_CONTEXT_KEY, context);
@@ -189,15 +227,15 @@
 
         cancelAnimationFrame(logoPlacementFrame);
         logoPlacementFrame = requestAnimationFrame(() => {
-            const collapseButton = headerElement?.querySelector<HTMLElement>(
-                ':scope > .snowui-sidebar-collapse-button',
+            const collapseButtonHost = headerElement?.querySelector<HTMLElement>(
+                ':scope > .snowui-sidebar-collapse-button-host',
             );
             if (
                 headerElement &&
                 logo?.isConnected &&
-                logo.nextElementSibling !== collapseButton
+                logo.nextElementSibling !== collapseButtonHost
             ) {
-                headerElement.insertBefore(logo, collapseButton ?? null);
+                headerElement.insertBefore(logo, collapseButtonHost ?? null);
             }
         });
     }
@@ -229,6 +267,9 @@
                 "--snowui-sidebar-footer-measured-height",
                 nextHeight,
             );
+            if (persistenceReady && resolvedActiveItemId) {
+                scheduleActiveItemReveal();
+            }
         }
     }
 
@@ -246,6 +287,146 @@
             bodyViewport.removeAttribute("data-scroll-mask");
         }
     }
+
+    function getPersistenceStorageKey() {
+        return persistenceKey
+            ? `snowui:sidebar:${persistenceKey}`
+            : undefined;
+    }
+
+    function findItem(itemId: string) {
+        if (!navigationElement) return undefined;
+        return Array.from(
+            navigationElement.querySelectorAll<HTMLElement>(
+                "[data-sidebar-item-id]",
+            ),
+        ).find((item) => item.dataset.sidebarItemId === itemId);
+    }
+
+    function findItemSectionId(itemId: string) {
+        return findItem(itemId)?.closest<HTMLElement>(
+            "[data-sidebar-section-id]",
+        )?.dataset.sidebarSectionId;
+    }
+
+    function expandActiveItemSection(itemId: string) {
+        const item = findItem(itemId);
+        const section = item?.closest<HTMLElement>(
+            "[data-sidebar-section-id]",
+        );
+        const sectionId = section?.dataset.sidebarSectionId;
+        if (!sectionId || collapsedSections[sectionId] !== true) return;
+        collapsedSections = {
+            ...collapsedSections,
+            [sectionId]: false,
+        };
+    }
+
+    function revealActiveItem() {
+        if (!bodyViewport || !resolvedActiveItemId) return;
+        const item = findItem(resolvedActiveItemId);
+        if (!item || bodyViewport.scrollHeight <= bodyViewport.clientHeight + 1) {
+            return;
+        }
+
+        const viewportRect = bodyViewport.getBoundingClientRect();
+        const itemRect = item.getBoundingClientRect();
+        const footerOcclusion =
+            hasExternalFooter && !isCollapsed
+                ? (footerElement?.getBoundingClientRect().height ?? 0) + 12
+                : 0;
+        const visibleHeight = Math.max(
+            itemRect.height,
+            viewportRect.height - footerOcclusion,
+        );
+        const itemCenterInContent =
+            bodyViewport.scrollTop +
+            itemRect.top -
+            viewportRect.top +
+            itemRect.height / 2;
+        const maxScroll = Math.max(
+            0,
+            bodyViewport.scrollHeight - bodyViewport.clientHeight,
+        );
+        bodyViewport.scrollTop = Math.min(
+            maxScroll,
+            Math.max(0, itemCenterInContent - visibleHeight / 2),
+        );
+        syncBodyScrollMask();
+    }
+
+    function scheduleActiveItemReveal() {
+        cancelAnimationFrame(activeRevealFrame);
+        window.clearTimeout(activeRevealTimer);
+        activeRevealFrame = requestAnimationFrame(() => {
+            revealActiveItem();
+            activeRevealTimer = window.setTimeout(revealActiveItem, 550);
+        });
+    }
+
+    async function restorePersistedState() {
+        const storageKey = getPersistenceStorageKey();
+        if (!storageKey) return;
+        let restored: PersistedSidebarState | undefined;
+        try {
+            const raw = window.localStorage.getItem(storageKey);
+            if (raw) restored = JSON.parse(raw) as PersistedSidebarState;
+        } catch {
+            restored = undefined;
+        }
+
+        if (restored?.version === 1) {
+            const restoredCollapsedSections =
+                restored.collapsedSections ?? {};
+            collapsedSections = restoredCollapsedSections;
+            if (
+                restored.activeItemId &&
+                restored.activeItemSectionId &&
+                collapsedSections[restored.activeItemSectionId] === true
+            ) {
+                collapsedSections = {
+                    ...collapsedSections,
+                    [restored.activeItemSectionId]: false,
+                };
+            }
+            await tick();
+            if (restored.activeItemId && findItem(restored.activeItemId)) {
+                internalActiveItemId = restored.activeItemId;
+                activeItemSectionId =
+                    findItemSectionId(restored.activeItemId) ??
+                    restored.activeItemSectionId;
+                onActiveItemChange?.(restored.activeItemId);
+                await tick();
+                expandActiveItemSection(restored.activeItemId);
+            } else {
+                collapsedSections = restoredCollapsedSections;
+            }
+        }
+        persistenceReady = true;
+        await tick();
+        scheduleActiveItemReveal();
+    }
+
+    $effect(() => {
+        const storageKey = getPersistenceStorageKey();
+        if (!storageKey || !persistenceReady) return;
+        const persistedState: PersistedSidebarState = {
+            version: 1,
+            activeItemId: resolvedActiveItemId,
+            activeItemSectionId: resolvedActiveItemId
+                ? findItemSectionId(resolvedActiveItemId) ?? activeItemSectionId
+                : undefined,
+            collapsedSections,
+        };
+        try {
+            window.localStorage.setItem(
+                storageKey,
+                JSON.stringify(persistedState),
+            );
+        } catch {
+            // localStorage 不可用时保持组件功能，不阻断导航。
+        }
+    });
 
     onMount(() => {
         syncExternalLogo();
@@ -268,10 +449,13 @@
         if (navigationElement) resizeObserver.observe(navigationElement);
         if (footerElement) resizeObserver.observe(footerElement);
         scheduleFooterSafeAreaSync();
+        void restorePersistedState();
         return () => {
             cancelAnimationFrame(footerMeasureFrame);
             cancelAnimationFrame(resizeEndFrame);
             cancelAnimationFrame(logoPlacementFrame);
+            cancelAnimationFrame(activeRevealFrame);
+            window.clearTimeout(activeRevealTimer);
             observer.disconnect();
             resizeObserver.disconnect();
         };
@@ -289,6 +473,9 @@
     data-navigation-variant={navigationVariant}
     data-resizing={resizing ? "true" : undefined}
     data-has-footer={hasExternalFooter ? "true" : undefined}
+    data-persistence-ready={persistenceKey && persistenceReady
+        ? "true"
+        : undefined}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
@@ -317,14 +504,16 @@
                 />
             </div>
         {/if}
-        <Button
-            size="sm"
-            class="snowui-sidebar-collapse-button"
-            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            onclick={toggleCollapsed}
-        >
-            <ResourceIcon name="rightbar" collection="snowui" size={16} aria-hidden="true" />
-        </Button>
+        <span class="snowui-sidebar-collapse-button-host">
+            <Button
+                size="sm"
+                class="snowui-sidebar-collapse-button"
+                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                onclick={toggleCollapsed}
+            >
+                <ResourceIcon name="rightbar" collection="snowui" size={16} aria-hidden="true" />
+            </Button>
+        </span>
     </header>
 
     <ScrollArea
@@ -474,20 +663,30 @@
     :global(:where(.snowui-sidebar-navigation > [data-as="logo"])) {
         display: none;
     }
-    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-navigation > :not(.snowui-sidebar-item):not(.snowui-sidebar-section):not(.snowui-separator):not([data-as="logo"]))) {
+    :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-navigation > :not(.snowui-sidebar-item):not(.snowui-sidebar-section):not(.snowui-separator):not(.snowui-continuous-hover-layer):not([data-as="logo"]))) {
         display: none;
+    }
+    :global(:where(.snowui-sidebar-collapse-button-host)) {
+        display: inline-flex;
+        width: var(--size-6);
+        height: var(--size-6);
+        flex: 0 0 var(--size-6);
+        align-items: center;
+        justify-content: center;
     }
     :global(:where(.snowui-sidebar-collapse-button)) {
         flex: 0 0 auto;
         visibility: hidden;
         pointer-events: none;
     }
-    :global(:where(.snowui-sidebar:hover, .snowui-sidebar:focus-within) .snowui-sidebar-collapse-button) {
+    :global(:where(.snowui-sidebar:hover, .snowui-sidebar:focus-within, .snowui-sidebar-collapse-button-host:hover) .snowui-sidebar-collapse-button) {
         visibility: visible;
         pointer-events: auto;
     }
-    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-collapse-button)) {
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-collapse-button-host)) {
         margin-inline: auto;
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-collapse-button)) {
         visibility: visible;
         pointer-events: auto;
     }
