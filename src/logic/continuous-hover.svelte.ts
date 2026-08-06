@@ -12,6 +12,8 @@ export interface ContinuousHoverOptions {
     followActive?: boolean;
     /** 连续排列且 pointer 总能直接命中 item 时，可关闭全量几何缓存与逐项 ResizeObserver。 */
     geometryMode?: "all" | "direct";
+    /** 命中或更接近该选择器时隐藏共享层，不把该区域及其相邻空隙推断为 item。 */
+    blockedSelector?: string;
 }
 
 type MeasuredItem = {
@@ -42,6 +44,7 @@ export class ContinuousHoverController {
     private enabled = true;
     private followActive = false;
     private geometryMode: "all" | "direct" = "all";
+    private blockedSelector = "";
     private activeItem?: HTMLElement;
     private items: HTMLElement[] = [];
     private measuredItems: MeasuredItem[] = [];
@@ -51,6 +54,7 @@ export class ContinuousHoverController {
         x: number;
         y: number;
         directItem?: HTMLElement;
+        blocked?: boolean;
     };
     private cleanups: Array<() => void> = [];
     private itemResizeCleanups: Array<() => void> = [];
@@ -69,6 +73,7 @@ export class ContinuousHoverController {
         this.enabled = options.enabled ?? true;
         this.followActive = options.followActive ?? false;
         this.geometryMode = options.geometryMode ?? "all";
+        this.blockedSelector = options.blockedSelector ?? "";
 
         if (this.enabled) this.ensureLayer();
 
@@ -78,6 +83,7 @@ export class ContinuousHoverController {
                 x: event.clientX,
                 y: event.clientY,
                 directItem: this.resolveItem(event.target),
+                blocked: this.resolveBlocked(event.target),
             };
             this.requestFrame();
         };
@@ -222,6 +228,14 @@ export class ContinuousHoverController {
             : undefined;
     }
 
+    private resolveBlocked(target: EventTarget | null): boolean {
+        if (!(target instanceof Element) || !this.host || !this.blockedSelector) {
+            return false;
+        }
+        const blocker = target.closest(this.blockedSelector);
+        return !!blocker && this.host.contains(blocker);
+    }
+
     private updateFromPoint(x: number, y: number) {
         if (!this.enabled || !this.host) return;
         if (this.geometryMode === "direct") return this.clear();
@@ -230,27 +244,15 @@ export class ContinuousHoverController {
         let nearest: HTMLElement | undefined;
         let nearestDistance = Number.POSITIVE_INFINITY;
         for (const { element, rect } of this.measuredItems) {
-            const dx =
-                this.axis === "y"
-                    ? 0
-                    : x < rect.left
-                      ? rect.left - x
-                      : x > rect.right
-                        ? x - rect.right
-                        : 0;
-            const dy =
-                this.axis === "x"
-                    ? 0
-                    : y < rect.top
-                      ? rect.top - y
-                      : y > rect.bottom
-                        ? y - rect.bottom
-                        : 0;
-            const distance = dx * dx + dy * dy;
+            const distance = this.distanceToRect(x, y, rect);
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 nearest = element;
             }
+        }
+        if (this.isBlockerNearest(x, y, nearestDistance)) {
+            this.clear();
+            return;
         }
         if (nearest) {
             const rect = this.measuredItems.find(
@@ -258,6 +260,41 @@ export class ContinuousHoverController {
             )?.rect;
             this.moveTo(nearest, rect);
         }
+    }
+
+    private distanceToRect(x: number, y: number, rect: DOMRect) {
+        const dx =
+            this.axis === "y"
+                ? 0
+                : x < rect.left
+                  ? rect.left - x
+                  : x > rect.right
+                    ? x - rect.right
+                    : 0;
+        const dy =
+            this.axis === "x"
+                ? 0
+                : y < rect.top
+                  ? rect.top - y
+                  : y > rect.bottom
+                    ? y - rect.bottom
+                    : 0;
+        return dx * dx + dy * dy;
+    }
+
+    private isBlockerNearest(
+        x: number,
+        y: number,
+        nearestItemDistance: number,
+    ) {
+        if (!this.host || !this.blockedSelector) return false;
+        return Array.from(
+            this.host.querySelectorAll<HTMLElement>(this.blockedSelector),
+        ).some((blocker) => {
+            const rect = blocker.getBoundingClientRect();
+            if (rect.width <= 0 || rect.height <= 0) return false;
+            return this.distanceToRect(x, y, rect) <= nearestItemDistance;
+        });
     }
 
     private moveTo(item: HTMLElement, measuredRect?: DOMRect) {
@@ -339,6 +376,10 @@ export class ContinuousHoverController {
             const pointer = this.pendingPointer;
             this.pendingPointer = undefined;
             if (pointer) {
+                if (pointer.blocked) {
+                    this.clear();
+                    return;
+                }
                 const directItem = pointer.directItem;
                 if (directItem?.isConnected && isEligibleItem(directItem)) {
                     // 直接命中必须使用当帧真实几何，避免布局变化后缓存尚未刷新。
