@@ -1,6 +1,7 @@
 name: Publish OSS package
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - "v*"
@@ -44,11 +45,14 @@ jobs:
         run: |
           set -euo pipefail
           PACKAGE_NAME="@snowui-design-system/components"
-          VERSION="${GITHUB_REF_NAME#v}"
           PACKAGE_VERSION="$(node -p "require('./package.json').version")"
-          if [[ "$VERSION" != "$PACKAGE_VERSION" ]]; then
-            echo "Tag version $VERSION does not match package version $PACKAGE_VERSION" >&2
-            exit 1
+          VERSION="$PACKAGE_VERSION"
+          if [[ "$GITHUB_EVENT_NAME" == "push" ]]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            if [[ "$TAG_VERSION" != "$PACKAGE_VERSION" ]]; then
+              echo "Tag version $TAG_VERSION does not match package version $PACKAGE_VERSION" >&2
+              exit 1
+            fi
           fi
 
           if npm view "${PACKAGE_NAME}@${VERSION}" version --registry=https://registry.npmjs.org/ >/dev/null 2>&1; then
