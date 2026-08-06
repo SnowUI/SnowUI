@@ -2,7 +2,7 @@
 
 > **版本**: v0.1.0
 > **状态**: 已实现(PRO)
-> **包归属**: `@snowui-design-system/components-pro`
+> **包归属**: `@snowui/components-pro`
 > **职责**: 承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。
 
 **继承**: 复用 Frame.svelte 的通用能力。

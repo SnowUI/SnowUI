@@ -162,7 +162,7 @@ helper 输出以下页面 bridge 变量：
   import {
     SidePanel,
     createSidePanelLayoutMotionStyle,
-  } from "@snowui-design-system/components-pro";
+  } from "@snowui/components-pro";
 
   let open = $state(false);
   let placement = $state<"floating" | "inline">("floating");

@@ -2,7 +2,7 @@
 
 > **版本**: v1.0.0
 > **状态**: 已实现(PRO)
-> **包归属**: `@snowui-design-system/components-pro`
+> **包归属**: `@snowui/components-pro`
 > **职责**: 渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。
 
 ---

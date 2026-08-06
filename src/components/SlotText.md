@@ -34,7 +34,7 @@
 
 ```svelte
 <script lang="ts">
-    import { SlotText, chromatic } from "@snowui-design-system/components-pro";
+    import { SlotText, chromatic } from "@snowui/components-pro";
 </script>
 
 <SlotText text="Deploy Ready" motionColor={chromatic()} />

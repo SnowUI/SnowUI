@@ -2,7 +2,7 @@
 
 > 包归属：PRO
 
-DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批量操作。它读取 DataTable Context，不支持独立搭配普通 Table。公开入口为 `@snowui-design-system/components-pro`。
+DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批量操作。它读取 DataTable Context，不支持独立搭配普通 Table。公开入口为 `@snowui/components-pro`。
 
 ## 组合模式
 

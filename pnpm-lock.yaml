@@ -13,8 +13,8 @@ importers:
         version: 3.2.0
     devDependencies:
       '@snowui-design-system/components':
-        specifier: 0.2.0-alpha.7
-        version: 0.2.0-alpha.7(@snowui-design-system/resource-svelte@1.0.26(svelte@5.56.4))(svelte@5.56.4)
+        specifier: 0.2.0-alpha.8
+        version: 0.2.0-alpha.8(@snowui-design-system/resource-svelte@1.0.26(svelte@5.56.4))(svelte@5.56.4)
       '@snowui-design-system/resource-svelte':
         specifier: 1.0.26
         version: 1.0.26(svelte@5.56.4)
@@ -321,8 +321,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@snowui-design-system/components@0.2.0-alpha.7':
-    resolution: {integrity: sha512-1DVU+A2JRgX4o5R0wh3mrTHjtjAoay5cEjGFRYdu0SbfaJb2D6tnN2Fmj76xcA9S6bq2dYICkZuzkcwkBbeEgw==}
+  '@snowui-design-system/components@0.2.0-alpha.8':
+    resolution: {integrity: sha512-buHb4+ngqmZidpS2J1d2jiQOS96mjLtyU4P0VCqrAw5GyvLXRYxPOJniCV/Lp+JjbYCh7agi4rF1W+tfORKPVg==}
     peerDependencies:
       '@snowui-design-system/resource-svelte': '>=1.0.26 <2.0.0'
       svelte: ^5.0.0
@@ -722,7 +722,7 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.62.2':
     optional: true
 
-  '@snowui-design-system/components@0.2.0-alpha.7(@snowui-design-system/resource-svelte@1.0.26(svelte@5.56.4))(svelte@5.56.4)':
+  '@snowui-design-system/components@0.2.0-alpha.8(@snowui-design-system/resource-svelte@1.0.26(svelte@5.56.4))(svelte@5.56.4)':
     dependencies:
       '@snowui-design-system/resource-svelte': 1.0.26(svelte@5.56.4)
       svelte: 5.56.4

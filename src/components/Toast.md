@@ -48,7 +48,7 @@ Toast 是 SnowUI 的全局通知组件。整套能力由三件交付物组成：
 ### `toast(input)` — 命令式入口
 
 ```ts
-import { toast } from "@snowui-design-system/components-pro";
+import { toast } from "@snowui/components-pro";
 
 toast("Done");                                        // 字符串语法 → 等价 { text: "Done" }
 toast({ text: "Done", positive: true });              // 积极语义 → 绿色 CheckCircle
@@ -273,7 +273,7 @@ Toast 动效拆成 4 类原子动效：
 
 ```svelte
 <script>
-    import { Button, Frame, Text, Toast, Toaster, showToast, toast } from "@snowui-design-system/components-pro";
+    import { Button, Frame, Text, Toast, Toaster, showToast, toast } from "@snowui/components-pro";
 </script>
 
 <Toaster />

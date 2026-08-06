@@ -2,7 +2,7 @@
 
 > **版本**: v1.3.1
 > **状态**: 已实现(PRO)
-> **包归属**: `@snowui-design-system/components-pro`
+> **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
 > **参考**: Figma Workshop 节点 `12617:1780`。
 

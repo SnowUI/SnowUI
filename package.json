@@ -1,9 +1,18 @@
 {
-  "name": "@snowui-design-system/components-pro",
+  "name": "@snowui/components-pro",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
+  "license": "UNLICENSED",
   "packageManager": "pnpm@10.20.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SnowUI/SnowUI-Pro.git"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -13,10 +22,12 @@
   },
   "files": ["src", "README.md"],
   "scripts": {
-    "check": "svelte-check --workspace ."
+    "check": "svelte-check --workspace .",
+    "pack:check": "npm pack --dry-run --cache ./node_modules/.cache/npm",
+    "prepublishOnly": "pnpm check"
   },
   "peerDependencies": {
-    "@snowui-design-system/components": ">=0.1.0 <1.0.0",
+    "@snowui-design-system/components": ">=0.2.0-alpha.8 <1.0.0",
     "@snowui-design-system/resource-svelte": ">=1.0.26 <2.0.0",
     "svelte": "^5.0.0"
   },
@@ -24,7 +35,7 @@
     "d3-shape": "^3.2.0"
   },
   "devDependencies": {
-    "@snowui-design-system/components": "0.2.0-alpha.7",
+    "@snowui-design-system/components": "0.2.0-alpha.8",
     "@snowui-design-system/resource-svelte": "1.0.26",
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
     "@tsconfig/svelte": "^5.0.0",

@@ -2,7 +2,7 @@
 
 > **版本**: v1.3.0
 > **状态**: 已实现(PRO)
-> **包归属**: `@snowui-design-system/components-pro`
+> **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、透明间隔、渐变颜色、4% 同色占位层与顺序出现动效的半圆仪表比例图。颜色、几何与出现时间轴能力与 CircularChart 保持同类心智。
 > **参考**: ECharts [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 官方示例，以及本地 ECharts `src/chart/pie/pieLayout.ts`、`src/chart/helper/sectorHelper.ts` 源码。
 

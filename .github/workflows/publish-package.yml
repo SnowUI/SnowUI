@@ -1,0 +1,92 @@
+name: Publish PRO package
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-pro-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.20.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: "@snowui"
+
+      - name: Verify tag and package version
+        shell: bash
+        run: |
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ]; then
+              echo "Tag version $TAG_VERSION does not match package version $PACKAGE_VERSION."
+              exit 1
+            fi
+          fi
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check package
+        run: pnpm check
+
+      - name: Inspect package contents
+        run: pnpm pack:check
+
+      - name: Select distribution tag
+        id: dist-tag
+        shell: bash
+        run: |
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          case "$PACKAGE_VERSION" in
+            *-alpha.*) DIST_TAG="alpha" ;;
+            *-beta.*) DIST_TAG="beta" ;;
+            *-*) DIST_TAG="next" ;;
+            *) DIST_TAG="latest" ;;
+          esac
+          echo "value=$DIST_TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether version already exists
+        id: package-version
+        shell: bash
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          if npm view "@snowui/components-pro@$PACKAGE_VERSION" version --registry=https://npm.pkg.github.com >/dev/null 2>package-view-error.log; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          elif grep -q "E404" package-view-error.log; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          else
+            cat package-view-error.log
+            exit 1
+          fi
+
+      - name: Publish private package
+        if: steps.package-version.outputs.exists != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm publish --no-git-checks --tag "${{ steps.dist-tag.outputs.value }}"

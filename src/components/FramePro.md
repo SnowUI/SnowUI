@@ -3,7 +3,7 @@
 > **版本**: v4.0.2（共享元素布局策略补充，2026-07-30）
 > **职责**: OSS Frame 的超集。在 OSS Frame 全部能力之上叠加**跨组件协调**：编排模式、联动控制、样式编排。
 > **样式规范**: 详见 [StyleSpec.md](../../../specs/StyleSpec.md)
-> **包归属**: `@snowui-design-system/components-pro`（PRO，私有）
+> **包归属**: `@snowui/components-pro`（PRO，私有）
 
 > ## v1.0.0 切割线说明（2026-05-06 起）
 >
