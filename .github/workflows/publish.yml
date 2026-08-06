@@ -1,4 +1,4 @@
-name: Publish OSS
+name: Publish OSS package
 
 on:
   push:
