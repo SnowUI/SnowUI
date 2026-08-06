@@ -110,6 +110,8 @@
        可选的实时百分比 label 位于右侧；填充右缘同样保留圆角。
        数值 label 使用 Black/100% 或 Static White/100% 基色；常态 opacity 40%，
        hover / focus / dragging 时 opacity 80%，不使用低透明度颜色 token。
+       title / label 通过与 Slider 等宽的 background-clip:text 渐变按 fill 右缘
+       实时逐像素分色：覆盖区域白色，未覆盖区域黑色。
        filled 指示器为 2px × 8px 全圆角胶囊，黑色填充内使用 Static White/100%，
        以中心点为基准渐显并由短变长、由细变粗，消失时反向执行。
     ───────────────────────────────────────── */
