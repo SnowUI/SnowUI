@@ -53,6 +53,11 @@
     const LOAD_MORE_ROW_REVEAL_INTERVAL_MS = 20;
     const DEFAULT_LOAD_MORE_THRESHOLD_PX = 80;
     const DEFAULT_LOAD_MORE_THROTTLE_MS = 500;
+    const EMPTY_SELECTION_STATE = {
+        all: false,
+        some: false,
+        rowIds: [] as Array<string | number>,
+    };
     export type DataTableVariant = "striped" | "divided";
     interface Props<T = any> extends Omit<FrameProps, "children" | "variant"> {
         rows?: T[];
@@ -514,11 +519,12 @@
                 scheduleRowRegistrationCommit();
             };
         },
-        isRowSelected: (rowId) => selectedRowIdSet.has(rowId),
+        isRowSelected: (rowId) => selection && selectedRowIdSet.has(rowId),
         setRowSelected: (rowId, selected) => updateSelectedRowIds(selected
             ? Array.from(new Set([...selectedRowIds, rowId]))
             : selectedRowIds.filter((id) => id !== rowId)),
         getSelectionState: () => {
+            if (!selection) return EMPTY_SELECTION_STATE;
             let selectedCount = 0;
             for (const id of registeredRowIds) {
                 if (selectedRowIdSet.has(id)) selectedCount += 1;
