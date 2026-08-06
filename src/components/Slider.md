@@ -1,6 +1,6 @@
 # Slider 滑动输入组件
 
-> **版本**: v1.1.0
+> **版本**: v1.1.1
 > **职责**: 提供单值、区间、水平、纵向与可切割 steps 的滑动输入。
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -11,7 +11,7 @@
 主布局模型：**复合管理布局**。
 
 - 轨道、填充条与拖动块规则复用 Progress：默认粗细 4px、轨道 `Black4`、填充 `Primary`、全圆角。
-- 拖动块固定为 `20px × 14px`，默认使用固定白色与 `0 1px 2px rgba(0, 0, 0, 0.4)` 阴影。
+- 拖动块固定为 `20px × 14px`，默认背景为 `Static White/80%`，含 `0.5px` 白色 Inside Stroke（inset shadow）与 `blur(2px)` 背景模糊；drop shadow 保持 `0 1px 2px rgba(0, 0, 0, 0.4)` 不变。
 - 鼠标常态隐藏拖动块；hover、`focus-visible`、拖动中显示；触控设备常驻显示。
 - label 采用默认内置模式，默认不显示；`showLabel=true` 时自动生成 Text，并显示对应拖动块的实时值。Range 自动生成两个 Text。
 - 内置 label 默认排版为 12px / 16px，可通过 `parts.Text` 配置。显式 `<Text as="label">` 内容保持原样并替换内置 label。
@@ -32,7 +32,7 @@
 | `thickness` | `number \| string` | `4` | 轨道粗细 |
 | `background` | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
 | `color` | `SnowUIColor \| string` | `"Primary"` | 填充条颜色 |
-| `thumbColor` | `SnowUIColor \| string` | `"StaticWhite100"` | 拖动块颜色 |
+| `thumbColor` | `SnowUIColor \| string` | `"StaticWhite80"` | 拖动块颜色 |
 | `disabled` | `boolean` | `false` | 禁用交互 |
 | `name` | `string` | - | 原生表单字段名 |
 | `ariaLabel` | `string \| string[]` | - | 单值可访问名称；Range 可分别声明两个名称 |
@@ -77,6 +77,11 @@
 - steps 只在固定尺寸的 track 上使用 CSS mask 生成 1px 透明缝隙；父级 mask 同时裁切内部 fill，切割线不会随填充宽度移动，也不假设页面背景色。
 
 ## 更新日志 (Changelog)
+
+### v1.1.1 (2026-08-06)
+
+- thumb 默认背景更新为 `Static White/80%`（`--static-white-80`）；新增 `0.5px` 白色 Inside Stroke（inset shadow）与 `blur(2px)` 背景模糊。
+- 原有 drop shadow 保持不变。
 
 ### v1.1.0 (2026-07-04)
 

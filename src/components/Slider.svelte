@@ -1,6 +1,6 @@
 <!--
   Slider 滑动输入组件
-  v1.1.0
+  v1.1.1
 
   文档: ./Slider.md
 -->
@@ -51,7 +51,7 @@
         thickness = 4,
         background = "Black4",
         color = "Primary",
-        thumbColor = "StaticWhite100",
+        thumbColor = "StaticWhite80",
         disabled = false,
         name = undefined,
         ariaLabel = undefined,
@@ -446,12 +446,16 @@
         border-radius: var(--radius-full);
         background-color: var(
             --snowui-slider-thumb-color-override,
-            var(--snowui-slider-thumb-color, var(--static-white-100, #ffffff))
+            var(--snowui-slider-thumb-color, var(--static-white-80, #ffffffcc))
         );
-        box-shadow: var(
-            --snowui-slider-thumb-shadow-override,
-            0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.4)
-        );
+        box-shadow:
+            inset 0 0 0 var(--border-1) var(--static-white-100, #ffffff),
+            var(
+                --snowui-slider-thumb-shadow-override,
+                0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.4)
+            );
+        backdrop-filter: blur(calc(var(--size-4) / 8));
+        -webkit-backdrop-filter: blur(calc(var(--size-4) / 8));
         opacity: 0;
         transform: translate(-50%, -50%);
         transition:

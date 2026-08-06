@@ -101,6 +101,9 @@
     /* ─────────────────────────────────────────
        Slider
        轨道与填充规则继承 Progress；thumb 固定 20px × 14px。
+       thumb 默认背景 Static White/80%（var(--static-white-80)），
+       含 0.5px 白色 Inside Stroke（inset shadow）与 blur(2px) 背景模糊；
+       drop shadow 保持 0 1px 2px rgba(0, 0, 0, 0.4) 不变。
        横向 label 在 thumb 顶部，纵向 label 在 thumb 左侧。
        label 默认排版 12px / 16px；空 label 自动显示对应实时值。
     ───────────────────────────────────────── */
@@ -108,7 +111,7 @@
     /* --snowui-slider-thickness-override: ; */    /* 轨道粗细（默认 4px） */
     /* --snowui-slider-background-override: ; */   /* 轨道底色（默认 var(--black-4)） */
     /* --snowui-slider-color-override: ; */        /* 填充颜色（默认 var(--primary)） */
-    /* --snowui-slider-thumb-color-override: ; */  /* thumb 颜色（默认 var(--static-white-100)） */
+    /* --snowui-slider-thumb-color-override: ; */  /* thumb 颜色（默认 var(--static-white-80)） */
     /* --snowui-slider-thumb-shadow-override: ; */ /* thumb 阴影（默认 0 1px 2px rgba(0, 0, 0, 0.4)） */
 
 
