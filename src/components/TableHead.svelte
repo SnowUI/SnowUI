@@ -32,7 +32,7 @@
         }>;
         [key: string]: any;
     }
-    let { columnId = undefined, label = undefined, as: role = undefined, sortDirection = undefined, defaultSort = undefined, defaultSortActive = false, roleLayout = undefined, onSortChange = undefined, resizable: canResize = false, minWidth = 64, maxWidth = Infinity, align = "start", children, parts = undefined, class: userClass = "", style: userStyle = "", use: userActions = [], enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
+    let { columnId = undefined, label = undefined, as: role = undefined, sortDirection = undefined, defaultSort = undefined, defaultSortActive = false, roleLayout = undefined, onSortChange = undefined, resizable: canResize = true, minWidth = 64, maxWidth = Infinity, align = "start", children, parts = undefined, class: userClass = "", style: userStyle = "", use: userActions = [], enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
     const table = getTableContext();
     const selectionEnabled = $derived(table.isSelectionEnabled());
     const actionsEnabled = $derived(table.isActionsEnabled());
