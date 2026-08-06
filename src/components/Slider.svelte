@@ -1,6 +1,6 @@
 <!--
   Slider 滑动输入组件
-  v1.1.1
+  v1.2.4
 
   文档: ./Slider.md
 -->
@@ -15,8 +15,19 @@
     } from "../lib/color";
     import { splitFrameHostProps } from "../logic/frame-prop-filter";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import {
+        GENERIC_DISAPPEAR_MOTION,
+        GENERIC_SCALE_APPEAR_MOTION,
+    } from "../motion/presets/generic";
+    import { motionMsVar } from "../motion/presets/utils";
+    import {
+        MOTION_DURATION_STANDARD_APPEAR_MS,
+        MOTION_DURATION_STANDARD_DISAPPEAR_MS,
+        MOTION_EASING_STANDARD,
+    } from "../motion/tokens";
 
     type SliderOrientation = "horizontal" | "vertical";
+    type SliderVariant = "default" | "filled";
 
     interface Props extends Omit<FrameProps, "children"> {
         value?: number | number[];
@@ -24,6 +35,8 @@
         maxValue?: number;
         step?: number;
         orientation?: SliderOrientation;
+        variant?: SliderVariant;
+        title?: string;
         showSteps?: boolean;
         showLabel?: boolean;
         thickness?: number | string;
@@ -46,9 +59,11 @@
         maxValue = 100,
         step = 1,
         orientation = "horizontal",
+        variant = "default",
+        title = "Text",
         showSteps = false,
         showLabel = false,
-        thickness = 4,
+        thickness = undefined,
         background = "Black4",
         color = "Primary",
         thumbColor = "StaticWhite80",
@@ -132,6 +147,37 @@
             ? Math.min(100, Math.abs((step / (maxValue - minValue)) * 100))
             : 100,
     );
+    const filledStepPositions = $derived.by(() => {
+        if (
+            variant !== "filled" ||
+            !showSteps ||
+            !Number.isFinite(step) ||
+            step <= 0 ||
+            maxValue === minValue
+        ) {
+            return [];
+        }
+
+        const count = Math.floor(Math.abs((maxValue - minValue) / step));
+        if (count > 100) return [];
+
+        const positions = Array.from({ length: count + 1 }, (_, index) =>
+            Math.min(100, index * stepPercent),
+        );
+        if ((positions.at(-1) ?? 0) < 100) positions.push(100);
+        return positions;
+    });
+    const resolvedThickness = $derived(
+        thickness ?? (variant === "filled" ? 32 : 4),
+    );
+    const filledTitleIsOnFill = $derived(endPercent >= 25);
+    const filledValueIsOnFill = $derived(endPercent >= 100);
+    const filledIndicatorMotionStyle = [
+        `--snowui-slider-indicator-appear-duration: ${motionMsVar(GENERIC_SCALE_APPEAR_MOTION.duration, MOTION_DURATION_STANDARD_APPEAR_MS)}`,
+        `--snowui-slider-indicator-appear-easing: ${GENERIC_SCALE_APPEAR_MOTION.easing ?? MOTION_EASING_STANDARD}`,
+        `--snowui-slider-indicator-disappear-duration: ${motionMsVar(GENERIC_DISAPPEAR_MOTION.duration, MOTION_DURATION_STANDARD_DISAPPEAR_MS)}`,
+        `--snowui-slider-indicator-disappear-easing: ${GENERIC_DISAPPEAR_MOTION.easing ?? MOTION_EASING_STANDARD}`,
+    ].join("; ");
     const resolvedAriaLabels = $derived(
         Array.isArray(ariaLabel)
             ? ariaLabel
@@ -142,7 +188,7 @@
     );
     const sliderStyle = $derived(
         [
-            `--snowui-slider-thickness: ${toCssLength(thickness)}`,
+            `--snowui-slider-thickness: ${toCssLength(resolvedThickness)}`,
             `--snowui-slider-background: ${resolveSnowUIColor(background)}`,
             `--snowui-slider-color: ${resolveSnowUIColor(color)}`,
             `--snowui-slider-thumb-color: ${resolveSnowUIColor(thumbColor)}`,
@@ -150,6 +196,7 @@
             `--snowui-slider-start: ${startPercent}%`,
             `--snowui-slider-end: ${endPercent}%`,
             `--snowui-slider-step-percent: ${stepPercent}%`,
+            variant === "filled" ? filledIndicatorMotionStyle : "",
             userStyle,
         ]
             .filter(Boolean)
@@ -167,9 +214,12 @@
                 return;
             }
             label.dataset.snowuiSliderAutoLabel = "true";
-            label.textContent = String(
-                resolvedValues[index] ?? resolvedValues[0] ?? minValue,
-            );
+            const resolvedValue =
+                resolvedValues[index] ?? resolvedValues[0] ?? minValue;
+            label.textContent =
+                variant === "filled"
+                    ? `${Math.round(toPercent(resolvedValue))}%`
+                    : String(resolvedValue);
         });
     });
 
@@ -249,11 +299,23 @@
 </script>
 
 <Frame
-    class={["snowui-slider", userClass].filter(Boolean).join(" ")}
+    class={[
+        "snowui-slider",
+        variant === "filled" ? "snowui-slider-filled" : "",
+        userClass,
+    ]
+        .filter(Boolean)
+        .join(" ")}
     style={sliderStyle}
     data-orientation={orientation}
     data-range={isRange || undefined}
     data-show-steps={showSteps || undefined}
+    data-title-on-fill={variant === "filled" && filledTitleIsOnFill
+        ? "true"
+        : undefined}
+    data-value-on-fill={variant === "filled" && filledValueIsOnFill
+        ? "true"
+        : undefined}
     data-dragging={dragging || undefined}
     data-disabled={disabled ? "true" : undefined}
     {disabled}
@@ -273,6 +335,10 @@
         onpointerup={handlePointerUp}
         onpointercancel={handlePointerUp}
     >
+        {#if variant === "filled" && title}
+            <Text class="snowui-slider-title">{title}</Text>
+        {/if}
+
         {#if children || showLabel}
             <div bind:this={labelsRef} class="snowui-slider-labels">
                 {#if children}
@@ -289,10 +355,26 @@
             <div class="snowui-slider-fill"></div>
         </div>
 
+        {#if variant === "filled" && showSteps}
+            <div class="snowui-slider-step-markers" aria-hidden="true">
+                {#each filledStepPositions as position}
+                    <span
+                        data-active={endPercent > startPercent &&
+                        position >= startPercent &&
+                        position <= endPercent
+                            ? "true"
+                            : undefined}
+                        style={`--snowui-slider-step-position: ${position}%`}
+                    ></span>
+                {/each}
+            </div>
+        {/if}
+
         {#each resolvedValues as resolvedValue, index}
             <div
                 class="snowui-slider-thumb"
                 data-index={index}
+                data-at-start={toPercent(resolvedValue) <= 0 || undefined}
                 aria-hidden="true"
                 style={`--snowui-slider-thumb-position: ${toPercent(resolvedValue)}%`}
             ></div>
@@ -337,12 +419,37 @@
         min-height: 0;
     }
 
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"])) {
+        height: var(
+            --snowui-slider-thickness-override,
+            var(--snowui-slider-thickness, var(--size-8))
+        );
+        min-height: var(
+            --snowui-slider-thickness-override,
+            var(--snowui-slider-thickness, var(--size-8))
+        );
+        overflow: hidden;
+        border-radius: var(
+            --snowui-slider-filled-radius-override,
+            var(--radius-2)
+        );
+        background-color: var(
+            --snowui-slider-background-override,
+            var(--snowui-slider-background, var(--black-4, #0000000a))
+        );
+    }
+
     :global(:where(.snowui-slider-control)) {
         position: relative;
         display: block;
         width: 100%;
         min-height: calc(var(--size-4) * 0.875);
         touch-action: none;
+    }
+
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"] .snowui-slider-control)) {
+        height: 100%;
+        min-height: 0;
     }
 
     :global(:where(.snowui-slider[data-orientation="vertical"] .snowui-slider-control)) {
@@ -382,6 +489,16 @@
         transform: translateX(-50%);
     }
 
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"] .snowui-slider-track)) {
+        inset: 0;
+        height: 100%;
+        border-radius: var(
+            --snowui-slider-filled-radius-override,
+            var(--radius-2)
+        );
+        transform: none;
+    }
+
     :global(:where(.snowui-slider-fill)) {
         position: absolute;
         top: 0;
@@ -405,7 +522,14 @@
         height: calc(var(--snowui-slider-end, 0%) - var(--snowui-slider-start, 0%));
     }
 
-    :global(:where(.snowui-slider[data-show-steps="true"] .snowui-slider-track)) {
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"] .snowui-slider-fill)) {
+        border-radius: var(
+            --snowui-slider-filled-radius-override,
+            var(--radius-2)
+        );
+    }
+
+    :global(:where(.snowui-slider:not(.snowui-slider-filled)[data-show-steps="true"] .snowui-slider-track)) {
         mask-image:
             linear-gradient(
                 to right,
@@ -420,7 +544,7 @@
             );
     }
 
-    :global(:where(.snowui-slider[data-orientation="vertical"][data-show-steps="true"] .snowui-slider-track)) {
+    :global(:where(.snowui-slider:not(.snowui-slider-filled)[data-orientation="vertical"][data-show-steps="true"] .snowui-slider-track)) {
         mask-image:
             linear-gradient(
                 to top,
@@ -476,10 +600,60 @@
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
 
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"] .snowui-slider-thumb)) {
+        inset-inline-start: max(
+            var(--padding-1),
+            calc(var(--snowui-slider-thumb-position) - var(--padding-1))
+        );
+        z-index: 4;
+        width: calc(var(--size-4) / 8);
+        height: calc(var(--size-4) / 2);
+        border-radius: var(--radius-full);
+        background-color: var(--static-white-100, #ffffff);
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.5, 0.5);
+        transform-origin: center center;
+        transition:
+            opacity
+                var(--snowui-slider-indicator-disappear-duration, 0.15s)
+                var(
+                    --snowui-slider-indicator-disappear-easing,
+                    cubic-bezier(0.22, 1, 0.36, 1)
+                ),
+            transform
+                var(--snowui-slider-indicator-disappear-duration, 0.15s)
+                var(
+                    --snowui-slider-indicator-disappear-easing,
+                    cubic-bezier(0.22, 1, 0.36, 1)
+                );
+    }
+
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"] .snowui-slider-thumb[data-at-start="true"])) {
+        background-color: var(--black-40, #00000066);
+    }
+
     :global(:where(.snowui-slider:not([data-disabled="true"]):hover .snowui-slider-thumb)),
     :global(:where(.snowui-slider:focus-within .snowui-slider-thumb)),
     :global(:where(.snowui-slider[data-dragging="true"] .snowui-slider-thumb)) {
         opacity: 1;
+    }
+
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"]:not([data-disabled="true"]):hover .snowui-slider-thumb)),
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"]:focus-within .snowui-slider-thumb)),
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"][data-dragging="true"] .snowui-slider-thumb)) {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1, 1);
+        transition-duration: var(
+            --snowui-slider-indicator-appear-duration,
+            0.25s
+        );
+        transition-timing-function: var(
+            --snowui-slider-indicator-appear-easing,
+            cubic-bezier(0.22, 1, 0.36, 1)
+        );
     }
 
     :global(:where(.snowui-slider-input)) {
@@ -505,6 +679,19 @@
         pointer-events: none;
     }
 
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"] .snowui-slider-labels)) {
+        top: var(--padding-2);
+        bottom: var(--padding-2);
+        inset-inline-start: var(--padding-2);
+        inset-inline-end: var(--padding-2);
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        min-width: 0;
+        overflow: hidden;
+    }
+
     :global(:where(.snowui-slider) .snowui-slider-labels > *) {
         position: absolute;
         bottom: calc(
@@ -523,6 +710,23 @@
             opacity
                 var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
+    }
+
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"]) .snowui-slider-labels > *) {
+        position: static;
+        overflow: hidden;
+        opacity: 0.4;
+        color: var(--black-100, #000000);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        translate: none;
+        transition: color
+            var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
+    }
+
+    :global(:where(.snowui-slider-filled[data-orientation="horizontal"][data-value-on-fill="true"]) .snowui-slider-labels > *) {
+        color: var(--static-white-100, #ffffff);
     }
 
     :global(:where(.snowui-slider[data-range="true"]) .snowui-slider-labels > :first-child) {
@@ -558,13 +762,71 @@
         bottom: var(--snowui-slider-start, 0%);
     }
 
-    :global(:where(.snowui-slider:not([data-disabled="true"]):hover) .snowui-slider-labels > *) {
+    :global(:where(.snowui-slider:not(.snowui-slider-filled):not([data-disabled="true"]):hover) .snowui-slider-labels > *) {
         opacity: 1;
     }
 
+    :global(:where(.snowui-slider-title)) {
+        position: absolute;
+        top: 50%;
+        inset-inline-start: var(--padding-2);
+        z-index: 3;
+        max-width: calc(100% - var(--size-9));
+        overflow: hidden;
+        color: var(--black-100, #000000);
+        font-size: var(--text-12);
+        line-height: var(--leading-12);
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        translate: 0 -50%;
+        pointer-events: none;
+        transition: color
+            var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
+    }
+
+    :global(:where(.snowui-slider-filled[data-title-on-fill="true"] .snowui-slider-title)) {
+        color: var(--static-white-100, #ffffff);
+    }
+
+    :global(:where(.snowui-slider-filled:not([data-disabled="true"]):hover) .snowui-slider-labels > *),
+    :global(:where(.snowui-slider-filled:focus-within) .snowui-slider-labels > *),
+    :global(:where(.snowui-slider-filled[data-dragging="true"]) .snowui-slider-labels > *) {
+        opacity: 0.8;
+    }
+
+    :global(:where(.snowui-slider-step-markers)) {
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-slider-step-markers > span)) {
+        position: absolute;
+        top: 50%;
+        inset-inline-start: var(--snowui-slider-step-position);
+        width: calc(var(--size-4) / 8);
+        height: calc(var(--size-4) / 8);
+        border-radius: var(--radius-full);
+        background-color: var(--black-10, #0000001a);
+        transform: translate(-50%, -50%);
+    }
+
+    :global(:where(.snowui-slider-step-markers > span[data-active="true"])) {
+        background-color: var(--static-white-20, #ffffff33);
+    }
+
     @media (hover: none) {
-        :global(:where(.snowui-slider-thumb)) {
+        :global(:where(.snowui-slider:not(.snowui-slider-filled) .snowui-slider-thumb)) {
             opacity: 1;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-slider-filled .snowui-slider-thumb)) {
+            transform: translate(-50%, -50%) scale(1, 1);
+            transition: none;
         }
     }
 </style>
