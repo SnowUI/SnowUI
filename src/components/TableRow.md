@@ -1,9 +1,9 @@
 # TableRow
 
-> **版本**: v1.7.0
+> **版本**: v1.8.0
 > **职责**: 表头或表体的 `<tr>`，统一整行 hover 几何与交互状态。
 
-`rowId` 会映射为 `data-row-id`，并注册到 Table 的当前渲染行集合。`active` 是完全受外部控制的持久视觉状态：开启后输出 `data-active="true"`，使用 `var(--snowui-table-row-hover-background-override, var(--black-4))` 作为静态背景；真实 hover 到激活行时，TableBody 的连续 hover 移动层会再叠加一层同色背景。组件自身不通过点击、hover 或其他交互切换 `active`。
+`rowId` 会映射为 `data-row-id`。仅当 DataTable 开启 selection 时，行才注册到当前渲染行集合，供全选和部分选中状态使用；只读表、排序表与行预览不维护无用的选择注册。`active` 是完全受外部控制的持久视觉状态：开启后输出 `data-active="true"`，使用 `var(--snowui-table-row-hover-background-override, var(--black-4))` 作为静态背景；真实 hover 到激活行时，TableBody 的连续 hover 移动层会再叠加一层同色背景。组件自身不通过点击、hover 或其他交互切换 `active`。
 
 选中时只由 Table Context 输出 `data-selected="true"`，供 selection 角色列保持 Checkbox 可见；`active` 不会写入选中状态，也不会将 Checkbox 设为选中。默认 `divided` 变体的静态行两端无圆角；hover、active（含 `data-force-hover="true"` 静态预览）时首尾单元格形成 12px 外缘圆角，并隐藏该行上下相邻的分割线。普通 hover 背景只由 TableBody 的连续移动层绘制；active 与静态 hover 预览保留自己的持久背景。`striped` 所有数据行始终保持 12px 外缘圆角，active 时以 `--black-4` 激活背景覆盖条纹，hover 时连续移动层继续叠加。
 
@@ -31,6 +31,7 @@
 
 ## Changelog
 
+- 2026-08-06：v1.8.0，仅在 DataTable 开启 selection 时注册 `rowId`；只读、排序与行预览表不再维护无用的行选择集合。
 - 2026-08-03：v1.7.0，新增外部受控 `active` 激活态；默认使用 `--black-4` 持久背景，允许与 TableBody 连续 hover 层叠加，且不会改变 Checkbox / selected 状态。
 - 2026-08-03：v1.6.0，删除 TableRow 的单元格 hover 背景与背景过渡；颜色统一由 TableBody 的唯一连续移动层绘制。
 - 2026-07-08：v1.5.0，行内空白点击改为可选行预览协议；未配置 DataTable `onRowPreview` 时不响应，选择只由 selection 角色列触发。

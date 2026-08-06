@@ -1,6 +1,7 @@
 # Avatar.svelte 文档
 
-> **版本**: v2.11.1
+> **版本**: v2.12.0
+> **变更记录 (2026-08-06)**: 默认 Gradient 头像常态改为轻量共享静态图；仅 hover 或 `gradientMotion` 开启时挂载完整 Gradient 组件，降低长表格中的组件、响应式状态与 SVG 资源开销。
 > **变更记录 (2026-08-03)**: 修复外部 Badge / Icon 子内容被内部 Frame 片段遮蔽的问题；Avatar 根盒统一使用中线对齐，确保 `empty` 与图片、Gradient 头像同排等高。
 > **变更记录 (2026-08-03)**: 默认 Gradient 头像 hover 使用七段非对称路径；每次进入随机切换且不重复上一组相位 / 方向配置。
 > **变更记录 (2026-08-02)**: 默认头像改为随机 Gradient；原灰色用户图标改为 `empty` 空头像变体；Avatar 单色 hover 通过像素 alpha 仅叠加实际图形。
@@ -158,7 +159,7 @@
 - 所有 hover 规则排除 `.snowui-disabled`、`[data-disabled="true"]` 与 `:disabled`；reduced-motion 下关闭淡入淡出并保留静态随机色反馈。
 
 **默认 / 空头像**
-- `default`：内部直接渲染 Gradient，seed 优先使用 `aria-label` / `data-name` / `title`，无名称时使用实例 ID，使同屏默认头像自然分散到六种配色。
+- `default`：常态直接渲染按 seed 选择的共享 Gradient 静态图，seed 优先使用 `aria-label` / `data-name` / `title`，无名称时使用实例 ID，使同屏默认头像自然分散到六种配色。完整 Gradient 组件只在 hover 期间按需挂载并在退出动效完成后释放；`gradientMotion` 开启时保持常驻。
 - `empty`：保留 `var(--black-4)` 灰色背景与 resource-svelte `user` 图标，明确表达尚无头像内容。
 
 ### 5. Hover 规范 (Hover Spec)
@@ -203,6 +204,12 @@
 ---
 
 ## 更新日志
+
+### v2.12.0 (2026-08-06)
+
+- 默认 Gradient fallback 常态不再为每个 Avatar 创建完整 Gradient 组件、实例 ID、hover 状态与响应式派生链，只渲染共享静态图。
+- hover 时按需挂载完整 Gradient 水波与五色 Overlay，退出 0.5 秒后回收；`gradientMotion` 继续显式常驻完整 Gradient。
+- 静态图使用原生 lazy loading、异步解码和低请求优先级，长表格只优先处理视口附近头像。
 
 ### v2.11.1 (2026-08-03)
 
