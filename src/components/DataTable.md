@@ -1,6 +1,6 @@
 # DataTable（PRO 数据表格）
 
-> **版本**: v1.9.0  
+> **版本**: v1.12.0  
 > **职责**: 协调查询、排序和分页状态；Toolbar、Table 与 Pagination 由使用方自由组合。
 
 DataTable 不发起请求，也不格式化业务字段。预取、缓存和无延迟切换属于页面数据层；日期显示统一使用 OSS `formatDate()`。
@@ -87,6 +87,8 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 
 默认 **只读表**：`selection={false}`、`actions={false}`，不显示 checkbox 列与操作列。markup 中仍可声明 `<TableHead as="selection" />` / `<TableCell as="actions">` 等；DataTable 关闭时整列不渲染、不参与列注册。
 
+只读默认态同时跳过行选择 Set 查询与全选集合扫描；TableRow 不读取选中状态、不注册 rowId。开启 `selection` 后再恢复完整选择路径，DOM 与交互协议不变。
+
 ```svelte
 <!-- 默认：无 checkbox、无操作列 -->
 <DataTable {rows}>…</DataTable>
@@ -129,6 +131,7 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 
 ## Changelog
 
+- 2026-08-06：v1.12.0，只读默认态复用稳定空选择状态并跳过逐行 Set 查询 / 全选集合扫描；开启 selection 后保持完整选择行为。
 - 2026-07-12：v1.11.0，新增 `selection` / `actions`（默认 false）；默认不显示 checkbox 与操作列，可独立开启。
 - 2026-07-08：v1.10.0，新增 `onRowPreview` 行空白点击预览协议；未配置时空白点击不再切换选中。
 
