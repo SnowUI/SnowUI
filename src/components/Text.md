@@ -6,7 +6,7 @@
 - `parts.Tooltip`：配置截断时内置 Tooltip。
 - 外置 Tooltip 或其他 children 不受 Text 私有 DOM 选择器控制。
 
-> **版本**: v3.5.0
+> **版本**: v3.5.1
 > **变更记录 (2026-05-18)**: 新增 `stateText`，支持读取父 Frame `currentState` 后声明式切换文本。
 > **变更记录 (2026-04-28)**: 标注主布局模型为文本流布局；Text hover 位移改为 transform 变量，不再通过 margin 改变文本流外部间距。
 > **变更记录 (2026-03-16)**: 按需求将 Text 自带 hover 态改为默认关闭，显式传入 `interactive={true}` 才开启。
@@ -15,6 +15,8 @@
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式、形态等)。
 **默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。
 **核心机制**: 采用 **组件内聚模式 (Component-owned Truncation)**，`Text` 自身直接处理 `lines`/`onTruncate`，`Frame` 仅负责通用能力路由。
+
+未声明 `lines` 时，截断控制器保持休眠，不读取文本、不排队 rAF，也不登记 MutationObserver / ResizeObserver；动态设置 `lines` 后再按既有协议激活，不改变默认文本视觉。
 
 ## 布局模型
 
@@ -259,6 +261,10 @@ graph TD
 ---
 
 ## 更新日志 (Changelog)
+
+### v3.5.1 (2026-08-06)
+
+- 未声明 `lines` 时截断控制器完全休眠，不读取文字、不创建观察目标；动态启用截断时仍按原协议激活。
 
 ### v3.5.0 (2026-07-04)
 

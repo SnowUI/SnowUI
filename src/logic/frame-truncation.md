@@ -1,7 +1,7 @@
 # frame-truncation.svelte.ts 文档
 
-> **版本**: v1.4.0
-> **职责**: 通过 `TruncationController` 管理 Text、Link 与 TableCell 共用的文本截断和可展开能力（历史文件名保留）。
+> **版本**: v1.5.0
+> **职责**: 通过 `TruncationController` 管理 Text 与 Link 共用的文本截断和可展开能力（历史文件名保留）；密集 TableCell 使用表级批处理器。
 
 **需求**: 提供多行截断检测、单行溢出检测、可展开/收起状态管理，并向子组件提供截断状态上下文。
 
@@ -106,13 +106,19 @@ interface TruncationContext {
 
 ### 关联关系
 
-- **消费组件**: [Text.svelte](./../components/Text.svelte)、[Link.svelte](./../components/Link.svelte)、[TableCell.svelte](./../components/TableCell.svelte)
+- **消费组件**: [Text.svelte](./../components/Text.svelte)、[Link.svelte](./../components/Link.svelte)
+- **TableCell**: 默认单行截断改由 `lib/table-truncation.ts` 的表级批处理器管理，避免逐格控制器与观察目标。
 - **依赖**: [text-collapse.svelte.ts](./text-collapse.svelte.ts)
 - **Context**: [keys.ts](./../keys.ts)
 
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.5.0 (2026-08-06)
+
+- `lines` 未声明时控制器不读取文本、不排队 rAF、不登记 MutationObserver / ResizeObserver。
+- TableCell 从逐实例控制器迁移到 Table 级批处理器；Text / Link 继续使用本控制器。
 
 ### v1.4.0 (2026-06-23)
 

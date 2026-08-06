@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
 - Skeleton 是加载基础设施，不作为公开 part。
 
-> **版本**: v1.7.5
+> **版本**: v1.8.0
 > **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。
 
 默认单元格高度为 40px，内边距为上下 8px、左右 12px；首尾单元格也保持相同的 12px 外缘 padding。Table 使用原生相邻列布局，列与列之间没有额外 gap；视觉间距来自左右 cell padding。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。
@@ -59,11 +59,13 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 
 > **以下内容供 AI 阅读，不展示在文档站点**
 
-- 与 Text 共用 TruncationController 和全局 resizeManager。
+- 默认单行截断登记到当前 Table 的 `TableTruncationManager`；同一表只观察 viewport / table，不允许恢复逐 Cell ResizeObserver。
+- 普通 Cell 未声明高级 Frame 能力时使用原生 td 快路径；高级能力存在时自动回退完整 Frame。
 - 子级 Text 显式声明 lines 时成为最近的截断 owner，Cell 不再重复生成 Tooltip。
 
 ## Changelog
 
+- 2026-08-06：v1.8.0，默认普通 Cell 使用语义快路径；单行截断改为表级同帧批量读、统一写，移除逐 Cell TruncationController / ResizeObserver，保留 Tooltip、onTruncate 与高级 Frame 自动回退。
 - 2026-08-03：v1.7.5，selection Checkbox 的 1px 增量改为固定 `0.0625rem` 特例，移除尺寸计算对 `--border-2` 的语义误用。
 - 2026-08-03：v1.7.4，selection 内置 Checkbox 默认尺寸改为 Token 计算的 17px，并新增 `--snowui-table-selection-checkbox-size-override`；`parts.Checkbox.size` 显式配置仍优先。
 - 2026-08-03：v1.7.3，删除 TableCell 自身的行 hover 背景，仅保留上下分割线避让；striped hover 时单元格透明，由 TableBody 唯一连续移动层显示颜色。

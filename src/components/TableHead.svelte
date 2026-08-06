@@ -6,7 +6,7 @@
     import Indicator from "./Indicator.svelte";
     import Checkbox from "./Checkbox.svelte";
     import { getTableContext, type TableColumnRegistration, type TableRoleLayout } from "../lib/table-context.svelte";
-    import { createProgressiveBlurStyles, createUniformBlurStyles, type ProgressiveBlurDirection } from "../lib/progressive-blur";
+    import { getTableRoleBlurStyles } from "../lib/table-role-blur";
     import {
         type ComponentPartsOf,
     } from "../logic/component-parts.svelte";
@@ -65,6 +65,12 @@
     });
     const tableVariant = $derived(table.getVariant());
     const resolvedRoleLayout = $derived(roleLayout ?? table.getRoleLayout());
+    const hasSelectionOverlay = $derived(
+        table.isDataTable() && selectionEnabled && resolvedRoleLayout === "overlay",
+    );
+    const hasActionsOverlay = $derived(
+        table.isDataTable() && actionsEnabled && resolvedRoleLayout === "overlay",
+    );
     const width = $derived(resolvedColumnId ? table.getColumnWidth(resolvedColumnId) : undefined);
     const sort = $derived(table.getSort());
     const selectionState = $derived(table.getSelectionState());
@@ -114,30 +120,10 @@
         }
         table.toggleSort(columnId);
     }
-    function buildRoleOverlayBlur(direction: ProgressiveBlurDirection) {
-        const options = {
-            direction,
-            layerCount: table.getRoleOverlayLayers(),
-            width: "var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3))",
-            sampleExtension: "var(--snowui-table-role-overlay-sample-extension-override, 4rem)",
-            maxBlur: "var(--snowui-table-role-overlay-blur-override, 0rem)",
-            minBlur: "0rem",
-            leadWidthRatio: 0.1,
-            endRatio: 0.72,
-            featherRatio: 2.8,
-            tailOpacity: 0,
-            edgeFeatherRatio: table.getRoleOverlayUniformFeather(),
-            tintColor: "#ffffff",
-            tintOpacity: "var(--snowui-table-role-overlay-tint-opacity-override, 0%)",
-        };
-        return table.getRoleOverlayBlurMode() === "uniform"
-            ? createUniformBlurStyles(options)
-            : createProgressiveBlurStyles(options);
-    }
-    const selectionBlur = $derived(buildRoleOverlayBlur("left-to-right"));
-    const actionsBlur = $derived(buildRoleOverlayBlur("right-to-left"));
-    const selectionContentBlur = $derived(buildRoleOverlayBlur("left-to-right"));
-    const actionsContentBlur = $derived(buildRoleOverlayBlur("right-to-left"));
+    const selectionBlur = $derived(getTableRoleBlurStyles(table, "left-to-right"));
+    const actionsBlur = $derived(getTableRoleBlurStyles(table, "right-to-left"));
+    const selectionContentBlur = $derived(getTableRoleBlurStyles(table, "left-to-right"));
+    const actionsContentBlur = $derived(getTableRoleBlurStyles(table, "right-to-left"));
     const selectionCheckboxSizeStyle = $derived(
         parts?.Checkbox?.size === undefined
             ? "--snowui-checkbox-size-override: var(--snowui-table-selection-checkbox-size-override, calc(var(--size-4, 1rem) + 0.0625rem))"
@@ -186,16 +172,20 @@
         <span class="snowui-table-head-content snowui-table-head-content-static">{#if children}{@render children()}{/if}</span>
     {/if}
     {#if !isSelectionRole && !isActionsRole}
-        <span class="snowui-table-head-selection-blur-proxy" style={selectionContentBlur.containerStyle} aria-hidden="true">
-            {#each selectionContentBlur.layers as layer (layer.index)}
-                <span style={layer.style}></span>
-            {/each}
-        </span>
-        <span class="snowui-table-head-actions-blur-proxy" style={actionsContentBlur.containerStyle} aria-hidden="true">
-            {#each actionsContentBlur.layers as layer (layer.index)}
-                <span style={layer.style}></span>
-            {/each}
-        </span>
+        {#if hasSelectionOverlay}
+            <span class="snowui-table-head-selection-blur-proxy" style={selectionContentBlur.containerStyle} aria-hidden="true">
+                {#each selectionContentBlur.layers as layer (layer.index)}
+                    <span style={layer.style}></span>
+                {/each}
+            </span>
+        {/if}
+        {#if hasActionsOverlay}
+            <span class="snowui-table-head-actions-blur-proxy" style={actionsContentBlur.containerStyle} aria-hidden="true">
+                {#each actionsContentBlur.layers as layer (layer.index)}
+                    <span style={layer.style}></span>
+                {/each}
+            </span>
+        {/if}
     {/if}
     {#if canResize && resolvedColumnId && !isSelectionRole && !isActionsRole}
         <Indicator

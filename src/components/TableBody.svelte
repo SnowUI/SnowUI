@@ -37,21 +37,21 @@
     );
     const skeletonWidths = ["62%", "76%", "54%", "68%"];
     let bodyElement = $state<HTMLElement | undefined>(undefined);
-    const continuousHoverController = new ContinuousHoverController();
+    let continuousHoverController: ContinuousHoverController | undefined;
     $effect(() => {
-        if (!bodyElement) return;
+        if (!bodyElement || !continuousHover) return;
         const overlayHost = bodyElement.closest<HTMLElement>(".snowui-table-viewport");
         if (!overlayHost) return;
+        continuousHoverController ??= new ContinuousHoverController();
         return continuousHoverController.attach(bodyElement, {
             selector: ":scope > .snowui-table-row",
             layerClass: "snowui-table-continuous-hover-layer",
             axis: "y",
             geometryMode: "direct",
-            enabled: continuousHover,
+            enabled: true,
             overlayHost,
         });
     });
-    $effect(() => continuousHoverController.setEnabled(continuousHover));
     function getSkeletonWidth(rowIndex: number, columnIndex: number) {
         return skeletonWidths[(rowIndex + columnIndex * 2) % skeletonWidths.length];
     }

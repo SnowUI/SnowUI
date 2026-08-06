@@ -542,7 +542,7 @@
         </div>
         <!-- Children (Badge/Icon) rendered OUTSIDE masked container -->
         {#if badgeChildren}
-            {@render badgeChildren({})}
+            {@render badgeChildren()}
         {/if}
     {/snippet}
 </Frame>

@@ -1,6 +1,6 @@
 # Table（语义表格）
 
-> **版本**: v2.2.0
+> **版本**: v2.3.0
 > **职责**: 提供 OSS 原生表格语义、列宽与加载展示；宽表参与页面固有宽度计算，由页面容器负责横向滚动。
 
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
@@ -174,6 +174,12 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hover 时首尾单元格会自动形成 12px 圆角。
 
+## 密集表格性能协议
+
+默认普通 `TableRow` / `TableCell` 在未声明高级 Frame 能力时使用等价的原生 `tr / td` 语义快路径，并保留既有 class、data state、样式、事件和无障碍语义。传入动效、响应式、Context、Scale Observer、parts 或其他 Frame 配置时自动回到完整 Frame 路径，公开能力不受限制。
+
+单行截断由每个 Table 实例统一批处理：Table 只观察 viewport 与原生 table 两个布局宿主，在同一 animation frame 内先集中读取所有单元格的 `scrollWidth / clientWidth`，再统一提交截断状态。禁止退化为逐 Cell ResizeObserver、逐 Cell rAF 或读写交错。selection / actions 关闭或使用普通列布局时，不生成永远不可见的 overlay blur proxy 与 Cell mask 变量；启用 overlay 后仍使用完全相同的视觉层。
+
 `roleLayout="overlay"` 适合宽表或需要边缘悬浮操作的场景。表头全选框只在 hover 数据行、hover 首个数据列表头（Date）、聚焦/直接 hover 全选框自身或存在选中态时显示（详见上文「选择归属」）；行动按钮只在该行 hover 时显示，不因行被选中而保持显示。
 
 行动按钮（actions 列）被包裹在 `.snowui-table-role-overlay-controls` 容器内：表格的显隐渐变作用在这个**包裹层**的 `opacity` 上，而不是直接作用在按钮元素上。因此按钮自身的 `opacity`（如 `Button bare` 常态 40%、hover 100%）得以保留并与包裹层的渐变相乘，避免表格的 `opacity:1` 覆盖掉按钮自身的状态透明度导致图标按钮失去 hover 反馈。
@@ -192,6 +198,7 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 ## Changelog
 
+- 2026-08-06：v2.3.0，新增密集表格语义快路径和表级单帧截断批处理；默认单元格不再初始化逐格 Frame 运行时与尺寸观察，关闭角色能力时跳过无效 overlay DOM / 样式，视觉与完整能力回退保持不变。
 - 2026-08-06：v2.2.0，普通数据列的 TableHead 默认允许拖动改宽；固定列使用 `resizable={false}` 显式关闭，排序的数据规则保持现有边界。
 
 - 2026-08-03：v2.1.2，17px selection Checkbox 的 1px 增量改为固定 `0.0625rem` 特例，禁止借用 `--border-2` 参与尺寸计算。

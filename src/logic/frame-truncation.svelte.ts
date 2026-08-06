@@ -34,6 +34,12 @@ export class TruncationController {
 
         // 提取并维护完整文本内容
         $effect(() => {
+            if (this.lines === undefined) {
+                this.#element = undefined;
+                if (this.fullText) this.fullText = "";
+                if (this.isTruncated) this.isTruncated = false;
+                return;
+            }
             const el = getElement();
             if (!el) return;
 
