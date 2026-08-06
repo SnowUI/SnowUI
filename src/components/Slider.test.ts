@@ -49,54 +49,68 @@ export const examples = [
         logic: ["label", "value", "external-format"],
     },
     {
-        name: "F1: Filled 变体与指示器",
+        name: "F1: Solid 变体与指示器",
         code: `F1
 <div class="flex-col gap-12" style="width: 160px;">
-  <Slider value={45} variant="filled" showLabel aria-label="四十五百分比" />
-  <Slider value={28} variant="filled" title="Text" showLabel aria-label="二十八百分比" />
-  <Slider value={74} variant="filled" title="Text" showLabel aria-label="七十四百分比" />
-  <Slider value={100} variant="filled" title="Text" showLabel aria-label="一百百分比" />
+  <Slider value={45} variant="solid" showLabel aria-label="四十五百分比" />
+  <Slider value={28} variant="solid" title="Text" showLabel aria-label="二十八百分比" />
+  <Slider value={74} variant="solid" title="Text" showLabel aria-label="七十四百分比" />
+  <Slider value={100} variant="solid" title="Text" showLabel aria-label="一百百分比" />
 </div>`,
         expected: {
             render: "默认 32px 高、8px 圆角；内置标题位于左侧，showLabel 生成的百分比 label 位于右侧，填充的左右两端均为圆角。",
             interaction: "数值 label 使用 100% 基色与独立 opacity：常态 40%，hover、focus 与拖动时 80%；填充边缘内侧 4px 的全圆角 Static White/100% 指示器以中心点为基准渐显、短变长、细变粗，退出时反向消失。",
         },
-        logic: ["variant", "title", "showLabel", "filled", "indicator-motion", "percentage"],
+        logic: ["variant", "title", "showLabel", "solid", "indicator-motion", "percentage"],
     },
     {
-        name: "F2: Filled 分段样式",
+        name: "F2: Solid 分段样式",
         code: `F2
 <div style="width: 160px;">
-  <Slider value={50} step={25} showSteps showLabel variant="filled" aria-label="分段百分比" />
+  <Slider value={50} step={25} showSteps showLabel variant="solid" aria-label="分段百分比" />
 </div>`,
         expected: {
-            render: "轨道按 0、25、50、75、100 五个位置显示 2px 圆点分段标记。",
-            interaction: "保持原生 Slider 的点击、拖动与键盘交互。",
+            render: "轨道只在 25、50、75 三个内部位置显示 2px 圆点，不显示最左和最右端点。",
+            interaction: "分段点固定使用 Black/10%，hover 和填充覆盖时均不改变颜色；保持原生 Slider 的点击、拖动与键盘交互。",
         },
-        logic: ["variant", "filled", "showSteps", "step"],
+        logic: ["variant", "solid", "showSteps", "step"],
     },
     {
-        name: "F3: Filled 标题与粗细",
+        name: "F3: Solid 标题与粗细",
         code: `F3
 <div style="width: 160px;">
-  <Slider value={0} variant="filled" title="Volume" thickness={40} showLabel aria-label="音量百分比" />
+  <Slider value={0} variant="solid" title="Volume" thickness={40} showLabel aria-label="音量百分比" />
 </div>`,
         expected: {
-            render: "标题可配置为 Volume，filled 高度由 thickness 设为 40px；0 值指示器位于 Slider 左边框内侧 4px。",
+            render: "标题可配置为 Volume，solid 高度由 thickness 设为 40px；0 值指示器位于 Slider 左边框内侧 4px。",
             interaction: "数值 label 继续使用 showLabel、parts.Text 与默认关闭规则。",
         },
         logic: ["variant", "title", "thickness", "showLabel", "zero-indicator"],
     },
     {
-        name: "F4: Filled 实时文字分色",
+        name: "F4: Solid 实时文字分色",
         code: `F4
 <div style="width: 160px;">
-  <Slider value={88} variant="filled" title="Text" showLabel aria-label="实时分色百分比" />
+  <Slider value={88} variant="solid" title="Text" showLabel aria-label="实时分色百分比" />
 </div>`,
         expected: {
             render: "黑色填充覆盖到 title 或数值 label 的哪一部分，该部分文字即为白色；未覆盖部分保持黑色。",
             interaction: "点击或拖动时，文字黑白分界与填充右缘使用同一个实时百分比连续移动，不做整段文字阈值切换。",
         },
         logic: ["variant", "title", "showLabel", "live-contrast", "background-clip"],
+    },
+    {
+        name: "G1: Soft 自适应配色",
+        code: `G1
+<div class="flex-col gap-12" style="width: 160px;">
+  <Slider value={45} variant="soft" title="Text" showLabel aria-label="柔和四十五百分比" />
+  <Slider value={88} variant="soft" title="Text" showLabel aria-label="柔和八十八百分比" />
+  <Slider value={100} step={25} showSteps variant="soft" title="Text" showLabel aria-label="柔和一百百分比" />
+</div>`,
+        expected: {
+            render: "填充使用 Black/10%，title、数值 label 与指示器使用 Black/100% 基色；内部 steps 固定使用 Black/10%，颜色 token 随亮色 / 暗色主题变化。",
+            interaction: "文字仍与填充边界实时同步，但覆盖前后均保持 Black/100% 基色；数值 label 继续使用 40% / 80% opacity。",
+        },
+        logic: ["variant", "soft", "theme-adaptive", "Black10", "Black100"],
     },
 ] as const;
