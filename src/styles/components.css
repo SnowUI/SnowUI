@@ -106,22 +106,25 @@
        drop shadow 保持 0 1px 2px rgba(0, 0, 0, 0.4) 不变。
        横向 label 在 thumb 顶部，纵向 label 在 thumb 左侧。
        label 默认排版 12px / 16px；空 label 自动显示对应实时值。
-       filled 变体默认高 32px、圆角 8px；内置 title 位于左侧，
+       solid / soft 条形变体默认高 32px、圆角 8px；内置 title 位于左侧，
        可选的实时百分比 label 位于右侧；填充右缘同样保留圆角。
-       数值 label 使用 Black/100% 或 Static White/100% 基色；常态 opacity 40%，
-       hover / focus / dragging 时 opacity 80%，不使用低透明度颜色 token。
+       solid 默认 Primary 填充 + Static White/100% 覆盖文字；soft 默认
+       Black/10% 填充，全部内部元素使用主题自适应 Black/100% 基色。
+       数值 label 常态 opacity 40%，hover / focus / dragging 时 opacity 80%。
        title / label 通过与 Slider 等宽的 background-clip:text 渐变按 fill 右缘
        实时逐像素分色：覆盖区域白色，未覆盖区域黑色。
-       filled 指示器为 2px × 8px 全圆角胶囊，黑色填充内使用 Static White/100%，
+       条形指示器为 2px × 8px 全圆角胶囊，solid 使用 Static White/100%，
+       soft 使用 Black/100%。分段点只显示内部刻度并固定使用 Black/10%，
+       不响应 hover，也不随填充覆盖范围改变颜色；
        以中心点为基准渐显并由短变长、由细变粗，消失时反向执行。
     ───────────────────────────────────────── */
     /* --snowui-slider-label-gap-override: ; */    /* label 与 thumb 间距（默认 calc(var(--gap-1) / 2) = 2px） */
-    /* --snowui-slider-thickness-override: ; */    /* 轨道粗细 / filled 整体高度（默认 4px；filled 默认 32px） */
+    /* --snowui-slider-thickness-override: ; */    /* 轨道粗细 / 条形整体高度（默认 4px；solid / soft 默认 32px） */
     /* --snowui-slider-background-override: ; */   /* 轨道底色（默认 var(--black-4)） */
     /* --snowui-slider-color-override: ; */        /* 填充颜色（默认 var(--primary)） */
     /* --snowui-slider-thumb-color-override: ; */  /* thumb 颜色（默认 var(--static-white-80)） */
     /* --snowui-slider-thumb-shadow-override: ; */ /* thumb 阴影（默认 0 1px 2px rgba(0, 0, 0, 0.4)） */
-    /* --snowui-slider-filled-radius-override: ; */ /* filled 容器圆角（默认 var(--radius-2) = 8px） */
+    /* --snowui-slider-bar-radius-override: ; */    /* solid / soft 容器圆角（默认 var(--radius-2) = 8px） */
 
 
     /* ─────────────────────────────────────────
