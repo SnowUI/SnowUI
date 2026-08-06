@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v1.9.2
+> **版本**: v2.1.0
 > **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -21,7 +21,7 @@
 | defaultSortActive | `boolean` | `false` | 使 `defaultSort` 的默认方向也显示激活态和图标，并将交互循环扩展为可取消排序 |
 | roleLayout | `column \| overlay` | Table context | 覆盖当前角色表头的角色列布局；普通表头忽略 |
 | onSortChange | `(direction) => void` | - | 独立使用时的三态排序回调 |
-| resizable | `boolean` | `false` | 是否显示列宽手柄 |
+| resizable | `boolean` | `true` | 是否显示列宽手柄；普通列默认可拖动改宽，设为 `false` 时关闭 |
 | minWidth / maxWidth | `number` | `64 / Infinity` | 拖动约束 |
 
 排序状态同步到 `aria-sort`。**只有 DataTable `defaultSort` 命中列的默认方向不显示激活态或图标**（`defaultSortActive` 可覆写）；其他已排序状态显示对应图标。图标遵循主流前端表格的“数值方向”语义：ascending（A→Z、0→9、早→晚）显示内置 `ArrowsUp`；descending（Z→A、9→0、晚→早）显示内置 `ArrowsDown`。图标尺寸为 16px，与文字间距为 0。
@@ -34,6 +34,8 @@
 可排序表头遵循通用无底色文字 / Icon hover 规则：使用 `Black/100% × opacity 0.4 → 1`，不切换颜色源。hover、键盘 focus 与排序激活态都为 `opacity: 1`，因此激活时文字与内置图标保持同色。不可排序的列不渲染按钮，没有 hover 和点击态。
 
 不需要 `sortable` prop。DataTable 根据同名原始字段或 `sorters[columnId]` 自动判断列是否可排序；独立 TableHead 在声明 `sortDirection` / `onSortChange` 时也自动启用交互。没有任何排序规则的列不渲染按钮。
+
+普通数据列只要声明 `columnId`，默认就在列尾渲染 Indicator 并允许拖动修改宽度；不需要重复声明 `resizable`。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。
 
 未声明任何 `defaultSort` 时，TableHead 不会把第一列视为隐式默认排序列。当所有列均未激活排序时，DataTable 保留上层传入的 rows / filteredRows 顺序。
 
@@ -64,7 +66,7 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 默认排序由对应列头直接声明：
 
 ```svelte
-<TableHead columnId="createdAt" defaultSort="descending" resizable>Date</TableHead>
+<TableHead columnId="createdAt" defaultSort="descending">Date</TableHead>
 ```
 
 同一个 DataTable 只能有一个 TableHead 声明 `defaultSort`。该声明优先于 DataTable 旧的对象式 `defaultSort={{ columnId, direction }}`；DataTable 对象式入口仅作为兼容回退保留。
@@ -99,6 +101,7 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 ## Changelog
 
+- 2026-08-06：v2.1.0，普通数据列的 `resizable` 默认值改为 `true`；声明 `columnId` 后即可拖动改宽，固定列可显式传入 `resizable={false}`；selection/actions 角色列保持不可拖动。
 - 2026-08-03：v1.9.2，selection Checkbox 的 1px 增量改为固定 `0.0625rem` 特例，不再复用边框 Token。
 - 2026-08-03：v1.9.1，selection 全选 Checkbox 与数据行统一使用 Token 计算的 17px Table 组合尺寸；独立 Checkbox 默认值不变。
 

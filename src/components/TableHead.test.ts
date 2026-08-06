@@ -2,7 +2,7 @@ export const examples = [
     {
         name: "A1: DataTable 排序与列宽",
         code: `A1
-<Table><TableHeader><TableRow><TableHead columnId="price" defaultSort="descending" defaultSortActive resizable minWidth={64}>价格</TableHead></TableRow></TableHeader></Table>`,
+<Table><TableHeader><TableRow><TableHead columnId="price" defaultSort="descending" defaultSortActive minWidth={64}>价格</TableHead></TableRow></TableHeader></Table>`,
         expected: { render: "渲染 th 与 aria-sort；defaultSortActive 使默认方向也显示激活态和图标；ascending 使用 ArrowsUp，descending 使用 ArrowsDown。", layout: "图标 16px、与文间距 0；右侧 Indicator 为 1px × 16px 居中。", interaction: "defaultSortActive 列按默认 → 反向 → none → 默认；其他列按 none → ascending → descending → none。", performance: "排序状态由上层 context 持有。", responsive: "受 min/max 限制。" },
         logic: ["Sort", "Resize"],
     },
@@ -14,10 +14,10 @@ export const examples = [
         logic: ["ControlledSort"],
     },
     {
-        name: "A3: 静态列头",
+        name: "A3: 固定静态列头",
         code: `A3
-<Table><TableHeader><TableRow><TableHead columnId="note">备注</TableHead></TableRow></TableHeader></Table>`,
-        expected: { render: "渲染静态 th，不渲染排序按钮。", layout: "保持表头文字排版。", interaction: "无 hover、点击或排序激活态。", performance: "不注册排序交互。", responsive: "跟随 Table。" },
+<Table><TableHeader><TableRow><TableHead columnId="note" resizable={false}>备注</TableHead></TableRow></TableHeader></Table>`,
+        expected: { render: "渲染静态 th，不渲染排序按钮或改宽 Indicator。", layout: "保持表头文字排版。", interaction: "无 hover、点击、排序或改宽交互。", performance: "不注册排序交互。", responsive: "跟随 Table。" },
         logic: ["Static"],
     },
     {

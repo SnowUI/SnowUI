@@ -1,6 +1,6 @@
 # Table（语义表格）
 
-> **版本**: v2.1.2
+> **版本**: v2.2.0
 > **职责**: 提供 OSS 原生表格语义、列宽与加载展示；宽表参与页面固有宽度计算，由页面容器负责横向滚动。
 
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
@@ -42,6 +42,8 @@ padding 归属：Table 根层和原生 table 不制造 padding；表头与数据
 gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell padding；TableCell 复合内容的 gap 由 TableCell 自身控制。
 
 普通 Table 不提供 checkbox 选择列或按钮操作列。`TableHead/TableCell as="selection|actions"` 只有位于 PRO DataTable Context 中才激活；选择状态、角色布局与批量操作均由 DataTable 持有。
+
+普通数据列的 TableHead 在声明 `columnId` 后默认允许拖动修改列宽；需要固定宽度的列可传入 `resizable={false}`。该默认能力只负责列宽，不会让普通 Table 自动拥有数据排序规则。
 
 DataTable selection 角色中，TableHead 的全选 Checkbox 与 TableCell 的行 Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`，即 17×17px。额外的 `0.0625rem` 是 [StyleSpec.md §2.2.2](../../../specs/StyleSpec.md) 登记的 Table 视觉居中特例，不借用任何边框 Token，也不改变 Checkbox 组件自身的 16px 默认值；可通过 `--snowui-table-selection-checkbox-size-override` 覆盖。
 
@@ -165,7 +167,7 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 ```svelte
 <Table bind:columnWidths minWidth={600}>
-    <TableHeader><TableRow><TableHead columnId="name" resizable>名称</TableHead></TableRow></TableHeader>
+    <TableHeader><TableRow><TableHead columnId="name">名称</TableHead></TableRow></TableHeader>
     <TableBody><TableRow rowId="one"><TableCell columnId="name">一段很长的名称</TableCell></TableRow></TableBody>
 </Table>
 ```
@@ -189,6 +191,8 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 - 列宽持久化属于页面层，Table 只发出变化。
 
 ## Changelog
+
+- 2026-08-06：v2.2.0，普通数据列的 TableHead 默认允许拖动改宽；固定列使用 `resizable={false}` 显式关闭，排序的数据规则保持现有边界。
 
 - 2026-08-03：v2.1.2，17px selection Checkbox 的 1px 增量改为固定 `0.0625rem` 特例，禁止借用 `--border-2` 参与尺寸计算。
 - 2026-08-03：v2.1.1，Table selection 内置 Checkbox 改为 Token 计算的 17px 组合特化，使奇数高度数据行内上下各留 16px；Checkbox 组件全局默认仍为 16px。
