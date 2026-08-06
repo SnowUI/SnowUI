@@ -1,6 +1,6 @@
 <!-- Table 行；圆角由首尾单元格自动完成。文档: ./TableRow.md -->
 <script lang="ts">
-    import { onMount, type Snippet } from "svelte";
+    import type { Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { getTableContext } from "../lib/table-context.svelte";
     import { provideTableRowContext } from "../lib/table-row-context.svelte";
@@ -21,7 +21,10 @@
         userCurrentState ?? (resolvedWhileAppear === undefined ? undefined : "Appear"),
     );
     provideTableRowContext({ getRowId: () => rowId });
-    onMount(() => (rowId === undefined ? undefined : table.registerRow(rowId)));
+    $effect(() => {
+        if (rowId === undefined || !table.isSelectionEnabled()) return;
+        return table.registerRow(rowId);
+    });
     function handleClick(event: MouseEvent) {
         onclick?.(event);
         if (event.defaultPrevented || rowId === undefined) return;

@@ -1,6 +1,6 @@
 <!--
  Avatar 头像组件
-  v2.11.1
+  v2.12.0
 
  1. 核心能力 (Features):
     - 多样形态: 支持 circular, rounded, square 三种形状
@@ -18,10 +18,17 @@
  -->
 
 <script lang="ts">
-    import { setContext, type Component, type Snippet } from "svelte";
+    import {
+        onDestroy,
+        setContext,
+        type Component,
+        type Snippet,
+    } from "svelte";
     import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
-    import Gradient from "./Gradient.svelte";
+    import Gradient, {
+        getStaticGradientSource,
+    } from "./Gradient.svelte";
     import {
         AVATAR_CONTEXT_KEY,
         getSizeContext,
@@ -147,8 +154,17 @@
         typeof fallbackText === "string" ? fallbackText.trim() : "",
     );
     let avatarHoverColorIndex = $state(0);
+    let gradientHoverMounted = $state(false);
+    let gradientHoverActive = $state(false);
+    let gradientHoverUnmountTimer: ReturnType<typeof setTimeout> | undefined;
     const hasExplicitFallbackText = $derived(explicitFallbackText.length > 0);
     const defaultGradientSeed = $derived(labelSource || avatarInstanceId);
+    const resolvedDefaultGradientSeed = $derived(
+        labelSource || explicitFallbackText || defaultGradientSeed,
+    );
+    const defaultGradientStaticSource = $derived(
+        getStaticGradientSource(resolvedDefaultGradientSeed),
+    );
     const resolvedFallback = $derived(
         fallback ??
             (variant === "default" && !hasExplicitFallbackText
@@ -282,6 +298,7 @@
             fallback: _fallback,
             delayMs: _delayMs,
             onpointerenter: _onpointerenter,
+            onpointerleave: _onpointerleave,
             ...filtered
         } = rest as Record<string, any>;
         return filtered;
@@ -301,11 +318,42 @@
                 Math.random() * AVATAR_HOVER_COLORS.length,
             );
         }
+        if (isInteractive && hasGradientFallback && !gradientMotion) {
+            if (gradientHoverUnmountTimer !== undefined) {
+                clearTimeout(gradientHoverUnmountTimer);
+                gradientHoverUnmountTimer = undefined;
+            }
+            gradientHoverMounted = true;
+            gradientHoverActive = true;
+        }
         const userHandler = rest.onpointerenter as
             | ((event: PointerEvent) => void)
             | undefined;
         userHandler?.(event);
     }
+
+    function handlePointerLeave(event: PointerEvent) {
+        if (hasGradientFallback && !gradientMotion) {
+            gradientHoverActive = false;
+            if (gradientHoverUnmountTimer !== undefined) {
+                clearTimeout(gradientHoverUnmountTimer);
+            }
+            gradientHoverUnmountTimer = setTimeout(() => {
+                gradientHoverMounted = false;
+                gradientHoverUnmountTimer = undefined;
+            }, 550);
+        }
+        const userHandler = rest.onpointerleave as
+            | ((event: PointerEvent) => void)
+            | undefined;
+        userHandler?.(event);
+    }
+
+    onDestroy(() => {
+        if (gradientHoverUnmountTimer !== undefined) {
+            clearTimeout(gradientHoverUnmountTimer);
+        }
+    });
 </script>
 
 <Frame
@@ -326,6 +374,7 @@
         .join(" ")}
     data-disabled={cleanRest.disabled ? "true" : undefined}
     onpointerenter={handlePointerEnter}
+    onpointerleave={handlePointerLeave}
     style={rootStyleFinal}
     renderHints={avatarRenderHints}
     {...cleanRest}
@@ -433,30 +482,44 @@
                         .filter(Boolean)
                         .join(" ")}
                 >
-                    <!-- svelte-ignore svelte_component_deprecated -->
-                    <svelte:component
-                        this={resolvedFallback}
-                        as="avatar-image"
-                        seed={labelSource ||
-                            explicitFallbackText ||
-                            defaultGradientSeed}
-                        size="100%"
-                        radius="inherit"
-                        motion={hasGradientFallback
-                            ? gradientMotion
-                            : undefined}
-                        class={[
-                            "snowui-avatar-visual-media",
-                            usesAvatarColorFilter
-                                ? "snowui-avatar-color-filtered"
-                                : "",
-                        ]
-                            .filter(Boolean)
-                            .join(" ")}
-                        style={usesAvatarColorFilter
-                            ? `--snowui-avatar-color-filter: url(#${avatarColorFilterId})`
-                            : undefined}
-                    />
+                    {#if hasGradientFallback && !gradientMotion && !gradientHoverMounted}
+                        <img
+                            class="snowui-avatar-visual-media snowui-gradient-static-image"
+                            src={defaultGradientStaticSource}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            fetchpriority="low"
+                            draggable="false"
+                            aria-hidden="true"
+                        />
+                    {:else}
+                        <!-- svelte-ignore svelte_component_deprecated -->
+                        <svelte:component
+                            this={resolvedFallback}
+                            as="avatar-image"
+                            seed={resolvedDefaultGradientSeed}
+                            size="100%"
+                            radius="inherit"
+                            motion={hasGradientFallback
+                                ? gradientMotion
+                                : undefined}
+                            avatarHoverActive={hasGradientFallback && !gradientMotion
+                                ? gradientHoverActive
+                                : undefined}
+                            class={[
+                                "snowui-avatar-visual-media",
+                                usesAvatarColorFilter
+                                    ? "snowui-avatar-color-filtered"
+                                    : "",
+                            ]
+                                .filter(Boolean)
+                                .join(" ")}
+                            style={usesAvatarColorFilter
+                                ? `--snowui-avatar-color-filter: url(#${avatarColorFilterId})`
+                                : undefined}
+                        />
+                    {/if}
                 </div>
             {:else if showFallback}
                 <div class="snowui-avatar-visual snowui-avatar-visual-foreground">
