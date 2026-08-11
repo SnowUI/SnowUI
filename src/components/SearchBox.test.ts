@@ -1,6 +1,6 @@
 /**
  * SearchBox.test.ts
- * v1.0.0
+ * v1.1.0
  *
  * 测试覆盖：SearchBox.md 定义的 variant、外置 Kbd、清除 X、禁用态、点击弹出 SearchPopup。
  */
@@ -56,5 +56,21 @@ export const examples = [
             interaction: "点击搜索历史默认不关闭(closeOnSelect={false}),点击联系人通过 closeOnSelect={true} 关闭",
         },
         logic: ["Template", "Popover", "Click", "CloseOnSelect"],
+    },
+    {
+        name: "SB-06：窄宽度退化为搜索图标",
+        code: `SB-06
+<SearchBox
+    collapseBelow={80}
+    placeholder="Search"
+    aria-label="Search"
+    style="width: 1rem;"
+/>`,
+        expected: {
+            render: "仅保留 leading Search 图标，文本和 trailing 不占布局",
+            interaction: "图标态仍保持整个 SearchBox 可点击和可键盘打开",
+            responsive: "组件自身宽度不大于 80px 时进入 icon 退化态；即使外部 width 更小，最小宽度仍为左右实际 padding + leading Icon",
+        },
+        logic: ["ResponsiveCollapse", "Search", "Keyboard"],
     },
 ] as const;

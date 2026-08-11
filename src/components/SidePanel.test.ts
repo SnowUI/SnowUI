@@ -87,7 +87,7 @@ export const examples = [
 <SidePanel open title="Actions">
     {#snippet bottomLeading()}
         <Frame row gap={2}>
-            <Button bare size="sm" aria-label="下载">
+            <Button bare iconOnly emphasis="muted" size="sm" aria-label="下载">
                 <ResourceIcon name="arrow-line-down" size={16} />
             </Button>
         </Frame>

@@ -57,7 +57,7 @@ export const examples = [
 <Tab variant="bare" value="random">
     <Button as="item" value="all">All</Button>
     <Button as="item" value="random">Random</Button>
-    <Button as="item" value="icon" aria-label="收藏"><Icon><Star /></Icon></Button>
+    <Button as="item" value="icon" iconOnly aria-label="收藏"><Icon><Star /></Icon></Button>
 </Tab>`,
         expected: { render: "文字和单 Icon Item 均无外壳，激活项 100%、未激活项 40%。", layout: "容器与按钮均无 padding 和圆角，间距由 Tab gap 控制。", interaction: "hover 与切换只改变 opacity。", performance: "复用既有 Tab item 扫描和 Button 变量桥接。", responsive: "跟随 Tab 与 Button 尺寸档位。" },
         logic: ["Contract", "Selection", "Bare", "OpacityOverride"],

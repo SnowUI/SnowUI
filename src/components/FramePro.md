@@ -208,7 +208,7 @@ Frame 通过 `size` 属性和上下文机制实现跨层级的尺寸控制：
     </Frame>
 
     <!-- 同样支持阻断 -->
-    <Button>
+    <Button iconOnly aria-label="操作">
         <Icon />        <!-- 16px (Button 内部阻断) -->
     </Button>
 </Frame>

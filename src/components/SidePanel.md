@@ -21,7 +21,7 @@
 - **`editable={true}`**：自动显示下工具栏默认按钮（左 copy/delete，右取消 `borderless` + 保存 `gray`，组内 gap 8px）。
 - **只读 + 自定义下栏**：传入 `bottomLeading` / `bottomTrailing` / `bottomLeadingActions` / `bottomTrailingActions` 任一即显示下工具栏；只自定义一侧时另一侧为空，可编辑时缺省侧用默认按钮。
 - **上工具栏固定默认内置**（placement / previous / next + 标题 + 关闭 X），**不支持**替换。
-- 上、下工具栏的内置 icon-only Button 会在 hover 时显示自身 `ariaLabel` 的 Tooltip；调用方显式传入的 `bottomLeading` / `bottomTrailing` 不会被改写。
+- 上、下工具栏的内置 icon-only Button 显式使用 `emphasis="muted"`，并在 hover 时显示自身 `ariaLabel` 的 Tooltip；调用方显式传入的 `bottomLeading` / `bottomTrailing` 不会被改写。可通过 `parts.Button.emphasis` 统一覆盖内置按钮的强调级别。
 - 内置 placement、previous、next、copy、delete、cancel、save、close 文案通过 `LocaleProvider` / `useLocale()` 读取；对应 key 为 `sidePanel.placement.toInline`、`sidePanel.placement.toFloating`、`sidePanel.previous`、`sidePanel.next`、`sidePanel.copy`、`sidePanel.delete`、`sidePanel.cancel`、`sidePanel.save`、`sidePanel.close`。无 Provider 时为 `zh-CN`。`title` 与 actions 数组的 `label` / `ariaLabel` 属于调用方业务文案，保持最高优先级且不翻译。
 - 下栏优先级：Snippet **>** actions 数组 **>** 默认可编辑按钮。
 - 内置 Button / Indicator 通过 `parts.Button` / `parts.Indicator` 批量配置。
@@ -86,7 +86,7 @@
 <SidePanel bind:open editable>
   {#snippet bottomLeading()}
     <Frame row gap={2}>
-      <Button bare size="sm" aria-label="下载" onclick={download}>
+      <Button bare iconOnly emphasis="muted" size="sm" aria-label="下载" onclick={download}>
         <ResourceIcon name="arrow-line-down" size={16} />
       </Button>
     </Frame>
@@ -286,6 +286,8 @@ SidePanel 本身提供高度能力，但页面负责决定它相对于哪个空�
 主布局模型：**复合管理布局**。定义见 [../../../specs/LayoutProtocol.md §12.3](../../../specs/LayoutProtocol.md)。
 
 ## Changelog
+
+- **SP-Init.30 / v1.3.2 (2026-08-09)**：适配 Button bare 默认 100%，内置 icon-only 工具操作显式使用 `emphasis="muted"` 保留原弱化视觉。
 
 - **SP-Init.29 / v1.3.1 (2026-07-20)**：修复从浮层切换到内嵌预览时，Portal 分支切换可能导致 SidePanel 消失的问题；改为迁移稳定渲染宿主并保留内容子树。
 - **SP-Init.28 / v1.3.0 (2026-07-13)**：将 SidePanel-Demo 的实现确立为默认内嵌布局协议；定义“浮动停靠 + 挤压指定内容”的语义、页面/组件职责、被挤压与被覆盖区域的选择方式、同步动效不变量、fixed rail 完整写法，以及高度与视口间距的单一事实来源。

@@ -1,6 +1,6 @@
 <!--
   SearchBox 搜索框触发器
-  v1.0.3
+  v1.1.0
 
   文档: ./SearchBox.md
 
@@ -14,7 +14,11 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
     import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
-    import { Frame, type FrameProps } from "@snowui-design-system/components";
+    import {
+        Frame,
+        resizeManager,
+        type FrameProps,
+    } from "@snowui-design-system/components";
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
         variant?: "gray" | "outline";
@@ -24,6 +28,7 @@
         disabled?: boolean;
         readonly?: boolean;
         showSearchIcon?: boolean;
+        collapseBelow?: number;
         clearable?: boolean;
         children?: Snippet;
         onOpenChange?: (open: boolean) => void;
@@ -41,6 +46,7 @@
         disabled = false,
         readonly = false,
         showSearchIcon = true,
+        collapseBelow = undefined,
         clearable = true,
         children,
         onOpenChange = undefined,
@@ -53,6 +59,7 @@
         class: userClass = "",
         style: userStyle = "",
         renderHints: userRenderHints = undefined,
+        element = $bindable(),
         ...rest
     }: Props = $props();
 
@@ -99,9 +106,38 @@
         value = "";
         onClear?.();
     }
+
+    $effect(() => {
+        const node = element;
+        const threshold = collapseBelow;
+        if (!node) return;
+
+        const update = (width: number) => {
+            if (
+                typeof threshold === "number" &&
+                threshold > 0 &&
+                width <= threshold
+            ) {
+                node.dataset.responsiveCollapse = "icon";
+            } else {
+                delete node.dataset.responsiveCollapse;
+            }
+        };
+
+        update(node.getBoundingClientRect().width);
+        const unwatch = resizeManager.watch(node, (entry) =>
+            update(entry.contentRect.width),
+        );
+
+        return () => {
+            unwatch();
+            delete node.dataset.responsiveCollapse;
+        };
+    });
 </script>
 
 <Frame
+    bind:element
     tag="div"
     role="button"
     tabindex={disabled ? -1 : 0}
@@ -115,6 +151,7 @@
     aria-disabled={disabled ? "true" : undefined}
     aria-haspopup="dialog"
     aria-expanded={open ? "true" : "false"}
+    aria-label={rest["aria-label"] ?? displayText}
     class={[
         "snowui-search-box",
         "snowui-field-bordered",
@@ -188,6 +225,7 @@
         /* 默认搜索图标色:静止 Black/20%,hover 加深到 Black/40% */
         --snowui-search-box-icon-color: var(--black-20, #00000033);
         --snowui-search-box-icon-hover-color: var(--black-40, #00000066);
+        --snowui-search-box-trailing-color: var(--black-20, #00000033);
 
         width: var(--snowui-search-box-width-override, auto);
         min-width: 0;
@@ -256,6 +294,37 @@
                 var(--snowui-frame-color-motion-easing, ease-out),
             color var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
+    }
+
+    :global(
+            :where(
+                    .snowui-search-box[data-responsive-collapse="icon"]
+                )
+        ) {
+        grid-template-columns: auto;
+        justify-content: center;
+        min-width: max-content;
+        gap: 0;
+    }
+
+    :global(
+            :where(
+                    .snowui-search-box[data-responsive-collapse="icon"]
+                        > :not([data-as="leading"])
+                )
+        ) {
+        display: none;
+    }
+
+    :global(
+            :where(
+                    .snowui-search-box[data-responsive-collapse="icon"]
+                        > [data-as="leading"]
+                )
+        ) {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: center;
     }
 
     /* outline 变体:透明底 + 可见边框,hover 时边框加深(参 Button outline) */
@@ -339,6 +408,18 @@
                 > .snowui-search-box-default-icon[data-as="leading"]
         ) {
         display: none;
+    }
+
+    /* 外置 trailing 默认使用 Black/20%；内建清除 X 保留共享按钮颜色。 */
+    :global(
+            :where(
+                    .snowui-search-box
+                        > [data-as="trailing"]:not(
+                            .snowui-search-box-clear-btn
+                        )
+                )
+        ) {
+        color: var(--snowui-search-box-trailing-color);
     }
 
     /* ─── Clear (X) 按钮 ─────────────────────────────────────────

@@ -1,4 +1,4 @@
-<!-- SidebarItem PRO Block v1.4.0. 文档: ./SidebarItem.md -->
+<!-- SidebarItem PRO Block v1.4.1. 文档: ./SidebarItem.md -->
 <script lang="ts">
     import type { Snippet } from "svelte";
     import {
@@ -121,7 +121,7 @@
             href={disabled ? undefined : href}
             disabled={disabled}
             hoverColor={false}
-            style="--snowui-link-color: inherit;"
+            style="--snowui-link-color: inherit; --snowui-link-gap-override: var(--snowui-sidebar-item-gap-override, var(--gap-2));"
             row
             enableAutoLayout={true}
             contentFill
@@ -164,6 +164,8 @@
                     <Button
                         {...parts?.Button}
                         bare
+                        iconOnly
+                        emphasis={parts?.Button?.emphasis ?? "muted"}
                         size="sm"
                         disabled={action.disabled}
                         aria-label={action.label}

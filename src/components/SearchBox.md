@@ -1,6 +1,6 @@
 # SearchBox (搜索框触发器)
 
-> **版本**: v1.0.3
+> **版本**: v1.1.0
 > **职责**: 提供 PRO 搜索入口触发器；点击整个搜索框打开搜索浮层。
 
 `SearchBox` 是搜索浮层的触发器，交互类似 `Select`。它不是原生输入框，整个组件都是可点击区域；视觉颜色、hover、focus、清除 X、内部布局参考 `Input`，并通过 `FramePro` 接通 PRO Frame 能力。
@@ -12,6 +12,7 @@
 - 外置 `Kbd` 由使用者通过 children 放入 trailing，不默认集成
 - 有值时显示清除 X，视觉规则参考 `Input`
 - 点击整块触发器打开浮层
+- 可通过 `collapseBelow` 在自身宽度不足时只保留 leading 搜索图标；最小宽度由左右实际 padding + leading Icon 固有宽度组成
 - 不显示焦点外圈；鼠标点击、Escape 等键盘操作后的视觉状态一致
 
 ---
@@ -29,6 +30,7 @@
 | disabled | `boolean` | `false` | 禁用触发器 |
 | readonly | `boolean` | `false` | 只读触发器，不响应打开 |
 | showSearchIcon | `boolean` | `true` | 是否渲染默认搜索图标 |
+| collapseBelow | `number` | — | 当组件自身宽度小于或等于该 px 阈值时，仅保留 leading 搜索图标；未传时不启用 |
 | clearable | `boolean` | `true` | 有值时是否显示清除按钮 |
 | children | `Snippet` | — | 外置 leading/trailing，如 `Kbd` |
 | onOpenChange | `(open: boolean) => void` | — | 打开状态变化回调 |
@@ -40,6 +42,11 @@
 <SearchBox placeholder="Search">
   <Kbd as="trailing">/</Kbd>
 </SearchBox>
+```
+
+```svelte
+<!-- 容器收窄到 80px 以下时只保留搜索图标 -->
+<SearchBox collapseBelow={80} placeholder="Search" />
 ```
 
 ```svelte
@@ -67,6 +74,8 @@
 - Content：文本内容，Fill，`min-width: 0`。
 - Trailing：外置 `Kbd` 或内建清除 X。
 
+`collapseBelow` 复用 Components 包公开的 `resizeManager` 监听真实根宿主，不创建组件私有 `ResizeObserver`。命中阈值后仅由 SearchBox 隐藏 Content / Trailing 并收敛网格；页面仍负责给组件分配宽度以及决定具体阈值。
+
 ### 样式数值
 
 样式数值登记在 `../../../specs/ComponentStyleSheet.md`。
@@ -79,6 +88,7 @@
 - radius: 16px
 - icon: 16px
 - text: 14px / 20px
+- 外置 `as="trailing"`：默认 `Black/20%`；内建清除 X 继续使用共享清除按钮颜色规则
 
 颜色与状态参考 `Input` / `Field` CSS 行为，但 `SearchBox` 是搜索浮层触发器，不是文本输入框，因此不显示 Field focus ring，也屏蔽全局 `focus-visible` outline；点击后、按 Escape 关闭后都应保持无焦点外圈。
 
@@ -107,6 +117,11 @@
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.1.0 (2026-08-10)
+
+- 新增 `collapseBelow`，可在自身宽度不足时退化为仅 leading 搜索图标；图标态最小宽度等于左右实际 padding + leading Icon 固有宽度。
+- 尺寸监听复用 Components 全局 `resizeManager`，页面只负责分配宽度与选择阈值。
 
 ### v1.0.3 (2026-05-09)
 

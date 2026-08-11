@@ -56,7 +56,7 @@ export const examples = [
         expected: {
             render: "Workshop 显式 Logo 完整替换默认横向 SnowUILogo，导航与 Tags 自由混排",
             layout: "as=logo 节点位于固定 Header 且左右 padding 4px；Header 与下方 Body 的根级 gap 为 12px；直接子节点 as=logo-icon 定义折叠保留图形",
-            interaction: "折叠按钮使用 Button bare 默认常态与 hover 颜色；Page 与 Tags 标题默认均可展开收起且标题无需 Tooltip",
+            interaction: "Section 折叠按钮显式使用 muted bare 的常态与 hover 透明度；Page 与 Tags 标题默认均可展开收起且标题无需 Tooltip",
             performance: "未传 sections 时只渲染显式 Body 内容",
             responsive: "折叠后只保留 as=logo-icon 图形，图形与折叠按钮间距 8px，并隐藏 Workshop、分类标题和 Tags 内容",
         },
@@ -164,7 +164,7 @@ export const examples = [
         name: "SB-07：状态记忆与 active 定位",
         code: `SB-07
 <Frame style="width: 220px; height: 20rem;">
-    <Sidebar persistenceKey="test-sb-07-persistence">
+    <Sidebar>
         <SidebarSection id="top" title="Top">
             <SidebarItem id="overview" label="Overview" />
             <SidebarItem id="projects" label="Projects" />
@@ -188,9 +188,33 @@ export const examples = [
             render: "刷新后恢复各 Section 的展开 / 折叠状态与最后选中的 active item。",
             layout: "列表可滚动时，恢复后的 active item 尽量位于扣除 Footer 安全区后的可视中心；首尾按滚动边界夹紧。",
             interaction: "若 active item 所属 Section 上次被折叠，刷新后该 Section 自动展开；hover Section 标题或两个折叠标题之间的空隙时共享 hover 层隐藏，不点亮下方最近 Item；整体折叠后 Item 仍显示连续 hover 背景，直接进入折叠按钮预期位置也会显示按钮。",
-            performance: "只在提供 persistenceKey 时读写命名空间隔离的 localStorage；恢复后进行即时与动效结束后的两次定位校正。",
+            performance: "默认使用 snowui:sidebar:default 命名空间读写 localStorage；恢复后进行即时与动效结束后的两次定位校正。多实例通过不同 persistenceKey 隔离。",
             responsive: "Section 内容折叠时卸载；active item 的 Section 归属由 Sidebar 独立记忆。",
         },
         logic: ["Persistence", "ActiveReveal", "SectionRecovery", "HoverBlocker"],
+    },
+    {
+        name: "SB-08：关闭宽度调整、状态记忆与数据标签",
+        code: `SB-08
+{#snippet proTag()}<Tag>PRO</Tag>{/snippet}
+<Frame style="width: 220px; height: 20rem;">
+    <Sidebar
+        resizable={false}
+        persistence={false}
+        sections={[
+            { id: "components", title: "Components", items: [
+                { id: "gauge-chart", label: "GaugeChart", icon: "gauge", tags: proTag },
+            ] },
+        ]}
+    />
+</Frame>`,
+        expected: {
+            render: "数据模式 SidebarItem 正常渲染由 tags Snippet 提供的 PRO 标签。",
+            layout: "关闭 resizable 后不渲染右侧宽度 Indicator，Sidebar 保持 width 指定或默认宽度。",
+            interaction: "导航选择与 Section 折叠仍可用；刷新后不恢复 active item 或 Section 折叠状态。",
+            performance: "persistence={false} 时不读取或写入 localStorage。",
+            responsive: "站点可由外层响应式布局决定何时使用固定宽度或其他导航形态。",
+        },
+        logic: ["ResizableOptOut", "PersistenceOptOut", "DataTags"],
     },
 ] as const;

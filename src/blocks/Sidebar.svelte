@@ -1,4 +1,4 @@
-<!-- Sidebar PRO Block v1.5.2. 文档: ./Sidebar.md -->
+<!-- Sidebar PRO Block v1.6.0. 文档: ./Sidebar.md -->
 <script lang="ts">
     import { onMount, setContext, tick, untrack, type Snippet } from "svelte";
     import {
@@ -59,8 +59,12 @@
         width?: number;
         minWidth?: number;
         maxWidth?: number;
+        /** 是否允许通过右侧 Indicator 调整展开宽度。 */
+        resizable?: boolean;
         activeItemId?: string;
-        /** 显式启用本地状态记忆，并作为 localStorage 命名空间。 */
+        /** 是否记忆 active item 与 Section 折叠状态。 */
+        persistence?: boolean;
+        /** localStorage 实例命名空间；多实例应提供不同值。 */
         persistenceKey?: string;
         ariaLabel?: string;
         /** 导航项之间是否使用容器级连续 hover 背景。 */
@@ -86,8 +90,10 @@
         width = $bindable(220),
         minWidth = 160,
         maxWidth = 480,
+        resizable = true,
         activeItemId = undefined,
-        persistenceKey = undefined,
+        persistence = true,
+        persistenceKey = "default",
         ariaLabel = "Primary navigation",
         continuousHover = true,
         onCollapsedChange = undefined,
@@ -289,7 +295,7 @@
     }
 
     function getPersistenceStorageKey() {
-        return persistenceKey
+        return persistence && persistenceKey
             ? `snowui:sidebar:${persistenceKey}`
             : undefined;
     }
@@ -471,9 +477,10 @@
     style={rootStyle}
     data-collapsed={isCollapsed ? "true" : "false"}
     data-navigation-variant={navigationVariant}
+    data-resizable={resizable ? "true" : "false"}
     data-resizing={resizing ? "true" : undefined}
     data-has-footer={hasExternalFooter ? "true" : undefined}
-    data-persistence-ready={persistenceKey && persistenceReady
+    data-persistence-ready={persistence && persistenceKey && persistenceReady
         ? "true"
         : undefined}
     enableResponsive={enableResponsive}
@@ -506,6 +513,7 @@
         {/if}
         <span class="snowui-sidebar-collapse-button-host">
             <Button
+                iconOnly
                 size="sm"
                 class="snowui-sidebar-collapse-button"
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -555,7 +563,7 @@
         inert={isCollapsed}
     ></footer>
 
-    {#if !isCollapsed}
+    {#if !isCollapsed && resizable}
         <Indicator
             {...parts?.Indicator}
             target={rootElement}

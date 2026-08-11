@@ -316,6 +316,8 @@
     {#if !action.hidden}
         <Button
             bare={action.bare ?? !action.label}
+            iconOnly={!!action.icon && !action.label}
+            emphasis={parts?.Button?.emphasis ?? "muted"}
             size="sm"
             variant={action.variant ?? "gray"}
             disabled={action.disabled}
@@ -386,6 +388,8 @@
                         <span class="snowui-side-panel-title">{title}</span>
                         <Button
                             bare
+                            iconOnly
+                            emphasis={parts?.Button?.emphasis ?? "muted"}
                             size="sm"
                             aria-label={locale.t("sidePanel.close")}
                             class="snowui-side-panel-toolbar-button snowui-side-panel-close"

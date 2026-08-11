@@ -46,7 +46,7 @@
 - `value="xxx"` —— 必填,项标识值(通过 Button rest-spread 落到根 `<button>` 元素的 `value` 属性)
 - 可选 `disabled` —— 禁用单项
 - 可选 `href` —— 通过 Button 的 `href` 实现路由型 Tab(Button 会渲染为 `<a>`)
-- 可选 `bare` —— 使用无 padding / radius / 背景且不限制内容类型的 Button；Tab 继续通过 Button 根节点上的 `--snowui-button-opacity-override` 接管透明度，因此不会与 `bare` 默认 0.4 发生叠乘
+- 可选 `bare` —— 使用无 padding / radius / 背景且不限制内容类型的 Button；Tab 继续通过 Button 根节点上的 `--snowui-button-opacity-override` 独立接管 inactive / hover / active 透明度，因此不依赖 Button bare 的默认强调级别
 
 ### 2.3 5 个 variant
 
@@ -208,7 +208,7 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 <!-- bare：文字、单 Icon、混合内容均可 -->
 <Tab variant="bare" size="md" value="all">
   <Button as="item" value="all">All</Button>
-  <Button as="item" value="random"><Icon><Star /></Icon></Button>
+  <Button as="item" value="random" iconOnly aria-label="收藏"><Icon><Star /></Icon></Button>
 </Tab>
 
 <!-- 纵向排列 -->

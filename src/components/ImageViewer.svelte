@@ -441,6 +441,7 @@
                 <Button
                     {...builtInButtonProps}
                     as="prev"
+                    iconOnly
                     aria-label="上一张"
                 >
                     <ResourceIcon
@@ -452,6 +453,7 @@
                 <Button
                     {...builtInButtonProps}
                     as="next"
+                    iconOnly
                     aria-label="下一张"
                 >
                     <ResourceIcon
@@ -464,6 +466,7 @@
                     <Button
                         {...builtInButtonProps}
                         as="close"
+                        iconOnly
                         aria-label="关闭图片预览"
                     >
                         <ResourceIcon name="close" size={16} aria-hidden="true" />

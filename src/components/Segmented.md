@@ -116,7 +116,7 @@ Segmented 是 Tab 的宿主组件特化：真实 Tab 是主要视觉表面、交
 <!-- bare -->
 <Segmented variant="bare" value="all">
   <Button as="item" value="all">All</Button>
-  <Button as="item" value="random"><Icon><Star /></Icon></Button>
+  <Button as="item" value="random" iconOnly aria-label="收藏"><Icon><Star /></Icon></Button>
 </Segmented>
 
 <!-- 接入 Form -->

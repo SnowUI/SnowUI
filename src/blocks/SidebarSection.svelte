@@ -74,6 +74,7 @@
             {#if canCollapse}
                 <Button
                     bare
+                    emphasis={parts?.Button?.emphasis ?? "muted"}
                     size="sm"
                     class="snowui-sidebar-section-toggle"
                     aria-label={isCollapsed ? `Expand ${title}` : `Collapse ${title}`}
@@ -100,6 +101,8 @@
                             <Button
                                 {...parts?.Button}
                                 bare
+                                iconOnly
+                                emphasis={parts?.Button?.emphasis ?? "muted"}
                                 size="sm"
                                 disabled={action.disabled}
                                 aria-label={action.label}

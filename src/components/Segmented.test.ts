@@ -39,7 +39,7 @@ export const examples = [
         <Button as="item" value="a"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
         <Button as="item" value="b"><Icon><Star /></Icon><Text>Mobile</Text></Button>
     </Segmented>
-    <Segmented variant="bare" value="a"><Button as="item" value="a">Web</Button><Button as="item" value="b"><Icon><Star /></Icon></Button></Segmented>
+    <Segmented variant="bare" value="a"><Button as="item" value="a">Web</Button><Button as="item" value="b" iconOnly aria-label="收藏"><Icon><Star /></Icon></Button></Segmented>
 </Frame>`,
         expected: {
             render:

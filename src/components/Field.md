@@ -203,7 +203,7 @@ Field 是字段表面的槽位宿主特化：
 <!-- Date + 自定义日期按钮（简单结构） -->
 <Field>
   <Input type="date" />
-  <Button bare as="trailing">
+  <Button bare iconOnly as="trailing" aria-label="打开日期选择">
     <ArrowLineDown size={16} />
   </Button>
 </Field>
@@ -212,7 +212,7 @@ Field 是字段表面的槽位宿主特化：
 <Field>
   <Frame as="row" row>
     <Input type="date" />
-    <Button bare as="trailing">
+    <Button bare iconOnly as="trailing" aria-label="打开日期选择">
       <ArrowLineDown size={16} />
     </Button>
   </Frame>
@@ -339,7 +339,7 @@ Field 是字段表面的槽位宿主特化：
 <Field>
     <Icon as="leading"><CalendarBlank /></Icon>
     <Input type="date" name="dueDate" />
-    <Button as="trailing" bare><Icon size={16}><ArrowLineUpDown /></Icon></Button>
+    <Button as="trailing" bare iconOnly aria-label="打开日期选择"><Icon size={16}><ArrowLineUpDown /></Icon></Button>
 </Field>
 ```
 

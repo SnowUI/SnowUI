@@ -103,13 +103,13 @@ export const examples = [
         ]}
         index={0}
     >
-        <Button as="prev" size="md" variant="gray" backgroundBlur aria-label="上一张">
+        <Button as="prev" iconOnly size="md" variant="gray" backgroundBlur aria-label="上一张">
             <ArrowLineLeft />
         </Button>
-        <Button as="next" size="md" variant="gray" backgroundBlur aria-label="下一张">
+        <Button as="next" iconOnly size="md" variant="gray" backgroundBlur aria-label="下一张">
             <ArrowLineRight />
         </Button>
-        <Button as="close" size="md" variant="gray" backgroundBlur aria-label="关闭图片预览">
+        <Button as="close" iconOnly size="md" variant="gray" backgroundBlur aria-label="关闭图片预览">
             <Close />
         </Button>
     </ImageViewer>

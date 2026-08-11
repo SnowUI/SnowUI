@@ -1,4 +1,4 @@
-import { getContext } from "svelte";
+import { getContext, type Snippet } from "svelte";
 
 export const SIDEBAR_CONTEXT_KEY = Symbol("snowui-sidebar");
 
@@ -26,10 +26,11 @@ export interface SidebarActionData {
 export interface SidebarItemData {
     id: string;
     label: string;
-    icon?: string;
+    icon?: string | Snippet;
     iconCollection?: string;
     href?: string;
     disabled?: boolean;
     updated?: boolean;
+    tags?: Snippet;
     actions?: SidebarActionData[];
 }
