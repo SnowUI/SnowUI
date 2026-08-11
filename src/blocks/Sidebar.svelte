@@ -1,4 +1,4 @@
-<!-- Sidebar PRO Block v1.6.0. 文档: ./Sidebar.md -->
+<!-- Sidebar PRO Block v1.6.1. 文档: ./Sidebar.md -->
 <script lang="ts">
     import { onMount, setContext, tick, untrack, type Snippet } from "svelte";
     import {
@@ -513,6 +513,7 @@
         {/if}
         <span class="snowui-sidebar-collapse-button-host">
             <Button
+                bare
                 iconOnly
                 size="sm"
                 class="snowui-sidebar-collapse-button"
