@@ -1,6 +1,6 @@
 /**
  * tokens.ts
- * v1.3.0
+ * v1.3.1
  * Motion 数值 token 单一来源。
  */
 
@@ -40,6 +40,7 @@ export const MOTION_SPRING_MOVE_MASS = 1;
 
 export const MOTION_DURATION_TOOLTIP_APPEAR_MS = 150;
 export const MOTION_DURATION_TOOLTIP_DISAPPEAR_MS = 50;
+/** @deprecated Tooltip appear no longer uses an internal delay. */
 export const MOTION_DELAY_TOOLTIP_APPEAR_MS = 80;
 
 export const MOTION_SCALE_GENERIC_APPEAR_FROM = 0.97;

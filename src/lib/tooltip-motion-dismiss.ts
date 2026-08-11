@@ -71,22 +71,29 @@ function affectsGeometry(propertyName: string): boolean {
     );
 }
 
-function isRelatedMotionTarget(
+function isTriggerOrAncestorMotionTarget(
     triggerEl: HTMLElement,
     target: EventTarget | null,
 ): target is Element {
     if (!(target instanceof Element)) return false;
-    return target === triggerEl ||
-        target.contains(triggerEl) ||
-        triggerEl.contains(target);
+    return target === triggerEl || target.contains(triggerEl);
 }
 
 function dismissRelatedTooltips(
     state: DocumentMotionDismissState,
     target: EventTarget | null,
+    includeDescendants: boolean,
 ): void {
     for (const registration of [...state.registrations.values()]) {
-        if (!isRelatedMotionTarget(registration.triggerEl, target)) continue;
+        const affectsTriggerAnchor = isTriggerOrAncestorMotionTarget(
+            registration.triggerEl,
+            target,
+        );
+        const isDescendant = target instanceof Element &&
+            registration.triggerEl.contains(target);
+        if (!affectsTriggerAnchor && !(includeDescendants && isDescendant)) {
+            continue;
+        }
         registration.onDismiss();
     }
 }
@@ -99,10 +106,15 @@ function getDocumentState(document: Document): DocumentMotionDismissState {
         registrations: new Map(),
         handleTransitionRun: (event) => {
             if (!affectsGeometry(event.propertyName)) return;
-            dismissRelatedTooltips(state, event.target);
+            // A descendant geometry transition can still resize or move the
+            // trigger's border box, so retain the conservative dismissal path.
+            dismissRelatedTooltips(state, event.target, true);
         },
         handleAnimationStart: (event) => {
-            dismissRelatedTooltips(state, event.target);
+            // Keyframe events do not expose animated property names. Only the
+            // trigger itself or an ancestor can be assumed to move its anchor;
+            // decorative descendant animations must not close the Tooltip.
+            dismissRelatedTooltips(state, event.target, false);
         },
     };
     documentStates.set(document, state);

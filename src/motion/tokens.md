@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.7.0
+> **版本**: v1.7.3
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -27,16 +27,19 @@
 | `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
 | `MOTION_DISTANCE_*` | text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
 | `MOTION_BLUR_*` | 2px、3px、10px 三档实际 blur 来源 |
-| `MOTION_DURATION_TOOLTIP_*` | Tooltip 专属出现 / 消失节奏 |
-| `MOTION_DELAY_TOOLTIP_APPEAR_MS` | Tooltip 出现动效内部 delay |
+| `MOTION_DURATION_TOOLTIP_*` | Tooltip Foreground 出现 / 消失节奏 |
+| `MOTION_DELAY_TOOLTIP_APPEAR_MS` | 兼容保留的旧 Tooltip 出现 delay；已标记 deprecated，默认 preset 不再消费 |
 | `MOTION_SCALE_DROPDOWN_*` | Popover、Listbox、Menu dropdown |
-| `MOTION_SCALE_TOOLTIP_*` | Tooltip |
+| `MOTION_SCALE_TOOLTIP_*` | Tooltip Foreground 出现 / 消失 scale |
 | `MOTION_SCALE_DIALOG_*` | Dialog / Modal 内容面板 |
 | `MOTION_SCALE_GENERIC_*` | 显式 scale-in 原语、replacement 等需要缩放的 preset；generic appear 本身不再默认消费 |
 | `MOTION_SCALE_ICON_SWAP_FROM` / `MOTION_SCALE_HOVER_*` | Icon 替换与 hover 放大 |
 
 ## 变更记录
 
+- v1.7.3 (2026-08-12): 分层后 Tooltip Foreground 恢复 appear duration / scale token；Portal / Backdrop 不消费这些 token。
+- v1.7.2 (2026-08-12): Tooltip 出现 preset 清空视觉通道；旧 appear duration / scale token 为兼容直接引用者保留并标记 deprecated。
+- v1.7.1 (2026-08-12): Tooltip 出现 preset 不再消费内部 delay；原 token 为兼容直接引用者暂时保留并标记 deprecated。
 - v1.7.0 (2026-07-30): 新增连续悬停背景专项移动与响应时长 token，避免沿用偏慢的 250ms 基础节奏。
 - v1.6.0 (2026-07-12): 默认位移 damping 从 Rare UI 基线 30 调为临界阻尼 `2 * sqrt(300 * 1) = 34.6410161514`，保留 spring 加减速并去除回弹；基线参数 300 / 30 / 1 保留于本记录供恢复。
 - v1.5.0 (2026-07-12): 默认位移改为 Rare UI Sidebar 同参数 spring，新增 move duration 与 stiffness / damping / mass token。

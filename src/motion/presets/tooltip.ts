@@ -1,6 +1,5 @@
 import type { MotionConfig } from "../../logic/motion-config";
 import {
-    MOTION_DELAY_TOOLTIP_APPEAR_MS,
     MOTION_DURATION_TOOLTIP_APPEAR_MS,
     MOTION_DURATION_TOOLTIP_DISAPPEAR_MS,
     MOTION_EASING_TOOLTIP,
@@ -15,7 +14,6 @@ export const TOOLTIP_APPEAR_MOTION: MotionConfig = {
     opacity: [0, 1],
     scale: [MOTION_SCALE_TOOLTIP_APPEAR_FROM, MOTION_SCALE_TOOLTIP_APPEAR_TO],
     duration: MOTION_DURATION_TOOLTIP_APPEAR_MS,
-    delay: MOTION_DELAY_TOOLTIP_APPEAR_MS,
     easing: MOTION_EASING_TOOLTIP,
 };
 

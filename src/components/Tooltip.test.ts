@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.4.0
+ * v1.5.1
  */
 export const examples = [
     {
@@ -122,7 +122,7 @@ export const examples = [
         expected: {
             render: "多个相邻按钮分别显示不同 Tooltip 内容",
             interaction:
-                "任一 Tooltip 成功显示后，300ms 内 hover 另一个 Tooltip 时立即显示；共享外框保持挂载，内容更新并移动到当前按钮上方；等待超过 300ms 后恢复 600ms 首次延迟",
+                "任一 Tooltip 成功显示后，300ms 内 hover 另一个 Tooltip 时立即显示；指针穿过相邻按钮 gap 并停留 150ms 时，共享外框仍保持挂载，内容更新并移动到当前按钮上方；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
         },
         logic: ["Warmup", "Cooldown", "SharedDelay", "SharedOverlay"],
     },
@@ -146,5 +146,31 @@ export const examples = [
             performance: "仅 Tooltip 显示期间启用 document 级共享监听；无逐帧布局读取、ResizeObserver 或 MutationObserver；颜色和背景过渡不会触发关闭",
         },
         logic: ["DismissOnMotion", "ImmediateDismiss", "Performance"],
+    },
+    {
+        name: "G1: 后代装饰动效保持提示 (Descendant Animation)",
+        code: `G1
+<div class="p-40">
+    <Button class="tooltip-descendant-animation-trigger">
+        <span class="tooltip-descendant-animation-icon">✦</span>
+        动画图标
+        <Tooltip>后代装饰动效不关闭提示</Tooltip>
+    </Button>
+</div>
+
+<style>
+    .tooltip-descendant-animation-trigger:hover .tooltip-descendant-animation-icon {
+        animation: tooltip-test-spin 1200ms linear infinite;
+    }
+
+    @keyframes tooltip-test-spin {
+        to { transform: rotate(360deg); }
+    }
+</style>`,
+        expected: {
+            render: "按钮内图标 hover 后持续旋转",
+            interaction: "Tooltip 显示后，后代图标的 animationstart 不会使 Tooltip 消失",
+        },
+        logic: ["DismissOnMotion", "DescendantAnimation", "Regression"],
     },
 ] as const;

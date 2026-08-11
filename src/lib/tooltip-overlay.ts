@@ -1,7 +1,9 @@
 import type { Snippet } from "svelte";
 import { writable } from "svelte/store";
+import { TOOLTIP_SKIP_DELAY_DURATION_MS } from "./tooltip-delay";
 
-export const TOOLTIP_OVERLAY_SWITCH_HIDE_DELAY_MS = 80;
+export const TOOLTIP_OVERLAY_SWITCH_HIDE_DELAY_MS =
+    TOOLTIP_SKIP_DELAY_DURATION_MS;
 
 export interface TooltipOverlayState {
     id: string;
@@ -54,7 +56,7 @@ export function scheduleTooltipOverlayHide(id: string, delayMs = TOOLTIP_OVERLAY
         if (activeTooltipId !== id) return;
         activeTooltipId = undefined;
         tooltipOverlay.set(null);
-    }, TOOLTIP_OVERLAY_SWITCH_HIDE_DELAY_MS);
+    }, delayMs);
 }
 
 export function hideTooltipOverlay(id: string): void {

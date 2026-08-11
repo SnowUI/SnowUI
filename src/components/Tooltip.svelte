@@ -1,7 +1,12 @@
 <!--
- Tooltip 文字提示组件 v1.7.1
+ Tooltip 文字提示组件 v1.7.6
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-12): PRO 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
+ 变更 (2026-08-12): 毛玻璃 Backdrop 与 opacity/scale Foreground 分层，恢复 Tooltip 渐显且不再削弱首帧背景模糊。
+ 变更 (2026-08-12): 毛玻璃 Portal 显示前保留一个不可见预绘制帧，且出现时不再执行 transform，避免实际滤镜像素晚于 Tooltip。
+ 变更 (2026-08-12): 出现 preset 不再对毛玻璃 Portal 做 opacity 渐显，使背景模糊与 Tooltip 在同一可见首帧生效。
+ 变更 (2026-08-12): 后代 Logo / Icon 的装饰性 animation 不再误触发动效关闭；触发器、祖先及后代几何 transition 规则保持。
  变更 (2026-08-12): Styles 根节点隔离规则不再误命中 Portal，恢复默认 light 毛玻璃对应用内容的真实背景采样。
  变更 (2026-07-28): 默认感知触发元素及祖先的几何动效，并在首帧位移前立即关闭。
  变更 (2026-07-28): Tooltip 默认外观变体由 dark 改为 light。
@@ -224,6 +229,7 @@
     let lastPositionTooltipId: string | undefined;
     let overlayWasVisible = false;
     let portalReady = $state(false);
+    let portalReadyFrame: number | undefined;
     let portalMotionReady = $state(false);
     let sizeMotionEnabled = $state(false);
     let hoverShowTimer: number | undefined;
@@ -274,6 +280,10 @@
     });
 
     function resetMotionBaseline() {
+        if (portalReadyFrame !== undefined) {
+            window.cancelAnimationFrame(portalReadyFrame);
+            portalReadyFrame = undefined;
+        }
         portalReady = false;
         portalMotionReady = false;
         sizeMotionEnabled = false;
@@ -557,7 +567,14 @@
         hasMeasuredPosition = true;
         lastPositionTooltipId = activeTooltipId;
         coords = bestCoords;
-        portalReady = true;
+        if (!portalReady && portalReadyFrame === undefined) {
+            const readyTooltipId = activeTooltipId;
+            portalReadyFrame = window.requestAnimationFrame(() => {
+                portalReadyFrame = undefined;
+                if ((currentOverlay?.id ?? tooltipId) !== readyTooltipId) return;
+                portalReady = true;
+            });
+        }
         if (
             tooltipBehavior.lifecycleMotion &&
             !portalMotionReady &&
@@ -702,7 +719,10 @@
 
     // Portal 定位样式 (fixed + px，与 getBoundingClientRect 坐标保持同一单位)
     const portalStyle = $derived(
-        `--snowui-tooltip-top: ${coords.top}px; --snowui-tooltip-left: ${coords.left}px; top: var(--snowui-tooltip-top-override, var(--snowui-tooltip-top)); left: var(--snowui-tooltip-left-override, var(--snowui-tooltip-left)); transform-origin: ${tooltipTransformOrigin};`,
+        `--snowui-tooltip-top: ${coords.top}px; --snowui-tooltip-left: ${coords.left}px; top: var(--snowui-tooltip-top-override, var(--snowui-tooltip-top)); left: var(--snowui-tooltip-left-override, var(--snowui-tooltip-left));`,
+    );
+    const foregroundStyle = $derived(
+        `transform-origin: ${tooltipTransformOrigin};`,
     );
 </script>
 
@@ -721,9 +741,6 @@
             enableContext={false}
             enableDefaultMotion={false}
             enableScaleObserver={false}
-            currentState={effectivePortalLifecycleState}
-            whileAppear={effectivePortalAppearMotion}
-            whileDisappear={effectivePortalDisappearMotion}
             use={[portal]}
             bind:element={tooltipRef}
             loopMotion={renderedOverlay.loopMotion}
@@ -754,18 +771,31 @@
                 role="tooltip"
                 {...renderedOverlay.rest}
             >
+                <span class="snowui-tooltip-backdrop" aria-hidden="true"></span>
                 <Frame
                     enableResponsive={false}
                     enableContext={false}
+                    enableDefaultMotion={false}
                     enableScaleObserver={false}
-                    bind:element={sizeContentRef}
-                    class="snowui-tooltip-inner"
+                    currentState={effectivePortalLifecycleState}
+                    whileAppear={effectivePortalAppearMotion}
+                    whileDisappear={effectivePortalDisappearMotion}
+                    class="snowui-tooltip-foreground"
+                    style={foregroundStyle}
                 >
-                    {#if renderedOverlay.children}
-                        {@render renderedOverlay.children()}
-                    {:else if renderedOverlay.fallbackContent}
-                        {renderedOverlay.fallbackContent}
-                    {/if}
+                    <Frame
+                        enableResponsive={false}
+                        enableContext={false}
+                        enableScaleObserver={false}
+                        bind:element={sizeContentRef}
+                        class="snowui-tooltip-inner"
+                    >
+                        {#if renderedOverlay.children}
+                            {@render renderedOverlay.children()}
+                        {:else if renderedOverlay.fallbackContent}
+                            {renderedOverlay.fallbackContent}
+                        {/if}
+                    </Frame>
                 </Frame>
             </Frame>
         </Frame>
@@ -778,8 +808,6 @@
             enableContext={false}
             enableDefaultMotion={false}
             enableScaleObserver={false}
-            currentState={tooltipBehavior.lifecycleMotion ? "Appear" : "Idle"}
-            whileAppear={effectivePortalAppearMotion}
             use={[portal]}
             bind:element={tooltipRef}
             loopMotion={loopMotion}
@@ -810,18 +838,30 @@
                 role="tooltip"
                 {...forwardedRest}
             >
+                <span class="snowui-tooltip-backdrop" aria-hidden="true"></span>
                 <Frame
                     enableResponsive={false}
                     enableContext={false}
+                    enableDefaultMotion={false}
                     enableScaleObserver={false}
-                    bind:element={sizeContentRef}
-                    class="snowui-tooltip-inner"
+                    currentState={tooltipBehavior.lifecycleMotion ? "Appear" : "Idle"}
+                    whileAppear={effectivePortalAppearMotion}
+                    class="snowui-tooltip-foreground"
+                    style={foregroundStyle}
                 >
-                    {#if tooltipChildren}
-                        {@render tooltipChildren()}
-                    {:else if typeof displayContent === "string" && displayContent}
-                        {displayContent}
-                    {/if}
+                    <Frame
+                        enableResponsive={false}
+                        enableContext={false}
+                        enableScaleObserver={false}
+                        bind:element={sizeContentRef}
+                        class="snowui-tooltip-inner"
+                    >
+                        {#if tooltipChildren}
+                            {@render tooltipChildren()}
+                        {:else if typeof displayContent === "string" && displayContent}
+                            {displayContent}
+                        {/if}
+                    </Frame>
                 </Frame>
             </Frame>
         </Frame>
@@ -849,6 +889,7 @@
 
     :global(:where(.snowui-tooltip-size-shell)) {
         display: inline-block;
+        position: relative;
         box-sizing: border-box;
         overflow: hidden;
         transition:
@@ -899,6 +940,37 @@
             --snowui-tooltip-line-height-override,
             var(--snowui-tooltip-line-height)
         );
+        color: var(--static-white-100, #ffffffff);
+        white-space: nowrap;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-tooltip-content)[data-variant="light"]) {
+        color: var(--black-100, #000000ff);
+    }
+
+    :global(:where(.snowui-tooltip-backdrop)),
+    :global(:where(.snowui-tooltip-foreground)) {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-tooltip-backdrop)) {
+        z-index: 0;
+        backdrop-filter: blur(1.25rem);
+        -webkit-backdrop-filter: blur(1.25rem);
+        will-change: backdrop-filter;
+    }
+
+    :global(:where(.snowui-tooltip-foreground)) {
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        padding: inherit;
         background:
             linear-gradient(
                 0deg,
@@ -906,16 +978,15 @@
                 var(--static-white-10, #ffffff1a)
             ),
             var(--static-black-80, #000000cc);
-        color: var(--static-white-100, #ffffffff);
-        backdrop-filter: blur(1.25rem);
-        -webkit-backdrop-filter: blur(1.25rem);
-        white-space: nowrap;
-        pointer-events: none;
+        color: inherit;
+        will-change: opacity, transform;
     }
 
-    :global(:where(.snowui-tooltip-content)[data-variant="light"]) {
+    :global(
+        :where(.snowui-tooltip-content)[data-variant="light"]
+            :where(.snowui-tooltip-foreground)
+    ) {
         background: var(--black-4, #0000000a);
-        color: var(--black-100, #000000ff);
     }
 
     :global(:where(.snowui-tooltip-inner)) {

@@ -1,6 +1,6 @@
 # Tooltip.svelte 文档
 
-> **版本**: v1.7.1
+> **版本**: v1.7.6
 > **职责**: 文字提示组件，在悬停时显示额外信息。
 
 **能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
@@ -15,7 +15,7 @@
 | open | boolean | undefined | 手动控制显示状态 (可绑定) |
 | offset | number | 4 | 与触发器的距离 (px) |
 | variant | 'dark'\|'light' | 'light' | Tooltip 外观变体，默认 light，可显式切换为 dark |
-| dismissOnMotion | boolean | true | 非受控 hover 模式下，触发元素或其祖先开始位置、尺寸动效时立即隐藏 Tooltip |
+| dismissOnMotion | boolean | true | 非受控 hover 模式下，触发元素或其祖先开始动效，或后代开始几何 transition 时立即隐藏 Tooltip；后代装饰性 animation 不关闭 |
 
 ## 关键字 (Keyword)
 
@@ -71,12 +71,12 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 
 1. **hover 延迟**: 首次 hover 延迟 `450ms` 显示；Tooltip 成功显示后，在 `300ms` cooldown 窗口内切换到其他 Tooltip 时立即显示。
 2. **OSS 默认行为**: 首次 hover 延迟 `450ms` 显示；鼠标离开后立即隐藏；定位包含视口边缘碰撞避让和方向翻转；启用 transitions.dev Tooltip 风格出入场动效，平滑移动和尺寸动效默认关闭。
-3. **PRO 增强行为**: PRO 入口注册 Tooltip 增强后，非受控 hover 模式复用页面级 Portal；在相邻 Tooltip 触发器之间切换时，外框保持存在，内容、位置和宽高随新触发器更新。
+3. **PRO 增强行为**: PRO 入口注册 Tooltip 增强后，非受控 hover 模式复用页面级 Portal；离开当前触发器后的外框保留窗口与 `300ms` skip-delay 一致，在窗口内进入相邻 Tooltip 时外框保持存在，内容、位置和宽高随新触发器更新且不重新执行出现动效。
 4. **PRO 移动规则**: 仅当共享外框仍然可见并切换到另一个触发器时，才应用移动规则。移动距离小于等于 `min(240px, 视口短边 25%)` 且交叉轴距离小于等于 `48px` 时，外框平滑移动；超过距离阈值或跨上下两排 / 左右两列时直接定位到新触发器，避免跨区域飞行。移动时序与宽高变化保持一致，均为 `150ms`；移动过渡只作用在 Portal 的 `top / left`，避免 snap 状态被 Frame Active 的全属性 transition 影响。
 5. **重新出现规则**: 外框已经隐藏后，不论间隔多久再次 hover，都重置上一次的坐标、尺寸和触发器记录；新一轮 Tooltip 首帧先完成不可见测量和定位，再直接从当前 hover 位置出现，不做位移动效和宽度变化动效。
 6. **冷却恢复**: 离开 Tooltip 触发器超过 `300ms` 后，恢复首次 hover 的 `450ms` 延迟。未成功显示就移开时，不进入立即显示模式。
 7. **边界碰撞**: 自动翻转位置避免溢出视口。
-8. **动效感知关闭**: 默认只在 Tooltip 已显示期间，以页面级单例监听触发元素及其祖先的几何 transition / animation；开始后立即卸载 Tooltip 并跳过退出动效。颜色、背景与透明度过渡不会触发关闭；可通过 `dismissOnMotion={false}` 显式关闭。
+8. **动效感知关闭**: 默认只在 Tooltip 已显示期间，以页面级单例监听触发元素与祖先的 transition / animation，以及后代的几何 transition；命中后立即卸载 Tooltip 并跳过退出动效。后代 Logo / Icon 等装饰性 animation、颜色、背景与透明度 transition 不触发关闭；可通过 `dismissOnMotion={false}` 显式关闭。
 
 ## 样式逻辑（实现对照）
 
@@ -114,14 +114,14 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 - PRO 注册增强后：
   - Tooltip 成功显示后，页面内其他 Tooltip 在 `300ms` cooldown 窗口内立即显示；
   - 连续切换触发器时复用同一个 Portal 外框，更新内部文字、定位与尺寸；
-  - 新一轮显示先完成不可见测量和定位，再把 Portal Frame 切到 `Appear` 状态，使用 `TOOLTIP_APPEAR_MOTION`；具体 duration / delay / scale 以 motion preset catalog 为准；
+  - 新一轮显示先完成不可见测量和定位，并为毛玻璃层保留一个不可见预绘制帧，再整体显示 Portal；稳定 Backdrop 首帧以完整 opacity 提供 blur，独立 Foreground 使用 `TOOLTIP_APPEAR_MOTION` 对背景色和内容执行 opacity + 轻微 scale。Portal 与 Backdrop 不参与该出现动效，因此渐显不会削弱滤镜；
   - 近距离切换时外框平滑移动到新触发器上方；远距离切换时外框直接贴到新位置；
   - 外框隐藏后再次出现时重置运动基线，首帧直接定位到当前触发器，并在渐显结束后才开启后续尺寸动效；
   - 离开触发器超过 `300ms` 后恢复 `450ms` 首次延迟；
-  - 生命周期出现使用 `TOOLTIP_APPEAR_MOTION` 的显式 opacity / scale / placement 位移通道；后续尺寸变化继续由 Frame `Idle -> Active` 形态时序承接；
-  - 内容宽高变化由 `snowui-tooltip-size-shell` 保存明确宽高，并消费 Frame `--snowui-frame-size-motion-*` 桥接变量过渡；尺寸时序基于 Frame 默认形态动效加快一倍为 `150ms`；背景、圆角、padding 和毛玻璃也在该 shell 上，外框本身发生形态变化，而不是通过遮罩裁切一块更长的内容外框；
+  - 生命周期出现只在 `snowui-tooltip-foreground` 使用 `TOOLTIP_APPEAR_MOTION` 的显式 opacity / scale 通道；后续尺寸变化继续由 Frame `Idle -> Active` 形态时序承接；
+  - 内容宽高变化由 `snowui-tooltip-size-shell` 保存明确宽高，并消费 Frame `--snowui-frame-size-motion-*` 桥接变量过渡；尺寸时序基于 Frame 默认形态动效加快一倍为 `150ms`。圆角和 padding 归 size shell，毛玻璃归稳定 Backdrop，背景色和内容归 Foreground；三个层级共享同一尺寸与裁切边界；
   - top / bottom 方向使用触发器中心作为固定锚点，尺寸外壳用静态 `transform: translateX(-50%)` 保持居中；left / right 方向使用触发器垂直中心作为固定锚点，尺寸外壳用静态 `transform: translateY(-50%)` 保持居中；宽高由 Frame size motion bridge 过渡，但居中偏移不参与过渡，因此连续切换和尺寸变化过程中 Tooltip 仍保持与触发器居中对齐；
-  - 鼠标移开后短暂保留外框以承接相邻触发器切换，未命中新 Tooltip 时把 Portal Frame 切到 `Disappear` 状态，使用参考 transitions.dev Tooltip 的 `50ms` 退出动效：淡出并缩到 `98%`；退出动画完成后再卸载共享外框。
+  - 鼠标移开后按 `300ms` skip-delay 保留外框以承接相邻触发器切换；窗口内命中新 Tooltip 时取消隐藏并直接复用。超过窗口仍未命中时把 Foreground Frame 切到 `Disappear` 状态，使用参考 transitions.dev Tooltip 的 `50ms` 退出动效：背景色和内容淡出并缩到 `98%`；退出完成后再卸载包含 Backdrop 的共享外框。
 - 受控模式（`open` 传入）由外部状态直接控制显隐，不参与共享 warmup / cooldown 状态。
 - 当外部传入 `loopMotion.preset="rotateClockwise"` 等循环默认能力时，Portal 外层 Frame 会直接承接该动效；因此 Tooltip 可见浮层本身可以连续旋转，且不会覆盖内部内容层的 appear `transform`。
 
@@ -145,6 +145,21 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.7.6 (2026-08-12)
+- 修复 Test Footer 相邻按钮间移动速度不同时，共享 Tooltip 偶发先消失再出现的问题。PRO 外框保留窗口由固定 80ms 对齐到共享 300ms skip-delay，隐藏函数同时改为尊重实际 `delayMs`。
+
+### v1.7.5 (2026-08-12)
+- 将 Tooltip 可见表面拆分为稳定 Backdrop 与独立 Foreground：Backdrop 首帧完整执行 `blur(20px)`，Foreground 的背景色和内容恢复 opacity + 轻微 scale。保留一个不可见预绘制帧，退出时 Foreground 继续使用原快速 opacity + scale。
+
+### v1.7.4 (2026-08-12)
+- Test Footer 复测仍能看到实际模糊像素晚于 Tooltip。进一步移除出现态 transform，并在 `data-ready=true` 前增加一个不可见预绘制帧；毛玻璃层只在 Tooltip 挂载期间通过 `will-change` 预合成，退出动效保持不变。
+
+### v1.7.3 (2026-08-12)
+- 修复 Tooltip 已出现后背景模糊才逐渐清晰的问题。滤镜计算本身没有延迟；出现 preset 移除 Portal opacity 与额外 delay，仅保留轻微 scale，使完整毛玻璃与 Tooltip 同帧出现。
+
+### v1.7.2 (2026-08-12)
+- 修复动画 Logo / Icon 作为触发器后代时，装饰性 `animationstart` 误关闭 Tooltip 的问题；触发器自身、祖先动效及后代几何 transition 的关闭保护保持不变。
 
 ### v1.7.1 (2026-08-12)
 - 修复 Styles 根节点隔离选择器误命中 Tooltip Portal，导致 `blur(1.25rem)` 无法采样应用内容的问题；Tooltip 默认 light 变体保持不变。

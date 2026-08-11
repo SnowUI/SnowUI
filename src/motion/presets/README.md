@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.5.0
+> **版本**: v1.9.0
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -10,7 +10,7 @@
 | `GENERIC_APPEAR_MOTION` / `GENERIC_DISAPPEAR_MOTION` | Frame fallback、普通内容进入 / 退出 | 语义明确的 overlay、Tooltip、Dialog | SnowUI generic default |
 | `GENERIC_SCALE_APPEAR_MOTION` | 普通组件显式 opt-in 保留 generic opacity + scale 进入 | Frame 默认 fallback、语义明确的 overlay / Tooltip / Dialog | SnowUI 旧 generic appear 组合的兼容显式 preset |
 | `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION` | Popover、Listbox、Menu dropdown，仅 opacity | Tooltip、Dialog、普通内容替换 | SnowUI dropdown overlay |
-| `TOOLTIP_APPEAR_MOTION` / `TOOLTIP_DISAPPEAR_MOTION` | Tooltip portal 内容 | Dropdown、Dialog | transitions.dev Tooltip |
+| `TOOLTIP_APPEAR_MOTION` / `TOOLTIP_DISAPPEAR_MOTION` | Tooltip Foreground 的 opacity + scale；不得用于 Portal、size shell 或 Backdrop | Dropdown、Dialog、承载 backdrop-filter 的祖先 | transitions.dev Tooltip + SnowUI backdrop-filter 合成约束 |
 | `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION` | Dialog / Modal 内容面板 | Tooltip、Dropdown | transitions.dev Modal open / close |
 | `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION` | Dialog 遮罩 opacity | 内容面板 scale | SnowUI Dialog 当前遮罩行为 |
 | `REPLACEMENT_APPEAR_MOTION` | Icon / Text / CodeBlock 等内容替换 | Overlay、Dialog | SnowUI replacement default |
@@ -42,6 +42,9 @@
 
 ## 变更记录
 
+- v1.9.0 (2026-08-12): Tooltip preset 恢复 opacity + scale，但消费目标限定为独立 Foreground；Portal / Backdrop 保持稳定。
+- v1.8.0 (2026-08-12): Test Footer 复测后移除 Tooltip 出现 preset 的 scale；毛玻璃 Portal 出现态不执行 opacity 或 transform。
+- v1.7.0 (2026-08-12): Tooltip 出现 preset 移除 Portal opacity 与 delay，仅保留 scale，确保毛玻璃和 Tooltip 同一首帧可见；退出 preset 不变。
 - v1.6.0 (2026-07-01): Popover、Listbox、Menu dropdown 统一移除 scale，共用 opacity-only dropdown overlay preset。
 - v1.5.0 (2026-06-30): 新增显式 opt-in 的 `GENERIC_SCALE_APPEAR_MOTION`，供组件迁移旧 generic opacity + scale 视觉；组件源码禁止继续依赖 boolean 默认视觉。
 - v1.4.0 (2026-06-30): generic appear 改为仅 opacity，并登记显式 while* 对象的完整通道语义。
