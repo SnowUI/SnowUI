@@ -1,6 +1,6 @@
 # CopyButton
 
-> **版本**: v1.0.0  
+> **版本**: v1.0.1
 > **职责**: 以真实 Button 为宿主的剪贴板复制与瞬时反馈按钮。
 
 ## 使用
@@ -35,6 +35,10 @@
 - pending / success 反馈期保持正常 Button 样式，但 `whileClick=false` 且业务点击被忽略，避免 Check 缩小和按钮闪动。
 
 ## 更新日志 (Changelog)
+
+### v1.0.1 (2026-08-11)
+
+- `showText=false` 时主动向 Button 声明 `iconOnly=true`，保持纯图标复制按钮的尺寸与命中区域。
 
 ### v1.0.0 (2026-07-03)
 

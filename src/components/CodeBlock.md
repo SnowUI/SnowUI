@@ -61,7 +61,7 @@
 | 行号 | `--black-20` |
 | 注释 / 灰色代码 | `--black-40` |
 | 语言标识 | `--black-40` |
-| 按钮区 | `--black-100` × `opacity: 0.4`（视觉等同 `--black-40`） |
+| 按钮区 | 内置操作显式使用 `Button bare emphasis="muted"`：`--black-100` × `opacity: 0.4`（视觉等同 `--black-40`） |
 | 关键字 / 数字 / literal | `#ff32c6` |
 | 函数 / 调用对象 | `#ffac60` |
 | 属性 / 方法 | `#1ac69c` |
@@ -70,7 +70,7 @@
 
 代码块根容器默认设置 `font-size: var(--text-12)` 与 `line-height: var(--leading-12)`；内部行号、`pre`、`code`、代码行全部继承根容器排版。`font-family` 默认继承外部上下文，不设置具体字体族，忽略设计稿中的字体设置。
 
-按钮 hover 对齐 Button `bare` 模式：关闭背景叠加，默认 `opacity: 0.4`，hover 提升到 `1`，并使用 Frame color motion 变量过渡。
+按钮 hover 对齐 Button 的 `bare emphasis="muted"` 模式：关闭背景叠加，默认 `opacity: 0.4`，hover 提升到 `1`，并使用 Frame color motion 变量过渡。
 
 工具栏使用内部 Pin 布局固定到 `pin-top-right`，偏移为 `var(--padding-2)`；右下角尺寸手柄复用 `Indicator axis="height" appearance="corner"`，宿主 hover 时以 1px / Black/20% 显示，自身 hover、focus 或 dragging 时变为 2px / Black/40%。
 
@@ -235,6 +235,7 @@ pnpm build`}
 
 | 日期 | 版本 | 说明 |
 |:---|:---|:---|
+| 2026-08-09 | v1.5.1 | Button bare 默认改为 100% 后，内置复制 / 放大操作显式使用 `emphasis="muted"` 保留原 40% → hover 100% 的次级操作视觉 |
 | 2026-07-30 | v1.5.0 | 全屏展开/收起改用共享元素 `layout` 策略，实际过渡位置与尺寸，代码字形不参与缩放；普通态与全屏态统一遵循 `showLineNumbers`，消除退出末帧横向突变 |
 | 2026-07-08 | v1.4.7 | 顶部操作按钮容器的 `pin-top-right` 偏移从 `--padding-2`（8px）调整为 `--padding-3`（12px），普通态与全屏态保持一致 |
 | 2026-07-08 | v1.4.6 | 顶部复制 / 放大操作按钮统一使用 Button bare 默认 16×16 尺寸；移除 CodeBlock 私有按钮外壳尺寸，按钮组间距改为 `--gap-2`（8px）并接入 `--snowui-code-block-gap-override` |

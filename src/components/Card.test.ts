@@ -108,7 +108,7 @@ export const examples = [
     <Frame row>
         <Icon as="leading" size={16}><Paperclip /></Icon>
         <Text>Attachment.pdf</Text>
-        <Button as="trailing" bare variant="borderless">
+        <Button as="trailing" bare iconOnly emphasis="muted" variant="borderless" aria-label="下载">
             <Icon size={16}><ArrowLineDown /></Icon>
         </Button>
     </Frame>

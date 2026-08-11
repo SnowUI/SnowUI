@@ -3,6 +3,10 @@
 export const DEFAULT_LOCALE = "zh-CN";
 
 export type SnowUIMessageKey =
+    | "colorSchemeButton.toLight"
+    | "colorSchemeButton.toDark"
+    | "styleButton.toSnowUI"
+    | "styleButton.toApple"
     | "sidePanel.placement.toInline"
     | "sidePanel.placement.toFloating"
     | "sidePanel.previous"
@@ -21,6 +25,10 @@ export const SNOWUI_MESSAGES: Record<
     Record<SnowUIMessageKey, string>
 > = {
     "zh-CN": {
+        "colorSchemeButton.toLight": "切换到亮色",
+        "colorSchemeButton.toDark": "切换到暗色",
+        "styleButton.toSnowUI": "切换到 SnowUI 风格",
+        "styleButton.toApple": "切换到 Apple 风格",
         "sidePanel.placement.toInline": "切换为内嵌预览",
         "sidePanel.placement.toFloating": "切换为浮层预览",
         "sidePanel.previous": "上一项",
@@ -32,6 +40,10 @@ export const SNOWUI_MESSAGES: Record<
         "sidePanel.close": "关闭",
     },
     "en-US": {
+        "colorSchemeButton.toLight": "Switch to light color scheme",
+        "colorSchemeButton.toDark": "Switch to dark color scheme",
+        "styleButton.toSnowUI": "Switch to SnowUI style",
+        "styleButton.toApple": "Switch to Apple style",
         "sidePanel.placement.toInline": "Switch to inline preview",
         "sidePanel.placement.toFloating": "Switch to floating preview",
         "sidePanel.previous": "Previous item",

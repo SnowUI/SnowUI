@@ -64,6 +64,7 @@
 
 <Button
     {...rest}
+    iconOnly={!children}
     {disabled}
     aria-expanded={resolvedExpanded}
     aria-label={resolvedExpanded ? collapseAriaLabel : ariaLabel}

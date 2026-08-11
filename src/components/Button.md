@@ -1,6 +1,8 @@
 # Button.svelte 文档
 
-> **版本**: v2.3.2
+> **版本**: v2.5.0
+> **变更记录 (2026-08-11)**: 新增显式 `iconOnly` 布局声明，默认 `false`；移除基于 children DOM 的自动推断，并为缺少可访问名称的 icon-only Button 提供开发警告。
+> **变更记录 (2026-08-09)**: `bare` 默认改为 100% 不透明；新增 `emphasis="muted"` 显式启用 40% → hover 100% 的弱化交互。
 > **变更记录 (2026-07-08)**: Button 默认最小宽度改为 `max-content`，保留“文字 + gap + padding”的自然下限，避免 fill 布局吞掉默认 padding。
 > **变更记录 (2026-07-08)**: 文字型 Button 默认 `white-space: nowrap`，避免在 Pagination 等压缩布局中被中文逐字换行。
 > **变更记录 (2026-06-01)**: 移除 `variant="link"`；文字链接统一迁移到独立 [Link.svelte](./Link.svelte)。
@@ -16,7 +18,9 @@
 | :--- | :--- | :--- | :--- |
 | variant | 'gray'\|'filled'\|'outline'\|'borderless' | 'gray' | 按钮变体样式 |
 | size | 'sm'\|'md'\|'lg' | 'sm' | 按钮尺寸 |
-| bare | `boolean` | `false` | 开启无外壳按钮模式，内容可包含文字、Icon 或其他元素。忽略 `variant`，移除 padding / radius / 背景 / 边框与 hover overlay，保留普通 Button 的内容 gap；前景色继承 `currentColor`，默认透明度 40%，hover 提升到 100%。单 Icon 时自动使用当前 `size` 档位的 12/16/20px Icon 尺寸上下文，并提供至少 16×16px 的透明点击热区。精确 Icon 尺寸由子 Icon 自己声明。放入 Tab 时由 Tab 的 Button opacity override 接管透明度，不发生叠乘。 |
+| iconOnly | `boolean` | `false` | 明确启用单视觉内容布局。使用对称 icon-only padding 与放大一级的尺寸上下文；不检查 children 类型。缺少 `aria-label`、`aria-labelledby` 或 `title` 时开发环境警告。 |
+| bare | `boolean` | `false` | 开启无外壳按钮模式，内容可包含文字、Icon 或其他元素。忽略 `variant`，移除 padding / radius / 背景 / 边框与 hover overlay，保留普通 Button 的内容 gap；前景色继承 `currentColor`，默认保持 100% 不透明。与 `iconOnly` 同时使用时采用当前 `size` 档位的 12/16/20px 视觉尺寸上下文，并提供至少 16×16px 的透明点击热区。精确尺寸由子视觉自己声明。放入 Tab 时由 Tab 的 Button opacity override 接管透明度，不发生叠乘。 |
+| emphasis | `'normal'\|'muted'` | `'normal'` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
 | backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
 | toggle | boolean | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 Secondary/Indigo 配色（gray / outline / borderless 生效，filled 排除）；`aria-pressed` 由 Frame 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
 | href | string | undefined | 链接地址 (渲染为 a 标签) |
@@ -29,7 +33,9 @@
 | :--- | :--- | :--- | :--- |
 | variant | `'gray' \| 'filled' \| 'outline' \| 'borderless'` | `'gray'` | 按钮变体 |
 | size | `'sm' \| 'md' \| 'lg'` | `'sm'` | 按钮尺寸 |
-| bare | `boolean` | `false` | 无外壳按钮模式，不限制内容类型。忽略 `variant`，外壳 padding / radius 为 0，保留内容 gap；单 Icon 自动获得尺寸上下文与最小透明点击热区。颜色使用 `currentColor × opacity: 0.4 -> 1`。 |
+| iconOnly | `boolean` | `false` | 显式选择单视觉内容布局；未声明时始终按普通内容按钮处理。 |
+| bare | `boolean` | `false` | 无外壳按钮模式，不限制内容类型。忽略 `variant`，外壳 padding / radius 为 0，保留内容 gap；与 `iconOnly` 同时使用时获得对应尺寸上下文与最小透明点击热区。默认使用 `currentColor × opacity: 1`。 |
+| emphasis | `'normal'\|'muted'` | `'normal'` | bare 的强调级别；`muted` 使用 `currentColor × opacity: 0.4 -> 1`。 |
 | backgroundBlur | `boolean` | `false` | 开启按钮背景模糊，默认强度为 `1.25rem`。 |
 | toggle | `boolean` | `false` | Toggle 模式语法糖。等价于显式声明 `Click={{ Idle: "Active", Active: "Idle" }} whileClick={false}`；Active 配色由 `data-state="Active"` 自动套 Indigo；`aria-pressed` 自动输出。 |
 | as | `'more' \| 'badge' \| 'icon' \| 'prev' \| 'next' \| 'close' \| 'item' \| 'current' \| 'page' \| 'leading' \| 'trailing'` | - | 角色化：作为 Text 展开按钮、Breadcrumb item、Pagination 模板，或接入 Image / ImageViewer / Field 宿主定位协议；进入 Image / ImageViewer 宿主时会翻译为对应 `pin-*` 方位 |
@@ -45,12 +51,13 @@ Button 的内部布局不接入三槽位模型：
 - 文字型 Button 默认 `white-space: nowrap`，保证按钮文案作为一个操作短语保持单行；特殊长文案可由使用方通过外部 style / class 显式覆盖。
 - 默认最小宽度为 `max-content`，即“内容 + gap + padding”的自然下限；外层 fill 布局可以把 Button 拉宽，但不能把 Button 压到吞掉默认 padding。
 - Button 自身负责 padding / gap / radius / font-size / line-height，并通过 `--snowui-button-*-override` 变量允许外部覆盖。
+- `iconOnly` 是单视觉内容布局的唯一开关，默认 `false`；Button 不读取 children 的 DOM 类型推断该状态。内容可以是 Icon、Logo 或其他单一视觉原子。
 - `as="leading"` / `as="trailing"` 只表示 Button 作为 Field / Input 等外层槽位宿主的配件；不会改变 Button 内部布局模型。
 - `as="item"` 表示 Button 作为 Breadcrumb 的路径片段；当前页不可交互规则由 Breadcrumb 标记 `aria-current="page"` 后触发。Button 未显式写 `variant` 时可继承 Breadcrumb 的 `variant`，显式 Button `variant` 优先。
 - `as="current"` / `as="page"` / `as="prev"` / `as="next"` 放入 Pagination 时表示角色样式模板；真实页码、可点击性与边界状态由 Pagination 生成和管理。
-- `bare` 是不限制内容类型的无外壳特化：保持当前字号 / 行高与普通内容 gap，固定清零 padding / radius，并使用 `currentColor × opacity: 0.4 -> 1` 表达交互。
+- `bare` 是不限制内容类型的无外壳特化：保持当前字号 / 行高与普通内容 gap，固定清零 padding / radius，并默认使用 `currentColor × opacity: 1`；仅 `emphasis="muted"` 使用 `0.4 -> 1` 表达次级操作。
 - `as="pageSize"` 可作为 Pagination 的每页条数视觉模板；Pagination 会注入当前数值和 `ArrowLineDown`，并用内置 Listbox 接管交互。Icon 作为 Button 普通内容，不使用 `as="trailing"`，间距由 Button 内容 gap 控制。
-- `bare` 内容为单 Icon 时自动注入当前档位的 12/16/20px Icon 尺寸上下文，并通过透明伪元素保证至少 16×16px 的点击热区；精确尺寸直接写在子 Icon 上。
+- `bare iconOnly` 显式注入当前档位的 12/16/20px 尺寸上下文，并通过透明伪元素保证至少 16×16px 的点击热区；精确尺寸直接写在子视觉上。
 - 当 Button 作为 `ButtonGroup` 的直系子项时，自动进入嵌入态：保留独立点击、链接、状态与内容 gap，退掉自身背景、边框和圆角，并接收 ButtonGroup 分配的单元格 padding。
 
 布局变量链：
@@ -81,13 +88,15 @@ Button 的内部布局不接入三槽位模型：
 <!-- 无外壳按钮，可包含任意内容 -->
 <Button bare>Random</Button>
 <Button bare><Icon><Shuffle /></Icon>Random</Button>
-<Button bare aria-label="展开"><ArrowLineDown size={16} /></Button>
+<Button iconOnly aria-label="展开"><ArrowLineDown /></Button>
+<Button bare iconOnly aria-label="展开"><ArrowLineDown size={16} /></Button>
+<Button bare iconOnly emphasis="muted" aria-label="次级操作"><ArrowLineDown size={16} /></Button>
 <Button backgroundBlur>背景模糊按钮</Button>
 
 <!-- 日期选择触发器 -->
 <Field>
   <Input type="date" />
-  <Button bare as="trailing">
+  <Button bare iconOnly as="trailing" aria-label="打开日期选择">
     <ArrowLineDown size={16} />
   </Button>
 </Field>
@@ -120,7 +129,7 @@ Button 放入 ButtonGroup 后不需要写额外 prop：
 - 嵌入态会接收 ButtonGroup 分配的单元格 padding，让 hover / 点击响应覆盖完整单元格，而不是只覆盖内部图标和文字。
 - 单元格首尾位置由 ButtonGroup 自动标记，不需要在 Button 上手写 `as="first"` / `as="last"`。
 - 嵌入态仍保留 `href` / `target` / `rel`、状态机、动效与 `aria-*` 等 Button 既有能力。
-- 纯图标单元格仍可由 Button 的 icon-only 识别处理；ButtonGroup 嵌入态会覆盖 icon-only padding，确保图标单元格的点击和 hover 区域与普通单元格一致。
+- 纯图标单元格必须在 Button 上显式声明 `iconOnly`；ButtonGroup 嵌入态会覆盖 icon-only padding，确保图标单元格的点击和 hover 区域与普通单元格一致。
 
 ## Toggle 与瞬时反馈 (声明式)
 
@@ -222,7 +231,7 @@ OSS Button **自动输出 `aria-pressed`**:
 <!-- 简单场景：自动推断 -->
 <Field>
   <Input type="date" />
-  <Button bare as="trailing">
+  <Button bare iconOnly as="trailing" aria-label="打开日期选择">
     <ArrowLineDown size={16} />
   </Button>
 </Field>
@@ -231,7 +240,7 @@ OSS Button **自动输出 `aria-pressed`**:
 <Field>
   <Frame as="row" row>
     <Input type="date" />
-    <Button bare as="trailing">
+    <Button bare iconOnly as="trailing" aria-label="打开日期选择">
       <ArrowLineDown size={16} />
     </Button>
   </Frame>
@@ -283,8 +292,8 @@ Button 放入 Pagination 时使用角色模板：
 
 > **备注**: 
 > 1. 常规按钮包含文字时，挂载的 `Icon` 等资源尺寸会优先等比缩小一号（`sm: 12`, `md: 16`, `lg: 20`）以匹配文本字号。
-> 2. 当按钮为纯图标按钮 (`isIconOnly`) 时，内部挂载的资源图标会自动放大一级以撑满空间：`sm: 16`, `md: 20`, `lg: 24`。
-> 3. `bare` 单 Icon 内容使用当前 `size` 档位的常规 Icon 尺寸（`sm -> 12`，`md -> 16`，`lg -> 20`）；子 Icon 显式声明 `size` 时优先使用自身尺寸。
+> 2. 当按钮显式声明 `iconOnly=true` 时，内部挂载的视觉资源使用放大一级的上下文：`sm: 16`, `md: 20`, `lg: 24`。
+> 3. `bare iconOnly` 使用当前 `size` 档位的常规视觉尺寸（`sm -> 12`，`md -> 16`，`lg -> 20`）；子视觉显式声明尺寸时优先使用自身尺寸。
 
 ### 1.1 Bare 模式
 
@@ -296,11 +305,11 @@ Button 放入 Pagination 时使用角色模板：
 | 内容 | 可包含文字、Icon 或其他元素 |
 | Padding / Radius | `0` |
 | Gap | 保留当前 Button `size` 档位的普通内容 gap |
-| 最小热区 | 单图标内容时至少 `16x16`，通过透明点击热区扩展，不改变可见尺寸 |
-| 默认透明度 | `0.4` |
-| Hover 透明度 | `1` |
+| 最小热区 | `iconOnly=true` 时至少 `16x16`，通过透明点击热区扩展，不改变可见尺寸 |
+| 默认透明度 | `1`；`emphasis="muted"` 时为 `0.4` |
+| Hover 透明度 | 默认保持 `1`；`emphasis="muted"` 时提升到 `1` |
 | Hover 背景图层 | 关闭 `Surface` 默认 hover 叠加 |
-| 单 Icon 尺寸 | 子 Icon 显式 `size` > 当前 Button 档位尺寸（`sm/md/lg -> 12/16/20`） |
+| icon-only 视觉尺寸 | 子视觉显式尺寸 > 当前 Button 档位尺寸（`sm/md/lg -> 12/16/20`） |
 
 ### 2. Colors & Interaction (颜色与交互)
 
@@ -349,6 +358,20 @@ Button 放入 Pagination 时使用角色模板：
 
 - **Button-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
 
+### v2.5.0 (2026-08-11)
+
+#### 破坏性变更
+- **BTN-IconOnly.2** 新增显式 `iconOnly` Prop，默认 `false`；Button 不再根据 children DOM 自动推断单视觉内容布局。
+- **BTN-IconOnly.3** `iconOnly=true` 输出 `data-icon-only="true"`，统一控制对称 padding、尺寸上下文、bare 最小命中区域与 render hints。
+- **BTN-A11y.2** 开发环境下，icon-only Button 缺少 `aria-label`、`aria-labelledby` 或 `title` 时输出警告。
+- **BTN-IconOnly.4** ColorSchemeButton、StyleButton、CopyButton、ExpandButton 及仓库内纯图标 Button 消费点改为主动声明 `iconOnly`。
+
+### v2.4.0 (2026-08-09)
+
+#### 调整
+- **BTN-Bare.2** `bare` 默认改为 `emphasis="normal"`，常态与 hover 均保持 100% 不透明；次级操作显式使用 `emphasis="muted"` 获得 40% → hover 100%。disabled 继续优先消费全局 `--snowui-state-opacity`。
+- **BTN-Bare.3** CopyButton 反馈期继承宿主 Button 的 bare 静止强调级别，不再无条件回落到 40%。
+
 ### v2.3.2 (2026-07-08)
 
 #### 修复
@@ -374,7 +397,7 @@ Button 放入 Pagination 时使用角色模板：
 ### v2.1.0 (2026-06-22)
 
 #### 新功能
-- **BTN-Bare.1** 新增 `bare` 无外壳按钮模式：内容可包含文字、Icon 或其他元素；无 padding / radius / 背景 / 边框，使用 `currentColor × opacity: 0.4 -> 1` 交互规则。
+- **BTN-Bare.1** 最初新增 `bare` 无外壳按钮模式：内容可包含文字、Icon 或其他元素；无 padding / radius / 背景 / 边框。当时使用 `currentColor × opacity: 0.4 -> 1`；2026-08-09 起该视觉改由 `emphasis="muted"` 显式启用，bare 默认 100%。
 - **BTN-Bare.2** `bare` 放入 Tab 时由 Tab 的 `--snowui-button-opacity-override` 接管透明度；两者作用于同一 Button 根节点，不发生透明度叠乘。
 
 ### v2.0.0 (2026-06-01)
@@ -432,7 +455,7 @@ Button 放入 Pagination 时使用角色模板：
 ### v1.3.5 (2026-02-25)
 
 #### 修复
-- **BTN-Fix.3** 注入 `RESOURCE_ICON_CONTEXT_KEY` 尺寸上下文：`<Button><ArrowLineDown /></Button>` 直放 `resource-svelte` 图标时，默认尺寸跟随按钮档位（sm/md/lg => 16/20/24），与 `<Icon><ArrowLineDown /></Icon>` 行为一致。
+- **BTN-Fix.3** 注入 `RESOURCE_ICON_CONTEXT_KEY` 尺寸上下文；当时直放资源图标会由 DOM 自动识别并使用 sm/md/lg => 16/20/24，v2.5.0 起改为 `<Button iconOnly>` 显式启用。
 
 ### v1.3.4 (2026-02-25)
 
@@ -470,7 +493,7 @@ Button 放入 Pagination 时使用角色模板：
 
 #### 修复
 - **BT-Fix.5** 修复 `icon + text` 被误判为 `icon-only` 的问题
-- **BT-Fix.6** `icon-only` 识别改为运行时精确检测（单图标元素 + 无文本节点）
+- **BT-Fix.6** 当时将 `icon-only` 识别改为运行时精确检测（单图标元素 + 无文本节点）；该自动识别已由 v2.5.0 移除。
 
 ### v1.2.3 (2026-02-07)
 

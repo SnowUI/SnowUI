@@ -1,6 +1,6 @@
 # Input.svelte 文档
 
-> **版本**: v1.1.1
+> **版本**: v1.1.2
 > **职责**: 基础单行输入宿主；`text` 使用原生可见 `<input>`，`date` / `color` 使用自定义可见展示层，其余类型继续承接原生 `<input>` 能力与 Frame 通用能力。
 
 **2026-04-27 补充**: 内建清除 X 恢复为焦点态交互：只有输入内容非空且 `Input` 处于 `focus-within` 时显示；失焦后隐藏且不为隐藏 X 预留额外 gap。
@@ -81,6 +81,7 @@
 | :--- | :--- | :--- | :--- |
 | type | `string` | `"text"` | 原生输入类型，如 `text` / `email` / `password` / `number`；`range` / `file` 不再支持，会回退为 `text` |
 | value | `string \| number` | - | 当前值，支持 `bind:value` |
+| element | `HTMLElement` | - | 外层真实 Frame 根元素引用，支持 `bind:element`；用于宿主特化组件复用根尺寸与焦点能力 |
 | defaultValue | `string \| number` | - | 初始值；未绑定 `value` 时作为初始展示值 |
 | disabled | `boolean` | `false` | 禁用输入 |
 | readonly | `boolean` | `false` | 只读输入；保留聚焦与选中文本能力，但不可直接编辑 |
@@ -244,7 +245,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 <!-- 日期输入 + 自定义 trailing 触发器（简单场景自动推断） -->
 <Field>
   <Input type="date" />
-  <Button bare as="trailing">
+  <Button bare iconOnly as="trailing" aria-label="打开日期选择">
     <ArrowLineDown size={16} />
   </Button>
 </Field>
@@ -253,7 +254,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 <Field>
   <Frame as="row" row>
     <Input type="date" />
-    <Button bare as="trailing">
+    <Button bare iconOnly as="trailing" aria-label="打开日期选择">
       <ArrowLineDown size={16} />
     </Button>
   </Frame>
@@ -529,6 +530,11 @@ invalid=true + !hasCustomTrailing
 
 - **Input-Motion.2026-06-18** 新增默认错误反馈 shake：独立 `Input invalid / aria-invalid` 自动播放，嵌入 `Field` 时由 `Field` 汇总播放，消费方无需手动传类名或状态。
 - **Input-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v1.1.2 (2026-08-10)
+
+- 补齐从 Frame 继承的 `bind:element` 根宿主引用，使 SearchInput 等宿主特化组件无需 wrapper 或私有 DOM 查询即可复用根尺寸能力。
+- 普通 Input 的 clear + leading 稳定宽度规则在 SearchInput 空值图标态时退出，避免隐藏 clear 的历史 gap 继续占据 Icon 右侧；聚焦或已有值后仍恢复原布局。
 
 ### v1.1.1 (2026-07-05)
 

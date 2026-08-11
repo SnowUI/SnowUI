@@ -9,6 +9,14 @@ export type {
 } from "./components/SelectButton.svelte";
 export { default as CopyButton } from "./components/CopyButton.svelte";
 export { default as ExpandButton } from "./components/ExpandButton.svelte";
+export { default as ColorSchemeButton } from "./components/ColorSchemeButton.svelte";
+export type { ColorScheme } from "./components/ColorSchemeButton.svelte";
+/** @deprecated Use ColorSchemeButton. */
+export { default as ThemeButton } from "./components/ColorSchemeButton.svelte";
+/** @deprecated Use ColorScheme. */
+export type { ColorScheme as ThemeButtonTheme } from "./components/ColorSchemeButton.svelte";
+export { default as StyleButton } from "./components/StyleButton.svelte";
+export type { SnowUIStyleMode } from "./components/StyleButton.svelte";
 export { default as ButtonGroup } from "./components/ButtonGroup.svelte";
 export { default as Breadcrumb } from "./components/Breadcrumb.svelte";
 export type { BreadcrumbItem } from "./components/Breadcrumb.svelte";

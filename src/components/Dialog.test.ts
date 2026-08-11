@@ -13,7 +13,7 @@ export const examples = [
         name: "DL-01:模版模式基础对话框",
         code: `DL-01
 <Dialog template id="dialog-basic">
-    <Button as="pin-top-right" variant="borderless" bare data-dialog-close aria-label="关闭">
+    <Button as="pin-top-right" variant="borderless" bare iconOnly emphasis="muted" data-dialog-close aria-label="关闭">
         <XCircle size={16} />
     </Button>
     <Text class="text-18 text-black-100">编辑资料</Text>
@@ -130,7 +130,7 @@ export const examples = [
 <Button>
     快速设置
     <Dialog as="dialog" size="sm">
-        <Button as="pin-top-right" variant="borderless" bare data-dialog-close aria-label="关闭">
+        <Button as="pin-top-right" variant="borderless" bare emphasis="muted" data-dialog-close aria-label="关闭">
             <XCircle size={16} />
         </Button>
         <Text class="text-18 text-black-100">快速设置</Text>

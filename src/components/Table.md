@@ -182,7 +182,7 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 `roleLayout="overlay"` 适合宽表或需要边缘悬浮操作的场景。表头全选框只在 hover 数据行、hover 首个数据列表头（Date）、聚焦/直接 hover 全选框自身或存在选中态时显示（详见上文「选择归属」）；行动按钮只在该行 hover 时显示，不因行被选中而保持显示。
 
-行动按钮（actions 列）被包裹在 `.snowui-table-role-overlay-controls` 容器内：表格的显隐渐变作用在这个**包裹层**的 `opacity` 上，而不是直接作用在按钮元素上。因此按钮自身的 `opacity`（如 `Button bare` 常态 40%、hover 100%）得以保留并与包裹层的渐变相乘，避免表格的 `opacity:1` 覆盖掉按钮自身的状态透明度导致图标按钮失去 hover 反馈。
+行动按钮（actions 列）被包裹在 `.snowui-table-role-overlay-controls` 容器内：表格的显隐渐变作用在这个**包裹层**的 `opacity` 上，而不是直接作用在按钮元素上。因此按钮自身的 `opacity`（次级操作应使用 `Button bare emphasis="muted"`，常态 40%、hover 100%）得以保留并与包裹层的渐变相乘，避免表格的 `opacity:1` 覆盖掉按钮自身的状态透明度导致图标按钮失去 hover 反馈。
 
 ## Keyword
 
@@ -250,7 +250,7 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 - 2026-06-27：v1.4.4，让表头第一列标题（Date 列）的「hover 边缘渐进式透明」触发条件与表头全选 Checkbox 的出现条件完全对齐：仅在 hover 数据行 / hover 该列表头 / hover|聚焦全选浮层 / 存在选中态时渐隐；全选 Checkbox 未出现时表头不再渐隐（此前为「鼠标进入表格即渐隐」）。
 
-- 2026-06-27：v1.4.3，两项修复：(1) 进一步收敛表头全选 Checkbox 的出现规则——改为仅在 hover 任意数据行、hover 首个数据列表头（overlay 下的 Date 列）、直接 hover/聚焦全选框自身或存在选中态时显示；hover 其他表头列（Stores 等）不再显示。(2) 修复 overlay 行动按钮（actions 列）图标按钮失去 hover 反馈的问题：将按钮包进 `.snowui-table-role-overlay-controls` 包裹层，表格的显隐渐变作用于包裹层 `opacity` 而非按钮元素本身，使 `Button bare` 的常态 40% / hover 100% 透明度得以保留（两层 `opacity` 相乘而非在同一元素上冲突）。
+- 2026-06-27：v1.4.3，两项修复：(1) 进一步收敛表头全选 Checkbox 的出现规则——改为仅在 hover 任意数据行、hover 首个数据列表头（overlay 下的 Date 列）、直接 hover/聚焦全选框自身或存在选中态时显示；hover 其他表头列（Stores 等）不再显示。(2) 修复 overlay 行动按钮（actions 列）图标按钮失去 hover 反馈的问题：将按钮包进 `.snowui-table-role-overlay-controls` 包裹层，表格的显隐渐变作用于包裹层 `opacity` 而非按钮元素本身，使弱化 bare 操作的常态 40% / hover 100% 透明度得以保留（两层 `opacity` 相乘而非在同一元素上冲突；2026-08-09 起需显式写 `emphasis="muted"`）。
 
 - 2026-06-27：v1.4.2，调整表头全选 Checkbox 的出现规则：由「鼠标进入表格视口（`.snowui-table-viewport:hover`）即显示」改为「hover 到任意表格行（`.snowui-table-viewport:has(.snowui-table-row:hover)`）、行内键盘聚焦或存在选中态时才显示」，与行内 Checkbox 的可见时机保持一致。因表头本身也是一行，触发条件天然涵盖表头行，从而保证指针从数据行上移到表头时全选框仍可见、可点击。
 

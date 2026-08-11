@@ -572,6 +572,7 @@
                     <CopyButton
                         text={resolvedCode}
                         bare
+                        emphasis={parts?.CopyButton?.emphasis ?? "muted"}
                         showText={false}
                         feedbackDuration={copyTimeout}
                         icon={hasCustomCopyIcon
@@ -590,6 +591,7 @@
                     <ExpandButton
                         expanded={isFullscreen}
                         bare
+                        emphasis={parts?.ExpandButton?.emphasis ?? "muted"}
                         class="snowui-code-block-btn"
                         ariaLabel="全屏查看"
                         collapseAriaLabel="退出全屏"
@@ -698,6 +700,7 @@
                     <CopyButton
                         text={resolvedCode}
                         bare
+                        emphasis={parts?.CopyButton?.emphasis ?? "muted"}
                         showText={false}
                         feedbackDuration={copyTimeout}
                         icon={hasCustomCopyIcon
@@ -715,6 +718,7 @@
                     <ExpandButton
                         expanded
                         bare
+                        emphasis={parts?.ExpandButton?.emphasis ?? "muted"}
                         class="snowui-code-block-btn"
                         ariaLabel="全屏查看"
                         collapseAriaLabel="退出全屏"

@@ -23,7 +23,7 @@ export const examples = [
     <Radio as="badge" checked />
 </Image>
 <Image src={Image01} size={40}>
-    <Button as="icon" variant="gray">
+    <Button as="icon" variant="gray" iconOnly aria-label="选择">
         <Icon>
             <Check />
         </Icon>

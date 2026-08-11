@@ -8,7 +8,7 @@
 - 组件无额外 wrapper，真实 `Input` 仍是根宿主；事件只由该宿主触发一次。
 - `Input` 自身隐藏生成的错误 `Text` 仍可通过平铺后的 `parts.Text` 配置。
 
-> **版本**: v1.2.1
+> **版本**: v1.3.0
 > **职责**: 提供与 `Input` 一致的 OSS 搜索输入框，默认内置 `Search`。
 
 `SearchInput` 是 `Input` 的搜索场景变体。除默认 `type="search"` 和默认 leading 图标为 `Search` 外，其颜色、hover/focus、清除 X、三槽位布局、Frame 能力与 `Input` 保持一致。
@@ -18,6 +18,7 @@
 - 默认使用 `Search` 作为 leading 图标，图标来自 `@snowui-design-system/resource-svelte`
 - 内置默认 `Search` 静止态为 Black/20，输入激活态为 Black/40；该颜色规则只属于 `SearchInput`
 - 支持外置 leading 替换默认图标
+- 可通过 `collapseBelow` 在自身宽度不足时退化为仅搜索图标；最小宽度由左右实际 padding + leading Icon 固有宽度组成，空值且未聚焦时折叠，聚焦或已有值时恢复输入内容
 - 清除 X、hover、focus、disabled、readonly、invalid 与默认错误 shake 等行为继承 `Input`
 - 根能力通过内部 `Input` 接通 OSS `Frame`
 
@@ -34,6 +35,7 @@
 | defaultValue | `string \| number` | — | 初始值 |
 | placeholder | `string` | — | 占位文本 |
 | showSearchIcon | `boolean` | `true` | 是否渲染默认搜索图标 |
+| collapseBelow | `number` | — | 当组件自身宽度小于或等于该 px 阈值时，在空值且未聚焦状态退化为仅搜索图标；未传时不启用 |
 | variant | `"default" \| "borderless"` | `"default"` | 外观变体；`borderless` 移除自身边框、背景、圆角、padding 和 focus ring，在 Flex / Block 宿主中填满可用空间，并在 shrink-to-fit 宿主中保持稳定固有宽度，适合嵌入已有表面的工具栏或面板 |
 | as | `"search" \| string` | `"search"` | 角色关键字;默认透传给内部 `Input`,使 SearchInput 放入 `<Popover>` / `<Listbox>` 时自动移入固定 header,行为与 `<Input as="search">` 一致。可显式覆盖。 |
 | children | `Snippet` | — | 外置 leading / trailing / 其他 Input 子内容 |
@@ -47,6 +49,11 @@
 
 ```svelte
 <SearchInput placeholder="Search" />
+```
+
+```svelte
+<!-- 容器收窄到 80px 以下时只保留搜索图标；点击或键盘聚焦后恢复输入 -->
+<SearchInput collapseBelow={80} placeholder="Search" />
 ```
 
 ```svelte
@@ -97,6 +104,7 @@
 | 关键字 | 处理方式 | 说明 |
 | :--- | :--- | :--- |
 | showSearchIcon | 条件渲染 | `false` 时不渲染默认 Search |
+| collapseBelow | 共享尺寸观察 | 复用 `resizeManager` 监听真实根宿主；只写入 `data-responsive-collapse="icon"`，空值且未聚焦时由 SearchInput 自己收敛布局，不改变 Input 的通用布局协议 |
 | variant | 根 class | `borderless` 由 SearchInput 自己移除边框、背景、圆角、padding 和 focus ring；以 `flex: 1 1 0; width: auto; max-width: 100%` 填满确定容器的可用空间，并避免 shrink-to-fit 宿主因输入状态重算百分比宽度；父容器不得通过后代选择器改写这些视觉或布局 |
 | children | 透传到 Input | 用于外置 leading/trailing 或其他组合内容 |
 
@@ -108,6 +116,11 @@
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.0 (2026-08-10)
+
+- 新增 `collapseBelow` 响应式退化能力；空值且未聚焦时使用明确的单列布局收敛为仅搜索图标，隐藏清除按钮的历史槽位与 gap 不再参与宽度；最小宽度等于左右实际 padding + leading Icon 固有宽度，聚焦或已有值时恢复真实输入内容与交互。
+- 尺寸监听复用全局 `resizeManager`，不创建组件私有 `ResizeObserver`。
 
 ### v1.2.1 (2026-07-05)
 

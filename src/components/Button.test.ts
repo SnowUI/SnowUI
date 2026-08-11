@@ -1,6 +1,8 @@
 /**
  * Button.test.ts
- * v1.4.2
+ * v1.6.0
+ * 变更记录 (2026-08-11): icon-only 改为显式 iconOnly=true；未声明等同于 false。
+ * 变更记录 (2026-08-09): bare 默认 100% 不透明，新增 emphasis="muted" 示例覆盖 40% → hover 100%。
  * 变更记录 (2026-07-05): 新增 backgroundBlur 开启状态示例。
  * 变更记录 (2026-05-18): 新增 B6 复制按钮示例，覆盖 P0.2 瞬时反馈模式：副作用挂 onclick，状态切换与内容回弹由 Frame 接管。
  * 变更记录 (2026-03-15): 修复 B3 图标按钮示例运行时错误，示例下拉图标改为 test 沙箱已注入的 `ArrowLineDown`。
@@ -25,7 +27,7 @@ export const examples = [
 <Button variant="outline">Outline</Button>
 <Button variant="borderless">Borderless</Button>
 <Button bare>Bare</Button>
-<Button bare aria-label="减少"><Minus /></Button>`,
+<Button bare iconOnly aria-label="减少"><Minus /></Button>`,
 
         logic: ["Style"],
     },
@@ -64,14 +66,15 @@ export const examples = [
         code: `A4
 <div class="flex-row gap-12 items-center">
     <Button bare>All</Button>
-    <Button bare><FourLeafClover size={24} /></Button>
+    <Button bare iconOnly aria-label="四叶草"><FourLeafClover size={24} /></Button>
+    <Button bare emphasis="muted">Muted</Button>
     <Button bare disabled>Disabled</Button>
 </div>`,
 
         expected: {
-            render: "无外壳按钮可包含文字或 Icon，无 padding、圆角、背景和边框，默认以 40% 透明度显示。",
+            render: "无外壳按钮可包含文字或 Icon，无 padding、圆角、背景和边框；默认保持 100% 不透明，muted 为 40%。",
             layout: "按钮尺寸由内部内容自然撑开。",
-            interaction: "可用按钮 hover 时透明度提升到 100%，禁用按钮不响应 hover。",
+            interaction: "默认按钮 hover 时透明度不变；muted hover 时由 40% 提升到 100%，禁用按钮不响应 hover。",
             performance: "仅通过 Button class 与 CSS 变量切换视觉。",
             responsive: "字号与行高继续跟随 Button size。",
         },
@@ -120,16 +123,24 @@ export const examples = [
     {
         name: "B2: 纯图标按钮 (Icon Only)",
         code: `B2
-<Button size="sm">
+<Button aria-label="未声明 iconOnly">
     <FourLeafClover />
 </Button>
-<Button size="md">
+<Button iconOnly size="sm" aria-label="四叶草">
     <FourLeafClover />
 </Button>
-<Button size="lg">
+<Button iconOnly size="md" aria-label="四叶草">
+    <FourLeafClover />
+</Button>
+<Button iconOnly size="lg" aria-label="四叶草">
     <FourLeafClover />
 </Button>`,
 
+        expected: {
+            render: "未声明 iconOnly 的 Button 使用普通内容布局；后三个显式 iconOnly Button 使用对应尺寸的对称 padding。",
+            layout: "iconOnly=false 不根据单个 SVG 自动改变布局；iconOnly=true 的 sm/md/lg 使用 4/8/12px 四边 padding。",
+            interaction: "所有按钮保持普通 Button 交互；纯图标按钮通过 aria-label 提供可访问名称。",
+        },
         logic: ["Composition"],
     },
     {
@@ -137,25 +148,25 @@ export const examples = [
         code: `B3
 <div class="flex-col gap-12">
     <div class="flex-row gap-8 items-center">
-        <Button bare aria-label="减少">
+        <Button bare iconOnly aria-label="减少">
             <Minus size={12} />
         </Button>
-        <Button bare aria-label="筛选">
+        <Button bare iconOnly aria-label="筛选">
             <FourLeafClover size={16} />
         </Button>
-        <Button bare size="lg" variant="filled" aria-label="展开">
+        <Button bare iconOnly size="lg" variant="filled" aria-label="展开">
             <ArrowLineDown />
         </Button>
-        <Button bare aria-label="增加">
+        <Button bare iconOnly aria-label="增加">
             <Plus size={24} />
         </Button>
     </div>
     <div class="flex-row gap-8 items-center p-8 rounded-12 bg-surface-1">
         <Input placeholder="搜索内容" />
-        <Button bare size="md" variant="outline" aria-label="展开筛选">
+        <Button bare iconOnly size="md" variant="outline" aria-label="展开筛选">
             <ArrowLineDown />
         </Button>
-        <Button bare aria-label="清空输入">
+        <Button bare iconOnly aria-label="清空输入">
             <Minus size={16} />
         </Button>
     </div>
@@ -169,7 +180,7 @@ export const examples = [
         </Button>
     </div>
     <div class="text-12 text-black-40">
-        说明：bare 忽略 filled/outline 等 variant 的视觉结果。单 Icon 默认继承当前 size 档位的 12/16/20px 尺寸上下文，并获得至少 16×16px 的透明点击热区；精确尺寸直接声明在子 Icon 上。Icon + 文字继续保留普通 Button 的内容 gap。
+        说明：bare 忽略 filled/outline 等 variant 的视觉结果。显式 iconOnly 的单视觉内容继承当前 size 档位的 12/16/20px 尺寸上下文，并获得至少 16×16px 的透明点击热区；未声明 iconOnly 等同于 false。精确尺寸直接声明在子 Icon 上，Icon + 文字继续保留普通 Button 的内容 gap。
     </div>
 </div>`,
 
@@ -361,7 +372,7 @@ export const examples = [
 >
     {#snippet children({ currentState })}
         <div class="flex-row gap-16 items-center bg-background-1 p-16 rounded-12 border-black-10 w-hug">
-            <Button variant="gray" size="lg">
+            <Button iconOnly variant="gray" size="lg" aria-label="减少">
                 <Minus />
             </Button>
             <div class="text-24 font-semibold min-w-48" style="text-align: center;">
@@ -370,7 +381,7 @@ export const examples = [
                     duration={500}
                 />
             </div>
-            <Button variant="gray" size="lg">
+            <Button iconOnly variant="gray" size="lg" aria-label="增加">
                 <Plus />
             </Button>
         </div>
@@ -606,17 +617,17 @@ export const examples = [
                 <FourLeafClover />
             </Icon>Gray</Button
         >
-        <Button variant="filled" size="lg"
+        <Button iconOnly aria-label="四叶草" variant="filled" size="lg"
             ><Icon>
                 <FourLeafClover />
             </Icon>Filled</Button
         >
-        <Button variant="outline" size="lg"
+        <Button iconOnly aria-label="四叶草" variant="outline" size="lg"
             ><Icon>
                 <FourLeafClover />
             </Icon>Outline</Button
         >
-        <Button variant="borderless" size="lg"
+        <Button iconOnly aria-label="四叶草" variant="borderless" size="lg"
             ><Icon>
                 <FourLeafClover />
             </Icon>Borderless</Button
@@ -708,13 +719,13 @@ export const examples = [
     },
     {
         name: "Custom 23-00-59",
-        code: `<Button bare><FourLeafClover size={16} /></Button>
-<Button bare><FourLeafClover size={20} /></Button>
-<Button bare><FourLeafClover size={24} /></Button>
-<Button bare><FourLeafClover size={32} /></Button>
-<Button bare><FourLeafClover size={40} /></Button>
-<Button bare><FourLeafClover size={48} /></Button>
-<Button bare><FourLeafClover size={80} /></Button>
+        code: `<Button bare iconOnly aria-label="四叶草"><FourLeafClover size={16} /></Button>
+<Button bare iconOnly aria-label="四叶草"><FourLeafClover size={20} /></Button>
+<Button bare iconOnly aria-label="四叶草"><FourLeafClover size={24} /></Button>
+<Button bare iconOnly aria-label="四叶草"><FourLeafClover size={32} /></Button>
+<Button bare iconOnly aria-label="四叶草"><FourLeafClover size={40} /></Button>
+<Button bare iconOnly aria-label="四叶草"><FourLeafClover size={48} /></Button>
+<Button bare iconOnly aria-label="四叶草"><FourLeafClover size={80} /></Button>
 <Button bare>文字</Button>`,
         logic: ["UserCreated"],
     },] as const;

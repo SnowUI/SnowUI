@@ -149,7 +149,7 @@
        sm: padding=4px 12px  gap=4px   radius=12px
        md: padding=8px 16px  gap=6px   radius=16px
        lg: padding=12px 20px gap=8px   radius=20px
-       bare: padding=0 radius=0，gap 继承档位；currentColor × opacity 0.4 -> 1
+       bare: padding=0 radius=0，gap 继承档位；默认 currentColor × opacity 1；emphasis=muted 时 0.4 -> 1
     ───────────────────────────────────────── */
     /* --snowui-button-padding-override: ; */          /* padding y+x */
     /* --snowui-button-icon-only-padding-override: ; */ /* icon-only 模式 padding（sm=4px md=8px lg=12px） */

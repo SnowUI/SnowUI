@@ -1,6 +1,6 @@
 /**
  * SearchInput.test.ts
- * v1.2.0
+ * v1.3.0
  *
  * 测试覆盖：SearchInput.md 定义的默认 Search、外置 leading、清除 X、Input 宿主 Props 平铺。
  */
@@ -57,5 +57,20 @@ export const examples = [
     parts={{ Text: { size: "sm" } }}
 />`,
         logic: ["HostSpecialization", "InputProps", "PartsText"],
+    },
+    {
+        name: "SI-07：窄宽度退化为搜索图标",
+        code: `SI-07
+<SearchInput
+    collapseBelow={80}
+    placeholder="Search"
+    style="width: 1rem;"
+/>`,
+        expected: {
+            render: "空值且未聚焦时仅显示水平居中的 Search 图标，左右间距相等",
+            interaction: "点击或键盘聚焦后恢复真实输入控件；输入值存在时保持内容可见",
+            responsive: "组件自身宽度不大于 80px 时进入 icon 退化态；即使外部 width 更小，最小宽度仍为左右实际 padding + leading Icon",
+        },
+        logic: ["ResponsiveCollapse", "Search", "Focus"],
     },
 ] as const;

@@ -1,6 +1,6 @@
 <!--
  Input 组件：基础单行输入框
- v1.1.1
+ v1.1.2
 
  文档: ./Input.md
 -->
@@ -55,6 +55,7 @@
     type DateDraft = Record<TemporalSegmentKey, string>;
 
     interface Props extends Omit<FrameProps, "tag"> {
+        element?: HTMLElement;
         type?: HTMLInputAttributes["type"];
         value?: InputValue;
         defaultValue?: InputValue;
@@ -110,6 +111,7 @@
     const inheritedInputPart = useComponentPart<Props>("Input");
     let {
         value = $bindable(),
+        element = $bindable(),
         ...explicitProps
     }: Props = $props();
     let {
@@ -263,6 +265,9 @@
         isEmbedded && !isCustomColorType && !isCustomTemporalType,
     );
     let hostElement = $state<HTMLElement | undefined>(undefined);
+    $effect(() => {
+        element = hostElement;
+    });
     // as="search" 时自动移入浮层 header 区域（固定置顶，不随内容滚动）
     $effect(() => {
         if (!isOverlaySearchHeader || !listboxHeaderPortal?.el || !hostElement) return;
@@ -2737,6 +2742,10 @@
             .snowui-input:not(.snowui-search-input-borderless)[data-has-root-accessory="true"]:has(
                     > .snowui-input-clear-btn
                 ):has(> [data-as="leading"]):not(
+                    .snowui-search-input-responsive-icon:not(
+                            :focus-within
+                        ):not(.snowui-search-input-has-value)
+                ):not(
                     :has(
                             > [data-as="trailing"]:not(
                                     .snowui-input-clear-btn

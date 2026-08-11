@@ -20,7 +20,7 @@ Button 的兼容 Props 在根级平铺；Button 是宿主，不提供 `parts.But
 
 `selectionMode="persistent"` 是默认持续选择模式：trigger 显示当前选中项。`selectionMode="action"` 是命令执行模式：trigger 始终显示 placeholder，点击选项只触发 `onAction(value)`，不保存选中值。因此无需另设 MenuButton。
 
-SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默认以最长选项决定固定宽度，其他选项全部 fill，并且不显示选中 check。搜索 placeholder、搜索时 160px 最小宽度和打开后锁宽由 Listbox 统一提供。`bare` 直接传给宿主 Button。
+SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默认以最长选项决定固定宽度，其他选项全部 fill，并且不显示选中 check。搜索 placeholder、搜索时 160px 最小宽度和打开后锁宽由 Listbox 统一提供。`bare` 与 `emphasis` 直接传给宿主 Button；因此 bare 默认 100%，需要次级触发器时显式使用 `emphasis="muted"`。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 

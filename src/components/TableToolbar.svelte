@@ -112,6 +112,13 @@
         column.columnId && column.sortable && !column.role,
     ));
     const hasBulkItems = $derived(showCopyAction || showDeleteAction || bulkActions !== undefined);
+    const builtInBareEmphasis = $derived(parts?.Button?.emphasis ?? "muted");
+    const pickerParts = $derived({
+        Button: {
+            ...parts?.Button,
+            emphasis: builtInBareEmphasis,
+        },
+    });
 
     $effect(() => setSort(sortValue));
     $effect(() => setFilter(filterValue));
@@ -180,14 +187,14 @@
     {#if bulkActionsEnabled && hasSelection}
         <span class="snowui-table-toolbar-built-in snowui-table-toolbar-bulk" data-as="bulk">
             <span class="snowui-table-toolbar-selection" aria-live="polite">{selectionLabel(resolvedSelectedCount)}</span>
-            {#if showClearAction}<Button bare disabled={pendingAction !== undefined} onclick={() => onClearSelection ? onClearSelection(resolvedSelectedCount) : table.clearSelection()}>{clearLabel}</Button>{/if}
+            {#if showClearAction}<Button bare emphasis={builtInBareEmphasis} disabled={pendingAction !== undefined} onclick={() => onClearSelection ? onClearSelection(resolvedSelectedCount) : table.clearSelection()}>{clearLabel}</Button>{/if}
             {#if showClearAction && hasBulkItems}<Separator column length={12} />{/if}
             {#if showCopyAction}
                 <span class="snowui-table-toolbar-bulk-action" data-pending={pendingAction === "copy" ? "true" : undefined}>
                     {#if pendingAction === "copy"}
                         <Spinner size={12} aria-label={`${copyLabel}中`} />
                     {:else}
-                        <Button bare aria-label={copyLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("copy")}>
+                        <Button bare iconOnly emphasis={builtInBareEmphasis} aria-label={copyLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("copy")}>
                             <ResourceIcon name="copy" size={16} aria-hidden="true" />
                             <Tooltip as="tooltip">{copyLabel}</Tooltip>
                         </Button>
@@ -199,7 +206,7 @@
                     {#if pendingAction === "delete"}
                         <Spinner size={12} aria-label={`${deleteLabel}中`} />
                     {:else}
-                        <Button bare aria-label={deleteLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("delete")}>
+                        <Button bare iconOnly emphasis={builtInBareEmphasis} aria-label={deleteLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("delete")}>
                             <ResourceIcon name="trash" size={16} aria-hidden="true" />
                             <Tooltip as="tooltip">{deleteLabel}</Tooltip>
                         </Button>
@@ -213,7 +220,7 @@
 
     {#if sort}
         <Select class="snowui-table-toolbar-built-in snowui-table-toolbar-picker" as="sort"
-            bind:value={sortValue} buttonTrigger buttonBare ariaLabel={sortLabel}>
+            bind:value={sortValue} buttonTrigger buttonBare ariaLabel={sortLabel} parts={pickerParts}>
             {#snippet triggerContent()}
                 <ResourceIcon name="arrows-down-up" size={16} aria-hidden="true" />
                 <Tooltip as="tooltip">{sortLabel}</Tooltip>
@@ -230,7 +237,7 @@
 
     {#if filter}
         <Select class="snowui-table-toolbar-built-in snowui-table-toolbar-picker" as="filter"
-            bind:value={filterValue} buttonTrigger buttonBare ariaLabel={filterLabel}
+            bind:value={filterValue} buttonTrigger buttonBare ariaLabel={filterLabel} parts={pickerParts}
             data-placeholder-visible={filterValue === "default" ? "true" : undefined}>
             {#snippet triggerContent()}
                 <ResourceIcon name="funnel-simple" size={16} aria-hidden="true" />

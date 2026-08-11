@@ -140,7 +140,7 @@ export const examples = [
         code: `I-14b
 <Field style="width: 20rem;">
     <Input type="date" />
-    <Button as="trailing" type="button" variant="borderless" bare aria-label="打开日期选择器">
+    <Button as="trailing" type="button" variant="borderless" bare iconOnly emphasis="muted" aria-label="打开日期选择器">
         <CalendarBlank size={16} />
     </Button>
 </Field>`,
@@ -166,7 +166,7 @@ export const examples = [
         code: `I-15b
 <Field style="width: 20rem;">
     <Input type="time" />
-    <Button as="trailing" type="button" variant="borderless" bare aria-label="打开时间选择器">
+    <Button as="trailing" type="button" variant="borderless" bare iconOnly emphasis="muted" aria-label="打开时间选择器">
         <Clock size={16} />
     </Button>
 </Field>`,

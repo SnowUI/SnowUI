@@ -591,6 +591,8 @@
                     <Button
                         {...parts?.Button}
                         as="more"
+                        iconOnly
+                        aria-label="展开"
                         backgroundBlur
                         class="snowui-text-built-in-more"
                     >

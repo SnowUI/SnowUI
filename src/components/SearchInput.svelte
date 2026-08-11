@@ -1,6 +1,6 @@
 <!--
   SearchInput 简单搜索输入框
-  v1.2.1
+  v1.3.0
 
   文档: ./SearchInput.md
 -->
@@ -13,6 +13,7 @@
         mergeComponentPartProps,
         useComponentPart,
     } from "../logic/component-parts.svelte";
+    import { resizeManager } from "../logic/observer.svelte";
 
     type InputProps = ComponentProps<typeof Input>;
     type ControlledInputKeys =
@@ -21,13 +22,16 @@
         | "type"
         | "as"
         | "class"
+        | "element"
         | "children";
 
     interface Props extends Omit<InputProps, ControlledInputKeys> {
         type?: InputProps["type"];
         value?: string | number;
+        element?: HTMLElement;
         defaultValue?: string | number;
         showSearchIcon?: boolean;
+        collapseBelow?: number;
         variant?: "default" | "borderless";
         as?: InputProps["as"];
         class?: string;
@@ -38,12 +42,14 @@
     const inheritedSearchInputPart = useComponentPart<Props>("SearchInput");
     let {
         value = $bindable(),
+        element = $bindable(),
         ...explicitProps
     }: Props = $props();
     let {
         type = "search",
         defaultValue = undefined,
         showSearchIcon = true,
+        collapseBelow = undefined,
         variant = "default",
         as = "search",
         class: userClass = "",
@@ -55,14 +61,52 @@
             explicitProps,
         ),
     );
+
+    let responsiveIcon = $state(false);
+    const hasValue = $derived(
+        value !== undefined && value !== null && String(value) !== "" ||
+            value === undefined &&
+                defaultValue !== undefined &&
+                defaultValue !== null &&
+                String(defaultValue) !== "",
+    );
+
+    $effect(() => {
+        const node = element;
+        const threshold = collapseBelow;
+        if (!node) return;
+
+        const update = (width: number) => {
+            if (
+                typeof threshold === "number" &&
+                threshold > 0 &&
+                width <= threshold
+            ) {
+                responsiveIcon = true;
+            } else {
+                responsiveIcon = false;
+            }
+        };
+
+        update(node.getBoundingClientRect().width);
+        const unwatch = resizeManager.watch(node, (entry) =>
+            update(entry.contentRect.width),
+        );
+
+        return () => {
+            unwatch();
+            responsiveIcon = false;
+        };
+    });
 </script>
 
 <Input
     bind:value
+    bind:element
     {defaultValue}
     {type}
     {as}
-    class={`snowui-search-input snowui-search-input-${variant}${userClass ? ` ${userClass}` : ""}`}
+    class={`snowui-search-input snowui-search-input-${variant}${responsiveIcon ? " snowui-search-input-responsive-icon" : ""}${hasValue ? " snowui-search-input-has-value" : ""}${userClass ? ` ${userClass}` : ""}`}
     {...rest}
 >
     {#if showSearchIcon}
@@ -78,6 +122,64 @@
 </Input>
 
 <style>
+    :global(
+            .snowui-frame.snowui-input.snowui-search-input.snowui-search-input-responsive-icon:not(
+                    :focus-within
+                ):not(.snowui-search-input-has-value)
+        ) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        justify-items: center;
+        min-width: max-content;
+        gap: 0;
+    }
+
+    :global(
+            :where(
+                    .snowui-input.snowui-search-input-responsive-icon:not(
+                            :focus-within
+                        ):not(.snowui-search-input-has-value)
+                        > [data-as="leading"]
+                )
+        ) {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: center;
+    }
+
+    /* 原生 input 覆盖整个 icon-only 命中区：视觉收敛但仍可直接聚焦，
+       focus-within 后自动回到 Input 的标准三槽位布局。 */
+    :global(
+            :where(
+                    .snowui-input.snowui-search-input-responsive-icon:not(
+                            :focus-within
+                        ):not(.snowui-search-input-has-value)
+                        > .snowui-input-control
+                )
+        ) {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        opacity: 0;
+        cursor: text;
+    }
+
+    :global(
+            :where(
+                    .snowui-input.snowui-search-input-responsive-icon:not(
+                            :focus-within
+                        ):not(.snowui-search-input-has-value)
+                        > :not([data-as="leading"]):not(
+                            .snowui-input-control
+                        )
+                )
+        ) {
+        display: none;
+    }
+
     :global(:where(.snowui-input.snowui-search-input-borderless)) {
         --snowui-field-border-width: 0rem;
         --snowui-field-focus-ring-width: 0rem;

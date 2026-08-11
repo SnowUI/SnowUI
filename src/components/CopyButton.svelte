@@ -112,6 +112,7 @@
 
 <Button
     {...rest}
+    iconOnly={!showText}
     {disabled}
     data-copy-button
     data-copy-status={status}
@@ -146,7 +147,7 @@
 
 <style>
     /* CopyButton 自己管理 bare 状态的透明度与交互光标。反馈期内即使仍被
-       hover，也保持常态透明度，避免复制成功时按钮突然闪亮。 */
+       hover，也保持当前 emphasis 的常态透明度，避免复制成功时按钮突然闪亮。 */
     :global(:where(.snowui-button)[data-copy-button]) {
         cursor: pointer;
     }
@@ -158,7 +159,10 @@
     ) {
         opacity: var(
             --snowui-copy-button-feedback-opacity,
-            var(--snowui-state-opacity, 0.4)
+            var(
+                --snowui-state-opacity,
+                var(--snowui-button-bare-idle-opacity, 1)
+            )
         );
     }
 </style>

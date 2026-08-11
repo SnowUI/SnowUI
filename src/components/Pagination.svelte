@@ -669,10 +669,10 @@
             <Button as="pageSize" variant="borderless" />
             <Button as="current" variant="gray" />
             <Button as="page" variant="outline" />
-            <Button as="prev" variant="outline">
+            <Button as="prev" variant="outline" iconOnly aria-label="上一页">
                 <ResourceIcon name="arrow-line-left" size={16} aria-hidden="true" />
             </Button>
-            <Button as="next" variant="outline">
+            <Button as="next" variant="outline" iconOnly aria-label="下一页">
                 <ResourceIcon name="arrow-line-right" size={16} aria-hidden="true" />
             </Button>
         {/if}

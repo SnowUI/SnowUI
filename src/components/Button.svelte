@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.3.2
+  v2.5.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -37,7 +37,11 @@
   interface Props extends Omit<FrameProps, "size"> {
     variant?: "gray" | "filled" | "outline" | "borderless";
     size?: "sm" | "md" | "lg";
+    /** 明确启用单视觉内容布局；默认 false，不根据 children 自动推断。 */
+    iconOnly?: boolean;
     bare?: boolean;
+    /** bare 模式的视觉强调级别；normal 默认始终 100%，muted 为 40% 并在 hover 时提升到 100%。 */
+    emphasis?: "normal" | "muted";
     /** 是否启用背景内容模糊；默认 false。 */
     backgroundBlur?: boolean;
     /**
@@ -65,7 +69,9 @@
   let {
     variant = undefined,
     size = undefined,
+    iconOnly = false,
     bare = false,
+    emphasis = "normal",
     backgroundBlur = false,
     toggle = false,
     href = undefined,
@@ -134,9 +140,8 @@
     return "sm";
   });
 
-  // 响应式的单个图标状态
-  let isIconOnly = $state(false);
   let buttonElement = $state<HTMLElement | undefined>(undefined);
+  let hasWarnedMissingIconOnlyName = false;
 
   const defaultButtonIconSize = $derived.by(() => {
     if (resolvedSize === "lg") return 20;
@@ -146,8 +151,8 @@
 
   // 传递给 Frame Context 的尺寸（供 Icon/Avatar 等子组件继承）
   const contextPixelSize = $derived.by(() => {
-    if (bare && isIconOnly) return defaultButtonIconSize;
-    if (isIconOnly) {
+    if (bare && iconOnly) return defaultButtonIconSize;
+    if (iconOnly) {
       if (resolvedSize === "lg") return 24;
       if (resolvedSize === "md") return 20;
       return 16;
@@ -158,7 +163,7 @@
     }
   });
   const buttonRenderHints = $derived.by(() => {
-    if (bare && isIconOnly) {
+    if (bare && iconOnly) {
       return {
         variant: userRenderHints?.variant ?? "circle",
         width: userRenderHints?.width ?? `${defaultButtonIconSize}px`,
@@ -200,6 +205,29 @@
     get size() {
       return contextPixelSize;
     },
+  });
+
+  $effect(() => {
+    if (
+      !import.meta.env.DEV ||
+      !iconOnly ||
+      !buttonElement ||
+      hasWarnedMissingIconOnlyName
+    ) return;
+
+    const node = buttonElement;
+    queueMicrotask(() => {
+      const hasAccessibleName =
+        !!node.getAttribute("aria-label")?.trim() ||
+        !!node.getAttribute("aria-labelledby")?.trim() ||
+        !!node.getAttribute("title")?.trim();
+      if (hasAccessibleName || hasWarnedMissingIconOnlyName) return;
+      hasWarnedMissingIconOnlyName = true;
+      console.warn(
+        "[SnowUI Button] iconOnly={true} requires aria-label, aria-labelledby, or title.",
+        node,
+      );
+    });
   });
 
   // 上下文感知 (用于 as="more" 逻辑)
@@ -476,46 +504,6 @@
     clearHoldSuppressResetTimer();
   }
 
-  // 精确识别“仅 1 个图标且无文本节点”的场景，避免 icon + text 误判
-  function detectIconOnly(node: HTMLElement) {
-    const iconSelector =
-      ".snowui-icon-wrapper, .snowui-icon, .snowui-avatar, svg, img";
-
-    const update = () => {
-      const elementChildren = Array.from(node.children).filter(
-        (child) => !child.classList.contains("snowui-tooltip-placeholder"),
-      );
-      const hasSingleIconElement =
-        elementChildren.length === 1 &&
-        elementChildren[0]?.matches?.(iconSelector);
-      const hasTextNode = Array.from(node.childNodes).some(
-        (child) =>
-          child.nodeType === Node.TEXT_NODE && !!child.textContent?.trim(),
-      );
-
-      node.classList.toggle(
-        "snowui-button-icon-only",
-        hasSingleIconElement && !hasTextNode,
-      );
-      isIconOnly = hasSingleIconElement && !hasTextNode;
-    };
-
-    update();
-
-    const observer = new MutationObserver(update);
-    observer.observe(node, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-    });
-
-    return {
-      destroy() {
-        observer.disconnect();
-      },
-    };
-  }
-
   onDestroy(() => {
     clearHoldTimers();
     clearHoldSuppressResetTimer();
@@ -538,6 +526,8 @@
   {target}
   {rel}
   data-variant={bare ? undefined : resolvedVariant}
+  data-icon-only={iconOnly ? "true" : undefined}
+  data-emphasis={bare ? emphasis : undefined}
   data-embedded={isButtonGroupEmbedded ? "button-group" : undefined}
   data-leading={as === "leading" ? "true" : undefined}
   data-trailing={as === "trailing" ? "true" : undefined}
@@ -558,7 +548,8 @@
     bare ? "snowui-button-bare" : "",
     backgroundBlur ? "snowui-button-background-blur" : "",
     isButtonGroupEmbedded ? "snowui-button-embedded-button-group" : "",
-    bare && isIconOnly
+    iconOnly ? "snowui-button-icon-only" : "",
+    bare && iconOnly
       ? "snowui-button-bare-icon-only"
       : "",
     className,
@@ -575,7 +566,6 @@
   {...toggleDefaults}
   {...clickProps}
   {...frameRestProps}
-  use={[detectIconOnly]}
   children={normalizeFrameSnippet(buttonChildren)}
 />
 
@@ -800,10 +790,20 @@
   :global(:where(.snowui-button).snowui-button-bare) {
     --snowui-button-background: transparent;
     --snowui-button-border-color: transparent;
-    --snowui-button-opacity: var(--snowui-state-opacity, 0.4);
+    --snowui-button-bare-idle-opacity: 1;
+    --snowui-button-opacity: var(
+      --snowui-state-opacity,
+      var(--snowui-button-bare-idle-opacity)
+    );
     background-image: none;
     transition:
       opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
+  }
+
+  :global(
+      :where(.snowui-button).snowui-button-bare[data-emphasis="muted"]
+    ) {
+    --snowui-button-bare-idle-opacity: 0.4;
   }
 
   :global(:where(.snowui-button).snowui-button-bare) {

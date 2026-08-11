@@ -119,7 +119,7 @@ export const examples = [
     <Text as="label" style="color: var(--black-40, rgba(0, 0, 0, 0.4));">Due Date</Text>
     <Icon as="leading" style="color: var(--black-40, rgba(0, 0, 0, 0.4));"><CalendarBlank /></Icon>
     <Input type="date" name="dueDate" defaultValue="2026-02-01" />
-    <Button as="trailing" type="button" variant="borderless" bare aria-label="打开日期选择" style="color: var(--black-40, rgba(0, 0, 0, 0.4));">
+    <Button as="trailing" type="button" variant="borderless" bare iconOnly emphasis="muted" aria-label="打开日期选择">
         <Icon size={16}><ArrowLineUpDown /></Icon>
     </Button>
 </Field>`,
@@ -231,14 +231,14 @@ export const examples = [
     </Text>
     <Frame as="row" row style="align-items: center; justify-content: space-between;">
         <Frame as="row" row style="gap: var(--gap-1);">
-            <Button type="button" variant="borderless" bare aria-label="添加附件">
+            <Button type="button" variant="borderless" bare iconOnly emphasis="muted" aria-label="添加附件">
                 <Paperclip size={16} />
             </Button>
-            <Button type="button" variant="borderless" bare aria-label="附加第二操作">
+            <Button type="button" variant="borderless" bare iconOnly emphasis="muted" aria-label="附加第二操作">
                 <CalendarBlank size={16} />
             </Button>
         </Frame>
-        <Button type="button" variant="borderless" bare aria-label="发送">
+        <Button type="button" variant="borderless" bare iconOnly emphasis="muted" aria-label="发送">
             <PaperPlaneRight size={16} />
         </Button>
     </Frame>
