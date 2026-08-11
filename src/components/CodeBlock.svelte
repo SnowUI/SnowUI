@@ -1,8 +1,8 @@
 <!--
   CodeBlock 组件：代码块显示，支持行号、复制、全屏放大
-  v1.5.0
+  v1.6.1
 
-  布局模型：复合管理布局（固定工具栏 + 可滚动代码区 + 全屏覆盖层）
+  布局模型：默认态为复合管理布局；singleLine 变体为槽位宿主布局
 
   Frame 能力接入：
   - 根层：enableDefaultMotion=true
@@ -13,6 +13,7 @@
       退出：applyFlipExit 将全屏层缩回卡片位置后卸载
 
   外置 Icon 替换（ComponentGuidelines §2.7.1）：
+  - singleLine 支持 as="leading" / data-as="leading" 前置配件
   - as="trailing" / data-as="trailing" 替换默认右侧动作区
   - data-as="copy-icon" / "copied-icon" / "expand-icon" / "collapse-icon" 保留为精确图标替换兼容入口
 
@@ -117,6 +118,8 @@
     ]);
 
     interface Props extends Partial<FrameProps> {
+        /** 视觉与布局变体；singleLine 使用三槽单行代码条 */
+        variant?: "default" | "singleLine";
         /** 要显示的代码字符串 */
         code?: string;
         /** 语言标识，显示在工具栏 */
@@ -149,6 +152,7 @@
     }
 
     let {
+        variant = "default",
         code = "",
         language = "",
         showLanguage = true,
@@ -187,16 +191,19 @@
     let hasCustomCopiedIcon = $state(false);
     let hasCustomExpandIcon = $state(false);
     let hasCustomCollapseIcon = $state(false);
+    let hasCustomLeading = $state(false);
     let hasCustomTrailing = $state(false);
     let customCopyIconHtml = $state("");
     let customCopiedIconHtml = $state("");
     let customExpandIconHtml = $state("");
     let customCollapseIconHtml = $state("");
+    let customLeadingHtml = $state("");
     let customTrailingHtml = $state("");
     let childCode = $state("");
     let hostElement: HTMLElement | undefined = $state(undefined);
 
     /* ─── 计算属性 ─── */
+    const isSingleLine = $derived(variant === "singleLine");
     const resolvedCode = $derived(code || childCode);
     const lines = $derived(resolvedCode ? resolvedCode.split("\n") : []);
     const resolvedVisibleLines = $derived(Math.max(1, visibleLines || 15));
@@ -204,11 +211,14 @@
         Math.min(Math.max(lines.length || 1, 1), resolvedVisibleLines),
     );
     const highlightedLines = $derived(lines.map(highlightLine));
+    const highlightedSingleLine = $derived(highlightLine(resolvedCode));
     const rootStyle = $derived(
         [
             `--snowui-code-block-visible-lines: ${autoVisibleLines};`,
             userStyle,
-            resizeHeight !== undefined ? `height:${resizeHeight}px;` : "",
+            !isSingleLine && resizeHeight !== undefined
+                ? `height:${resizeHeight}px;`
+                : "",
         ]
             .filter(Boolean)
             .join(" "),
@@ -408,6 +418,9 @@
             const childPre = hostElement!.querySelector(
                 ".snowui-code-block-accessories pre",
             ) as HTMLElement | null;
+            const leading = hostElement!.querySelector(
+                '.snowui-code-block-accessories [data-as="leading"], .snowui-code-block-accessories .snowui-role-leading',
+            ) as HTMLElement | null;
             const trailing = hostElement!.querySelector(
                 '.snowui-code-block-accessories [data-as="trailing"], .snowui-code-block-accessories .snowui-role-trailing',
             ) as HTMLElement | null;
@@ -427,11 +440,13 @@
             hasCustomCopiedIcon = !!copiedIcon;
             hasCustomExpandIcon = !!expandIcon;
             hasCustomCollapseIcon = !!collapseIcon;
+            hasCustomLeading = !!leading;
             hasCustomTrailing = !!trailing;
             customCopyIconHtml = copyIcon?.innerHTML ?? "";
             customCopiedIconHtml = copiedIcon?.innerHTML ?? "";
             customExpandIconHtml = expandIcon?.innerHTML ?? "";
             customCollapseIconHtml = collapseIcon?.innerHTML ?? "";
+            customLeadingHtml = leading?.innerHTML ?? "";
             customTrailingHtml = trailing?.innerHTML ?? "";
             childCode =
                 childPre?.textContent ??
@@ -447,7 +462,15 @@
 
     $effect(() => {
         highlightedLines;
+        highlightedSingleLine;
         updateScrollFade();
+    });
+
+    $effect(() => {
+        if (!isSingleLine) return;
+        resizeHeight = undefined;
+        isFullscreen = false;
+        isExitingFullscreen = false;
     });
 
     $effect(() => {
@@ -533,13 +556,21 @@
 
 <!-- 根容器：bind:element 用于 MutationObserver 和 FLIP captureFlipRect 起点记录 -->
 <Frame
+    {...rest}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
     enableDefaultMotion={true}
+    enableAutoLayout={isSingleLine}
+    row={isSingleLine}
     bind:element={hostElement}
-    class={["snowui-code-block", "snowui-overlay-scrollbar-host", className].filter(Boolean).join(" ")}
-    data-resized={resizeHeight !== undefined ? "true" : undefined}
+    class={[
+        "snowui-code-block",
+        !isSingleLine && "snowui-overlay-scrollbar-host",
+        className,
+    ].filter(Boolean).join(" ")}
+    data-variant={variant}
+    data-resized={!isSingleLine && resizeHeight !== undefined ? "true" : undefined}
     style={rootStyle}
     renderHints={{
         variant: "rect",
@@ -548,8 +579,54 @@
         radius: "var(--radius-4)",
     }}
     componentParts={parts}
-    {...rest}
 >
+    {#if isSingleLine}
+        {#if hasCustomLeading}
+            <span
+                class="snowui-code-block-single-line-leading"
+                data-as="leading">{@html customLeadingHtml}</span
+            >
+        {/if}
+
+        <div class="snowui-code-block-single-line-content">
+            <pre class="snowui-code-block-pre"><code
+                    class="snowui-code-block-code"
+                    >{#each highlightedSingleLine as token}<span
+                            class={`snowui-code-block-token snowui-code-block-token-${token.kind}`}
+                            >{token.text}</span
+                        >{/each}</code
+                ></pre
+            >
+        </div>
+
+        {#if hasCustomTrailing}
+            <span
+                class="snowui-code-block-trailing-custom"
+                data-as="trailing">{@html customTrailingHtml}</span
+            >
+        {:else if showCopyButton}
+            <div
+                class="snowui-code-block-actions snowui-code-block-single-line-trailing"
+                data-as="trailing"
+            >
+                <CopyButton
+                    text={resolvedCode}
+                    bare
+                    emphasis={parts?.CopyButton?.emphasis ?? "muted"}
+                    showText={false}
+                    feedbackDuration={copyTimeout}
+                    icon={hasCustomCopyIcon
+                        ? normalizeActionSnippet(copyIconSnippet)
+                        : undefined}
+                    successIcon={hasCustomCopiedIcon
+                        ? normalizeActionSnippet(copiedIconSnippet)
+                        : undefined}
+                    class="snowui-code-block-btn snowui-hoverable"
+                    ariaLabel="复制代码"
+                />
+            </div>
+        {/if}
+    {:else}
     <!-- 工具栏 -->
     <div
         class="snowui-code-block-toolbar snowui-code-block-default-pin-top-right"
@@ -660,6 +737,7 @@
         ariaLabel="调整代码块高度"
         onSizeChange={handleResizeHeight}
     />
+    {/if}
     {#if children}
         <div class="snowui-code-block-accessories" aria-hidden="true">
             {@render children()}
@@ -668,7 +746,7 @@
 </Frame>
 
 <!-- 全屏覆盖层：手动使用 layout 策略进出，代码字形不参与 scale -->
-{#if isFullscreen || isExitingFullscreen}
+{#if !isSingleLine && (isFullscreen || isExitingFullscreen)}
     <Frame
         bind:element={fullscreenElement}
         tag="div"
@@ -807,9 +885,6 @@
             var(--snowui-code-block-visible-lines) * 1lh
         );
 
-        display: flex;
-        flex-direction: column;
-        gap: var(--gap-2);
         background-color: var(
             --snowui-code-block-bg-override,
             var(--snowui-code-block-bg)
@@ -839,6 +914,54 @@
         overflow: hidden;
         position: relative;
         width: 100%;
+    }
+
+    :global(:where(.snowui-code-block[data-variant="default"])) {
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-2);
+    }
+
+    /* singleLine：沿用 Input 的 Leading / Content / Trailing 三槽结构。 */
+    :global(:where(.snowui-code-block[data-variant="singleLine"])) {
+        --snowui-code-block-padding-x: var(--padding-4);
+        --snowui-code-block-padding-y: var(--padding-3);
+
+        gap: var(
+            --snowui-code-block-gap-override,
+            var(--snowui-code-block-gap)
+        );
+        box-sizing: border-box;
+        height: auto;
+    }
+
+    :global(:where(.snowui-code-block-single-line-content)) {
+        grid-row: 1;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        white-space: nowrap;
+        scrollbar-width: none;
+    }
+
+    :global(:where(.snowui-code-block-single-line-content::-webkit-scrollbar)) {
+        display: none;
+    }
+
+    :global(
+        :where(
+            .snowui-code-block[data-variant="singleLine"]
+                > [data-as="leading"],
+            .snowui-code-block[data-variant="singleLine"]
+                > [data-as="trailing"]
+        )
+    ) {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+        white-space: nowrap;
+        line-height: inherit;
     }
 
     :global(:where(.snowui-code-block-fullscreen)) {
@@ -981,6 +1104,24 @@
         font: inherit;
         margin: 0;
         padding: 0;
+    }
+
+    :global(
+        :where(
+            .snowui-code-block[data-variant="singleLine"]
+                .snowui-code-block-pre
+        )
+    ) {
+        white-space: nowrap;
+    }
+
+    :global(
+        :where(
+            .snowui-code-block[data-variant="singleLine"]
+                .snowui-code-block-code
+        )
+    ) {
+        display: inline;
     }
 
     :global(:where(.snowui-code-block-line)) {

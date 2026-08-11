@@ -1,6 +1,6 @@
 # Input.svelte 文档
 
-> **版本**: v1.1.2
+> **版本**: v1.1.3
 > **职责**: 基础单行输入宿主；`text` 使用原生可见 `<input>`，`date` / `color` 使用自定义可见展示层，其余类型继续承接原生 `<input>` 能力与 Frame 通用能力。
 
 **2026-04-27 补充**: 内建清除 X 恢复为焦点态交互：只有输入内容非空且 `Input` 处于 `focus-within` 时显示；失焦后隐藏且不为隐藏 X 预留额外 gap。
@@ -11,7 +11,7 @@
 
 **2026-04-09 图标规则补充**: `Input` 内建 error trailing icon，以及放在 `Input` 里的前置 / 后置 icon，位置优先由 `Input` 自身控制。默认要求是 icon 到最近可见内边界保持 `16px`；进入 `Field` 后仍沿用这条规则。若 `Input as="segment"` 处于连续字段表面中，icon 到最近边框或分割线的距离仍保持 `16px`，不因为 `Field` 组合而改成新的偏移规则。
 **2026-04-09 补充**: 根据需求文档中 F-01 的期望 HTML，`type="text"` 已回收为可见原生 `<input>`，不再额外渲染自定义 editor / placeholder 覆盖层；`Field > Input` 的结构收敛为 `div > input`，placeholder 与输入内容共同走浏览器原生单行输入排版。
-**2026-07-05 补充**: `Input` 单独使用时默认 padding 调整为 `12 / 12`；进入 `Field` 后仍由 Field 的既有 `12 / 16` 规则接管。
+**2026-08-12 更正**: `Input` 单独使用时的源码默认 padding 为 `12 / 16`；此前文档中的 `12 / 12` 为记录错误。进入 `Field` 后仍由 Field 的既有 `12 / 16` 规则接管。
 **2026-03-29 补充**: 当 `type="text"` 同时声明 `list` 时，`Input` 会回退为可见原生 `<input>`，以保留浏览器原生 `datalist` 建议项。
 **2026-03-29 补充**: `type="file"` 已从 `Input` 组件支持范围中移除；传入该类型时会回退为普通 `text` 输入，不再透传浏览器原生文件上传器。
 **2026-03-28 补充**: `type="range"` 已从 `Input` 组件支持范围中移除；传入该类型时会回退为普通 `text` 输入，不再直接透传浏览器原生滑杆。
@@ -25,7 +25,7 @@
 ## 2026-04-04 表单样式规则
 
 - 基础节奏统一：`Field` 默认 `padding = 12 / 16`，`gap = 8`
-- `Input` 单独使用时：组件自身带 `12 / 12` padding 和 `8` gap
+- `Input` 单独使用时：组件自身带 `12 / 16` padding 和 `8` gap
 - icon 位置由 `Input` 自己控制：leading / trailing icon 到最近可见内边界默认都是 `16px`
 - 错误态内建 warning icon 也走同一条 trailing icon 规则，不额外使用 overlay 偏移
 - 放进 `Field` 后，先看有没有 `as="segment"`
@@ -530,6 +530,10 @@ invalid=true + !hasCustomTrailing
 
 - **Input-Motion.2026-06-18** 新增默认错误反馈 shake：独立 `Input invalid / aria-invalid` 自动播放，嵌入 `Field` 时由 `Field` 汇总播放，消费方无需手动传类名或状态。
 - **Input-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v1.1.3 (2026-08-12)
+
+- 更正独立 Input 标准态 padding 记录为源码实际值 `12px / 16px`；组件行为未改变。
 
 ### v1.1.2 (2026-08-10)
 

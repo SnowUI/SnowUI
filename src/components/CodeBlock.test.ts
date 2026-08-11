@@ -1,7 +1,7 @@
 /**
  * CodeBlock.test.ts
- * v1.2.0
- * 变更记录 (2026-07-30): 增加全屏布局转场回归示例，验证代码字形不缩放且末帧不横跳。
+ * v1.3.0
+ * 变更记录 (2026-08-12): 增加 singleLine 三槽布局回归示例，验证单行内容、Leading 与默认复制 Trailing。
  */
 export const examples = [
     {
@@ -128,6 +128,25 @@ function resizeViewport(width: number) {
         ],
     },
 
+    {
+        name: "CB-07：单行三槽代码条",
+        code: `CB-07
+<CodeBlock
+    variant="singleLine"
+    code="import { Button } from '@snowui-design-system/components';"
+    style="width: 38rem;"
+>
+    <Icon as="leading"><Bell /></Icon>
+</CodeBlock>`,
+        logic: [
+            "variant",
+            "singleLine",
+            "leading",
+            "content",
+            "trailing",
+            "showCopyButton",
+        ],
+    },
     {
         name: "Custom 04-13-42",
         code: `CB-01

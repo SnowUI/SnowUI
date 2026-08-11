@@ -1,6 +1,6 @@
 # Tooltip.svelte 文档
 
-> **版本**: v1.7.0
+> **版本**: v1.7.1
 > **职责**: 文字提示组件，在悬停时显示额外信息。
 
 **能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
@@ -102,6 +102,7 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 
 ### 4) 滤镜与阴影
 - 保留毛玻璃：`backdrop-filter: blur(1.25rem)`（含 `-webkit-backdrop-filter`）。
+- Portal 必须保持在应用根节点隔离层之外，且自身不得被全局根节点选择器误加 `isolation: isolate`；否则毛玻璃虽有计算值，但无法采样应用根节点内的页面内容。根节点隔离规则见 [StyleSpec.md §2.6.4](../../../specs/StyleSpec.md#264-全局根层隔离与-portal-背景采样)。
 - 当前版本已移除阴影，不使用 `box-shadow`。
 
 ### 5) 显隐动效
@@ -144,6 +145,9 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.7.1 (2026-08-12)
+- 修复 Styles 根节点隔离选择器误命中 Tooltip Portal，导致 `blur(1.25rem)` 无法采样应用内容的问题；Tooltip 默认 light 变体保持不变。
 
 ### v1.7.0 (2026-07-28)
 - 新增默认开启的 `dismissOnMotion`。触发元素或其祖先开始几何动效时，Tooltip 会在第一帧位移前立即卸载，避免 Portal 跟随定位产生跳动。

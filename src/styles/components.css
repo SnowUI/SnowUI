@@ -275,7 +275,7 @@
 
     /* ─────────────────────────────────────────
        Input
-       标准: padding-y=12px padding-x=12px gap=8px radius=16px
+       标准: padding-y=12px padding-x=16px gap=8px radius=16px
        compact: padding-y=8px padding-x=8px gap=8px radius=12px
     ───────────────────────────────────────── */
     /* --snowui-input-padding-y: ; */           /* padding-y */
@@ -287,7 +287,7 @@
     /* ─────────────────────────────────────────
        SearchInput
        继承 Input 覆盖入口；默认样式与 Input 标准一致。
-       padding-y=12px padding-x=12px gap=8px radius=16px
+       padding-y=12px padding-x=16px gap=8px radius=16px
     ───────────────────────────────────────── */
     /* SearchInput 使用 --snowui-input-* 覆盖入口，不新增平行变量。 */
 
@@ -315,9 +315,9 @@
     /* --snowui-code-block-bg-override: ; */          /* 背景色（默认 var(--background-2)） */
     /* --snowui-code-block-fg-override: ; */          /* 前景色（默认 #1c1c1c；语法着色色值固定在组件内） */
     /* --snowui-code-block-content-height-override: ; */ /* 代码区高度（默认 5lh，约 5 行） */
-    /* --snowui-code-block-padding-override: ; */     /* 整体 padding（默认 var(--padding-5) = 20px） */
-    /* --snowui-code-block-padding-y-override: ; */   /* 上下 padding（默认 var(--padding-5) = 20px） */
-    /* --snowui-code-block-padding-x-override: ; */   /* 左右 padding（默认 var(--padding-5) = 20px） */
+    /* --snowui-code-block-padding-override: ; */     /* 整体 padding（默认态 20px；singleLine 上下 12px / 左右 16px） */
+    /* --snowui-code-block-padding-y-override: ; */   /* 上下 padding（默认态 var(--padding-5) = 20px；singleLine var(--padding-3) = 12px） */
+    /* --snowui-code-block-padding-x-override: ; */   /* 左右 padding（默认态 var(--padding-5) = 20px；singleLine var(--padding-4) = 16px） */
     /* --snowui-code-block-radius-override: ; */      /* 圆角（默认 var(--radius-4) = 16px） */
     /* --snowui-code-block-gap-override: ; */         /* 操作按钮 gap（默认 var(--gap-2) = 8px） */
     /* --snowui-code-block-scroll-mask-size-override: ; */ /* 滚动边缘透明渐隐尺寸（默认 32px） */

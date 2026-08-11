@@ -1,6 +1,6 @@
 /**
  * Auto Layout Protocol
- * v1.0.0
+ * v1.0.1
  * Level 1: 三槽位布局模型与 Pin 布局的结构化原语
  * 规范来源: specs/LayoutProtocol.md
  *
@@ -13,6 +13,15 @@
     gap: var(--gap-2);
     align-items: center;
     align-content: flex-start;
+}
+
+/* 行模式三槽 Grid 只有一条内容轨道；固定高度大于轨道高度时必须整体垂直居中。
+ * 保留基础 flex-wrap 场景的 align-content:flex-start，不让多余空间只堆到底部。 */
+:where([data-auto-layout].snowui-direction-row:has(> [data-as="leading"])),
+:where([data-auto-layout].snowui-direction-row:has(> [data-as="trailing"])),
+:where([data-auto-layout].snowui-direction-row-reverse:has(> [data-as="leading"])),
+:where([data-auto-layout].snowui-direction-row-reverse:has(> [data-as="trailing"])) {
+    align-content: center;
 }
 
 /* === 列模式：子元素水平拉伸 === */

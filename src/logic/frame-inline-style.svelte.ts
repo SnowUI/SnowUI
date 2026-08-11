@@ -161,7 +161,7 @@ function buildExposedVariables(
             }
 
             if (prefix === "gap") {
-                style += `--${identityId}-${kebabKey}: var(--gap-${value}, calc(0.25rem * ${value} * var(--gap-scale, 1)));`;
+                style += `--${identityId}-${kebabKey}: var(--gap-${value}, calc(4px * ${value} * var(--gap-scale, 1)));`;
                 continue;
             }
 
@@ -219,7 +219,7 @@ function buildDirectLayoutStyle(frameProps: FrameProps): string {
         gap === undefined || gap === null
             ? ""
             : typeof gap === "number"
-              ? `gap: var(--gap-${gap}, calc(0.25rem * ${gap} * var(--gap-scale, 1)))`
+              ? `gap: var(--gap-${gap}, calc(4px * ${gap} * var(--gap-scale, 1)))`
               : `gap: ${gap}`,
         frameProps.width === undefined || frameProps.width === null
             ? ""

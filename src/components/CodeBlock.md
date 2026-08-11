@@ -5,9 +5,9 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.5.0
-> **更新**: 2026-07-30
-> **布局模型**: 复合管理布局（Composite Management Layout）
+> **版本**: v1.6.1
+> **更新**: 2026-08-12
+> **布局模型**: 默认态为复合管理布局；`singleLine` 为槽位宿主布局
 > **文档**: ./CodeBlock.md
 
 代码块组件，支持语法显示、基础语法着色、行号、复制到剪贴板与全屏放大。全屏放大/缩小使用共享元素转场的 `layout` 策略：实际过渡位置与尺寸，不缩放代码字形；图标切换动效使用 `REPLACEMENT_APPEAR_MOTION`，避免继承浮层类动效语义。
@@ -23,10 +23,10 @@
 |:---|:---|
 | **内容** | `code`, `language`, `children` |
 | **功能开关** | `showLanguage`, `showLineNumbers`, `showCopyButton`, `showExpandButton` |
-| **布局** | `visibleLines`, 拖拽高度 |
+| **布局** | `variant="default|singleLine"`, `visibleLines`, 默认态拖拽高度 |
 | **行为** | `copyTimeout`；复制能力由默认内置 CopyButton 承担 |
 | **默认内置组件** | `parts.CopyButton` 配置内置 bare CopyButton；`parts.ExpandButton` 配置内置 bare ExpandButton；`parts.Indicator` 配置缩放手柄 |
-| **外置 Icon 槽位** | `as="trailing"`；兼容 `data-as="copy-icon"`, `data-as="copied-icon"`, `data-as="expand-icon"`, `data-as="collapse-icon"`，前两者映射到 CopyButton icon/successIcon |
+| **外置配件槽位** | `singleLine` 支持 `as="leading"`；全部变体支持 `as="trailing"`；兼容 `data-as="copy-icon"`, `data-as="copied-icon"`, `data-as="expand-icon"`, `data-as="collapse-icon"`，前两者映射到 CopyButton icon/successIcon |
 | **Frame 透传** | `class`, `style`, `...rest` |
 
 ---
@@ -35,6 +35,7 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 |:---|:---|:---|:---|
+| `variant` | `"default" \| "singleLine"` | `"default"` | `singleLine` 使用 Input 同类 Leading / Content / Trailing 三槽布局；固定为单行展示，不生成高度拖拽、语言、行号、全屏或纵向滚动结构 |
 | `code` | `string` | `""` | 要显示的代码字符串 |
 | `language` | `string` | — | 语言标识，显示在工具栏（如 `"tsx"`, `"css"`） |
 | `showLanguage` | `boolean` | `true` | 是否显示语言标识 |
@@ -45,6 +46,37 @@
 | `copyTimeout` | `number` | `2000` | 复制成功图标（Check）的停留时长（ms），超时后恢复 Copy 图标 |
 | `children` | `Snippet` | — | 代码内容或附件源；纯文本会作为代码，`as="trailing"` 会替换右侧动作区 |
 | `...rest` | — | — | 透传至根 Frame（class、style、动效关键字等） |
+
+---
+
+## `singleLine` 单行变体
+
+`variant="singleLine"` 面向 import、install command、短配置值等独占一行的只读代码条。它仍使用 `<pre><code>`、内置轻量语法着色和 CopyButton，不改用 Input，也不引入表单语义。
+
+布局参考 Input 的三槽协议：
+
+| 槽位 | 尺寸 | 内容 |
+|:---|:---|:---|
+| Leading | Hug | 可选外置 `as="leading"` 配件 |
+| Content | Fill / `min-width: 0` | 单行高亮代码；超宽时仅横向滚动 |
+| Trailing | Hug | 外置 `as="trailing"`，否则为默认内置 CopyButton |
+
+单行态固定隐藏语言、行号和全屏按钮；`visibleLines`、`showLanguage`、`showLineNumbers`、`showExpandButton` 在该变体中不产生对应结构。根层不生成 Indicator，不接受拖拽高度，也不创建纵向 scrollbar / fade。默认 padding 与 Input 标准态一致：上下 `--padding-3`（12px）、左右 `--padding-4`（16px）；gap 为 `--gap-2`（8px），圆角为 `--radius-4`（16px）。
+
+```svelte
+<CodeBlock
+    variant="singleLine"
+    code="import { Button } from '@snowui-design-system/components';"
+/>
+```
+
+需要 Leading 配件时：
+
+```svelte
+<CodeBlock variant="singleLine" code="pnpm add @snowui-design-system/components">
+    <Icon as="leading"><Package /></Icon>
+</CodeBlock>
+```
 
 ---
 
@@ -149,7 +181,7 @@ CodeBlock 只声明轨道定位，滚动条尺寸、显隐、hover 形态与鼠�
 
 | Frame 能力 | 接入层 | 说明 |
 |:---|:---|:---|
-| 普通 Frame | 根 Frame | 容器不触发默认 hover 动效 |
+| 普通 Frame | 根 Frame | 容器不触发默认 hover 动效；`singleLine` 固定启用 row + Auto Layout 三槽协议 |
 | `enableResponsive` | 根 Frame | 默认 `false`（代码块本身不需要容器断点响应） |
 | `enableContext` | 根 Frame | 默认 `false` |
 | `enableScaleObserver` | 根 Frame | 默认 `false` |
@@ -222,7 +254,7 @@ pnpm build`}
 
 ## 布局模型
 
-主布局模型：**复合管理布局**（参见 [LayoutProtocol.md §12.6](../../../specs/LayoutProtocol.md)）
+默认态主布局模型：**复合管理布局**（参见 [LayoutProtocol.md §12.6](../../../specs/LayoutProtocol.md)）。`singleLine` 改用**槽位宿主布局**，根层直接管理 Leading / Content / Trailing，且不生成下列默认态的滚动、全屏与 resize 子树。
 
 组件内部包含：
 - 工具栏区域（固定在顶部，不随代码滚动）
@@ -235,6 +267,8 @@ pnpm build`}
 
 | 日期 | 版本 | 说明 |
 |:---|:---|:---|
+| 2026-08-12 | v1.6.1 | `singleLine` 的 padding、gap 与圆角对齐 Input 标准态：上下 12px、左右 16px、gap 8px、圆角 16px |
+| 2026-08-12 | v1.6.0 | 新增 `variant="singleLine"`；参考 Input 实现 Leading / Content / Trailing 三槽布局，保留高亮与复制，移除语言、行号、全屏、纵向滚动及高度拖拽结构 |
 | 2026-08-09 | v1.5.1 | Button bare 默认改为 100% 后，内置复制 / 放大操作显式使用 `emphasis="muted"` 保留原 40% → hover 100% 的次级操作视觉 |
 | 2026-07-30 | v1.5.0 | 全屏展开/收起改用共享元素 `layout` 策略，实际过渡位置与尺寸，代码字形不参与缩放；普通态与全屏态统一遵循 `showLineNumbers`，消除退出末帧横向突变 |
 | 2026-07-08 | v1.4.7 | 顶部操作按钮容器的 `pin-top-right` 偏移从 `--padding-2`（8px）调整为 `--padding-3`（12px），普通态与全屏态保持一致 |
