@@ -34,6 +34,8 @@ jobs:
         run: pnpm verify:styles
       - name: Check OSS boundary
         run: pnpm check:oss
+      - name: Check component catalog
+        run: pnpm catalog:check
       - name: Build components
         run: pnpm build
       - name: Verify npm package contents

@@ -20,6 +20,7 @@
     "./logic/*": "./src/logic/*.ts",
     "./motion/*.css": "./src/motion/*.css",
     "./motion/*": "./src/motion/*.ts",
+    "./component-catalog.json": "./component-catalog.json",
     "./styles": "./src/styles/index.css",
     "./styles/*": "./src/styles/*"
   },
@@ -28,6 +29,7 @@
     "!src/demo",
     "!src/playground",
     "!src/test",
+    "component-catalog.json",
     "README.md"
   ],
   "scripts": {
@@ -37,6 +39,8 @@
     "check:standards": "node ../scripts/check-standards.js",
     "fix:standards": "node ../scripts/check-standards.js --fix",
     "check:oss": "node scripts/check-oss-deps.mjs",
+    "catalog:generate": "node scripts/generate-component-catalog.mjs",
+    "catalog:check": "node scripts/generate-component-catalog.mjs --check",
     "verify:styles": "node scripts/verify-styles.mjs"
   },
   "peerDependencies": {

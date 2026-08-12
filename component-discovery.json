@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "components": {
+    "Button": {
+      "intents": ["触发操作", "默认按钮", "图标按钮", "无背景按钮"],
+      "aliases": ["按钮默认样式", "Icon 按钮", "只有图标的按钮", "bare并有hover", "bare 并有 hover", "bare 按钮要有 hover"],
+      "whenToUse": "触发即时操作；bare 且需要透明度 hover 时使用 emphasis=muted。",
+      "avoidWhen": "互斥参数选择使用 Segmented；内容面板切换使用 Tab。",
+      "related": ["ButtonGroup", "OverflowActions", "SelectButton"]
+    },
+    "ButtonGroup": {
+      "intents": ["按钮组合", "相邻操作组"],
+      "aliases": ["一组按钮", "按钮之间带分隔"],
+      "related": ["Button", "Separator"]
+    },
+    "OverflowActions": {
+      "intents": ["响应式操作集合", "操作溢出", "更多菜单"],
+      "aliases": ["宽度变窄时逐个隐藏", "从左边开始逐个隐藏", "放不下时收进 More"],
+      "whenToUse": "一组操作需要从完整态退化为 icon-only，并把剩余操作逐项或全部转入 More。",
+      "related": ["OverflowAction", "Separator", "SelectButton"]
+    },
+    "Separator": {
+      "intents": ["区域分割", "横向分割线", "纵向分割线"],
+      "aliases": ["分割线", "竖向分隔线", "横线"],
+      "avoidWhen": "图表坐标线、网格线和路径不使用 Separator。"
+    },
+    "ColorSchemeButton": {
+      "intents": ["明暗模式切换", "主题方案切换"],
+      "aliases": ["明暗切换按钮", "主题按钮", "ThemeButton"],
+      "related": ["Button", "StyleButton"]
+    },
+    "CopyButton": {
+      "intents": ["复制内容", "复制代码"],
+      "aliases": ["复制按钮", "复制代码按钮"],
+      "related": ["Button", "CodeBlock"]
+    },
+    "ExpandButton": {
+      "intents": ["展开内容", "全屏预览"],
+      "aliases": ["展开按钮", "全屏按钮"],
+      "related": ["Button", "CodeBlock"]
+    },
+    "SelectButton": {
+      "intents": ["按钮触发选择菜单", "按钮触发命令菜单"],
+      "aliases": ["下拉按钮", "带菜单的按钮"],
+      "related": ["Button", "Listbox", "MenuItem"]
+    },
+    "SearchInput": {
+      "intents": ["搜索输入", "可折叠搜索框"],
+      "aliases": ["搜索输入框", "窄屏只显示搜索图标"],
+      "related": ["Input"]
+    },
+    "CodeBlock": {
+      "intents": ["代码展示", "代码复制", "代码展开"],
+      "aliases": ["代码块", "单行代码条"],
+      "related": ["CopyButton", "ExpandButton"]
+    },
+    "ThemeButton": {
+      "deprecated": true,
+      "canonical": "ColorSchemeButton",
+      "aliases": ["旧主题按钮"]
+    }
+  }
+}
