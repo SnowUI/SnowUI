@@ -53,6 +53,9 @@ jobs:
       - name: Check package
         run: pnpm check
 
+      - name: Check component catalog
+        run: pnpm catalog:check
+
       - name: Inspect package contents
         run: pnpm pack:check
 

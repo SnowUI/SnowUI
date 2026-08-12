@@ -1,0 +1,570 @@
+{
+  "schemaVersion": 1,
+  "package": "@snowui/components-pro",
+  "generatedFrom": [
+    "src/index.ts",
+    "src/blocks/index.ts",
+    "src/components/*.md",
+    "src/blocks/*.md",
+    "component-discovery.json"
+  ],
+  "components": [
+    {
+      "name": "BarChart",
+      "canonical": "BarChart",
+      "package": "@snowui/components-pro",
+      "import": "import { BarChart } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/BarChart.svelte",
+      "documentation": "src/components/BarChart.md",
+      "description": "渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "ChartGroup",
+      "canonical": "ChartGroup",
+      "package": "@snowui/components-pro",
+      "import": "import { ChartGroup } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/ChartGroup.svelte",
+      "documentation": "src/components/ChartGroup.md",
+      "description": "承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "CircularChart",
+      "canonical": "CircularChart",
+      "package": "@snowui/components-pro",
+      "import": "import { CircularChart } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/CircularChart.svelte",
+      "documentation": "src/components/CircularChart.md",
+      "description": "渲染可调圆角、环厚、隔断、整体尺寸的圆环/饼形比例图。Hover 动效参考 Apache ECharts pie-borderRadius 示例的强调反馈，并按 SnowUI 规范改为外侧增厚。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "DataTable",
+      "canonical": "DataTable",
+      "package": "@snowui/components-pro",
+      "import": "import { DataTable } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/DataTable.svelte",
+      "documentation": "src/components/DataTable.md",
+      "description": "协调查询、排序和分页状态；Toolbar、Table 与 Pagination 由使用方自由组合。",
+      "intents": [
+        "数据表格",
+        "排序分页表格",
+        "带操作的数据列表"
+      ],
+      "aliases": [
+        "高级表格",
+        "数据表"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "TableToolbar",
+        "Table",
+        "SidePanel"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "Field",
+      "canonical": "Field",
+      "package": "@snowui/components-pro",
+      "import": "import { Field } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/Field.svelte",
+      "documentation": "src/components/Field.md",
+      "description": "表单容器组件，负责承接输入框视觉外壳、组合布局、错误提示与角色化插槽协议。",
+      "intents": [
+        "表单字段组合",
+        "标签帮助错误信息"
+      ],
+      "aliases": [
+        "表单项",
+        "带 label 的输入"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "Input",
+        "Textarea",
+        "Select"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "FlowText",
+      "canonical": "FlowText",
+      "package": "@snowui/components-pro",
+      "import": "import { FlowText } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/FlowText.svelte",
+      "documentation": "src/components/FlowText.md",
+      "description": "FlowText 使用统一字符重组运行时显示文字、格式化数字、计时器与倒计时。文字和符号变化使用同一套字符出现 / 消失视觉：字符沿趋势纵向移动一整行，位移使用 900ms number-flow timing；字符变形从位移开始的同一刻触发，默认 100ms linear 到达边缘 scaleY；同时采用 AnimatePresence 的 450ms ease-out opacity。数字替换时，通用字符运行时仍负责 diff / 顺序 / 清理；同位置且相同的字符直接复用，例如保留的千分位逗号不会跟随数字滚动。新增或删除的千分位、小数点、百万分位等分隔符会作为普通字符纵向出现 / 消失。FlowText animator 内部临时渲染 NumberFlow 同款 0-9 连续 wheel，让同一位数字沿连续轨道滚到目标数字。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "Frame",
+      "canonical": "FramePro",
+      "package": "@snowui/components-pro",
+      "import": "import { Frame } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/FramePro.svelte",
+      "documentation": "src/components/FramePro.md",
+      "description": "OSS Frame 的超集。在 OSS Frame 全部能力之上叠加跨组件协调：编排模式、联动控制、样式编排。",
+      "intents": [],
+      "aliases": [
+        "PRO Frame"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "FramePro",
+      "canonical": "FramePro",
+      "package": "@snowui/components-pro",
+      "import": "import { FramePro } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/FramePro.svelte",
+      "documentation": "src/components/FramePro.md",
+      "description": "OSS Frame 的超集。在 OSS Frame 全部能力之上叠加跨组件协调：编排模式、联动控制、样式编排。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "GaugeChart",
+      "canonical": "GaugeChart",
+      "package": "@snowui/components-pro",
+      "import": "import { GaugeChart } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/GaugeChart.svelte",
+      "documentation": "src/components/GaugeChart.md",
+      "description": "渲染可调圆角、环厚、透明间隔、渐变颜色、4% 同色占位层与顺序出现动效的半圆仪表比例图。颜色、几何与出现时间轴能力与 CircularChart 保持同类心智。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "GradientMotion",
+      "canonical": "GradientMotion",
+      "package": "@snowui/components-pro",
+      "import": "import { GradientMotion } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/GradientMotion.svelte",
+      "documentation": "src/components/GradientMotion.md",
+      "description": "按 glimm.dev / glimm@0.1.4 还原 shader sweep 渐变效果，可作为可裁切媒体面、头像默认图或背景扫光层使用。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "ImageViewer",
+      "canonical": "ImageViewer",
+      "package": "@snowui/components-pro",
+      "import": "import { ImageViewer } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/ImageViewer.svelte",
+      "documentation": "src/components/ImageViewer.md",
+      "description": "页面级媒体预览组件，负责显示当前图片/视频与组合式控制按钮。",
+      "intents": [
+        "图片预览",
+        "图片全屏查看",
+        "图片组导航"
+      ],
+      "aliases": [
+        "图片查看器",
+        "灯箱"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "Image",
+        "ImageGroup"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "LineChart",
+      "canonical": "LineChart",
+      "package": "@snowui/components-pro",
+      "import": "import { LineChart } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/LineChart.svelte",
+      "documentation": "src/components/LineChart.md",
+      "description": "渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "NumberFlow",
+      "canonical": "NumberFlow",
+      "package": "@snowui/components-pro",
+      "import": "import { NumberFlow } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/NumberFlow.svelte",
+      "documentation": "src/components/NumericText.md",
+      "description": "NumericText 提供 SwiftUI numericText 风格的单行文字 / 数字差异过渡，只动画发生变化的中间区间。",
+      "intents": [
+        "数字滚动",
+        "数值变化动画"
+      ],
+      "aliases": [
+        "数字流动",
+        "数字滚轮动画"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "NumericText"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "NumericText",
+      "canonical": "NumericText",
+      "package": "@snowui/components-pro",
+      "import": "import { NumericText } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/NumericText.svelte",
+      "documentation": "src/components/NumericText.md",
+      "description": "NumericText 提供 SwiftUI numericText 风格的单行文字 / 数字差异过渡，只动画发生变化的中间区间。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "ScrambleText",
+      "canonical": "ScrambleText",
+      "package": "@snowui/components-pro",
+      "import": "import { ScrambleText } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/ScrambleText.svelte",
+      "documentation": "src/components/ScrambleText.md",
+      "description": "ScrambleText 提供字符扰动、循环并归位到目标文字的动效。默认使用 cascade，动效速度和字符错峰由组件内部统一维护。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "SearchBox",
+      "canonical": "SearchBox",
+      "package": "@snowui/components-pro",
+      "import": "import { SearchBox } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/SearchBox.svelte",
+      "documentation": "src/components/SearchBox.md",
+      "description": "提供 PRO 搜索入口触发器；点击整个搜索框打开搜索浮层。",
+      "intents": [
+        "站点搜索",
+        "带快捷键的搜索框",
+        "响应式搜索框"
+      ],
+      "aliases": [
+        "顶部搜索",
+        "窄屏搜索按钮"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "SearchInput"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "Segmented",
+      "canonical": "Segmented",
+      "package": "@snowui/components-pro",
+      "import": "import { Segmented } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/Segmented.svelte",
+      "documentation": "src/components/Segmented.md",
+      "description": "RadioGroup 的视觉变体,在多个互斥选项之间切换\"过滤器/参数\"。视觉系统",
+      "intents": [
+        "互斥参数选择",
+        "过滤器单选",
+        "响应式节点选择"
+      ],
+      "aliases": [
+        "节点选择",
+        "Mobile Tablet Desktop 选择",
+        "分段选择器"
+      ],
+      "whenToUse": "多个互斥参数或过滤器之间单选，使用 radiogroup 语义。",
+      "avoidWhen": "切换内容面板时使用 Tab。",
+      "related": [
+        "Tab",
+        "Button"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "Sidebar",
+      "canonical": "Sidebar",
+      "package": "@snowui/components-pro",
+      "import": "import { Sidebar } from '@snowui/components-pro';",
+      "tier": "pro-block",
+      "kind": "block",
+      "source": "src/blocks/Sidebar.svelte",
+      "documentation": "src/blocks/Sidebar.md",
+      "description": "提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。",
+      "intents": [
+        "文档侧边导航",
+        "可折叠侧栏",
+        "可调宽侧栏"
+      ],
+      "aliases": [
+        "左侧导航",
+        "侧边栏"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "SidebarSection",
+        "SidebarItem"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "SidebarItem",
+      "canonical": "SidebarItem",
+      "package": "@snowui/components-pro",
+      "import": "import { SidebarItem } from '@snowui/components-pro';",
+      "tier": "pro-block",
+      "kind": "block",
+      "source": "src/blocks/SidebarItem.svelte",
+      "documentation": "src/blocks/SidebarItem.md",
+      "description": "Sidebar 普通导航项，支持 active、状态标签、更新 Badge、leading icon 与可选操作区。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "SidebarSection",
+      "canonical": "SidebarSection",
+      "package": "@snowui/components-pro",
+      "import": "import { SidebarSection } from '@snowui/components-pro';",
+      "tier": "pro-block",
+      "kind": "block",
+      "source": "src/blocks/SidebarSection.svelte",
+      "documentation": "src/blocks/SidebarSection.md",
+      "description": "Sidebar 分类块，内置分类标题、展开/收起按钮与可选操作区。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "SidePanel",
+      "canonical": "SidePanel",
+      "package": "@snowui/components-pro",
+      "import": "import { SidePanel } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/SidePanel.svelte",
+      "documentation": "src/components/SidePanel.md",
+      "description": "右侧详情弹出窗，支持浮层与页面右侧内嵌两种预览形态。",
+      "intents": [
+        "侧边详情面板",
+        "行预览面板",
+        "浮动编辑面板"
+      ],
+      "aliases": [
+        "右侧面板",
+        "详情抽屉"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "DataTable"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "SlotText",
+      "canonical": "SlotText",
+      "package": "@snowui/components-pro",
+      "import": "import { SlotText } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/SlotText.svelte",
+      "documentation": "src/components/SlotText.md",
+      "description": "SlotText 为逐字符纵向槽位滚动文字。动效时序由组件内部维护，不提供时长、错峰、弹性或缓动调参。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "SplitText",
+      "canonical": "SplitText",
+      "package": "@snowui/components-pro",
+      "import": "import { SplitText } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/motion/SplitText.svelte",
+      "documentation": "src/motion/SplitText.md",
+      "description": "文字拆分工具，只负责拆分，编排和动效由 Motion 系统控制。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "Tab",
+      "canonical": "Tab",
+      "package": "@snowui/components-pro",
+      "import": "import { Tab } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/Tab.svelte",
+      "documentation": "src/components/Tab.md",
+      "description": "在多个互斥选项之间切换\"视图/内容区\"。子项使用 Button,激活态视觉",
+      "intents": [
+        "内容面板切换",
+        "视图切换"
+      ],
+      "aliases": [
+        "Tab 切换",
+        "Preview Code 切换",
+        "标签页"
+      ],
+      "whenToUse": "选项对应不同内容区域或视图。",
+      "avoidWhen": "只改变参数或过滤器时使用 Segmented。",
+      "related": [
+        "Segmented",
+        "Button"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "TableToolbar",
+      "canonical": "TableToolbar",
+      "package": "@snowui/components-pro",
+      "import": "import { TableToolbar } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/TableToolbar.svelte",
+      "documentation": "src/components/TableToolbar.md",
+      "description": "DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批量操作。它读取 DataTable Context，不支持独立搭配普通 Table。公开入口为 @snowui/components-pro。",
+      "intents": [
+        "表格工具栏",
+        "表格搜索筛选操作"
+      ],
+      "aliases": [
+        "Table 顶部操作区"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "DataTable",
+        "OverflowActions"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "Toast",
+      "canonical": "Toast",
+      "package": "@snowui/components-pro",
+      "import": "import { Toast } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/Toast.svelte",
+      "documentation": "src/components/Toast.md",
+      "description": "全局浮层通知，支持命令式 API、6 位置堆叠、内置/外置图标三槽位与 rich 富文本变体",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "Toaster",
+      "canonical": "Toaster",
+      "package": "@snowui/components-pro",
+      "import": "import { Toaster } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/Toaster.svelte",
+      "documentation": "src/components/Toaster.md",
+      "description": "<Toaster",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    }
+  ]
+}
