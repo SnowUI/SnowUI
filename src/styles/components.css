@@ -2,10 +2,10 @@
  * SnowUI Components Styles — 外部样式覆盖入口
  *
  * 外部覆盖意义：
- *   本文件与 specs/ComponentStyleSheet.md（表 3）共同构成「外部样式覆盖体系」。
+ *   本文件与 specs/ComponentStyleSheet.md §3 共同构成「外部样式覆盖体系」。
  *   用户无需修改任何组件源文件，只需取消对应注释并赋值，即可覆盖单一组件的局部样式。
- *   · 变量名的权威来源 → specs/ComponentStyleSheet.md 表3（覆盖入口表）
- *   · 变量含义与默认值 → 本文件各组件注释段
+ *   · 变量名的权威来源 → 运行时代码实际消费的 --snowui-*-override；ComponentStyleSheet §3 为生成索引
+ *   · 变量含义与默认值 → 对应组件源码与公开组件文档；本文件注释用于发现和快速参考
  *
  * 用法：
  *   在引入 SnowUI 样式后引入此文件，取消注释需要修改的变量并设置新值。
@@ -14,13 +14,11 @@
  *   - 注释中括号内为该属性的默认值，仅供参考。
  *
  * ⚠️ 仓库内维护者注意（最终用户可忽略此段）:
- *   本文件是 specs/GUIDELINES.md §3.8「默认值三处同步原则」的第 3 处。
- *   当组件 .svelte 源码修改了 `var(--snowui-xxx-override, var(--snowui-xxx, token))`
- *   中的 token 默认值，或新增 / 删除 override 变量时，必须同步以下两处：
- *   1. 本文件对应注释里的"默认 Npx"标注（第 3 处）；
- *   2. specs/ComponentStyleSheet.md 的 token 列与表3 覆盖入口列（第 2 处）。
- *   完整链路：创建/修改组件 → 更新 ComponentStyleSheet.md 表3 → 在本文件对应组件段落添加注释行。
- *   详见 specs/GUIDELINES.md §3.8、specs/ComponentGuidelines.md §3.8。
+ *   当组件源码新增、改名或删除 override，或改变其默认值时：
+ *   1. 同步对应组件公开文档与本文件的名称 / 快速参考；
+ *   2. 在 specs/ 执行 `node scripts/generate-spec-index.mjs` 刷新 ComponentStyleSheet §3；
+ *   3. 在工作区根执行 `node scripts/check-standards.js`，双向核对运行时名称、生成索引和本文件注释入口。
+ *   详见 specs/StyleSpec.md §2.3.1、§2.9.2 与 specs/ComponentStyleSheet.md §1。
  */
 
 :root {
@@ -432,7 +430,7 @@
 
     /* ─────────────────────────────────────────
        补充覆盖入口（尺寸 / 背景 / 边框 / 动效 / 状态等）
-       与 specs/ComponentStyleSheet.md 表 3.1 一一对应。
+       名称由运行时代码决定，并生成到 specs/ComponentStyleSheet.md §3。
        具体默认值见对应组件 .svelte 源码。
     ───────────────────────────────────────── */
 
@@ -721,7 +719,7 @@
 
     /* ─────────────────────────────────────────
        共享 X 清除/关闭图标按钮基类（.snowui-clear-icon-btn）
-       被 Input / SearchBox / Toast 共用；改这里全局生效。
+       被 Input / Tag / MenuItem / SearchBox / Toast 共用；改这里全局生效。
        规范：specs/StyleSpec.md §2.6.3 第 5 类
     ───────────────────────────────────────── */
     /* --snowui-clear-icon-size-override: ; */            /* 尺寸（默认 var(--size-4) = 16px） */
@@ -752,7 +750,7 @@
 
     /* ─────────────────────────────────────────
        排版核心覆盖入口（font-size / line-height / color / radius）
-       与表 3 一一对应，按组件登记。具体默认值见组件 .svelte 源码。
+       按组件登记；名称索引见 ComponentStyleSheet §3，具体默认值见组件源码与公开文档。
     ───────────────────────────────────────── */
 
     /* Badge */
@@ -823,7 +821,7 @@
     /* --snowui-table-role-overlay-blur-md-override: ; */ /* default: .25rem */
     /* --snowui-table-role-overlay-blur-lg-override: ; */ /* default: .875rem */
     /* --snowui-table-role-overlay-tint-override: ; */ /* default: --background-1 */
-    /* --snowui-table-role-overlay-tint-opacity-override: ; */ /* default: .1% */
+    /* --snowui-table-role-overlay-tint-opacity-override: ; */ /* default: 0% */
     /* --snowui-table-row-hover-background-override: ; */ /* 连续 hover 移动层 + TableRow active 持久背景；default: --black-4 */
     /* --snowui-table-row-radius-override: ; */ /* default: --radius-3 */
     /* --snowui-table-body-skeleton-width-override: ; */ /* default: 54%–76% staggered by row and column */
