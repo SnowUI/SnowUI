@@ -72,6 +72,17 @@
         table.isDataTable() && actionsEnabled && resolvedRoleLayout === "overlay",
     );
     const width = $derived(resolvedColumnId ? table.getColumnWidth(resolvedColumnId) : undefined);
+    const resolvedMinWidth = $derived(isActionsRole ? table.getActionsMinWidth() : minWidth);
+    const resolvedMaxWidth = $derived(isActionsRole ? table.getActionsMaxWidth() : maxWidth);
+    const isResizeEnabled = $derived(
+        canResize
+        && !!resolvedColumnId
+        && !isSelectionRole
+        && (!isActionsRole || (
+            table.isActionsResizable()
+            && resolvedRoleLayout === "column"
+        )),
+    );
     const sort = $derived(table.getSort());
     const selectionState = $derived(table.getSelectionState());
     const contextDefaultSort = $derived(table.getDefaultSort());
@@ -98,7 +109,12 @@
         ...(Array.isArray(userActions) ? userActions : []),
         columnScope,
     ]);
-    const finalStyle = $derived(`${width ? `--snowui-table-head-width-runtime:${width}px;width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));min-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));max-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime))` : ""};text-align:${align};${userStyle}`);
+    const runtimeWidth = $derived(
+        (isSelectionRole || isActionsRole) && resolvedRoleLayout === "overlay"
+            ? undefined
+            : width,
+    );
+    const finalStyle = $derived(`${runtimeWidth ? `--snowui-table-head-width-runtime:${runtimeWidth}px;width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));min-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));max-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime))` : ""};${hasActionsOverlay ? `--snowui-table-role-overlay-width-override:${width ?? table.getActionsColumnWidth()}px;` : ""}text-align:${align};${userStyle}`);
     $effect(() => {
         const declaredDefaultSort = defaultSort;
         const declaredColumnId = columnId;
@@ -187,13 +203,13 @@
             </span>
         {/if}
     {/if}
-    {#if canResize && resolvedColumnId && !isSelectionRole && !isActionsRole}
+    {#if isResizeEnabled && resolvedColumnId}
         <Indicator
             class="snowui-table-head-indicator"
             axis="width"
             value={width}
-            minSize={minWidth}
-            maxSize={maxWidth}
+            minSize={resolvedMinWidth}
+            maxSize={resolvedMaxWidth}
             applySize={false}
             ariaLabel={`调整 ${resolvedColumnId} 列宽`}
             onSizeChange={(next) => table.setColumnWidth(resolvedColumnId, next)}

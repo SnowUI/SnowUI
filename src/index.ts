@@ -18,6 +18,15 @@ export type { ColorScheme as ThemeButtonTheme } from "./components/ColorSchemeBu
 export { default as StyleButton } from "./components/StyleButton.svelte";
 export type { SnowUIStyleMode } from "./components/StyleButton.svelte";
 export { default as ButtonGroup } from "./components/ButtonGroup.svelte";
+export { default as OverflowActions } from "./components/OverflowActions.svelte";
+export type {
+    OverflowActionsActionEvent,
+    OverflowActionsActionItem,
+    OverflowActionsItem,
+    OverflowActionsSeparatorItem,
+} from "./components/OverflowActions.svelte";
+export { default as OverflowAction } from "./components/OverflowAction.svelte";
+export type { OverflowActionIcon } from "./logic/overflow-actions.svelte";
 export { default as Breadcrumb } from "./components/Breadcrumb.svelte";
 export type { BreadcrumbItem } from "./components/Breadcrumb.svelte";
 export { default as Card } from "./components/Card.svelte";

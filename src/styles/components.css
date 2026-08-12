@@ -181,6 +181,15 @@
 
 
     /* ─────────────────────────────────────────
+       OverflowActions
+       单行操作集合 gap=8px；Separator 默认长度=12px。
+       Button 与 More 视觉继续由 Button / SelectButton override 管理。
+    ───────────────────────────────────────── */
+    /* --snowui-overflow-actions-gap-override: ; */       /* Action / Separator / More 间距（默认 var(--gap-2) = 8px） */
+    /* --snowui-overflow-actions-separator-length: ; */   /* 可见纵向 Separator 长度（默认 var(--size-3) = 12px） */
+
+
+    /* ─────────────────────────────────────────
        Breadcrumb
        root gap: row=4px column=4px
        separator: font=14px/20px color=black/10%

@@ -14,6 +14,7 @@
     import Tooltip from "./Tooltip.svelte";
     import Checkbox from "./Checkbox.svelte";
     import Skeleton from "./Skeleton.svelte";
+    import OverflowActions from "./OverflowActions.svelte";
     import { resizeManager } from "../logic/observer.svelte";
     import { getTableContext, type TableRoleLayout } from "../lib/table-context.svelte";
     import { getTableRowContext } from "../lib/table-row-context.svelte";
@@ -73,6 +74,12 @@
         table.isDataTable() && actionsEnabled && resolvedRoleLayout === "overlay",
     );
     const width = $derived(resolvedColumnId ? table.getColumnWidth(resolvedColumnId) : undefined);
+    const defaultActions = $derived(
+        isActionsRole && rowId !== undefined ? table.getRowActions(rowId) : [],
+    );
+    const actionsAvailableWidth = $derived(
+        Math.max(0, (width ?? table.getActionsColumnWidth()) - 24),
+    );
     const resolvedLines = $derived(skeleton || isSelectionRole || isActionsRole || lines === false ? undefined : lines);
     const contextRowAppearMotion = $derived(
         !skeleton && !isSelectionRole && !isActionsRole && rowId !== undefined
@@ -225,14 +232,19 @@
             reset();
         };
     });
-    const finalStyle = $derived(`${width ? `--snowui-table-cell-width-runtime:${width}px;width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime));min-width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime));max-width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime))` : ""};text-align:${align};${userStyle}`);
+    const runtimeWidth = $derived(
+        (isSelectionRole || isActionsRole) && resolvedRoleLayout === "overlay"
+            ? undefined
+            : width,
+    );
+    const finalStyle = $derived(`${runtimeWidth ? `--snowui-table-cell-width-runtime:${runtimeWidth}px;width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime));min-width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime));max-width:var(--snowui-table-cell-width-override,var(--snowui-table-cell-width-runtime))` : ""};text-align:${align};${userStyle}`);
     // actions 的遮罩依赖每行实测后写入的宽度变量，必须在内容单元格自身计算。
     // 若把这条表达式定义在 Table 根上，根节点无法读取后代行上的变量，整条 mask 会失效。
     const contentStyle = $derived(
         `${gap === undefined
             ? ""
             : `gap:${typeof gap === "number" ? `var(--gap-${gap}, calc(var(--gap-1) * ${gap}))` : gap};`}` +
-        `${hasActionsOverlay ? `--snowui-table-cell-actions-fade-mask:${actionsFadeMask};` : ""}`,
+        `${hasActionsOverlay ? `--snowui-table-cell-actions-fade-mask:${actionsFadeMask};--snowui-table-role-overlay-width-override:${width ?? table.getActionsColumnWidth()}px;` : ""}`,
     );
     const selectionBlur = $derived(getTableRoleBlurStyles(table, "left-to-right"));
     const actionsBlur = $derived(getTableRoleBlurStyles(table, "right-to-left"));
@@ -290,7 +302,22 @@
                     <span style={layer.style}></span>
                 {/each}
             </span>
-        <span class="snowui-table-role-overlay-controls">{#if children}{@render children()}{/if}</span>
+        <span class="snowui-table-role-overlay-controls">{#if children}
+            {@render children()}
+        {:else if rowId !== undefined && defaultActions.length > 0}
+            <OverflowActions
+                items={defaultActions}
+                compact={table.getActionsCompact()}
+                overflow={table.getActionsOverflow()}
+                overflowFrom={table.getActionsOverflowFrom()}
+                availableWidth={actionsAvailableWidth}
+                onAction={({ id, item }) => table.runRowAction({
+                    rowId,
+                    actionId: id,
+                    item,
+                })}
+            />
+        {/if}</span>
     </span>
     {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : undefined} data-lines={resolvedLines} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
         {#if children}{@render children()}{/if}
@@ -332,7 +359,7 @@
     :global(:where(.snowui-table-cell-content[data-actions="true"])) { opacity: 0; pointer-events: none; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
     :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-as="selection"] .snowui-table-selection-control),
     :global(:where(.snowui-table-cell[data-as="selection"] .snowui-table-selection-control[data-selected="true"])) { opacity: 1; pointer-events: auto; }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"]) .snowui-table-cell:not([data-role-layout="overlay"]) .snowui-table-cell-content[data-actions="true"]) { opacity: 1; pointer-events: auto; }
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell:not([data-role-layout="overlay"]) .snowui-table-cell-content[data-actions="true"]) { opacity: 1; pointer-events: auto; }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="selection"])),
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="actions"])) { position: sticky; width: 0; min-width: 0; max-width: 0; padding: 0; overflow: visible; background: transparent; z-index: 3; }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="selection"])) { left: 0; }
@@ -364,7 +391,7 @@
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"]) > :not(.snowui-table-role-blur-layer)) { opacity: 0; pointer-events: none; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
     :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control > :not(.snowui-table-role-blur-layer)),
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control[data-selected="true"]) > :not(.snowui-table-role-blur-layer)),
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"]) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"] > :not(.snowui-table-role-blur-layer)) { opacity: 1; pointer-events: auto; }
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"] > :not(.snowui-table-role-blur-layer)) { opacity: 1; pointer-events: auto; }
     :global(:where(.snowui-table-cell[data-table-variant="striped"])) { border-bottom-color: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row:nth-child(odd)) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, var(--surface-3, #f7f7f7)); }
     :global(:where(.snowui-table-body .snowui-table-row:nth-child(even)) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, transparent); }

@@ -2,6 +2,7 @@ import { getContext, setContext } from "svelte";
 import type { ResourceSize } from "../context";
 import type { MotionConfig } from "../logic/motion-config";
 import type { TableTruncationResult } from "./table-truncation";
+import type { OverflowActionsItem } from "../components/OverflowActions.svelte";
 
 export type TableSortDirection = "ascending" | "descending";
 export type TableRoleLayout = "column" | "overlay";
@@ -24,6 +25,12 @@ export interface TableSelectionController {
     clearSelection: () => void;
 }
 
+export interface TableActionsActionEvent {
+    rowId: string | number;
+    actionId: string;
+    item?: Exclude<OverflowActionsItem, { type: "separator" }>;
+}
+
 export interface TableContext {
     isDataTable: () => boolean;
     getColumnWidth: (columnId: string) => number | undefined;
@@ -39,6 +46,15 @@ export interface TableContext {
     isSelectionEnabled: () => boolean;
     /** DataTable 是否显示操作按钮列；非 DataTable 时无意义 */
     isActionsEnabled: () => boolean;
+    getRowActions: (rowId: string | number) => OverflowActionsItem[];
+    runRowAction: (event: TableActionsActionEvent) => void;
+    getActionsCompact: () => "auto" | "none";
+    getActionsOverflow: () => "all" | "progressive";
+    getActionsOverflowFrom: () => "start" | "end";
+    getActionsColumnWidth: () => number;
+    getActionsMinWidth: () => number;
+    getActionsMaxWidth: () => number;
+    isActionsResizable: () => boolean;
     registerDefaultSort: (columnId: string, direction: TableSortDirection, active: boolean) => () => void;
     isSortable: (columnId: string) => boolean;
     toggleSort: (columnId: string) => void;
@@ -97,6 +113,15 @@ const fallback: TableContext = {
     getRoleOverlayUniformFeather: () => 0.3,
     isSelectionEnabled: () => true,
     isActionsEnabled: () => true,
+    getRowActions: () => [],
+    runRowAction: () => {},
+    getActionsCompact: () => "auto",
+    getActionsOverflow: () => "all",
+    getActionsOverflowFrom: () => "end",
+    getActionsColumnWidth: () => 160,
+    getActionsMinWidth: () => 40,
+    getActionsMaxWidth: () => 320,
+    isActionsResizable: () => false,
     registerDefaultSort: () => () => {},
     isSortable: () => false,
     toggleSort: () => {},

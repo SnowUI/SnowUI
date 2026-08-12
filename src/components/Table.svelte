@@ -42,7 +42,10 @@
     const truncationManager = new TableTruncationManager();
 
     provideTableContext({
-        getColumnWidth: (columnId) => columnWidths[columnId] ?? autoLockedColumnWidths[columnId],
+        getColumnWidth: (columnId) =>
+            columnWidths[columnId]
+            ?? autoLockedColumnWidths[columnId]
+            ?? parentTable.getColumnWidth(columnId),
         setColumnWidth: (columnId, width) => {
             columnWidths = { ...columnWidths, [columnId]: Math.round(width) };
             onColumnWidthsChange?.(columnWidths);
