@@ -50,7 +50,7 @@ gap 归属：Root FramePro 统一控制直系区域间距，默认为 `var(--gap
 | variant | `striped \| divided` | `divided` | 行视觉；斑马纹或分割线 |
 | selectedRowIds | `(string \| number)[]`（bindable） | `[]` | 已选行 id；选择状态由 DataTable 持有 |
 | selection | `boolean` | `false` | 是否显示 checkbox 选择列；为 false 时 `as="selection"` 的 Head/Cell 不渲染 |
-| actions | `boolean` | `false` | 是否显示操作按钮列；为 false 时 `as="actions"` 的 Head/Cell 不渲染 |
+| actions | `boolean \| DataTableActionsConfig<T>` | `false` | 是否显示操作列；配置对象会在空 actions Cell 中默认生成 OverflowActions |
 | roleLayout | `column \| overlay` | `column` | checkbox / actions 角色列布局（仅在对应列开启时生效） |
 | roleOverlayLayers | `number` | `4` | overlay 渐进模糊层数 |
 | roleOverlayBlurMode | `progressive \| uniform` | `progressive` | overlay 模糊算法 |
@@ -102,6 +102,35 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 <!-- 只要操作列 -->
 <DataTable actions {rows}>…</DataTable>
 ```
+
+`actions={true}` 保留原有显式组合：业务仍可在每个 `<TableCell as="actions">` 中自行书写按钮。传入配置对象时，未声明 children 的 actions Cell 默认使用 `OverflowActions`；显式 children 始终替换默认内容。
+
+```svelte
+<DataTable
+    {rows}
+    rowKey={(row) => row.id}
+    actions={{
+        items: (row) => [
+            { id: "edit", label: "编辑", icon: "pencil-simple" },
+            { type: "separator", id: "danger" },
+            { id: "delete", label: "删除", icon: "trash", disabled: !row.canDelete },
+        ],
+        overflow: "progressive",
+        overflowFrom: "end",
+        width: 120,
+        minWidth: 40,
+        maxWidth: 240,
+        resizable: true,
+        onAction: ({ row, actionId }) => runRowAction(row, actionId),
+    }}
+>
+    ...
+</DataTable>
+```
+
+配置模式的默认列宽为 160px；`compact="auto"`、`overflow="all"`、`overflowFrom="end"`。`resizable` 默认 false；仅 `roleLayout="column"` 支持 actions 列拖动，overlay 模式始终不提供列宽 Indicator。拖动结果由 Table 的 `columnWidths.__actions` 接管并实时下发到各行；每个 OverflowActions 接收数值 `availableWidth`，不会为每个 Cell 新建尺寸观察器。overlay 模式使用同一 actions 宽度作为浮层宽度。
+
+当 More 菜单展开时，当前响应式分配被冻结，行 hover 显隐规则也把打开的 SelectButton 视为保持可见，避免列宽或指针离开行后触发器消失。Separator 只在两侧仍有操作时保留，不会独立留在可见区域或菜单首尾。
 
 ## 行预览
 

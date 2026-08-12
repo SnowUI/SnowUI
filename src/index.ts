@@ -74,6 +74,11 @@ export {
     type DataTableLoadMoreSource,
     type DataTableLoadMore,
     type DataTableLoadMoreMode,
+    type DataTableActionEvent,
+    type DataTableActionItem,
+    type DataTableActionSeparatorItem,
+    type DataTableActionsItem,
+    type DataTableActionsConfig,
 } from './components/DataTable.svelte'
 export { default as TableToolbar } from './components/TableToolbar.svelte'
 export {

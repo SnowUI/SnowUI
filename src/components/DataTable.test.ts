@@ -101,4 +101,34 @@ export const examples = [
         expected: { render: "DataTable 内部渲染位于表格底部下方的非布局表尾哨兵。", layout: "自动加载沿用最近纵向滚动容器，不创建新的滚动区。", interaction: "默认越过表格底部后继续滚动 80px，首次再停留 500ms 才加载；首次等待期间上滚离开触发区则取消，页面无需 Observer。", performance: "首次确认等待避免滚动惯性期间扩展滚动高度；后续请求保持最小间隔，loadingMore 防止并发，hasMore=false 后移除哨兵并停止观察。", responsive: "阈值不改变表格尺寸与列宽协议。" },
         logic: ["AutoLoad", "InternalSentinel", "ScrollThreshold", "TriggerConfirmation", "RequestThrottle"],
     },
+    {
+        name: "A6: 默认响应式操作列",
+        code: `A6
+<DataTable
+    rows={[{ id: 1, name: "SnowUI" }]}
+    rowKey={(row) => row.id}
+    actions={{
+        width: 120,
+        minWidth: 40,
+        maxWidth: 240,
+        resizable: true,
+        overflow: "progressive",
+        overflowFrom: "end",
+        items: () => [
+            { id: "edit", label: "编辑", icon: "pencil-simple" },
+            { type: "separator", id: "danger" },
+            { id: "delete", label: "删除", icon: "trash" },
+        ],
+    }}
+>
+    {#snippet children(state)}
+        <Table>
+            <TableHeader><TableRow><TableHead columnId="name">名称</TableHead><TableHead as="actions">操作</TableHead></TableRow></TableHeader>
+            <TableBody>{#each state.rows as row}<TableRow rowId={row.id}><TableCell>{row.name}</TableCell><TableCell as="actions" /></TableRow>{/each}</TableBody>
+        </Table>
+    {/snippet}
+</DataTable>`,
+        expected: { render: "actions 配置自动在空 actions Cell 中渲染 OverflowActions。", layout: "column 模式使用 120px 初始列宽，拖动后通过共享列宽上下文更新。", interaction: "可见 Button 与 More 菜单都通过 DataTable onAction 返回 row 与 actionId；菜单展开期间行操作保持可见。", performance: "DataTable 直接下发列宽，不为每个操作单元格新增 ResizeObserver。", responsive: "先统一 Icon-only，再从末端逐项进入菜单；Separator 不会单独留在首尾。" },
+        logic: ["Actions", "OverflowActions", "ResizableColumn", "RowAction", "NoCellObserver"],
+    },
 ];

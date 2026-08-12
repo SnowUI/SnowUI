@@ -4,6 +4,7 @@
     import {
         provideTableContext,
         type TableColumnRegistration,
+        type TableContext,
         type TableRoleLayout,
         type TableRoleOverlayBlurMode,
         type TableSortState,
@@ -59,6 +60,55 @@
         rowIds: [] as Array<string | number>,
     };
     export type DataTableVariant = "striped" | "divided";
+    export interface DataTableActionItem {
+        type?: "action";
+        id: string;
+        label: string;
+        icon?: string | Snippet;
+        disabled?: boolean;
+        href?: string;
+        onAction?: () => void;
+    }
+    export interface DataTableActionSeparatorItem {
+        type: "separator";
+        id: string;
+    }
+    export type DataTableActionsItem =
+        | DataTableActionItem
+        | DataTableActionSeparatorItem;
+    export interface DataTableActionEvent<T> {
+        row: T;
+        rowId: string | number;
+        actionId: string;
+        item?: DataTableActionItem;
+        state: DataTableRenderState<T>;
+    }
+    export interface DataTableActionsConfig<T> {
+        items: (row: T, state: DataTableRenderState<T>) => DataTableActionsItem[];
+        onAction?: (event: DataTableActionEvent<T>) => void;
+        compact?: "auto" | "none";
+        overflow?: "all" | "progressive";
+        overflowFrom?: "start" | "end";
+        width?: number;
+        minWidth?: number;
+        maxWidth?: number;
+        resizable?: boolean;
+    }
+    interface DataTableActionsContextExtension {
+        getRowActions: (rowId: string | number) => DataTableActionsItem[];
+        runRowAction: (event: {
+            rowId: string | number;
+            actionId: string;
+            item?: DataTableActionItem;
+        }) => void;
+        getActionsCompact: () => "auto" | "none";
+        getActionsOverflow: () => "all" | "progressive";
+        getActionsOverflowFrom: () => "start" | "end";
+        getActionsColumnWidth: () => number;
+        getActionsMinWidth: () => number;
+        getActionsMaxWidth: () => number;
+        isActionsResizable: () => boolean;
+    }
     interface Props<T = any> extends Omit<FrameProps, "children" | "variant"> {
         rows?: T[];
         mode?: DataTableMode;
@@ -94,7 +144,7 @@
         /** 是否显示 checkbox 选择列，默认 false */
         selection?: boolean;
         /** 是否显示操作按钮列，默认 false */
-        actions?: boolean;
+        actions?: boolean | DataTableActionsConfig<T>;
         roleLayout?: TableRoleLayout;
         roleOverlayLayers?: number;
         roleOverlayBlurMode?: TableRoleOverlayBlurMode;
@@ -171,6 +221,14 @@
     let loadMoreController: AbortController | undefined;
     const resolvedLoadMoreSize = $derived(
         Math.max(1, Math.floor(Number(loadMoreSize) || 5)),
+    );
+    const actionsConfig = $derived(
+        typeof actions === "object" ? actions : undefined,
+    );
+    const actionsColumnWidth = $derived(
+        actionsConfig
+            ? Math.max(40, Number(actionsConfig.width) || 160)
+            : 40,
     );
     function scheduleRowRegistrationCommit() {
         if (rowRegistrationCommitQueued) return;
@@ -471,14 +529,49 @@
         return undefined;
     }
 
-    provideTableContext({
+    const tableContext: Partial<TableContext> & DataTableActionsContextExtension = {
         isDataTable: () => true,
         getRoleLayout: () => roleLayout,
         getRoleOverlayLayers: () => roleOverlayLayers,
         getRoleOverlayBlurMode: () => roleOverlayBlurMode,
         getRoleOverlayUniformFeather: () => roleOverlayUniformFeather,
         isSelectionEnabled: () => selection,
-        isActionsEnabled: () => actions,
+        isActionsEnabled: () => actions !== false,
+        getColumnWidth: (columnId) =>
+            columnId === "__actions" ? actionsColumnWidth : undefined,
+        getRowActions: (rowId: string | number) => {
+            if (!actionsConfig) return [];
+            const row = findRowById(rowId);
+            return row === undefined
+                ? []
+                : actionsConfig.items(row, renderState as DataTableRenderState<any>);
+        },
+        runRowAction: ({ rowId, actionId, item }: {
+            rowId: string | number;
+            actionId: string;
+            item?: DataTableActionItem;
+        }) => {
+            if (!actionsConfig?.onAction) return;
+            const row = findRowById(rowId);
+            if (row === undefined) return;
+            actionsConfig.onAction({
+                row,
+                rowId,
+                actionId,
+                item,
+                state: renderState as DataTableRenderState<any>,
+            });
+        },
+        getActionsCompact: () => actionsConfig?.compact ?? "auto",
+        getActionsOverflow: () => actionsConfig?.overflow ?? "all",
+        getActionsOverflowFrom: () => actionsConfig?.overflowFrom ?? "end",
+        getActionsColumnWidth: () => actionsColumnWidth,
+        getActionsMinWidth: () => Math.max(40, Number(actionsConfig?.minWidth) || 40),
+        getActionsMaxWidth: () => Math.max(
+            actionsColumnWidth,
+            Number(actionsConfig?.maxWidth) || 320,
+        ),
+        isActionsResizable: () => actionsConfig?.resizable === true,
         getVariant: () => variant,
         getLoading: () => loading && visibleRows.length === 0,
         getLoadingMore: () => loadingMore,
@@ -559,7 +652,8 @@
             page = 1;
             onPageChange?.(page);
         },
-    });
+    };
+    provideTableContext(tableContext);
 
     $effect(() => {
         if (page === resolvedPage) return;
