@@ -142,6 +142,8 @@
         width: 100%;
         min-width: 0;
         overflow: visible;
+        container-type: inline-size;
+        --snowui-table-responsive-cell-padding-inline: clamp(calc(var(--padding-1) / 2), 2cqi, var(--padding-3));
     }
     :global(:where(.snowui-table-viewport[data-continuous-hover-overlay-host="true"] > .snowui-table)) {
         position: relative;

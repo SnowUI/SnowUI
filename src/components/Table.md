@@ -1,6 +1,6 @@
 # Table（语义表格）
 
-> **版本**: v2.3.0
+> **版本**: v2.4.0
 > **职责**: 提供 OSS 原生表格语义、列宽与加载展示；宽表参与页面固有宽度计算，由页面容器负责横向滚动。
 
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
@@ -37,7 +37,7 @@ Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、
 
 局部布局来源：Root Frame 不声明 `row` / `column`，不启用通用槽位排列；`table` 及各语义子项显式关闭 Auto Layout，保持浏览器原生表格布局。TableHead 内部的排序按钮和 Indicator、TableCell 的可选内容 row 属于各子组件的局部布局。
 
-padding 归属：Table 根层和原生 table 不制造 padding；表头与数据单元格分别由 TableHead / TableCell 负责 padding。
+padding 归属：Table 根层和原生 table 不制造 padding；表头与数据单元格分别由 TableHead / TableCell 负责 padding。普通、selection 与 actions 单元格的左右 padding 按 Table 自身容器宽度在 `2px → 12px` 之间流动（`clamp(calc(var(--padding-1) / 2), 2cqi, var(--padding-3))`），上下 padding 保持 8px；已登记的 Head/Cell padding override 仍可整体接管。
 
 gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell padding；TableCell 复合内容的 gap 由 TableCell 自身控制。
 
@@ -198,6 +198,7 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 ## Changelog
 
+- 2026-08-14：v2.4.0，Table viewport 建立 inline-size 容器；TableHead / TableCell 左右 padding 随表格自身宽度从默认 12px 流动到最小 2px，DataTable 组合自然继承。
 - 2026-08-06：v2.3.0，新增密集表格语义快路径和表级单帧截断批处理；默认单元格不再初始化逐格 Frame 运行时与尺寸观察，关闭角色能力时跳过无效 overlay DOM / 样式，视觉与完整能力回退保持不变。
 - 2026-08-06：v2.2.0，普通数据列的 TableHead 默认允许拖动改宽；固定列使用 `resizable={false}` 显式关闭，排序的数据规则保持现有边界。
 

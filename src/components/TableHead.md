@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v2.1.0
+> **版本**: v2.2.0
 > **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -35,7 +35,7 @@
 
 不需要 `sortable` prop。DataTable 根据同名原始字段或 `sorters[columnId]` 自动判断列是否可排序；独立 TableHead 在声明 `sortDirection` / `onSortChange` 时也自动启用交互。没有任何排序规则的列不渲染按钮。
 
-普通数据列只要声明 `columnId`，默认就在列尾渲染 Indicator 并允许拖动修改宽度；不需要重复声明 `resizable`。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。
+普通数据列只要声明 `columnId`，默认就在列尾渲染 Indicator 并允许拖动修改宽度；不需要重复声明 `resizable`。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。普通与角色表头的左右 padding 与 TableCell 使用同一容器响应规则，在 2px 到 12px 之间流动，上下保持 8px。
 
 未声明任何 `defaultSort` 时，TableHead 不会把第一列视为隐式默认排序列。当所有列均未激活排序时，DataTable 保留上层传入的 rows / filteredRows 顺序。
 
@@ -96,11 +96,12 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 - 排序与列宽都通过 Table context 协调，不在组件内保存业务 Store。
 - DataTable 下 `as="selection"` / `as="actions"` 受 Context `isSelectionEnabled` / `isActionsEnabled` 控制；关闭时整列不渲染。
 - 默认 `font-weight: 400`，字号与行高消费 `--text-12 / --leading-12`。
-- 所有表头单元格的左右 padding 均为 12px，与数据行对齐。
+- 所有表头单元格与数据行使用相同的响应式左右 padding，范围为 2px 到 12px。
 - `resizable` 使用通用 Indicator；命中带沿用 line 全高协议（表头单元格右缘全高）；常态视觉线为 **1px × 16px**、贴列右缘、垂直居中（TableHead 覆盖 `.snowui-indicator-visual`）；进入命中带时加粗到 2px。
 
 ## Changelog
 
+- 2026-08-14：v2.2.0，普通、selection、actions 与 overlay 角色表头的左右 padding 改为按 Table 容器宽度响应，范围为 2px 到 12px。
 - 2026-08-06：v2.1.0，普通数据列的 `resizable` 默认值改为 `true`；声明 `columnId` 后即可拖动改宽，固定列可显式传入 `resizable={false}`；selection/actions 角色列保持不可拖动。
 - 2026-08-03：v1.9.2，selection Checkbox 的 1px 增量改为固定 `0.0625rem` 特例，不再复用边框 Token。
 - 2026-08-03：v1.9.1，selection 全选 Checkbox 与数据行统一使用 Token 计算的 17px Table 组合尺寸；独立 Checkbox 默认值不变。

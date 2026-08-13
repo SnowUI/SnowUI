@@ -52,7 +52,7 @@ export const examples = [{
         layout: "八个普通数据列展示 Table-Demo 表格一的订阅内容，不含 checkbox 列和按钮列。",
         interaction: "仅保留普通数据行的默认 hover；没有搜索、排序、筛选、分页或加载更多交互。",
         performance: "静态数据直接由 OSS Table 语义组件渲染，不创建 PRO 数据状态。",
-        responsive: "最小宽度为 960px，超出窄容器时由页面滚动容器承接。",
+        responsive: "最小宽度为 960px，超出窄容器时由页面滚动容器承接；表头与数据 Cell 左右 padding 按 Table 容器宽度在 2px 到 12px 之间响应。",
     },
     logic: ["Semantic", "DisplayOnly", "OSSBoundary"],
 }, {
