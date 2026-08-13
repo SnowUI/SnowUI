@@ -20,7 +20,7 @@ export const examples = [
         <Pagination page={state.page} total={state.totalPages} />
     {/snippet}
 </DataTable>`,
-        expected: { render: "渲染排序并分页后的数据。", layout: "Table 与 Pagination 可自由组合。", interaction: "表头循环升序、降序、无排序。", performance: "稳定排序 rows 副本，不修改原数组。", responsive: "Table 自行处理横向溢出。" },
+        expected: { render: "渲染排序并分页后的数据。", layout: "Table 与 Pagination 可自由组合。", interaction: "表头循环升序、降序、无排序。", performance: "稳定排序 rows 副本，不修改原数组。", responsive: "Table 自行处理横向溢出；表头与数据 Cell 左右 padding 按内部 Table 容器宽度在 2px 到 12px 之间响应。" },
         logic: ["ClientSort", "DefaultFieldSorter", "Stable", "Pagination"],
     },
     {

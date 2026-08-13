@@ -1,6 +1,6 @@
 # DataTable（PRO 数据表格）
 
-> **版本**: v1.12.0  
+> **版本**: v1.13.0
 > **职责**: 协调查询、排序和分页状态；Toolbar、Table 与 Pagination 由使用方自由组合。
 
 DataTable 不发起请求，也不格式化业务字段。预取、缓存和无延迟切换属于页面数据层；日期显示统一使用 OSS `formatDate()`。
@@ -19,7 +19,7 @@ DataTable 不发起请求，也不格式化业务字段。预取、缓存和无�
 
 局部布局来源：Root FramePro 使用 `column + contentFill` 管理直系区域；TableToolbar 保持自身的 row 槽位宿主布局，Table 保持原生表格布局，Pagination 保持内联外壳布局。DataTable 只协调区域排列和数据状态，不改写子组件的主布局模型。
 
-padding 归属：DataTable 根层不制造 padding；工具栏、表格 Cell、分页和自定义状态区分别由各自组件负责。
+padding 归属：DataTable 根层不制造 padding；工具栏、表格 Cell、分页和自定义状态区分别由各自组件负责。内部 Table 的表头与数据 Cell 左右 padding 按 Table 容器宽度在 2px 到 12px 之间响应，上下保持 8px；DataTable 不复制单元格 padding 实现。
 
 gap 归属：Root FramePro 统一控制直系区域间距，默认为 `var(--gap-3)`（12px）；子组件内部 gap 由子组件自身控制。
 
@@ -160,6 +160,7 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 
 ## Changelog
 
+- 2026-08-14：v1.13.0，组合的 TableHead / TableCell 左右 padding 随内部 Table 容器宽度在 2px 到 12px 之间响应；保持由 OSS Table 单元格唯一拥有实现。
 - 2026-08-06：v1.12.0，只读默认态复用稳定空选择状态并跳过逐行 Set 查询 / 全选集合扫描；开启 selection 后保持完整选择行为。
 - 2026-07-12：v1.11.0，新增 `selection` / `actions`（默认 false）；默认不显示 checkbox 与操作列，可独立开启。
 - 2026-07-08：v1.10.0，新增 `onRowPreview` 行空白点击预览协议；未配置时空白点击不再切换选中。
