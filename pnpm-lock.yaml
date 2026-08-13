@@ -13,11 +13,11 @@ importers:
         version: 3.2.0
     devDependencies:
       '@snowui-design-system/components':
-        specifier: 0.2.0-alpha.8
-        version: 0.2.0-alpha.8(@snowui-design-system/resource-svelte@1.0.26(svelte@5.56.4))(svelte@5.56.4)
+        specifier: 0.2.0-alpha.9
+        version: 0.2.0-alpha.9(@snowui-design-system/resource-svelte@1.0.29(svelte@5.56.4))(svelte@5.56.4)
       '@snowui-design-system/resource-svelte':
-        specifier: 1.0.26
-        version: 1.0.26(svelte@5.56.4)
+        specifier: 1.0.29
+        version: 1.0.29(svelte@5.56.4)
       '@sveltejs/vite-plugin-svelte':
         specifier: ^4.0.4
         version: 4.0.4(svelte@5.56.4)(vite@5.4.21)
@@ -321,17 +321,17 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@snowui-design-system/components@0.2.0-alpha.8':
-    resolution: {integrity: sha512-buHb4+ngqmZidpS2J1d2jiQOS96mjLtyU4P0VCqrAw5GyvLXRYxPOJniCV/Lp+JjbYCh7agi4rF1W+tfORKPVg==}
+  '@snowui-design-system/components@0.2.0-alpha.9':
+    resolution: {integrity: sha512-2D11t3Ov2HjbmtTaGNmRyX7BbOsGEJ78JJ4e3anVj5VzaeTPf+pcGLTTjh6De9zyEBcSfXe1dfwdXJqto3LG/w==}
     peerDependencies:
       '@snowui-design-system/resource-svelte': '>=1.0.26 <2.0.0'
       svelte: ^5.0.0
 
-  '@snowui-design-system/resource-base@1.0.25':
-    resolution: {integrity: sha512-UFGfXiVdjKEJ3asaRT5B/z1EhTI0lBcvZtvODpeZGxCCk3K39kNcX0kbwcw00uVdQhAS9OKzH1Ei7CYplSuXJg==}
+  '@snowui-design-system/resource-base@1.0.28':
+    resolution: {integrity: sha512-IEmNXkmGHfGonbOAHVpUjOjJL+UvBeOQOg1yYbERGDqHLj7dtN5JHquLAwqw704EwVi/bkL+1KTUrRYYQm0VyA==}
 
-  '@snowui-design-system/resource-svelte@1.0.26':
-    resolution: {integrity: sha512-I4PyeXlTxXb3Bv7Zsu8E8fdHkyOkMhuvnvXkLhuEMe1jarA3DNd6AWaCNBOu8ItNQNijd9t8tevh72AOIy3V+g==}
+  '@snowui-design-system/resource-svelte@1.0.29':
+    resolution: {integrity: sha512-zAbxfa/MyoZnGiOLqMTeCmM45veNuOrzwwMTzLHHrNaJrB73brHIUiUGaiEWCZd+mGw+sv/qSMwydn8Psm1G2w==}
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0
 
@@ -722,16 +722,16 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.62.2':
     optional: true
 
-  '@snowui-design-system/components@0.2.0-alpha.8(@snowui-design-system/resource-svelte@1.0.26(svelte@5.56.4))(svelte@5.56.4)':
+  '@snowui-design-system/components@0.2.0-alpha.9(@snowui-design-system/resource-svelte@1.0.29(svelte@5.56.4))(svelte@5.56.4)':
     dependencies:
-      '@snowui-design-system/resource-svelte': 1.0.26(svelte@5.56.4)
+      '@snowui-design-system/resource-svelte': 1.0.29(svelte@5.56.4)
       svelte: 5.56.4
 
-  '@snowui-design-system/resource-base@1.0.25': {}
+  '@snowui-design-system/resource-base@1.0.28': {}
 
-  '@snowui-design-system/resource-svelte@1.0.26(svelte@5.56.4)':
+  '@snowui-design-system/resource-svelte@1.0.29(svelte@5.56.4)':
     dependencies:
-      '@snowui-design-system/resource-base': 1.0.25
+      '@snowui-design-system/resource-base': 1.0.28
       svelte: 5.56.4
 
   '@sveltejs/acorn-typescript@1.0.11(acorn@8.17.0)':
