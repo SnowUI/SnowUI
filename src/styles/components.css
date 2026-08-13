@@ -310,6 +310,7 @@
     /* --snowui-search-box-font-size-override: ; */   /* font-size（默认 var(--text-14) = 14px） */
     /* --snowui-search-box-line-height-override: ; */ /* line-height（默认 var(--leading-14) = 20px） */
     /* --snowui-search-box-width-override: ; */       /* width（默认 auto） */
+    /* --snowui-search-box-background-blur-override: ; */ /* 背景模糊（默认 1.25rem = 20px） */
 
 
     /* SearchPopup 已于 2026-05-15 合并入 Popover 中尺寸(size="md")。
@@ -714,6 +715,7 @@
     /* --snowui-search-box-placeholder-color-override: ; */  /* 占位符颜色（默认值见组件源码） */
     /* --snowui-search-box-icon-color-override: ; */         /* 图标颜色（默认值见组件源码） */
     /* --snowui-search-box-icon-hover-color-override: ; */   /* 图标悬浮颜色（默认值见组件源码） */
+    /* --snowui-search-box-background-blur-override: ; */    /* 背景模糊（默认 1.25rem = 20px） */
 
     /* PRO SearchPopup 已于 2026-05-15 合并入 Popover 中尺寸,override 入口收敛到 --snowui-popover-* */
 
