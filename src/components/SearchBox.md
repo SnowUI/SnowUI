@@ -89,6 +89,7 @@
 - icon: 16px
 - text: 14px / 20px
 - 外置 `as="trailing"`：默认 `Black/20%`；内建清除 X 继续使用共享清除按钮颜色规则
+- 背景模糊：`blur(1.25rem)`（20px，与 Tooltip 一致），可通过 `--snowui-search-box-background-blur-override` 覆盖
 
 颜色与状态参考 `Input` / `Field` CSS 行为，但 `SearchBox` 是搜索浮层触发器，不是文本输入框，因此不显示 Field focus ring，也屏蔽全局 `focus-visible` outline；点击后、按 Escape 关闭后都应保持无焦点外圈。
 
@@ -117,6 +118,10 @@
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.1.1 (2026-08-14)
+
+- SearchBox 根组件默认增加与 Tooltip 一致的 `backdrop-filter: blur(1.25rem)`，并提供 `--snowui-search-box-background-blur-override`。
 
 ### v1.1.0 (2026-08-10)
 
