@@ -510,10 +510,11 @@
     }
 
     /* ============================================================
-       Variant: pill (样式1，默认)
-       默认半透明背景使用与 SearchBox 相同的背景模糊。
+       Variant: pill / icon-toggle (样式1 / 样式4)
+       半透明背景使用与 SearchBox 相同的背景模糊。
        ============================================================ */
-    :global(.snowui-tab-pill) {
+    :global(.snowui-tab-pill),
+    :global(.snowui-tab-icon-toggle) {
         --snowui-tab-backdrop-filter: blur(
             var(--snowui-tab-background-blur-override, 1.25rem)
         );

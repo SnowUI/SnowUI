@@ -5,7 +5,7 @@
 - 默认内置模式（推荐）：`items` 自动生成 `<Button as="item">`；item 可用 `icon` 声明图标，Tab 内置生成 `Icon + Text`，适用于 `icon-toggle`；`parts.Button / parts.Icon / parts.Text` 配置统一 Props。
 - 显式组合模式：显式书写 Button，用于 Icon、Text、复杂内容或逐项 Props 差异。
 
-> **版本**: v1.2.1
+> **版本**: v1.2.2
 > **状态**: 已实现(PRO)
 > **职责**: 在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
 > 由 Tab 容器通过 CSS override Button 的桥接变量接管。
@@ -60,7 +60,7 @@
 容器无背景、无圆角。子项 padding 0(override Button)。激活项底部 2px 横向下划线(垂直时为左侧 2px 竖线),颜色 `--primary`；激活项 Text / Icon 同样使用 `--primary`。未激活项 Text / Icon 使用 `--black-100 × opacity: 0.4`。子项间距更大:SM=`--gap-3`(12) / MD=`--gap-4`(16) / LG=`--gap-5`(20)。
 
 #### variant="icon-toggle"(样式4)
-容器视觉与 pill 相同。未激活项隐藏 `.snowui-text`,只显示图标(子项内部需包含 Icon + Text 节点);激活项显示 icon + text,文字渐显时消费 Frame 生命周期进入 bridge 时序,宽度通过 Frame size motion bridge 平滑展开。
+容器视觉与 pill 相同，包含与 SearchBox 一致的 `blur(1.25rem)`（20px）背景模糊。未激活项隐藏 `.snowui-text`,只显示图标(子项内部需包含 Icon + Text 节点);激活项显示 icon + text,文字渐显时消费 Frame 生命周期进入 bridge 时序,宽度通过 Frame size motion bridge 平滑展开。
 
 #### variant="bare"
 容器无背景、padding 和圆角，不显示 indicator；Item 无背景、padding 和圆角，只通过 `opacity: 0.4 -> 1` 表达未激活、hover 与激活状态。内容可以是文字、单 Icon 或 Icon + 文字。Item gap 复用 underline 的尺寸梯度：SM=12px / MD=16px / LG=20px。
@@ -101,7 +101,7 @@
 | 用途 | Token / 值 |
 | :--- | :--- |
 | 容器背景(pill/icon-toggle) | `--black-4` (rgba(0,0,0,0.04)) |
-| 容器背景模糊(pill) | `blur(1.25rem)`（20px，与 SearchBox 一致） |
+| 容器背景模糊(pill/icon-toggle) | `blur(1.25rem)`（20px，与 SearchBox 一致） |
 | 激活项背景(pill/icon-toggle) | `--static-white-80` |
 | 激活项 shadow(pill/icon-toggle) | `0 2px 4px rgba(0,0,0,0.1)` |
 | 激活项背景(solid) | `--black-4` |
@@ -125,7 +125,7 @@
 | `--snowui-tab-radius-override` | 容器 radius |
 | `--snowui-tab-gap-override` | 容器 gap |
 | `--snowui-tab-background-override` | 容器背景 |
-| `--snowui-tab-background-blur-override` | 容器背景模糊；pill 默认 `1.25rem`，其他变体默认 `none` |
+| `--snowui-tab-background-blur-override` | 容器背景模糊；pill/icon-toggle 默认 `1.25rem`，其他变体默认 `none` |
 | `--snowui-tab-inactive-opacity-override` | 未激活 item 透明度，默认 `0.4` |
 | `--snowui-tab-hover-opacity-override` | 未激活 item hover 透明度，默认 `1` |
 
@@ -235,6 +235,10 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 ---
 
 ## 8. 更新日志 (Changelog)
+
+### v1.2.2 (2026-08-14)
+
+- `icon-toggle` 变体同步启用与 pill、SearchBox 相同的 `blur(1.25rem)` 背景模糊。
 
 ### v1.2.1 (2026-08-14)
 

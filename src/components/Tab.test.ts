@@ -26,7 +26,7 @@ export const examples = [
     <Button as="item" value="web"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
     <Button as="item" value="mobile"><Icon><Star /></Icon><Text>Mobile</Text></Button>
 </Tab>`,
-        expected: { render: "非激活项隐藏文字。", layout: "宽度随内容变化。", interaction: "切换时由 Button 自己处理内部文字。", performance: "父级不穿透 Text。", responsive: "跟随容器。" },
+        expected: { render: "非激活项隐藏文字；半透明容器使用 20px 背景模糊。", layout: "宽度随内容变化。", interaction: "切换时由 Button 自己处理内部文字。", performance: "父级不穿透 Text；模糊仅作用于小面积静态容器。", responsive: "跟随容器。" },
         logic: ["PublicBridge", "ContentVisibility"],
     },
     {

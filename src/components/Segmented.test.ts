@@ -43,7 +43,7 @@ export const examples = [
 </Frame>`,
         expected: {
             render:
-                "5 variant 视觉与 Tab 一致；bare 无外壳和 indicator；Icon 与 Text 同步继承颜色。",
+                "5 variant 视觉与 Tab 一致；pill/icon-toggle 使用 20px 背景模糊，bare 无外壳和 indicator；Icon 与 Text 同步继承颜色。",
         },
         logic: ["Variant"],
     },
