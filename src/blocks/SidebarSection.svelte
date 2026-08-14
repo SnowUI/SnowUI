@@ -1,7 +1,13 @@
-<!-- SidebarSection PRO Block v1.3.0. 文档: ./SidebarSection.md -->
+<!-- SidebarSection PRO Block v1.4.0. 文档: ./SidebarSection.md -->
 <script lang="ts">
     import { untrack, type Snippet } from "svelte";
-    import { Button, Text, Tooltip, type FrameProps } from "@snowui-design-system/components";
+    import {
+        Button,
+        Separator,
+        Text,
+        Tooltip,
+        type FrameProps,
+    } from "@snowui-design-system/components";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
     import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
     import FramePro from "../components/FramePro.svelte";
@@ -16,7 +22,10 @@
         onCollapsedChange?: (collapsed: boolean) => void;
         actions?: SidebarActionData[] | Snippet;
         children?: Snippet;
-        parts?: ComponentPartsOf<{ Button: typeof Button }>;
+        parts?: ComponentPartsOf<{
+            Button: typeof Button;
+            Separator: typeof Separator;
+        }>;
         [key: string]: any;
     }
 
@@ -123,6 +132,7 @@
         aria-hidden={isCollapsed ? "true" : undefined}
     >
         {#if !isCollapsed}{@render children?.()}{/if}
+        <Separator {...parts?.Separator} />
     </div>
 </FramePro>
 

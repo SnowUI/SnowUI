@@ -1,4 +1,4 @@
-<!-- Sidebar PRO Block v1.6.1. 文档: ./Sidebar.md -->
+<!-- Sidebar PRO Block v1.7.0. 文档: ./Sidebar.md -->
 <script lang="ts">
     import { onMount, setContext, tick, untrack, type Snippet } from "svelte";
     import {
@@ -593,6 +593,8 @@
         --snowui-sidebar-padding-x: var(--padding-3);
         --snowui-sidebar-padding-y: var(--padding-4);
         --snowui-sidebar-gap: var(--gap-3);
+        --snowui-sidebar-separator-padding-x: var(--padding-2);
+        --snowui-sidebar-separator-padding-y: var(--padding-2);
         position: relative;
         display: flex;
         width: var(--snowui-sidebar-width-override, var(--snowui-sidebar-width));
@@ -728,6 +730,35 @@
         box-sizing: border-box;
         flex-direction: column;
         gap: var(--snowui-sidebar-navigation-gap-override, var(--gap-1));
+    }
+    :global(:where(.snowui-sidebar) :where(.snowui-separator-row)) {
+        display: block;
+        width: 100%;
+        height: calc(
+            var(
+                    --snowui-separator-thickness-override,
+                    var(--snowui-separator-thickness, 0.03125rem)
+                ) +
+                var(
+                    --snowui-sidebar-separator-padding-y-override,
+                    var(--snowui-sidebar-separator-padding-y)
+                ) +
+                var(
+                    --snowui-sidebar-separator-padding-y-override,
+                    var(--snowui-sidebar-separator-padding-y)
+                )
+        );
+        box-sizing: border-box;
+        padding: var(
+                --snowui-sidebar-separator-padding-y-override,
+                var(--snowui-sidebar-separator-padding-y)
+            )
+            var(
+                --snowui-sidebar-separator-padding-x-override,
+                var(--snowui-sidebar-separator-padding-x)
+            );
+        background-clip: content-box;
+        line-height: 0;
     }
     :global(:where(.snowui-sidebar-navigation .snowui-sidebar-item)) {
         z-index: 1;

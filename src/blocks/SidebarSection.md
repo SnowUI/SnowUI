@@ -1,6 +1,6 @@
 # SidebarSection（PRO Block）
 
-> **版本**: v1.3.0
+> **版本**: v1.4.0
 > **职责**: Sidebar 分类块，内置分类标题、展开/收起按钮与可选操作区。
 
 ## API 参考
@@ -15,9 +15,9 @@
 | `onCollapsedChange` | `(collapsed: boolean) => void` | — | 分类折叠变化回调 |
 | `actions` | `SidebarActionData[] \| Snippet` | `[]` | 0～多个标题操作；数组生成 `Button bare` |
 | `children` | `Snippet` | — | 分类内容 |
-| `parts` | `ComponentPartsOf` | — | 配置数据生成的 Button |
+| `parts` | `ComponentPartsOf` | — | 配置数据生成的 Button 与内置 Separator |
 
-整体 Sidebar 折叠时，标题行先消费 Frame color bridge 渐隐；透明度归零后，标题高度、纵向 padding 与 Section gap 才消费 Frame size bridge 收起，因此内容 Item 在标题消失后才开始上移。标题节点保留在 DOM 中，并在折叠期间通过 `inert`、`aria-hidden` 与延迟 `visibility: hidden` 停止交互。分类自身折叠时不渲染内容子树；Sidebar 在折叠前记忆 active item 的 Section 归属，因此刷新恢复无需保留隐藏内容 DOM。标题行默认 padding 为左右 `8px`（`var(--padding-2)`）、上下 `4px`（`var(--padding-1)`），同时作用于标题、折叠箭头与 actions 的完整排列区域。有标题时默认可折叠；标题文字与箭头共同位于一个 `Button bare emphasis="muted"` 中，整段标题均可点击且不显示 Tooltip。数据生成的 action 可用 `iconCollection: "snowui"` 显式选择同名 SnowUI 图标，action Tooltip 统一显示在按钮右侧。标题操作按钮之间固定使用 `var(--gap-2)`（8px），并同样显式使用 muted 强调级别保留 40% → hover 100% 的次级操作视觉。
+整体 Sidebar 折叠时，标题行先消费 Frame color bridge 渐隐；透明度归零后，标题高度、纵向 padding 与 Section gap 才消费 Frame size bridge 收起，因此内容 Item 在标题消失后才开始上移。标题节点保留在 DOM 中，并在折叠期间通过 `inert`、`aria-hidden` 与延迟 `visibility: hidden` 停止交互。分类自身折叠时不渲染内容子树；Sidebar 在折叠前记忆 active item 的 Section 归属，因此刷新恢复无需保留隐藏内容 DOM。每个分类内容末尾内置一个横向 `Separator`，展开、分类折叠与 Sidebar 整体折叠时均由 SidebarSection 统一保留，调用方无需手动添加；它与 Sidebar 内显式组合的横向 Separator 一起消费 Sidebar 统一的四边 `8px` padding、零行高和横向 / 纵向 padding override，Separator 自身仍可通过 `parts.Separator` 配置。标题行默认 padding 为左右 `8px`（`var(--padding-2)`）、上下 `4px`（`var(--padding-1)`），同时作用于标题、折叠箭头与 actions 的完整排列区域。有标题时默认可折叠；标题文字与箭头共同位于一个 `Button bare emphasis="muted"` 中，整段标题均可点击且不显示 Tooltip。数据生成的 action 可用 `iconCollection: "snowui"` 显式选择同名 SnowUI 图标，action Tooltip 统一显示在按钮右侧。标题操作按钮之间固定使用 `var(--gap-2)`（8px），并同样显式使用 muted 强调级别保留 40% → hover 100% 的次级操作视觉。
 
 ---
 
@@ -37,6 +37,11 @@
 | SidebarSection | [SidebarSection.svelte](./SidebarSection.svelte) | 分类折叠与标题操作 |
 
 ## 更新日志 (Changelog)
+
+### v1.4.0 (2026-08-15)
+
+#### 新功能
+- 分类内容末尾内置横向 Separator，调用方无需手动添加；它与 Sidebar 内显式 Separator 共用四边 8px padding、零行高及 Sidebar 横向 / 纵向 padding override，并通过 `parts.Separator` 保留自身配置入口。
 
 ### v1.3.0 (2026-08-06)
 
