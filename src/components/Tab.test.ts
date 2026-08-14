@@ -6,7 +6,7 @@ export const examples = [
     <Button as="item" value="web"><Icon><FourLeafClover /></Icon>Web</Button>
     <Button as="item" value="mobile"><Icon><Star /></Icon>Mobile</Button>
 </Tab>`,
-        expected: { render: "仅 as=item 的 Button 成为 Tab 项。", layout: "横向 pill。", interaction: "点击与方向键切换。", performance: "只扫描角色子项。", responsive: "跟随容器。" },
+        expected: { render: "仅 as=item 的 Button 成为 Tab 项；默认 pill 半透明背景使用 20px 背景模糊。", layout: "横向 pill。", interaction: "点击与方向键切换。", performance: "只扫描角色子项；模糊仅作用于小面积静态容器。", responsive: "跟随容器。" },
         logic: ["Contract", "Selection", "Keyboard"],
     },
     {

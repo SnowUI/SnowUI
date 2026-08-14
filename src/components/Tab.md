@@ -5,7 +5,7 @@
 - 默认内置模式（推荐）：`items` 自动生成 `<Button as="item">`；item 可用 `icon` 声明图标，Tab 内置生成 `Icon + Text`，适用于 `icon-toggle`；`parts.Button / parts.Icon / parts.Text` 配置统一 Props。
 - 显式组合模式：显式书写 Button，用于 Icon、Text、复杂内容或逐项 Props 差异。
 
-> **版本**: v1.1.1
+> **版本**: v1.2.1
 > **状态**: 已实现(PRO)
 > **职责**: 在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
 > 由 Tab 容器通过 CSS override Button 的桥接变量接管。
@@ -51,7 +51,7 @@
 ### 2.3 5 个 variant
 
 #### variant="pill"(样式1, 默认)
-容器有 `--black-4` 背景 + padding。激活项:`--static-white-80` 白底 + `0 2px 4px rgba(0,0,0,0.1)` shadow。未激活项 Text / Icon 使用 `--black-100 × opacity: 0.4`；激活项 Text / Icon 使用 `--static-black-100` 与 `opacity: 1`；未激活项 hover 时仅将 `opacity` 提升到 `1`。
+容器有 `--black-4` 背景 + padding，并使用与 SearchBox 一致的 `blur(1.25rem)`（20px）背景模糊。激活项:`--static-white-80` 白底 + `0 2px 4px rgba(0,0,0,0.1)` shadow。未激活项 Text / Icon 使用 `--black-100 × opacity: 0.4`；激活项 Text / Icon 使用 `--static-black-100` 与 `opacity: 1`；未激活项 hover 时仅将 `opacity` 提升到 `1`。
 
 #### variant="solid"(样式2)
 容器**无**背景、**无** padding。激活项:`--black-4` 背景,**无** shadow。激活项 Text / Icon 保持 Button 默认颜色链；未激活项 Text / Icon 使用 `--black-100 × opacity: 0.4`。
@@ -101,6 +101,7 @@
 | 用途 | Token / 值 |
 | :--- | :--- |
 | 容器背景(pill/icon-toggle) | `--black-4` (rgba(0,0,0,0.04)) |
+| 容器背景模糊(pill) | `blur(1.25rem)`（20px，与 SearchBox 一致） |
 | 激活项背景(pill/icon-toggle) | `--static-white-80` |
 | 激活项 shadow(pill/icon-toggle) | `0 2px 4px rgba(0,0,0,0.1)` |
 | 激活项背景(solid) | `--black-4` |
@@ -124,6 +125,7 @@
 | `--snowui-tab-radius-override` | 容器 radius |
 | `--snowui-tab-gap-override` | 容器 gap |
 | `--snowui-tab-background-override` | 容器背景 |
+| `--snowui-tab-background-blur-override` | 容器背景模糊；pill 默认 `1.25rem`，其他变体默认 `none` |
 | `--snowui-tab-inactive-opacity-override` | 未激活 item 透明度，默认 `0.4` |
 | `--snowui-tab-hover-opacity-override` | 未激活 item hover 透明度，默认 `1` |
 
@@ -233,6 +235,11 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 ---
 
 ## 8. 更新日志 (Changelog)
+
+### v1.2.1 (2026-08-14)
+
+- 默认 `pill` 变体增加与 SearchBox 一致的 `backdrop-filter: blur(1.25rem)`，并同步 `-webkit-backdrop-filter`。
+- 新增 `--snowui-tab-background-blur-override` 公开覆盖入口；其他变体默认不启用背景模糊。
 
 ### v1.2.0 (2026-07-06)
 

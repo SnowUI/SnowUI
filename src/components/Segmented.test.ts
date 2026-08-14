@@ -24,7 +24,7 @@ export const examples = [
     </Segmented>
 </Frame>`,
         expected: {
-            render: "与 Tab pill 视觉完全一致;ARIA role=radiogroup,子项 role=radio",
+            render: "与 Tab pill 视觉完全一致，半透明背景使用 20px 背景模糊;ARIA role=radiogroup,子项 role=radio",
         },
         logic: ["Variant=pill", "Size", "Default"],
     },

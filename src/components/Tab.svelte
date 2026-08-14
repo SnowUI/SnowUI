@@ -348,6 +348,7 @@
         --snowui-tab-padding: var(--padding-1);
         --snowui-tab-radius: var(--radius-5);
         --snowui-tab-gap: var(--gap-1);
+        --snowui-tab-backdrop-filter: none;
 
         /* === 颜色 === */
         --snowui-tab-background: var(--black-4, rgba(0, 0, 0, 0.04));
@@ -368,6 +369,8 @@
             --snowui-tab-background-override,
             var(--snowui-tab-background)
         );
+        backdrop-filter: var(--snowui-tab-backdrop-filter);
+        -webkit-backdrop-filter: var(--snowui-tab-backdrop-filter);
         box-sizing: border-box;
     }
 
@@ -504,6 +507,16 @@
                 > [data-as="item"][data-active="false"]:hover:not(:disabled)
         ) {
         --snowui-button-opacity-override: var(--snowui-tab-hover-opacity);
+    }
+
+    /* ============================================================
+       Variant: pill (样式1，默认)
+       默认半透明背景使用与 SearchBox 相同的背景模糊。
+       ============================================================ */
+    :global(.snowui-tab-pill) {
+        --snowui-tab-backdrop-filter: blur(
+            var(--snowui-tab-background-blur-override, 1.25rem)
+        );
     }
 
     /* ============================================================

@@ -6,7 +6,7 @@
 - 默认内置模式（推荐）：`items` 交给 Tab 生成 Button；`parts.Button` 沿默认生成链路显式转发。
 - 显式组合模式：显式书写 `<Button as="item">`，逐项 Props 直接配置。
 
-> **版本**: v1.2.0
+> **版本**: v1.2.1
 > **状态**: 已实现(PRO)
 > **职责**: RadioGroup 的视觉变体,在多个互斥选项之间切换"过滤器/参数"。视觉系统
 > 与 [Tab](./Tab.md) 完全共享,在 ARIA 语义、键盘行为、Form 接入上区分。
@@ -83,6 +83,8 @@ Segmented 是 Tab 的宿主组件特化：真实 Tab 是主要视觉表面、交
 
 `--snowui-tab-*-override` 变量同样适用于 Segmented(Segmented 内部包裹 Tab,共享同一组 CSS 变量与类名)。
 
+默认 `pill` 变体继承 Tab 的 `blur(1.25rem)`（20px）背景模糊；可通过 `--snowui-tab-background-blur-override` 覆盖。
+
 ---
 
 ## 5. 动效
@@ -131,6 +133,10 @@ Segmented 是 Tab 的宿主组件特化：真实 Tab 是主要视觉表面、交
 ---
 
 ## 8. 更新日志 (Changelog)
+
+### v1.2.1 (2026-08-14)
+
+- 默认 `pill` 变体继承 Tab 与 SearchBox 同级的 20px 背景模糊及公开 override。
 
 ### v1.2.0 (2026-07-05)
 
