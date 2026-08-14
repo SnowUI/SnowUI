@@ -746,6 +746,7 @@
     /* --snowui-tab-radius-override: ; */      /* 容器 radius(默认 sm=var(--radius-4)=16;md=var(--radius-5)=20;lg=var(--radius-6)=24;underline/bare=0) */
     /* --snowui-tab-gap-override: ; */         /* 容器子项间距(默认 sm=calc(var(--gap-1)/2)=2px;md/lg=var(--gap-1)=4px;underline/bare 时 sm/md/lg=var(--gap-3/4/5)=12/16/20) */
     /* --snowui-tab-background-override: ; */  /* 容器背景(默认 pill/icon-toggle=var(--black-4);solid/underline/bare=transparent) */
+    /* --snowui-tab-background-blur-override: ; */ /* 容器背景模糊(默认 pill=1.25rem=20px;其他变体=none) */
     /* --snowui-tab-inactive-opacity-override: ; */ /* 未激活 item 透明度(默认 0.4) */
     /* --snowui-tab-hover-opacity-override: ; */    /* 未激活 item hover 透明度(默认 1) */
 
