@@ -22,6 +22,8 @@
 **推荐容器**: `Field.svelte`。
 **默认能力开关**: `enableResponsive=true`, `enableContext=true`, `enableScaleObserver=false`。
 
+可见原生 `<input>` 显式接入 `layout.css` 的 `.snowui-native-control`，只归一化 box sizing、margin 并继承消费环境的字体与颜色；Input 自身字号、行高、Padding、边框和状态视觉不依赖可选的 `snowui-base.css`。
+
 ## 2026-04-04 表单样式规则
 
 - 基础节奏统一：`Field` 默认 `padding = 12 / 16`，`gap = 8`

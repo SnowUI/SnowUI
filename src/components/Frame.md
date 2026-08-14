@@ -74,6 +74,7 @@ FramePro 在 OSS Frame 之上只增加三类跨组件协调能力：
 | 静态 size context（setContext） | ✅ OSS | 1 | （无外部观察器，简单 setContext） |
 | 断点响应式 class（`enableResponsive`） | ✅ OSS | 1 | `frame-responsive.svelte.ts` |
 | CSS 行为工具类（hoverable / field-bordered） | ✅ OSS | 1 | `layout.css` |
+| SnowUI 原生宿主基线（box sizing / margin / 字体与颜色继承） | ✅ OSS | 1 | `layout.css` |
 | 解析 `while*` props → motion 配置 | ✅ OSS | 1 | `frame-motion-defaults.ts` |
 | **JS 动效执行**（Tween / Spring / 缓动函数） | ✅ OSS | 1 | `motion-engine.ts`（迁入）、`frame-motion.svelte.ts`（迁入） |
 | **交互状态机**（`currentState` / hovered / pressed / focused） | ✅ OSS | 1 | `frame-state.svelte.ts`（迁入） |

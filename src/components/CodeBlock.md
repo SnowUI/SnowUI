@@ -5,8 +5,8 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.6.1
-> **更新**: 2026-08-12
+> **版本**: v1.6.2
+> **更新**: 2026-08-15
 > **布局模型**: 默认态为复合管理布局；`singleLine` 为槽位宿主布局
 > **文档**: ./CodeBlock.md
 
@@ -267,6 +267,7 @@ pnpm build`}
 
 | 日期 | 版本 | 说明 |
 |:---|:---|:---|
+| 2026-08-15 | v1.6.2 | 内部 `pre` / `code` 显式使用 `border-box`，与既有 padding、margin、font reset 一起隔离可选 `snowui-base.css` 的元素级影响 |
 | 2026-08-12 | v1.6.1 | `singleLine` 的 padding、gap 与圆角对齐 Input 标准态：上下 12px、左右 16px、gap 8px、圆角 16px |
 | 2026-08-12 | v1.6.0 | 新增 `variant="singleLine"`；参考 Input 实现 Leading / Content / Trailing 三槽布局，保留高亮与复制，移除语言、行号、全屏、纵向滚动及高度拖拽结构 |
 | 2026-08-09 | v1.5.1 | Button bare 默认改为 100% 后，内置复制 / 放大操作显式使用 `emphasis="muted"` 保留原 40% → hover 100% 的次级操作视觉 |

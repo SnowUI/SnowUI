@@ -1,5 +1,6 @@
 /* Layout Utility Styles */
-/* v1.1.0 */
+/* v1.2.0 */
+/* Log (2026-08-15): 新增 SnowUI 原生宿主基线，组件不再依赖可选 snowui-base.css 的控件字体与 margin reset。 */
 /* Log (2026-02-22): 收敛 Surface hover 覆写能力，仅保留 --snowui-frame-hover-image-override 作为声明式覆盖入口。 */
 /* Log (2026-03-10): Avatar / Image 的 hover 回收至组件内，layout.css 不再承接媒体类组件的专用 hover 细节。 */
 /* Log (2026-03-16): 新增 Field 文本高亮变量，供日期字段分段焦点样式等输入型场景复用。 */
@@ -23,7 +24,17 @@
  * 优先级：Level 1 (最低)，使用 :where() 将权重降为 0。
  */
 
-/* === 全局基准重置 === */
+/* === SnowUI 宿主基线 ===
+ * 只命中 Frame 与显式接入的原生控件，不使用 button / input / :disabled 等裸选择器。
+ * 组件因此不依赖可选的 snowui-base.css，同时继续继承消费环境的字体与颜色。
+ */
+:where([data-snowui-frame], .snowui-native-control) {
+    box-sizing: border-box;
+    margin: 0;
+    color: inherit;
+    font-family: inherit;
+}
+
 :where(html) {
     --snowui-selection-bg: color-mix(
         in srgb,
@@ -232,7 +243,7 @@
 /**
  * Utility Classes
  */
-:disabled {
+:where([data-snowui-frame]:disabled, .snowui-native-control:disabled) {
     cursor: default;
 }
 

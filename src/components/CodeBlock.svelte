@@ -1,6 +1,6 @@
 <!--
   CodeBlock 组件：代码块显示，支持行号、复制、全屏放大
-  v1.6.1
+  v1.6.2
 
   布局模型：默认态为复合管理布局；singleLine 变体为槽位宿主布局
 
@@ -1088,6 +1088,7 @@
     }
 
     :global(:where(.snowui-code-block-pre)) {
+        box-sizing: border-box;
         margin: 0;
         tab-size: 4;
         white-space: pre;
@@ -1097,6 +1098,7 @@
     }
 
     :global(:where(.snowui-code-block-code)) {
+        box-sizing: border-box;
         display: block;
         color: inherit;
         background: transparent;

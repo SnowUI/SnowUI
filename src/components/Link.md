@@ -5,7 +5,8 @@
 - `parts.Tooltip`：配置单行截断时的内置 Tooltip。
 - 自定义提示结构时使用外置 Tooltip 组合；显式 Props 高于 part。
 
-> **版本**: v1.2.2
+> **版本**: v1.2.3
+> **变更记录 (2026-08-15)**: Link 根节点显式移除原生下划线，不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；`underline` 仍由组件公开 Prop 控制。
 > **职责**: 提供正文、说明与导航中的文字链接样式。
 > **设计稿**: [Workshop / Link](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12417-11133&t=GYb3gHf9U5Ff6hcQ-4)
 
@@ -139,6 +140,10 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 - **迁移**：原 `<Button variant="link">` 已移除；按钮式跳转继续使用 `<Button href>`。
 
 ## 更新日志 (Changelog)
+
+### v1.2.3 (2026-08-15)
+
+- Link 根节点显式声明 `text-decoration: none`，默认视觉不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；公开 `underline` Prop 继续拥有下划线状态。
 
 ### v1.2.2 (2026-07-02)
 

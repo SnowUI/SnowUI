@@ -441,7 +441,7 @@
     <!-- svelte-ignore a11y_autofocus -->
     <button
         bind:this={triggerEl}
-        class="snowui-select-trigger"
+        class="snowui-select-trigger snowui-native-control"
         type="button"
         role="combobox"
         aria-haspopup="listbox"

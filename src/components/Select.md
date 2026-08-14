@@ -30,6 +30,8 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 **默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。
 **自动布局协议**: Select 根元素为 `<Frame row>`，trigger（content/fill）+ indicator（trailing/hug）由自动布局协议管理。
 
+字段型原生 trigger 显式接入 `layout.css` 的 `.snowui-native-control`，只归一化 box sizing、margin 并继承消费环境的字体与颜色；Select 自身字号、行高、Padding、边框和状态视觉不依赖可选的 `snowui-base.css`。`buttonTrigger` 模式由 Button / Frame 的同一宿主基线承接。
+
 **2026-04-27 更新**: Select v3.1.0 — 支持直系复杂 `leading` / `trailing` 槽位；自定义 trailing 替换默认 indicator。
 
 ## 2026-04-27 v3.1.0 复杂槽位规则

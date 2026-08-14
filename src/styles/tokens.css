@@ -72,33 +72,33 @@
    --border-8: calc(0.25rem * var(--border-scale));
 
    /* ==========================
-     4) 圆角梯度 (固定 px，不随 html 根字号响应式缩放)
+     4) 圆角梯度 (rem；下方 px 注释均为 16px 根字号下的名义值)
      Base: 4px
      ========================== */
    /* 0px */
    --radius-0: 0;
    /* 4px */
-   --radius-1: calc(4px * var(--radius-scale));
+   --radius-1: calc(0.25rem * var(--radius-scale));
    /* 8px */
-   --radius-2: calc(8px * var(--radius-scale));
+   --radius-2: calc(0.5rem * var(--radius-scale));
    /* 12px */
-   --radius-3: calc(12px * var(--radius-scale));
+   --radius-3: calc(0.75rem * var(--radius-scale));
    /* 16px */
-   --radius-4: calc(16px * var(--radius-scale));
+   --radius-4: calc(1rem * var(--radius-scale));
    /* 20px */
-   --radius-5: calc(20px * var(--radius-scale));
+   --radius-5: calc(1.25rem * var(--radius-scale));
    /* 24px */
-   --radius-6: calc(24px * var(--radius-scale));
+   --radius-6: calc(1.5rem * var(--radius-scale));
    /* 28px */
-   --radius-7: calc(28px * var(--radius-scale));
+   --radius-7: calc(1.75rem * var(--radius-scale));
    /* 32px */
-   --radius-8: calc(32px * var(--radius-scale));
+   --radius-8: calc(2rem * var(--radius-scale));
    /* 40px */
-   --radius-10: calc(40px * var(--radius-scale));
+   --radius-10: calc(2.5rem * var(--radius-scale));
    /* 48px */
-   --radius-12: calc(48px * var(--radius-scale));
+   --radius-12: calc(3rem * var(--radius-scale));
    /* 80px */
-   --radius-20: calc(80px * var(--radius-scale));
+   --radius-20: calc(5rem * var(--radius-scale));
    /* 9999px */
    --radius-full: 9999px;
 
@@ -136,49 +136,49 @@
    --size-full: 100%;
 
    /* ==========================
-     6) 内边距 & 间距梯度 (固定 px，不随 html 根字号响应式缩放)
+     6) 内边距 & 间距梯度 (rem；下方 px 注释均为 16px 根字号下的名义值)
      ========================== */
    /* 0px */
    --padding-0: 0;
    /* 4px */
-   --padding-1: calc(4px * var(--padding-scale));
+   --padding-1: calc(0.25rem * var(--padding-scale));
    /* 8px */
-   --padding-2: calc(8px * var(--padding-scale));
+   --padding-2: calc(0.5rem * var(--padding-scale));
    /* 12px */
-   --padding-3: calc(12px * var(--padding-scale));
+   --padding-3: calc(0.75rem * var(--padding-scale));
    /* 16px */
-   --padding-4: calc(16px * var(--padding-scale));
+   --padding-4: calc(1rem * var(--padding-scale));
    /* 20px */
-   --padding-5: calc(20px * var(--padding-scale));
+   --padding-5: calc(1.25rem * var(--padding-scale));
    /* 24px */
-   --padding-6: calc(24px * var(--padding-scale));
+   --padding-6: calc(1.5rem * var(--padding-scale));
    /* 28px */
-   --padding-7: calc(28px * var(--padding-scale));
+   --padding-7: calc(1.75rem * var(--padding-scale));
    /* 40px */
-   --padding-10: calc(40px * var(--padding-scale));
+   --padding-10: calc(2.5rem * var(--padding-scale));
    /* 48px */
-   --padding-12: calc(48px * var(--padding-scale));
+   --padding-12: calc(3rem * var(--padding-scale));
 
    /* 0px */
    --gap-0: 0;
    /* 4px */
-   --gap-1: calc(4px * var(--gap-scale));
+   --gap-1: calc(0.25rem * var(--gap-scale));
    /* 8px */
-   --gap-2: calc(8px * var(--gap-scale));
+   --gap-2: calc(0.5rem * var(--gap-scale));
    /* 12px */
-   --gap-3: calc(12px * var(--gap-scale));
+   --gap-3: calc(0.75rem * var(--gap-scale));
    /* 16px */
-   --gap-4: calc(16px * var(--gap-scale));
+   --gap-4: calc(1rem * var(--gap-scale));
    /* 20px */
-   --gap-5: calc(20px * var(--gap-scale));
+   --gap-5: calc(1.25rem * var(--gap-scale));
    /* 24px */
-   --gap-6: calc(24px * var(--gap-scale));
+   --gap-6: calc(1.5rem * var(--gap-scale));
    /* 28px */
-   --gap-7: calc(28px * var(--gap-scale));
+   --gap-7: calc(1.75rem * var(--gap-scale));
    /* 40px */
-   --gap-10: calc(40px * var(--gap-scale));
+   --gap-10: calc(2.5rem * var(--gap-scale));
    /* 48px */
-   --gap-12: calc(48px * var(--gap-scale));
+   --gap-12: calc(3rem * var(--gap-scale));
 
    /* ==========================
      7) Orchestration Dynamic Vars

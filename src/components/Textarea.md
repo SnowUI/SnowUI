@@ -18,6 +18,8 @@
 **推荐容器**: `Field.svelte`。
 **默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。
 
+内部原生 `<textarea>` 显式接入 `layout.css` 的 `.snowui-native-control`，只归一化 box sizing、margin 并继承消费环境的字体与颜色；Textarea 自身字号、行高、Padding、边框和状态视觉不依赖可选的 `snowui-base.css`。
+
 ## 布局模型
 
 主布局模型：复合管理布局。

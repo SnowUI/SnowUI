@@ -1399,7 +1399,7 @@
         <input
             {...inputRestProps}
             bind:this={nativeInputElement}
-            class="snowui-input-control snowui-input-embedded-native snowui-horizontal-scroll-mask"
+            class="snowui-input-control snowui-native-control snowui-input-embedded-native snowui-horizontal-scroll-mask"
             data-scroll-mask-x={horizontalScrollMask}
             {id}
             type={normalizedInputType}
@@ -1496,7 +1496,7 @@
             <input
                 {...inputRestProps}
                 bind:this={nativeInputElement}
-                class="snowui-input-control snowui-input-control-native snowui-input-control-color-native"
+                class="snowui-input-control snowui-native-control snowui-input-control-native snowui-input-control-color-native"
                 {id}
                 type="color"
                 {name}
@@ -1540,7 +1540,7 @@
         <input
             {...inputRestProps}
             bind:this={nativeInputElement}
-            class="snowui-input-control snowui-input-control-native snowui-input-control-date-native"
+            class="snowui-input-control snowui-native-control snowui-input-control-native snowui-input-control-date-native"
             {id}
             type={normalizedInputType}
             {name}
@@ -1648,7 +1648,7 @@
         <input
             {...inputRestProps}
             bind:this={nativeInputElement}
-            class="snowui-input-control snowui-horizontal-scroll-mask"
+            class="snowui-input-control snowui-native-control snowui-horizontal-scroll-mask"
             data-scroll-mask-x={horizontalScrollMask}
             {id}
             type={normalizedInputType}

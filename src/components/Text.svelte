@@ -1,5 +1,5 @@
 <!--
-     Text 组件：智能文本显示与截断组件 v3.5.1
+     Text 组件：智能文本显示与截断组件 v3.5.2
 
  文档: ./Text.md
 -->
@@ -693,6 +693,10 @@
             var(--snowui-state-opacity, var(--snowui-parallax-opacity, 1))
         );
         /* transition: transform 0.1s linear, opacity 0.1s linear; (被禁用，以免阻塞 WAAPI 动效) */
+    }
+
+    :global(:where(.snowui-text:is(p, h1, h2, h3, h4, h5, h6))) {
+        overflow-wrap: break-word;
     }
 
     :global(:where(.snowui-text-single-line-label)) {

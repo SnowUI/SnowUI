@@ -273,7 +273,7 @@
     <textarea
         {...textareaRestProps}
         bind:this={textareaEl}
-        class={`snowui-textarea-control${readonly ? "" : " snowui-overlay-scrollbar-viewport snowui-scroll-mask"}`}
+        class={`snowui-textarea-control snowui-native-control${readonly ? "" : " snowui-overlay-scrollbar-viewport snowui-scroll-mask"}`}
         data-scroll-mask={!readonly && !isEmbedded
             ? resolveScrollMask(showTopFade, showBottomFade)
             : undefined}

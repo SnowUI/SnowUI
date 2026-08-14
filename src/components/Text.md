@@ -6,7 +6,8 @@
 - `parts.Tooltip`：配置截断时内置 Tooltip。
 - 外置 Tooltip 或其他 children 不受 Text 私有 DOM 选择器控制。
 
-> **版本**: v3.5.1
+> **版本**: v3.5.2
+> **变更记录 (2026-08-15)**: `p / h1…h6` 语义宿主显式启用长词换行保护，不依赖可选 `snowui-base.css`；`tag="code"` 仍按契约允许消费应用级 code 初始化。
 > **变更记录 (2026-05-18)**: 新增 `stateText`，支持读取父 Frame `currentState` 后声明式切换文本。
 > **变更记录 (2026-04-28)**: 标注主布局模型为文本流布局；Text hover 位移改为 transform 变量，不再通过 margin 改变文本流外部间距。
 > **变更记录 (2026-03-16)**: 按需求将 Text 自带 hover 态改为默认关闭，显式传入 `interactive={true}` 才开启。
@@ -261,6 +262,10 @@ graph TD
 ---
 
 ## 更新日志 (Changelog)
+
+### v3.5.2 (2026-08-15)
+
+- `p / h1…h6` 语义宿主显式启用 `overflow-wrap: break-word`，未引入可选 `snowui-base.css` 时仍保持长词保护；`tag="code"` 继续允许消费应用级 code 初始化。
 
 ### v3.5.1 (2026-08-06)
 

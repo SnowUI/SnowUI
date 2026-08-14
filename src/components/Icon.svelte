@@ -1,6 +1,6 @@
 <!--
  Icon 图标组件
-  v2.3.2
+  v2.3.3
 
  1. 核心能力 (Features):
     - 统一尺寸: 默认 16px。支持 16, 20, 24, 28, 32, 40, 48, 80 八种标准尺寸。
@@ -441,9 +441,15 @@
         margin: 0;
     }
 
-    :global(:where(.snowui-icon-image)) {
+    :global(:where(.snowui-icon-image)),
+    :global(:where(.snowui-icon-content > svg)) {
+        display: block;
         width: 100%;
         height: 100%;
+        max-width: 100%;
+    }
+
+    :global(:where(.snowui-icon-image)) {
         object-fit: contain;
     }
 

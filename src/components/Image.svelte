@@ -540,10 +540,7 @@
        - 空 fallback → 根无标志 → background 层 background-color 加深
        详见 components/src/styles/layout.css §"Media Hoverable 工具类"。 */
 
-    /* 
-      深度修复：根据用户要求移除 :focus-visible 样式。
-      由于全局 base.css 定义了 4px outline，此处需要确权阻断。
-    */
+    /* Image 的设计不显示焦点外环；由组件自身确权，不依赖应用级 focus reset。 */
     :global(:where(.snowui-image:focus-visible)) {
         outline: none;
         box-shadow: none;

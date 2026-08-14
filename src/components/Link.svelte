@@ -312,6 +312,7 @@
         --snowui-link-decoration-hover-opacity: var(--snowui-state-opacity, 1);
 
         color: var(--snowui-link-color-override, var(--snowui-link-color));
+        text-decoration: none;
         width: fit-content;
         max-width: 100%;
         gap: var(--snowui-link-gap-override, var(--snowui-link-gap));
