@@ -177,6 +177,13 @@
         enableContext={enableContext}
         enableScaleObserver={enableScaleObserver}
         {...rest}
+        renderHints={{
+            variant: rest.renderHints?.variant ?? "rect",
+            width: rest.renderHints?.width ?? "12rem",
+            height: rest.renderHints?.height ?? "2.25rem",
+            radius: rest.renderHints?.radius ?? "var(--radius-4)",
+            rows: rest.renderHints?.rows,
+        }}
     >
         {#if showBuiltinIcon && !hasCustomLeading}
             <span

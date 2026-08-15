@@ -1,6 +1,6 @@
 <!--
   GradientMotion 渐变动效图组件
-  v4.0.0
+  v4.0.1
 
   职责：按 glimm.dev / glimm@0.1.4 还原 shader sweep 渐变效果。
   文档：./GradientMotion.md

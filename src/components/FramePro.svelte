@@ -82,7 +82,7 @@
         initOrchestrator,
         getOrchestrator,
     } from "../logic/frame-orchestrator.svelte";
-    import { Skeleton, getSkeletonComponentKey } from "@snowui-design-system/components";
+    import { Skeleton } from "@snowui-design-system/components";
 
     interface Props extends FrameProps {
         [key: string]: any;
@@ -262,15 +262,13 @@
     });
     const resolvedStateStyle = $derived(classStateRuntime.resolvedStateStyle);
     const computedClass = $derived(classStateRuntime.computedClass);
-    const skeletonComponentKey = $derived(
-        getSkeletonComponentKey(computedClass),
-    );
     let skeletonProbe = $state<HTMLElement>();
     const skeletonRuntime = createFrameSkeletonRuntime({
         getFrameProps: () => frameProps,
         getEffectiveLoading: () => effectiveLoading,
         getEffectiveSkeleton: () => effectiveSkeleton,
-        getSkeletonComponentKey: () => skeletonComponentKey,
+        // 兼容当前已安装的 OSS 类型；v1.1 runtime 不再读取 class key。
+        getSkeletonComponentKey: () => undefined,
         getProbeHost: () => skeletonProbe,
     });
     const shouldRenderSkeleton = $derived(skeletonRuntime.shouldRenderSkeleton);

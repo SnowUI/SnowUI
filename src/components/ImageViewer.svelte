@@ -381,6 +381,13 @@
         style={userStyle || undefined}
         onclick={handleRootClick}
         {...rest}
+        renderHints={{
+            variant: userRenderHints?.variant ?? "rect",
+            width: userRenderHints?.width ?? "7rem",
+            height: userRenderHints?.height ?? "5rem",
+            radius: userRenderHints?.radius ?? "var(--radius-3)",
+            rows: userRenderHints?.rows,
+        }}
     >
         <div class="snowui-image-viewer-viewport">
             <div class="snowui-image-viewer-media-shell">
@@ -425,7 +432,13 @@
                         <div class="snowui-image-viewer-skeleton-layer">
                             <Skeleton
                                 componentClass="snowui-image-viewer"
-                                renderHints={userRenderHints}
+                                renderHints={{
+                                    variant: userRenderHints?.variant ?? "rect",
+                                    width: userRenderHints?.width ?? "7rem",
+                                    height: userRenderHints?.height ?? "5rem",
+                                    radius: userRenderHints?.radius ?? "var(--radius-3)",
+                                    rows: userRenderHints?.rows,
+                                }}
                             />
                         </div>
                     {/if}

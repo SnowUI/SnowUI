@@ -1,6 +1,6 @@
 # FramePro.svelte（PRO）
 
-> **版本**: v4.0.2（共享元素布局策略补充，2026-07-30）
+> **版本**: v4.0.3（Skeleton 自注册协议，2026-08-15）
 > **职责**: OSS Frame 的超集。在 OSS Frame 全部能力之上叠加**跨组件协调**：编排模式、联动控制、样式编排。
 > **样式规范**: 详见 [StyleSpec.md](../../../specs/StyleSpec.md)
 > **包归属**: `@snowui/components-pro`（PRO，私有）
@@ -172,7 +172,7 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 | avatarSize | `number` | - | **New** 独立控制内部 Avatar 的尺寸 (Context 传递) |
 | loading | `boolean` | `false` | 是否进入加载态。只表示状态，不决定具体视觉呈现。 |
 | skeleton | `boolean` | `true` | 加载态是否渲染骨架。可继承父级 loading protocol。 |
-| renderHints | `{ variant?: "line" \| "circle" \| "rect"; width?: string \| number; height?: string \| number; radius?: string \| number }` | - | 组件传给 Skeleton 的渲染提示桥。用于把最终解析后的骨架形态、尺寸与圆角信息透传给默认骨架协议。 |
+| renderHints | `{ variant?: "line" \| "circle" \| "rect"; width?: string \| number; height?: string \| number; radius?: string \| number; rows?: number }` | - | 组件根的 Skeleton 自注册协议。组件提供最终形态、尺寸、圆角与行数；调用方逐字段覆盖。 |
 | use | `Action[]` | - | Svelte Actions 数组 |
 | children | `Snippet` | - | 子内容 (容器类组件) |
 | currentState | `CoreState` | `"Idle"` | 外部受控核心状态。用于 Toast / Portal 等由父级管理生命周期的场景，把 `Appear` / `Disappear` / `Active` 等状态交给 Frame 默认动效系统解析。 |
@@ -689,8 +689,9 @@ SnowUI 组件内部若拥有明确默认视觉，应直接引用组件族 preset
 - 页面或区块根节点只需要提供一次加载信号，例如 `<Frame loading={pageLoading}>`
 - 子组件无需逐个声明 `loading`，会通过 `SKELETON_CONTEXT_KEY` 自动继承父级 loading
 - `skeleton` 默认为 `true`；设为 `false` 时，保留真实组件内容，只让 `whileLoad` 负责加载态动效
-- 命中已注册组件类名时，`Frame` 会直接渲染对应 Skeleton 形态
-- 组件可通过 `renderHints` 向 `Skeleton` 补充最终解析后的 `variant / width / height`，让骨架尺寸与真实组件尺寸保持一致
+- 组件根提供 `renderHints` 即完成 Skeleton 自注册；Frame 输出登记标记并自动渲染对应形态
+- 父 Frame 只探测第一层已注册 child，并透传最终 `variant / width / height / radius / rows`
+- 未注册的普通 Frame 仍渲染通用 fallback；集中 class mapping 仅保留旧调用方兼容
 - 容器型 `Frame` 在存在 `children` 且未命中特定组件映射时，优先保留子树，让子组件各自渲染骨架
 - 叶子节点且未命中映射时，回退渲染通用矩形骨架
 - 加载期间根节点会自动输出 `aria-busy="true"` 与 `data-loading="true"`，并阻断交互
@@ -1301,6 +1302,10 @@ fontSize: "12 + Math.floor($self.width / 100)"
 ---
 
 ## 更新日志 (Changelog)
+
+### v4.0.3 (2026-08-15)
+
+- 同步 OSS Frame 的 `renderHints` Skeleton 自注册、首层已注册 child probe 与通用 fallback 协议。
 
 ### v4.0.2 (2026-07-30)
 

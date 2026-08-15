@@ -1,6 +1,6 @@
 # GradientMotion (渐变动效图)
 
-> **版本**: v4.0.0
+> **版本**: v4.0.1
 > **职责**: 按 glimm.dev / `glimm@0.1.4` 还原 shader sweep 渐变效果，可作为可裁切媒体面、头像默认图或背景扫光层使用。
 > **包归属**: PRO
 
@@ -56,6 +56,12 @@ GradientMotion 是一个 PRO 动效组件。它输出 glimm.dev 同款 WebGL 扫
 | as | `string` | - | Frame 角色声明；Avatar 场景推荐 `as="avatar-image"` |
 
 > `as="avatar-image"` 会自动启用头像专用连续填充逻辑；如需直接使用组件，也可显式传 `variant="avatar"`。
+
+## 专业艺术色例外
+
+GradientMotion 的内置 glimm cosine palette、WebGL 不可用时的 CSS fallback palette，以及 `colors` 传入的四个六位 HEX 采样色，已在 [StyleSpec §2.1.3](../../../specs/StyleSpec.md#213-专业艺术色例外强制) 单独登记为专业艺术色例外。shader 必须将这些颜色转换为数值向量并生成连续色域；它们表达生成式画面，不表达按钮、文字、状态或表面语义，因此不要求映射到 SnowUI 语义 Token。
+
+该例外只覆盖 GradientMotion 专业画面的 palette。`colors` 不是通用颜色 Prop 协议，不得据此让其他组件跳过 `resolveSnowUIColor()`；组件根的尺寸、圆角、外部 `class` / `style` 覆盖、无障碍、外层 motion 与 reduced-motion 仍遵守现行规范。新增 palette 类型或把这些颜色用于 UI 语义前必须重新登记。
 
 ## 使用示例
 
@@ -142,6 +148,10 @@ GradientMotion 是一个 PRO 动效组件。它输出 glimm.dev 同款 WebGL 扫
 ---
 
 ## 更新日志 (Changelog)
+
+### v4.0.1 (2026-08-15)
+
+- 将内置 shader palette、CSS fallback palette 与专用 `colors` 四色艺术输入正式登记为专业艺术色例外，并明确例外不扩展到组件其他样式和动效契约。
 
 ### v4.0.0 (2026-07-07)
 

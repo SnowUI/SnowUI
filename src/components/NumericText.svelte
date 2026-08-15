@@ -269,6 +269,13 @@
     {enableScaleObserver}
     {enableDefaultMotion}
     {...rest}
+    renderHints={{
+        variant: rest.renderHints?.variant ?? "line",
+        width: rest.renderHints?.width ?? `calc(${Math.max(1, Array.from(displayValue).length)}ch + 0.5rem)`,
+        height: rest.renderHints?.height ?? "1.25rem",
+        radius: rest.renderHints?.radius,
+        rows: rest.renderHints?.rows,
+    }}
 >
     <svelte:element
         this={TEXT_MOTION_CHARACTER_TAG}

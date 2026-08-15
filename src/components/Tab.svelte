@@ -312,6 +312,13 @@
     onclick={handleClick}
     onkeydown={handleKeydown}
     {...rest}
+    renderHints={{
+        variant: rest.renderHints?.variant ?? "rect",
+        width: rest.renderHints?.width ?? "12rem",
+        height: rest.renderHints?.height ?? "1.5rem",
+        radius: rest.renderHints?.radius ?? "var(--radius-4)",
+        rows: rest.renderHints?.rows,
+    }}
 >
     <div
         bind:this={indicatorEl}
