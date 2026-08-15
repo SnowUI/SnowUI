@@ -1,6 +1,7 @@
 # Avatar.svelte 文档
 
-> **版本**: v2.12.2
+> **版本**: v2.12.3
+> **变更记录 (2026-08-15)**: 默认 Gradient hover 改为按需挂载预栅格 SVG 图层；不再创建运行时 filter DOM，并继承 Gradient 的共享视口暂停能力。
 > **变更记录 (2026-08-15)**: 将 Avatar hover alpha 艺术色与 Gradient、GradientMotion 的画面艺术色分项登记，明确 Avatar 只拥有自己的 hover 染色例外。
 > **变更记录 (2026-08-15)**: 正式登记默认 Gradient 与图片 / 普通组件头像 hover 六色为专业艺术色例外；例外不建立通用语义色，也不豁免 Avatar 的其他 Token / 样式规则。
 > **变更记录 (2026-08-06)**: 默认 Gradient 头像常态改为轻量共享静态图；仅 hover 或 `gradientMotion` 开启时挂载完整 Gradient 组件，降低长表格中的组件、响应式状态与 SVG 资源开销。
@@ -158,7 +159,7 @@
 - Overlay 位于 `.snowui-avatar-container` 内、完整视觉内容上方和外部 Badge 下方，继承头像圆角与裁切。
 - 每次 pointer enter 从六种 Gradient 中心主色中等概率随机选择一种；同一次 hover 内不运行颜色变化动画。
 - Avatar 单色 Overlay 通过 SVG alpha composite 只作用于图片或组件实际绘制的非透明图形，透明区域保持不变；fallbackText 与 empty 用户图标不参与染色。
-- Gradient fallback 自行拥有多色循环 hover，并在常态静态模式下按需淡入实时 SVG 水波形变；Avatar 不再对其重复叠加单色层。
+- Gradient fallback 自行拥有多色循环 hover，并在常态静态模式下按需淡入四个预栅格 SVG 图层的水波形变；Avatar 不再对其重复叠加单色层。
 - 只过渡一个小画布纯色层的 opacity，默认峰值 `58%`、入口 / 退出 `0.5s`。
 - 所有 hover 规则排除 `.snowui-disabled`、`[data-disabled="true"]` 与 `:disabled`；reduced-motion 下关闭淡入淡出并保留静态随机色反馈。
 
@@ -208,6 +209,10 @@
 ---
 
 ## 更新日志
+
+### v2.12.3 (2026-08-15)
+
+- 默认 Gradient hover 改为按需挂载四个模块缓存的预栅格 SVG 图层，不再创建运行时 filter DOM；活动 Gradient 同时继承共享视口暂停能力。
 
 ### v2.12.2 (2026-08-15)
 

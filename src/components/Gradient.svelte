@@ -1,8 +1,8 @@
 <!--
   Gradient 矢量渐变组件
-  v2.12.1
+  v2.13.1
 
-  职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
+  职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并以预栅格图层保持四层柔和形变。
   文档：./Gradient.md
 -->
 
@@ -29,6 +29,17 @@
         subtract: string;
         subtract2: string;
         center: string;
+    };
+
+    type GradientMotionLayer =
+        | "vector-4"
+        | "vector-3"
+        | "subtract"
+        | "subtract-2";
+
+    type GradientMotionLayerSource = {
+        name: GradientMotionLayer;
+        source: string;
     };
 
     const GRADIENT_PALETTES: Record<GradientVariant, GradientPalette> = {
@@ -94,6 +105,105 @@
     const GRADIENT_VARIANTS = Object.keys(
         GRADIENT_PALETTES,
     ) as GradientVariant[];
+
+    const GRADIENT_MOTION_LAYER_SOURCE_CACHE = new Map<
+        string,
+        GradientMotionLayerSource[]
+    >();
+    const GRADIENT_VISIBILITY_CALLBACKS = new WeakMap<
+        Element,
+        (visible: boolean) => void
+    >();
+    let gradientVisibilityObserver: IntersectionObserver | undefined;
+
+    function observeGradientVisibility(
+        node: Element,
+        onVisibilityChange: (visible: boolean) => void,
+    ) {
+        if (typeof IntersectionObserver === "undefined") {
+            onVisibilityChange(true);
+            return () => {};
+        }
+
+        gradientVisibilityObserver ??= new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    GRADIENT_VISIBILITY_CALLBACKS.get(entry.target)?.(
+                        entry.isIntersecting,
+                    );
+                }
+            },
+            { rootMargin: "128px" },
+        );
+        GRADIENT_VISIBILITY_CALLBACKS.set(node, onVisibilityChange);
+        gradientVisibilityObserver.observe(node);
+
+        return () => {
+            gradientVisibilityObserver?.unobserve(node);
+            GRADIENT_VISIBILITY_CALLBACKS.delete(node);
+        };
+    }
+
+    function createGradientMotionLayerSource(
+        name: GradientMotionLayer,
+        palette: GradientPalette,
+        canvasSize: 600 | 720,
+    ) {
+        const definitions: Record<
+            GradientMotionLayer,
+            { blur: number; shape: string }
+        > = {
+            "vector-4": {
+                blur: 60,
+                shape: `<ellipse cx="214.952" cy="111.754" rx="384.575" ry="213.162" transform="rotate(-146.037 214.952 111.754)" fill="${palette.vector4}"/>`,
+            },
+            "vector-3": {
+                blur: 60,
+                shape: `<ellipse cx="282.642" cy="177.528" rx="223.026" ry="153.731" transform="rotate(-135.496 282.642 177.528)" fill="${palette.vector3}"/>`,
+            },
+            subtract: {
+                blur: 40,
+                shape: `<path d="M63.8873 -19.2028C116.398 1.25526 169.035 25.0829 221.278 52.3178C285.966 86.04 346.709 123.243 403 163.081C584.414 291.473 271.178 628.302 278.61 357.5C282.932 200.002 197.822 55.4726 63.8873 -19.2028Z" fill="${palette.subtract}"/>`,
+            },
+            "subtract-2": {
+                blur: 50,
+                shape: `<path d="M417.77 -97.6118C594.82 20.5018 571.194 414.723 412.576 243.5C361.565 188.436 300.326 136.413 230.397 90.6631C173.62 53.5181 115.35 23.2776 57.5 0.00434098C-138.842 -78.9842 286.515 -185.174 417.77 -97.6118Z" fill="${palette.subtract2}"/>`,
+            },
+        };
+        const definition = definitions[name];
+        const canvasStart = (360 - canvasSize) / 2;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${canvasStart} ${canvasStart} ${canvasSize} ${canvasSize}" preserveAspectRatio="none"><defs><filter id="blur" x="${canvasStart}" y="${canvasStart}" width="${canvasSize}" height="${canvasSize}" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="${definition.blur}"/></filter></defs><g filter="url(#blur)">${definition.shape}</g></svg>`;
+
+        return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    }
+
+    function getGradientMotionLayerSources(
+        variant: GradientVariant,
+        avatar: boolean,
+    ) {
+        const cacheKey = `${variant}:${avatar ? "avatar" : "default"}`;
+        const cached = GRADIENT_MOTION_LAYER_SOURCE_CACHE.get(cacheKey);
+        if (cached) return cached;
+
+        const palette = GRADIENT_PALETTES[variant];
+        const sources = (
+            [
+                "vector-4",
+                "vector-3",
+                "subtract",
+                "subtract-2",
+            ] as GradientMotionLayer[]
+        ).map((name) => ({
+            name,
+            source: createGradientMotionLayerSource(
+                name,
+                palette,
+                avatar || name === "subtract-2" ? 720 : 600,
+            ),
+        }));
+        GRADIENT_MOTION_LAYER_SOURCE_CACHE.set(cacheKey, sources);
+        return sources;
+    }
 
     export function resolveGradientVariant(
         seed: string | number | undefined,
@@ -196,6 +306,7 @@
         renderHints: userRenderHints = undefined,
         onpointerenter: userPointerEnter = undefined,
         onpointerleave: userPointerLeave = undefined,
+        use: userUse = [],
         enableResponsive = false,
         enableContext = false,
         enableScaleObserver = false,
@@ -206,12 +317,6 @@
     const DEFAULT_RADIUS = "var(--radius-0)";
     const componentId = $props.id();
     const instanceId = `snowui-gradient-${componentId}`;
-    const clipId = `${instanceId}-clip`;
-    const vector4FilterId = `${instanceId}-vector-4-blur`;
-    const vector3FilterId = `${instanceId}-vector-3-blur`;
-    const subtractFilterId = `${instanceId}-subtract-blur`;
-    const subtract2FilterId = `${instanceId}-subtract-2-blur`;
-
     getSize();
 
     function toCssLength(value: number | string): string {
@@ -239,6 +344,9 @@
         STATIC_GRADIENT_SOURCES[resolvedVariant] ??
             STATIC_GRADIENT_SOURCES.blue,
     );
+    const motionLayerSources = $derived(
+        getGradientMotionLayerSources(resolvedVariant, isAvatarVariant),
+    );
     const avatarColorCycle = $derived(
         isAvatarVariant
             ? resolveAvatarColorCycle(resolvedVariant, seed, instanceId)
@@ -264,6 +372,7 @@
     let avatarOverlayMounted = $state(false);
     let avatarOverlayReady = $state(false);
     let avatarMotionProfile = $state(0);
+    let motionVisible = $state(true);
     let avatarOverlayFrame: number | undefined;
     let avatarOverlayUnmountTimer: ReturnType<typeof setTimeout> | undefined;
     const hoverMotionMounted = $derived(
@@ -335,6 +444,14 @@
         if (!controlledAvatarHover) deactivateAvatarOverlay();
     }
 
+    function connectGradientVisibility(node: HTMLElement) {
+        return {
+            destroy: observeGradientVisibility(node, (visible) => {
+                motionVisible = visible;
+            }),
+        };
+    }
+
     $effect(() => {
         const controlled = controlledAvatarHover;
         const active = avatarHoverActive;
@@ -360,6 +477,7 @@
         `snowui-gradient-${resolvedVariant}`,
         isAvatarVariant ? "snowui-gradient-avatar" : "",
         motionRunning ? "snowui-gradient-motion-enabled" : "",
+        motionVisible ? "snowui-gradient-motion-visible" : "",
         hoverMotionMounted ? "snowui-gradient-hover-motion-enabled" : "",
         className,
     ]
@@ -381,6 +499,7 @@
     onmouseleave={handleMouseLeave}
     onpointerenter={userPointerEnter}
     onpointerleave={userPointerLeave}
+    use={[connectGradientVisibility, ...userUse]}
     {...rest}
 >
     {#if isAvatarVariant && !motionEnabled}
@@ -396,152 +515,26 @@
         />
     {/if}
     {#if renderLiveGradient}
-        <svg
-        class={`snowui-gradient-svg ${hoverMotionMounted ? "snowui-gradient-hover-motion-svg" : ""}`}
-        viewBox="0 0 360 360"
-        preserveAspectRatio="none"
-        aria-hidden="true"
-        focusable="false"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <defs>
-            <filter
-                id={vector4FilterId}
-                x="-245.611"
-                y="-286.49"
-                width="921.128"
-                height="796.487"
-                filterUnits="userSpaceOnUse"
-                color-interpolation-filters="sRGB"
-            >
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                <feBlend
-                    mode="normal"
-                    in="SourceGraphic"
-                    in2="BackgroundImageFix"
-                    result="shape"
-                />
-                <feGaussianBlur
-                    stdDeviation="60"
-                    result="effect1_foregroundBlur"
-                />
-            </filter>
-            <filter
-                id={vector3FilterId}
-                x="-29.5047"
-                y="-133.435"
-                width="624.294"
-                height="621.927"
-                filterUnits="userSpaceOnUse"
-                color-interpolation-filters="sRGB"
-            >
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                <feBlend
-                    mode="normal"
-                    in="SourceGraphic"
-                    in2="BackgroundImageFix"
-                    result="shape"
-                />
-                <feGaussianBlur
-                    stdDeviation="60"
-                    result="effect1_foregroundBlur"
-                />
-            </filter>
-            <filter
-                id={subtractFilterId}
-                x="-16.1127"
-                y="-99.2028"
-                width="555.729"
-                height="639.235"
-                filterUnits="userSpaceOnUse"
-                color-interpolation-filters="sRGB"
-            >
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                <feBlend
-                    mode="normal"
-                    in="SourceGraphic"
-                    in2="BackgroundImageFix"
-                    result="shape"
-                />
-                <feGaussianBlur
-                    stdDeviation="40"
-                    result="effect1_foregroundBlur"
-                />
-            </filter>
-            <filter
-                id={subtract2FilterId}
-                x="-93.4444"
-                y="-230.518"
-                width="734.724"
-                height="616.471"
-                filterUnits="userSpaceOnUse"
-                color-interpolation-filters="sRGB"
-            >
-                <feFlood flood-opacity="0" result="BackgroundImageFix" />
-                <feBlend
-                    mode="normal"
-                    in="SourceGraphic"
-                    in2="BackgroundImageFix"
-                    result="shape"
-                />
-                <feGaussianBlur
-                    stdDeviation="50"
-                    result="effect1_foregroundBlur"
-                />
-            </filter>
-            <clipPath id={clipId}>
-                <rect width="360" height="360" />
-            </clipPath>
-        </defs>
-
-        <g clip-path={`url(#${clipId})`}>
-            <rect width="360" height="360" fill={palette.background} />
-            <g
-                class="snowui-gradient-layer snowui-gradient-layer-vector-4"
-                filter={`url(#${vector4FilterId})`}
-            >
-                <ellipse
-                    cx="214.952"
-                    cy="111.754"
-                    rx="384.575"
-                    ry="213.162"
-                    transform="rotate(-146.037 214.952 111.754)"
-                    fill={palette.vector4}
-                />
-            </g>
-            <g
-                class="snowui-gradient-layer snowui-gradient-layer-vector-3"
-                filter={`url(#${vector3FilterId})`}
-            >
-                <ellipse
-                    cx="282.642"
-                    cy="177.528"
-                    rx="223.026"
-                    ry="153.731"
-                    transform="rotate(-135.496 282.642 177.528)"
-                    fill={palette.vector3}
-                />
-            </g>
-            <g
-                class="snowui-gradient-layer snowui-gradient-layer-subtract"
-                filter={`url(#${subtractFilterId})`}
-            >
-                <path
-                    d="M63.8873 -19.2028C116.398 1.25526 169.035 25.0829 221.278 52.3178C285.966 86.04 346.709 123.243 403 163.081C584.414 291.473 271.178 628.302 278.61 357.5C282.932 200.002 197.822 55.4726 63.8873 -19.2028Z"
-                    fill={palette.subtract}
-                />
-            </g>
-            <g
-                class="snowui-gradient-layer snowui-gradient-layer-subtract-2"
-                filter={`url(#${subtract2FilterId})`}
-            >
-                <path
-                    d="M417.77 -97.6118C594.82 20.5018 571.194 414.723 412.576 243.5C361.565 188.436 300.326 136.413 230.397 90.6631C173.62 53.5181 115.35 23.2776 57.5 0.00434098C-138.842 -78.9842 286.515 -185.174 417.77 -97.6118Z"
-                    fill={palette.subtract2}
-                />
-            </g>
-        </g>
-        </svg>
+        <div
+            class={`snowui-gradient-live ${hoverMotionMounted ? "snowui-gradient-hover-motion-live" : ""}`}
+            aria-hidden="true"
+            style={`--snowui-gradient-background-internal: ${palette.background}`}
+        >
+            {#each motionLayerSources as layer}
+                <div
+                    class={`snowui-gradient-layer snowui-gradient-layer-${layer.name}`}
+                >
+                    <img
+                        class="snowui-gradient-layer-image"
+                        src={layer.source}
+                        alt=""
+                        decoding="sync"
+                        draggable="false"
+                        aria-hidden="true"
+                    />
+                </div>
+            {/each}
+        </div>
     {/if}
     {#if isAvatarVariant && avatarOverlayMounted}
         <div class="snowui-gradient-avatar-overlay" aria-hidden="true">
@@ -597,6 +590,8 @@
         mask-image: linear-gradient(black, black);
         box-sizing: border-box;
         isolation: isolate;
+        contain: layout paint style;
+        content-visibility: auto;
     }
 
     :global(:where(.snowui-gradient-svg)) {
@@ -611,9 +606,14 @@
         object-fit: fill;
     }
 
-    :global(:where(.snowui-gradient-hover-motion-svg)) {
+    :global(:where(.snowui-gradient-live)) {
         position: absolute;
         inset: 0;
+        background-color: var(--snowui-gradient-background-internal);
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-gradient-hover-motion-live)) {
         opacity: 0;
         transition: opacity
             var(--snowui-gradient-avatar-hover-exit-duration, 0.5s)
@@ -622,7 +622,7 @@
 
     :global(
             :where(.snowui-gradient-hover-motion-enabled[data-avatar-overlay-ready="true"])
-                :where(.snowui-gradient-hover-motion-svg)
+                :where(.snowui-gradient-hover-motion-live)
         ) {
         opacity: 1;
         transition-duration: var(
@@ -632,13 +632,46 @@
     }
 
     :global(:where(.snowui-gradient-avatar)) {
-        contain: layout paint style;
-        content-visibility: auto;
+        contain-intrinsic-size: var(--snowui-gradient-width)
+            var(--snowui-gradient-height);
     }
 
     :global(:where(.snowui-gradient-layer)) {
-        transform-box: view-box;
+        position: absolute;
+        inset: 0;
         transform-origin: center;
+    }
+
+    :global(:where(.snowui-gradient-layer-image)) {
+        position: absolute;
+        top: -33.333333%;
+        left: -33.333333%;
+        display: block;
+        width: 166.666667%;
+        max-width: none;
+        height: 166.666667%;
+        pointer-events: none;
+        user-select: none;
+    }
+
+    :global(
+            :where(.snowui-gradient-layer-subtract-2)
+                :where(.snowui-gradient-layer-image)
+        ) {
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+    }
+
+    :global(
+            :where(.snowui-gradient-avatar)
+                :where(.snowui-gradient-layer-image)
+        ) {
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
     }
 
     :global(
@@ -646,15 +679,29 @@
                 :where(.snowui-gradient-layer)
         ) {
         will-change: transform;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
         animation-duration: var(
             --snowui-gradient-motion-duration-override,
             var(--snowui-gradient-motion-duration, 15s)
         );
         animation-timing-function: var(
             --snowui-gradient-motion-easing-override,
-            cubic-bezier(1, 1, 1, 1)
+            steps(90, end)
         );
         animation-iteration-count: infinite;
+    }
+
+    :global(
+            :where(
+                    .snowui-gradient-motion-enabled:not(
+                            .snowui-gradient-motion-visible
+                        )
+                )
+                :where(.snowui-gradient-layer)
+        ) {
+        animation-play-state: paused;
+        will-change: auto;
     }
 
     :global(

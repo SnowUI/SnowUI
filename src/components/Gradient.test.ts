@@ -1,6 +1,6 @@
 /**
  * Gradient.test.ts
- * v2.12.0
+ * v2.13.1
  */
 export const examples = [
     {
@@ -30,7 +30,7 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "三项使用同一套 viewBox 矢量；尺寸按 0.25×、0.5×、1× 缩放时，图形边界与四层 Gaussian Blur 同比缩放。",
-            performance: "不使用 ResizeObserver、Canvas 或运行时 blur 重算。",
+            performance: "不使用 ResizeObserver、Canvas 或运行时 blur 重算；活动图层复用模块级预栅格 SVG 图源，最上方的 Subtract 2 使用独立 720 × 720 安全区，避免旋转 / 缩放时暴露裁切边界。",
         },
         logic: ["VectorScaling", "BlurScaling"],
     },
@@ -57,8 +57,8 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "以三列两行依次渲染 blue、cyan、green、red、orange、purple 六个 80 × 80 Gradient Avatar；圆形外壳裁切无有色毛边，内部矢量不溢出。",
-            interaction: "每个头像 hover 时排除当前 variant，并按实例随机顺序在其余五种 Gradient 中心色之间持续交叉过渡；同时按需淡入实时 SVG，四个图层以 6.4s / 7.2s / 8.4s / 6.8s 不同周期和七段非对称路径持续流动。每次进入随机选择且不重复上一组相位 / 方向配置；颜色 Overlay 保持双层、58% 峰值、10s 循环、1s进入和0.5s退出。",
-            performance: "Avatar 常态直接复用 lazy / async / low-priority 的六份静态 SVG 图片资源，不创建 Gradient 组件；hover 时才为当前头像挂载 Gradient、一份实时 SVG、四组 filter 与五色 × 两层 Overlay，淡出后全部卸载；受控 effect 不追踪这些内部动效状态。",
+            interaction: "每个头像 hover 时排除当前 variant，并按实例随机顺序在其余五种 Gradient 中心色之间持续交叉过渡；同时按需淡入四个预栅格 SVG 图层，四层以 6.4s / 7.2s / 8.4s / 6.8s 不同周期和七段非对称路径持续流动。每次进入随机选择且不重复上一组相位 / 方向配置；颜色 Overlay 保持双层、58% 峰值、10s 循环、1s进入和0.5s退出。",
+            performance: "Avatar 常态直接复用 lazy / async / low-priority 的六份静态 SVG 图片资源，不创建 Gradient 组件；hover 时才为当前头像挂载 Gradient、四张无 filter DOM 的预栅格图层与五色 × 两层 Overlay，淡出后全部卸载；受控 effect 不追踪这些内部动效状态。",
             accessibility: "prefers-reduced-motion: reduce 下停止颜色循环，并以随机序列首色保留静态 hover 反馈。",
         },
         logic: ["SixVariants", "Avatar", "SeedPalette", "RandomColorCycle", "OverlayBlend", "ControlledEffectBoundary", "ReducedMotion"],
@@ -69,7 +69,7 @@ export const examples = [
 <GradientMotionController />`,
         expected: {
             render: "底色矩形固定不动；Vector 4、Vector 3、Subtract、Subtract 2 分别执行位移 / 旋转、位移 / 缩放、位移 / 非等比形变、位移 / 旋转 / 缩放。图形位于上方，19 条控制条在下方按四列排列，并全部以各自可调范围上限作为默认值；基础时长 60s 与整体速度 4× 合成为实际 15s 循环。",
-            performance: "控制状态仅存在于 Test 辅助组件；Gradient 只动画四个有色 SVG 图层的 transform，不逐帧修改 Gaussian Blur、路径、颜色或混合模式。",
+            performance: "控制状态仅存在于 Test 辅助组件；Gradient 只动画四个预栅格 SVG 图片宿主的 transform，不逐帧修改 Gaussian Blur、路径、颜色或混合模式；离开视口预热范围后暂停，IntersectionObserver 缺失时保持运行。",
             accessibility: "prefers-reduced-motion: reduce 下停止动画并恢复静态基线。",
         },
         logic: ["MotionControls", "LayerTransforms", "StaticBackground", "ReducedMotion"],

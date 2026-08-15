@@ -451,7 +451,7 @@
     /* --snowui-gradient-height-override: ; */  /* 高度（默认 360px） */
     /* --snowui-gradient-radius-override: ; */  /* 圆角 / 裁切半径（默认 var(--radius-0) = 0） */
     /* --snowui-gradient-motion-duration-override: ; */ /* 四层持续动效实际时长（默认 15s，对应 Test 基础时长 60s ÷ 整体速度 4×） */
-    /* --snowui-gradient-motion-easing-override: ; */ /* 四层动效缓动（默认 cubic-bezier(1, 1, 1, 1)） */
+    /* --snowui-gradient-motion-easing-override: ; */ /* 常驻四层每个相邻关键帧区间的更新密度 / 缓动（默认 steps(90, end)） */
     /* --snowui-gradient-motion-vector-4-x-amplitude-override: ; */ /* Vector 4 X 位移幅度（默认 12%） */
     /* --snowui-gradient-motion-vector-4-y-amplitude-override: ; */ /* Vector 4 Y 位移幅度（默认 12%） */
     /* --snowui-gradient-motion-vector-4-rotate-amplitude-override: ; */ /* Vector 4 旋转幅度（默认 20deg） */

@@ -368,7 +368,7 @@
       "kind": "component",
       "source": "src/components/Gradient.svelte",
       "documentation": "src/components/Gradient.md",
-      "description": "以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。",
+      "description": "以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并以预栅格图层保持四层柔和形变。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
