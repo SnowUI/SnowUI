@@ -104,6 +104,13 @@
     enableScaleObserver={false}
     enableDefaultMotion={false}
     {...rest}
+    renderHints={{
+        variant: rest.renderHints?.variant ?? "line",
+        width: rest.renderHints?.width ?? (resolvedDirection === "row" ? "100%" : "var(--border-1)"),
+        height: rest.renderHints?.height ?? (resolvedDirection === "row" ? "var(--border-1)" : "100%"),
+        radius: rest.renderHints?.radius ?? (rounded ? "var(--radius-full)" : "0"),
+        rows: rest.renderHints?.rows,
+    }}
 >
     {@render children?.()}
 </Frame>

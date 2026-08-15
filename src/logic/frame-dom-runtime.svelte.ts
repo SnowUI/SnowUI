@@ -293,12 +293,17 @@ export function createFrameDomRuntime(options: FrameDomRuntimeOptions) {
             "data-scale-apply": options.getHasScaleApplyConfig()
                 ? "true"
                 : undefined,
+            "data-skeleton-registered":
+                frameProps.renderHints !== undefined ? "true" : undefined,
             "data-render-hint-variant": frameProps.renderHints?.variant,
             "data-render-hint-width": toRenderHintDomValue(
                 frameProps.renderHints?.width,
             ),
             "data-render-hint-height": toRenderHintDomValue(
                 frameProps.renderHints?.height,
+            ),
+            "data-render-hint-radius": toRenderHintDomValue(
+                frameProps.renderHints?.radius,
             ),
             "data-render-hint-rows":
                 frameProps.renderHints?.rows !== undefined

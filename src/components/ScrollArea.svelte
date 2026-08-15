@@ -80,6 +80,13 @@
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
     enableDefaultMotion={enableDefaultMotion}
+    renderHints={{
+        variant: rest.renderHints?.variant ?? "rect",
+        width: rest.renderHints?.width ?? "100%",
+        height: rest.renderHints?.height ?? "6rem",
+        radius: rest.renderHints?.radius ?? "var(--radius-3)",
+        rows: rest.renderHints?.rows,
+    }}
 >
     <!-- Scroll viewport 必须可聚焦，才能通过方向键与 PageUp/PageDown 操作。 -->
     <!-- svelte-ignore a11y_no_noninteractive_tabindex -->

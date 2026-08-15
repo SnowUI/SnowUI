@@ -95,6 +95,13 @@
     style={userStyle || undefined}
     data-layout={layout}
     {...rest}
+    renderHints={{
+        variant: rest.renderHints?.variant ?? "rect",
+        width: rest.renderHints?.width ?? "5rem",
+        height: rest.renderHints?.height ?? "2.5rem",
+        radius: rest.renderHints?.radius ?? "var(--radius-3)",
+        rows: rest.renderHints?.rows,
+    }}
 >
     {#if children}
         {@render children()}

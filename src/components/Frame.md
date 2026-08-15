@@ -1,6 +1,6 @@
 # Frame.svelte（OSS）
 
-> **版本**: v1.0.0
+> **版本**: v1.2.0（Skeleton 自注册协议，2026-08-15）
 > **职责**: OSS 版基础容器。承载所有**自包含**的组件能力——布局、状态机、JS 动效执行、FLIP、Scale 观察、Perception、Skeleton 协议。
 > **边界**: 不包含**跨组件协调**能力（编排模式 / 联动控制 / 样式编排）。这三类能力由 `FramePro.svelte` 提供。
 > **包归属**: `@snowui-design-system/components`（OSS，公开）
@@ -197,7 +197,7 @@ v1.0.0 的动机：v0.x 把 CodeBlock 这类只是想做"自身状态切换 + �
 | `enableResponsive` | 响应式断点 class 监听 |
 | `enableContext` | 向子组件提供 Frame Context（`currentState` / `interactionState` / loading / skeleton / while* 等）；子组件可只读消费 |
 | `enableScaleObserver` | 观察自身尺寸驱动比例响应 |
-| `loading` + `skeleton` | Skeleton 协议与加载态渲染 || `tag` / `as` / `class` / `style` / `...rest` | 基础 DOM 与样式透传 |
+| `loading` + `skeleton` | Skeleton 协议与加载态渲染；组件根通过 `renderHints` 自注册，父 Frame 只探测首层已注册 child，未注册 Frame 使用通用 fallback || `tag` / `as` / `class` / `style` / `...rest` | 基础 DOM 与样式透传 |
 | `while*` 关键字（解析 + 执行） | 完整 JS 动效引擎执行 whileHover/Active/Appear/... |
 | `Click` / `Hover` / `Focus` / 状态链（`Active={["Idle","auto"]}`） | 自身状态机驱动 |
 | `stateClass` / `stateStyle` / `stateContent` | 状态驱动 class / inline-style / Snippet 切换 |
@@ -238,6 +238,8 @@ v1.0.0 的动机：v0.x 把 CodeBlock 这类只是想做"自身状态切换 + �
 - 切割线变更日志：本文档 §1.6
 
 ## 更新日志
+
+- v1.2.0 (2026-08-15): `renderHints` 成为组件 Skeleton 自注册协议；父 Frame 只探测首层已注册 child，旧 class mapping 降级为兼容层。
 
 - v1.1.0 (2026-06-30): 所有显式 `while*` 对象统一为完整视觉通道声明，仅继承默认时序 / 动力学参数；generic `whileAppear` 默认仅渐显。
 

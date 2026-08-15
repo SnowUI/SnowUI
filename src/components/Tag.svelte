@@ -244,6 +244,13 @@
         .join(" ")}
     {...toggleDefaults}
     {...rest}
+    renderHints={{
+        variant: rest.renderHints?.variant ?? "line",
+        width: rest.renderHints?.width ?? "3rem",
+        height: rest.renderHints?.height ?? "1.25rem",
+        radius: rest.renderHints?.radius ?? "var(--radius-3)",
+        rows: rest.renderHints?.rows,
+    }}
 >
     {#if shape !== "default" && arrowPath}
         <svg

@@ -258,6 +258,13 @@
     use={finalUse}
     componentParts={parts}
     {...rest}
+    renderHints={{
+        variant: rest.renderHints?.variant ?? "line",
+        width: rest.renderHints?.width ?? "5rem",
+        height: rest.renderHints?.height ?? "1rem",
+        radius: rest.renderHints?.radius,
+        rows: rest.renderHints?.rows,
+    }}
 >
     {#if children}
         {@render children()}

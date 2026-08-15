@@ -728,7 +728,16 @@
 
 <!-- 占位符 -->
 {#if finalDisabled && effectiveSkeleton}
-    <Skeleton componentClass="snowui-tooltip" renderHints={renderHints} />
+    <Skeleton
+        componentClass="snowui-tooltip"
+        renderHints={{
+            variant: renderHints?.variant ?? "rect",
+            width: renderHints?.width ?? "4.5rem",
+            height: renderHints?.height ?? "2rem",
+            radius: renderHints?.radius ?? "var(--radius-3)",
+            rows: renderHints?.rows,
+        }}
+    />
 {:else}
     <span bind:this={placeholderRef} class="snowui-tooltip-placeholder" style="display: none;" aria-hidden="true"
         >&#8203;</span

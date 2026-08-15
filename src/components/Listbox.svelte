@@ -110,6 +110,7 @@
         enableResponsive = false,
         enableContext = true,
         enableScaleObserver = false,
+        renderHints: userRenderHints = undefined,
         ...rest
     }: Props = $derived(
         mergeComponentPartProps(inheritedListboxPart.current, explicitProps),
@@ -454,6 +455,13 @@
                     enableContext={enableContext}
                     enableScaleObserver={enableScaleObserver}
                     componentParts={{ MenuItem: resolvedParts.MenuItem }}
+                    renderHints={{
+                        variant: userRenderHints?.variant ?? "rect",
+                        width: userRenderHints?.width ?? "10rem",
+                        height: userRenderHints?.height ?? "8rem",
+                        radius: userRenderHints?.radius ?? "var(--radius-3)",
+                        rows: userRenderHints?.rows,
+                    }}
                 >
                     {#if children}
                         {@render children()}

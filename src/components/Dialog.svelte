@@ -308,6 +308,13 @@
                 enableContext={enableContext}
                 enableScaleObserver={enableScaleObserver}
                 {...rest}
+                renderHints={{
+                    variant: rest.renderHints?.variant ?? "rect",
+                    width: rest.renderHints?.width ?? "20rem",
+                    height: rest.renderHints?.height ?? "10rem",
+                    radius: rest.renderHints?.radius ?? "var(--radius-3)",
+                    rows: rest.renderHints?.rows,
+                }}
             >
                 {@render children?.()}
             </Frame>

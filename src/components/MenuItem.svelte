@@ -207,6 +207,13 @@
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
     {...frameRestProps}
+    renderHints={{
+        variant: frameRestProps.renderHints?.variant ?? "line",
+        width: frameRestProps.renderHints?.width ?? "100%",
+        height: frameRestProps.renderHints?.height ?? "2rem",
+        radius: frameRestProps.renderHints?.radius,
+        rows: frameRestProps.renderHints?.rows,
+    }}
 >
     {#if children}
         {@render children()}

@@ -1,6 +1,7 @@
 # Skeleton.svelte 文档
 
-> **版本**: v1.3.9
+> **版本**: v1.4.0
+> **变更记录 (2026-08-15)**: `renderHints` 升级为组件自注册协议并优先于 class 映射；Frame 首层探测只收集已注册 child；完整消费 `radius`；集中 class 映射降级为兼容层。
 > **变更记录 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确多项骨架只是内部渲染布局，不注册为通用宿主布局。
 > **职责**: 通用骨架渲染器，供 `Frame` 默认加载协议与测试示例复用。
 
@@ -10,7 +11,7 @@
 
 主布局模型：内禀原子布局。
 
-- Skeleton 作为占位原语时，尺寸由 `variant`、`componentClass`、`renderHints` 与显式 `width / height` 决定，作为外部布局子项时表现为 Hug 或按调用方传入的固定尺寸渲染。
+- Skeleton 作为占位原语时，尺寸优先由组件自注册的 `renderHints` 决定；显式 `variant / width / height` 可覆盖 hints，旧 `componentClass` 映射只作兼容。作为外部布局子项时表现为 Hug 或按调用方传入的固定尺寸渲染。
 - 多条 text skeleton、avatar-group skeleton overlap 等只是 Skeleton 私有渲染布局，用于模拟目标组件占位，不向外提供通用区域协议。
 - Skeleton 不输出 `data-auto-layout`；Frame 的 loading 协议负责决定是否渲染 Skeleton，Skeleton 本身不接管宿主布局。
 
@@ -29,8 +30,8 @@
 | `variant` | `"line" \| "circle" \| "rect" \| "text" \| "circular" \| "rectangular"` | `undefined` | 显式指定骨架形状；别名会归一化到 `line / circle / rect` |
 | `width` | `string \| number` | `undefined` | 显式宽度；数字会自动转成 `rem` |
 | `height` | `string \| number` | `undefined` | 显式高度；数字会自动转成 `rem` |
-| `componentClass` | `string` | `undefined` | 组件根类名，用于匹配组件级默认骨架布局 |
-| `renderHints` | `RenderHints` | `undefined` | 组件传入的骨架提示桥，当前支持 `variant / width / height / radius / rows` |
+| `componentClass` | `string` | `undefined` | 旧调用方兼容入口；仅在没有 `renderHints` 时匹配历史默认布局，新组件不得以此登记 |
+| `renderHints` | `RenderHints` | `undefined` | 组件自注册协议，支持 `variant / width / height / radius / rows` |
 | `loading` | `boolean` | `true` | 是否显示骨架；为 `false` 时回退渲染 `children` |
 | `responsive` | `ResponsiveConfig` | `undefined` | 响应式宽高覆写 |
 | `class` | `string` | `""` | 外部类名；多项骨架时挂到布局容器，单项骨架时挂到骨架块本身 |
@@ -43,24 +44,19 @@
 | `variant` | `"line" \| "circle" \| "rect"` | 覆盖默认骨架形状 |
 | `width` | `string \| number` | 覆盖默认宽度 |
 | `height` | `string \| number` | 覆盖默认高度 |
-| `radius` | `string \| number` | 协议层保留；当前 `Skeleton` 不读取外部 `radius` 值 |
-| `rows` | `number` | 仅在文字类骨架中生效；大于 `1` 时会展开为多条 `line` |
+| `radius` | `string \| number` | 覆盖骨架圆角；数字按 16px 名义基准转为 rem |
+| `rows` | `number` | 大于 `1` 时展开为多条 `line`，最后一行宽度为容器的 `30%` |
 
-注意：
-
-- `Skeleton` 当前不会消费外部 `renderHints.radius`。
-- 非圆形 Skeleton 默认圆角固定为 `12px` 对应的 `var(--radius-3, 0.75rem)`。
-- `Icon` 是特例：骨架形状为 `rect`，但内部写死 `radius: 50%`，视觉上为全圆角。
+未传 `radius` 时，非圆形 Skeleton 使用 `var(--radius-3, 0.75rem)`；`circle` 始终使用 `50%`。旧 Icon class 映射仍保留 `rect + 50%` 的兼容外观。
 
 ## 3. 解析顺序
 
 `Skeleton` 的布局解析顺序固定如下：
 
-1. 先根据 `componentClass` 识别组件类型。
-2. 若没有识别到组件，但传了显式 `variant / width / height`，则直接按显式单项骨架渲染。
-3. 若识别到组件，则先取该组件的默认骨架布局。
-4. 再叠加 `renderHints` 与显式 `variant / width / height`。
-5. 若完全未命中，则回退为通用 `rect` 骨架。
+1. 存在 `renderHints` 时视为组件已自注册，直接以 hints 创建布局；显式 `variant / width / height` 逐字段优先。
+2. 没有 hints 但传了显式 `variant / width / height` 时，按显式单项骨架渲染。
+3. 仅旧调用方没有 hints / 显式几何时，才根据 `componentClass` 读取历史默认布局。
+4. 完全未命中时回退为通用 `rect` 骨架。
 
 ## 4. 默认样式规则
 
@@ -103,37 +99,17 @@
 - `circle` 永远保持 `border-radius: 50%`。
 - `line / circle / rect` 都有 `max-width: 100%; max-height: 100%;` 兜底。
 
-## 5. 组件映射规则
+## 5. 组件自注册规则
 
-`Skeleton` 通过组件根类名集中映射默认布局。当前映射如下：
+支持默认 Skeleton 的组件在真实根 Frame 上提供最终 `renderHints`。默认值由组件拥有，调用方传入的 `renderHints` 逐字段优先；尺寸随公开 `size / width / height / rows` 变化时，组件必须先解析最终值再注册。
 
-| 组件 key | 匹配类名 | 形状 | 默认宽高 / 规则 |
-| :--- | :--- | :--- | :--- |
-| `avatar-group` | `.snowui-avatar-group` | `circle` | `1rem x 1rem` |
-| `avatar` | `.snowui-avatar` | `circle` | `2.5rem x 2.5rem` |
-| `flow-text` | `.snowui-flow-text` | `line` | `4rem x 1rem` |
-| `button` | `.snowui-button` | `line` | `5rem x 1rem` |
-| `text` | `.snowui-text` | `line` | `100% x 1.25rem` |
-| `badge` | `.snowui-badge` | `line` | `2.5rem x 1rem` |
-| `switch` | `.snowui-switch` | `line` | `2.5rem x 1.5rem` |
-| `spinner` | `.snowui-spinner` | `circle` | `1.5rem x 1.5rem` |
-| `radio` | `.snowui-radio` | `circle` | `1.25rem x 1.25rem` |
-| `icon` | `.snowui-icon` | `rect` | `1.25rem x 1.25rem`，内部圆角 `50%` |
-| `checkbox` | `.snowui-checkbox` | `rect` | `1.25rem x 1.25rem` |
-| `tooltip` | `.snowui-tooltip` | `rect` | `4.5rem x 2rem` |
-| `popover` | `.snowui-popover` | `rect` | `7rem x 5rem` |
-| `frame` | `.snowui-frame` | `line` | `100% x 1.25rem` |
-| `test` | `.snowui-test` | `rect` | `5rem x 2rem` |
-| `field` | `.snowui-field` | `rect` | `100% x 1.25rem` |
-| `input` | `.snowui-input` | `line` | `100% x 1.25rem` |
-| `textarea` | `.snowui-textarea` | `rect` | `100% x calc((var(--leading-14) * 4) + var(--padding-3) + var(--padding-6))` |
-| `select` | `.snowui-select` | `line` | `100% x 1.25rem` |
-| `listbox` | `.snowui-listbox` | `rect` | `10rem x 8rem` |
-| `fallback` | 未命中 | `rect` | `6rem x 3rem` |
+Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` 及对应 `data-render-hint-*`；Tooltip 等直接以 Skeleton 为加载根的窄例外由 Skeleton 输出同一登记属性。父 Frame 进入加载态时，只探测第一层带该标记的 child；未注册的纯布局 / 逻辑节点不生成多余骨架。若当前 Frame 自身没有 hints、首层也没有注册项，仍生成通用 fallback，因此页面无需手写 Skeleton。
+
+`COMPONENT_CLASS_MAPPING` 与 `getSkeletonComponentKey()` 只为旧版直接传 `componentClass` 的调用方保留。SnowUI 新组件与新骨架布局不得新增 class 映射；应在组件根提供 hints，并在组件文档说明动态几何来源。
 
 ## 6. 文本骨架规则
 
-`Text` 是当前唯一会展开成多条骨架的默认组件。
+任何已注册组件都可以用 `renderHints.rows` 展开成多条文字骨架；Text 会根据内容自动计算行数。
 
 ### 6.1 行数来源
 
@@ -152,7 +128,7 @@
 | 规则 | 值 |
 | :--- | :--- |
 | 布局方向 | 上下排列 |
-| 容器宽度 | `100%` |
+| 容器宽度 | `renderHints.width` / 第一行宽度；未提供时 `100%` |
 | 前置行宽度 | `100%` |
 | 最后一行宽度 | `30%` |
 | 单行高度 | `1.25rem` |
@@ -164,13 +140,13 @@
 - 当组件自身进入 `loading + skeleton` 时，优先渲染当前组件自己的 Skeleton。
 - 不继续展开组件内部的 `Icon / Text / Avatar` 等子组件。
 - 当 `Frame` 进入 `loading + skeleton` 时：
-  - 若第一层存在直接子组件，则只渲染这些第一层组件对应的 Skeleton。
+  - 若第一层存在已自注册的直接子组件，则只渲染这些第一层组件对应的 Skeleton。
   - 若第一层不存在组件，则 `Frame` 自身回退为文字形态 Skeleton。
 
 ## 8. 尺寸规则
 
 - 数字型 `width / height` 会统一转成 `rem`。
-- `Skeleton` 优先使用组件通过 `renderHints.width / height` 提供的最终尺寸。
+- `Skeleton` 优先使用组件通过 `renderHints.width / height / radius / rows` 提供的最终几何。
 - 这意味着圆角矩形 Skeleton 在组件已经提供尺寸提示时，会跟随组件的最终宽高，而不是回退成通用短宽。
 - 当前没有启用“读取真实 DOM 实测尺寸”的通用机制。
 
@@ -186,8 +162,8 @@
 职责分工：
 
 - `Frame` 负责 `loading / skeleton` 协议入口
-- `Skeleton` 负责骨架样式、长度规则和组件映射
-- 组件通过 `renderHints` 向 `Skeleton` 提供最终尺寸提示
+- `Skeleton` 负责骨架样式、长度规则和 hints 解析；class 映射只作兼容
+- 组件通过根 `renderHints` 自注册最终骨架几何
 
 ---
 
@@ -210,12 +186,19 @@
 | CSS 类名 | `snowui-skeleton-circle` | 圆形骨架 |
 | CSS 类名 | `snowui-skeleton-rect` | 圆角矩形骨架 |
 | CSS 类名 | `snowui-skeleton-layout-*` | 骨架组合布局 |
-| 映射函数 | `getSkeletonComponentKey` | 根据组件根类名识别组件类型 |
-| 映射函数 | `resolveSkeletonLayout` | 将组件类型解析为骨架布局 |
+| 兼容函数 | `getSkeletonComponentKey` | 仅为旧版 `componentClass` 调用识别组件类型 |
+| 解析函数 | `resolveSkeletonLayout` | 优先将组件 `renderHints` 解析为骨架布局，再处理兼容与 fallback |
 | 布局函数 | `createTextLayout` | 生成多条文字骨架布局 |
 | 覆写函数 | `applyRenderHints` | 将 `renderHints` 叠加到默认布局 |
 
 ## 更新日志 (Changelog)
+
+### v1.4.0 (2026-08-15)
+
+- 组件通过根 Frame `renderHints` 自注册，不再要求维护集中 class mapping。
+- Frame 首层 probe 只收集 `data-skeleton-registered="true"` 的 child。
+- `renderHints.radius` 进入 DOM bridge、probe 与 Skeleton 最终样式。
+- 旧 `COMPONENT_CLASS_MAPPING` 保留兼容，但不再接受新 SnowUI 组件登记。
 
 ### v1.3.9 (2026-07-30)
 

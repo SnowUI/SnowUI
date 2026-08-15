@@ -1,9 +1,10 @@
 /**
  * frame-skeleton-runtime.svelte.ts
- * v1.0.0
+ * v1.1.0
  * 职责：统一处理 Frame 的 Skeleton probe、子骨架探测与加载渲染前判定。
  *
  * Log:
+ * - [2026-08-15] Change: `renderHints` 改为组件自注册信号；首层 probe 只收集已注册 child，不再依赖集中 class key。
  * - [2026-03-09] Init: 从 Frame.svelte 抽离 Skeleton probe、首层子骨架收集、renderHints 解析与 shouldRenderSkeleton 等渲染前判定。
  */
 
@@ -18,7 +19,8 @@ export interface FrameSkeletonRuntimeOptions {
     getFrameProps: () => FrameProps;
     getEffectiveLoading: () => boolean;
     getEffectiveSkeleton: () => boolean;
-    getSkeletonComponentKey: () => string | undefined;
+    /** @deprecated v1.1 起不再读取；仅保留跨包类型兼容。 */
+    getSkeletonComponentKey?: () => string | undefined;
     getProbeHost: () => HTMLElement | undefined;
 }
 
@@ -26,6 +28,7 @@ function parseSkeletonChildHints(node: HTMLElement): RenderHints | undefined {
     const variant = node.dataset.renderHintVariant;
     const width = node.dataset.renderHintWidth;
     const height = node.dataset.renderHintHeight;
+    const radius = node.dataset.renderHintRadius;
     const rowsValue = node.dataset.renderHintRows;
     const rows =
         rowsValue !== undefined
@@ -36,6 +39,7 @@ function parseSkeletonChildHints(node: HTMLElement): RenderHints | undefined {
         variant === undefined &&
         width === undefined &&
         height === undefined &&
+        radius === undefined &&
         rowsValue === undefined
     ) {
         return undefined;
@@ -45,6 +49,7 @@ function parseSkeletonChildHints(node: HTMLElement): RenderHints | undefined {
         variant: variant as RenderHints["variant"],
         width,
         height,
+        radius,
         rows: Number.isFinite(rows) ? rows : undefined,
     };
 }
@@ -58,13 +63,12 @@ function collectFirstLayerSkeletonChildren(
         .filter(
             (child): child is HTMLElement =>
                 child instanceof HTMLElement &&
-                child.dataset.snowuiFrame === "true",
+                child.dataset.skeletonRegistered === "true",
         )
         .map((child) => ({
             componentClass: child.className,
             renderHints: parseSkeletonChildHints(child),
-        }))
-        .filter((child) => child.componentClass.trim().length > 0);
+        }));
 }
 
 export function createFrameSkeletonRuntime(
@@ -76,13 +80,11 @@ export function createFrameSkeletonRuntime(
     const shouldRenderSkeleton = $derived(
         options.getEffectiveLoading() &&
             options.getEffectiveSkeleton() &&
-            !options.getFrameProps().stateContent &&
-            (options.getSkeletonComponentKey() !== undefined ||
-                !options.getFrameProps().children),
+            !options.getFrameProps().stateContent,
     );
     const needsSkeletonProbe = $derived(
         shouldRenderSkeleton &&
-            options.getSkeletonComponentKey() === "frame" &&
+            options.getFrameProps().renderHints === undefined &&
             !!options.getFrameProps().children,
     );
     const shouldRenderProbedChildSkeletons = $derived(
@@ -127,10 +129,11 @@ export function createFrameSkeletonRuntime(
             attributes: true,
             attributeFilter: [
                 "class",
-                "data-snowui-frame",
+                "data-skeleton-registered",
                 "data-render-hint-variant",
                 "data-render-hint-width",
                 "data-render-hint-height",
+                "data-render-hint-radius",
                 "data-render-hint-rows",
             ],
         });

@@ -220,6 +220,13 @@
     enableScaleObserver={enableScaleObserver}
     enableDefaultMotion={true}
     {...frameRest}
+    renderHints={{
+        variant: frameRest.renderHints?.variant ?? "rect",
+        width: frameRest.renderHints?.width ?? "100%",
+        height: frameRest.renderHints?.height ?? "var(--leading-14)",
+        radius: frameRest.renderHints?.radius,
+        rows: frameRest.renderHints?.rows ?? 3,
+    }}
 >
     {@render children?.()}
 </Frame>

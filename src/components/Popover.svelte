@@ -509,6 +509,13 @@
         enableContext={enableContext}
         enableScaleObserver={enableScaleObserver}
         {...rest}
+        renderHints={{
+            variant: rest.renderHints?.variant ?? "rect",
+            width: rest.renderHints?.width ?? "7rem",
+            height: rest.renderHints?.height ?? "5rem",
+            radius: rest.renderHints?.radius ?? "var(--radius-3)",
+            rows: rest.renderHints?.rows,
+        }}
     >
         <div
             bind:this={headerEl}

@@ -1,6 +1,6 @@
 <!--
   Gradient 矢量渐变组件
-  v2.12.0
+  v2.12.1
 
   职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并让四个有色图层持续柔和形变。
   文档：./Gradient.md

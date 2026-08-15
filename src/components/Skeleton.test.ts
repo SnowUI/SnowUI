@@ -1,6 +1,7 @@
 /**
  * Skeleton.test.ts
- * v1.3.4
+ * v1.4.0
+ * 变更记录 (2026-08-15): 新增 renderHints 自注册、radius 与父 Frame 首层探测示例；验证不依赖已知组件 class。
  * 变更记录 (2026-03-07): 新增“骨架渲染逻辑验证”示例，覆盖 Frame 第一层组件优先、Frame 回退文字骨架、Text 多段落骨架。
  */
 export const examples = [
@@ -117,5 +118,40 @@ export const examples = [
             "frame-fallback",
             "text-paragraph-rows",
         ],
-    }
+    },
+    {
+        name: "8: renderHints 自注册验证",
+        code: `8
+<Frame loading skeleton class="p-16 inset-black-10 rounded-12">
+    <Frame
+        renderHints={{
+            variant: "rect",
+            width: "18rem",
+            height: "4rem",
+            radius: "var(--radius-6)",
+        }}
+    >
+        任意组件内容
+    </Frame>
+</Frame>
+
+<Frame
+    loading
+    skeleton
+    renderHints={{ variant: "line", width: "18rem", height: "1rem", rows: 3 }}
+/>
+
+<Frame loading skeleton>
+    <Tooltip>直接以 Skeleton 为加载根的组件也能被父 Frame 探测</Tooltip>
+</Frame>`,
+        logic: [
+            "loading",
+            "skeleton",
+            "renderHints-registration",
+            "radius",
+            "rows",
+            "direct-skeleton-root",
+            "no-class-mapping",
+        ],
+    },
 ] as const;

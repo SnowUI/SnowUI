@@ -1,6 +1,10 @@
 <!--
  Skeleton 骨架屏组件
- v1.3.9
+ v1.4.0
+
+ 变更记录 (2026-08-15):
+ - `renderHints` 成为组件自注册协议并优先于 class 映射；集中 class 映射仅保留兼容用途
+ - 完整消费 `renderHints.radius`，Frame 首层探测可保留组件声明的圆角
 
  变更记录 (2026-03-14):
  - Input 骨架高度同步到 44px，和 Input 默认 14 字号 + 12/16 padding 样式保持一致
@@ -146,11 +150,12 @@
         shape: "line" | "circle" | "rect",
         width?: string,
         height?: string,
+        radius?: string,
     ): SkeletonLayout {
         return {
             key,
             known: true,
-            items: [{ shape, width, height }],
+            items: [{ shape, width, height, radius }],
         };
     }
 
@@ -159,6 +164,7 @@
         rows: number,
         width?: string,
         height?: string,
+        radius?: string,
     ): SkeletonLayout {
         const safeRows = Math.max(1, Math.floor(rows));
         const fullWidth = width ?? "100%";
@@ -172,6 +178,7 @@
                         ? "30%"
                         : fullWidth,
                 height,
+                radius,
             })),
         };
     }
@@ -188,9 +195,10 @@
         const variant = explicit?.variant ?? hints?.variant;
         const width = toCssLength(explicit?.width ?? hints?.width);
         const height = toCssLength(explicit?.height ?? hints?.height);
+        const radius = toCssLength(hints?.radius);
         const rows = hints?.rows;
 
-        if (!variant && !width && !height && rows === undefined) {
+        if (!variant && !width && !height && !radius && rows === undefined) {
             return layout;
         }
 
@@ -203,6 +211,7 @@
                           rows,
                           width ?? layout.items[0]?.width,
                           height ?? layout.items[0]?.height,
+                          radius ?? layout.items[0]?.radius,
                       ).items
                     : layout.items.map((item) => ({
                           ...item,
@@ -211,8 +220,44 @@
                               : item.shape,
                           width: width ?? item.width,
                           height: height ?? item.height,
+                          radius: radius ?? item.radius,
                       })),
         };
+    }
+
+    function createRegisteredLayout(options: {
+        renderHints: RenderHints;
+        variant?: SkeletonVariant;
+        width?: string | number;
+        height?: string | number;
+    }): SkeletonLayout {
+        const variant = options.variant ?? options.renderHints.variant;
+        const width = toCssLength(
+            options.width ?? options.renderHints.width,
+        );
+        const height = toCssLength(
+            options.height ?? options.renderHints.height,
+        );
+        const radius = toCssLength(options.renderHints.radius);
+        const rows = options.renderHints.rows;
+
+        if (rows !== undefined && rows > 1) {
+            return createTextLayout(
+                "registered",
+                rows,
+                width ?? "100%",
+                height ?? "1.25rem",
+                radius,
+            );
+        }
+
+        return createSingleLayout(
+            "registered",
+            normalizeVariant(variant),
+            width ?? "6rem",
+            height ?? "3rem",
+            radius,
+        );
     }
 
     export function resolveSkeletonLayout(
@@ -224,6 +269,15 @@
             height?: string | number;
         } = {},
     ): SkeletonLayout {
+        if (options.renderHints) {
+            return createRegisteredLayout({
+                renderHints: options.renderHints,
+                variant: options.variant,
+                width: options.width,
+                height: options.height,
+            });
+        }
+
         const componentKey = getSkeletonComponentKey(options.componentClass);
         if (
             !componentKey &&
@@ -825,6 +879,7 @@
             "snowui-skeleton-layout",
             `snowui-skeleton-layout-${layout.key}`,
             layout.items.length === 1 ? "snowui-skeleton-layout-single" : "",
+            layout.items.length > 1 ? "snowui-skeleton-layout-text" : "",
             layout.items.length > 1 ? className : "",
         ]
             .filter(Boolean)
@@ -834,7 +889,15 @@
     const containerStyle = $derived.by(() => {
         if (layout.items.length === 1) return undefined;
         return (
-            [style, responsiveController.style].filter(Boolean).join(";") ||
+            [
+                layout.items[0]?.width
+                    ? `--snowui-skeleton-layout-width: ${layout.items[0].width}`
+                    : "",
+                style,
+                responsiveController.style,
+            ]
+                .filter(Boolean)
+                .join(";") ||
             undefined
         );
     });
@@ -874,6 +937,12 @@
         use:responsiveController.connect
         class={containerClass}
         style={containerStyle}
+        data-skeleton-registered={renderHints !== undefined ? "true" : undefined}
+        data-render-hint-variant={renderHints?.variant}
+        data-render-hint-width={toCssLength(renderHints?.width)}
+        data-render-hint-height={toCssLength(renderHints?.height)}
+        data-render-hint-radius={toCssLength(renderHints?.radius)}
+        data-render-hint-rows={renderHints?.rows}
         aria-busy="true"
         aria-hidden="true"
     >
@@ -923,7 +992,8 @@
     }
 
     :global(:where(.snowui-skeleton-layout-text)) {
-        width: 100%;
+        width: var(--snowui-skeleton-layout-width, 100%);
+        max-width: 100%;
         flex-direction: column;
         align-items: stretch;
     }
