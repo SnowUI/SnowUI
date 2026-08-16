@@ -1,7 +1,7 @@
 # SnowUI Components 项目说明
 
-> **版本**: v2.0.0
-> **更新**: 2026-07-13
+> **版本**: v2.1.0
+> **更新**: 2026-08-16
 > **职责**: 项目结构与开发环境说明
 
 ## 1. 项目概览
@@ -13,11 +13,8 @@
 - **样式**: 包内 `src/styles/`，不依赖 `SnowUI/home` 或上级 `styles/`
 
 ### 依赖关系
-- **@snowui-design-system/resource-svelte**: 
-  - **用途**: 提供图标、头像、插画等静态资源组件。
-  - **引用方式**: 
-    - 生产代码: `import { IconName } from "@snowui-design-system/resource-svelte";`
-    - Vite 配置: 使用已发布 npm 包。
+- **组件内置功能图标**：由 Components 包内 `ComponentIcon` 语义协议与默认图标快照自包含交付，生产代码不依赖 `resource-svelte`。
+- **@snowui-design-system/resource-svelte**：仅作为开发示例素材和可选应用级 IconProvider adapter；外部用户无需安装。
 
 ---
 

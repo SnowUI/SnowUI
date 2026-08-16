@@ -14,7 +14,7 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
     import { onMount } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { getListboxOwner } from "../context";
     import { splitFrameHostProps } from "../logic/frame-prop-filter";
@@ -234,10 +234,10 @@
             onmousedown={handleMousedown}
             tabindex={-1}
         >
-            <ResourceIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
+            <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
         </button>
     {:else if resolvedShowCheck}
-        <ResourceIcon
+        <ComponentIcon
             name="check"
             class="snowui-menu-item-check"
             as="trailing"

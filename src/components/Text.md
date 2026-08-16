@@ -445,7 +445,7 @@ graph TD
 
 #### 修复
 - **TX-Fix.12** 修复 `lines=0` 在外层容器含 padding 时的截断误判：`checkCollapse` 改为用 `min(constraintHeight, measureClientHeight)` 计算可视高度，恢复 `isTruncated/isCollapsed`，确保 `more` 按钮可见。
-- **TX-Fix.13** 默认 `more` 按钮图标替换为 `@snowui-design-system/resource-svelte` 的 `CaretDown`，移除内联 SVG。
+- **TX-Fix.13** 默认 `more` 按钮图标改为 `ComponentIcon name="arrow-line-down"`，由 Components 内置回退与 IconProvider 统一解析，不再使用内联 SVG 或强制外部资源依赖。
 
 ### v3.3.7 (2026-02-25)
 

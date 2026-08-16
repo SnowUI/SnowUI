@@ -1,6 +1,6 @@
 /**
  * AccordionItem.test.ts
- * v1.2.0
+ * v1.2.1
  *
  * AccordionItem 需要放在 Accordion 内使用，本文件提供设计稿形态的最小组合验证。
  */
@@ -25,7 +25,14 @@ export const examples = [
         <Frame as="content" row>可以在发货前修改地址、联系人与备注信息。</Frame>
     </AccordionItem>
 </Accordion>`,
-        logic: ["title", "content"],
+        expected: {
+            render: "默认 trailing 指示器正常显示，展开项内容可见。",
+            layout: "内容区从测量高度展开，收起后不占用内容高度。",
+            interaction: "点击可用 title 时，内容高度、padding 与透明度按 RESIZE_MOTION 过渡，指示器同步旋转；减少动效时立即提交相同最终状态。",
+            performance: "展开高度由共享 ResizeObserver 测量，不轮询布局。",
+            responsive: "宽度变化后重新测量内容高度，展开结果保持完整。",
+        },
+        logic: ["title", "content", "resize-motion", "reduced-motion"],
     },
     {
         name: "B1: filled 禁用项",

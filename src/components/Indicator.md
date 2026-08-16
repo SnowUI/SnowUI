@@ -1,7 +1,7 @@
 # Indicator（尺寸指示手柄）
 
-> **版本**: v1.2.0
-> **更新**: 2026-07-28
+> **版本**: v1.2.1
+> **更新**: 2026-08-16
 > **职责**: 提供宿主 hover 显示、Pointer / 键盘拖动与统一视觉反馈的通用尺寸手柄
 > **布局模型**: Pin 布局
 > **文档**: ./Indicator.md
@@ -41,7 +41,7 @@ Indicator 会在准备显示时检查同一 resize target 内可见的 SnowUI ov
 - line + width：命中带 = 父级全高 × 8px（`top/bottom:0`）；视觉默认 2px × **16px**，hover / focus / dragging 时视觉宽变为 4px；沿边长度可用 `--snowui-indicator-visual-length` 覆盖。
 - line + height：命中带 = 父级全宽 × 8px（`left/right:0`）；视觉默认 **16px** × 2px，hover / focus / dragging 时视觉高变为 4px；沿边长度同上变量。
 - line 与 Scrollbar 一致通过实际 width / height 变化而非 transform 缩放，使用 `var(--radius-full, 9999px)`，端点始终为完整胶囊圆角。
-- corner：固定 16px 视觉盒；图形作为 Indicator 私有内置 SVG，使用单条 round cap / round join stroke，避免小尺寸实心复合路径的内外沿子像素不一致，不依赖资源包 RoundedCorner。宿主 hover 时为 1px、Black/20%，自身 hover / focus-visible / dragging 时为 2px、Black/40%。
+- corner：固定 16px 视觉盒；图形作为 Indicator 私有内置 SVG，使用单条 round cap / round join stroke，避免小尺寸实心复合路径的内外沿子像素不一致，不依赖资源包 RoundedCorner。显示时为 Black/10，自身 hover / focus-visible / dragging 时为 Black/20；描边同时由 1px 加粗为 2px。
 - corner 固定在右下角；默认 `axis="height"`，使用 `ns-resize` 上下双箭头并只调整高度。
 - corner 显式 `axis="both"` 时使用 `nwse-resize` 对角双箭头，同时调整宽度和高度。
 - 定位：line 自管 absolute 贴边（不用 pin 居中）；corner 默认 `as="pin-bottom-right"` + `pinOffset="var(--padding-1)"` + `z-index: 4`。
@@ -80,10 +80,15 @@ Indicator 会在准备显示时检查同一 resize target 内可见的 SnowUI ov
 - Indicator 将 handle 元素直接交给 resizable；pointerdown / keyboard 从手柄本身起始，并使用 pointer capture + window capture 持续跟踪 move / up / cancel。禁止父组件复制 pointer / keyboard 算法。
 - resizable action 的创建 effect 只跟踪 target / handle / axis；`value`、边界和 callback 使用独立 effect 调用 `action.update()`。创建时必须使用 `untrack()` 读取 options，禁止尺寸写回触发 action destroy，导致拖拽在第一次 pointermove 后中断。
 - width 对应 resizable horizontal axis 与 ARIA vertical orientation；height 对应相反组合。
-- corner 使用 resource-svelte RoundedCorner；hover 通过 path stroke 扩粗，不缩放图标。
+- corner 使用组件私有内置 SVG；hover 通过 path stroke 扩粗，不缩放图标。
 - 不接入 Skeleton：手柄没有加载占位意义。
 
 ## 更新日志 (Changelog)
+
+### v1.2.1 (2026-08-16)
+
+- 将默认 Black/10 与交互态 Black/20 的颜色归属收敛到实际 visual 层，避免 Frame 根层 `color: inherit` 因样式加载顺序覆盖手柄颜色。
+- 保持 `--snowui-indicator-color-override` 与 `--snowui-indicator-active-color-override` 的既有覆盖能力。
 
 ### v1.2.0 (2026-07-28)
 

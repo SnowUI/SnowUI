@@ -1,7 +1,7 @@
 <!-- ColorSchemeButton：以真实 Button 为宿主的页面亮色 / 暗色方案切换按钮。 -->
 <script lang="ts">
     import { onMount, type ComponentProps, type Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Button from "./Button.svelte";
     import { useLocale } from "../i18n/locale.svelte";
     import {
@@ -131,13 +131,13 @@
         {#if darkIcon}
             {@render darkIcon()}
         {:else}
-            <ResourceIcon name="moon" aria-hidden="true" />
+            <ComponentIcon name="moon" aria-hidden="true" />
         {/if}
     {:else}
         {#if lightIcon}
             {@render lightIcon()}
         {:else}
-            <ResourceIcon name="sun" aria-hidden="true" />
+            <ComponentIcon name="sun" aria-hidden="true" />
         {/if}
     {/if}
     {@render children?.()}

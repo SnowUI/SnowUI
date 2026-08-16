@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.5.0
+  v2.5.1
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -18,7 +18,7 @@
 
 <script lang="ts">
   import { onDestroy, setContext, type Snippet } from "svelte";
-  import { RESOURCE_ICON_CONTEXT_KEY } from "@snowui-design-system/resource-svelte";
+  import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
   import Frame, { type FrameProps } from "./Frame.svelte";
   import {
     mergeComponentPartProps,
@@ -201,7 +201,7 @@
   });
 
   // 资源图标直接放在 Button 内时，注入默认尺寸上下文（与 <Icon> 包裹一致）
-  setContext(RESOURCE_ICON_CONTEXT_KEY, {
+  setContext(OPTIONAL_RESOURCE_ICON_CONTEXT_KEY, {
     get size() {
       return contextPixelSize;
     },
@@ -578,7 +578,7 @@
     justify-content: center;
     position: relative;
     flex-direction: row;
-    transition:
+    --snowui-frame-component-transition:
       color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
       background-color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
       --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
@@ -590,7 +590,7 @@
     box-sizing: border-box;
     text-decoration: none;
     white-space: nowrap;
-    transform: translate(var(--snowui-drag-x, 0), var(--snowui-drag-y, 0));
+    --snowui-frame-component-transform: translate(var(--snowui-drag-x, 0), var(--snowui-drag-y, 0));
     opacity: var(--snowui-button-opacity-override, var(--snowui-button-opacity));
 
     /* 内部计算层（internal） */
@@ -796,7 +796,7 @@
       var(--snowui-button-bare-idle-opacity)
     );
     background-image: none;
-    transition:
+    --snowui-frame-component-transition:
       opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
   }
 

@@ -165,7 +165,7 @@
             var(--snowui-chip-shadow)
         );
         white-space: nowrap;
-        transition:
+        --snowui-frame-component-transition:
             background-color
                 var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),

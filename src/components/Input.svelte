@@ -20,7 +20,7 @@
 <script lang="ts">
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Text from "./Text.svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import type { Snippet } from "svelte";
     import { getField, getListboxOwner, getListboxHeaderPortal } from "../context";
     import {
@@ -1454,7 +1454,7 @@
                 onmousedown={(e) => e.preventDefault()}
                 tabindex={-1}
             >
-                <ResourceIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
+                <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
             </button>
         {/if}
         {#if resolvedInvalid && !hasCustomTrailing}
@@ -1462,7 +1462,7 @@
                 class="snowui-input-warning-icon snowui-role-trailing text-secondary-red"
                 aria-hidden="true"
             >
-                <ResourceIcon name="warning" size={16} aria-hidden="true" />
+                <ComponentIcon name="warning" size={16} aria-hidden="true" />
             </span>
         {/if}
     </div>
@@ -1639,7 +1639,7 @@
                     {disabled}
                     tabindex={disabled ? undefined : -1}
                 >
-                    <ResourceIcon name={temporalDefaultIconName} size={16} aria-hidden="true" />
+                    <ComponentIcon name={temporalDefaultIconName} size={16} aria-hidden="true" />
                 </button>
             {/if}
         </div>
@@ -1711,7 +1711,7 @@
                     onclick={handleStepUp}
                     onmousedown={(e) => e.preventDefault()}
                 >
-                    <ResourceIcon name="arrow-line-up" size={16} aria-hidden="true" />
+                    <ComponentIcon name="arrow-line-up" size={16} aria-hidden="true" />
                 </button>
             {/if}
             {#if !hasCustomStepperDown}
@@ -1724,7 +1724,7 @@
                     onclick={handleStepDown}
                     onmousedown={(e) => e.preventDefault()}
                 >
-                    <ResourceIcon name="arrow-line-down" size={16} aria-hidden="true" />
+                    <ComponentIcon name="arrow-line-down" size={16} aria-hidden="true" />
                 </button>
             {/if}
             {@render children?.()}
@@ -1733,7 +1733,7 @@
                     class="snowui-input-warning-icon snowui-role-trailing text-secondary-red"
                     aria-hidden="true"
                 >
-                    <ResourceIcon name="warning" size={16} aria-hidden="true" />
+                    <ComponentIcon name="warning" size={16} aria-hidden="true" />
                 </span>
             {/if}
         </div>
@@ -1749,7 +1749,7 @@
                 onmousedown={(e) => e.preventDefault()}
                 tabindex={-1}
             >
-                <ResourceIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
+                <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
             </button>
         {/if}
         {#if resolvedInvalid && !hasCustomTrailing}
@@ -1757,7 +1757,7 @@
                 class="snowui-input-warning-icon snowui-role-trailing text-secondary-red"
                 aria-hidden="true"
             >
-                <ResourceIcon name="warning" size={16} aria-hidden="true" />
+                <ComponentIcon name="warning" size={16} aria-hidden="true" />
             </span>
         {/if}
     {/if}

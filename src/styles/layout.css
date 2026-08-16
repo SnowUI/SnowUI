@@ -1,5 +1,8 @@
 /* Layout Utility Styles */
-/* v1.2.0 */
+/* v1.2.3 */
+/* Log (2026-08-16): Hoverable Level 1 行为进入低优先级 layer，保留组件自有 transition 通道。 */
+/* Log (2026-08-16): Frame 默认动效代理进入独立低优先级 layer，避免覆盖组件自有 transition / transform。 */
+/* Log (2026-08-16): SnowUI 宿主基线进入独立低优先级 layer，避免动态模块加载顺序反向覆盖组件自有 color。 */
 /* Log (2026-08-15): 新增 SnowUI 原生宿主基线，组件不再依赖可选 snowui-base.css 的控件字体与 margin reset。 */
 /* Log (2026-02-22): 收敛 Surface hover 覆写能力，仅保留 --snowui-frame-hover-image-override 作为声明式覆盖入口。 */
 /* Log (2026-03-10): Avatar / Image 的 hover 回收至组件内，layout.css 不再承接媒体类组件的专用 hover 细节。 */
@@ -28,11 +31,13 @@
  * 只命中 Frame 与显式接入的原生控件，不使用 button / input / :disabled 等裸选择器。
  * 组件因此不依赖可选的 snowui-base.css，同时继续继承消费环境的字体与颜色。
  */
-:where([data-snowui-frame], .snowui-native-control) {
-    box-sizing: border-box;
-    margin: 0;
-    color: inherit;
-    font-family: inherit;
+@layer snowui-host-baseline {
+    :where([data-snowui-frame], .snowui-native-control) {
+        box-sizing: border-box;
+        margin: 0;
+        color: inherit;
+        font-family: inherit;
+    }
 }
 
 :where(html) {
@@ -53,43 +58,66 @@
 
 
 
-/* === Frame Level 0 默认动效代理承接 (Default Motion Fallback) === */
-/* 由 Frame 组件的 motionConfigToStyle 内联推入 --su-motion-* 变量，在此以 (0,0,0) 优先级实际渲染 */
-/* 注意：只消费 transform 和 transition，避免 background-color/opacity 回退值产生副作用 */
-:where([data-snowui-frame]) {
-    transform: var(--su-motion-transform, none);
-    transition: var(--su-motion-transition, none);
+/* === Frame 根节点视觉通道 (Root Motion Channel) === */
+/*
+ * 单一属性出口避免 Frame 显式 motion、组件根默认值与共享行为争夺 transform / transition：
+ * 1. inline --su-motion-*（调用方显式 Frame motion）
+ * 2. --snowui-frame-component-*（组件根拥有的默认视觉）
+ * 3. --snowui-frame-shared-*（Hoverable 等共享 fallback）
+ * 实际属性保持在低优先级 layer，外部 class / style 仍可按普通 cascade 接管。
+ */
+@layer snowui-frame-motion-fallback {
+    :where([data-snowui-frame]) {
+        transform: var(
+            --su-motion-transform,
+            var(--snowui-frame-component-transform, none)
+        );
+        transition: var(
+            --su-motion-transition,
+            var(
+                --snowui-frame-component-transition,
+                var(--snowui-frame-shared-transition, none)
+            )
+        );
+    }
 }
 
 /* === Hoverable 工具类 (hover 叠加反馈 + 交互态手形指针) ===
    语义:hoverable 表示该元素响应 hover、属于可交互元素。
    消费方(Avatar / Image / Button 等)只需条件加 .snowui-hoverable,
    即可同时获得 hover overlay 与 cursor: pointer,不再单独声明。 */
-:where(.snowui-hoverable) {
-    cursor: pointer;
-    --snowui-hover-overlay-opacity: 0%;
-    /* background-image 引用 --snowui-hover-overlay-opacity，通过 @property 动画该变量实现平滑过渡 */
-    background-image:
-        var(--snowui-frame-hover-image-override,
-            linear-gradient(
-                color-mix(in srgb, var(--snowui-hover-color, currentColor) var(--snowui-hover-overlay-opacity), transparent),
-                color-mix(in srgb, var(--snowui-hover-color, currentColor) var(--snowui-hover-overlay-opacity), transparent)
-            ));
-    transition:
-        background-color 0.2s,
-        --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
-        opacity 0.2s,
-        transform 0.2s;
-}
+@layer snowui-shared-behavior {
+    :where(.snowui-hoverable) {
+        cursor: pointer;
+        --snowui-hover-overlay-opacity: 0%;
+        --snowui-frame-shared-transition:
+            background-color 0.2s,
+            --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
+            opacity 0.2s,
+            transform 0.2s;
+        /* background-image 引用 --snowui-hover-overlay-opacity，通过 @property 动画该变量实现平滑过渡 */
+        background-image:
+            var(--snowui-frame-hover-image-override,
+                linear-gradient(
+                    color-mix(in srgb, var(--snowui-hover-color, currentColor) var(--snowui-hover-overlay-opacity), transparent),
+                    color-mix(in srgb, var(--snowui-hover-color, currentColor) var(--snowui-hover-overlay-opacity), transparent)
+                ));
+    }
 
-:where(.snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled)) {
-    /* 仅更新 overlay 透明度变量；background-image 引用它自动更新，无需重新声明 background-image */
-    --snowui-hover-overlay-opacity: var(--snowui-hover-opacity, var(--snowui-frame-hover-opacity, 4%));
-}
+    /* 原生 button 等非 Frame 消费方仍直接消费同一共享通道。 */
+    :where(.snowui-hoverable:not([data-snowui-frame])) {
+        transition: var(--snowui-frame-shared-transition);
+    }
 
-/* Dark Mode 补偿 */
-:where([theme="dark"] .snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled)) {
-    --snowui-frame-hover-opacity: 10%;
+    :where(.snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled)) {
+        /* 仅更新 overlay 透明度变量；background-image 引用它自动更新，无需重新声明 background-image */
+        --snowui-hover-overlay-opacity: var(--snowui-hover-opacity, var(--snowui-frame-hover-opacity, 4%));
+    }
+
+    /* Dark Mode 补偿 */
+    :where([theme="dark"] .snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled)) {
+        --snowui-frame-hover-opacity: 10%;
+    }
 }
 
 /* === Media Hoverable 工具类 (媒体型可交互组件 hover 反馈) ===
@@ -633,7 +661,7 @@
  * Toast.snowui-toast-close-btn 等所有"灰→黑 X"按钮。
  * 仅含视觉规则（尺寸、颜色、opacity、圆角、过渡、button 重置、内部 svg 100% 填充）；
  * 显示/隐藏时机（display none / focus-within 显示 / hover 容器才显示）由各组件自行声明。
- * 内部图标统一使用 resource-svelte 的既有图标资源：
+ * 内部图标统一使用 Components 自有 ComponentIcon 语义资源：
  * <XCircle weight="fill" />（圆形清除）或 <Close />（Tag 紧凑关闭 X）。
  * Tag 的 Close regular 形状来自 close-regular.svg，对齐 Workshop node-id=11898-37771 的 12×12 plain X。
  * 规范：specs/StyleSpec.md §2.6.3 第 5 类（共享 X 图标按钮基类）

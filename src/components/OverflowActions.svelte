@@ -8,7 +8,7 @@
         type ComponentProps,
         type Snippet,
     } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
     import SelectButton from "./SelectButton.svelte";
@@ -380,7 +380,7 @@
 
 {#snippet renderMenuIcon(icon: OverflowActionIcon | undefined)}
     {#if typeof icon === "string"}
-        <ResourceIcon name={icon} size={16} aria-hidden="true" />
+        <ComponentIcon name={icon} size={16} aria-hidden="true" />
     {:else if icon}
         {@render icon()}
     {/if}
@@ -435,7 +435,7 @@
             parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem }}
         >
             {#snippet label()}
-                <ResourceIcon name="three-dots" aria-hidden="true" />
+                <ComponentIcon name="three-dots" aria-hidden="true" />
             {/snippet}
             <Listbox search={false} showCheck={false} placementMode="bottom" {align}>
                 {#each menuEntries as entry}
@@ -461,7 +461,7 @@
     <span class="snowui-overflow-actions-more-measure" aria-hidden="true" inert>
         <span bind:this={moreMeasureElement}>
             <Button {...resolvedButtonProps} iconOnly tabindex={-1} aria-label={moreLabel}>
-                <ResourceIcon name="three-dots" aria-hidden="true" />
+                <ComponentIcon name="three-dots" aria-hidden="true" />
             </Button>
         </span>
     </span>

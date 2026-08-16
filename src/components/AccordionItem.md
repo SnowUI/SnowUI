@@ -1,6 +1,6 @@
 # AccordionItem.svelte 文档
 
-> **版本**: v1.2.2
+> **版本**: v1.2.3
 > **职责**: 作为 Accordion 内部的单个折叠项容器。
 > **包归属**: OSS
 
@@ -83,6 +83,11 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.2.3 (2026-08-16)
+
+#### 动效修复
+- Frame 根 `transform` / `transition` 改为单一低优先级出口后，AccordionItem 根动效通过组件输入通道接入；Content 的高度、padding、透明度过渡与默认指示器旋转继续由各自节点拥有，不再受 CSS 注入顺序影响。
 
 ### v1.2.2 (2026-06-18)
 

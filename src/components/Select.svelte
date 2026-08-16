@@ -8,7 +8,7 @@
 <script lang="ts">
     import type { ComponentProps, Snippet } from "svelte";
     import { setContext } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
     import Input from "./Input.svelte";
@@ -206,7 +206,7 @@
     const selectedLabel = $derived(selectedOption?.label ?? (hasValue ? resolvedValueStr : undefined));
     const isPlaceholderVisible = $derived(!hasValue);
 
-    // 外置 trailing 替换默认 indicator。内置 ResourceIcon 自身是直系 trailing。
+    // 外置 trailing 替换默认 indicator。内置 ComponentIcon 自身是直系 trailing。
     $effect(() => {
         if (!selectEl) return;
         const host = selectEl;
@@ -469,7 +469,7 @@
 
     <!-- 指示器图标（箭头） -->
     {#if !buttonTrigger && !hasCustomTrailing}
-        <ResourceIcon name="arrow-line-up-down" as="trailing" class="snowui-select-indicator" size={16} aria-hidden="true" onclick={handleTriggerClick} />
+        <ComponentIcon name="arrow-line-up-down" as="trailing" class="snowui-select-indicator" size={16} aria-hidden="true" onclick={handleTriggerClick} />
     {/if}
 
     <!-- 默认内置模式生成 Listbox + MenuItem；显式 children 存在时切换为显式组合模式。 -->

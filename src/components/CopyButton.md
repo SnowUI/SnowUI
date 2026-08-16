@@ -30,7 +30,7 @@
 - 主布局模型：宿主组件特化。
 - 宿主：Button。
 - Clipboard 能力复用 `../lib/clipboard.ts`。
-- 默认 Copy/Check 为 resource-svelte 功能图标基础设施。
+- 默认 copy/check 由 Components 自有 `ComponentIcon` 解析；应用级 `IconProvider` 可统一替换，未命中时回退包内默认。
 - Copy/Check 变化使用 Button → Frame 的 `stateContent`，与 CodeBlock 复制按钮采用同一协议。
 - pending / success 反馈期保持正常 Button 样式，但 `whileClick=false` 且业务点击被忽略，避免 Check 缩小和按钮闪动。
 

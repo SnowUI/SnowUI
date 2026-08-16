@@ -394,6 +394,23 @@
       "deprecated": false
     },
     {
+      "name": "IconProvider",
+      "canonical": "IconProvider",
+      "package": "@snowui-design-system/components",
+      "import": "import { IconProvider } from '@snowui-design-system/components';",
+      "tier": "oss",
+      "kind": "component",
+      "source": "src/components/IconProvider.svelte",
+      "documentation": "src/components/IconProvider.md",
+      "description": "为 SnowUI 组件自己拥有的内置功能图标提供应用级图标库替换，同时保留 Components 随包默认回退。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "Image",
       "canonical": "Image",
       "package": "@snowui-design-system/components",

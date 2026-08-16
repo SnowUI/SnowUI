@@ -16,7 +16,7 @@ export const examples = [
         expected: {
             render: "宿主未 hover 时隐藏，进入任意宿主子内容后显示 line 手柄。",
             layout: "Indicator 绝对定位在宿主右侧或底部，不占内容布局空间。",
-            interaction: "自身 hover 时变为 Black/40% 并沿粗细轴放大 2 倍，支持 Pointer 与方向键调整。",
+            interaction: "自身 hover 时由 Black/10 变为 Black/20 并沿粗细轴放大 2 倍，支持 Pointer 与方向键调整；颜色不受 Frame 样式加载顺序影响。",
             performance: "pointermove 通过共享 resizable 在 rAF 中合并。",
             responsive: "尺寸被限制在声明的 minSize 与 maxSize 范围内。",
         },
@@ -30,9 +30,9 @@ export const examples = [
     <Indicator axis="height" appearance="corner" minSize={60} maxSize={320} />
 </Frame>`,
         expected: {
-            render: "宿主 hover 时显示 16px RoundedCorner，常规描边为 1px、Black/20%。",
+            render: "宿主 hover 时显示 16px corner，常规描边为 1px、Black/10。",
             layout: "图标固定在宿主右下角，命中区扩展不改变布局。",
-            interaction: "自身 hover、focus 或 dragging 时描边变为 2px、Black/40%，图标尺寸不缩放。",
+            interaction: "自身 hover、focus 或 dragging 时描边变为 2px、Black/20，图标尺寸不缩放。",
             performance: "复用 line 相同的显隐与 resizable 协议。",
             responsive: "拖动只改变宿主高度。",
         },

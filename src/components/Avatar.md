@@ -165,7 +165,7 @@
 
 **默认 / 空头像**
 - `default`：常态直接渲染按 seed 选择的共享 Gradient 静态图，seed 优先使用 `aria-label` / `data-name` / `title`，无名称时使用实例 ID，使同屏默认头像自然分散到六种配色。完整 Gradient 组件只在 hover 期间按需挂载并在退出动效完成后释放；`gradientMotion` 开启时保持常驻。
-- `empty`：保留 `var(--black-4)` 灰色背景与 resource-svelte `user` 图标，明确表达尚无头像内容。
+- `empty`：保留 `var(--black-4)` 灰色背景与 Components 内置语义 `user` 图标，明确表达尚无头像内容；应用级 `IconProvider` 可替换。
 
 ### 5. Hover 规范 (Hover Spec)
 

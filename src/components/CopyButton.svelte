@@ -1,7 +1,7 @@
 <!-- CopyButton：以真实 Button 为宿主的剪贴板复制按钮。 -->
 <script lang="ts">
     import { onDestroy, type ComponentProps, type Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Button from "./Button.svelte";
     import Frame from "./Frame.svelte";
     import { writeClipboardText } from "../lib/clipboard";
@@ -96,7 +96,7 @@
     {#if icon}
         {@render icon()}
     {:else}
-        <ResourceIcon name="copy" size={16} aria-hidden="true" />
+        <ComponentIcon name="copy" size={16} aria-hidden="true" />
     {/if}
 {/snippet}
 
@@ -106,7 +106,7 @@
     {:else if successContent}
         {@render successContent()}
     {:else}
-        <ResourceIcon name="check" size={16} aria-hidden="true" />
+        <ComponentIcon name="check" size={16} aria-hidden="true" />
     {/if}
 {/snippet}
 

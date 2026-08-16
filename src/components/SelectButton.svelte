@@ -1,7 +1,7 @@
 <!-- SelectButton：以真实 Button 为宿主并复用 Select 单选能力。 -->
 <script lang="ts">
     import type { ComponentProps, Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Button from "./Button.svelte";
     import Select, {
         type SelectOption,
@@ -136,7 +136,7 @@
                 disabled: context.disabled,
             })}
         {:else}
-            <ResourceIcon name="arrow-line-down" size={16} aria-hidden="true" />
+            <ComponentIcon name="arrow-line-down" size={16} aria-hidden="true" />
         {/if}
     {/if}
 {/snippet}

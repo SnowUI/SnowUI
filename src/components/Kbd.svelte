@@ -92,7 +92,7 @@
         font-family: inherit;
         white-space: nowrap;
         user-select: none;
-        transition:
+        --snowui-frame-component-transition:
             background-color
                 var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),

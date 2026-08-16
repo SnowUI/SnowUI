@@ -454,8 +454,6 @@
         flex: 0 0 auto;
         font-size: var(--text-12);
         line-height: var(--leading-12);
-        /* 与 overlay 滚动条 thumb 一致：默认 Black/10，hover Black/20 */
-        color: var(--snowui-indicator-color-override, var(--black-10, #0000001a));
         outline: none;
         touch-action: none;
         user-select: none;
@@ -494,6 +492,8 @@
         display: block;
         border-radius: var(--radius-full, 9999px);
         background-color: currentColor;
+        /* visual 自己拥有颜色，避免 Frame 根层的 color: inherit 受加载顺序影响。 */
+        color: var(--snowui-indicator-color-override, var(--black-10, #0000001a));
         opacity: 0;
         transition:
             color var(--snowui-frame-color-motion-duration, 0.15s)
@@ -548,9 +548,9 @@
         opacity: 1;
     }
 
-    :global(:where(.snowui-indicator:hover)),
-    :global(:where(.snowui-indicator:focus-visible)),
-    :global(:where(.snowui-indicator[data-dragging="true"])) {
+    :global(:where(.snowui-indicator:hover) > .snowui-indicator-visual),
+    :global(:where(.snowui-indicator:focus-visible) > .snowui-indicator-visual),
+    :global(:where(.snowui-indicator[data-dragging="true"]) > .snowui-indicator-visual) {
         color: var(--snowui-indicator-active-color-override, var(--black-20, #00000033));
     }
 
@@ -569,7 +569,6 @@
     :global(:where(.snowui-indicator-corner)) {
         width: var(--size-4);
         height: var(--size-4);
-        color: var(--snowui-indicator-color-override, var(--black-10, #0000001a));
         z-index: 4;
     }
 

@@ -1,5 +1,5 @@
 <!--
-  Frame OSS v1.2.0
+  Frame OSS v1.3.0
   职责：自包含 Frame 容器（作用半径 = 1 个 Frame）。
   能力：状态机、JS 动效执行、自身 FLIP、Scale Observer、Perception、Skeleton、stateContent Grid Stacking。
   边界：不含跨组件协调（§7.7 编排模式 / §8 联动控制 / §10 样式编排），那些能力在 FramePro。

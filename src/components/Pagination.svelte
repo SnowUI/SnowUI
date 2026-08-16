@@ -12,7 +12,7 @@
 
 <script lang="ts">
     import { setContext, tick, type Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
     import Listbox from "./Listbox.svelte";
@@ -670,23 +670,23 @@
             <Button as="current" variant="gray" />
             <Button as="page" variant="outline" />
             <Button as="prev" variant="outline" iconOnly aria-label="上一页">
-                <ResourceIcon name="arrow-line-left" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrow-line-left" size={16} aria-hidden="true" />
             </Button>
             <Button as="next" variant="outline" iconOnly aria-label="下一页">
-                <ResourceIcon name="arrow-line-right" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrow-line-right" size={16} aria-hidden="true" />
             </Button>
         {/if}
         <span bind:this={previousIconTemplateEl}>
-            <ResourceIcon name="arrow-line-left" class="snowui-pagination-default-icon" size={16} aria-hidden="true" />
+            <ComponentIcon name="arrow-line-left" class="snowui-pagination-default-icon" size={16} aria-hidden="true" />
         </span>
         <span bind:this={nextIconTemplateEl}>
-            <ResourceIcon name="arrow-line-right" class="snowui-pagination-default-icon" size={16} aria-hidden="true" />
+            <ComponentIcon name="arrow-line-right" class="snowui-pagination-default-icon" size={16} aria-hidden="true" />
         </span>
         <span
             class="snowui-pagination-page-size-icon-template"
             bind:this={pageSizeIconTemplateEl}
         >
-            <ResourceIcon name="arrow-line-down" size={16} aria-hidden="true" />
+            <ComponentIcon name="arrow-line-down" size={16} aria-hidden="true" />
         </span>
     </div>
     <div class="snowui-pagination-items" bind:this={itemsEl}></div>

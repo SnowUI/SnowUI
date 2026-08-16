@@ -1,6 +1,7 @@
 /**
  * Button.test.ts
- * v1.6.0
+ * v1.6.1
+ * 变更记录 (2026-08-16): A1/A2 明确验证 filled 的 Static White 前景色不受宿主基线加载顺序影响。
  * 变更记录 (2026-08-11): icon-only 改为显式 iconOnly=true；未声明等同于 false。
  * 变更记录 (2026-08-09): bare 默认 100% 不透明，新增 emphasis="muted" 示例覆盖 40% → hover 100%。
  * 变更记录 (2026-07-05): 新增 backgroundBlur 开启状态示例。
@@ -46,8 +47,14 @@ export const examples = [
         <Button variant="filled" size="lg">Large</Button>
     </div>
 </div>`,
-
-        logic: ["Size"],
+        expected: {
+            render: "三种尺寸的 filled Button 均保持 Primary 背景与 Static White 文字，文字清晰可见。",
+            layout: "尺寸与原有 padding、圆角和内容布局不变。",
+            interaction: "hover 只增加既有 overlay，不改变前景色。",
+            performance: "宿主基线与组件样式的先后加载不影响 filled 前景色。",
+            responsive: "sm、md、lg 使用同一变体颜色契约。",
+        },
+        logic: ["Size", "FilledColor", "CascadeOrder"],
     },
     {
         name: "A3: 禁用状态 (Disabled)",

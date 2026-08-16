@@ -1,6 +1,6 @@
 # Frame.svelte（OSS）
 
-> **版本**: v1.2.0（Skeleton 自注册协议，2026-08-15）
+> **版本**: v1.3.0（根视觉通道，2026-08-16）
 > **职责**: OSS 版基础容器。承载所有**自包含**的组件能力——布局、状态机、JS 动效执行、FLIP、Scale 观察、Perception、Skeleton 协议。
 > **边界**: 不包含**跨组件协调**能力（编排模式 / 联动控制 / 样式编排）。这三类能力由 `FramePro.svelte` 提供。
 > **包归属**: `@snowui-design-system/components`（OSS，公开）
@@ -208,6 +208,8 @@ v1.0.0 的动机：v0.x 把 CodeBlock 这类只是想做"自身状态切换 + �
 | `morph` | 形态过渡容器 |
 | bridge 变量输出 | `--snowui-frame-*-motion-*` 供组件 CSS 消费 |
 
+Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级出口生成：显式 `while*` 写入的 inline `--su-motion-*` 优先，其次是组件根 `--snowui-frame-component-*`，最后是 Hoverable 等 `--snowui-frame-shared-*` fallback。组件不得在 Frame 根平行写最终属性；非 Frame 内部节点不受此限制。该内部通道不改变外部 `class` / `style` 对最终属性的接管能力。
+
 > **OSS Frame 不支持的能力**（这些必须用 FramePro）：
 > - `orchestrate*` 编排模式（父控子启动时机）
 > - `Click={{ target, action }}` 跨组件联动
@@ -238,6 +240,8 @@ v1.0.0 的动机：v0.x 把 CodeBlock 这类只是想做"自身状态切换 + �
 - 切割线变更日志：本文档 §1.6
 
 ## 更新日志
+
+- v1.3.0 (2026-08-16): Frame 根 `transform` / `transition` 收敛为单一低优先级出口，按显式 motion、组件输入、共享 fallback 的固定顺序解析。
 
 - v1.2.0 (2026-08-15): `renderHints` 成为组件 Skeleton 自注册协议；父 Frame 只探测首层已注册 child，旧 class mapping 降级为兼容层。
 

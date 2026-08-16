@@ -1,6 +1,6 @@
 <!--
   Breadcrumb 组件：页面层级路径导航容器
-  v1.0.0
+  v1.0.1
 
   职责：
   - 只作为组合式容器，不生成 items / separator。
@@ -294,8 +294,10 @@
     }
 
     :global(:where(.snowui-breadcrumb-item)) {
-        transition:
+        --snowui-frame-component-transition:
             opacity var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out),
+            --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
 

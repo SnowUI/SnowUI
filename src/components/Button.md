@@ -1,6 +1,7 @@
 # Button.svelte 文档
 
-> **版本**: v2.5.0
+> **版本**: v2.5.1
+> **变更记录 (2026-08-16)**: SnowUI 宿主基线改为固定低优先级层，`filled` 的 Static White 前景色不再因动态模块加载顺序被 Frame `color: inherit` 覆盖。
 > **变更记录 (2026-08-11)**: 新增显式 `iconOnly` 布局声明，默认 `false`；移除基于 children DOM 的自动推断，并为缺少可访问名称的 icon-only Button 提供开发警告。
 > **变更记录 (2026-08-09)**: `bare` 默认改为 100% 不透明；新增 `emphasis="muted"` 显式启用 40% → hover 100% 的弱化交互。
 > **变更记录 (2026-07-08)**: Button 默认最小宽度改为 `max-content`，保留“文字 + gap + padding”的自然下限，避免 fill 布局吞掉默认 padding。
@@ -355,6 +356,11 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.5.1 (2026-08-16)
+
+- Filled 的 Static White 文字与图标色恢复；宿主基线的继承色不再依赖 CSS 注入顺序覆盖组件自有前景色。
+- 外部 class / inline style 的既有覆盖优先级保持不变。
 
 - **Button-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
 

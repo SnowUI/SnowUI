@@ -1,6 +1,6 @@
 <!--
   AccordionItem 组件：Accordion 内部单个折叠项容器
-  v1.2.2
+  v1.2.3
 
   外层 AccordionItem 负责一整项的背景、圆角、分隔线与展开高度。
   内部通过直系 Frame as="title" / Frame as="content" 承载标题与内容三槽位布局。
@@ -11,7 +11,7 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
     import { getAllContexts, mount, onDestroy, onMount, tick, unmount } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { getAccordion } from "../context";
     import { resizeManager } from "../logic/observer.svelte";
@@ -101,7 +101,7 @@
         if (previous) void unmount(previous);
         indicator.replaceChildren();
         indicator.dataset.iconName = iconName;
-        const instance = mount(ResourceIcon, {
+        const instance = mount(ComponentIcon, {
             target: indicator,
             context: iconContexts,
             props: { name: iconName, size: 16, "aria-hidden": "true" },
@@ -247,7 +247,7 @@
             --snowui-accordion-shadow-override,
             var(--snowui-accordion-item-shadow)
         );
-        transition:
+        --snowui-frame-component-transition:
             background-color var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),
             box-shadow var(--snowui-frame-color-motion-duration, 0.15s)

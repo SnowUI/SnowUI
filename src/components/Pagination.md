@@ -119,7 +119,7 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 
 Pagination 克隆 Button 模板作为 Listbox trigger，因此视觉由 Button 的 `variant`、尺寸和样式控制，选项面板、键盘导航、Portal 与选择状态由内置 Listbox 服务管理。未声明 `Button as="pageSize"` 或未传 `pageSizeOptions` 时不渲染选择器。
 
-pageSize 的默认箭头使用 `@snowui-design-system/resource-svelte` 的 `ArrowLineDown`。它与 `ArrowLineLeft` / `ArrowLineRight` 使用相同的 `--snowui-pagination-icon-size` 尺寸入口；pageSize 的 Icon wrapper、Icon Frame 与内部 SVG 三层都收敛到该尺寸，避免 Icon 默认尺寸溢出。Icon 是 Button 的普通内容，不标记 `as="trailing"`；文字与 Icon 的水平居中及间距继承 Button 自己的内容布局与 gap。pageSize 外壳和 Button 模板始终为 Hug，不参与页码按钮的 Fill 分配。
+pageSize 的默认箭头使用 Components 语义 `arrow-line-down` 图标。它与 `arrow-line-left` / `arrow-line-right` 使用相同的 `--snowui-pagination-icon-size` 尺寸入口；pageSize 的 Icon wrapper、Icon Frame 与内部 SVG 三层都收敛到该尺寸，避免 Icon 默认尺寸溢出。Icon 是 Button 的普通内容，不标记 `as="trailing"`；文字与 Icon 的水平居中及间距继承 Button 自己的内容布局与 gap。pageSize 外壳和 Button 模板始终为 Hug，不参与页码按钮的 Fill 分配。
 
 Pagination 内部将页码与 prev / next 组织为一个分页按钮组。`pageSizeGap` 只控制 pageSize 与这个按钮组之间的间距，按钮组内部仍使用 Pagination 的普通 `column-gap`：
 
@@ -480,7 +480,7 @@ Root Frame(nav)
 - 新增 `pageSize`、`pageSizeOptions`、`pageSizeAriaLabel` 与 `onPageSizeChange`。
 - 新增 `Button as="pageSize"` 视觉模板；模板声明顺序控制选择器位于页码左侧或右侧。
 - 使用内置 Listbox 承接选项、键盘、Portal 和选择交互，Button 模板负责视觉。
-- 默认箭头改用 resource-svelte 的 `ArrowLineDown`；Icon 透明度沿用 Pagination 左右箭头的 `0.4 → 1` hover 规则。
+- 默认箭头通过 `ComponentIcon name="arrow-line-down"` 解析；内置回退随 Components 交付，应用可通过 IconProvider 切库，Icon 透明度沿用 Pagination 左右箭头的 `0.4 → 1` hover 规则。
 - 新增 `pageSizeGap`，独立控制 pageSize 与分页按钮组的间距；组内 Pagination gap 保持不变。
 - 新增普通 `gap` Prop，直接控制页码、prev、next 的组内间距；公开数字按 px 处理。
 - 根节点 `style="gap:…"` 按是否存在 pageSize 映射到 pageSize 外层间距或普通组内间距，并保持 inline style 高于对应 Prop。

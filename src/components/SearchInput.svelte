@@ -7,7 +7,7 @@
 
 <script lang="ts">
     import type { ComponentProps, Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Input from "./Input.svelte";
     import {
         mergeComponentPartProps,
@@ -110,7 +110,7 @@
     {...rest}
 >
     {#if showSearchIcon}
-        <ResourceIcon
+        <ComponentIcon
             name="search"
             as="leading"
             size={16}

@@ -20,7 +20,7 @@
 
 <script lang="ts">
     import { getContext, setContext, type Component, type Snippet } from "svelte";
-    import { RESOURCE_ICON_CONTEXT_KEY } from "@snowui-design-system/resource-svelte";
+    import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { FRAME_CONTEXT_KEY } from "../keys";
     import type { StateValueMap } from "../logic/frame-types";
@@ -99,7 +99,7 @@
         sizeCtx?.iconSize !== undefined ? sizeCtx.iconSize : sizeCtx?.size,
     );
 
-    setContext(RESOURCE_ICON_CONTEXT_KEY, {
+    setContext(OPTIONAL_RESOURCE_ICON_CONTEXT_KEY, {
         size: "100%",
         get weight() {
             return weight;

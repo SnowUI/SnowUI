@@ -198,7 +198,7 @@
         text-decoration: none;
         cursor: var(--snowui-state-cursor, pointer);
         overflow: hidden;
-        transition:
+        --snowui-frame-component-transition:
             color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
             background-color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
             --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),

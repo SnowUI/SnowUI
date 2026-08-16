@@ -1,5 +1,5 @@
 <!--
-  Tag 组件：标签 v1.2.0
+  Tag 组件：标签 v1.2.1
 
   布局模型：内联外壳布局（与 Button 一致），不接入三槽位。
   - 子元素通过 gap 自然排列；外部覆盖 `--snowui-tag-gap`（或传 gap）即可同步影响所有子元素之间的间距，包括内置 X 与文字、外部 Icon 与文字。
@@ -21,7 +21,7 @@
 
 <script lang="ts">
     import type { Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import { resizeManager } from "../logic/observer.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
 
@@ -277,7 +277,7 @@
             aria-label="Close tag"
             onclick={handleCloseClick}
         >
-            <ResourceIcon name="close" size={16} aria-hidden="true" />
+            <ComponentIcon name="close" size={16} aria-hidden="true" />
         </button>
     {/if}
 </Frame>
@@ -312,10 +312,12 @@
         line-height: var(--snowui-tag-line-height-override, var(--snowui-tag-line-height));
         background-color: var(--snowui-tag-bg-override, var(--snowui-tag-bg));
         color: var(--snowui-tag-color-override, var(--snowui-tag-color));
-        transition:
+        --snowui-frame-component-transition:
             background-color var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),
             color var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out),
+            --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
 
@@ -323,10 +325,12 @@
        挂载 padding-right 的 transition 在该作用域内声明，hover 状态变化时由消费 Frame 桥接动效平滑过渡。
        注：该选择器不会触发 check-standards §5.7.5 根类 transition 禁用规则（规则仅扫描 :global(:where(.snowui-tag)) 根块）。 */
     :global(:where(.snowui-tag)[data-closable="true"]) {
-        transition:
+        --snowui-frame-component-transition:
             background-color var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),
             color var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out),
+            --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),
             padding-right var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);

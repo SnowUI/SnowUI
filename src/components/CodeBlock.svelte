@@ -37,7 +37,7 @@
         applyFlipExit,
     } from "../logic/layout-flip";
     import ExpandButton from "./ExpandButton.svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import type { Snippet } from "svelte";
 
     type CodeTokenKind =
@@ -513,7 +513,7 @@
             >{@html customCopyIconHtml}</span
         >
     {:else}
-        <ResourceIcon
+        <ComponentIcon
             name="copy"
             class="snowui-code-block-icon-builtin"
             as="copy-icon"
@@ -530,7 +530,7 @@
             >{@html customCopiedIconHtml}</span
         >
     {:else}
-        <ResourceIcon
+        <ComponentIcon
             name="check"
             class="snowui-code-block-icon-builtin"
             as="copied-icon"

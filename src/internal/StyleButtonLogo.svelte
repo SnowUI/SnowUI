@@ -1,7 +1,7 @@
 <!-- StyleButton 内部品牌 Logo：读取 Button 注入的图标尺寸上下文。 -->
 <script lang="ts">
     import { getContext } from "svelte";
-    import { RESOURCE_ICON_CONTEXT_KEY } from "@snowui-design-system/resource-svelte";
+    import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
     import SnowUILogo from "../components/SnowUILogo.svelte";
 
     interface Props {
@@ -11,7 +11,7 @@
     let { mode }: Props = $props();
     const resourceIconContext = getContext<{
         size?: number | string;
-    } | undefined>(RESOURCE_ICON_CONTEXT_KEY);
+    } | undefined>(OPTIONAL_RESOURCE_ICON_CONTEXT_KEY);
     const logoSize = $derived.by(() => {
         const numericSize = Number(resourceIconContext?.size ?? 16);
         return Number.isFinite(numericSize) && numericSize > 0 ? numericSize : 16;

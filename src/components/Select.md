@@ -499,7 +499,7 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 
 ### v3.2.0 (2026-07-02)
 
-- 内置下拉指示图标改为 `ResourceIcon name="arrow-line-up-down"`，跟随 resource-svelte 图标库切换。
+- 内置下拉指示图标使用 `ComponentIcon name="arrow-line-up-down"`；默认由 Components 自包含，应用级 `IconProvider` 可统一切换图标库。
 - 保持直系 trailing 槽位协议；自定义 trailing 继续替换默认指示图标。
 
 - **Select-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。

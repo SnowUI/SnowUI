@@ -41,7 +41,7 @@ SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默
 - 宿主：Button；状态控制器：Select。
 - 受控字段：children、as、value、disabled、id、trigger 事件与 ARIA。
 - 无视觉 wrapper 由 Select 提供；Button 仍是真实交互节点。
-- 依赖：Select、Button、Listbox、Input、MenuItem、resource-svelte。
+- 依赖：Select、Button、Listbox、Input、MenuItem 与 Components 内置语义图标协议。
 
 ## 更新日志 (Changelog)
 

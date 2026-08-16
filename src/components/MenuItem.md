@@ -75,7 +75,7 @@ MenuItem 的根布局固定按 Leading / Label / Trailing 三段组织：
 | 文字颜色 | `var(--black-80)` |
 | hover / active 背景 | 瞬时 `var(--black-4)`；遵循 `StyleSpec.md §2.4` 的菜单/列表项高亮例外 |
 | 选中标记 | trailing check，`opacity: 0` → `1` |
-| 删除 X | 复用 `.snowui-clear-icon-btn` 与 resource-svelte `<XCircle weight="fill" />`；颜色源保持 `Black/100%`，inactive `opacity: 0.4`，hover `opacity: 1` |
+| 删除 X | 复用 `.snowui-clear-icon-btn` 与 Components `ComponentIcon name="x-circle" weight="fill"`；应用 Provider 可替换，颜色源保持 `Black/100%`，inactive `opacity: 0.4`，hover `opacity: 1` |
 | 禁用 | `opacity: 0.2; pointer-events: none` |
 | gap | `var(--gap-2)` = 8px |
 | 复合槽位内部 gap | `var(--gap-2)` = 8px；可通过外部 class / style 覆盖 |
@@ -161,7 +161,7 @@ MenuItem 的根布局固定按 Leading / Label / Trailing 三段组织：
 ### v1.2.3 (2026-05-31)
 
 #### 样式调整
-- 自定义项删除 X 改为复用 `.snowui-clear-icon-btn` 与 resource-svelte `<XCircle weight="fill" />`，统一使用 `Black/100% × opacity: 0.4 -> 1`。
+- 自定义项删除 X 复用 `.snowui-clear-icon-btn` 与 `ComponentIcon name="x-circle" weight="fill"`，统一使用 `Black/100% × opacity: 0.4 -> 1`，并接受应用 IconProvider 替换。
 - disabled 透明度从 `0.4` 调整为全局规范值 `0.2`。
 
 ### v1.2.2 (2026-05-09)

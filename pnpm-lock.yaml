@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@snowui-design-system/resource-svelte':
-        specifier: '>=1.0.26 <2.0.0'
-        version: 1.0.26(svelte@5.56.4)
     devDependencies:
       '@codemirror/lang-html':
         specifier: ^6.4.11
@@ -27,6 +23,9 @@ importers:
       '@replit/codemirror-lang-svelte':
         specifier: ^6.0.0
         version: 6.0.0(@codemirror/autocomplete@6.20.3)(@codemirror/lang-css@6.3.1)(@codemirror/lang-html@6.4.11)(@codemirror/lang-javascript@6.2.5)(@codemirror/language@6.12.4)(@codemirror/state@6.7.1)(@codemirror/view@6.43.6)(@lezer/common@1.5.2)(@lezer/highlight@1.2.3)(@lezer/javascript@1.5.4)(@lezer/lr@1.4.10)
+      '@snowui-design-system/resource-svelte':
+        specifier: 1.0.29
+        version: 1.0.29(svelte@5.56.4)
       '@sveltejs/vite-plugin-svelte':
         specifier: ^7.2.0
         version: 7.2.0(svelte@5.56.4)(vite@8.1.4)
@@ -255,11 +254,11 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@snowui-design-system/resource-base@1.0.26':
-    resolution: {integrity: sha512-psrOl1Co+6WlR+8LWdaX3auHE8VKA7whroYfl9KmHW8yO+yFr2lUwal9tADlbH7Wu1jBtuitikT+pFpKbmmtzQ==}
+  '@snowui-design-system/resource-base@1.0.28':
+    resolution: {integrity: sha512-IEmNXkmGHfGonbOAHVpUjOjJL+UvBeOQOg1yYbERGDqHLj7dtN5JHquLAwqw704EwVi/bkL+1KTUrRYYQm0VyA==}
 
-  '@snowui-design-system/resource-svelte@1.0.26':
-    resolution: {integrity: sha512-I4PyeXlTxXb3Bv7Zsu8E8fdHkyOkMhuvnvXkLhuEMe1jarA3DNd6AWaCNBOu8ItNQNijd9t8tevh72AOIy3V+g==}
+  '@snowui-design-system/resource-svelte@1.0.29':
+    resolution: {integrity: sha512-zAbxfa/MyoZnGiOLqMTeCmM45veNuOrzwwMTzLHHrNaJrB73brHIUiUGaiEWCZd+mGw+sv/qSMwydn8Psm1G2w==}
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0
 
@@ -799,11 +798,11 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@snowui-design-system/resource-base@1.0.26': {}
+  '@snowui-design-system/resource-base@1.0.28': {}
 
-  '@snowui-design-system/resource-svelte@1.0.26(svelte@5.56.4)':
+  '@snowui-design-system/resource-svelte@1.0.29(svelte@5.56.4)':
     dependencies:
-      '@snowui-design-system/resource-base': 1.0.26
+      '@snowui-design-system/resource-base': 1.0.28
       svelte: 5.56.4
 
   '@sveltejs/acorn-typescript@1.0.11(acorn@8.17.0)':

@@ -68,6 +68,16 @@ export type { ListboxItem } from "./components/Listbox.svelte";
 export { default as MenuItem } from "./components/MenuItem.svelte";
 export { default as Frame } from "./components/Frame.svelte";
 export { default as LocaleProvider } from "./components/LocaleProvider.svelte";
+export { default as IconProvider } from "./components/IconProvider.svelte";
+export {
+    createComponentIconResolver,
+    type ComponentIconComponent,
+    type ComponentIconMap,
+    type ComponentIconRenderProps,
+    type ComponentIconRequest,
+    type ComponentIconResolver,
+    type ComponentIconWeight,
+} from "./logic/component-icon";
 
 export { default as Text } from './components/Text.svelte'
 export { default as Tooltip } from "./components/Tooltip.svelte";

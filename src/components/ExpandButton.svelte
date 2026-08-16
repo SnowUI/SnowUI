@@ -1,7 +1,7 @@
 <!-- ExpandButton：以真实 Button 为宿主的展开 / 收起按钮。 -->
 <script lang="ts">
     import type { ComponentProps, Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Button from "./Button.svelte";
     import Frame from "./Frame.svelte";
     import { REPLACEMENT_APPEAR_MOTION } from "../motion/presets/replacement";
@@ -82,7 +82,7 @@
             {#if collapseIcon}
                 {@render collapseIcon()}
             {:else}
-                <ResourceIcon name="arrows-in-simple" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-in-simple" size={16} aria-hidden="true" />
             {/if}
         </Frame>
     {:else}
@@ -96,7 +96,7 @@
             {#if icon}
                 {@render icon()}
             {:else}
-                <ResourceIcon name="arrows-out-simple" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-out-simple" size={16} aria-hidden="true" />
             {/if}
         </Frame>
     {/if}

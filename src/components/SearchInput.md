@@ -15,7 +15,7 @@
 
 ## 功能概览
 
-- 默认使用 `Search` 作为 leading 图标，图标来自 `@snowui-design-system/resource-svelte`
+- 默认使用语义名 `search` 的 Components 内置图标；可由应用级 `IconProvider` 或外置 leading 替换
 - 内置默认 `Search` 静止态为 Black/20，输入激活态为 Black/40；该颜色规则只属于 `SearchInput`
 - 支持外置 leading 替换默认图标
 - 可通过 `collapseBelow` 在自身宽度不足时退化为仅搜索图标；最小宽度由左右实际 padding + leading Icon 固有宽度组成，空值且未聚焦时折叠，聚焦或已有值时恢复输入内容

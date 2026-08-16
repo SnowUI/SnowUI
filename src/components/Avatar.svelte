@@ -24,7 +24,7 @@
         type Component,
         type Snippet,
     } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Gradient, {
         getStaticGradientSource,
@@ -529,7 +529,7 @@
                         >
                     {:else}
                         <span class="snowui-avatar-fallback">
-                            <ResourceIcon
+                            <ComponentIcon
                                 name="user"
                                 size="1em"
                                 class="snowui-avatar-default-icon"

@@ -1,7 +1,7 @@
 <!-- OverflowActions 的专用真实 Button 子项。文档：./OverflowAction.md -->
 <script lang="ts">
     import { onMount, type ComponentProps, type Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame from "./Frame.svelte";
     import Button from "./Button.svelte";
     import {
@@ -113,7 +113,7 @@
 
 {#snippet renderIcon()}
     {#if typeof icon === "string"}
-        <ResourceIcon name={icon} aria-hidden="true" />
+        <ComponentIcon name={icon} aria-hidden="true" />
     {:else if icon}
         {@render icon()}
     {/if}

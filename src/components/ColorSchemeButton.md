@@ -35,7 +35,7 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 
 - 包归属：OSS；主布局模型为内联外壳布局。
 - 组合身份：Button 宿主组件特化，不提供 `parts.Button`。
-- 内置图标不传显式 size，必须消费 Button 注入的 ResourceIcon 尺寸上下文。
+- 内置图标不传显式 size，必须由 `ComponentIcon` 消费 Button 提供的图标尺寸 Context；切换 IconProvider 不能改变该尺寸所有权。
 - 多实例通过观察根节点 `theme` 属性同步；`applyToDocument={false}` 时由受控 `scheme` 同步。
 - 状态切换不接入 replacement preset、CSS transition 或 View Transition。
 

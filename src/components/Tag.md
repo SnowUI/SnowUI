@@ -1,9 +1,10 @@
 # Tag.svelte 文档
 
-> **版本**: v1.2.0
+> **版本**: v1.2.1
 > **变更记录 (2026-05-22)**: `shape="left-arrow" / "right-arrow"` 改为内部 SVG 背景路径，根据当前 Tag 宽高生成完整圆角箭头轮廓；所有外角均圆角化，尽量复原 Workshop `node-id=11951-40471` 中的箭头 Tag。
 > **变更记录 (2026-05-21)**: 激活态内置 X 颜色改为 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%，不再使用黑色。
-> **变更记录 (2026-05-21)**: 内置 X 使用 resource-svelte 的 `<Close />`（由 `resource-base/assets/icons/regular/close-regular.svg` 生成），其形状来自 Workshop `node-id=11898-37771` 的 12×12 X；hover 仍复用 `.snowui-clear-icon-btn` 的 0.4 → 1 透明度规则。
+> **变更记录 (2026-08-16)**: 内置 X 改由 Components 自有 `ComponentIcon name="close"` 解析；无外部资源包时保持相同默认形状，应用级 `IconProvider` 可统一替换。
+> **变更记录 (2026-08-16)**: Tag 自有颜色、padding 与 hover overlay 过渡稳定覆盖 Level 1 共享行为，不依赖 CSS 注入顺序。
 > **变更记录 (2026-05-21)**: 新增 `toggle` 语法糖，与 Button 一致自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；点击进入激活态，再次点击回到常态。
 > **职责**: 标签组件，用于用户标记 / 筛选 / 路径片段等交互语义。
 > **设计稿**: [Workshop / Tag](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=11841-21705&t=nY2VC3oisn12OH01-4)
@@ -67,7 +68,7 @@
 
 - 子元素通过 `gap` 自然排列；外部覆盖 `--snowui-tag-gap` 或传 `gap` 即可同步影响所有子元素间距（包括内置 X 与文字、外部 Icon 与文字）。
 - **不内置 leading Icon**；需要 Dot 由消费方显式传入 `<Icon as="leading">`。
-- 删除 X 由 `closable={true}` 自动渲染在末尾；视觉与 hover 复用 `.snowui-clear-icon-btn` 共享基类（内部图标为 resource-svelte 的 `<Close />`，来源为 `close-regular.svg`）；默认 `width: 0` 不占位，hover Tag 时显形，hover X 自身时透明度提升到 1。激活态下 X 颜色源切到 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%。
+- 删除 X 由 `closable={true}` 自动渲染在末尾；视觉与 hover 复用 `.snowui-clear-icon-btn` 共享基类（默认图标为 Components 自有语义 `close`，其包内形状快照来源为 `close-regular.svg`）；默认 `width: 0` 不占位，hover Tag 时显形，hover X 自身时透明度提升到 1。激活态下 X 颜色源切到 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%。
 - **边距按元素类型决定**（与 Figma 对齐）：文字与边的间距 8px、Icon / X 与边的间距 4px。组件通过 MutationObserver 检测**真实**首/末位节点（包含文本节点），按节点类型写到 `data-edge-left` / `data-edge-right`（`"icon"` / `"text"`），CSS `[data-edge-*="icon"]` 把对应侧 padding 从 8px 收紧到 4px。**纯 CSS `:first-child` / `:last-child` 只看元素节点，无法识别"末位文字"的情况**，因此走 JS。closable 的 X 不计入边距检测（X 由 `[data-closable]:hover` 单独管理右 padding）。
 - 箭头形状（`left-arrow` / `right-arrow`）由内部 SVG 背景路径实现，不进入子元素布局；组件用 ResizeObserver 获取当前宽高并生成完整外轮廓，所有拐点都通过二次贝塞尔圆角化，尽量复原 Workshop `node-id=11951-40471`。
 
@@ -200,7 +201,7 @@
 
 | 属性 | 值 |
 | :--- | :--- |
-| 实现 | 复用 `.snowui-clear-icon-btn` 共享基类；内部图标为 resource-svelte 的 `<Close />`（由 `close-regular.svg` 生成，regular，来自 Workshop 12×12 X） |
+| 实现 | 复用 `.snowui-clear-icon-btn` 共享基类；内部图标为 Components `ComponentIcon name="close"`（包内默认 regular 快照来自 `close-regular.svg` 与 Workshop 12×12 X） |
 | Size | `12px`（通过 `--snowui-clear-icon-size-override: var(--snowui-tag-icon-size)` 接入共享基类） |
 | Color | 默认态：`var(--black-100)` × opacity；激活态：`var(--secondary-indigo)` × opacity |
 | Opacity（默认） | `0.4` |
@@ -234,6 +235,10 @@
 
 ## 更新日志 (Changelog)
 
+### v1.2.1 (2026-08-16)
+
+- 恢复 Tag 根与 closable 状态的完整 transition 通道，并显式保留 hover overlay 过渡。
+
 ### v1.2.0 (2026-05-22)
 
 #### 修复
@@ -242,7 +247,7 @@
 ### v1.1.2 (2026-05-21)
 
 #### 修复
-- **TAG-Close.3** 内置 X 恢复为 resource-svelte 的 `<Close />` plain X 图标，保持原有 Tag 关闭图标外观；规范登记 Tag 的关闭 X 来源为 `close-regular.svg`，并明确其形状来源为 Workshop 12×12。
+- **TAG-Close.3** 内置 X 通过 `ComponentIcon name="close"` 使用 Components 随包 plain X 默认图标，并可由 IconProvider 统一替换；默认形状仍来源于 `close-regular.svg` 与 Workshop 12×12。
 - **TAG-Close.4** 激活态内置 X 颜色源改为 `--secondary-indigo`：未 hover X 时 40%，hover X 时 100%，避免激活 Tag 内的 X hover 成黑色。
 
 ### v1.1.1 (2026-05-21)

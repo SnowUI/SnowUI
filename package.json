@@ -16,6 +16,7 @@
     "./lib/*.svelte": "./src/lib/*.svelte.ts",
     "./lib/*": "./src/lib/*.ts",
     "./internal/table-toolbar": "./src/components/TableToolbar.svelte",
+    "./internal/component-icon": "./src/internal/component-icon/index.ts",
     "./logic/*.svelte": "./src/logic/*.svelte.ts",
     "./logic/*": "./src/logic/*.ts",
     "./motion/*.css": "./src/motion/*.css",
@@ -44,10 +45,10 @@
     "verify:styles": "node scripts/verify-styles.mjs"
   },
   "peerDependencies": {
-    "@snowui-design-system/resource-svelte": ">=1.0.26 <2.0.0",
     "svelte": "^5.0.0"
   },
   "devDependencies": {
+    "@snowui-design-system/resource-svelte": "1.0.29",
     "@codemirror/lang-html": "^6.4.11",
     "@codemirror/lang-javascript": "^6.2.4",
     "@codemirror/lang-json": "^6.0.2",

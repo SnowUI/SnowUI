@@ -1,7 +1,7 @@
 <!-- 可排序、可调整列宽的表头单元格。文档: ./TableHead.md -->
 <script lang="ts">
      import { untrack, type Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Indicator from "./Indicator.svelte";
     import Checkbox from "./Checkbox.svelte";
@@ -179,9 +179,9 @@
         <button class="snowui-table-sort" type="button" data-active={isSortActive ? "true" : undefined} onclick={toggleSort}>
             <span class="snowui-table-head-content">{#if children}{@render children()}{/if}</span>
             {#if isSortActive && direction === "ascending"}
-                <ResourceIcon name="arrows-up" class="snowui-table-sort-icon" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-up" class="snowui-table-sort-icon" size={16} aria-hidden="true" />
             {:else if isSortActive && direction === "descending"}
-                <ResourceIcon name="arrows-down" class="snowui-table-sort-icon" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-down" class="snowui-table-sort-icon" size={16} aria-hidden="true" />
             {/if}
         </button>
     {:else}

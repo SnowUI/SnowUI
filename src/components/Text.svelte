@@ -9,7 +9,7 @@
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
     import Tooltip from "./Tooltip.svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import { fitTextToElement } from "../lib/truncate";
     import { TextTruncation } from "../logic/frame-truncation.svelte";
@@ -596,7 +596,7 @@
                         backgroundBlur
                         class="snowui-text-built-in-more"
                     >
-                        <ResourceIcon
+                        <ComponentIcon
                             name="arrow-line-down"
                             size={16}
                             aria-hidden="true"
@@ -680,7 +680,7 @@
         );
         --snowui-text-hover-transition-default:
             transform 1000ms ease-out;
-        transform: translate(
+        --snowui-frame-component-transform: translate(
                 calc(
                     var(--snowui-parallax-x, 0px) +
                         var(--snowui-text-hover-shift-x, 0px)
@@ -774,7 +774,7 @@
     }
 
     :global(:where(.snowui-text-hover-enabled)) {
-        transition: var(
+        --snowui-frame-component-transition: var(
             --snowui-text-hover-transition-override,
             var(--snowui-text-hover-transition-default)
         );

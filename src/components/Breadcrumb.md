@@ -1,6 +1,6 @@
 # Breadcrumb (面包屑)
 
-> **版本**: v1.0.0
+> **版本**: v1.0.1
 > **职责**: 提供页面层级路径导航容器。
 > **设计稿**: [Workshop / Breadcrumb](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12046-1772&t=nY2VC3oisn12OH01-4)
 
@@ -155,6 +155,10 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.0.1 (2026-08-16)
+
+- item 的透明度与 hover overlay 过渡不再受共享样式注入顺序影响。
 
 ### v1.0.0 (2026-05-25)
 

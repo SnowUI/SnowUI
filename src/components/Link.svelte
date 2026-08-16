@@ -9,7 +9,7 @@
 
 <script lang="ts">
     import type { Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Tooltip from "./Tooltip.svelte";
     import { resolveSnowUIColor, type SnowUIColor } from "../lib/color";
@@ -283,7 +283,7 @@
             data-as="trailing"
             aria-hidden="true"
         >
-            <ResourceIcon name="arrow-up-right" class="snowui-link-default-icon" size={12} aria-hidden="true" />
+            <ComponentIcon name="arrow-up-right" class="snowui-link-default-icon" size={12} aria-hidden="true" />
         </span>
     {:else if variant === "external" && !hasCustomTrailing}
         <span
@@ -291,7 +291,7 @@
             data-as="trailing"
             aria-hidden="true"
         >
-            <ResourceIcon name="arrow-square-out" class="snowui-link-default-icon" size={12} aria-hidden="true" />
+            <ComponentIcon name="arrow-square-out" class="snowui-link-default-icon" size={12} aria-hidden="true" />
         </span>
     {/if}
 </Frame>
@@ -325,7 +325,7 @@
             var(--snowui-link-line-height)
         );
         cursor: var(--snowui-state-cursor, pointer);
-        transition:
+        --snowui-frame-component-transition:
             color var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
