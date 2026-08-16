@@ -5,8 +5,8 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.6.2
-> **更新**: 2026-08-15
+> **版本**: v1.6.3
+> **更新**: 2026-08-17
 > **布局模型**: 默认态为复合管理布局；`singleLine` 为槽位宿主布局
 > **文档**: ./CodeBlock.md
 
@@ -61,7 +61,7 @@
 | Content | Fill / `min-width: 0` | 单行高亮代码；超宽时仅横向滚动 |
 | Trailing | Hug | 外置 `as="trailing"`，否则为默认内置 CopyButton |
 
-单行态固定隐藏语言、行号和全屏按钮；`visibleLines`、`showLanguage`、`showLineNumbers`、`showExpandButton` 在该变体中不产生对应结构。根层不生成 Indicator，不接受拖拽高度，也不创建纵向 scrollbar / fade。默认 padding 与 Input 标准态一致：上下 `--padding-3`（12px）、左右 `--padding-4`（16px）；gap 为 `--gap-2`（8px），圆角为 `--radius-4`（16px）。
+单行态固定隐藏语言、行号和全屏按钮；`visibleLines`、`showLanguage`、`showLineNumbers`、`showExpandButton` 在该变体中不产生对应结构。根层不生成 Indicator，不接受拖拽高度，也不创建纵向 scrollbar / fade；内容横向溢出时仍使用常显的 Overlay 横向滚动条。默认 padding 与 Input 标准态一致：上下 `--padding-3`（12px）、左右 `--padding-4`（16px）；gap 为 `--gap-2`（8px），圆角为 `--radius-4`（16px）。
 
 ```svelte
 <CodeBlock
@@ -168,12 +168,12 @@
 | 结构 | 说明 |
 |:---|:---|
 | `.snowui-overlay-scrollbar-viewport` | 可滚动 viewport，隐藏原生滚动条 |
-| `.snowui-overlay-scrollbar` | 自定义轨道，不占布局宽度 |
+| `.snowui-overlay-scrollbar` | 自定义纵向 / 横向轨道，不占布局尺寸；横向溢出时常显 |
 | `.snowui-overlay-scrollbar-thumb` | Thumb 视觉与拖拽逻辑由通用样式 / hook 统一管理 |
 | `.snowui-scroll-mask` + `data-scroll-mask` | 顶部 / 尾部滚动透明渐隐 |
 | `.snowui-indicator-corner` | 右下角通用 Indicator 高度手柄；位置由 Indicator 默认规则统一管理 |
 
-CodeBlock 只声明轨道定位，滚动条尺寸、显隐、hover 形态与鼠标拖拽由共享样式和 `useOverlayScrollbar` 承接。
+CodeBlock 的默认态、全屏态和 `singleLine` 都由 `useOverlayScrollbar` 管理横向溢出；默认态和全屏态同时管理纵向溢出。组件只声明轨道定位，滚动条尺寸、显隐、hover 形态与鼠标拖拽由共享样式承接。纵向条随宿主 hover 显隐，横向条在内容溢出时始终显示。
 
 ---
 
@@ -267,6 +267,7 @@ pnpm build`}
 
 | 日期 | 版本 | 说明 |
 |:---|:---|:---|
+| 2026-08-17 | v1.6.3 | 默认态、全屏态与 `singleLine` 接入共享 Overlay 横向滚动条；代码横向溢出时常显并支持拖拽，不再隐藏原生条后缺少可见滚动反馈 |
 | 2026-08-15 | v1.6.2 | 内部 `pre` / `code` 显式使用 `border-box`，与既有 padding、margin、font reset 一起隔离可选 `snowui-base.css` 的元素级影响 |
 | 2026-08-12 | v1.6.1 | `singleLine` 的 padding、gap 与圆角对齐 Input 标准态：上下 12px、左右 16px、gap 8px、圆角 16px |
 | 2026-08-12 | v1.6.0 | 新增 `variant="singleLine"`；参考 Input 实现 Leading / Content / Trailing 三槽布局，保留高亮与复制，移除语言、行号、全屏、纵向滚动及高度拖拽结构 |

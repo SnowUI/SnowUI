@@ -1,7 +1,7 @@
 /**
  * CodeBlock.test.ts
- * v1.3.0
- * 变更记录 (2026-08-12): 增加 singleLine 三槽布局回归示例，验证单行内容、Leading 与默认复制 Trailing。
+ * v1.3.1
+ * 变更记录 (2026-08-17): 补充默认态与 singleLine 横向溢出回归，验证共享横向滚动条常显与拖拽。
  */
 export const examples = [
     {
@@ -50,11 +50,12 @@ function updateGutters(cm) {
         code: `CB-02
 <CodeBlock
     language="js"
-    code={\`const theme = "Figma CodeBlock";
+    showLineNumbers
+    code={\`const theme = "Figma CodeBlock with a deliberately long line that must overflow horizontally and keep the SnowUI scrollbar visible";
 console.log(theme);\`}
     style="width: 28rem;"
 />`,
-        logic: ["code"],
+        logic: ["code", "showLineNumbers", "horizontalScrollbar"],
     },
     {
         name: "CB-03：关闭工具按钮",
@@ -134,7 +135,7 @@ function resizeViewport(width: number) {
 <CodeBlock
     variant="singleLine"
     code="import { Button } from '@snowui-design-system/components';"
-    style="width: 38rem;"
+    style="width: 22rem;"
 >
     <Icon as="leading"><Bell /></Icon>
 </CodeBlock>`,
@@ -145,6 +146,7 @@ function resizeViewport(width: number) {
             "content",
             "trailing",
             "showCopyButton",
+            "horizontalScrollbar",
         ],
     },
     {

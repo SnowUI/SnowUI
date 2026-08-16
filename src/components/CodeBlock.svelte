@@ -1,6 +1,6 @@
 <!--
   CodeBlock 组件：代码块显示，支持行号、复制、全屏放大
-  v1.6.2
+  v1.6.3
 
   布局模型：默认态为复合管理布局；singleLine 变体为槽位宿主布局
 
@@ -178,8 +178,10 @@
     let fullscreenElement: HTMLElement | undefined = $state(undefined);
     let codeViewportElement: HTMLElement | undefined = $state(undefined);
     let codeScrollbarElement: HTMLElement | undefined = $state(undefined);
+    let codeHorizontalScrollbarElement: HTMLElement | undefined = $state(undefined);
     let fullscreenViewportElement: HTMLElement | undefined = $state(undefined);
     let fullscreenScrollbarElement: HTMLElement | undefined = $state(undefined);
+    let fullscreenHorizontalScrollbarElement: HTMLElement | undefined = $state(undefined);
     let showTopFade = $state(false);
     let showBottomFade = $state(false);
     let showFullscreenTopFade = $state(false);
@@ -224,12 +226,22 @@
             .join(" "),
     );
     const codeScrollbar = useOverlayScrollbar(
-        () => codeViewportElement,
+        () => (isSingleLine ? undefined : codeViewportElement),
         () => codeScrollbarElement,
+    );
+    const codeHorizontalScrollbar = useOverlayScrollbar(
+        () => codeViewportElement,
+        () => codeHorizontalScrollbarElement,
+        "horizontal",
     );
     const fullscreenScrollbar = useOverlayScrollbar(
         () => fullscreenViewportElement,
         () => fullscreenScrollbarElement,
+    );
+    const fullscreenHorizontalScrollbar = useOverlayScrollbar(
+        () => fullscreenViewportElement,
+        () => fullscreenHorizontalScrollbarElement,
+        "horizontal",
     );
 
     function readIdentifier(value: string, start: number) {
@@ -366,7 +378,9 @@
 
     function refreshScrollState() {
         codeScrollbar.refresh();
+        codeHorizontalScrollbar.refresh();
         fullscreenScrollbar.refresh();
+        fullscreenHorizontalScrollbar.refresh();
     }
 
     function updateScrollFade() {
@@ -566,7 +580,7 @@
     bind:element={hostElement}
     class={[
         "snowui-code-block",
-        !isSingleLine && "snowui-overlay-scrollbar-host",
+        "snowui-overlay-scrollbar-host",
         className,
     ].filter(Boolean).join(" ")}
     data-variant={variant}
@@ -588,7 +602,11 @@
             >
         {/if}
 
-        <div class="snowui-code-block-single-line-content">
+        <div
+            bind:this={codeViewportElement}
+            class="snowui-code-block-single-line-content snowui-overlay-scrollbar-viewport"
+            data-scroll-axis="horizontal"
+        >
             <pre class="snowui-code-block-pre"><code
                     class="snowui-code-block-code"
                     >{#each highlightedSingleLine as token}<span
@@ -690,6 +708,7 @@
         <div
             bind:this={codeViewportElement}
             class="snowui-code-block-body snowui-overlay-scrollbar-viewport snowui-scroll-mask"
+            data-scroll-axis="both"
             data-scroll-mask={resolveScrollMask(showTopFade, showBottomFade)}
         >
             {#if showLineNumbers && lines.length > 0}
@@ -718,6 +737,7 @@
     <div
         bind:this={codeScrollbarElement}
         class="snowui-code-block-scrollbar snowui-overlay-scrollbar"
+        data-axis="vertical"
         data-visible={codeScrollbar.hasOverflow ? "true" : undefined}
         aria-hidden="true"
     >
@@ -738,6 +758,18 @@
         onSizeChange={handleResizeHeight}
     />
     {/if}
+    <div
+        bind:this={codeHorizontalScrollbarElement}
+        class="snowui-code-block-scrollbar snowui-overlay-scrollbar"
+        data-axis="horizontal"
+        data-visible={codeHorizontalScrollbar.hasOverflow ? "true" : undefined}
+        aria-hidden="true"
+    >
+        <div
+            class="snowui-overlay-scrollbar-thumb"
+            style="width: {codeHorizontalScrollbar.thumbSize}px; transform: translate3d({codeHorizontalScrollbar.thumbOffset}px, 0, 0);"
+        ></div>
+    </div>
     {#if children}
         <div class="snowui-code-block-accessories" aria-hidden="true">
             {@render children()}
@@ -816,6 +848,7 @@
             <div
                 bind:this={fullscreenViewportElement}
                 class="snowui-code-block-body snowui-code-block-body-fullscreen snowui-overlay-scrollbar-viewport snowui-scroll-mask"
+                data-scroll-axis="both"
                 data-scroll-mask={resolveScrollMask(
                     showFullscreenTopFade,
                     showFullscreenBottomFade,
@@ -847,12 +880,27 @@
         <div
             bind:this={fullscreenScrollbarElement}
             class="snowui-code-block-scrollbar snowui-overlay-scrollbar"
+            data-axis="vertical"
             data-visible={fullscreenScrollbar.hasOverflow ? "true" : undefined}
             aria-hidden="true"
         >
             <div
                 class="snowui-overlay-scrollbar-thumb"
                 style="height: {fullscreenScrollbar.thumbHeight}px; transform: translate3d(0, {fullscreenScrollbar.thumbY}px, 0);"
+            ></div>
+        </div>
+        <div
+            bind:this={fullscreenHorizontalScrollbarElement}
+            class="snowui-code-block-scrollbar snowui-overlay-scrollbar"
+            data-axis="horizontal"
+            data-visible={fullscreenHorizontalScrollbar.hasOverflow
+                ? "true"
+                : undefined}
+            aria-hidden="true"
+        >
+            <div
+                class="snowui-overlay-scrollbar-thumb"
+                style="width: {fullscreenHorizontalScrollbar.thumbSize}px; transform: translate3d({fullscreenHorizontalScrollbar.thumbOffset}px, 0, 0);"
             ></div>
         </div>
     </Frame>
@@ -1204,7 +1252,7 @@
     /* 组件只声明轨道定位；视觉样式由 scrollbar.css 的 .snowui-overlay-scrollbar 承接。 */
     /* 滚动条提升到根容器（position:relative），绕开 scroll-shell 的 overflow:clip 裁切。 */
     /* top/bottom 对齐 scroll-shell 上下边缘（即容器 padding-y 处），right: 4px 贴近右边缘。 */
-    :global(:where(.snowui-code-block-scrollbar)) {
+    :global(:where(.snowui-code-block-scrollbar[data-axis="vertical"])) {
         top: var(
             --snowui-code-block-padding-y-override,
             var(--snowui-code-block-padding-y)
