@@ -13,7 +13,7 @@
 
 <script lang="ts">
     import type { Snippet } from "svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
     import {
         Frame,
         resizeManager,
@@ -170,7 +170,7 @@
     {...rest}
 >
     {#if showSearchIcon}
-        <ResourceIcon
+        <ComponentIcon
             name="search"
             as="leading"
             class="snowui-search-box-default-icon"
@@ -197,7 +197,7 @@
             onmousedown={(event) => event.preventDefault()}
             tabindex={-1}
         >
-            <ResourceIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
+            <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
         </button>
     {/if}
 </Frame>
@@ -393,7 +393,7 @@
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
 
-    /* ResourceIcon 直出图标元素；hover / has-value 仍用后代选择器。 */
+    /* ComponentIcon 直出图标元素；hover / has-value 仍用后代选择器。 */
     :global(
             .snowui-search-box:hover:not([data-disabled="true"])
                 .snowui-search-box-default-icon,

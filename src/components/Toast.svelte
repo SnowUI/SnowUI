@@ -25,7 +25,7 @@
     import { onMount, onDestroy, type Snippet } from "svelte";
     import { Frame, type FrameProps } from "@snowui-design-system/components";
     import { GENERIC_SCALE_APPEAR_MOTION } from "@snowui-design-system/components/motion/presets/generic";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
     import {
         registerToastTemplate,
         unregisterToastTemplate,
@@ -192,9 +192,9 @@
                 aria-hidden="true"
             >
                 {#if positive}
-                    <ResourceIcon name="check-circle" weight="fill" size={20} aria-hidden="true" />
+                    <ComponentIcon name="check-circle" weight="fill" size={20} aria-hidden="true" />
                 {:else}
-                    <ResourceIcon name="warning" weight="fill" size={20} aria-hidden="true" />
+                    <ComponentIcon name="warning" weight="fill" size={20} aria-hidden="true" />
                 {/if}
             </span>
         {/if}
@@ -210,7 +210,7 @@
                 onmousedown={(e) => e.preventDefault()}
                 tabindex={-1}
             >
-                <ResourceIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
+                <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
             </button>
         {/if}
     </Frame>

@@ -7,7 +7,13 @@
     "moduleResolution": "bundler",
     "customConditions": ["svelte"],
     "types": ["vite/client"],
-    "verbatimModuleSyntax": true
+    "verbatimModuleSyntax": true,
+    "paths": {
+      "@snowui-design-system/components/internal/component-icon": [
+        "../components/src/internal/component-icon/index.ts",
+        "./node_modules/@snowui-design-system/components/src/internal/component-icon/index.ts"
+      ]
+    }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte"]
 }

@@ -9,7 +9,7 @@
         type FrameProps,
     } from "@snowui-design-system/components";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
     import FramePro from "../components/FramePro.svelte";
     import { getSidebarContext, type SidebarActionData } from "./sidebar-context.svelte";
 
@@ -84,7 +84,7 @@
                 {#if iconSnippet}
                     {@render iconSnippet()}
                 {:else if iconName}
-                    <ResourceIcon name={iconName} collection={iconCollection} size={20} />
+                    <ComponentIcon name={iconName} collection={iconCollection} size={20} />
                 {/if}
                 {#if updated && collapsed}
                     <Badge
@@ -171,7 +171,7 @@
                         aria-label={action.label}
                         onclick={(event: MouseEvent) => runAction(event, action)}
                     >
-                        <ResourceIcon name={action.icon} collection={action.iconCollection} size={16} aria-hidden="true" />
+                        <ComponentIcon name={action.icon} collection={action.iconCollection} size={16} aria-hidden="true" />
                         <Tooltip as="tooltip" position="right">{action.label}</Tooltip>
                     </Button>
                 {/each}

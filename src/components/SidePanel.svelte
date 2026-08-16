@@ -18,7 +18,7 @@
     import { getMotionTotalDurationMs } from "@snowui-design-system/components/motion/presets/utils";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
     import { provideComponentParts } from "@snowui-design-system/components/logic/component-parts.svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
     import type { SidePanelPlacement, SidePanelToolbarAction } from "../lib/side-panel";
     import FramePro from "./FramePro.svelte";
 
@@ -326,7 +326,7 @@
             onclick={(event: MouseEvent) => handleAction(action, event)}
         >
             {#if action.icon}
-                <ResourceIcon name={action.icon} size={16} aria-hidden="true" />
+                <ComponentIcon name={action.icon} size={16} aria-hidden="true" />
             {/if}
             {#if action.label}<span>{action.label}</span>{/if}
             {#if action.icon && !action.label && (action.ariaLabel ?? action.label)}
@@ -395,7 +395,7 @@
                             class="snowui-side-panel-toolbar-button snowui-side-panel-close"
                             onclick={() => void closePanel()}
                         >
-                            <ResourceIcon name="close" size={16} aria-hidden="true" />
+                            <ComponentIcon name="close" size={16} aria-hidden="true" />
                             <Tooltip as="tooltip">{locale.t("sidePanel.close")}</Tooltip>
                         </Button>
                     </div>

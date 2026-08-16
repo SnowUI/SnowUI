@@ -382,7 +382,7 @@ Toast 作为宿主子节点,点击宿主即触发,无需 id、无需手动 `show
 ### 关联关系
 
 - **共享视觉基类**：`.snowui-quick-action-panel`（rich 变体；定义于 `components/src/styles/layout.css`）
-- **内置 Icon**：`@snowui-design-system/resource-svelte` 的 `CheckCircle` / `Warning` / `XCircle`
+- **内置 Icon**：Components `ComponentIcon` 的 `check-circle` / `warning` / `x-circle`；可由应用级 `IconProvider` 替换并保留包内回退
 - **Skeleton 登记**：`components/src/components/Skeleton.svelte` 的 `COMPONENT_CLASS_MAPPING` 增加 `snowui-toast → toast`
 
 ---

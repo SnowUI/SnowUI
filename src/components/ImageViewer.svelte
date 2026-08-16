@@ -23,7 +23,7 @@
         resolveDomImagePreviewRequest,
         resolvePreviewImageElement,
     } from "@snowui-design-system/components/logic/image-preview";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
 
     interface ImageViewerItem {
         src?: string | Component;
@@ -457,7 +457,7 @@
                     iconOnly
                     aria-label="上一张"
                 >
-                    <ResourceIcon
+                    <ComponentIcon
                         name="arrow-line-left"
                         size={16}
                         aria-hidden="true"
@@ -469,7 +469,7 @@
                     iconOnly
                     aria-label="下一张"
                 >
-                    <ResourceIcon
+                    <ComponentIcon
                         name="arrow-line-right"
                         size={16}
                         aria-hidden="true"
@@ -482,7 +482,7 @@
                         iconOnly
                         aria-label="关闭图片预览"
                     >
-                        <ResourceIcon name="close" size={16} aria-hidden="true" />
+                        <ComponentIcon name="close" size={16} aria-hidden="true" />
                     </Button>
                 {/if}
             </div>

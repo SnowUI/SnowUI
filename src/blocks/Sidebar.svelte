@@ -16,7 +16,7 @@
     } from "@snowui-design-system/components/motion/presets/effects";
     import { resolveMotionCssTiming } from "@snowui-design-system/components/motion/spring";
     import { CONTINUOUS_HOVER_MOTION_STYLE } from "@snowui-design-system/components/motion/presets/continuous-hover";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
     import FramePro from "../components/FramePro.svelte";
     import SidebarSection from "./SidebarSection.svelte";
     import SidebarItem from "./SidebarItem.svelte";
@@ -520,7 +520,7 @@
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                 onclick={toggleCollapsed}
             >
-                <ResourceIcon name="rightbar" collection="snowui" size={16} aria-hidden="true" />
+                <ComponentIcon name="rightbar" size={16} aria-hidden="true" />
             </Button>
         </span>
     </header>

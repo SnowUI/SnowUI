@@ -9,7 +9,7 @@
         type FrameProps,
     } from "@snowui-design-system/components";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
-    import { Icon as ResourceIcon } from "@snowui-design-system/resource-svelte";
+    import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
     import FramePro from "../components/FramePro.svelte";
     import { getSidebarContext, type SidebarActionData } from "./sidebar-context.svelte";
 
@@ -93,7 +93,7 @@
                 >
                     <Text class="snowui-sidebar-section-title">{title}</Text>
                     <span class="snowui-sidebar-section-toggle-icon">
-                        <ResourceIcon name="arrow-line-down" collection="snowui" size={12} aria-hidden="true" />
+                        <ComponentIcon name="arrow-line-down" size={12} aria-hidden="true" />
                     </span>
                 </Button>
             {:else}
@@ -117,7 +117,7 @@
                                 aria-label={action.label}
                                 onclick={() => action.onSelect?.(id)}
                             >
-                                <ResourceIcon name={action.icon} collection={action.iconCollection} size={12} aria-hidden="true" />
+                                <ComponentIcon name={action.icon} collection={action.iconCollection} size={12} aria-hidden="true" />
                                 <Tooltip as="tooltip" position="right">{action.label}</Tooltip>
                             </Button>
                         {/each}
