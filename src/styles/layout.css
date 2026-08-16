@@ -1,5 +1,6 @@
 /* Layout Utility Styles */
-/* v1.2.3 */
+/* v1.2.4 */
+/* Log (2026-08-17): Frame 方向基座进入 snowui-frame-direction layer，并显式登记共享 layer 顺序，保证三槽 Grid 可覆盖方向 display，同时组件自有布局仍可接管。 */
 /* Log (2026-08-16): Hoverable Level 1 行为进入低优先级 layer，保留组件自有 transition 通道。 */
 /* Log (2026-08-16): Frame 默认动效代理进入独立低优先级 layer，避免覆盖组件自有 transition / transform。 */
 /* Log (2026-08-16): SnowUI 宿主基线进入独立低优先级 layer，避免动态模块加载顺序反向覆盖组件自有 color。 */
@@ -9,6 +10,9 @@
 /* Log (2026-03-16): 新增 Field 文本高亮变量，供日期字段分段焦点样式等输入型场景复用。 */
 /* Log (2026-03-17): 按最新交互需求将全局文字与输入选中背景统一调整为 Secondary/Indigo 40%。 */
 /* Log (2026-06-18): 新增通用错误反馈 shake 类，供 Frame stateClass 在 Input / Field 等表单场景复用。 */
+
+/* 共享结构与行为层按依赖顺序集中登记。未分层的组件基类与消费方样式稳定高于这些默认。 */
+@layer snowui-host-baseline, snowui-frame-direction, snowui-auto-layout, snowui-frame-motion-fallback, snowui-shared-behavior;
 
 /**
  * Hover Overlay 动效：注册可动画化的自定义属性，让 hover overlay 透明度平滑过渡。
@@ -571,33 +575,35 @@
  * Direction Classes
  * 布局方向类
  */
-:where(.snowui-direction-row) {
-    display: flex;
-    flex-direction: row;
-}
+@layer snowui-frame-direction {
+    :where(.snowui-direction-row) {
+        display: flex;
+        flex-direction: row;
+    }
 
-:where(.snowui-direction-row-reverse) {
-    display: flex;
-    flex-direction: row-reverse;
-}
+    :where(.snowui-direction-row-reverse) {
+        display: flex;
+        flex-direction: row-reverse;
+    }
 
-:where(.snowui-direction-column) {
-    display: flex;
-    flex-direction: column;
-}
+    :where(.snowui-direction-column) {
+        display: flex;
+        flex-direction: column;
+    }
 
-:where(.snowui-direction-column-reverse) {
-    display: flex;
-    flex-direction: column-reverse;
-}
+    :where(.snowui-direction-column-reverse) {
+        display: flex;
+        flex-direction: column-reverse;
+    }
 
-:where(.snowui-direction-grid) {
-    display: grid;
-}
+    :where(.snowui-direction-grid) {
+        display: grid;
+    }
 
-:where(.snowui-direction-grid-reverse) {
-    display: grid;
-    direction: rtl;
+    :where(.snowui-direction-grid-reverse) {
+        display: grid;
+        direction: rtl;
+    }
 }
 
 /**

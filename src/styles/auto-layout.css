@@ -1,11 +1,11 @@
 /**
  * Auto Layout Protocol
- * v1.1.0
+ * v1.1.1
  * Level 1: 三槽位布局模型与 Pin 布局的结构化原语
  * 规范来源: specs/LayoutProtocol.md
  *
  * 必须在 layout.css 之后加载，以取得 Frame 结构基础；覆盖优先级不依赖源码顺序。
- * 全部规则固定置于低优先级 layer，组件自有布局不依赖模块注入顺序即可覆盖。
+ * 全部规则固定置于低优先级 layer；该 layer 高于 Frame 方向基座、低于未分层组件样式。
  */
 
 @layer snowui-auto-layout {

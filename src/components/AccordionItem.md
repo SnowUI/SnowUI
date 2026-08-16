@@ -1,6 +1,6 @@
 # AccordionItem.svelte 文档
 
-> **版本**: v1.2.3
+> **版本**: v1.2.4
 > **职责**: 作为 Accordion 内部的单个折叠项容器。
 > **包归属**: OSS
 
@@ -83,6 +83,10 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.2.4 (2026-08-17)
+
+- 三槽 title/content Host 依赖共享 layer 的固定结构顺序：Frame 方向基座低于 Auto Layout，保证 trailing 指示器占据最右侧独立轨道，同时组件自有 gap 仍可覆盖共享默认。
 
 ### v1.2.3 (2026-08-16)
 

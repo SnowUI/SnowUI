@@ -1,6 +1,6 @@
 # 通用样式目录 (Styles Directory)
 
-> **版本**: v1.6.1
+> **版本**: v1.6.2
 > **路径**: `./.`
 
 本目录是 Components 包唯一的样式来源。组件构建、GitHub 仓库和 npm 包不得读取仓库外的 `styles/`。
@@ -19,7 +19,7 @@
 | [scale.md](./scale.md) | `scale.css` 规则与覆盖优先级文档 |
 | [auto-layout.css](./auto-layout.css) | `snowui-auto-layout` 低优先级 layer 中的三槽位、Wrap、Gap、镜像与 Pin 原语 |
 
-`auto-layout.css` 的共享默认全部位于 `@layer snowui-auto-layout`。组件未分层的低权重基类、公开 class/style 与 Frame inline 输入稳定高于该层；组件自有 gap、wrap 或 alignment 不得依赖模块加载顺序。
+`layout.css` 集中登记 `snowui-host-baseline → snowui-frame-direction → snowui-auto-layout → snowui-frame-motion-fallback → snowui-shared-behavior`。方向基座低于 Auto Layout，因此三槽 Host 可从 flex 切换为 Grid；组件未分层的低权重基类、公开 class/style 与 Frame inline 输入仍稳定高于全部共享 layer。组件自有 gap、wrap 或 alignment 不得依赖模块加载顺序。
 
 ---
 

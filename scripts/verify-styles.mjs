@@ -47,6 +47,18 @@ if (!autoLayout.includes("@layer snowui-auto-layout")) {
     process.exit(1);
 }
 
+const layout = readFileSync("src/styles/layout.css", "utf8");
+const sharedLayerOrder =
+    "@layer snowui-host-baseline, snowui-frame-direction, snowui-auto-layout, snowui-frame-motion-fallback, snowui-shared-behavior;";
+if (!layout.includes(sharedLayerOrder)) {
+    console.error("❌ layout.css must keep the declared shared layer order");
+    process.exit(1);
+}
+if (!/@layer snowui-frame-direction\s*\{[\s\S]*?\.snowui-direction-row/.test(layout)) {
+    console.error("❌ Frame direction primitives must stay in snowui-frame-direction");
+    process.exit(1);
+}
+
 const buttonGroup = readFileSync("src/components/ButtonGroup.svelte", "utf8");
 if (!/<Frame[\s\S]*?enableAutoLayout=\{false\}[\s\S]*?>/.test(buttonGroup)) {
     console.error("❌ ButtonGroup inline shell must keep Auto Layout disabled");

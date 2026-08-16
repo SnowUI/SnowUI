@@ -1,6 +1,6 @@
 <!--
   AccordionItem 组件：Accordion 内部单个折叠项容器
-  v1.2.3
+  v1.2.4
 
   外层 AccordionItem 负责一整项的背景、圆角、分隔线与展开高度。
   内部通过直系 Frame as="title" / Frame as="content" 承载标题与内容三槽位布局。
