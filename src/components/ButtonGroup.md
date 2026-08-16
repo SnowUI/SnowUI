@@ -1,10 +1,10 @@
 # ButtonGroup.svelte 文档
 
-> **版本**: v1.0.0
+> **版本**: v1.0.1
 > **职责**: 提供由多个 Button 单元格与 Separator 组成的拆分按钮容器。
 
 **继承**: 复用 Frame.svelte 的通用能力。
-**默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。
+**默认能力开关**: `enableAutoLayout=false`, `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。ButtonGroup 是内联外壳布局，`row` 只提供方向类，不接入三槽位默认 gap。
 
 ## 关键字 (Keyword)
 
@@ -63,6 +63,7 @@
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
 - ButtonGroup 根层管理外壳圆角、背景、边框与裁剪；视觉 padding 转交给嵌入态 Button，确保每个单元格的 hover / 点击热区覆盖自身完整单元格。
+- ButtonGroup 根层显式关闭 Auto Layout；Button 与 Separator 之间的布局 gap 恒为 `0`，内容到 Separator 的视觉距离只由相邻 Button 的内侧 padding 表达。Button hover 盒必须与 Separator 边界连续。
 - 如果消费方在 ButtonGroup 根层追加 padding（例如 `class="p-40"` 或内联 `padding`），ButtonGroup 会把根层 padding 映射为首尾单元格 hover 覆盖的扩展区域；hover 仍然按单元格独立响应，并被根层圆角裁剪。
 - ButtonGroup 与 Button 相同的视觉规则统一使用 Button token：`--snowui-button-padding-block` / `--snowui-button-padding-inline`、`--snowui-button-radius`、`--snowui-button-background`、`--snowui-button-color`、`--snowui-button-border-*`、`--snowui-button-font-size`、`--snowui-button-line-height`。ButtonGroup 只保留分组专属的内侧间距、Separator 长度与外部 padding 扩展变量。
 - Button 管理单元格内部 Icon / Text / Spinner 的 gap。
@@ -130,11 +131,14 @@
 
 ## 更新日志 (Changelog)
 
+### v1.0.1 (2026-08-16)
+
+- 根层关闭不属于该布局模型的 Auto Layout，保证 Button hover / 点击单元格与 Separator 无布局间隙。
+
 ### v1.0.0 (2026-05-19)
 
 #### 新功能
 - 初始版本，支持 Button 嵌入态、Separator 分割线、四种变体与三种尺寸。
-
 
 
 

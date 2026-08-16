@@ -1,11 +1,14 @@
 /**
  * Auto Layout Protocol
- * v1.0.1
+ * v1.1.0
  * Level 1: 三槽位布局模型与 Pin 布局的结构化原语
  * 规范来源: specs/LayoutProtocol.md
  *
- * 必须在 layout.css 之后加载（源码顺序依赖）
+ * 必须在 layout.css 之后加载，以取得 Frame 结构基础；覆盖优先级不依赖源码顺序。
+ * 全部规则固定置于低优先级 layer，组件自有布局不依赖模块注入顺序即可覆盖。
  */
+
+@layer snowui-auto-layout {
 
 /* === 基础：flex 行为 === */
 :where([data-auto-layout]) {
@@ -199,4 +202,5 @@
 :where([data-as="pin-bottom-right"]) {
     bottom: var(--pin-offset-y, var(--pin-offset, var(--gap-2)));
     right: var(--pin-offset-x, var(--pin-offset, var(--gap-2)));
+}
 }

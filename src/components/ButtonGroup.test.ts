@@ -7,7 +7,7 @@ export const examples = [
     <Separator as="separator" column />
     <Button as="item">更多</Button>
 </ButtonGroup>`,
-        expected: { render: "item 形成统一分组外壳。", layout: "separator 位于两项之间。", interaction: "按钮各自处理点击。", performance: "只扫描角色子项。", responsive: "跟随容器。" },
+        expected: { render: "item 形成统一分组外壳。", layout: "根不输出 data-auto-layout，computed gap 为 0；两个 Button 盒分别紧贴 Separator 两侧。", interaction: "按钮各自处理点击，hover 覆盖完整单元格并连续到 Separator 边界。", performance: "只扫描角色子项。", responsive: "跟随容器。" },
         logic: ["Contract", "GroupCell"],
     },
     {

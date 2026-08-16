@@ -5,6 +5,7 @@ const required = [
     "src/styles/index.css",
     "src/styles/themes.css",
     "src/styles/components.css",
+    "src/styles/auto-layout.css",
 ];
 
 for (const file of required) {
@@ -38,6 +39,18 @@ for (const importPath of ["./themes.css", "./components.css"]) {
         console.error(`❌ src/styles/index.css must import ${importPath}`);
         process.exit(1);
     }
+}
+
+const autoLayout = readFileSync("src/styles/auto-layout.css", "utf8");
+if (!autoLayout.includes("@layer snowui-auto-layout")) {
+    console.error("❌ auto-layout.css must stay in the snowui-auto-layout low-priority layer");
+    process.exit(1);
+}
+
+const buttonGroup = readFileSync("src/components/ButtonGroup.svelte", "utf8");
+if (!/<Frame[\s\S]*?enableAutoLayout=\{false\}[\s\S]*?>/.test(buttonGroup)) {
+    console.error("❌ ButtonGroup inline shell must keep Auto Layout disabled");
+    process.exit(1);
 }
 
 console.log("✅ Components styles are self-contained");
