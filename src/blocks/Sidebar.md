@@ -1,6 +1,6 @@
 # Sidebar（PRO Block）
 
-> **版本**: v1.7.2
+> **版本**: v1.7.3
 > **职责**: 提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。
 > **归属**: PRO Blocks / Template Block
 
@@ -60,7 +60,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - active 视觉状态由 Sidebar 管理；宿主仍通过 `activeItemId` / `onActiveItemChange` 持有实际导航与内容切换。恢复合法的持久化 active item 时，Sidebar 会调用 `onActiveItemChange` 通知宿主。
 - 默认与自定义 `as="logo"` host 均使用 `4px` 左右 padding，使 Logo 图形与 SidebarItem 图标垂直对齐。
 - Header 在展开 / 折叠状态使用同一套起始对齐结构，Logo Icon 保持固定 leading slot；Test 示例以固定宽度左对齐宿主承载 Sidebar，避免居中宿主在根宽度变化时带动整个 Logo 位移。Logo host 强制保持单行，wordmark 通过 host 裁切与透明度收起，不会在窄宽度下换行并撑高 Logo，也不在动效起点直接切换整体 Header 对齐。
-- 折叠按钮是内置 `<Button bare iconOnly>`，与 Logo 位于同一 Header 水平线上，并始终位于 Logo host 分配区域的右边。Logo host 填充按钮之前的剩余 Header 宽度，只设置稳定的 36px 最小 leading slot；按钮会跟随 Sidebar 宽度以 Frame 默认 move spring 从 Logo 区域右侧平移到折叠位置，不发生瞬移。按钮外层保留同尺寸透明命中 host，因此鼠标进入 Sidebar，或直接进入按钮应出现的位置（包括折叠态超出根视觉边界的部分）时都能显示按钮。默认 `navigationVariant="icon"` 时按上述 hover / focus-within 规则显形；`navigationVariant="text"` 的折叠态隐藏 Logo、Body 和 Footer，只保留水平居中且始终可见的展开按钮。
+- 折叠按钮是内置 `<Button bare iconOnly>`，与 Logo 位于同一 Header 水平线上，并始终位于 Logo host 分配区域的右边。透明命中 host 使用 `--size-6` 并由 Header flex 安置到内容右边界，`ResourceSize` 16 图标在 host 内居中；展开态图标不得越过 Header 与导航项共用的内容右边界，在 16px 名义根字号下与该边界保持 `4px` 间距。不得再用额外 transform 或非 Token 偏移改变此位置。Logo host 填充按钮之前的剩余 Header 宽度，只设置稳定的 36px 最小 leading slot；按钮会跟随 Sidebar 宽度以 Frame 默认 move spring 从 Logo 区域右侧平移到折叠位置，不发生瞬移。按钮外层保留同尺寸透明命中 host，因此鼠标进入 Sidebar，或直接进入按钮应出现的位置（包括折叠态超出根视觉边界的部分）时都能显示按钮。默认 `navigationVariant="icon"` 时按上述 hover / focus-within 规则显形；`navigationVariant="text"` 的折叠态隐藏 Logo、Body 和 Footer，只保留水平居中且始终可见的展开按钮。
 - 折叠开始时，Sidebar 宽度、Item 文字与 Section 标题同时开始变化：宽度收窄，Item 文字和标题消费 Frame color bridge 渐隐；Item leading Icon 保持原横向位置。标题透明度归零后，标题高度、padding 与 Section gap 才消费 Frame size bridge 收起，Item 随后上移。展开时按同一组 bridge 平滑恢复。
 - 折叠按钮不内置 Tooltip，通过随状态更新的 `aria-label` 保留“展开 / 折叠侧边栏”可访问名称。其余内置 Tooltip（折叠态 Item label、Item action、Section action）统一位于对应元素右侧（`position="right"`）。Section 标题默认可折叠但不显示 Tooltip。
 - 默认不设置背景色。
@@ -115,6 +115,11 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
 ## 更新日志 (Changelog)
+
+### v1.7.3 (2026-08-17)
+
+#### 优化
+- 展开态折叠按钮移除额外位移，由 `--size-6` 命中 host 与 `ResourceSize` 16 图标的居中关系确定位置；图标保持在 Header / 导航项内容右边界内侧，名义间距为 4px。
 
 ### v1.7.2 (2026-08-17)
 

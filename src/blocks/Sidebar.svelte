@@ -1,4 +1,4 @@
-<!-- Sidebar PRO Block v1.7.2. 文档: ./Sidebar.md -->
+<!-- Sidebar PRO Block v1.7.3. 文档: ./Sidebar.md -->
 <script lang="ts">
     import { onMount, setContext, tick, untrack, type Snippet } from "svelte";
     import {
