@@ -1,6 +1,6 @@
 /**
  * Accordion.test.ts
- * v1.3.0
+ * v1.5.0
  *
  * 测试覆盖：对齐 Figma 设计稿的 2 种类型 × 3 种尺寸示例。
  */
@@ -67,7 +67,7 @@ const disabledItems = `
 
 export const examples = [
     {
-        name: "A1: default sm",
+        name: "A1: filled sm（默认）",
         code: `A1
 <Accordion
     size="sm"
@@ -79,21 +79,21 @@ export const examples = [
         { title: "支持哪些支付方式？", content: "支持银行卡、余额和企业账户支付。" },
     ]}
 />`,
-        logic: ["default", "size-sm", "figma", "BuiltInMode"],
+        logic: ["filled", "default-variant", "size-sm", "figma", "BuiltInMode"],
     },
     {
-        name: "A2: filled sm",
+        name: "A2: divided sm",
         code: `A2
-<Accordion variant="filled" size="sm" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
+<Accordion variant="divided" size="sm" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
 </Accordion>`,
-        logic: ["filled", "size-sm", "figma"],
+        logic: ["divided", "size-sm", "figma"],
     },
     {
-        name: "B1: default md",
+        name: "B1: divided md",
         code: `B1
-<Accordion size="md" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
+<Accordion variant="divided" size="md" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
 </Accordion>`,
-        logic: ["default", "size-md", "figma"],
+        logic: ["divided", "size-md", "figma"],
     },
     {
         name: "B2: filled md",
@@ -103,11 +103,11 @@ export const examples = [
         logic: ["filled", "size-md", "figma"],
     },
     {
-        name: "C1: default lg",
+        name: "C1: divided lg",
         code: `C1
-<Accordion size="lg" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
+<Accordion variant="divided" size="lg" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
 </Accordion>`,
-        logic: ["default", "size-lg", "figma"],
+        logic: ["divided", "size-lg", "figma"],
     },
     {
         name: "C2: filled lg",

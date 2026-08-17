@@ -59,7 +59,7 @@
 
 | 文件 | 作用 | 备注 |
 | :--- | :--- | :--- |
-| `observer.svelte.ts` | 全局单例 `ResizeObserverManager` | 共享监听基础设施，不要在组件里自行 new `ResizeObserver` |
+| `observer.svelte.ts` | 延迟创建、按帧交付的全局单例 `ResizeObserverManager` | 共享监听基础设施；SSR 与能力缺失时不创建原生 Observer，所有项目禁止在此入口之外 `new ResizeObserver` |
 | `frame-scale-observer.svelte.ts` | 把运行时宽高、高宽比、统一尺寸写进 CSS 变量 | 仅观察和写变量，不直接决定视觉样式 |
 | `frame-scale-resolver.svelte.ts` | 把 `FrameProps` 解析成 Scale observer 参数和 style 变量 | `resolveScaleObserverOptions()`、`resolveScaleStyleVars()` |
 | `responsive.svelte.ts` | 旧的 headless 响应式控制器，支持断点规则对象 | 老链路/非 Frame 逻辑可复用，但新组件先看 `frame-responsive.svelte.ts` |

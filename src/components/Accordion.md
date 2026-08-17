@@ -1,6 +1,6 @@
 # Accordion.svelte 文档
 
-> **版本**: v1.4.0
+> **版本**: v1.5.0
 > **职责**: 提供可展开 / 收起的内容分组容器，用于 FAQ、设置项、分段说明与信息折叠。
 > **包归属**: OSS（标准 UI 原语；不使用跨 Frame 协调、复杂 PRO 动效或产品级区块能力）
 
@@ -13,7 +13,7 @@
 - 显式 children 存在时替换内置 items，用于自定义 AccordionItem 结构。
 - 支持单开与多开两种模式。
 - 支持非受控 `defaultValue` 与受控 `value`。
-- 支持 `variant="default" | "filled"` 两种视觉形态。
+- 支持 `variant="filled" | "divided"` 两种视觉形态。
 - 支持 `size="sm" | "md" | "lg"` 三档密度。
 - 默认 trailing 图标为组件内部绘制的 `+ / -`，展开 / 收起时整颗图标使用 Frame motion bridge 时序旋转半圈；外部提供直系 `as="trailing"` 时会替换默认图标。
 
@@ -29,7 +29,7 @@
 | `value` | `string \| string[]` | - | 受控展开值。`single` 使用字符串；`multiple` 使用字符串数组。 |
 | `defaultValue` | `string \| string[]` | - | 非受控初始展开值。 |
 | `collapsible` | `boolean` | `true` | 单开模式下，点击已展开项是否允许收起。 |
-| `variant` | `"default" \| "filled"` | `"default"` | 视觉形态。 |
+| `variant` | `"filled" \| "divided"` | `"filled"` | 视觉形态；`divided` 与 DataTable 的分割线命名一致。 |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` | 尺寸密度；未显式传入时可从父级尺寸上下文推导。 |
 | `disabled` | `boolean` | `false` | 禁用整个 Accordion。 |
 | `items` | `{ title: string; content: string }[]` | `[]` | 默认内置模式的数据；内部 value 使用数组索引字符串。 |
@@ -68,9 +68,9 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 
 | variant / size | Title padding | Content padding | Radius | Gap |
 | :--- | :--- | :--- | :--- | :--- |
-| `default sm` | `8px 8px` | `8px 8px` | `0` | `0` |
-| `default md` | `12px 8px` | `12px 8px` | `0` | `0` |
-| `default lg` | `16px 8px` | `16px 8px` | `0` | `0` |
+| `divided sm` | `8px 8px` | `8px 8px` | `0` | `0` |
+| `divided md` | `12px 8px` | `12px 8px` | `0` | `0` |
+| `divided lg` | `16px 8px` | `16px 8px` | `0` | `0` |
 | `filled sm` | `8px 12px` | `8px 12px` | `12px` | `4px` |
 | `filled md` | `12px 16px` | `12px 16px` | `16px` | `4px` |
 | `filled lg` | `16px 20px` | `16px 20px` | `24px` | `4px` |
@@ -85,13 +85,14 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 | `--snowui-accordion-content-line-height` | `var(--leading-14)` | md 正文行高；sm/lg 分别映射 `--leading-12` / `--leading-16` |
 | Content color | `inherit` | title 与 content 都继承父级文字颜色，不设置独立文本色 |
 | `--snowui-accordion-padding-y` | `var(--padding-3)` | md Title 纵向 padding |
-| `--snowui-accordion-padding-x` | `var(--padding-2)` | default md Title 横向 padding；filled md 覆写为 `--padding-4` |
+| `--snowui-accordion-padding-x` | `var(--padding-2)` | divided md Title 横向 padding；filled md 覆写为 `--padding-4` |
 | `--snowui-accordion-content-padding-y` | `var(--padding-3)` | md Content 纵向 padding |
-| `--snowui-accordion-content-padding-x` | `var(--padding-2)` | default md Content 横向 padding；filled md 覆写为 `--padding-4` |
+| `--snowui-accordion-content-padding-x` | `var(--padding-2)` | divided md Content 横向 padding；filled md 覆写为 `--padding-4` |
 | `--snowui-accordion-gap` | `0` | 子项间距 |
 | `--snowui-accordion-trigger-gap` | `var(--gap-2)` | Title 内部间距 |
 | `--snowui-accordion-radius` | `var(--radius-0)` | default 圆角；filled sm/md/lg 分别为 `--radius-3` / `--radius-4` / `--radius-6` |
 | `--snowui-accordion-icon-size` | `var(--size-5)` | md 图标尺寸；sm/lg 分别为 `--size-4` / `--size-6` |
+| `--snowui-accordion-item-bg` | `transparent` | divided 背景；filled 覆写为 `var(--black-4)` |
 | `--snowui-accordion-content-max-block-size-override` | `100vh` | Content 展开时的最大高度覆盖入口，用于极长内容场景 |
 
 公开覆盖入口见 [components.css](../styles/components.css) 的 Accordion 段。
@@ -178,6 +179,12 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.5.0 (2026-08-17)
+
+- 将默认视觉形态从原 `variant="default"` 调整为 `variant="filled"`。
+- 将原分割线形态重命名为 `variant="divided"`，与 DataTable 命名统一；彻底移除 `variant="default"`，不提供兼容别名。
+- 将默认 `filled` 形态的 item 背景从 `Background/2` 调整为 `Black/4%`。
 
 ### v1.4.0 (2026-07-04)
 

@@ -1,6 +1,6 @@
 # frame-scale-observer.svelte.ts 文档
 
-> **版本**: v1.3.1
+> **版本**: v1.3.2
 > **职责**: 监听节点宽高并写入运行时 CSS 变量，服务统一比例系统（不直接应用视觉样式）。
 
 ## 1. 功能概览
@@ -104,6 +104,8 @@
 1. 不直接写入 `--snowui-scale-height` / `--snowui-scale-width`，避免覆盖外部 class。
 2. 使用共享 `ResizeObserverManager`，避免每个组件独立创建观察器。
 3. 该 observer 仅负责“观察与变量写入”，不直接触发样式覆盖；样式是否生效由 apply 模式控制。
+4. 模块导入与服务端渲染不创建 `ResizeObserver`；仅在浏览器挂载后的首次 `watch()` 延迟创建。浏览器缺少该 API 或初始化失败时，尺寸变量观察退化为无操作，组件核心内容与其他交互继续可用。
+5. 同一帧的通知由共享 Manager 合并，并在下一动画帧统一交付，避免观察回调同步写入尺寸变量形成循环。
 
 ## 8. 使用示例
 
@@ -124,6 +126,11 @@ use:frameScaleObserver={{
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.2 (2026-08-17)
+
+- 共享 `ResizeObserverManager` 改为首次 `watch()` 时延迟创建，保证模块导入与 SSR 不访问浏览器 API。
+- `ResizeObserver` 缺失或初始化失败时只关闭尺寸观察增强，不再抛出未处理异常。
 
 ### v1.3.1 (2026-02-07)
 

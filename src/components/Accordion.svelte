@@ -1,6 +1,6 @@
 <!--
   Accordion 组件：可展开 / 收起的内容容器
-  v1.4.0
+  v1.5.0
 
   布局模型：复合管理布局。根层为 Frame，仅提供分组状态与 AccordionContext。
   内部内容由 AccordionItem 容器组成，单项内部使用 Frame as="title|content"。
@@ -22,7 +22,7 @@
     import { RESIZE_MOTION_STYLE } from "../motion/presets/resize";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
 
-    type AccordionVariant = "default" | "filled";
+    type AccordionVariant = "filled" | "divided";
     type AccordionSize = "sm" | "md" | "lg";
 
     export interface AccordionEntry {
@@ -54,7 +54,7 @@
         value = $bindable<AccordionValue | undefined>(undefined),
         defaultValue = undefined,
         collapsible = true,
-        variant = "default",
+        variant = "filled",
         size = undefined,
         disabled = false,
         role = "presentation",
@@ -275,7 +275,7 @@
 
     :global(:where(.snowui-accordion-filled)) {
         --snowui-accordion-gap: var(--gap-1);
-        --snowui-accordion-item-bg: var(--background-2, #f9f9fa);
+        --snowui-accordion-item-bg: var(--black-4, #0000000a);
         --snowui-accordion-item-shadow: none;
     }
 

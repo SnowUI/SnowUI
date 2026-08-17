@@ -43,7 +43,7 @@
     /* --snowui-accordion-radius-override: ; */             /* item border-radius（default 默认 0；filled 默认 sm 12 / md 16 / lg 24） */
     /* --snowui-accordion-icon-size-override: ; */          /* 默认展开/收起图标尺寸（默认 sm 16 / md 20 / lg 24） */
     /* --snowui-accordion-content-max-block-size-override: ; */ /* Content 展开最大高度（默认 100vh） */
-    /* --snowui-accordion-background-override: ; */         /* item 背景（默认 default transparent；filled var(--background-2)） */
+    /* --snowui-accordion-background-override: ; */         /* item 背景（divided transparent；默认 filled var(--black-4)） */
     /* --snowui-accordion-shadow-override: ; */             /* item inset 分隔线 / 边框阴影 */
     /* --snowui-accordion-item-content-block-size-override: ; */ /* 单个 Content 展开最大高度（默认测量高度，后备 100vh） */
 

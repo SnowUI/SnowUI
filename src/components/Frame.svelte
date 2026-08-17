@@ -1,5 +1,5 @@
 <!--
-  Frame OSS v1.3.0
+  Frame OSS v1.3.1
   职责：自包含 Frame 容器（作用半径 = 1 个 Frame）。
   能力：状态机、JS 动效执行、自身 FLIP、Scale Observer、Perception、Skeleton、stateContent Grid Stacking。
   边界：不含跨组件协调（§7.7 编排模式 / §8 联动控制 / §10 样式编排），那些能力在 FramePro。
@@ -7,6 +7,7 @@
 
   v1.0.0 (2026-05-06): OSS / PRO 切割线重构。OSS Frame 接入完整状态机、动效执行、FLIP、Scale Observer、Perception、stateContent。
                        详见 /Frame-Refactor-Plan.md。
+  v1.3.1 (2026-08-17): Responsive 与 Scale Observer 统一复用 SSR-safe、按帧交付的共享 resizeManager。
   v0.1.0 (起点): OSS 仅做 props 归一化、CSS class 拼装、bridge 变量、skeleton 渲染。
 -->
 

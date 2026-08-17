@@ -1,24 +1,6 @@
 import { getContext } from "svelte";
 import { FRAME_BREAKPOINTS_CONTEXT_KEY } from "../keys";
-
-// 共享的 ResizeObserver 实例
-let sharedObserver: ResizeObserver | undefined;
-// 订阅者映射：使用 WeakMap 允许元素被 GC 回收
-const subscribers = new WeakMap<Element, (width: number) => void>();
-// 当前观察的元素集合（用于管理生命周期，WeakMap 无法遍历）
-const observedElements = new Set<Element>();
-
-function initObserver() {
-    if (sharedObserver) return;
-    sharedObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-            const callback = subscribers.get(entry.target);
-            if (callback) {
-                callback(entry.contentRect.width);
-            }
-        }
-    });
-}
+import { resizeManager } from "./observer.svelte";
 
 export class FrameResponsive {
     containerWidth = $state(0);
@@ -62,31 +44,15 @@ export class FrameResponsive {
     }
 
     resizeObserver = (node: HTMLElement) => {
-        initObserver();
-
-        // 注册订阅
-        subscribers.set(node, (width) => {
-            this.containerWidth = width;
+        const unwatch = resizeManager.watch(node, (entry) => {
+            this.containerWidth = entry.contentRect.width;
         });
-        observedElements.add(node);
-
-        sharedObserver!.observe(node);
 
         // 初始化宽度
         this.containerWidth = node.getBoundingClientRect().width;
 
         return {
-            destroy() {
-                subscribers.delete(node);
-                observedElements.delete(node);
-                sharedObserver!.unobserve(node);
-
-                // 如果没有订阅者了，清理 observer
-                if (observedElements.size === 0) {
-                    sharedObserver!.disconnect();
-                    sharedObserver = undefined;
-                }
-            },
+            destroy: unwatch,
         };
     };
 }

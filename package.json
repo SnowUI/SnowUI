@@ -38,8 +38,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "check:standards": "node ../scripts/check-standards.js",
+    "check:resize-observer": "node scripts/check-resize-observer-boundary.mjs",
     "fix:standards": "node ../scripts/check-standards.js --fix",
-    "check:oss": "node scripts/check-oss-deps.mjs",
+    "check:oss": "node scripts/check-oss-deps.mjs && node scripts/check-resize-observer-boundary.mjs",
     "catalog:generate": "node scripts/generate-component-catalog.mjs",
     "catalog:check": "node scripts/generate-component-catalog.mjs --check",
     "verify:styles": "node scripts/verify-styles.mjs"
