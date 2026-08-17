@@ -57,7 +57,7 @@ export const examples = [
             render: "Workshop 显式 Logo 完整替换默认横向 SnowUILogo，导航与 Tags 自由混排",
             layout: "as=logo 节点位于固定 Header 且左右 padding 4px；Header 与下方 Body 的根级 gap 为 12px；显式 Separator 与两个 SidebarSection 内置 Separator 均使用上下 / 左右 8px padding、零行高和相同线条视觉；直接子节点 as=logo-icon 定义折叠保留图形",
             interaction: "Section 折叠按钮显式使用 muted bare 的常态与 hover 透明度；Page 与 Tags 标题默认均可展开收起且标题无需 Tooltip",
-            performance: "未传 sections 时只渲染显式 Body 内容",
+            performance: "未传 sections 时只渲染显式 Body 内容；自定义 Logo 移入 Header 后，导航区由 Svelte 补回的源节点保持隐藏，即使 Logo host 使用 flex utility 也不得显示第二个 Logo",
             responsive: "折叠后只保留 as=logo-icon 图形，图形与折叠按钮间距 8px，并隐藏 Workshop、分类标题和 Tags 内容",
         },
         logic: ["SB-Init.3", "SB-Init.4", "SB-Init.6"],

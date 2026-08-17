@@ -1,4 +1,4 @@
-<!-- Sidebar PRO Block v1.7.0. 文档: ./Sidebar.md -->
+<!-- Sidebar PRO Block v1.7.2. 文档: ./Sidebar.md -->
 <script lang="ts">
     import { onMount, setContext, tick, untrack, type Snippet } from "svelte";
     import {
@@ -7,6 +7,7 @@
         ScrollArea,
         SnowUILogo,
         ContinuousHoverController,
+        resizeManager,
         type FrameProps,
     } from "@snowui-design-system/components";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
@@ -444,16 +445,16 @@
             syncBodyScrollMask();
             scheduleFooterSafeAreaSync();
         });
-        const resizeObserver = new ResizeObserver(() => {
+        const handleResize = () => {
             syncBodyScrollMask();
             syncFooterSafeArea();
-        });
+        };
         if (navigationElement) observer.observe(navigationElement, { childList: true });
         if (headerElement) observer.observe(headerElement, { childList: true });
         if (footerElement) observer.observe(footerElement, { childList: true });
-        if (bodyViewport) resizeObserver.observe(bodyViewport);
-        if (navigationElement) resizeObserver.observe(navigationElement);
-        if (footerElement) resizeObserver.observe(footerElement);
+        const resizeCleanups = [bodyViewport, navigationElement, footerElement]
+            .filter((element): element is HTMLElement => Boolean(element))
+            .map((element) => resizeManager.watch(element, handleResize));
         scheduleFooterSafeAreaSync();
         void restorePersistedState();
         return () => {
@@ -463,7 +464,7 @@
             cancelAnimationFrame(activeRevealFrame);
             window.clearTimeout(activeRevealTimer);
             observer.disconnect();
-            resizeObserver.disconnect();
+            resizeCleanups.forEach((cleanup) => cleanup());
         };
     });
 </script>
@@ -671,7 +672,7 @@
     :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-header > [data-as="logo"])) {
         display: none;
     }
-    :global(:where(.snowui-sidebar-navigation > [data-as="logo"])) {
+    :global(.snowui-sidebar-navigation > [data-as="logo"]) {
         display: none;
     }
     :global(:where(.snowui-sidebar[data-collapsed="true"] .snowui-sidebar-navigation > :not(.snowui-sidebar-item):not(.snowui-sidebar-section):not(.snowui-separator):not(.snowui-continuous-hover-layer):not([data-as="logo"]))) {

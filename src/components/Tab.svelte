@@ -23,7 +23,7 @@
 
 <script lang="ts">
     import { setContext, type Component, type Snippet } from "svelte";
-    import { Button, Frame, Icon, Text, type FrameProps } from "@snowui-design-system/components";
+    import { Button, Frame, Icon, Text, resizeManager, type FrameProps } from "@snowui-design-system/components";
     import { BUTTON_SIZE_CONTEXT_KEY } from "@snowui-design-system/components/keys";
     import { TAB_INDICATOR_MOTION_STYLE } from "@snowui-design-system/components/motion/presets/tab";
     import {
@@ -262,15 +262,14 @@
         if (!rootEl) return;
         const obs = new MutationObserver(() => syncActive(false));
         obs.observe(rootEl, { childList: true, subtree: false });
-        const ro = new ResizeObserver(() => syncActive(initialized));
-        ro.observe(rootEl);
+        const unwatchResize = resizeManager.watch(rootEl, () => syncActive(initialized));
         queueMicrotask(() => {
             syncActive(false);
             initialized = true;
         });
         return () => {
             obs.disconnect();
-            ro.disconnect();
+            unwatchResize();
         };
     });
 

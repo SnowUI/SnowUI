@@ -5,7 +5,7 @@
 - 默认内置模式（推荐）：`items` 自动生成 `<Button as="item">`；item 可用 `icon` 声明图标，Tab 内置生成 `Icon + Text`，适用于 `icon-toggle`；`parts.Button / parts.Icon / parts.Text` 配置统一 Props。
 - 显式组合模式：显式书写 Button，用于 Icon、Text、复杂内容或逐项 Props 差异。
 
-> **版本**: v1.2.2
+> **版本**: v1.2.3
 > **状态**: 已实现(PRO)
 > **职责**: 在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
 > 由 Tab 容器通过 CSS override Button 的桥接变量接管。
@@ -168,6 +168,10 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 - `Enter` / `Space`:由 Button 原生 click 行为触发,激活当前焦点项。
 - **Roving tabindex**:激活项 `tabindex=0`,其他项 `tabindex=-1`。整个 Tab 在外部 Tab 键序列中只占一位。
 
+### 尺寸观察与环境退化
+
+Tab indicator 的位置与尺寸监听统一通过 Components 的 `resizeManager`。服务端输出保留完整 Tab、Item 和选中语义，不创建浏览器 Observer；浏览器缺少 `ResizeObserver` 或初始化失败时，只停止容器尺寸变化后的 indicator 自动重测，切换、键盘与内容继续可用。尺寸通知在下一动画帧统一交付，避免 indicator 写入尺寸后同步触发新的 Observer 循环。
+
 ---
 
 ## 7. 使用示例
@@ -235,6 +239,10 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 ---
 
 ## 8. 更新日志 (Changelog)
+
+### v1.2.3 (2026-08-17)
+
+- Tab 根尺寸监听迁入共享 `resizeManager`，统一 SSR、能力缺失、按帧交付与资源释放边界。
 
 ### v1.2.2 (2026-08-14)
 

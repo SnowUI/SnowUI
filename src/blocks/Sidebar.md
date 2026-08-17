@@ -1,6 +1,6 @@
 # Sidebar（PRO Block）
 
-> **版本**: v1.7.0
+> **版本**: v1.7.2
 > **职责**: 提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。
 > **归属**: PRO Blocks / Template Block
 
@@ -65,7 +65,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - 折叠按钮不内置 Tooltip，通过随状态更新的 `aria-label` 保留“展开 / 折叠侧边栏”可访问名称。其余内置 Tooltip（折叠态 Item label、Item action、Section action）统一位于对应元素右侧（`position="right"`）。Section 标题默认可折叠但不显示 Tooltip。
 - 默认不设置背景色。
 - Footer 只内置底部覆盖区域，不内置业务文案；区域默认使用 Figma Auto Layout 的 Align top left：内容整体位于容器左上方，内部横向排列并在同一水平线上垂直居中，内容 gap 与四边 padding 均为 `8px`。区域保持 `12px` 圆角、透明背景与 `backdrop-filter: blur(20px)`。直接子节点 `as="footer"` 提供业务内容。折叠 / 展开期间 Footer 固定使用展开态内容宽度与底部位置，不跟随根宽度收缩或位移，只使用与 Sidebar 宽度时间轴一致的 opacity 渐隐 / 渐显；折叠态通过 `inert`、`aria-hidden` 与 `pointer-events: none` 退出交互。
-- 存在 Footer 时，Sidebar 通过 `ResizeObserver` 跟踪 Footer 实际高度，并为 Navigation 的滚动末端增加“Footer 实际高度 + 固定 `12px`”安全区；滚动到底后最后一个 Item 完整停在 Footer 上方。此 `12px` 是 Footer 遮挡保护契约，不跟随外部 `--snowui-sidebar-navigation-gap-override`、Section gap 或 Item gap 改变。
+- 存在 Footer 时，Sidebar 通过共享 `resizeManager` 跟踪 Footer、Navigation 与滚动区域的实际尺寸，并为 Navigation 的滚动末端增加“Footer 实际高度 + 固定 `12px`”安全区；滚动到底后最后一个 Item 完整停在 Footer 上方。此 `12px` 是 Footer 遮挡保护契约，不跟随外部 `--snowui-sidebar-navigation-gap-override`、Section gap 或 Item gap 改变。服务端不创建 Observer；浏览器能力缺失或初始化失败时仅停止后续自动重测，Sidebar 结构、导航、折叠和现有 Footer 安全区继续可用。
 
 ---
 
@@ -115,6 +115,16 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
 ## 更新日志 (Changelog)
+
+### v1.7.2 (2026-08-17)
+
+#### 修复
+- 自定义 `as="logo"` 被安置到 Header 后，导航区由 Svelte 补回的源节点始终保持隐藏；宿主的 `flex` 等 utility 不再覆盖该结构边界并显示重复 Logo。
+
+### v1.7.1 (2026-08-17)
+
+#### 修复
+- Footer、Navigation 与滚动区域的尺寸监听迁入共享 `resizeManager`，统一 SSR、能力退化、按帧交付与资源释放边界。
 
 ### v1.7.0 (2026-08-15)
 
