@@ -1,6 +1,6 @@
 <!--
   Pagination 组件：页码导航容器
-  v1.3.3
+  v1.4.0
 
   职责：
   - 读取直系 Button 作为 current / page / prev / next 角色样式模板。
@@ -21,7 +21,7 @@
         type ListboxOptionRegistration,
         type ListboxOwnerContext,
     } from "../context";
-    import { LISTBOX_OWNER_CONTEXT_KEY } from "../keys";
+    import { BUTTON_COLLECTION_CONTEXT_KEY, LISTBOX_OWNER_CONTEXT_KEY } from "../keys";
     import { resizeManager } from "../logic/observer.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
 
@@ -81,6 +81,8 @@
         renderHints: userRenderHints = undefined,
         ...rest
     }: Props = $props();
+
+    setContext(BUTTON_COLLECTION_CONTEXT_KEY, { scaleOnHover: false });
 
     let templatesEl = $state<HTMLElement | undefined>(undefined);
     let itemsEl = $state<HTMLElement | undefined>(undefined);

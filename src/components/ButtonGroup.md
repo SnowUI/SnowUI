@@ -1,6 +1,6 @@
 # ButtonGroup.svelte 文档
 
-> **版本**: v1.0.1
+> **版本**: v1.1.0
 > **职责**: 提供由多个 Button 单元格与 Separator 组成的拆分按钮容器。
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -23,6 +23,7 @@
 - ButtonGroup 不内置 Popover / Menu 行为。需要菜单时，消费方把 Popover 触发器或菜单图标放入某个 Button 单元格。
 - ButtonGroup 不提供专用 Cell 组件。单元格直接复用 Button，避免平行维护第二套按钮事件、链接、状态、图标尺寸与无障碍逻辑。
 - ButtonGroup 不改变 Button 的 `bare` 无外壳语义；单 Icon 的尺寸上下文与透明点击热区继续由 Button 自动处理。
+- ButtonGroup 中多个 Button 共同构成一个复合控件，item 默认 `scaleOnHover=false`，避免相邻单元格互相覆盖；子 Button 可显式传 `scaleOnHover={true}` 重新开启。
 
 ## 结构规则
 
@@ -131,6 +132,10 @@
 
 ## 更新日志 (Changelog)
 
+### v1.1.0 (2026-08-19)
+
+- 复合控件内的 Button item 默认关闭 hover 放大，保留颜色反馈，并允许实例显式重新开启。
+
 ### v1.0.1 (2026-08-16)
 
 - 根层关闭不属于该布局模型的 Auto Layout，保证 Button hover / 点击单元格与 Separator 无布局间隙。
@@ -139,6 +144,5 @@
 
 #### 新功能
 - 初始版本，支持 Button 嵌入态、Separator 分割线、四种变体与三种尺寸。
-
 
 

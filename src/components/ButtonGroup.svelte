@@ -1,6 +1,6 @@
 <!--
   ButtonGroup 组件：按钮分组容器
-  v1.0.1
+  v1.1.0
 
   作为多个嵌入态 Button + Separator 的分组外壳。Button 负责单元格交互，ButtonGroup 负责统一外壳视觉与间距。
 -->
@@ -9,7 +9,7 @@
     import { setContext, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { getSize } from "../context";
-    import { BUTTON_GROUP_CONTEXT_KEY } from "../keys";
+    import { BUTTON_COLLECTION_CONTEXT_KEY, BUTTON_GROUP_CONTEXT_KEY } from "../keys";
 
     type ButtonGroupVariant = "gray" | "filled" | "outline" | "borderless";
     type ButtonGroupSize = "sm" | "md" | "lg";
@@ -126,6 +126,7 @@
             return disabled;
         },
     });
+    setContext(BUTTON_COLLECTION_CONTEXT_KEY, { scaleOnHover: false });
 
     const buttonGroupRenderHints = $derived.by(() => {
         const base =

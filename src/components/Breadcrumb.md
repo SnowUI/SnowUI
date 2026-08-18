@@ -1,6 +1,6 @@
 # Breadcrumb (面包屑)
 
-> **版本**: v1.0.1
+> **版本**: v1.1.0
 > **职责**: 提供页面层级路径导航容器。
 > **设计稿**: [Workshop / Breadcrumb](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12046-1772&t=nY2VC3oisn12OH01-4)
 
@@ -16,6 +16,7 @@ Breadcrumb 支持两种模式：
 - 最后一个 `as="item"` 自动作为当前页面。
 - 可通过 `variant` 给内部 `Button as="item"` 提供默认 Button 变体。
 - 非当前 item 默认整体透明度 40%，hover 时恢复 100%。
+- item 属于同一导航复合控件，默认关闭 Button hover 放大；显式 `scaleOnHover={true}` 可按实例重新开启。
 - 当前页面 item 输出 `aria-current="page"`，不可 hover、不可点击、不可键盘激活。
 - separator 默认使用 `14px / 20px` 与 `black/10%`。
 
@@ -88,6 +89,7 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 4. 当前项不会触发 Button hover、click、Enter 或 Space。
 5. separator 自动设置 `aria-hidden="true"`。
 6. Breadcrumb 的 `variant` 只影响 `Button as="item"` 的默认 Button 变体，且不覆盖子级显式 `variant`。
+7. Breadcrumb 为 item 提供 `scaleOnHover=false` 默认值；子级 Button 的显式值优先。
 
 ## 布局模型
 
@@ -155,6 +157,10 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.1.0 (2026-08-19)
+
+- Breadcrumb item 作为复合导航项默认关闭 Button hover 放大，并允许子 Button 显式重新开启。
 
 ### v1.0.1 (2026-08-16)
 

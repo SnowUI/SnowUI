@@ -34,6 +34,7 @@ import {
     SIZE_CONTEXT_KEY,
     FIELD_CONTEXT_KEY,
     BUTTON_GROUP_CONTEXT_KEY,
+    BUTTON_COLLECTION_CONTEXT_KEY,
     BUTTON_SIZE_CONTEXT_KEY,
     BREADCRUMB_CONTEXT_KEY,
     ACCORDION_CONTEXT_KEY,
@@ -284,6 +285,16 @@ export function getButtonGroup(): ButtonGroupContext | undefined {
     return getContext<ButtonGroupContext>(BUTTON_GROUP_CONTEXT_KEY);
 }
 
+// --- Button Collection Context ---
+
+export interface ButtonCollectionContext {
+    readonly scaleOnHover: boolean;
+}
+
+export function getButtonCollection(): ButtonCollectionContext | undefined {
+    return getContext<ButtonCollectionContext>(BUTTON_COLLECTION_CONTEXT_KEY);
+}
+
 // --- Button Size Context ---
 
 export type ButtonSizeContextValue = "sm" | "md" | "lg";
@@ -291,6 +302,8 @@ export type ButtonSizeContextValue = "sm" | "md" | "lg";
 export interface ButtonSizeContext {
     present: true;
     readonly size: ButtonSizeContextValue;
+    /** 复合控件可同时提供 Button item 的内置 hover scale 默认值。 */
+    readonly scaleOnHover?: boolean;
 }
 
 export function getButtonSize(): ButtonSizeContext | undefined {

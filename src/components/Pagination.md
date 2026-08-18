@@ -7,7 +7,7 @@
 - `parts.MenuItem`：统一配置 pageSize 选项。
 - 具体结构差异继续通过现有 `as` 模板/外置选择器协议完成；外置显式 Props 高于 part。
 
-> **版本**: v1.3.3
+> **版本**: v1.4.0
 > **职责**: 提供页码导航容器。
 > **设计稿**: [Workshop / Pagination](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12078-21567&t=nY2VC3oisn12OH01-4)
 
@@ -24,7 +24,7 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 - 根据 `page` / `total` 自动生成页码和 `...`。
 - 缺少 `prev` / `next` 模板时使用内置默认箭头。
 - 当前页、边界 prev / next、整体 disabled、单页 disabled 都由 Pagination 管理可点击性。
-- Pagination 不控制使用方 Button 模板的 variant / size / hover / border / background。
+- Pagination 不控制使用方 Button 模板的 variant / size / hover 颜色 / border / background；作为复合导航控件，只将 item 的 Button hover 放大默认关闭，模板可用 `scaleOnHover={true}` 覆盖。
 - Pagination 支持 `auto`、`hug`、`fill` 三种明确宽度模式。
 - 传入 `pageSizeOptions` 并声明 `Button as="pageSize"` 时，显示每页条数选择器。
 - `pageSize` 模板在 children 中的声明顺序决定选择器位于页码左侧或右侧。
@@ -78,6 +78,7 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 - 缺失 `page` 模板时，使用内置默认普通页文字。
 - 缺失 `prev` / `next` 模板时，使用内置默认 `ArrowLineLeft/Right` SVG。
 - 自定义 Button 模板保留自己的 variant、size、padding、radius、hover、focus、border 和背景。
+- Pagination 生成的 Button 默认 `scaleOnHover=false`；模板显式传 `scaleOnHover={true}` 时保留放大反馈。
 - Pagination 只接管生成后的宽度模式、页码文本、可点击性和无障碍状态。
 
 ## 使用示例
@@ -454,6 +455,10 @@ Root Frame(nav)
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.4.0 (2026-08-19)
+
+- Pagination 内部 Button 作为复合导航项默认关闭 hover 放大，模板可显式重新开启；其余 hover 颜色和视觉 Props 保持由 Button 拥有。
 
 ### v1.3.3 (2026-07-08)
 

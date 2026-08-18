@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.9.0
+> **版本**: v1.10.0
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -18,6 +18,7 @@
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
 | `CONTINUOUS_HOVER_MOTION` | Sidebar、Listbox、Popover、TableBody、Accordion、Tab / Segmented 的共享 hover 背景移动 | 单项独立 hover、生命周期进入 | Fluid Functionalism proximity hover |
 | `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
+| `BUTTON_HOVER_SCALE_UP_MOTION` | 独立动作 Button 默认 hover 放大到 `1.06`，不改变布局尺寸 | 复合控件项、非 Button hover、生命周期出现 | Threads 图片导航按钮 + Owner 指定比例 |
 | `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
 | `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
 | `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |
@@ -33,7 +34,7 @@
 2. 第二个组件复用同一语义值时，必须抽到 preset。
 3. 组件文档应引用 preset 名称；如写具体数字，必须注明以本 catalog 为准。
 4. 触发延迟不是 MotionConfig，归共享 lib 管理。
-5. 自然语言出现“放大”时必须结合触发语义选择：hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
+5. 自然语言出现“放大”时必须结合触发语义选择：Button 默认 hover 用 `BUTTON_HOVER_SCALE_UP_MOTION`，其他 hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
 6. 自然语言出现“尺寸变化 / 展开 / 收起 / 高度变化 / 宽度变化”时，优先使用 `RESIZE_MOTION`；只有语义明确不同且已存在专项 preset 时例外。
 7. Tab / Segmented indicator 同时移动和变形时必须使用 `TAB_INDICATOR_MOTION`，不得使用普通 `RESIZE_MOTION` 或分别维护 transform / size 时序。
 8. `GENERIC_APPEAR_MOTION` 默认只包含 opacity；需要生命周期缩放时必须显式声明 scale 或选择含 scale 的组件族 preset。
@@ -42,6 +43,7 @@
 
 ## 变更记录
 
+- v1.10.0 (2026-08-19): 新增 Button 专属 `1.06` hover scale preset，保留通用 hover preset 的既有 `1.05` 消费语义。
 - v1.9.0 (2026-08-12): Tooltip preset 恢复 opacity + scale，但消费目标限定为独立 Foreground；Portal / Backdrop 保持稳定。
 - v1.8.0 (2026-08-12): Test Footer 复测后移除 Tooltip 出现 preset 的 scale；毛玻璃 Portal 出现态不执行 opacity 或 transform。
 - v1.7.0 (2026-08-12): Tooltip 出现 preset 移除 Portal opacity 与 delay，仅保留 scale，确保毛玻璃和 Tooltip 同一首帧可见；退出 preset 不变。

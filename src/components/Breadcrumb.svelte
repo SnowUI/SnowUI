@@ -1,6 +1,6 @@
 <!--
   Breadcrumb 组件：页面层级路径导航容器
-  v1.0.1
+  v1.1.0
 
   职责：
   - 只作为组合式容器，不生成 items / separator。
@@ -18,6 +18,7 @@
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import {
         BREADCRUMB_CONTEXT_KEY,
+        BUTTON_COLLECTION_CONTEXT_KEY,
         type BreadcrumbContext,
         type BreadcrumbVariant,
     } from "../context";
@@ -59,6 +60,7 @@
             return variant;
         },
     });
+    setContext(BUTTON_COLLECTION_CONTEXT_KEY, { scaleOnHover: false });
 
     type ManagedSnapshot = {
         ariaCurrent: string | null;

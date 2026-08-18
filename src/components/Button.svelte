@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.5.1
+  v2.6.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -20,6 +20,7 @@
   import { onDestroy, setContext, type Snippet } from "svelte";
   import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
   import Frame, { type FrameProps } from "./Frame.svelte";
+  import { BUTTON_HOVER_SCALE_UP_MOTION } from "../motion/presets/effects";
   import {
     mergeComponentPartProps,
     useComponentPart,
@@ -30,6 +31,7 @@
     getText,
     getSize,
     getButtonGroup,
+    getButtonCollection,
     getButtonSize,
     getBreadcrumb,
   } from "../context";
@@ -44,6 +46,8 @@
     emphasis?: "normal" | "muted";
     /** 是否启用背景内容模糊；默认 false。 */
     backgroundBlur?: boolean;
+    /** 是否启用 Button 内置的 hover 放大反馈；独立动作默认 true，复合控件项可由容器默认关闭。 */
+    scaleOnHover?: boolean;
     /**
      * Toggle 模式：内部自动注入 `Click={{Idle:"Active",Active:"Idle"}}` 与 `whileClick=false` 默认值，
      * 配合 Frame 自动暴露的 `data-state="Active"` 让根节点在激活态自动套用 Secondary/Indigo 配色。
@@ -73,6 +77,7 @@
     bare = false,
     emphasis = "normal",
     backgroundBlur = false,
+    scaleOnHover = undefined,
     toggle = false,
     href = undefined,
     target = undefined,
@@ -110,6 +115,7 @@
   // 上下文感知
   const contextSize = getSize();
   const buttonGroupCtx = getButtonGroup();
+  const buttonCollectionCtx = getButtonCollection();
   const buttonSizeCtx = getButtonSize();
   const breadcrumbCtx = getBreadcrumb();
   const isButtonGroupEmbedded = $derived(
@@ -125,6 +131,12 @@
   });
   const resolvedDisabled = $derived(
     disabled || (isButtonGroupEmbedded && buttonGroupCtx?.disabled === true),
+  );
+  const resolvedScaleOnHover = $derived(
+    scaleOnHover
+      ?? buttonCollectionCtx?.scaleOnHover
+      ?? buttonSizeCtx?.scaleOnHover
+      ?? true,
   );
   // 计算最终尺寸：优先使用 prop size，其次映射上下文尺寸
   const resolvedSize = $derived.by(() => {
@@ -251,7 +263,17 @@
     return "";
   });
   const buttonStyle = $derived.by(() => {
-    const styles = [hostStyle, userStyle]
+    const scale = Array.isArray(BUTTON_HOVER_SCALE_UP_MOTION.scale)
+      ? BUTTON_HOVER_SCALE_UP_MOTION.scale[1]
+      : (BUTTON_HOVER_SCALE_UP_MOTION.scale ?? 1);
+    const duration = BUTTON_HOVER_SCALE_UP_MOTION.duration ?? 0;
+    const easing = BUTTON_HOVER_SCALE_UP_MOTION.easing ?? "ease";
+    const defaultHoverMotionStyle = [
+      `--snowui-button-hover-scale-to: ${scale}`,
+      `--snowui-button-hover-motion-duration: ${duration}ms`,
+      `--snowui-button-hover-motion-easing: ${easing}`,
+    ].join("; ");
+    const styles = [defaultHoverMotionStyle, hostStyle, userStyle]
       .filter(Boolean)
       .join("; ");
     return styles || undefined;
@@ -528,6 +550,7 @@
   data-variant={bare ? undefined : resolvedVariant}
   data-icon-only={iconOnly ? "true" : undefined}
   data-emphasis={bare ? emphasis : undefined}
+  data-default-hover-scale={resolvedScaleOnHover && rest.whileHover === undefined ? "true" : undefined}
   data-embedded={isButtonGroupEmbedded ? "button-group" : undefined}
   data-leading={as === "leading" ? "true" : undefined}
   data-trailing={as === "trailing" ? "true" : undefined}
@@ -583,14 +606,16 @@
       background-color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
       --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
       border-color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
-      box-shadow var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
+      box-shadow var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
+      transform var(--snowui-button-hover-motion-duration, 0.2s) var(--snowui-button-hover-motion-easing, ease);
     border: none;
     cursor: var(--snowui-state-cursor, pointer);
     outline: none;
     box-sizing: border-box;
     text-decoration: none;
     white-space: nowrap;
-    --snowui-frame-component-transform: translate(var(--snowui-drag-x, 0), var(--snowui-drag-y, 0));
+    --snowui-button-hover-scale: 1;
+    --snowui-frame-component-transform: translate(var(--snowui-drag-x, 0), var(--snowui-drag-y, 0)) scale(var(--snowui-button-hover-scale));
     opacity: var(--snowui-button-opacity-override, var(--snowui-button-opacity));
 
     /* 内部计算层（internal） */
@@ -773,6 +798,55 @@
   :global(:where(.snowui-button)[data-variant="borderless"]) {
     --snowui-button-background: transparent;
     --snowui-button-border-color: transparent;
+    --snowui-button-borderless-hover-opacity: 4%;
+    background-image: none;
+    isolation: isolate;
+  }
+
+  :global(:where([theme="dark"] .snowui-button[data-variant="borderless"])) {
+    --snowui-button-borderless-hover-opacity: 10%;
+  }
+
+  :global(:where(.snowui-button)[data-variant="borderless"])::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: inherit;
+    background-color: color-mix(
+      in srgb,
+      var(--snowui-hover-color, currentColor)
+        var(--snowui-button-borderless-hover-opacity),
+      transparent
+    );
+    pointer-events: none;
+    opacity: var(--snowui-button-borderless-background-opacity, 0);
+    transform: scale(var(--snowui-button-borderless-background-scale, 1));
+    transform-origin: center;
+    transition:
+      transform var(--snowui-button-hover-motion-duration, 0.2s)
+        var(--snowui-button-hover-motion-easing, ease),
+      opacity var(--snowui-frame-color-motion-duration, 0.15s)
+        var(--snowui-frame-color-motion-easing, ease-out);
+  }
+
+  :global(
+      :where(.snowui-button)[data-variant="borderless"][data-default-hover-scale="true"]
+    ) {
+    --snowui-button-borderless-background-scale: 0.84;
+  }
+
+  :global(
+      :where(.snowui-button)[data-variant="borderless"]:hover:not(.snowui-disabled):not(:disabled)
+    ) {
+    --snowui-button-borderless-background-opacity: 1;
+  }
+
+  :global(
+      :where(.snowui-button)[data-default-hover-scale="true"]:hover:not(.snowui-disabled):not(:disabled)
+    ) {
+    --snowui-button-hover-scale: var(--snowui-button-hover-scale-to);
+    --snowui-button-borderless-background-scale: 1;
   }
 
   /* Toggle / 瞬时反馈：Active 状态由 Frame 自动暴露的 data-state="Active" 触发，
@@ -797,12 +871,13 @@
     );
     background-image: none;
     --snowui-frame-component-transition:
-      opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
+      opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
+      transform var(--snowui-button-hover-motion-duration, 0.2s) var(--snowui-button-hover-motion-easing, ease);
   }
 
   :global(
       :where(.snowui-button).snowui-button-bare[data-emphasis="muted"]
-    ) {
+  ) {
     --snowui-button-bare-idle-opacity: 0.4;
   }
 
@@ -899,5 +974,17 @@
       --snowui-hover-opacity,
       var(--snowui-frame-hover-opacity, 4%)
     );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(:where(.snowui-button)[data-default-hover-scale="true"]) {
+      transition: none;
+    }
+
+    :global(
+        :where(.snowui-button)[data-variant="borderless"][data-default-hover-scale="true"]
+      )::after {
+      transition: none;
+    }
   }
 </style>

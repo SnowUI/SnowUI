@@ -1,6 +1,7 @@
 /**
  * Button.test.ts
- * v1.6.1
+ * v1.7.0
+ * 变更记录 (2026-08-19): A1 覆盖独立动作默认 hover 放大到 1.06、scaleOnHover 独立关闭；Borderless 保留原色并使用独立背景层扩张，bare 不增加背景。
  * 变更记录 (2026-08-16): A1/A2 明确验证 filled 的 Static White 前景色不受宿主基线加载顺序影响。
  * 变更记录 (2026-08-11): icon-only 改为显式 iconOnly=true；未声明等同于 false。
  * 变更记录 (2026-08-09): bare 默认 100% 不透明，新增 emphasis="muted" 示例覆盖 40% → hover 100%。
@@ -28,9 +29,19 @@ export const examples = [
 <Button variant="outline">Outline</Button>
 <Button variant="borderless">Borderless</Button>
 <Button bare>Bare</Button>
+<Button scaleOnHover={false}>No scale</Button>
 <Button bare iconOnly aria-label="减少"><Minus /></Button>`,
 
-        logic: ["Style"],
+        expected: {
+            render: "全部 variant 与 bare 保持各自原有背景、边框和前景色。",
+            layout: "hover 缩放只影响绘制，Button 与自适应父容器的布局尺寸不变。",
+            interaction: "独立动作默认 hover 放大到 1.06；scaleOnHover=false、disabled 与复合控件项不缩放；Borderless 保留原有 hover 颜色并让背景层扩张，bare 不出现背景。",
+            performance: "Button 根视觉通道只更新 transform，不触发布局重排。",
+            responsive: "缩放比例不随 Button size 或根字号改变。",
+            accessibility: "prefers-reduced-motion: reduce 下直接提交最终 hover 比例，不执行缩放过渡。",
+        },
+
+        logic: ["Style", "Motion", "Layout", "Accessibility"],
     },
     {
         name: "A2: 尺寸 (Sizes)",
