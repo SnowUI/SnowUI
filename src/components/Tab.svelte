@@ -118,6 +118,7 @@
         get size() {
             return size;
         },
+        scaleOnHover: false,
     });
 
     /** 获取容器内所有"项 Button" */

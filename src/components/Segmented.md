@@ -6,7 +6,7 @@
 - 默认内置模式（推荐）：`items` 交给 Tab 生成 Button；`parts.Button` 沿默认生成链路显式转发。
 - 显式组合模式：显式书写 `<Button as="item">`，逐项 Props 直接配置。
 
-> **版本**: v1.2.2
+> **版本**: v1.3.0
 > **状态**: 已实现(PRO)
 > **职责**: RadioGroup 的视觉变体,在多个互斥选项之间切换"过滤器/参数"。视觉系统
 > 与 [Tab](./Tab.md) 完全共享,在 ARIA 语义、键盘行为、Form 接入上区分。
@@ -25,6 +25,8 @@
 | 视觉(variant/size/token) | **完全相同** | **完全相同** |
 
 Segmented 是 Tab 的宿主组件特化：真实 Tab 是主要视觉表面、交互节点和根 DOM；Segmented 只固定 radiogroup 语义、方向键直切行为，并增加 `name` 隐藏表单字段。
+
+Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保留原有颜色与 indicator 反馈；可通过子 Button 或 `parts.Button.scaleOnHover=true` 显式开启。
 
 ### 宿主 Props 与所有权
 

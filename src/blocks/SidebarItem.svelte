@@ -1,4 +1,4 @@
-<!-- SidebarItem PRO Block v1.4.1. 文档: ./SidebarItem.md -->
+<!-- SidebarItem PRO Block v1.5.0. 文档: ./SidebarItem.md -->
 <script lang="ts">
     import type { Snippet } from "svelte";
     import {
@@ -136,6 +136,7 @@
     {:else}
         <Button
             bare
+            scaleOnHover={false}
             size="sm"
             disabled={disabled}
             row

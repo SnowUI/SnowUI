@@ -5,7 +5,7 @@
 - 默认内置模式（推荐）：`items` 自动生成 `<Button as="item">`；item 可用 `icon` 声明图标，Tab 内置生成 `Icon + Text`，适用于 `icon-toggle`；`parts.Button / parts.Icon / parts.Text` 配置统一 Props。
 - 显式组合模式：显式书写 Button，用于 Icon、Text、复杂内容或逐项 Props 差异。
 
-> **版本**: v1.2.3
+> **版本**: v1.3.0
 > **状态**: 已实现(PRO)
 > **职责**: 在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
 > 由 Tab 容器通过 CSS override Button 的桥接变量接管。
@@ -18,6 +18,7 @@
 - **子项即 Button**:不新增 TabItem 组件。子项直接使用 Button,在 Button 上声明 `value="..."` 即可。Button 的 size 档位决定 Item 的 padding / radius / font-size / line-height(完全继承 Button SM/MD/LG)。
 - **容器接管激活态视觉**:Tab 不修改 Button 源码,而是通过 CSS 上下文 override Button 的三层桥接变量(`--snowui-button-background-override` / `--snowui-button-color-override` / `--snowui-button-opacity-override` / `--snowui-button-padding-override`)在 Tab 上下文内接管视觉,**不污染外部 Button**。
 - **共享 indicator FLIP 动效**:激活态的"白底"/"灰底"/"下划线"通过一个共享的 `.snowui-tab-indicator` 元素绝对定位,在 Item 间通过 transform/width/height 平滑过渡,而非每个 Item 各自 fade。
+- **复合控件 hover**:Item 默认关闭 Button 的 scale hover，保留 Tab 自己的背景/透明度反馈与 indicator；子 Button 或 `parts.Button.scaleOnHover=true` 可显式重新开启。
 
 ---
 
