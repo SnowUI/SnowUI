@@ -1,7 +1,7 @@
 # Button.svelte 文档
 
-> **版本**: v2.6.0
-> **变更记录 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_SCALE_UP_MOTION` 放大到 `1.06`，不改变布局尺寸；`scaleOnHover` 可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 保留原有 hover 颜色，并通过独立背景层扩张清晰表达放大；bare 保持无背景。
+> **版本**: v2.7.0
+> **变更记录 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_SCALE_UP_MOTION` 将背景层放大到 `1.06`，文字、Icon 与命中区保持原尺寸；`scaleOnHover` 可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 保留原有 hover 颜色并从 `0.84` 扩张到 `1.06`；bare 没有背景，因此不执行内置放大。
 > **变更记录 (2026-08-16)**: SnowUI 宿主基线改为固定低优先级层，`filled` 的 Static White 前景色不再因动态模块加载顺序被 Frame `color: inherit` 覆盖。
 > **变更记录 (2026-08-11)**: 新增显式 `iconOnly` 布局声明，默认 `false`；移除基于 children DOM 的自动推断，并为缺少可访问名称的 icon-only Button 提供开发警告。
 > **变更记录 (2026-08-09)**: `bare` 默认改为 100% 不透明；新增 `emphasis="muted"` 显式启用 40% → hover 100% 的弱化交互。
@@ -21,10 +21,10 @@
 | variant | 'gray'\|'filled'\|'outline'\|'borderless' | 'gray' | 按钮变体样式 |
 | size | 'sm'\|'md'\|'lg' | 'sm' | 按钮尺寸 |
 | iconOnly | `boolean` | `false` | 明确启用单视觉内容布局。使用对称 icon-only padding 与放大一级的尺寸上下文；不检查 children 类型。缺少 `aria-label`、`aria-labelledby` 或 `title` 时开发环境警告。 |
-| bare | `boolean` | `false` | 开启无外壳按钮模式，内容可包含文字、Icon 或其他元素。忽略 `variant`，移除 padding / radius / 背景 / 边框与 hover overlay，保留普通 Button 的内容 gap；前景色继承 `currentColor`，默认保持 100% 不透明。独立使用时 hover 只执行默认 `scale(1.06)`，不增加背景。与 `iconOnly` 同时使用时采用当前 `size` 档位的 12/16/20px 视觉尺寸上下文，并提供至少 16×16px 的透明点击热区。精确尺寸由子视觉自己声明。放入 Tab 时由 Tab 的 Button opacity override 接管透明度，不发生叠乘。 |
+| bare | `boolean` | `false` | 开启无外壳按钮模式，内容可包含文字、Icon 或其他元素。忽略 `variant`，移除 padding / radius / 背景 / 边框与 hover overlay，保留普通 Button 的内容 gap；前景色继承 `currentColor`，默认保持 100% 不透明。因为没有背景层，`scaleOnHover` 不产生视觉放大，文字与 Icon 保持原尺寸。与 `iconOnly` 同时使用时采用当前 `size` 档位的 12/16/20px 视觉尺寸上下文，并提供至少 16×16px 的透明点击热区。精确尺寸由子视觉自己声明。放入 Tab 时由 Tab 的 Button opacity override 接管透明度，不发生叠乘。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
 | backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
-| scaleOnHover | `boolean` | `true` | 是否启用 Button 内置 hover 放大。独立动作默认开启；复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。只控制内置默认，不覆盖显式 `whileHover`。 |
+| scaleOnHover | `boolean` | `true` | 是否启用 Button 内置背景层 hover 放大。独立动作默认开启；文字、Icon、Spinner 与命中区不缩放。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
 | toggle | boolean | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 Secondary/Indigo 配色（gray / outline / borderless 生效，filled 排除）；`aria-pressed` 由 Frame 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
 | href | string | undefined | 链接地址 (渲染为 a 标签) |
 | target | string | undefined | 链接打开方式 |
@@ -40,7 +40,7 @@
 | bare | `boolean` | `false` | 无外壳按钮模式，不限制内容类型。忽略 `variant`，外壳 padding / radius 为 0，保留内容 gap；与 `iconOnly` 同时使用时获得对应尺寸上下文与最小透明点击热区。默认使用 `currentColor × opacity: 1`。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 的强调级别；`muted` 使用 `currentColor × opacity: 0.4 -> 1`。 |
 | backgroundBlur | `boolean` | `false` | 开启按钮背景模糊，默认强度为 `1.25rem`。 |
-| scaleOnHover | `boolean` | `true` | 控制内置 `scale(1.06)` hover；复合控件项从 owner 继承 `false`，实例显式值优先。 |
+| scaleOnHover | `boolean` | `true` | 控制背景层内置 `scale(1.06)` hover；内容不缩放。复合控件项从 owner 继承 `false`，实例显式值优先。 |
 | toggle | `boolean` | `false` | Toggle 模式语法糖。等价于显式声明 `Click={{ Idle: "Active", Active: "Idle" }} whileClick={false}`；Active 配色由 `data-state="Active"` 自动套 Indigo；`aria-pressed` 自动输出。 |
 | as | `'more' \| 'badge' \| 'icon' \| 'prev' \| 'next' \| 'close' \| 'item' \| 'current' \| 'page' \| 'leading' \| 'trailing'` | - | 角色化：作为 Text 展开按钮、Breadcrumb item、Pagination 模板，或接入 Image / ImageViewer / Field 宿主定位协议；进入 Image / ImageViewer 宿主时会翻译为对应 `pin-*` 方位 |
 
@@ -338,7 +338,7 @@ Button 放入 Pagination 时使用角色模板：
 |:---|:---|
 | **Filled** | 20% overlay (`currentColor`) |
 | **Gray/Outline** | Light: 4% overlay, Dark: 10% overlay |
-| **Borderless** | Light: 4%、Dark: 10%；独立背景层在默认 scale hover 时从 `0.84` 扩张到 `1`，最终颜色保持不变 |
+| **Borderless** | Light: 4%、Dark: 10%；独立背景层在默认 scale hover 时从 `0.84` 扩张到 `1.06`，最终颜色保持不变 |
 
 ---
 
@@ -360,6 +360,12 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.7.0 (2026-08-19)
+
+#### 动效
+- **BTN-Hover.3** 内置 hover scale 从 Button 根迁移到独立背景层；文字、Icon、Spinner、状态内容和命中区保持原尺寸。
+- **BTN-Hover.4** gray / filled / outline / borderless 继续使用原有 base background + overlay 颜色合成；Borderless 背景从 `0.84` 扩张到 `1.06`，bare 因无背景层不执行内置放大。
 
 ### v2.6.0 (2026-08-19)
 

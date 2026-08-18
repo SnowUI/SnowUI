@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.10.0
+> **版本**: v1.10.1
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -18,7 +18,7 @@
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
 | `CONTINUOUS_HOVER_MOTION` | Sidebar、Listbox、Popover、TableBody、Accordion、Tab / Segmented 的共享 hover 背景移动 | 单项独立 hover、生命周期进入 | Fluid Functionalism proximity hover |
 | `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
-| `BUTTON_HOVER_SCALE_UP_MOTION` | 独立动作 Button 默认 hover 放大到 `1.06`，不改变布局尺寸 | 复合控件项、非 Button hover、生命周期出现 | Threads 图片导航按钮 + Owner 指定比例 |
+| `BUTTON_HOVER_SCALE_UP_MOTION` | 独立动作 Button 默认只将背景层放大到 `1.06`，内容与布局尺寸不变 | bare、复合控件项、非 Button hover、生命周期出现 | Threads 图片导航按钮 + Owner 指定比例 |
 | `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
 | `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
 | `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |
@@ -43,6 +43,7 @@
 
 ## 变更记录
 
+- v1.10.1 (2026-08-19): Button hover preset 的消费对象从组件根收敛为独立背景层，文字与 Icon 不参与缩放。
 - v1.10.0 (2026-08-19): 新增 Button 专属 `1.06` hover scale preset，保留通用 hover preset 的既有 `1.05` 消费语义。
 - v1.9.0 (2026-08-12): Tooltip preset 恢复 opacity + scale，但消费目标限定为独立 Foreground；Portal / Backdrop 保持稳定。
 - v1.8.0 (2026-08-12): Test Footer 复测后移除 Tooltip 出现 preset 的 scale；毛玻璃 Portal 出现态不执行 opacity 或 transform。
