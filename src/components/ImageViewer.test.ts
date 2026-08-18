@@ -12,6 +12,7 @@ export const examples = [
     <ImageGroup
         previewMode="viewer"
         size={80}
+        contentHug
         class="w-full justify-center"
         style="width: min(100%, 48rem);"
     >
