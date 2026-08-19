@@ -647,6 +647,7 @@ void main() {
     enableAutoLayout={false}
     class={[
         "snowui-gradient-motion",
+        !isAvatarVariant ? "snowui-rounded-rectangle" : "",
         `snowui-gradient-motion-${resolvedVariant}`,
         isAvatarVariant ? "snowui-gradient-motion-avatar" : "",
         !webglReady ? "snowui-gradient-motion-fallback-active" : "",
@@ -707,12 +708,14 @@ void main() {
         width: 100%;
         height: 100%;
         border-radius: inherit;
+        corner-shape: inherit;
     }
 
     :global(:where(.snowui-gradient-motion-fallback)) {
         position: absolute;
         inset: -20%;
         border-radius: inherit;
+        corner-shape: inherit;
         background:
             linear-gradient(
                 90deg,

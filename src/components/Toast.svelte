@@ -172,7 +172,7 @@
         data-variant={variant}
         data-size={resolvedSize}
         data-pos={position}
-        class={`snowui-toast snowui-toast-${variant} snowui-toast-size-${resolvedSize}${isRich ? " snowui-quick-action-panel" : ""}${userClass ? ` ${userClass}` : ""}`}
+        class={`snowui-toast snowui-rounded-rectangle snowui-toast-${variant} snowui-toast-size-${resolvedSize}${isRich ? " snowui-quick-action-panel" : ""}${userClass ? ` ${userClass}` : ""}`}
         enableResponsive={enableResponsive}
         enableContext={enableContext}
         enableScaleObserver={enableScaleObserver}

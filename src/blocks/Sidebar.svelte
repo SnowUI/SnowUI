@@ -129,7 +129,7 @@
         if (!navigationElement) return;
         return continuousHoverController.attach(navigationElement, {
             selector: ".snowui-sidebar-item",
-            layerClass: "snowui-sidebar-continuous-hover-layer",
+            layerClass: "snowui-sidebar-continuous-hover-layer snowui-rounded-rectangle",
             axis: "y",
             enabled: continuousHover,
             blockedSelector: ".snowui-sidebar-section-header",
@@ -559,7 +559,7 @@
 
     <footer
         bind:this={footerElement}
-        class="snowui-sidebar-footer"
+        class="snowui-sidebar-footer snowui-rounded-rectangle"
         data-has-footer={hasExternalFooter ? "true" : undefined}
         aria-hidden={isCollapsed ? "true" : undefined}
         inert={isCollapsed}

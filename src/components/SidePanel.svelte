@@ -168,6 +168,7 @@
     const panelClass = $derived(
         [
             "snowui-side-panel",
+            "snowui-rounded-rectangle",
             placement === "inline" ? "snowui-quick-action-panel" : "",
             "snowui-overlay-scrollbar-host",
             placement === "inline" ? "snowui-side-panel-inline" : "snowui-side-panel-floating",
@@ -346,8 +347,8 @@
         whileAppear={layoutOwnsInlineMotion ? false : SIDE_PANEL_APPEAR_MOTION}
         whileDisappear={layoutOwnsInlineMotion ? false : SIDE_PANEL_DISAPPEAR_MOTION}
         class={placement === "floating"
-            ? "snowui-side-panel-motion-shell snowui-quick-action-panel"
-            : "snowui-side-panel-motion-shell"}
+            ? "snowui-side-panel-motion-shell snowui-quick-action-panel snowui-rounded-rectangle"
+            : "snowui-side-panel-motion-shell snowui-rounded-rectangle"}
         enableResponsive={false}
         enableDefaultMotion={enableDefaultMotion}
         enableContext={false}
@@ -528,6 +529,7 @@
         box-sizing: border-box;
         padding: 0;
         border-radius: inherit;
+        corner-shape: inherit;
         font-size: var(--snowui-side-panel-font-size-override, var(--text-14));
         line-height: var(--snowui-side-panel-line-height-override, var(--leading-14));
         --snowui-side-panel-toolbar-height: var(--size-12);

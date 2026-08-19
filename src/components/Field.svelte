@@ -71,7 +71,7 @@
 
 {#snippet fieldSurface()}
     <Frame
-        class={`snowui-field snowui-field-bordered${userClass ? ` ${userClass}` : ""}`}
+        class={`snowui-field snowui-rounded-rectangle snowui-field-bordered${userClass ? ` ${userClass}` : ""}`}
         enableAutoLayout={true}
         data-as={typeof rest.as === "string" ? rest.as : undefined}
         data-invalid={invalid ? "true" : undefined}

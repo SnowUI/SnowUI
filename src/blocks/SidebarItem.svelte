@@ -71,7 +71,7 @@
     tag="div"
     row
     enableAutoLayout={false}
-    class={["snowui-sidebar-item", userClass].filter(Boolean).join(" ")}
+    class={["snowui-sidebar-item", "snowui-rounded-rectangle", userClass].filter(Boolean).join(" ")}
     data-active={active ? "true" : "false"}
     data-sidebar-item-id={id}
     data-collapsed={collapsed ? "true" : "false"}
@@ -206,6 +206,7 @@
         padding: var(--snowui-sidebar-item-padding-y-override, var(--padding-2))
             var(--snowui-sidebar-item-padding-x-override, var(--padding-2));
         border-radius: inherit;
+        corner-shape: inherit;
         color: inherit;
         --snowui-button-opacity-override: 1;
         text-decoration: none;

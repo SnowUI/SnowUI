@@ -154,6 +154,7 @@
     aria-label={rest["aria-label"] ?? displayText}
     class={[
         "snowui-search-box",
+        "snowui-rounded-rectangle",
         "snowui-field-bordered",
         `snowui-search-box-${variant}`,
         userClass,

@@ -300,6 +300,7 @@
     data-initialized={initialized ? "true" : "false"}
     class={[
         "snowui-tab",
+        "snowui-rounded-rectangle",
         `snowui-tab-${variant}`,
         `snowui-tab-${size}`,
         `snowui-tab-${resolvedDirection}`,
