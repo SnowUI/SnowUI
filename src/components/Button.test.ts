@@ -1,6 +1,7 @@
 /**
  * Button.test.ts
- * v1.10.0
+ * v1.11.0
+ * 变更记录 (2026-08-19): hover 从按尺寸比例 scale 改为固定像素背景扩张；sm/md/lg 的背景总宽、总高统一增加 2px。
  * 变更记录 (2026-08-19): lg hover 背景层终点改为 1.015；hover 背景颜色立即切换，不执行 opacity 渐现或渐隐。
  * 变更记录 (2026-08-19): hover 背景层终点比例按最终尺寸改为 sm 1.05、md 1.03、lg 1.01。
  * 变更记录 (2026-08-19): Button hover 背景层终点比例由 1.06 调整为 1.05。
@@ -39,10 +40,10 @@ export const examples = [
         expected: {
             render: "全部 variant 与 bare 保持各自原有背景、边框和前景色。",
             layout: "hover 缩放只影响绘制，Button 与自适应父容器的布局尺寸不变。",
-            interaction: "独立动作默认只放大背景层，终点比例按最终尺寸为 sm 1.05、md 1.03、lg 1.015；文字与 Icon 保持原尺寸。hover 背景颜色立即切换，不渐现或渐隐；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 保留原有 hover 颜色并让背景层扩张，bare 不出现背景或内置缩放。",
-            performance: "基础背景层与 hover 颜色叠层只动画 transform；hover 颜色通过 opacity 立即切换，scale 期间不逐帧重算 color-mix 背景，也不触发布局重排。",
-            responsive: "缩放比例由最终 Button size 档位决定（sm 1.05、md 1.03、lg 1.015），不随根字号改变。",
-            accessibility: "prefers-reduced-motion: reduce 下直接提交最终 hover 比例，不执行缩放过渡。",
+            interaction: "独立动作默认只扩张背景层；sm、md、lg 的背景总宽与总高都增加 2px（四边各 1px），文字与 Icon 保持原尺寸。hover 背景颜色立即切换，不渐现或渐隐；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 使用同一像素扩张，bare 不出现背景或内置放大。",
+            performance: "基础背景层与 hover 颜色叠层只动画绝对定位 inset；hover 颜色通过 opacity 立即切换，不逐帧重算 color-mix 背景，也不触发布局重排。",
+            responsive: "固定 2px 背景增量不随 Button size、内容宽度或根字号改变。",
+            accessibility: "prefers-reduced-motion: reduce 下直接提交四边 1px 外扩，不执行 inset 过渡。",
         },
 
         logic: ["Style", "Motion", "Layout", "Accessibility"],
@@ -65,7 +66,7 @@ export const examples = [
         expected: {
             render: "三种尺寸的 filled Button 均保持 Primary 背景与 Static White 文字，文字清晰可见。",
             layout: "尺寸与原有 padding、圆角和内容布局不变。",
-            interaction: "hover 立即增加既有 overlay，并分别将 sm/md/lg 背景层放大到 1.05/1.03/1.015，不改变前景色或内容尺寸。",
+            interaction: "hover 立即增加既有 overlay，并将 sm/md/lg 背景层的总宽、总高统一增加 2px，不改变前景色或内容尺寸。",
             performance: "宿主基线与组件样式的先后加载不影响 filled 前景色。",
             responsive: "sm、md、lg 使用同一变体颜色契约。",
         },

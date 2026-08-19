@@ -1,14 +1,14 @@
 # 通用效果 Motion Preset
 
-> **版本**: v1.2.0
-> **职责**: 将 transitions.dev 中可由单个 Frame 表达的效果整理为语义 MotionConfig。
+> **版本**: v1.3.0
+> **职责**: 将通用单 Frame 效果与 Button 背景层 CSS 动效整理为语义 preset。
 
 ## 导出
 
 | 需求语义 | preset |
 | :--- | :--- |
 | hover 轻微放大 | `HOVER_SCALE_UP_MOTION` |
-| Button 默认 hover 背景层按最终尺寸放大 | `BUTTON_HOVER_SCALE_UP_MOTIONS`；`BUTTON_HOVER_SCALE_UP_MOTION` 为默认 / sm 兼容入口 |
+| Button 默认 hover 背景总宽与总高固定增加 `2px` | `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` |
 | hover 上浮并放大 | `HOVER_LIFT_MOTION` |
 | 数字向上弹入 | `NUMBER_POP_APPEAR_MOTION` |
 | 短文字替换 | `TEXT_SWAP_APPEAR_MOTION` |
@@ -20,7 +20,7 @@
 
 ## 使用边界
 
-- 本文件只收录单个 Frame 可表达的 opacity、scale、x/y、blur 与 timing 组合。
+- 本文件收录单个 Frame 可表达的 opacity、scale、x/y、blur 与 timing 组合，以及由组件背景伪元素消费、但仍需共享 token 管理的 Button 固定像素扩张。
 - Badge 双层动画、Avatar hover-out 强回弹、Success check 路径绘制、error shake 分段、shimmer 循环等专项动画继续由共享专项能力或组件内部实现负责。
 - 组件命中这里的语义时直接引用 preset，不复制具体数值。
 

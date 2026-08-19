@@ -22,9 +22,7 @@ import {
     MOTION_EASING_STANDARD,
     MOTION_SCALE_HOVER_FROM,
     MOTION_SCALE_HOVER_TO,
-    MOTION_SCALE_BUTTON_HOVER_SM_TO,
-    MOTION_SCALE_BUTTON_HOVER_MD_TO,
-    MOTION_SCALE_BUTTON_HOVER_LG_TO,
+    MOTION_DISTANCE_BUTTON_HOVER_GROWTH_PX,
     MOTION_SCALE_ICON_SWAP_FROM,
 } from "../tokens";
 
@@ -35,21 +33,12 @@ export const HOVER_SCALE_UP_MOTION: MotionConfig = {
     easing: MOTION_EASING_STANDARD,
 };
 
-const createButtonHoverScaleMotion = (scaleTo: number): MotionConfig => ({
-    scale: [MOTION_SCALE_HOVER_FROM, scaleTo],
+/** Button 默认 hover 背景层固定像素扩张；growth 是总宽与总高的增加量。 */
+export const BUTTON_HOVER_BACKGROUND_GROWTH_MOTION = {
+    growth: MOTION_DISTANCE_BUTTON_HOVER_GROWTH_PX,
     duration: MOTION_DURATION_BUTTON_HOVER_MS,
     easing: MOTION_EASING_BUTTON_HOVER,
-});
-
-/** Button 默认 hover 背景层按最终尺寸放大；内容不缩放，颜色反馈继续由 Button variant 自己拥有。 */
-export const BUTTON_HOVER_SCALE_UP_MOTIONS = {
-    sm: createButtonHoverScaleMotion(MOTION_SCALE_BUTTON_HOVER_SM_TO),
-    md: createButtonHoverScaleMotion(MOTION_SCALE_BUTTON_HOVER_MD_TO),
-    lg: createButtonHoverScaleMotion(MOTION_SCALE_BUTTON_HOVER_LG_TO),
-};
-
-/** 默认 / sm Button 的兼容入口。 */
-export const BUTTON_HOVER_SCALE_UP_MOTION = BUTTON_HOVER_SCALE_UP_MOTIONS.sm;
+} as const;
 
 export const HOVER_LIFT_MOTION: MotionConfig = {
     ...HOVER_SCALE_UP_MOTION,
