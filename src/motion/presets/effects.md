@@ -1,6 +1,6 @@
 # 通用效果 Motion Preset
 
-> **版本**: v1.1.1
+> **版本**: v1.2.0
 > **职责**: 将 transitions.dev 中可由单个 Frame 表达的效果整理为语义 MotionConfig。
 
 ## 导出
@@ -8,7 +8,7 @@
 | 需求语义 | preset |
 | :--- | :--- |
 | hover 轻微放大 | `HOVER_SCALE_UP_MOTION` |
-| Button 默认 hover 背景层放大 | `BUTTON_HOVER_SCALE_UP_MOTION` |
+| Button 默认 hover 背景层按最终尺寸放大 | `BUTTON_HOVER_SCALE_UP_MOTIONS`；`BUTTON_HOVER_SCALE_UP_MOTION` 为默认 / sm 兼容入口 |
 | hover 上浮并放大 | `HOVER_LIFT_MOTION` |
 | 数字向上弹入 | `NUMBER_POP_APPEAR_MOTION` |
 | 短文字替换 | `TEXT_SWAP_APPEAR_MOTION` |

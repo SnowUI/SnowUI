@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.7.0
+  v2.9.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -20,7 +20,7 @@
   import { onDestroy, setContext, type Snippet } from "svelte";
   import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
   import Frame, { type FrameProps } from "./Frame.svelte";
-  import { BUTTON_HOVER_SCALE_UP_MOTION } from "../motion/presets/effects";
+  import { BUTTON_HOVER_SCALE_UP_MOTIONS } from "../motion/presets/effects";
   import {
     mergeComponentPartProps,
     useComponentPart,
@@ -263,11 +263,12 @@
     return "";
   });
   const buttonStyle = $derived.by(() => {
-    const scale = Array.isArray(BUTTON_HOVER_SCALE_UP_MOTION.scale)
-      ? BUTTON_HOVER_SCALE_UP_MOTION.scale[1]
-      : (BUTTON_HOVER_SCALE_UP_MOTION.scale ?? 1);
-    const duration = BUTTON_HOVER_SCALE_UP_MOTION.duration ?? 0;
-    const easing = BUTTON_HOVER_SCALE_UP_MOTION.easing ?? "ease";
+    const hoverMotion = BUTTON_HOVER_SCALE_UP_MOTIONS[resolvedSize];
+    const scale = Array.isArray(hoverMotion.scale)
+      ? hoverMotion.scale[1]
+      : (hoverMotion.scale ?? 1);
+    const duration = hoverMotion.duration ?? 0;
+    const easing = hoverMotion.easing ?? "ease";
     const defaultHoverMotionStyle = [
       `--snowui-button-hover-scale-to: ${scale}`,
       `--snowui-button-hover-motion-duration: ${duration}ms`,
@@ -596,12 +597,6 @@
 />
 
 <style>
-  @property --snowui-button-background-hover-overlay-opacity {
-    syntax: "<percentage>";
-    inherits: true;
-    initial-value: 0%;
-  }
-
   /* Button 样式 */
   /* Level 2: Component Base (降权为 0) */
   :global(:where(.snowui-button)) {
@@ -778,11 +773,6 @@
     --snowui-button-background: var(--primary, #000000);
     --snowui-button-color: var(--static-white-100, #ffffff);
     --snowui-button-border-color: transparent;
-  }
-
-  :global(
-      :where(.snowui-button)[data-variant="filled"]:hover:not(.snowui-disabled)
-    ) {
     --snowui-hover-opacity: 20%;
   }
 
@@ -812,36 +802,37 @@
   /* 默认 hover scale 只作用于独立背景层；Button 内容与命中区保持原尺寸。 */
   :global(:where(.snowui-button).snowui-button-background-scale-surface) {
     --snowui-button-background-layer-opacity: 1;
-    --snowui-button-background-hover-overlay-opacity: 0%;
+    --snowui-button-background-hover-layer-opacity: 0;
+    --snowui-hover-overlay-opacity: 0%;
     background-color: transparent;
     background-image: none;
     box-shadow: none;
     isolation: isolate;
   }
 
+  :global(
+      :where([theme="dark"] .snowui-button).snowui-button-background-scale-surface
+    ) {
+    --snowui-button-background-hover-color-opacity: 10%;
+  }
+
+  /* 基础背景与 hover 颜色分层，避免 scale 动画逐帧重算 color-mix 背景。 */
+  :global(:where(.snowui-button).snowui-button-background-scale-surface)::before,
   :global(:where(.snowui-button).snowui-button-background-scale-surface)::after {
     content: "";
     position: absolute;
     inset: 0;
-    z-index: -1;
     border-radius: inherit;
+    pointer-events: none;
+    transform: scale(var(--snowui-button-hover-scale));
+    transform-origin: center;
+  }
+
+  :global(:where(.snowui-button).snowui-button-background-scale-surface)::before {
+    z-index: -2;
     background-color: var(
       --snowui-button-background-override,
       var(--snowui-button-background)
-    );
-    background-image: linear-gradient(
-      color-mix(
-        in srgb,
-        var(--snowui-hover-color, currentColor)
-          var(--snowui-button-background-hover-overlay-opacity),
-        transparent
-      ),
-      color-mix(
-        in srgb,
-        var(--snowui-hover-color, currentColor)
-          var(--snowui-button-background-hover-overlay-opacity),
-        transparent
-      )
     );
     box-shadow: inset 0 0 0
       var(
@@ -852,31 +843,37 @@
         --snowui-button-border-color-override,
         var(--snowui-button-border-color)
       );
-    pointer-events: none;
     opacity: var(--snowui-button-background-layer-opacity);
-    transform: scale(var(--snowui-button-hover-scale));
-    transform-origin: center;
     transition:
       transform var(
           --snowui-button-background-hover-motion-duration,
           var(--snowui-button-hover-motion-duration, 0.2s)
         )
         var(--snowui-button-hover-motion-easing, ease),
-      opacity var(
-          --snowui-button-background-color-motion-duration,
-          var(--snowui-frame-color-motion-duration, 0.15s)
-        )
-        var(--snowui-frame-color-motion-easing, ease-out),
-      --snowui-button-background-hover-overlay-opacity var(
-          --snowui-button-background-color-motion-duration,
-          var(--snowui-frame-color-motion-duration, 0.15s)
-        )
-        var(--snowui-frame-color-motion-easing, ease-out),
       box-shadow var(
           --snowui-button-background-color-motion-duration,
           var(--snowui-frame-color-motion-duration, 0.15s)
         )
         var(--snowui-frame-color-motion-easing, ease-out);
+  }
+
+  :global(:where(.snowui-button).snowui-button-background-scale-surface)::after {
+    z-index: -1;
+    background-color: color-mix(
+      in srgb,
+      var(--snowui-hover-color, currentColor)
+        var(
+          --snowui-hover-opacity,
+          var(--snowui-button-background-hover-color-opacity, 4%)
+        ),
+      transparent
+    );
+    opacity: var(--snowui-button-background-hover-layer-opacity);
+    transition: transform var(
+        --snowui-button-background-hover-motion-duration,
+        var(--snowui-button-hover-motion-duration, 0.2s)
+      )
+      var(--snowui-button-hover-motion-easing, ease);
   }
 
   :global(
@@ -889,10 +886,7 @@
   :global(
       :where(.snowui-button).snowui-button-background-scale-surface:hover:not(.snowui-disabled):not(:disabled)
     ) {
-    --snowui-button-background-hover-overlay-opacity: var(
-      --snowui-hover-opacity,
-      var(--snowui-frame-hover-opacity, 4%)
-    );
+    --snowui-button-background-hover-layer-opacity: 1;
     --snowui-button-background-layer-opacity: 1;
   }
 

@@ -1,6 +1,10 @@
 /**
  * Button.test.ts
- * v1.8.0
+ * v1.10.0
+ * 变更记录 (2026-08-19): lg hover 背景层终点改为 1.015；hover 背景颜色立即切换，不执行 opacity 渐现或渐隐。
+ * 变更记录 (2026-08-19): hover 背景层终点比例按最终尺寸改为 sm 1.05、md 1.03、lg 1.01。
+ * 变更记录 (2026-08-19): Button hover 背景层终点比例由 1.06 调整为 1.05。
+ * 变更记录 (2026-08-19): hover 基础背景与颜色叠层分离，放大只动画 transform，颜色反馈只动画叠层 opacity，避免 scale 期间逐帧重绘 color-mix 背景。
  * 变更记录 (2026-08-19): A1 覆盖独立动作只放大背景层到 1.06、内容保持原尺寸及 scaleOnHover 独立关闭；Borderless 保留原色并扩张，bare 不增加背景或缩放内容。
  * 变更记录 (2026-08-16): A1/A2 明确验证 filled 的 Static White 前景色不受宿主基线加载顺序影响。
  * 变更记录 (2026-08-11): icon-only 改为显式 iconOnly=true；未声明等同于 false。
@@ -35,9 +39,9 @@ export const examples = [
         expected: {
             render: "全部 variant 与 bare 保持各自原有背景、边框和前景色。",
             layout: "hover 缩放只影响绘制，Button 与自适应父容器的布局尺寸不变。",
-            interaction: "独立动作默认只将背景层放大到 1.06，文字与 Icon 保持原尺寸；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 保留原有 hover 颜色并让背景层扩张，bare 不出现背景或内置缩放。",
-            performance: "Button 背景伪元素只更新 transform，不触发布局重排。",
-            responsive: "缩放比例不随 Button size 或根字号改变。",
+            interaction: "独立动作默认只放大背景层，终点比例按最终尺寸为 sm 1.05、md 1.03、lg 1.015；文字与 Icon 保持原尺寸。hover 背景颜色立即切换，不渐现或渐隐；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 保留原有 hover 颜色并让背景层扩张，bare 不出现背景或内置缩放。",
+            performance: "基础背景层与 hover 颜色叠层只动画 transform；hover 颜色通过 opacity 立即切换，scale 期间不逐帧重算 color-mix 背景，也不触发布局重排。",
+            responsive: "缩放比例由最终 Button size 档位决定（sm 1.05、md 1.03、lg 1.015），不随根字号改变。",
             accessibility: "prefers-reduced-motion: reduce 下直接提交最终 hover 比例，不执行缩放过渡。",
         },
 
@@ -61,7 +65,7 @@ export const examples = [
         expected: {
             render: "三种尺寸的 filled Button 均保持 Primary 背景与 Static White 文字，文字清晰可见。",
             layout: "尺寸与原有 padding、圆角和内容布局不变。",
-            interaction: "hover 只增加既有 overlay，不改变前景色。",
+            interaction: "hover 立即增加既有 overlay，并分别将 sm/md/lg 背景层放大到 1.05/1.03/1.015，不改变前景色或内容尺寸。",
             performance: "宿主基线与组件样式的先后加载不影响 filled 前景色。",
             responsive: "sm、md、lg 使用同一变体颜色契约。",
         },

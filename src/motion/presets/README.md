@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.10.1
+> **版本**: v1.11.0
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -18,7 +18,7 @@
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
 | `CONTINUOUS_HOVER_MOTION` | Sidebar、Listbox、Popover、TableBody、Accordion、Tab / Segmented 的共享 hover 背景移动 | 单项独立 hover、生命周期进入 | Fluid Functionalism proximity hover |
 | `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
-| `BUTTON_HOVER_SCALE_UP_MOTION` | 独立动作 Button 默认只将背景层放大到 `1.06`，内容与布局尺寸不变 | bare、复合控件项、非 Button hover、生命周期出现 | Threads 图片导航按钮 + Owner 指定比例 |
+| `BUTTON_HOVER_SCALE_UP_MOTIONS` | 独立动作 Button 按最终尺寸只放大背景层：sm `1.05`、md `1.03`、lg `1.015`；内容与布局尺寸不变。`BUTTON_HOVER_SCALE_UP_MOTION` 保留为默认 / sm 兼容入口 | bare、复合控件项、非 Button hover、生命周期出现 | Threads 图片导航按钮 + Owner 指定比例 |
 | `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
 | `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
 | `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |
@@ -34,7 +34,7 @@
 2. 第二个组件复用同一语义值时，必须抽到 preset。
 3. 组件文档应引用 preset 名称；如写具体数字，必须注明以本 catalog 为准。
 4. 触发延迟不是 MotionConfig，归共享 lib 管理。
-5. 自然语言出现“放大”时必须结合触发语义选择：Button 默认 hover 用 `BUTTON_HOVER_SCALE_UP_MOTION`，其他 hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
+5. 自然语言出现“放大”时必须结合触发语义选择：Button 默认 hover 用 `BUTTON_HOVER_SCALE_UP_MOTIONS` 按最终尺寸解析，其他 hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
 6. 自然语言出现“尺寸变化 / 展开 / 收起 / 高度变化 / 宽度变化”时，优先使用 `RESIZE_MOTION`；只有语义明确不同且已存在专项 preset 时例外。
 7. Tab / Segmented indicator 同时移动和变形时必须使用 `TAB_INDICATOR_MOTION`，不得使用普通 `RESIZE_MOTION` 或分别维护 transform / size 时序。
 8. `GENERIC_APPEAR_MOTION` 默认只包含 opacity；需要生命周期缩放时必须显式声明 scale 或选择含 scale 的组件族 preset。
@@ -43,6 +43,9 @@
 
 ## 变更记录
 
+- v1.12.0 (2026-08-19): lg Button hover 背景层终点由 `1.01` 调整为 `1.015`；颜色立即切换由 Button 组件视觉层拥有。
+- v1.11.0 (2026-08-19): Button hover 背景层终点比例改为按最终尺寸解析：sm `1.05`、md `1.03`、lg `1.01`；原单数 preset 保留为默认 / sm 兼容入口。
+- v1.10.2 (2026-08-19): Button hover 背景层终点比例由 `1.06` 调整为 `1.05`。
 - v1.10.1 (2026-08-19): Button hover preset 的消费对象从组件根收敛为独立背景层，文字与 Icon 不参与缩放。
 - v1.10.0 (2026-08-19): 新增 Button 专属 `1.06` hover scale preset，保留通用 hover preset 的既有 `1.05` 消费语义。
 - v1.9.0 (2026-08-12): Tooltip preset 恢复 opacity + scale，但消费目标限定为独立 Foreground；Portal / Backdrop 保持稳定。
