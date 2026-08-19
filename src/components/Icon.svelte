@@ -304,6 +304,7 @@
         class={[
             "snowui-icon",
             background ? "snowui-icon-background" : "",
+            background ? "snowui-rounded-rectangle" : "",
             isBadgeRole ? "snowui-icon-role-badge" : "",
             className,
         ]
@@ -330,7 +331,7 @@
                 {:else if children}
                     {@render children({ responsive })}
                 {:else}
-                    <div class="snowui-icon-default"></div>
+                    <div class="snowui-icon-default snowui-rounded-rectangle"></div>
                 {/if}
             </div>
         {/snippet}

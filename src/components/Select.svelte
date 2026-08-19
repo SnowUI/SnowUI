@@ -380,7 +380,7 @@
     bind:element={selectEl}
     tag="div"
     row
-    class={`snowui-select${isEmbedded ? " snowui-field-host" : " snowui-field-bordered"}${userClass ? ` ${userClass}` : ""}`}
+    class={`snowui-select snowui-rounded-rectangle${isEmbedded ? " snowui-field-host" : " snowui-field-bordered"}${userClass ? ` ${userClass}` : ""}`}
     data-as={typeof rest.as === "string" ? rest.as : undefined}
     data-invalid={resolvedInvalid ? "true" : undefined}
     data-placeholder-visible={isPlaceholderVisible ? "true" : undefined}

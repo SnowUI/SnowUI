@@ -254,7 +254,7 @@
 <Frame
     bind:element={textareaHostEl}
     tag="div"
-    class={`snowui-textarea snowui-overlay-scrollbar-host${isEmbedded ? " snowui-field-host" : " snowui-field-bordered"}${userClass ? ` ${userClass}` : ""}`}
+    class={`snowui-textarea snowui-rounded-rectangle snowui-overlay-scrollbar-host${isEmbedded ? " snowui-field-host" : " snowui-field-bordered"}${userClass ? ` ${userClass}` : ""}`}
     data-invalid={resolvedInvalid ? "true" : undefined}
     data-readonly={readonly ? "true" : undefined}
     data-resize={effectiveResize}
@@ -436,6 +436,7 @@
         position: absolute;
         inset: 0;
         border-radius: inherit;
+        corner-shape: inherit;
         pointer-events: none;
         z-index: 2;
         box-shadow: inset 0 0 0 var(--snowui-field-border-width, 0.03125rem)

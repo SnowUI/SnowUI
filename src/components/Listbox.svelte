@@ -169,7 +169,7 @@
         if (!scrollListboxEl) return;
         return continuousHoverController.attach(scrollListboxEl, {
             selector: ":scope > .snowui-menu-item",
-            layerClass: "snowui-listbox-continuous-hover-layer",
+            layerClass: "snowui-listbox-continuous-hover-layer snowui-rounded-rectangle",
             axis: "y",
             enabled: continuousHover,
             followActive: true,
@@ -418,7 +418,7 @@
             whileDisappear={DROPDOWN_OVERLAY_DISAPPEAR_MOTION}
             data-open={presence.closing ? undefined : "true"}
             data-closing={presence.closing ? "true" : undefined}
-            class="snowui-listbox-portal snowui-quick-action-panel"
+            class="snowui-listbox-portal snowui-quick-action-panel snowui-rounded-rectangle"
             style="width: max-content; min-width: 100%; max-height: inherit;"
             contentFill
             {enableAutoLayout}

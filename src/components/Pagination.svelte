@@ -275,6 +275,7 @@
         button.dataset.as = role;
         button.className = [
             "snowui-pagination-default",
+            "snowui-rounded-rectangle",
             `snowui-pagination-default-${role}`,
         ].join(" ");
 
@@ -294,7 +295,7 @@
 
     function createEllipsis() {
         const ellipsis = document.createElement("span");
-        ellipsis.className = "snowui-pagination-ellipsis";
+        ellipsis.className = "snowui-pagination-ellipsis snowui-rounded-rectangle";
         ellipsis.dataset.as = "ellipsis";
         ellipsis.setAttribute("aria-hidden", "true");
         ellipsis.textContent = "...";
@@ -309,7 +310,7 @@
             createDefaultButton(role, String(token));
         button.dataset.page = String(token);
         button.dataset.as = role;
-        button.classList.add("snowui-pagination-item");
+        button.classList.add("snowui-pagination-item", "snowui-rounded-rectangle");
         if (isCurrent) {
             button.classList.add("snowui-pagination-current");
             button.setAttribute("aria-current", "page");
@@ -338,7 +339,7 @@
             createDefaultButton(role, role === "prev" ? "上一页" : "下一页");
 
         control.dataset.as = role;
-        control.classList.add("snowui-pagination-item");
+        control.classList.add("snowui-pagination-item", "snowui-rounded-rectangle");
         control.classList.add(`snowui-pagination-${role}`);
         control.setAttribute("aria-label", role === "prev" ? "上一页" : "下一页");
         appendDefaultControlIcon(control, role);

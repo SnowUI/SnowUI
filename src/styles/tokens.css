@@ -1,6 +1,6 @@
 /*
  * SnowUI Tokens
- * v2.4.0 (Stable Geometry Tokens)
+ * v2.5.0 (Stable Geometry Tokens)
  * 组件几何样式统一使用梯度 Token（--border-*, --radius-*, --size-*, --padding-*, --gap-*）
  * 文字使用 --text-* 与 --leading-* 配对。
  */
@@ -101,6 +101,8 @@
    --radius-20: calc(5rem * var(--radius-scale));
    /* 9999px */
    --radius-full: 9999px;
+   /* 圆角矩形连续角；正圆、胶囊、轨道与圆点不消费此 Token。 */
+   --corner-shape-rounded-rectangle: superellipse(1.1);
 
    /* ==========================
      5) 尺寸梯度 (Unified Size System, rem)

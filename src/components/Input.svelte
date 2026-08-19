@@ -1380,7 +1380,7 @@
 {#if rendersEmbeddedNativeHost}
     <div
         bind:this={hostElement}
-        class={`snowui-input snowui-field-host${(hasRootAccessory || (resolvedInvalid && !hasCustomTrailing)) ? " snowui-input-has-root-accessory" : ""}${embeddedRoleClass ? ` ${embeddedRoleClass}` : ""}${userClass ? ` ${userClass}` : ""}`}
+        class={`snowui-input snowui-rounded-rectangle snowui-field-host${(hasRootAccessory || (resolvedInvalid && !hasCustomTrailing)) ? " snowui-input-has-root-accessory" : ""}${embeddedRoleClass ? ` ${embeddedRoleClass}` : ""}${userClass ? ` ${userClass}` : ""}`}
         data-auto-layout="true"
         data-as={typeof rest.as === "string" ? rest.as : undefined}
         data-embedded={isEmbedded ? "true" : undefined}
@@ -1470,7 +1470,7 @@
     <Frame
         bind:element={hostElement}
         tag="div"
-        class={`snowui-input${isEmbedded ? " snowui-field-host" : " snowui-field-bordered"}${hasRootAccessory ? " snowui-input-has-root-accessory" : ""}${userClass ? ` ${userClass}` : ""}`}
+        class={`snowui-input snowui-rounded-rectangle${isEmbedded ? " snowui-field-host" : " snowui-field-bordered"}${hasRootAccessory ? " snowui-input-has-root-accessory" : ""}${userClass ? ` ${userClass}` : ""}`}
         data-invalid={resolvedInvalid ? "true" : undefined}
         data-readonly={readonly ? "true" : undefined}
         data-input-type={normalizedInputType}

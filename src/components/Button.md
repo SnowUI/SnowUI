@@ -1,7 +1,7 @@
 # Button.svelte 文档
 
-> **版本**: v2.12.0
-> **变更记录 (2026-08-19)**: Button 的 gray / filled / outline / borderless 外壳与独立 hover 背景层使用 `corner-shape: superellipse(1.1)`，在保留轻微连续角平滑的同时让视觉圆度接近原有普通圆角；sm / md / lg 与公开 override 的 `border-radius` 数值不变。不支持该实验 CSS 属性的浏览器继续使用现有普通圆角。bare 与 ButtonGroup 嵌入态仍保持 `radius: 0`。
+> **版本**: v2.13.0
+> **变更记录 (2026-08-19)**: Button 外壳接入 `layout.css` 的 `.snowui-rounded-rectangle` 共享视觉类，曲线值统一来自 `tokens.css` 的 `--corner-shape-rounded-rectangle`；独立 hover 背景层显式继承根曲线。sm / md / lg 与公开 override 的 `border-radius` 数值不变，不支持该实验 CSS 属性的浏览器继续使用现有普通圆角；bare 与 ButtonGroup 嵌入态仍保持 `radius: 0`。
 > **变更记录 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` 固定扩张背景层；sm / md / lg 以及不同内容宽度的背景总宽、总高统一增加 `2px`（四边各外扩 `1px`），文字、Icon 与命中区保持原尺寸。背景颜色以 `300ms ease-in-out` 柔和渐现 / 渐隐，慢于 `200ms ease` 外扩。`scaleOnHover` 作为兼容 Prop 名可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 使用同一固定像素扩张与颜色渐现；bare 没有背景，因此不执行内置放大。
 > **性能说明 (2026-08-19)**: 有背景的 Button 将基础背景与 hover 颜色叠层分开；放大阶段只动画绝对定位背景层的 `inset`，不会改变 Button 或父容器布局。hover 背景颜色仅动画预计算颜色叠层的 `opacity`，不在扩张或渐现期间逐帧重算 `color-mix()` 背景。Outline 原有边框颜色过渡继续保留。
 > **变更记录 (2026-08-16)**: SnowUI 宿主基线改为固定低优先级层，`filled` 的 Static White 前景色不再因动态模块加载顺序被 Frame `color: inherit` 覆盖。
@@ -57,7 +57,7 @@ Button 的内部布局不接入三槽位模型：
 - 文字型 Button 默认 `white-space: nowrap`，保证按钮文案作为一个操作短语保持单行；特殊长文案可由使用方通过外部 style / class 显式覆盖。
 - 默认最小宽度为 `max-content`，即“内容 + gap + padding”的自然下限；外层 fill 布局可以把 Button 拉宽，但不能把 Button 压到吞掉默认 padding。
 - Button 自身负责 padding / gap / radius / font-size / line-height，并通过 `--snowui-button-*-override` 变量允许外部覆盖。
-- gray / filled / outline / borderless 共用 `corner-shape: superellipse(1.1)` 连续角；该曲线只比普通 `round` 略微平滑，避免 `squircle` 的方正感，同时不改变 `--snowui-button-radius` 或 `--snowui-button-radius-override` 解析出的 corner area。独立 hover 背景伪元素显式使用同一曲线，避免 hover 时切回普通圆角；不支持 `corner-shape` 时自然回退为现有 `border-radius`。bare 与 ButtonGroup 嵌入态的半径仍为 `0`，外壳所有权不变。
+- gray / filled / outline / borderless 通过共享 `.snowui-rounded-rectangle` 消费 `--corner-shape-rounded-rectangle: superellipse(1.1)`；该曲线只比普通 `round` 略微平滑，同时不改变 `--snowui-button-radius` 或 `--snowui-button-radius-override` 解析出的 corner area。独立 hover 背景伪元素显式 `corner-shape: inherit`，避免 hover 时切回普通圆角；不支持 `corner-shape` 时自然回退为现有 `border-radius`。bare 与 ButtonGroup 嵌入态的半径仍为 `0`，外壳所有权不变。
 - `iconOnly` 是单视觉内容布局的唯一开关，默认 `false`；Button 不读取 children 的 DOM 类型推断该状态。内容可以是 Icon、Logo 或其他单一视觉原子。
 - `as="leading"` / `as="trailing"` 只表示 Button 作为 Field / Input 等外层槽位宿主的配件；不会改变 Button 内部布局模型。
 - `as="item"` 表示 Button 作为 Breadcrumb 的路径片段；当前页不可交互规则由 Breadcrumb 标记 `aria-current="page"` 后触发。Button 未显式写 `variant` 时可继承 Breadcrumb 的 `variant`，显式 Button `variant` 优先。
@@ -363,6 +363,11 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.13.0 (2026-08-19)
+
+#### 视觉架构
+- **BTN-Corner.2** Button 从组件内硬编码连续角改为接入 `tokens.css` + `layout.css` 的跨组件圆角矩形共享视觉原语；hover 背景层显式继承根曲线，既有 radius 数值、variant、bare 与组合嵌入态不变。
 
 ### v2.12.0 (2026-08-19)
 

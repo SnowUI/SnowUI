@@ -216,6 +216,7 @@
     column={isColumn}
     class={[
         "snowui-card",
+        "snowui-rounded-rectangle",
         scrollable ? "snowui-overlay-scrollbar-host" : "",
         isRow ? "snowui-card-row" : "snowui-card-column",
         interactive ? "snowui-card-interactive" : "",

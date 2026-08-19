@@ -164,6 +164,7 @@
     row
     class={[
         "snowui-button-group",
+        "snowui-rounded-rectangle",
         `snowui-button-group-${variant}`,
         `snowui-button-group-${resolvedSize}`,
         className,

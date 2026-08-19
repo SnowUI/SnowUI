@@ -580,6 +580,7 @@
     bind:element={hostElement}
     class={[
         "snowui-code-block",
+        "snowui-rounded-rectangle",
         "snowui-overlay-scrollbar-host",
         className,
     ].filter(Boolean).join(" ")}

@@ -769,6 +769,7 @@
                 class={[
                     "snowui-tooltip-content",
                     "snowui-tooltip-size-shell",
+                    "snowui-rounded-rectangle",
                     `snowui-tooltip-pos-${finalPosition}`,
                     renderedOverlay.className,
                 ]
@@ -836,6 +837,7 @@
                 class={[
                     "snowui-tooltip-content",
                     "snowui-tooltip-size-shell",
+                    "snowui-rounded-rectangle",
                     `snowui-tooltip-pos-${finalPosition}`,
                     className,
                 ]
@@ -963,6 +965,7 @@
         position: absolute;
         inset: 0;
         border-radius: inherit;
+        corner-shape: inherit;
         pointer-events: none;
     }
 

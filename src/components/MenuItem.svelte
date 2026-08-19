@@ -191,7 +191,7 @@
     row
     id={optionId}
     role={owner ? "option" : undefined}
-    class={`snowui-menu-item${userClass ? ` ${userClass}` : ""}`}
+    class={`snowui-menu-item snowui-rounded-rectangle${userClass ? ` ${userClass}` : ""}`}
     aria-selected={owner ? isSelected : (selectedProp || undefined)}
     aria-disabled={disabled || undefined}
     data-active={isActive || undefined}

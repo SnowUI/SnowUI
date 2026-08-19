@@ -923,6 +923,7 @@
         return [
             "snowui-skeleton",
             `snowui-skeleton-${item.shape}`,
+            item.shape === "rect" ? "snowui-rounded-rectangle" : "",
             item.className,
             isSingle ? className : "",
         ]

@@ -49,9 +49,13 @@ if (!autoLayout.includes("@layer snowui-auto-layout")) {
 
 const layout = readFileSync("src/styles/layout.css", "utf8");
 const sharedLayerOrder =
-    "@layer snowui-host-baseline, snowui-frame-direction, snowui-auto-layout, snowui-frame-motion-fallback, snowui-shared-behavior;";
+    "@layer snowui-host-baseline, snowui-frame-direction, snowui-auto-layout, snowui-frame-motion-fallback, snowui-shared-visual, snowui-shared-behavior;";
 if (!layout.includes(sharedLayerOrder)) {
     console.error("❌ layout.css must keep the declared shared layer order");
+    process.exit(1);
+}
+if (!/@supports \(corner-shape: superellipse\(1\.1\)\)[\s\S]*?:where\(\.snowui-rounded-rectangle\)/.test(layout)) {
+    console.error("❌ rounded rectangle enhancement must stay explicit and capability-gated");
     process.exit(1);
 }
 if (!/@layer snowui-frame-direction\s*\{[\s\S]*?\.snowui-direction-row/.test(layout)) {

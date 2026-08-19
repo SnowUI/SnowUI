@@ -205,6 +205,7 @@
     data-as={typeof frameRest.as === "string" ? frameRest.as : undefined}
     class={[
         "snowui-accordion-item",
+        "snowui-rounded-rectangle",
         className,
     ]
         .filter(Boolean)

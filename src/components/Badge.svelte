@@ -484,7 +484,9 @@
         {...rest}
     >
         {#snippet children()}
-            <div class="snowui-badge-surface">
+            <div class={variant === "border" && !effectiveDot
+                ? "snowui-badge-surface snowui-rounded-rectangle"
+                : "snowui-badge-surface"}>
                 <!-- 占位符 -->
                 <span
                     bind:this={placeholderRef}
@@ -699,6 +701,7 @@
         width: 100%;
         height: 100%;
         border-radius: inherit;
+        corner-shape: inherit;
     }
 
     :global(:where(.snowui-morph-item)) {

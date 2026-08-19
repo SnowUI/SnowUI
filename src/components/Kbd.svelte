@@ -35,6 +35,7 @@
     enableScaleObserver={false}
     class={[
         "snowui-kbd",
+        "snowui-rounded-rectangle",
         variant === "solid" ? "snowui-kbd-solid" : "",
         className,
     ]

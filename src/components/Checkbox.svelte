@@ -167,7 +167,7 @@
         tabindex={disabled ? -1 : 0}
         aria-label={ariaLabel}
     />
-    <div class="snowui-checkbox-visual">
+    <div class="snowui-checkbox-visual snowui-rounded-rectangle">
         <svg
             class="snowui-checkbox-icon"
             viewBox="2 2 12 12"

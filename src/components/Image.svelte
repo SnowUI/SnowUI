@@ -361,6 +361,7 @@
     enableScaleObserver={false}
     class={[
         "snowui-image",
+        "snowui-rounded-rectangle",
         resolvedInteractive ? "snowui-media-hoverable" : "",
         resolvedInteractive && hasLoadedMedia ? "snowui-media-hoverable-has-visual" : "",
         hasLoadedMedia ? "snowui-image-has-media" : "",
@@ -481,6 +482,7 @@
         width: 100%;
         height: 100%;
         border-radius: inherit;
+        corner-shape: inherit;
         overflow: hidden;
         isolation: isolate;
     }
@@ -490,6 +492,7 @@
         inset: 0;
         background-color: var(--black-4, #0000000a);
         border-radius: inherit;
+        corner-shape: inherit;
         z-index: 0;
         /* filter / transition 由 .snowui-media-hoverable-background 工具类提供 */
     }
@@ -522,6 +525,7 @@
         height: 100%;
         object-fit: cover;
         border-radius: inherit;
+        corner-shape: inherit;
         display: block;
     }
 
@@ -531,6 +535,7 @@
         z-index: 2;
         display: block;
         border-radius: inherit;
+        corner-shape: inherit;
         overflow: hidden;
         pointer-events: none;
     }

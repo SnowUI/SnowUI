@@ -1,5 +1,6 @@
 /* Layout Utility Styles */
-/* v1.2.4 */
+/* v1.3.0 */
+/* Log (2026-08-19): 新增显式 opt-in 的圆角矩形连续角共享视觉类；语义圆形、胶囊、轨道与圆点不接入。 */
 /* Log (2026-08-17): Frame 方向基座进入 snowui-frame-direction layer，并显式登记共享 layer 顺序，保证三槽 Grid 可覆盖方向 display，同时组件自有布局仍可接管。 */
 /* Log (2026-08-16): Hoverable Level 1 行为进入低优先级 layer，保留组件自有 transition 通道。 */
 /* Log (2026-08-16): Frame 默认动效代理进入独立低优先级 layer，避免覆盖组件自有 transition / transform。 */
@@ -12,7 +13,7 @@
 /* Log (2026-06-18): 新增通用错误反馈 shake 类，供 Frame stateClass 在 Input / Field 等表单场景复用。 */
 
 /* 共享结构与行为层按依赖顺序集中登记。未分层的组件基类与消费方样式稳定高于这些默认。 */
-@layer snowui-host-baseline, snowui-frame-direction, snowui-auto-layout, snowui-frame-motion-fallback, snowui-shared-behavior;
+@layer snowui-host-baseline, snowui-frame-direction, snowui-auto-layout, snowui-frame-motion-fallback, snowui-shared-visual, snowui-shared-behavior;
 
 /**
  * Hover Overlay 动效：注册可动画化的自定义属性，让 hover overlay 透明度平滑过渡。
@@ -23,6 +24,20 @@
     syntax: '<percentage>';
     inherits: false;
     initial-value: 0%;
+}
+
+/* === 圆角矩形连续角 ===
+ * 只由实际拥有圆角矩形表面的组件显式接入；radius-full、50%、轨道、圆点和特殊图形保持 round。
+ * 不支持 corner-shape 的浏览器忽略本段，继续使用组件原有 border-radius。 */
+@layer snowui-shared-visual {
+    @supports (corner-shape: superellipse(1.1)) {
+        :where(.snowui-rounded-rectangle) {
+            corner-shape: var(
+                --corner-shape-rounded-rectangle,
+                superellipse(1.1)
+            );
+        }
+    }
 }
 
 /**

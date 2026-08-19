@@ -474,6 +474,7 @@
     enableDefaultMotion={false}
     class={[
         "snowui-gradient",
+        !isAvatarVariant ? "snowui-rounded-rectangle" : "",
         `snowui-gradient-${resolvedVariant}`,
         isAvatarVariant ? "snowui-gradient-avatar" : "",
         motionRunning ? "snowui-gradient-motion-enabled" : "",
@@ -944,6 +945,7 @@
         inset: 0;
         overflow: hidden;
         border-radius: inherit;
+        corner-shape: inherit;
         pointer-events: none;
     }
 

@@ -174,7 +174,7 @@
 </script>
 
 <Frame tag="div" role="toolbar" aria-label={ariaLabel}
-    class={`snowui-table-toolbar ${userClass}`} data-bulk-pending={pendingAction}
+    class={`snowui-table-toolbar snowui-rounded-rectangle ${userClass}`} data-bulk-pending={pendingAction}
     aria-busy={pendingAction !== undefined ? "true" : undefined} row gap={2}
     enableResponsive={enableResponsive} enableContext={enableContext}
     enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>

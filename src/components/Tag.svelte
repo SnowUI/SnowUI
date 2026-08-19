@@ -237,6 +237,7 @@
     data-edge-right={edgeRight}
     class={[
         "snowui-tag",
+        "snowui-rounded-rectangle",
         "snowui-hoverable",
         className,
     ]

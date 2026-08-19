@@ -471,6 +471,7 @@
         [
             "snowui-popover",
             "snowui-quick-action-panel",
+            "snowui-rounded-rectangle",
             mode === "panel" ? "snowui-popover-panel" : "snowui-popover-portal",
             userClass,
         ]

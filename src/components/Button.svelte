@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.12.0
+  v2.13.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -561,6 +561,7 @@
   disabled={resolvedDisabled}
   class={[
     "snowui-button",
+    "snowui-rounded-rectangle",
     "snowui-hoverable",
     `snowui-button-${resolvedVariant}`,
     `snowui-button-${resolvedSize}`,
@@ -670,7 +671,6 @@
       --snowui-button-radius-override,
       var(--snowui-button-radius)
     );
-    corner-shape: superellipse(1.1);
     font-size: var(
       --snowui-button-font-size-override,
       var(--snowui-button-font-size)
@@ -826,7 +826,7 @@
     position: absolute;
     inset: calc(var(--snowui-button-hover-outset) * -1);
     border-radius: inherit;
-    corner-shape: superellipse(1.1);
+    corner-shape: inherit;
     pointer-events: none;
   }
 

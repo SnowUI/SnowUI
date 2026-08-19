@@ -259,7 +259,7 @@
     });
 
     const panelClass = $derived(
-        ["snowui-dialog", "snowui-quick-action-panel", userClass]
+        ["snowui-dialog", "snowui-quick-action-panel", "snowui-rounded-rectangle", userClass]
             .filter(Boolean)
             .join(" "),
     );
