@@ -1,8 +1,8 @@
 # Button.svelte 文档
 
-> **版本**: v2.10.0
-> **变更记录 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` 固定扩张背景层；sm / md / lg 以及不同内容宽度的背景总宽、总高统一增加 `2px`（四边各外扩 `1px`），文字、Icon 与命中区保持原尺寸。`scaleOnHover` 作为兼容 Prop 名可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 使用同一固定像素扩张；bare 没有背景，因此不执行内置放大。
-> **性能说明 (2026-08-19)**: 有背景的 Button 将基础背景与 hover 颜色叠层分开；放大阶段只动画绝对定位背景层的 `inset`，不会改变 Button 或父容器布局。hover 背景颜色通过独立叠层立即切换，不执行渐现或渐隐，也不在扩张期间逐帧重算 `color-mix()` 背景。Outline 原有边框颜色过渡继续保留。
+> **版本**: v2.11.0
+> **变更记录 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` 固定扩张背景层；sm / md / lg 以及不同内容宽度的背景总宽、总高统一增加 `2px`（四边各外扩 `1px`），文字、Icon 与命中区保持原尺寸。背景颜色以 `300ms ease-in-out` 柔和渐现 / 渐隐，慢于 `200ms ease` 外扩。`scaleOnHover` 作为兼容 Prop 名可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 使用同一固定像素扩张与颜色渐现；bare 没有背景，因此不执行内置放大。
+> **性能说明 (2026-08-19)**: 有背景的 Button 将基础背景与 hover 颜色叠层分开；放大阶段只动画绝对定位背景层的 `inset`，不会改变 Button 或父容器布局。hover 背景颜色仅动画预计算颜色叠层的 `opacity`，不在扩张或渐现期间逐帧重算 `color-mix()` 背景。Outline 原有边框颜色过渡继续保留。
 > **变更记录 (2026-08-16)**: SnowUI 宿主基线改为固定低优先级层，`filled` 的 Static White 前景色不再因动态模块加载顺序被 Frame `color: inherit` 覆盖。
 > **变更记录 (2026-08-11)**: 新增显式 `iconOnly` 布局声明，默认 `false`；移除基于 children DOM 的自动推断，并为缺少可访问名称的 icon-only Button 提供开发警告。
 > **变更记录 (2026-08-09)**: `bare` 默认改为 100% 不透明；新增 `emphasis="muted"` 显式启用 40% → hover 100% 的弱化交互。
@@ -339,7 +339,7 @@ Button 放入 Pagination 时使用角色模板：
 |:---|:---|
 | **Filled** | 20% overlay (`currentColor`) |
 | **Gray/Outline** | Light: 4% overlay, Dark: 10% overlay |
-| **Borderless** | Light: 4%、Dark: 10%；hover 颜色立即出现或消失，独立背景层同时向四边各外扩 `1px`，最终颜色保持不变 |
+| **Borderless** | Light: 4%、Dark: 10%；hover 颜色以 `300ms ease-in-out` 柔和渐现 / 渐隐，独立背景层同时以 `200ms ease` 向四边各外扩 `1px`，最终颜色保持不变 |
 
 ---
 
@@ -361,6 +361,11 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.11.0 (2026-08-19)
+
+#### 动效
+- **BTN-Hover.10** hover 颜色层恢复 opacity 过渡，并改为 `300ms ease-in-out`；它慢于 `200ms ease` 背景外扩，使颜色进入与退出更柔和。reduced-motion 下两者都立即提交最终状态。
 
 ### v2.10.0 (2026-08-19)
 

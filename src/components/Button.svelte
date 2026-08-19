@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.10.0
+  v2.11.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -267,10 +267,14 @@
     const outset = hoverMotion.growth / 2;
     const duration = hoverMotion.duration ?? 0;
     const easing = hoverMotion.easing ?? "ease";
+    const colorDuration = hoverMotion.colorDuration ?? duration;
+    const colorEasing = hoverMotion.colorEasing ?? easing;
     const defaultHoverMotionStyle = [
       `--snowui-button-hover-outset-to: ${outset}px`,
       `--snowui-button-hover-motion-duration: ${duration}ms`,
       `--snowui-button-hover-motion-easing: ${easing}`,
+      `--snowui-button-hover-color-motion-duration: ${colorDuration}ms`,
+      `--snowui-button-hover-color-motion-easing: ${colorEasing}`,
     ].join("; ");
     const styles = [defaultHoverMotionStyle, hostStyle, userStyle]
       .filter(Boolean)
@@ -865,11 +869,17 @@
       transparent
     );
     opacity: var(--snowui-button-background-hover-layer-opacity);
-    transition: inset var(
-        --snowui-button-background-hover-motion-duration,
-        var(--snowui-button-hover-motion-duration, 0.2s)
-      )
-      var(--snowui-button-hover-motion-easing, ease);
+    transition:
+      inset var(
+          --snowui-button-background-hover-motion-duration,
+          var(--snowui-button-hover-motion-duration, 0.2s)
+        )
+        var(--snowui-button-hover-motion-easing, ease),
+      opacity var(
+          --snowui-button-background-hover-color-motion-duration,
+          var(--snowui-button-hover-color-motion-duration, 0.3s)
+        )
+        var(--snowui-button-hover-color-motion-easing, ease-in-out);
   }
 
   :global(
@@ -1026,6 +1036,7 @@
   @media (prefers-reduced-motion: reduce) {
     :global(:where(.snowui-button)[data-default-hover-background-growth="true"]) {
       --snowui-button-background-hover-motion-duration: 0ms;
+      --snowui-button-background-hover-color-motion-duration: 0ms;
       --snowui-button-background-color-motion-duration: 0ms;
       transition: none;
     }

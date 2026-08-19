@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.7.3
+> **版本**: v1.8.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -8,7 +8,7 @@
 ## 使用规则
 
 1. 基础 duration、easing、scale 起止值先进入 `tokens.ts`。
-2. 组件族 preset 再从 `tokens.ts` 组合出 MotionConfig。
+2. 组件族 preset 再从 `tokens.ts` 组合出 MotionConfig 或组件背景层 CSS motion descriptor。
 3. 组件 `.svelte` 引用 preset，不复制 token 数值。
 4. 新数值只有被组件族复用或需要长期维护时才进入本文件。
 
@@ -22,10 +22,11 @@
 | `MOTION_DURATION_RESIZE_MS` | Card、Accordion、Panel 等明确尺寸变化节奏 |
 | `MOTION_DURATION_TAB_INDICATOR_MS` | Tab / Segmented indicator 位置与尺寸同步变化 |
 | `MOTION_DURATION_CONTINUOUS_HOVER_MS` / `MOTION_DURATION_CONTINUOUS_HOVER_RESPONSE_MS` | 连续悬停背景移动 / 变形 60ms，首次显隐响应 0ms |
+| `MOTION_DURATION_BUTTON_HOVER_MS` / `MOTION_DURATION_BUTTON_HOVER_COLOR_MS` | Button 背景像素外扩 200ms；颜色 opacity 渐现 / 渐隐 300ms，慢于几何变化 |
 | `MOTION_DURATION_*` / `MOTION_STAGGER_*` | 通用效果优先引用 250ms 基准；Badge、Tooltip、shake 等专项效果保留精确时长与 stagger |
-| `MOTION_EASING_*` | standard、in-out、linear 以及 Badge / Number / Check 各自精确 bounce 曲线 |
+| `MOTION_EASING_*` | standard、JS motion 的 in-out / linear、Button hover 颜色层 CSS `ease-in-out`，以及 Badge / Number / Check 各自精确 bounce 曲线 |
 | `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
-| `MOTION_DISTANCE_*` | text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
+| `MOTION_DISTANCE_*` | Button hover 背景总宽 / 总高增加 2px，以及 text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
 | `MOTION_BLUR_*` | 2px、3px、10px 三档实际 blur 来源 |
 | `MOTION_DURATION_TOOLTIP_*` | Tooltip Foreground 出现 / 消失节奏 |
 | `MOTION_DELAY_TOOLTIP_APPEAR_MS` | 兼容保留的旧 Tooltip 出现 delay；已标记 deprecated，默认 preset 不再消费 |
