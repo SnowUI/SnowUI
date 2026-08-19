@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.14.0
+  v2.15.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -614,7 +614,7 @@
       --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
       border-color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
       box-shadow var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
-      transform var(--snowui-button-hover-motion-duration, 0.2s) var(--snowui-button-hover-motion-easing, ease);
+      transform var(--snowui-button-hover-motion-duration, 0.15s) var(--snowui-button-hover-motion-easing, ease-in-out);
     border: none;
     cursor: var(--snowui-state-cursor, pointer);
     outline: none;
@@ -852,14 +852,14 @@
     transition:
       inset var(
           --snowui-button-background-hover-motion-duration,
-          var(--snowui-button-hover-motion-duration, 0.2s)
+          var(--snowui-button-hover-motion-duration, 0.15s)
         )
-        var(--snowui-button-hover-motion-easing, ease),
+        var(--snowui-button-hover-motion-easing, ease-in-out),
       border-radius var(
           --snowui-button-background-hover-motion-duration,
-          var(--snowui-button-hover-motion-duration, 0.2s)
+          var(--snowui-button-hover-motion-duration, 0.15s)
         )
-        var(--snowui-button-hover-motion-easing, ease),
+        var(--snowui-button-hover-motion-easing, ease-in-out),
       box-shadow var(
           --snowui-button-background-color-motion-duration,
           var(--snowui-frame-color-motion-duration, 0.15s)
@@ -882,14 +882,14 @@
     transition:
       inset var(
           --snowui-button-background-hover-motion-duration,
-          var(--snowui-button-hover-motion-duration, 0.2s)
+          var(--snowui-button-hover-motion-duration, 0.15s)
         )
-        var(--snowui-button-hover-motion-easing, ease),
+        var(--snowui-button-hover-motion-easing, ease-in-out),
       border-radius var(
           --snowui-button-background-hover-motion-duration,
-          var(--snowui-button-hover-motion-duration, 0.2s)
+          var(--snowui-button-hover-motion-duration, 0.15s)
         )
-        var(--snowui-button-hover-motion-easing, ease),
+        var(--snowui-button-hover-motion-easing, ease-in-out),
       opacity var(
           --snowui-button-background-hover-color-motion-duration,
           var(--snowui-button-hover-color-motion-duration, 0.3s)
@@ -939,7 +939,7 @@
     background-image: none;
     --snowui-frame-component-transition:
       opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
-      transform var(--snowui-button-hover-motion-duration, 0.2s) var(--snowui-button-hover-motion-easing, ease);
+      transform var(--snowui-button-hover-motion-duration, 0.15s) var(--snowui-button-hover-motion-easing, ease-in-out);
   }
 
   :global(
@@ -1033,10 +1033,10 @@
     );
     pointer-events: auto;
     transition:
-      top var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.2s)) var(--snowui-button-hover-motion-easing, ease),
-      right var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.2s)) var(--snowui-button-hover-motion-easing, ease),
-      bottom var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.2s)) var(--snowui-button-hover-motion-easing, ease),
-      left var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.2s)) var(--snowui-button-hover-motion-easing, ease);
+      top var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.15s)) var(--snowui-button-hover-motion-easing, ease-in-out),
+      right var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.15s)) var(--snowui-button-hover-motion-easing, ease-in-out),
+      bottom var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.15s)) var(--snowui-button-hover-motion-easing, ease-in-out),
+      left var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.15s)) var(--snowui-button-hover-motion-easing, ease-in-out);
   }
 
   :global(

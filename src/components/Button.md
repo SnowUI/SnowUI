@@ -1,9 +1,10 @@
 # Button.svelte 文档
 
-> **版本**: v2.14.0
-> **变更记录 (2026-08-19)**: Button 的独立 hover 背景每边外扩 `1px` 时，背景圆角半径同步增加 `1px`，并与 inset 共用 `200ms ease` 动效。该规则同时作用于 `iconOnly` 与普通圆角矩形 Button；`iconOnly` 不建立圆形语义或独立曲线分支，根圆角、连续角、内容和布局尺寸保持不变。
+> **版本**: v2.15.0
+> **变更记录 (2026-08-19)**: Button 背景 inset 与 radius 的几何动效由 `200ms ease` 优化为 `150ms ease-in-out`，减少 filled 高对比边缘停留在亚像素重绘状态的时间，并缓和 hover 进入 / 退出首段的视觉抖动；固定 `1px` 外扩、radius 同步、`300ms ease-in-out` 颜色渐变、内容与布局尺寸均不变。
+> **变更记录 (2026-08-19)**: Button 的独立 hover 背景每边外扩 `1px` 时，背景圆角半径同步增加 `1px`，并与 inset 共用当前 `150ms ease-in-out` 几何动效。该规则同时作用于 `iconOnly` 与普通圆角矩形 Button；`iconOnly` 不建立圆形语义或独立曲线分支，根圆角、连续角、内容和布局尺寸保持不变。
 > **变更记录 (2026-08-19)**: Button 外壳接入 `layout.css` 的 `.snowui-rounded-rectangle` 共享视觉类，曲线值统一来自 `tokens.css` 的 `--corner-shape-rounded-rectangle`；独立 hover 背景层显式继承根曲线。sm / md / lg 与公开 override 的 `border-radius` 数值不变，不支持该实验 CSS 属性的浏览器继续使用现有普通圆角；bare 与 ButtonGroup 嵌入态仍保持 `radius: 0`。
-> **变更记录 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` 固定扩张背景层；sm / md / lg 以及不同内容宽度的背景总宽、总高统一增加 `2px`（四边各外扩 `1px`），文字、Icon 与命中区保持原尺寸。背景颜色以 `300ms ease-in-out` 柔和渐现 / 渐隐，慢于 `200ms ease` 外扩。`scaleOnHover` 作为兼容 Prop 名可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 使用同一固定像素扩张与颜色渐现；bare 没有背景，因此不执行内置放大。
+> **变更记录 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` 固定扩张背景层；sm / md / lg 以及不同内容宽度的背景总宽、总高统一增加 `2px`（四边各外扩 `1px`），文字、Icon 与命中区保持原尺寸。背景颜色以 `300ms ease-in-out` 柔和渐现 / 渐隐，慢于 `150ms ease-in-out` 外扩。`scaleOnHover` 作为兼容 Prop 名可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 使用同一固定像素扩张与颜色渐现；bare 没有背景，因此不执行内置放大。
 > **性能说明 (2026-08-19)**: 有背景的 Button 将基础背景与 hover 颜色叠层分开；放大阶段只动画绝对定位背景层的 `inset`，不会改变 Button 或父容器布局。hover 背景颜色仅动画预计算颜色叠层的 `opacity`，不在扩张或渐现期间逐帧重算 `color-mix()` 背景。Outline 原有边框颜色过渡继续保留。
 > **变更记录 (2026-08-16)**: SnowUI 宿主基线改为固定低优先级层，`filled` 的 Static White 前景色不再因动态模块加载顺序被 Frame `color: inherit` 覆盖。
 > **变更记录 (2026-08-11)**: 新增显式 `iconOnly` 布局声明，默认 `false`；移除基于 children DOM 的自动推断，并为缺少可访问名称的 icon-only Button 提供开发警告。
@@ -342,7 +343,7 @@ Button 放入 Pagination 时使用角色模板：
 |:---|:---|
 | **Filled** | 20% overlay (`currentColor`) |
 | **Gray/Outline** | Light: 4% overlay, Dark: 10% overlay |
-| **Borderless** | Light: 4%、Dark: 10%；hover 颜色以 `300ms ease-in-out` 柔和渐现 / 渐隐，独立背景层同时以 `200ms ease` 向四边各外扩 `1px`，最终颜色保持不变 |
+| **Borderless** | Light: 4%、Dark: 10%；hover 颜色以 `300ms ease-in-out` 柔和渐现 / 渐隐，独立背景层同时以 `150ms ease-in-out` 向四边各外扩 `1px`，最终颜色保持不变 |
 
 ---
 
@@ -364,6 +365,11 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.15.0 (2026-08-19)
+
+#### 动效稳定性
+- **BTN-Hover.12** filled 实际浏览器逐帧观察确认根布局稳定，抖动感来自高对比边缘在 `200ms ease` 亚像素重绘以及几何 / 颜色分段结束；几何改为 `150ms ease-in-out`，缩短重绘窗口并缓和进入 / 退出首段，颜色继续以 `300ms ease-in-out` 柔和变化。
 
 ### v2.14.0 (2026-08-19)
 

@@ -41,7 +41,7 @@ export const examples = [
         expected: {
             render: "全部 variant 与 bare 保持各自原有背景、边框和前景色。",
             layout: "hover 缩放只影响绘制，Button 与自适应父容器的布局尺寸不变。",
-            interaction: "独立动作默认只扩张背景层；sm、md、lg 的背景总宽与总高都增加 2px（四边各 1px），文字与 Icon 保持原尺寸。hover 背景颜色以 300ms ease-in-out 渐现 / 渐隐，慢于 200ms ease 外扩；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 使用同一像素扩张与颜色渐现，bare 不出现背景或内置放大。",
+            interaction: "独立动作默认只扩张背景层；sm、md、lg 的背景总宽与总高都增加 2px（四边各 1px），文字与 Icon 保持原尺寸。几何以 150ms ease-in-out 扩张 / 收缩，hover 背景颜色以 300ms ease-in-out 渐现 / 渐隐；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 使用同一像素扩张与颜色渐现，bare 不出现背景或内置放大。",
             performance: "基础背景层只动画绝对定位 inset；hover 颜色叠层只动画 opacity，不逐帧重算 color-mix 背景，也不触发布局重排。",
             responsive: "固定 2px 背景增量不随 Button size、内容宽度或根字号改变。",
             accessibility: "prefers-reduced-motion: reduce 下直接提交四边 1px 外扩和最终颜色，不执行 inset 或 opacity 过渡。",

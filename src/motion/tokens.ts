@@ -1,6 +1,6 @@
 /**
  * tokens.ts
- * v1.4.0
+ * v1.5.0
  * Motion 数值 token 单一来源。
  */
 
@@ -15,7 +15,7 @@ export const MOTION_EASING_BOUNCE_STRONG = "cubic-bezier(0.34, 3.85, 0.64, 1)";
 export const MOTION_EASING_CLOSE = "cubic-bezier(0.4, 0, 0.2, 1)";
 export const MOTION_EASING_TOOLTIP = "easeOut";
 export const MOTION_EASING_REPLACEMENT = "easeOut";
-export const MOTION_EASING_BUTTON_HOVER = "ease";
+export const MOTION_EASING_BUTTON_HOVER = "ease-in-out";
 export const MOTION_EASING_BUTTON_HOVER_COLOR = "ease-in-out";
 
 export const MOTION_DURATION_BASE_MS = 250;
@@ -27,7 +27,7 @@ export const MOTION_DURATION_TAB_INDICATOR_MS = MOTION_DURATION_BASE_MS;
 export const MOTION_DURATION_CONTINUOUS_HOVER_MS = 60;
 export const MOTION_DURATION_CONTINUOUS_HOVER_RESPONSE_MS = 0;
 export const MOTION_DURATION_AVATAR_HOVER_MS = MOTION_DURATION_BASE_MS;
-export const MOTION_DURATION_BUTTON_HOVER_MS = 200;
+export const MOTION_DURATION_BUTTON_HOVER_MS = 150;
 export const MOTION_DURATION_BUTTON_HOVER_COLOR_MS = 300;
 export const MOTION_DURATION_PANEL_APPEAR_MS = MOTION_DURATION_BASE_MS;
 export const MOTION_DURATION_PANEL_DISAPPEAR_MS = MOTION_DURATION_BASE_MS;
