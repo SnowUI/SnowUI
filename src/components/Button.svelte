@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.13.0
+  v2.14.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -634,6 +634,10 @@
     --snowui-button-icon-only-padding: var(--padding-1);
     --snowui-button-gap: var(--gap-1);
     --snowui-button-radius: var(--radius-3);
+    --snowui-button-resolved-radius: var(
+      --snowui-button-radius-override,
+      var(--snowui-button-radius)
+    );
     --snowui-button-font-size: var(--text-12);
     --snowui-button-line-height: var(--leading-12);
     --snowui-button-min-width: max-content;
@@ -667,10 +671,7 @@
       var(--snowui-button-padding)
     );
     gap: var(--snowui-button-gap-override, var(--snowui-button-gap));
-    border-radius: var(
-      --snowui-button-radius-override,
-      var(--snowui-button-radius)
-    );
+    border-radius: var(--snowui-button-resolved-radius);
     font-size: var(
       --snowui-button-font-size-override,
       var(--snowui-button-font-size)
@@ -825,7 +826,9 @@
     content: "";
     position: absolute;
     inset: calc(var(--snowui-button-hover-outset) * -1);
-    border-radius: inherit;
+    border-radius: calc(
+      var(--snowui-button-resolved-radius) + var(--snowui-button-hover-outset)
+    );
     corner-shape: inherit;
     pointer-events: none;
   }
@@ -852,6 +855,11 @@
           var(--snowui-button-hover-motion-duration, 0.2s)
         )
         var(--snowui-button-hover-motion-easing, ease),
+      border-radius var(
+          --snowui-button-background-hover-motion-duration,
+          var(--snowui-button-hover-motion-duration, 0.2s)
+        )
+        var(--snowui-button-hover-motion-easing, ease),
       box-shadow var(
           --snowui-button-background-color-motion-duration,
           var(--snowui-frame-color-motion-duration, 0.15s)
@@ -873,6 +881,11 @@
     opacity: var(--snowui-button-background-hover-layer-opacity);
     transition:
       inset var(
+          --snowui-button-background-hover-motion-duration,
+          var(--snowui-button-hover-motion-duration, 0.2s)
+        )
+        var(--snowui-button-hover-motion-easing, ease),
+      border-radius var(
           --snowui-button-background-hover-motion-duration,
           var(--snowui-button-hover-motion-duration, 0.2s)
         )
