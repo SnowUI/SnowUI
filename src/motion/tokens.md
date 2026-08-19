@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.9.0
+> **版本**: v1.10.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -22,7 +22,7 @@
 | `MOTION_DURATION_RESIZE_MS` | Card、Accordion、Panel 等明确尺寸变化节奏 |
 | `MOTION_DURATION_TAB_INDICATOR_MS` | Tab / Segmented indicator 位置与尺寸同步变化 |
 | `MOTION_DURATION_CONTINUOUS_HOVER_MS` / `MOTION_DURATION_CONTINUOUS_HOVER_RESPONSE_MS` | 连续悬停背景移动 / 变形 60ms，首次显隐响应 0ms |
-| `MOTION_DURATION_BUTTON_HOVER_MS` / `MOTION_DURATION_BUTTON_HOVER_COLOR_MS` | Button 背景像素外扩 150ms；颜色 opacity 渐现 / 渐隐 300ms，慢于几何变化 |
+| `MOTION_DURATION_BUTTON_HOVER_MS` / `MOTION_DURATION_BUTTON_HOVER_COLOR_MS` | Button 背景像素外扩与颜色 opacity 渐现 / 渐隐统一为 150ms，使用同一时间线 |
 | `MOTION_DURATION_*` / `MOTION_STAGGER_*` | 通用效果优先引用 250ms 基准；Badge、Tooltip、shake 等专项效果保留精确时长与 stagger |
 | `MOTION_EASING_*` | standard、JS motion 的 in-out / linear、Button hover 几何与颜色层 CSS `ease-in-out`，以及 Badge / Number / Check 各自精确 bounce 曲线 |
 | `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
@@ -38,6 +38,7 @@
 
 ## 变更记录
 
+- v1.10.0 (2026-08-19): Button hover 颜色时长与背景像素外扩统一为 `150ms ease-in-out`，进入与退出时同时开始、同时结束。
 - v1.9.0 (2026-08-19): Button 背景像素外扩由 `200ms ease` 收敛为 `150ms ease-in-out`，减少 filled 高对比边缘停留在亚像素重绘状态的时间，并缓和 hover 进入 / 退出首段的视觉抖动；颜色仍为 `300ms ease-in-out`。
 - v1.7.3 (2026-08-12): 分层后 Tooltip Foreground 恢复 appear duration / scale token；Portal / Backdrop 不消费这些 token。
 - v1.7.2 (2026-08-12): Tooltip 出现 preset 清空视觉通道；旧 appear duration / scale token 为兼容直接引用者保留并标记 deprecated。

@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.15.0
+  v2.16.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -892,7 +892,7 @@
         var(--snowui-button-hover-motion-easing, ease-in-out),
       opacity var(
           --snowui-button-background-hover-color-motion-duration,
-          var(--snowui-button-hover-color-motion-duration, 0.3s)
+          var(--snowui-button-hover-color-motion-duration, 0.15s)
         )
         var(--snowui-button-hover-color-motion-easing, ease-in-out);
   }

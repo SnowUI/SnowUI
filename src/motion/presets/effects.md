@@ -1,6 +1,6 @@
 # 通用效果 Motion Preset
 
-> **版本**: v1.5.0
+> **版本**: v1.6.0
 > **职责**: 将通用单 Frame 效果与 Button 背景层 CSS 动效整理为语义 preset。
 
 ## 导出
@@ -8,7 +8,7 @@
 | 需求语义 | preset |
 | :--- | :--- |
 | hover 轻微放大 | `HOVER_SCALE_UP_MOTION` |
-| Button 默认 hover 背景总宽与总高以 `150ms ease-in-out` 固定增加 `2px`，颜色以 `300ms ease-in-out` 更慢地柔和渐现 / 渐隐 | `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` |
+| Button 默认 hover 背景总宽与总高固定增加 `2px`，背景几何与颜色统一以 `150ms ease-in-out` 同步变化 | `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` |
 | hover 上浮并放大 | `HOVER_LIFT_MOTION` |
 | 数字向上弹入 | `NUMBER_POP_APPEAR_MOTION` |
 | 短文字替换 | `TEXT_SWAP_APPEAR_MOTION` |
