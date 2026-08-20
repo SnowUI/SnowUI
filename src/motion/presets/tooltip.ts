@@ -1,6 +1,5 @@
 import type { MotionConfig } from "../../logic/motion-config";
 import {
-    MOTION_DISTANCE_TOOLTIP_CONTENT_DRIFT_PX,
     MOTION_DURATION_TOOLTIP_APPEAR_MS,
     MOTION_DURATION_TOOLTIP_DISAPPEAR_MS,
     MOTION_EASING_TOOLTIP,
@@ -34,7 +33,3 @@ export const TOOLTIP_APPEAR_TOTAL_MS = getMotionTotalDurationMs(
 export const TOOLTIP_DISAPPEAR_TOTAL_MS = getMotionTotalDurationMs(
     TOOLTIP_DISAPPEAR_MOTION,
 );
-
-/** 连续切换时，新旧内容沿外框移动方向同步推进的最大距离。 */
-export const TOOLTIP_CONTINUOUS_CONTENT_DRIFT_PX =
-    MOTION_DISTANCE_TOOLTIP_CONTENT_DRIFT_PX;

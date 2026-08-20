@@ -1,8 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.8.1
+ Tooltip 文字提示组件 v1.8.2
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-20): 连续 Tooltip 内容沿外框移动方向短距离推进，与二维裁切揭示共同形成连续流动效果。
+ 变更 (2026-08-20): 目标 Tooltip 间距不超过 4px 时，先将新旧内容拼成带 4px 间距的内容带，再依次移动外框和内容带；超过阈值只移动外框。
  变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
  变更 (2026-08-20): Button hover 伪元素 transition 不再被误判为触发器锚点运动。
  变更 (2026-08-12): 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
@@ -47,6 +47,8 @@
 <script module lang="ts">
     const TOOLTIP_MOVE_MAX_DISTANCE_PX = 240;
     const TOOLTIP_MOVE_MAX_VIEWPORT_RATIO = 0.25;
+    const TOOLTIP_CONTENT_TRACK_GAP_PX = 4;
+    const TOOLTIP_CONTENT_TRACK_MAX_TARGET_GAP_PX = 4;
     let nextTooltipId = 0;
     let overlayHost: { id: string; setHost: (value: boolean) => void } | undefined;
     const overlayHostCandidates = new Set<{
@@ -92,7 +94,6 @@
     import {
         TOOLTIP_APPEAR_MOTION,
         TOOLTIP_APPEAR_TOTAL_MS,
-        TOOLTIP_CONTINUOUS_CONTENT_DRIFT_PX,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
     } from "../motion/presets/tooltip";
@@ -249,11 +250,14 @@
     let coords = $state({ top: 0, left: 0 });
     let finalPosition: "top" | "bottom" | "left" | "right" = $state("top");
     let moveMode: "snap" | "move" = $state("snap");
+    let switchPhase: "idle" | "prepare" | "shell" | "content" = $state("idle");
     let measuredSize = $state({ width: 0, height: 0 });
     let pendingMeasuredSize = { width: 0, height: 0 };
     let measuredOverlayId: string | undefined;
     let activeTargetRect: TooltipVisualRect | undefined;
     let outgoingTargetRect: TooltipVisualRect | undefined;
+    let outgoingAlignedRect: TooltipVisualRect | undefined;
+    let outgoingContentRect: TooltipVisualRect | undefined;
     let switchStartRect: TooltipVisualRect | undefined;
     let shellMotionOffset = $state({ x: 0, y: 0 });
     let incomingLayerOffset = $state({ x: 0, y: 0 });
@@ -343,11 +347,14 @@
         hasMeasuredPosition = false;
         lastPositionTooltipId = undefined;
         moveMode = "snap";
+        switchPhase = "idle";
         measuredSize = { width: 0, height: 0 };
         pendingMeasuredSize = { width: 0, height: 0 };
         measuredOverlayId = undefined;
         activeTargetRect = undefined;
         outgoingTargetRect = undefined;
+        outgoingAlignedRect = undefined;
+        outgoingContentRect = undefined;
         switchStartRect = undefined;
         shellMotionOffset = { x: 0, y: 0 };
         incomingLayerOffset = { x: 0, y: 0 };
@@ -391,6 +398,8 @@
         switchMotionTimer = undefined;
         outgoingOverlay = null;
         outgoingTargetRect = undefined;
+        outgoingAlignedRect = undefined;
+        outgoingContentRect = undefined;
         switchStartRect = undefined;
         shellMotionOffset = { x: 0, y: 0 };
         incomingLayerOffset = { x: 0, y: 0 };
@@ -400,6 +409,7 @@
         incomingLayerSeam = 100;
         outgoingLayerSeam = 100;
         moveMode = "snap";
+        switchPhase = "idle";
     }
 
     function getProjectionRange(
@@ -464,27 +474,72 @@
         };
     }
 
-    function getContentDrift(
+    function getMovementUnit(
         startRect: TooltipVisualRect,
         targetRect: TooltipVisualRect,
     ) {
-        const dx =
+        let dx =
             targetRect.left + targetRect.width / 2 -
             (startRect.left + startRect.width / 2);
-        const dy =
+        let dy =
             targetRect.top + targetRect.height / 2 -
             (startRect.top + startRect.height / 2);
-        const length = Math.hypot(dx, dy);
-        if (length <= 0.5) return { x: 0, y: 0 };
+        let length = Math.hypot(dx, dy);
+        if (length <= 0.5) {
+            dx = targetRect.left - startRect.left;
+            dy = targetRect.top - startRect.top;
+            length = Math.hypot(dx, dy);
+        }
+        if (length <= 0.5) return { x: 1, y: 0 };
 
-        const distance = Math.min(
-            TOOLTIP_CONTINUOUS_CONTENT_DRIFT_PX,
-            length / 2,
-        );
+        return { x: dx / length, y: dy / length };
+    }
+
+    function concatenateContentRect(
+        oldRect: TooltipVisualRect,
+        newSize: { width: number; height: number },
+        direction: { x: number; y: number },
+    ): TooltipVisualRect {
+        const oldProjectionRadius =
+            (oldRect.width * Math.abs(direction.x) +
+                oldRect.height * Math.abs(direction.y)) /
+            2;
+        const newProjectionRadius =
+            (newSize.width * Math.abs(direction.x) +
+                newSize.height * Math.abs(direction.y)) /
+            2;
+        const centerDistance =
+            oldProjectionRadius +
+            TOOLTIP_CONTENT_TRACK_GAP_PX +
+            newProjectionRadius;
+        const centerX =
+            oldRect.left + oldRect.width / 2 + direction.x * centerDistance;
+        const centerY =
+            oldRect.top + oldRect.height / 2 + direction.y * centerDistance;
+
         return {
-            x: (dx / length) * distance,
-            y: (dy / length) * distance,
+            left: centerX - newSize.width / 2,
+            top: centerY - newSize.height / 2,
+            width: newSize.width,
+            height: newSize.height,
         };
+    }
+
+    function getRectDistance(
+        first: TooltipVisualRect,
+        second: TooltipVisualRect,
+    ) {
+        const gapX = Math.max(
+            first.left - (second.left + second.width),
+            second.left - (first.left + first.width),
+            0,
+        );
+        const gapY = Math.max(
+            first.top - (second.top + second.height),
+            second.top - (first.top + first.height),
+            0,
+        );
+        return Math.hypot(gapX, gapY);
     }
 
     function clearOverlayLifecycleTimers() {
@@ -562,9 +617,11 @@
             cancelSwitchMotion();
             switchStartRect = readVisualRect(sizeShellRef);
             outgoingOverlay = previousRenderedOverlay;
+            outgoingAlignedRect = activeTargetRect ?? switchStartRect;
+            outgoingContentRect = readVisualRect(sizeContentRef);
             outgoingTargetRect =
                 readVisualRect(incomingLayerRef) ??
-                activeTargetRect ??
+                outgoingAlignedRect ??
                 switchStartRect;
             if (outgoingTargetRect) {
                 outgoingLayerSize = {
@@ -818,13 +875,47 @@
 
         if (isSwitchingTooltip && canSmoothMove && startRect && outgoingTargetRect) {
             const oldTarget = outgoingTargetRect;
-            const contentDrift = getContentDrift(startRect, targetRect);
-            const incomingStartRect = {
-                ...targetRect,
-                left: targetRect.left - contentDrift.x,
-                top: targetRect.top - contentDrift.y,
+            const previousAlignedRect = outgoingAlignedRect ?? oldTarget;
+            const canJoinContentTrack =
+                getRectDistance(previousAlignedRect, targetRect) <=
+                TOOLTIP_CONTENT_TRACK_MAX_TARGET_GAP_PX;
+            const direction = getMovementUnit(startRect, targetRect);
+            const renderedIncomingLayerRect = readVisualRect(incomingLayerRef);
+            const renderedIncomingContentRect = readVisualRect(sizeContentRef);
+            const incomingContentInset = {
+                x:
+                    renderedIncomingLayerRect && renderedIncomingContentRect
+                        ? renderedIncomingContentRect.left -
+                          renderedIncomingLayerRect.left
+                        : 0,
+                y:
+                    renderedIncomingLayerRect && renderedIncomingContentRect
+                        ? renderedIncomingContentRect.top -
+                          renderedIncomingLayerRect.top
+                        : 0,
             };
-            const layerMasks = createLayerMasks(oldTarget, incomingStartRect);
+            const incomingContentTrackRect = canJoinContentTrack
+                ? concatenateContentRect(
+                      outgoingContentRect ?? oldTarget,
+                      renderedIncomingContentRect ?? targetRect,
+                      direction,
+                  )
+                : targetRect;
+            const incomingTrackRect = canJoinContentTrack
+                ? {
+                      left:
+                          incomingContentTrackRect.left -
+                          incomingContentInset.x,
+                      top:
+                          incomingContentTrackRect.top -
+                          incomingContentInset.y,
+                      width: targetRect.width,
+                      height: targetRect.height,
+                  }
+                : targetRect;
+            const layerMasks = canJoinContentTrack
+                ? createLayerMasks(oldTarget, incomingTrackRect)
+                : { outgoing: EMPTY_LAYER_MASK, incoming: EMPTY_LAYER_MASK };
             const initialBaseBounds = sizeMotionEnabled
                 ? getFloatingVisualBounds(
                       bestPos,
@@ -834,18 +925,30 @@
                 : targetRect;
             const revision = ++switchMotionRevision;
             moveMode = "snap";
+            switchPhase = "prepare";
             shellMotionOffset = {
                 x: startRect.left - initialBaseBounds.left,
                 y: startRect.top - initialBaseBounds.top,
             };
             incomingLayerOffset = {
-                x: incomingStartRect.left - startRect.left,
-                y: incomingStartRect.top - startRect.top,
+                x: canJoinContentTrack
+                    ? incomingTrackRect.left - startRect.left
+                    : 0,
+                y: canJoinContentTrack
+                    ? incomingTrackRect.top - startRect.top
+                    : 0,
             };
             outgoingLayerOffset = {
                 x: oldTarget.left - startRect.left,
                 y: oldTarget.top - startRect.top,
             };
+            if (!canJoinContentTrack) {
+                outgoingOverlay = null;
+                outgoingTargetRect = undefined;
+                outgoingAlignedRect = undefined;
+                outgoingContentRect = undefined;
+                outgoingLayerOffset = { x: 0, y: 0 };
+            }
             outgoingLayerMask = layerMasks.outgoing;
             incomingLayerMask = layerMasks.incoming;
             outgoingLayerSeam = layerMasks.outgoing.start;
@@ -857,20 +960,52 @@
                     switchMotionFrame = undefined;
                     if (revision !== switchMotionRevision) return;
                     moveMode = "move";
+                    switchPhase = "shell";
                     shellMotionOffset = { x: 0, y: 0 };
-                    incomingLayerOffset = { x: 0, y: 0 };
-                    outgoingLayerOffset = {
-                        x:
-                            oldTarget.left - targetRect.left +
-                            contentDrift.x,
-                        y:
-                            oldTarget.top - targetRect.top +
-                            contentDrift.y,
-                    };
-                    outgoingLayerSeam = layerMasks.outgoing.end;
-                    incomingLayerSeam = layerMasks.incoming.end;
+                    if (canJoinContentTrack) {
+                        incomingLayerOffset = {
+                            x: incomingTrackRect.left - targetRect.left,
+                            y: incomingTrackRect.top - targetRect.top,
+                        };
+                        outgoingLayerOffset = {
+                            x: oldTarget.left - targetRect.left,
+                            y: oldTarget.top - targetRect.top,
+                        };
+                    } else {
+                        incomingLayerOffset = { x: 0, y: 0 };
+                    }
                     switchMotionTimer = window.setTimeout(
-                        () => finishSwitchMotion(revision),
+                        () => {
+                            switchMotionTimer = undefined;
+                            if (revision !== switchMotionRevision) return;
+                            if (!canJoinContentTrack) {
+                                finishSwitchMotion(revision);
+                                return;
+                            }
+
+                            switchPhase = "content";
+                            const alignment = {
+                                x: targetRect.left - incomingTrackRect.left,
+                                y: targetRect.top - incomingTrackRect.top,
+                            };
+                            incomingLayerOffset = { x: 0, y: 0 };
+                            outgoingLayerOffset = {
+                                x:
+                                    oldTarget.left -
+                                    targetRect.left +
+                                    alignment.x,
+                                y:
+                                    oldTarget.top -
+                                    targetRect.top +
+                                    alignment.y,
+                            };
+                            outgoingLayerSeam = layerMasks.outgoing.end;
+                            incomingLayerSeam = layerMasks.incoming.end;
+                            switchMotionTimer = window.setTimeout(
+                                () => finishSwitchMotion(revision),
+                                TOOLTIP_SYNC_MOTION.duration,
+                            );
+                        },
                         TOOLTIP_SYNC_MOTION.duration,
                     );
                 });
@@ -886,8 +1021,11 @@
             incomingLayerSeam = 100;
             outgoingOverlay = null;
             outgoingTargetRect = undefined;
+            outgoingAlignedRect = undefined;
+            outgoingContentRect = undefined;
             switchStartRect = undefined;
             moveMode = "snap";
+            switchPhase = "idle";
         }
 
         incomingLayerReady = true;
@@ -1013,11 +1151,14 @@
                 cancelSwitchMotion();
                 outgoingOverlay = null;
                 outgoingTargetRect = undefined;
+                outgoingAlignedRect = undefined;
+                outgoingContentRect = undefined;
                 switchStartRect = undefined;
                 shellMotionOffset = { x: 0, y: 0 };
                 incomingLayerOffset = { x: 0, y: 0 };
                 outgoingLayerOffset = { x: 0, y: 0 };
                 moveMode = "snap";
+                switchPhase = "idle";
             }
         };
         updateReducedMotion();
@@ -1109,6 +1250,7 @@
             <div
                 class="snowui-tooltip-motion-shell"
                 data-move-mode={moveMode}
+                data-switch-phase={switchPhase}
                 style={motionShellStyle}
             >
                 <Frame
