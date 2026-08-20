@@ -1,6 +1,7 @@
 import type { Snippet } from "svelte";
 import { writable } from "svelte/store";
 import { TOOLTIP_SKIP_DELAY_DURATION_MS } from "./tooltip-delay";
+import { OVERLAY_TRIGGER_CONTINUOUS_SWITCH_BURST_INTERVAL_MS } from "./overlay-trigger-timing";
 
 export const TOOLTIP_OVERLAY_SWITCH_HIDE_DELAY_MS =
     TOOLTIP_SKIP_DELAY_DURATION_MS;
@@ -15,6 +16,7 @@ export interface TooltipOverlayState {
     style?: string;
     children?: Snippet;
     fallbackContent: string;
+    continuousMotion?: boolean;
     loopMotion?: any;
     rest: Record<string, any>;
 }
@@ -23,6 +25,7 @@ export const tooltipOverlay = writable<TooltipOverlayState | null>(null);
 export const tooltipOverlayImmediateDismissRevision = writable(0);
 
 let activeTooltipId: string | undefined;
+let lastContinuousSwitchAt: number | undefined;
 let hideTimer: ReturnType<typeof setTimeout> | undefined;
 
 function clearHideTimer(): void {
@@ -34,6 +37,21 @@ function clearHideTimer(): void {
 
 export function showTooltipOverlay(state: TooltipOverlayState): void {
     clearHideTimer();
+    const isSwitching =
+        activeTooltipId !== undefined && activeTooltipId !== state.id;
+    if (isSwitching) {
+        const now = performance.now();
+        state = {
+            ...state,
+            continuousMotion:
+                lastContinuousSwitchAt === undefined ||
+                now - lastContinuousSwitchAt >=
+                    OVERLAY_TRIGGER_CONTINUOUS_SWITCH_BURST_INTERVAL_MS,
+        };
+        lastContinuousSwitchAt = now;
+    } else if (activeTooltipId === undefined) {
+        lastContinuousSwitchAt = undefined;
+    }
     activeTooltipId = state.id;
     tooltipOverlay.set(state);
 }
@@ -44,10 +62,11 @@ export function updateTooltipOverlay(state: TooltipOverlayState): void {
 }
 
 export function scheduleTooltipOverlayHide(id: string, delayMs = TOOLTIP_OVERLAY_SWITCH_HIDE_DELAY_MS): void {
+    if (activeTooltipId !== id) return;
     clearHideTimer();
     if (delayMs <= 0) {
-        if (activeTooltipId !== id) return;
         activeTooltipId = undefined;
+        lastContinuousSwitchAt = undefined;
         tooltipOverlay.set(null);
         return;
     }
@@ -55,6 +74,7 @@ export function scheduleTooltipOverlayHide(id: string, delayMs = TOOLTIP_OVERLAY
         hideTimer = undefined;
         if (activeTooltipId !== id) return;
         activeTooltipId = undefined;
+        lastContinuousSwitchAt = undefined;
         tooltipOverlay.set(null);
     }, delayMs);
 }
@@ -63,6 +83,7 @@ export function hideTooltipOverlay(id: string): void {
     if (activeTooltipId !== id) return;
     clearHideTimer();
     activeTooltipId = undefined;
+    lastContinuousSwitchAt = undefined;
     tooltipOverlay.set(null);
 }
 
@@ -70,6 +91,7 @@ export function dismissTooltipOverlayImmediately(id: string): void {
     if (activeTooltipId !== id) return;
     clearHideTimer();
     activeTooltipId = undefined;
+    lastContinuousSwitchAt = undefined;
     tooltipOverlayImmediateDismissRevision.update((revision) => revision + 1);
     tooltipOverlay.set(null);
 }

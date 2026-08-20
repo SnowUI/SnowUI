@@ -1,6 +1,6 @@
 # tooltip-overlay.ts
 
-> **版本**: v1.2.0
+> **版本**: v1.3.0
 > **职责**: 协调页面内非受控 Tooltip 共用一个 Portal 外框。
 > **依赖方**: [`../components/Tooltip.svelte`](../components/Tooltip.svelte)
 
@@ -9,7 +9,7 @@
 | 场景 | 行为 |
 | :--- | :--- |
 | 首次 hover Tooltip | 由 `tooltip-delay.ts` 决定显示延迟，显示后写入共享 overlay state |
-| 从一个 Tooltip 触发器切到另一个 | 保留共享 Portal 外框，替换内容、触发器、位置与外观参数；具体移动 / 直达策略由 `Tooltip.svelte` 根据距离判定 |
+| 从一个 Tooltip 触发器切到另一个 | 首次相邻切换保留共享 Portal 连续裁切；`180ms` 内再次改目标时立即直达，停止累积动效；稳定超过窗口后的下一次切换重新启用裁切 |
 | 离开触发器后未进入新 Tooltip | 默认在共享 `300ms` skip-delay 窗口结束后清空 overlay state；期间进入新 Tooltip 会取消隐藏并复用外框 |
 | 受控 `open` 模式 | 不使用本模块，继续由 Tooltip 本地 Portal 渲染 |
 
@@ -20,7 +20,7 @@
 | `tooltipOverlay` | 当前共享 Tooltip 状态 store |
 | `showTooltipOverlay(state)` | 清理隐藏计时并显示/更新共享外框 |
 | `updateTooltipOverlay(state)` | 当前 active Tooltip 自身 props 变化时同步共享状态 |
-| `scheduleTooltipOverlayHide(id, delayMs?)` | 离开触发器后按实际 `delayMs` 隐藏；`delayMs=0` 时立即隐藏，默认值与 `TOOLTIP_SKIP_DELAY_DURATION_MS` 相同 |
+| `scheduleTooltipOverlayHide(id, delayMs?)` | 仅当前 active Tooltip 可安排隐藏，并按实际 `delayMs` 执行；非 active 触发器不得清除已有计时；`delayMs=0` 时立即隐藏，默认值与 `TOOLTIP_SKIP_DELAY_DURATION_MS` 相同 |
 | `hideTooltipOverlay(id)` | 当前 active Tooltip 卸载或禁用时立即隐藏 |
 
 ## 职责边界
@@ -28,6 +28,7 @@
 - 本模块只管理“同一个外框是否复用”和 active Tooltip 的渲染参数。
 - 首次延迟、快速切换窗口与冷却恢复仍由 [`tooltip-delay.ts`](./tooltip-delay.md) 管理。
 - 视觉样式与 Frame 动效仍在 [`Tooltip.svelte`](../components/Tooltip.svelte) 内消费。
+- burst 判断只在实际 Tooltip 切换时读取一次 `performance.now()`；不得恢复 document `pointermove`、逐实例 pointer 监听或逐帧速度采样。
 
 ## 问题与修复记录
 
@@ -44,6 +45,8 @@
 
 ## 变更记录
 
+- v1.3.0 (2026-08-21): 连续裁切触发改为切换节奏判断；首次切换始终执行，180ms burst 内后续目标直达，并删除 pointermove 热路径。
+- v1.2.1 (2026-08-20): 非 active 触发器离开时不再清除当前 Tooltip 的隐藏计时，避免延迟显示期间经过其他触发器后外框残留。
 - v1.2.0 (2026-08-20): 共享 Portal、300ms 保留窗口和连续切换迁为 OSS 默认能力；视觉切换改由 Tooltip 的二维裁切窗口承接。
 - v1.1.0 (2026-08-12): 外框保留时间统一为 300ms skip-delay；修复正 `delayMs` 被固定 80ms 覆盖的问题。
 - v1.0.1 (2026-07-28): 新增立即动效关闭 revision。

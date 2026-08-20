@@ -1,8 +1,9 @@
 <!--
- Tooltip 文字提示组件 v1.8.5
+ Tooltip 文字提示组件 v1.11.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-20): 外框保持线性移动，4px 拼接内容带使用较慢的独立速度与 cubic ease-out 缓出进度。
+ 变更 (2026-08-21): 首次相邻切换始终保留连续裁切；仅连续快速改目标时直达，并移除 document pointermove 热路径。
+ 变更 (2026-08-21): 内容在时间线 90% 后从 0.3px/ms 均匀减速到 0.05px/ms。
  变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
  变更 (2026-08-20): Button hover 伪元素 transition 不再被误判为触发器锚点运动。
  变更 (2026-08-12): 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
@@ -94,6 +95,8 @@
     import {
         TOOLTIP_APPEAR_MOTION,
         TOOLTIP_APPEAR_TOTAL_MS,
+        TOOLTIP_CONTINUOUS_CONTENT_DECELERATE_FROM,
+        TOOLTIP_CONTINUOUS_CONTENT_END_SPEED_PX_PER_MS,
         TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
         TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
         TOOLTIP_DISAPPEAR_MOTION,
@@ -287,6 +290,7 @@
     let switchContentDurationMs = $state(0);
     let switchShellDistancePx = $state(0);
     let switchContentDistancePx = $state(0);
+    let switchContentSpeedProfile = $state("speed-ramp(0.9, 0.3, 0.05)");
     let switchMotionRevision = 0;
     let prefersReducedMotion = $state(false);
     let reducedMotionMedia: MediaQueryList | undefined;
@@ -360,6 +364,7 @@
         switchContentDurationMs = 0;
         switchShellDistancePx = 0;
         switchContentDistancePx = 0;
+        switchContentSpeedProfile = "speed-ramp(0.9, 0.3, 0.05)";
         measuredSize = { width: 0, height: 0 };
         pendingMeasuredSize = { width: 0, height: 0 };
         measuredOverlayId = undefined;
@@ -408,6 +413,7 @@
         switchContentDurationMs = 0;
         switchShellDistancePx = 0;
         switchContentDistancePx = 0;
+        switchContentSpeedProfile = "speed-ramp(0.9, 0.3, 0.05)";
         outgoingOverlay = null;
         outgoingTargetRect = undefined;
         outgoingAlignedRect = undefined;
@@ -528,8 +534,102 @@
         return Math.min(elapsed / duration, 1);
     }
 
-    function getEaseOutProgress(progress: number) {
-        return 1 - (1 - progress) ** 3;
+    type TooltipMotionTuning = {
+        shellSpeed: number;
+        contentSpeed: number;
+        contentEndSpeed: number;
+        contentDecelerateFrom: number;
+    };
+
+    function readPositiveNumber(style: CSSStyleDeclaration, name: string, fallback: number) {
+        const value = Number.parseFloat(style.getPropertyValue(name));
+        return Number.isFinite(value) && value > 0 ? value : fallback;
+    }
+
+    function readUnitNumber(style: CSSStyleDeclaration, name: string, fallback: number) {
+        const value = Number.parseFloat(style.getPropertyValue(name));
+        return Number.isFinite(value) && value >= 0 && value <= 1
+            ? value
+            : fallback;
+    }
+
+    function readMotionTuning(): TooltipMotionTuning {
+        const style = sizeShellRef ? getComputedStyle(sizeShellRef) : undefined;
+        if (!style) {
+            return {
+                shellSpeed: TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
+                contentSpeed: TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
+                contentEndSpeed:
+                    TOOLTIP_CONTINUOUS_CONTENT_END_SPEED_PX_PER_MS,
+                contentDecelerateFrom:
+                    TOOLTIP_CONTINUOUS_CONTENT_DECELERATE_FROM,
+            };
+        }
+
+        const contentSpeed = readPositiveNumber(
+            style,
+            "--snowui-tooltip-test-content-speed",
+            TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
+        );
+        return {
+            shellSpeed: readPositiveNumber(
+                style,
+                "--snowui-tooltip-test-shell-speed",
+                TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
+            ),
+            contentSpeed,
+            contentEndSpeed: Math.min(
+                contentSpeed,
+                readPositiveNumber(
+                    style,
+                    "--snowui-tooltip-test-content-end-speed",
+                    TOOLTIP_CONTINUOUS_CONTENT_END_SPEED_PX_PER_MS,
+                ),
+            ),
+            contentDecelerateFrom: readUnitNumber(
+                style,
+                "--snowui-tooltip-test-content-decelerate-from",
+                TOOLTIP_CONTINUOUS_CONTENT_DECELERATE_FROM,
+            ),
+        };
+    }
+
+    function getSpeedRampDuration(
+        distance: number,
+        startSpeed: number,
+        endSpeed: number,
+        decelerateFrom: number,
+    ) {
+        const averageSpeed =
+            startSpeed * decelerateFrom +
+            ((startSpeed + endSpeed) / 2) * (1 - decelerateFrom);
+        return distance / averageSpeed;
+    }
+
+    function getSpeedRampProgress(
+        elapsed: number,
+        distance: number,
+        duration: number,
+        startSpeed: number,
+        endSpeed: number,
+        decelerateFrom: number,
+    ) {
+        if (distance <= 0 || duration <= 0 || elapsed >= duration) return 1;
+        const decelerateAt = duration * decelerateFrom;
+        if (elapsed <= decelerateAt) {
+            return Math.min((startSpeed * elapsed) / distance, 1);
+        }
+        const decelerateDuration = duration - decelerateAt;
+        const decelerateElapsed = elapsed - decelerateAt;
+        const acceleration = (endSpeed - startSpeed) / decelerateDuration;
+        const movedBeforeDeceleration = startSpeed * decelerateAt;
+        const movedDuringDeceleration =
+            startSpeed * decelerateElapsed +
+            (acceleration * decelerateElapsed * decelerateElapsed) / 2;
+        return Math.min(
+            (movedBeforeDeceleration + movedDuringDeceleration) / distance,
+            1,
+        );
     }
 
     function interpolate(start: number, end: number, progress: number) {
@@ -656,19 +756,27 @@
             previousRenderedOverlay.id !== overlayState.id
         ) {
             cancelSwitchMotion();
-            switchStartRect = readVisualRect(sizeShellRef);
-            outgoingOverlay = previousRenderedOverlay;
-            outgoingAlignedRect = activeTargetRect ?? switchStartRect;
-            outgoingContentRect = readVisualRect(sizeContentRef);
-            outgoingTargetRect =
-                readVisualRect(incomingLayerRef) ??
-                outgoingAlignedRect ??
-                switchStartRect;
-            if (outgoingTargetRect) {
-                outgoingLayerSize = {
-                    width: outgoingTargetRect.width,
-                    height: outgoingTargetRect.height,
-                };
+            if (overlayState.continuousMotion === false) {
+                switchStartRect = undefined;
+                outgoingOverlay = null;
+                outgoingAlignedRect = undefined;
+                outgoingContentRect = undefined;
+                outgoingTargetRect = undefined;
+            } else {
+                switchStartRect = readVisualRect(sizeShellRef);
+                outgoingOverlay = previousRenderedOverlay;
+                outgoingAlignedRect = activeTargetRect ?? switchStartRect;
+                outgoingContentRect = readVisualRect(sizeContentRef);
+                outgoingTargetRect =
+                    readVisualRect(incomingLayerRef) ??
+                    outgoingAlignedRect ??
+                    switchStartRect;
+                if (outgoingTargetRect) {
+                    outgoingLayerSize = {
+                        width: outgoingTargetRect.width,
+                        height: outgoingTargetRect.height,
+                    };
+                }
             }
             measuredOverlayId = undefined;
             incomingLayerReady = false;
@@ -894,6 +1002,7 @@
             lastPositionTooltipId !== activeTooltipId;
         const canSmoothMove =
             tooltipBehavior.smoothMove &&
+            overlayState?.continuousMotion !== false &&
             !prefersReducedMotion &&
             distance <= maxMoveDistance &&
             startRect !== undefined &&
@@ -964,10 +1073,11 @@
                       { width: startRect.width, height: startRect.height },
                   )
                 : targetRect;
+            const motionTuning = readMotionTuning();
             const shellDistance = getRectCenterDistance(startRect, targetRect);
             const shellDuration = getDistanceDuration(
                 shellDistance,
-                TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
+                motionTuning.shellSpeed,
             );
             const alignment = canJoinContentTrack
                 ? {
@@ -978,9 +1088,11 @@
             const contentDistance = canJoinContentTrack
                 ? Math.hypot(alignment.x, alignment.y)
                 : 0;
-            const contentDuration = getDistanceDuration(
+            const contentDuration = getSpeedRampDuration(
                 contentDistance,
-                TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
+                motionTuning.contentSpeed,
+                motionTuning.contentEndSpeed,
+                motionTuning.contentDecelerateFrom,
             );
             const totalDuration = Math.max(shellDuration, contentDuration);
             const revision = ++switchMotionRevision;
@@ -994,6 +1106,7 @@
             switchContentDurationMs = contentDuration;
             switchShellDistancePx = shellDistance;
             switchContentDistancePx = contentDistance;
+            switchContentSpeedProfile = `speed-ramp(${motionTuning.contentDecelerateFrom}, ${motionTuning.contentSpeed}, ${motionTuning.contentEndSpeed})`;
             shellMotionOffset = {
                 x: startRect.left - initialBaseBounds.left,
                 y: startRect.top - initialBaseBounds.top,
@@ -1037,8 +1150,13 @@
                             elapsed,
                             shellDuration,
                         );
-                        const contentProgress = getEaseOutProgress(
-                            getMotionProgress(elapsed, contentDuration),
+                        const contentProgress = getSpeedRampProgress(
+                            elapsed,
+                            contentDistance,
+                            contentDuration,
+                            motionTuning.contentSpeed,
+                            motionTuning.contentEndSpeed,
+                            motionTuning.contentDecelerateFrom,
                         );
                         const currentSize = {
                             width: interpolate(
@@ -1136,6 +1254,7 @@
             switchContentDurationMs = 0;
             switchShellDistancePx = 0;
             switchContentDistancePx = 0;
+            switchContentSpeedProfile = "speed-ramp(0.9, 0.3, 0.05)";
         }
 
         incomingLayerReady = true;
@@ -1274,6 +1393,7 @@
                 switchContentDurationMs = 0;
                 switchShellDistancePx = 0;
                 switchContentDistancePx = 0;
+                switchContentSpeedProfile = "speed-ramp(0.9, 0.3, 0.05)";
             }
         };
         updateReducedMotion();
@@ -1370,7 +1490,7 @@
                 data-content-duration={switchContentDurationMs}
                 data-shell-distance={switchShellDistancePx}
                 data-content-distance={switchContentDistancePx}
-                data-content-easing="ease-out"
+                data-content-speed-profile={switchContentSpeedProfile}
                 style={motionShellStyle}
             >
                 <Frame
