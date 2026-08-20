@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.12.0
+ Tooltip 文字提示组件 v1.13.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 进行中的连续切换改目标时使用 90–160ms cubic ease-out 快速重定向，避免反复重启完整时间线造成追随变慢。
  变更 (2026-08-21): 删除按含 padding 图层计算的二次 mask；真实内容矩形保持 4px 投影间距，圆角外框成为唯一裁切窗口。
  变更 (2026-08-21): 连续裁切改为有界协调时间线；外框平滑加减速，内容以轻微相位滞后同步收敛，打断时直接从当前画面重定向。
  变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
@@ -100,6 +101,11 @@
         TOOLTIP_CONTINUOUS_DURATION_PER_PX_MS,
         TOOLTIP_CONTINUOUS_MAX_DURATION_MS,
         TOOLTIP_CONTINUOUS_MIN_DURATION_MS,
+        TOOLTIP_CONTINUOUS_RETARGET_BASE_DURATION_MS,
+        TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG,
+        TOOLTIP_CONTINUOUS_RETARGET_DURATION_PER_PX_MS,
+        TOOLTIP_CONTINUOUS_RETARGET_MAX_DURATION_MS,
+        TOOLTIP_CONTINUOUS_RETARGET_MIN_DURATION_MS,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
     } from "../motion/presets/tooltip";
@@ -243,6 +249,8 @@
     let finalPosition: "top" | "bottom" | "left" | "right" = $state("top");
     let moveMode: "snap" | "frame" = $state("snap");
     let switchPhase: "idle" | "prepare" | "moving" = $state("idle");
+    let switchRetargeting = $state(false);
+    let pendingSwitchRetarget = false;
     let measuredSize = $state({ width: 0, height: 0 });
     let pendingMeasuredSize = { width: 0, height: 0 };
     let measuredOverlayId: string | undefined;
@@ -342,6 +350,8 @@
         lastPositionTooltipId = undefined;
         moveMode = "snap";
         switchPhase = "idle";
+        switchRetargeting = false;
+        pendingSwitchRetarget = false;
         animatedShellSize = undefined;
         switchShellDurationMs = 0;
         switchContentDurationMs = 0;
@@ -403,6 +413,7 @@
         outgoingLayerOffset = { x: 0, y: 0 };
         moveMode = "snap";
         switchPhase = "idle";
+        switchRetargeting = false;
     }
 
     function getMovementUnit(
@@ -511,7 +522,18 @@
     function getContinuousDuration(
         distance: number,
         tuning: TooltipMotionTuning,
+        retargeting: boolean,
     ) {
+        if (retargeting) {
+            return Math.min(
+                TOOLTIP_CONTINUOUS_RETARGET_MAX_DURATION_MS,
+                Math.max(
+                    TOOLTIP_CONTINUOUS_RETARGET_MIN_DURATION_MS,
+                    TOOLTIP_CONTINUOUS_RETARGET_BASE_DURATION_MS +
+                        distance * TOOLTIP_CONTINUOUS_RETARGET_DURATION_PER_PX_MS,
+                ),
+            );
+        }
         return Math.min(
             tuning.maxDuration,
             Math.max(
@@ -521,7 +543,8 @@
         );
     }
 
-    function getCoordinatedProgress(progress: number) {
+    function getCoordinatedProgress(progress: number, retargeting: boolean) {
+        if (retargeting) return 1 - Math.pow(1 - progress, 3);
         return (1 - Math.cos(Math.PI * progress)) / 2;
     }
 
@@ -653,14 +676,17 @@
             previousRenderedOverlay &&
             previousRenderedOverlay.id !== overlayState.id
         ) {
+            const wasSwitching = switchPhase !== "idle";
             cancelSwitchMotion();
             if (overlayState.continuousMotion === false) {
+                pendingSwitchRetarget = false;
                 switchStartRect = undefined;
                 outgoingOverlay = null;
                 outgoingAlignedRect = undefined;
                 outgoingContentRect = undefined;
                 outgoingTargetRect = undefined;
             } else {
+                pendingSwitchRetarget = wasSwitching;
                 switchStartRect = readVisualRect(sizeShellRef);
                 outgoingOverlay = previousRenderedOverlay;
                 outgoingAlignedRect = activeTargetRect ?? switchStartRect;
@@ -970,9 +996,15 @@
                 : targetRect;
             const motionTuning = readMotionTuning();
             const shellDistance = getRectCenterDistance(startRect, targetRect);
+            const isRetargeting = pendingSwitchRetarget;
+            pendingSwitchRetarget = false;
+            const contentLag = isRetargeting
+                ? TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG
+                : motionTuning.contentLag;
             const motionDuration = getContinuousDuration(
                 shellDistance,
                 motionTuning,
+                isRetargeting,
             );
             const alignment = canJoinContentTrack
                 ? {
@@ -989,6 +1021,7 @@
             const revision = ++switchMotionRevision;
             moveMode = "snap";
             switchPhase = "prepare";
+            switchRetargeting = isRetargeting;
             animatedShellSize = {
                 width: startRect.width,
                 height: startRect.height,
@@ -997,7 +1030,9 @@
             switchContentDurationMs = contentDuration;
             switchShellDistancePx = shellDistance;
             switchContentDistancePx = contentDistance;
-            switchContentSpeedProfile = `coordinated-ease(${motionTuning.contentLag})`;
+            switchContentSpeedProfile = isRetargeting
+                ? `retarget-ease-out(${contentLag})`
+                : `coordinated-ease(${contentLag})`;
             shellMotionOffset = {
                 x: startRect.left - initialBaseBounds.left,
                 y: startRect.top - initialBaseBounds.top,
@@ -1039,10 +1074,11 @@
                         );
                         const shellProgress = getCoordinatedProgress(
                             timelineProgress,
+                            isRetargeting,
                         );
                         const contentProgress = getContentProgress(
                             shellProgress,
-                            motionTuning.contentLag,
+                            contentLag,
                         );
                         const currentSize = {
                             width: interpolate(
@@ -1131,6 +1167,8 @@
             switchStartRect = undefined;
             moveMode = "snap";
             switchPhase = "idle";
+            switchRetargeting = false;
+            pendingSwitchRetarget = false;
             animatedShellSize = undefined;
             switchShellDurationMs = 0;
             switchContentDurationMs = 0;
@@ -1270,6 +1308,8 @@
                 outgoingLayerOffset = { x: 0, y: 0 };
                 moveMode = "snap";
                 switchPhase = "idle";
+                switchRetargeting = false;
+                pendingSwitchRetarget = false;
                 animatedShellSize = undefined;
                 switchShellDurationMs = 0;
                 switchContentDurationMs = 0;
@@ -1368,6 +1408,7 @@
                 class="snowui-tooltip-motion-shell"
                 data-move-mode={moveMode}
                 data-switch-phase={switchPhase}
+                data-retargeting={switchRetargeting}
                 data-shell-duration={switchShellDurationMs}
                 data-content-duration={switchContentDurationMs}
                 data-shell-distance={switchShellDistancePx}
