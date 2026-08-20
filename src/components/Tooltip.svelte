@@ -1,8 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.8.3
+ Tooltip 文字提示组件 v1.8.4
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-20): 外框与 4px 拼接内容带从同一帧开始，以统一线性像素速度移动，并分别按自身距离计算时长；超过拼接阈值时内容随外框移动。
+ 变更 (2026-08-20): 外框与 4px 拼接内容带从同一帧开始，但分别消费独立线性速度；内容带慢于外框，并分别按自身距离计算时长。
  变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
  变更 (2026-08-20): Button hover 伪元素 transition 不再被误判为触发器锚点运动。
  变更 (2026-08-12): 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
@@ -94,7 +94,8 @@
     import {
         TOOLTIP_APPEAR_MOTION,
         TOOLTIP_APPEAR_TOTAL_MS,
-        TOOLTIP_CONTINUOUS_MOVE_SPEED_PX_PER_MS,
+        TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
+        TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
     } from "../motion/presets/tooltip";
@@ -518,8 +519,8 @@
         );
     }
 
-    function getDistanceDuration(distance: number) {
-        return distance / TOOLTIP_CONTINUOUS_MOVE_SPEED_PX_PER_MS;
+    function getDistanceDuration(distance: number, speed: number) {
+        return distance / speed;
     }
 
     function getMotionProgress(elapsed: number, duration: number) {
@@ -960,7 +961,10 @@
                   )
                 : targetRect;
             const shellDistance = getRectCenterDistance(startRect, targetRect);
-            const shellDuration = getDistanceDuration(shellDistance);
+            const shellDuration = getDistanceDuration(
+                shellDistance,
+                TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
+            );
             const alignment = canJoinContentTrack
                 ? {
                       x: targetRect.left - incomingTrackRect.left,
@@ -970,7 +974,10 @@
             const contentDistance = canJoinContentTrack
                 ? Math.hypot(alignment.x, alignment.y)
                 : 0;
-            const contentDuration = getDistanceDuration(contentDistance);
+            const contentDuration = getDistanceDuration(
+                contentDistance,
+                TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
+            );
             const totalDuration = Math.max(shellDuration, contentDuration);
             const revision = ++switchMotionRevision;
             moveMode = "snap";

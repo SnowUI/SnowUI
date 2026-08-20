@@ -44,7 +44,8 @@ export const MOTION_SPRING_MOVE_MASS = 1;
 
 export const MOTION_DURATION_TOOLTIP_APPEAR_MS = 150;
 export const MOTION_DURATION_TOOLTIP_DISAPPEAR_MS = 50;
-export const MOTION_SPEED_TOOLTIP_CONTINUOUS_PX_PER_MS = 0.5;
+export const MOTION_SPEED_TOOLTIP_CONTINUOUS_SHELL_PX_PER_MS = 0.5;
+export const MOTION_SPEED_TOOLTIP_CONTINUOUS_CONTENT_PX_PER_MS = 0.3;
 /** @deprecated Tooltip appear no longer uses an internal delay. */
 export const MOTION_DELAY_TOOLTIP_APPEAR_MS = 80;
 
