@@ -1,8 +1,9 @@
 <!--
- Tooltip 文字提示组件 v1.8.0
+ Tooltip 文字提示组件 v1.8.1
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示固定在新旧位置的内容。
+ 变更 (2026-08-20): 连续 Tooltip 内容沿外框移动方向短距离推进，与二维裁切揭示共同形成连续流动效果。
+ 变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
  变更 (2026-08-20): Button hover 伪元素 transition 不再被误判为触发器锚点运动。
  变更 (2026-08-12): 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
  变更 (2026-08-12): 毛玻璃 Backdrop 与 opacity/scale Foreground 分层，恢复 Tooltip 渐显且不再削弱首帧背景模糊。
@@ -91,6 +92,7 @@
     import {
         TOOLTIP_APPEAR_MOTION,
         TOOLTIP_APPEAR_TOTAL_MS,
+        TOOLTIP_CONTINUOUS_CONTENT_DRIFT_PX,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
     } from "../motion/presets/tooltip";
@@ -228,6 +230,7 @@
     // Portal 逻辑
     let tooltipRef = $state<HTMLElement>();
     let sizeShellRef = $state<HTMLElement>();
+    let incomingLayerRef = $state<HTMLElement>();
     let sizeContentRef = $state<HTMLElement>();
     let placeholderRef = $state<HTMLElement>();
     let triggerEl: HTMLElement | null = null;
@@ -461,6 +464,29 @@
         };
     }
 
+    function getContentDrift(
+        startRect: TooltipVisualRect,
+        targetRect: TooltipVisualRect,
+    ) {
+        const dx =
+            targetRect.left + targetRect.width / 2 -
+            (startRect.left + startRect.width / 2);
+        const dy =
+            targetRect.top + targetRect.height / 2 -
+            (startRect.top + startRect.height / 2);
+        const length = Math.hypot(dx, dy);
+        if (length <= 0.5) return { x: 0, y: 0 };
+
+        const distance = Math.min(
+            TOOLTIP_CONTINUOUS_CONTENT_DRIFT_PX,
+            length / 2,
+        );
+        return {
+            x: (dx / length) * distance,
+            y: (dy / length) * distance,
+        };
+    }
+
     function clearOverlayLifecycleTimers() {
         if (overlayAppearTimer !== undefined) {
             window.clearTimeout(overlayAppearTimer);
@@ -536,7 +562,10 @@
             cancelSwitchMotion();
             switchStartRect = readVisualRect(sizeShellRef);
             outgoingOverlay = previousRenderedOverlay;
-            outgoingTargetRect = activeTargetRect ?? switchStartRect;
+            outgoingTargetRect =
+                readVisualRect(incomingLayerRef) ??
+                activeTargetRect ??
+                switchStartRect;
             if (outgoingTargetRect) {
                 outgoingLayerSize = {
                     width: outgoingTargetRect.width,
@@ -789,7 +818,13 @@
 
         if (isSwitchingTooltip && canSmoothMove && startRect && outgoingTargetRect) {
             const oldTarget = outgoingTargetRect;
-            const layerMasks = createLayerMasks(oldTarget, targetRect);
+            const contentDrift = getContentDrift(startRect, targetRect);
+            const incomingStartRect = {
+                ...targetRect,
+                left: targetRect.left - contentDrift.x,
+                top: targetRect.top - contentDrift.y,
+            };
+            const layerMasks = createLayerMasks(oldTarget, incomingStartRect);
             const initialBaseBounds = sizeMotionEnabled
                 ? getFloatingVisualBounds(
                       bestPos,
@@ -804,8 +839,8 @@
                 y: startRect.top - initialBaseBounds.top,
             };
             incomingLayerOffset = {
-                x: targetRect.left - startRect.left,
-                y: targetRect.top - startRect.top,
+                x: incomingStartRect.left - startRect.left,
+                y: incomingStartRect.top - startRect.top,
             };
             outgoingLayerOffset = {
                 x: oldTarget.left - startRect.left,
@@ -825,8 +860,12 @@
                     shellMotionOffset = { x: 0, y: 0 };
                     incomingLayerOffset = { x: 0, y: 0 };
                     outgoingLayerOffset = {
-                        x: oldTarget.left - targetRect.left,
-                        y: oldTarget.top - targetRect.top,
+                        x:
+                            oldTarget.left - targetRect.left +
+                            contentDrift.x,
+                        y:
+                            oldTarget.top - targetRect.top +
+                            contentDrift.y,
                     };
                     outgoingLayerSeam = layerMasks.outgoing.end;
                     incomingLayerSeam = layerMasks.incoming.end;
@@ -1126,6 +1165,7 @@
                             </span>
                         {/if}
                         <span
+                            bind:this={incomingLayerRef}
                             class="snowui-tooltip-content-layer"
                             data-tooltip-layer="incoming"
                             data-move-mode={moveMode}
