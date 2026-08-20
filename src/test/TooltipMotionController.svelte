@@ -1,6 +1,6 @@
 <!--
   Tooltip Test 专用连续裁切动效控制台
-  v2.0.0
+  v2.1.0
 
   仅供 Playground Test 沙箱使用，不属于 Tooltip 公开组件结构。
 -->
@@ -13,10 +13,10 @@
     import Tooltip from "../components/Tooltip.svelte";
 
     let motion = $state({
-        baseDuration: 120,
-        minDuration: 140,
-        maxDuration: 280,
-        durationPerPixel: 0.45,
+        baseDuration: 160,
+        minDuration: 180,
+        maxDuration: 360,
+        durationPerPixel: 0.6,
         contentLag: 0.08,
     });
 
@@ -61,7 +61,7 @@
                 <Slider
                     bind:value={motion.baseDuration}
                     minValue={80}
-                    maxValue={260}
+                    maxValue={520}
                     step={10}
                     aria-label="Tooltip 基础时长"
                 />
@@ -71,7 +71,7 @@
                 <Slider
                     bind:value={motion.minDuration}
                     minValue={120}
-                    maxValue={280}
+                    maxValue={560}
                     step={10}
                     aria-label="Tooltip 最短时长"
                 />
@@ -84,7 +84,7 @@
                 <Slider
                     bind:value={motion.maxDuration}
                     minValue={motion.minDuration}
-                    maxValue={500}
+                    maxValue={800}
                     step={10}
                     aria-label="Tooltip 最长时长"
                 />
