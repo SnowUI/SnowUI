@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.8.0
+ * v1.8.1
  */
 export const examples = [
     {
@@ -250,5 +250,27 @@ export const examples = [
             interaction: "Tooltip 显示后，后代图标的 animationstart 与 Button ::before / ::after hover 背景 transition 不会使 Tooltip 消失",
         },
         logic: ["DismissOnMotion", "DescendantAnimation", "Regression"],
+    },
+    {
+        name: "H1: 交互祖先触发 (Interactive Ancestor Trigger)",
+        code: `H1
+<div class="p-40">
+    <a
+        href="#tooltip-interactive-ancestor"
+        aria-label="Avatar"
+        style="display: inline-flex; width: 36px; height: 36px; align-items: center; justify-content: center;"
+    >
+        <span aria-hidden="true">●</span>
+        <span style="width: 0; overflow: hidden; white-space: nowrap;">
+            Avatar
+            <Tooltip position="right">Avatar</Tooltip>
+        </span>
+    </a>
+</div>`,
+        expected: {
+            render: "可见触发区只显示图标，内部 label 包装层为零宽",
+            interaction: "hover 链接的任意可见区域时，Tooltip 使用完整链接作为触发与定位宿主，并显示在右侧",
+        },
+        logic: ["InteractiveAncestor", "Link", "CollapsedLabel", "Regression"],
     },
 ] as const;

@@ -1,6 +1,6 @@
 # Tooltip.svelte 文档
 
-> **版本**: v1.14.0
+> **版本**: v1.14.1
 > **职责**: 文字提示组件，在悬停时显示额外信息。
 
 **能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
@@ -79,6 +79,7 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 8. **动效感知关闭**: 默认只在 Tooltip 已显示期间，以页面级单例监听触发元素与祖先的 transition / animation，以及后代真实元素的几何 transition；命中后立即卸载 Tooltip 并跳过退出动效。后代 Logo / Icon 等装饰性 animation、颜色、背景、透明度以及 `::before` / `::after` 伪元素 transition 不触发关闭；可通过 `dismissOnMotion={false}` 显式关闭。
 9. **连续打断与性能**: 动画未结束又切换目标时，从外框和当前新内容层各自的实时可见矩形重新计算下一段移动，并以当前目标 Tooltip 的最终对齐矩形判断下一次是否满足 `4px` 拼接门槛；旧时间线立即作废，不排队、不等待，也不得先跳到上一段终点。重定向段使用 `70–120ms` cubic ease-out；稳定段最短时长降为 `140ms`，使 Sidebar 约 40px 的逐项切换不会反复落入 200ms 慢段。合成提示只在 `moving` 阶段作用于外框 transform、宽高和内容 transform，结束后随状态选择器自动释放。
 10. **触发与减少动态效果**: warm Tooltip 的每次目标变化都立即提交，不用固定意图延迟、瞬时指针速度或 burst 窗口决定是否播放连续裁切，也不监听 document `pointermove`。`prefers-reduced-motion: reduce` 下，所有连续切换都立即定位并只显示新内容，不保留移动、宽高过渡或中间裁切状态。
+11. **交互宿主解析**: Tooltip 直接放在 Link / Button 的内部包装层时，以最近的 `a` / `button` / `role="link"` / `role="button"` 祖先作为 hover 命中与定位触发器；无交互祖先时保持以 Tooltip 的直接父元素为触发器。因此组件内部 label 在折叠态变为零宽或隐藏时，可见主操作仍保留完整 Tooltip 命中区。
 
 ## 样式逻辑（实现对照）
 
@@ -148,6 +149,10 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.14.1 (2026-08-21)
+- Tooltip 组合在 Link / Button 内部包装层时，改为使用最近交互祖先作为 hover 与定位触发器。
+- 修复 SidebarItem 的 Link 路径在折叠 label 后 Tooltip 占位层变为零宽、导致图标 hover 无法显示提示的问题。
 
 ### v1.14.0 (2026-08-21)
 - 稳定切换改为 `140–280ms`，进行中重定向改为 `70–120ms`；约 40px 的 SidebarItem 切换稳定在约 `140ms`。

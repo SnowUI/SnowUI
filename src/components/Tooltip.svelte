@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.14.0
+ Tooltip 文字提示组件 v1.14.1
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 组合在 Link / Button 内部包装层时优先使用最近交互祖先作为触发器，避免折叠导航隐藏 label 后 Tooltip 失去 hover 命中区。
  变更 (2026-08-21): 稳定切换收敛为 140–280ms，进行中改目标使用 70–120ms cubic ease-out，避免侧边栏短距离切换仍被最慢时长钳制。
  变更 (2026-08-21): 删除按含 padding 图层计算的二次 mask；真实内容矩形保持 4px 投影间距，圆角外框成为唯一裁切窗口。
  变更 (2026-08-21): 连续裁切改为有界协调时间线；外框平滑加减速，内容以轻微相位滞后同步收敛，打断时直接从当前画面重定向。
@@ -1239,6 +1240,17 @@
         }
     }
 
+    function resolveTriggerElement(placeholder: HTMLElement) {
+        const parent = placeholder.parentElement;
+        if (!parent) return null;
+
+        return (
+            parent.closest<HTMLElement>(
+                'button, a, [role="button"], [role="link"]',
+            ) ?? parent
+        );
+    }
+
     function createOverlayState(): TooltipOverlayState {
         return {
             id: tooltipId,
@@ -1326,7 +1338,7 @@
         });
 
         if (placeholderRef) {
-            triggerEl = placeholderRef.parentElement;
+            triggerEl = resolveTriggerElement(placeholderRef);
         }
 
         if (triggerEl) {
