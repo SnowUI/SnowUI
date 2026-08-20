@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.14.1
+ Tooltip 文字提示组件 v1.15.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 全局定位、媒体查询、Overlay 响应与动效关闭监听收敛到唯一共享 Portal host，定位刷新合并为每帧最多一次。
  变更 (2026-08-21): 组合在 Link / Button 内部包装层时优先使用最近交互祖先作为触发器，避免折叠导航隐藏 label 后 Tooltip 失去 hover 命中区。
  变更 (2026-08-21): 稳定切换收敛为 140–280ms，进行中改目标使用 70–120ms cubic ease-out，避免侧边栏短距离切换仍被最慢时长钳制。
  变更 (2026-08-21): 删除按含 padding 图层计算的二次 mask；真实内容矩形保持 4px 投影间距，圆角外框成为唯一裁切窗口。
@@ -276,6 +277,7 @@
     let overlayAppearTimer: number | undefined;
     let overlayDisappearTimer: number | undefined;
     let sizeMotionTimer: number | undefined;
+    let positionUpdateFrame: number | undefined;
     let switchMotionFrame: number | undefined;
     let animatedShellSize = $state<{ width: number; height: number }>();
     let switchShellDurationMs = $state(0);
@@ -622,6 +624,8 @@
     }
 
     $effect(() => {
+        if (!isOverlayHost) return;
+
         const overlayState = currentOverlay;
         const dismissRevision = immediateDismissRevision;
         const previousRenderedOverlay = untrack(() => renderedOverlay);
@@ -720,35 +724,37 @@
     });
 
     $effect(() => {
-        if (!dismissOnMotion || currentOverlay?.id !== tooltipId || !triggerEl) {
-            return;
-        }
+        if (!isOverlayHost) return;
+        const overlayState = currentOverlay;
+        if (!overlayState?.dismissOnMotion) return;
 
         return registerTooltipMotionDismiss({
-            id: tooltipId,
-            triggerEl,
+            id: overlayState.id,
+            triggerEl: overlayState.triggerEl,
             onDismiss: () => {
-                clearHoverShowTimer();
-                dismissTooltipOverlayImmediately(tooltipId);
+                dismissTooltipOverlayImmediately(overlayState.id);
                 scheduleTooltipWarmupReset();
             },
         });
     });
 
     $effect(() => {
-        const overlayId = currentOverlay?.id;
-        const overlayContent = currentOverlay?.fallbackContent;
         const tooltipWidth = measuredSize.width;
         const tooltipHeight = measuredSize.height;
-        void overlayId;
-        void overlayContent;
         void tooltipWidth;
         void tooltipHeight;
 
         finalPosition = position;
-        if (controlledVisible || (overlayVisible && currentOverlay)) {
-            tick().then(updatePosition);
+        if (controlledVisible) {
+            tick().then(schedulePositionUpdate);
+            return;
         }
+
+        if (!isOverlayHost) return;
+        const overlayState = currentOverlay;
+        void overlayState?.id;
+        void overlayState?.fallbackContent;
+        if (overlayVisible && overlayState) tick().then(schedulePositionUpdate);
     });
 
     $effect(() => {
@@ -774,7 +780,7 @@
                 ),
             };
             measuredOverlayId = renderedOverlay?.id ?? tooltipId;
-            tick().then(updatePosition);
+            tick().then(schedulePositionUpdate);
         };
 
         updateMeasuredSize();
@@ -821,7 +827,10 @@
 
     function updatePosition() {
         if (!tooltipRef) return;
-        const overlayState = currentOverlay ?? renderedOverlay;
+        const overlayState =
+            isOverlayHost && overlayVisible
+                ? (currentOverlay ?? renderedOverlay)
+                : null;
         const activeTriggerEl = overlayState?.triggerEl ?? triggerEl;
         if (!activeTriggerEl) return;
         const activeTooltipId = overlayState?.id ?? tooltipId;
@@ -1233,6 +1242,20 @@
         }
     }
 
+    function cancelPositionUpdate() {
+        if (positionUpdateFrame === undefined) return;
+        window.cancelAnimationFrame(positionUpdateFrame);
+        positionUpdateFrame = undefined;
+    }
+
+    function schedulePositionUpdate() {
+        if (positionUpdateFrame !== undefined) return;
+        positionUpdateFrame = window.requestAnimationFrame(() => {
+            positionUpdateFrame = undefined;
+            updatePosition();
+        });
+    }
+
     function clearHoverShowTimer() {
         if (hoverShowTimer !== undefined) {
             window.clearTimeout(hoverShowTimer);
@@ -1262,6 +1285,9 @@
             style: tooltipFrameStyle,
             children: tooltipChildren,
             fallbackContent: displayContent,
+            get dismissOnMotion() {
+                return dismissOnMotion;
+            },
             loopMotion,
             rest: forwardedRest,
         };
@@ -1285,7 +1311,6 @@
             if (finalDisabled) return;
             markTooltipShown();
             showTooltipOverlay(createOverlayState());
-            tick().then(updatePosition);
         };
         const showDelay = getTooltipHoverShowDelay();
         if (showDelay === 0) {
@@ -1305,6 +1330,27 @@
     let originalCursor = "";
 
     onMount(() => {
+        unregisterOverlayHost = registerOverlayHostCandidate(tooltipId, (value) => {
+            isOverlayHost = value;
+        });
+
+        if (placeholderRef) {
+            triggerEl = resolveTriggerElement(placeholderRef);
+        }
+
+        if (triggerEl) {
+            // 保存原始 cursor 并设置 pointer
+            originalCursor = triggerEl.style.cursor;
+            triggerEl.style.cursor = "pointer";
+            triggerEl.addEventListener("mouseenter", handleMouseEnter);
+            triggerEl.addEventListener("mouseleave", handleMouseLeave);
+        }
+
+    });
+
+    $effect(() => {
+        if (!isOverlayHost && !controlledVisible) return;
+
         reducedMotionMedia = window.matchMedia?.("(prefers-reduced-motion: reduce)");
         const updateReducedMotion = () => {
             prefersReducedMotion = reducedMotionMedia?.matches ?? false;
@@ -1332,36 +1378,23 @@
         };
         updateReducedMotion();
         reducedMotionMedia?.addEventListener("change", updateReducedMotion);
-
-        unregisterOverlayHost = registerOverlayHostCandidate(tooltipId, (value) => {
-            isOverlayHost = value;
-        });
-
-        if (placeholderRef) {
-            triggerEl = resolveTriggerElement(placeholderRef);
-        }
-
-        if (triggerEl) {
-            // 保存原始 cursor 并设置 pointer
-            originalCursor = triggerEl.style.cursor;
-            triggerEl.style.cursor = "pointer";
-            triggerEl.addEventListener("mouseenter", handleMouseEnter);
-            triggerEl.addEventListener("mouseleave", handleMouseLeave);
-        }
-
-        window.addEventListener("scroll", updatePosition, true);
-        window.addEventListener("resize", updatePosition);
+        window.addEventListener("scroll", schedulePositionUpdate, true);
+        window.addEventListener("resize", schedulePositionUpdate);
 
         return () => {
             reducedMotionMedia?.removeEventListener("change", updateReducedMotion);
+            reducedMotionMedia = undefined;
+            window.removeEventListener("scroll", schedulePositionUpdate, true);
+            window.removeEventListener("resize", schedulePositionUpdate);
+            cancelPositionUpdate();
         };
     });
 
     onDestroy(() => {
         clearHoverShowTimer();
         clearOverlayLifecycleTimers();
-        const wasActive = currentOverlay?.id === tooltipId;
-        hideTooltipOverlay(tooltipId);
+        cancelPositionUpdate();
+        const wasActive = hideTooltipOverlay(tooltipId);
         unregisterOverlayHost?.();
         if (open === undefined && wasActive) {
             scheduleTooltipWarmupReset();
@@ -1372,8 +1405,6 @@
             triggerEl.removeEventListener("mouseenter", handleMouseEnter);
             triggerEl.removeEventListener("mouseleave", handleMouseLeave);
         }
-        window.removeEventListener("scroll", updatePosition, true);
-        window.removeEventListener("resize", updatePosition);
     });
 
     // Portal 定位样式 (fixed + px，与 getBoundingClientRect 坐标保持同一单位)

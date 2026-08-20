@@ -15,6 +15,7 @@ export interface TooltipOverlayState {
     style?: string;
     children?: Snippet;
     fallbackContent: string;
+    dismissOnMotion: boolean;
     continuousMotion?: boolean;
     loopMotion?: any;
     rest: Record<string, any>;
@@ -60,11 +61,12 @@ export function scheduleTooltipOverlayHide(id: string, delayMs = TOOLTIP_OVERLAY
     }, delayMs);
 }
 
-export function hideTooltipOverlay(id: string): void {
-    if (activeTooltipId !== id) return;
+export function hideTooltipOverlay(id: string): boolean {
+    if (activeTooltipId !== id) return false;
     clearHideTimer();
     activeTooltipId = undefined;
     tooltipOverlay.set(null);
+    return true;
 }
 
 export function dismissTooltipOverlayImmediately(id: string): void {

@@ -1,6 +1,6 @@
 # Tooltip.svelte 文档
 
-> **版本**: v1.14.1
+> **版本**: v1.15.0
 > **职责**: 文字提示组件，在悬停时显示额外信息。
 
 **能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
@@ -80,6 +80,7 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 9. **连续打断与性能**: 动画未结束又切换目标时，从外框和当前新内容层各自的实时可见矩形重新计算下一段移动，并以当前目标 Tooltip 的最终对齐矩形判断下一次是否满足 `4px` 拼接门槛；旧时间线立即作废，不排队、不等待，也不得先跳到上一段终点。重定向段使用 `70–120ms` cubic ease-out；稳定段最短时长降为 `140ms`，使 Sidebar 约 40px 的逐项切换不会反复落入 200ms 慢段。合成提示只在 `moving` 阶段作用于外框 transform、宽高和内容 transform，结束后随状态选择器自动释放。
 10. **触发与减少动态效果**: warm Tooltip 的每次目标变化都立即提交，不用固定意图延迟、瞬时指针速度或 burst 窗口决定是否播放连续裁切，也不监听 document `pointermove`。`prefers-reduced-motion: reduce` 下，所有连续切换都立即定位并只显示新内容，不保留移动、宽高过渡或中间裁切状态。
 11. **交互宿主解析**: Tooltip 直接放在 Link / Button 的内部包装层时，以最近的 `a` / `button` / `role="link"` / `role="button"` 祖先作为 hover 命中与定位触发器；无交互祖先时保持以 Tooltip 的直接父元素为触发器。因此组件内部 label 在折叠态变为零宽或隐藏时，可见主操作仍保留完整 Tooltip 命中区。
+12. **多实例性能边界**: 非受控 Tooltip 实例只保留各自触发器的 enter / leave 监听。页面级 Overlay store 响应、动效关闭注册、`prefers-reduced-motion` 查询和 window scroll / resize 定位监听只由唯一共享 Portal host 承担；只有当前可见的受控 Tooltip 会额外注册自身定位监听。scroll、resize 与尺寸测量引起的重复定位请求通过 `requestAnimationFrame` 合并，每帧最多执行一次布局读取。
 
 ## 样式逻辑（实现对照）
 
@@ -149,6 +150,11 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.15.0 (2026-08-21)
+- 共享 Overlay store、动效关闭、reduced-motion 与 window 定位监听收敛到唯一 Portal host，非 host Tooltip 不再因其他提示切换而执行响应逻辑。
+- scroll、resize、ResizeObserver 和 Overlay 更新产生的定位请求改为每帧合并，避免同一帧重复读取布局。
+- 动效感知关闭由 Portal host 根据当前 Overlay 的 `dismissOnMotion` 配置注册，公开 Prop 和交互语义不变。
 
 ### v1.14.1 (2026-08-21)
 - Tooltip 组合在 Link / Button 内部包装层时，改为使用最近交互祖先作为 hover 与定位触发器。
