@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.19.0
+> **版本**: v1.20.0
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -11,7 +11,7 @@
 | `GENERIC_SCALE_APPEAR_MOTION` | 普通组件显式 opt-in 保留 generic opacity + scale 进入 | Frame 默认 fallback、语义明确的 overlay / Tooltip / Dialog | SnowUI 旧 generic appear 组合的兼容显式 preset |
 | `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION` | Popover、Listbox、Menu dropdown，仅 opacity | Tooltip、Dialog、普通内容替换 | SnowUI dropdown overlay |
 | `TOOLTIP_APPEAR_MOTION` / `TOOLTIP_DISAPPEAR_MOTION` | Tooltip Foreground 的 opacity + scale；不得用于 Portal、size shell 或 Backdrop | Dropdown、Dialog、承载 backdrop-filter 的祖先 | transitions.dev Tooltip + SnowUI backdrop-filter 合成约束 |
-| `TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS` / `TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS` | 连续 Tooltip 切换中，外框与拼接内容带从同一帧开始；外框按 `0.5px/ms` 线性移动，内容带按 `0.4px/ms` 计算时长并使用 cubic ease-out 缓出进度 | Tooltip 首次出现、远距离直接定位、reduced-motion | 用户将内容速度调为 `0.4px/ms`，并指定内容移动改为缓出；外框保留原 `75px / 150ms` 视觉基线 |
+| `TOOLTIP_CONTINUOUS_*_DURATION_*` / `TOOLTIP_CONTINUOUS_CONTENT_LAG` | 连续 Tooltip 切换中，外框与拼接内容带同帧开始、在同一 `200–320ms` 有界时间线收敛；外框使用正弦平滑加减速，内容保留 `0.12` 轻微相位滞后 | Tooltip 首次出现、远距离直接定位、reduced-motion | 参考视频逐帧分析：视觉交接约 300–330ms，外框与内容协调结束，不存在独立速度导致的内容长尾 |
 | `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION` | Dialog / Modal 内容面板 | Tooltip、Dropdown | transitions.dev Modal open / close |
 | `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION` | Dialog 遮罩 opacity | 内容面板 scale | SnowUI Dialog 当前遮罩行为 |
 | `REPLACEMENT_APPEAR_MOTION` | Icon / Text / CodeBlock 等内容替换 | Overlay、Dialog | SnowUI replacement default |
@@ -44,6 +44,7 @@
 
 ## 变更记录
 
+- v1.20.0 (2026-08-21): Tooltip 连续切换改为有界协调时间线，取消外框 / 内容独立像素速度；加入平滑加减速、轻微内容相位滞后和同帧收敛。
 - v1.19.0 (2026-08-20): Tooltip 内容带移动改用 cubic ease-out 缓出；保留用户当前调定的 `0.4px/ms` 内容时长速度与 `0.5px/ms` 外框线性速度。
 - v1.18.0 (2026-08-20): Tooltip 连续移动拆分外框与内容带速度；外框保留 `0.5px/ms`，内容带改为较慢的 `0.3px/ms`。
 - v1.17.0 (2026-08-20): Tooltip 连续切换改用统一 `0.5px/ms` 线性速度；外框与内容带同时开始，各自按移动距离计算时长。

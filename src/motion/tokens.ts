@@ -44,9 +44,18 @@ export const MOTION_SPRING_MOVE_MASS = 1;
 
 export const MOTION_DURATION_TOOLTIP_APPEAR_MS = 150;
 export const MOTION_DURATION_TOOLTIP_DISAPPEAR_MS = 50;
+export const MOTION_DURATION_TOOLTIP_CONTINUOUS_BASE_MS = 180;
+export const MOTION_DURATION_TOOLTIP_CONTINUOUS_MIN_MS = 200;
+export const MOTION_DURATION_TOOLTIP_CONTINUOUS_MAX_MS = 320;
+export const MOTION_DURATION_TOOLTIP_CONTINUOUS_PER_PX_MS = 0.5;
+export const MOTION_PROGRESS_TOOLTIP_CONTINUOUS_CONTENT_LAG = 0.12;
+/** @deprecated Continuous Tooltip now uses bounded duration tokens. */
 export const MOTION_SPEED_TOOLTIP_CONTINUOUS_SHELL_PX_PER_MS = 0.5;
+/** @deprecated Continuous Tooltip now uses bounded duration tokens. */
 export const MOTION_SPEED_TOOLTIP_CONTINUOUS_CONTENT_PX_PER_MS = 0.3;
+/** @deprecated Continuous Tooltip now uses bounded duration tokens. */
 export const MOTION_SPEED_TOOLTIP_CONTINUOUS_CONTENT_END_PX_PER_MS = 0.05;
+/** @deprecated Continuous Tooltip now uses coordinated progress. */
 export const MOTION_PROGRESS_TOOLTIP_CONTINUOUS_CONTENT_DECELERATE_FROM = 0.9;
 /** @deprecated Tooltip appear no longer uses an internal delay. */
 export const MOTION_DELAY_TOOLTIP_APPEAR_MS = 80;

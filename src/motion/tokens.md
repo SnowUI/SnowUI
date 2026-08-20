@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.10.0
+> **版本**: v1.11.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -28,7 +28,8 @@
 | `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
 | `MOTION_DISTANCE_*` | Button hover 背景总宽 / 总高增加 2px，以及 text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
 | `MOTION_BLUR_*` | 2px、3px、10px 三档实际 blur 来源 |
-| `MOTION_DURATION_TOOLTIP_*` | Tooltip Foreground 出现 / 消失节奏 |
+| `MOTION_DURATION_TOOLTIP_*` | Tooltip Foreground 出现 / 消失，以及连续交接的 base / min / max / per-pixel 有界时程 |
+| `MOTION_PROGRESS_TOOLTIP_CONTINUOUS_CONTENT_LAG` | Tooltip 连续交接中内容相对外框的轻微相位滞后；二者仍在同一结束帧收敛 |
 | `MOTION_DELAY_TOOLTIP_APPEAR_MS` | 兼容保留的旧 Tooltip 出现 delay；已标记 deprecated，默认 preset 不再消费 |
 | `MOTION_SCALE_DROPDOWN_*` | Popover、Listbox、Menu dropdown |
 | `MOTION_SCALE_TOOLTIP_*` | Tooltip Foreground 出现 / 消失 scale |
@@ -38,6 +39,7 @@
 
 ## 变更记录
 
+- v1.11.0 (2026-08-21): Tooltip 连续交接从外框 / 内容独立速度 token 改为 base、min、max、per-pixel 有界时程与内容相位滞后 token。
 - v1.10.0 (2026-08-19): Button hover 颜色时长与背景像素外扩统一为 `150ms ease-in-out`，进入与退出时同时开始、同时结束。
 - v1.9.0 (2026-08-19): Button 背景像素外扩由 `200ms ease` 收敛为 `150ms ease-in-out`，减少 filled 高对比边缘停留在亚像素重绘状态的时间，并缓和 hover 进入 / 退出首段的视觉抖动；颜色仍为 `300ms ease-in-out`。
 - v1.7.3 (2026-08-12): 分层后 Tooltip Foreground 恢复 appear duration / scale token；Portal / Backdrop 不消费这些 token。

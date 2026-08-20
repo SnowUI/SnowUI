@@ -122,7 +122,7 @@ export const examples = [
         expected: {
             render: "多个相邻按钮分别显示不同 Tooltip 内容",
             interaction:
-                "任一 Tooltip 成功显示后，hover 其他 Tooltip 立即响应；首次相邻切换始终执行连续裁切，180ms 内再次快速改目标时直达，稳定超过该窗口后的下一次切换恢复完整动效；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 4px 的内容带，内容带与共享圆角外框从同一帧开始；外框保持线性移动，内容带在时间线 90% 后从 0.3px/ms 均匀减速到 0.05px/ms；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
+                "任一 Tooltip 成功显示后，hover 其他 Tooltip 立即响应；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 4px 的内容带，内容带与共享圆角外框同帧进入 200–320ms 有界协调时间线；外框平滑加减速，内容轻微滞后并同步结束；连续快速改目标时从当前画面重定向，不排队、不等待、不禁用裁切；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
             accessibility:
                 "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
         },
@@ -143,8 +143,8 @@ export const examples = [
     <TooltipMotionController />
 </div>`,
         expected: {
-            render: "显示三个相邻 Tooltip 触发按钮，以及外框速度、内容初始速度、开始减速时间和最终速度控制项；减速默认从 90% 开始，最终速度默认 0.05px/ms",
-            interaction: "调整任一参数后，下一次相邻 Tooltip 连续切换立即使用新的调试参数；内容在指定时间点开始从初始速度均匀减速到最终速度；调节器不构成 Tooltip 公开 API",
+            render: "显示三个相邻 Tooltip 触发按钮，以及基础时长、最短 / 最长时长、距离增量和内容相位滞后控制项",
+            interaction: "调整任一参数后，下一次相邻 Tooltip 连续切换立即使用新的有界协调时间线；调节器不构成 Tooltip 公开 API",
         },
         logic: ["MotionTuning", "TestOnly", "ContinuousTooltip"],
     },

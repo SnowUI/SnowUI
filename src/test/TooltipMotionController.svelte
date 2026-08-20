@@ -1,6 +1,6 @@
 <!--
   Tooltip Test 专用连续裁切动效控制台
-  v1.0.0
+  v2.0.0
 
   仅供 Playground Test 沙箱使用，不属于 Tooltip 公开组件结构。
 -->
@@ -13,18 +13,20 @@
     import Tooltip from "../components/Tooltip.svelte";
 
     let motion = $state({
-        shellSpeed: 0.5,
-        contentSpeed: 0.3,
-        decelerateFrom: 0.9,
-        contentEndSpeed: 0.05,
+        baseDuration: 180,
+        minDuration: 200,
+        maxDuration: 320,
+        durationPerPixel: 0.5,
+        contentLag: 0.12,
     });
 
     const motionStyle = $derived(
         [
-            `--snowui-tooltip-test-shell-speed: ${motion.shellSpeed}`,
-            `--snowui-tooltip-test-content-speed: ${motion.contentSpeed}`,
-            `--snowui-tooltip-test-content-decelerate-from: ${motion.decelerateFrom}`,
-            `--snowui-tooltip-test-content-end-speed: ${motion.contentEndSpeed}`,
+            `--snowui-tooltip-test-base-duration: ${motion.baseDuration}`,
+            `--snowui-tooltip-test-min-duration: ${motion.minDuration}`,
+            `--snowui-tooltip-test-max-duration: ${motion.maxDuration}`,
+            `--snowui-tooltip-test-duration-per-pixel: ${motion.durationPerPixel}`,
+            `--snowui-tooltip-test-content-lag: ${motion.contentLag}`,
         ].join("; "),
     );
 </script>
@@ -55,52 +57,59 @@
     <Frame column class="gap-12">
         <Frame class="tooltip-motion-controller-grid">
             <Frame column class="gap-4">
-                <Text class="text-12">外框速度 {motion.shellSpeed.toFixed(2)}px/ms</Text>
+                <Text class="text-12">基础时长 {motion.baseDuration.toFixed(0)}ms</Text>
                 <Slider
-                    bind:value={motion.shellSpeed}
-                    minValue={0.1}
-                    maxValue={1}
-                    step={0.05}
-                    aria-label="Tooltip 外框速度"
+                    bind:value={motion.baseDuration}
+                    minValue={80}
+                    maxValue={260}
+                    step={10}
+                    aria-label="Tooltip 基础时长"
                 />
             </Frame>
             <Frame column class="gap-4">
-                <Text class="text-12">内容速度 {motion.contentSpeed.toFixed(2)}px/ms</Text>
+                <Text class="text-12">最短时长 {motion.minDuration.toFixed(0)}ms</Text>
                 <Slider
-                    bind:value={motion.contentSpeed}
-                    minValue={0.1}
-                    maxValue={1}
-                    step={0.05}
-                    aria-label="Tooltip 内容速度"
+                    bind:value={motion.minDuration}
+                    minValue={120}
+                    maxValue={280}
+                    step={10}
+                    aria-label="Tooltip 最短时长"
                 />
             </Frame>
         </Frame>
 
         <Frame class="tooltip-motion-controller-grid">
             <Frame column class="gap-4">
-                <Text class="text-12">
-                    开始减速时间 {(motion.decelerateFrom * 100).toFixed(0)}%
-                </Text>
+                <Text class="text-12">最长时长 {motion.maxDuration.toFixed(0)}ms</Text>
                 <Slider
-                    bind:value={motion.decelerateFrom}
-                    minValue={0.1}
-                    maxValue={0.95}
-                    step={0.05}
-                    aria-label="Tooltip 内容开始减速时间"
+                    bind:value={motion.maxDuration}
+                    minValue={motion.minDuration}
+                    maxValue={500}
+                    step={10}
+                    aria-label="Tooltip 最长时长"
                 />
             </Frame>
             <Frame column class="gap-4">
-                <Text class="text-12">
-                    最终速度 {motion.contentEndSpeed.toFixed(2)}px/ms
-                </Text>
+                <Text class="text-12">距离增量 {motion.durationPerPixel.toFixed(2)}ms/px</Text>
                 <Slider
-                    bind:value={motion.contentEndSpeed}
+                    bind:value={motion.durationPerPixel}
                     minValue={0.05}
-                    maxValue={motion.contentSpeed}
+                    maxValue={1.5}
                     step={0.05}
-                    aria-label="Tooltip 内容最终速度"
+                    aria-label="Tooltip 距离时长增量"
                 />
             </Frame>
+        </Frame>
+
+        <Frame column class="gap-4">
+            <Text class="text-12">内容相位滞后 {(motion.contentLag * 100).toFixed(0)}%</Text>
+            <Slider
+                bind:value={motion.contentLag}
+                minValue={0}
+                maxValue={0.5}
+                step={0.02}
+                aria-label="Tooltip 内容相位滞后"
+            />
         </Frame>
     </Frame>
 </Frame>

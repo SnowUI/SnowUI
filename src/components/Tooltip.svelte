@@ -1,9 +1,9 @@
 <!--
- Tooltip 文字提示组件 v1.11.0
+ Tooltip 文字提示组件 v1.12.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-21): 首次相邻切换始终保留连续裁切；仅连续快速改目标时直达，并移除 document pointermove 热路径。
- 变更 (2026-08-21): 内容在时间线 90% 后从 0.3px/ms 均匀减速到 0.05px/ms。
+ 变更 (2026-08-21): 删除按含 padding 图层计算的二次 mask；真实内容矩形保持 4px 投影间距，圆角外框成为唯一裁切窗口。
+ 变更 (2026-08-21): 连续裁切改为有界协调时间线；外框平滑加减速，内容以轻微相位滞后同步收敛，打断时直接从当前画面重定向。
  变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
  变更 (2026-08-20): Button hover 伪元素 transition 不再被误判为触发器锚点运动。
  变更 (2026-08-12): 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
@@ -95,10 +95,11 @@
     import {
         TOOLTIP_APPEAR_MOTION,
         TOOLTIP_APPEAR_TOTAL_MS,
-        TOOLTIP_CONTINUOUS_CONTENT_DECELERATE_FROM,
-        TOOLTIP_CONTINUOUS_CONTENT_END_SPEED_PX_PER_MS,
-        TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
-        TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
+        TOOLTIP_CONTINUOUS_BASE_DURATION_MS,
+        TOOLTIP_CONTINUOUS_CONTENT_LAG,
+        TOOLTIP_CONTINUOUS_DURATION_PER_PX_MS,
+        TOOLTIP_CONTINUOUS_MAX_DURATION_MS,
+        TOOLTIP_CONTINUOUS_MIN_DURATION_MS,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
     } from "../motion/presets/tooltip";
@@ -166,20 +167,6 @@
         width: number;
         height: number;
     }
-
-    interface TooltipLayerMask {
-        enabled: boolean;
-        angle: number;
-        start: number;
-        end: number;
-    }
-
-    const EMPTY_LAYER_MASK: TooltipLayerMask = {
-        enabled: false,
-        angle: 90,
-        start: 100,
-        end: 100,
-    };
 
     const inheritedTooltipPart = useComponentPart<Props>("Tooltip");
     let {
@@ -269,10 +256,6 @@
     let incomingLayerReady = $state(false);
     let outgoingLayerOffset = $state({ x: 0, y: 0 });
     let outgoingLayerSize = $state({ width: 0, height: 0 });
-    let incomingLayerMask = $state<TooltipLayerMask>(EMPTY_LAYER_MASK);
-    let outgoingLayerMask = $state<TooltipLayerMask>(EMPTY_LAYER_MASK);
-    let incomingLayerSeam = $state(100);
-    let outgoingLayerSeam = $state(100);
     let hasMeasuredPosition = false;
     let lastPositionTooltipId: string | undefined;
     let overlayWasVisible = false;
@@ -290,7 +273,7 @@
     let switchContentDurationMs = $state(0);
     let switchShellDistancePx = $state(0);
     let switchContentDistancePx = $state(0);
-    let switchContentSpeedProfile = $state("speed-ramp(0.9, 0.3, 0.05)");
+    let switchContentSpeedProfile = $state("coordinated-ease(0.12)");
     let switchMotionRevision = 0;
     let prefersReducedMotion = $state(false);
     let reducedMotionMedia: MediaQueryList | undefined;
@@ -322,10 +305,10 @@
         `--snowui-tooltip-motion-x: ${shellMotionOffset.x}px; --snowui-tooltip-motion-y: ${shellMotionOffset.y}px;`,
     );
     const incomingLayerStyle = $derived(
-        `--snowui-tooltip-layer-width: ${measuredSize.width}px; --snowui-tooltip-layer-height: ${measuredSize.height}px; --snowui-tooltip-layer-x: ${incomingLayerOffset.x}px; --snowui-tooltip-layer-y: ${incomingLayerOffset.y}px; --snowui-tooltip-layer-mask-angle: ${incomingLayerMask.angle}deg; --snowui-tooltip-layer-seam: ${incomingLayerSeam}%;`,
+        `--snowui-tooltip-layer-width: ${measuredSize.width}px; --snowui-tooltip-layer-height: ${measuredSize.height}px; --snowui-tooltip-layer-x: ${incomingLayerOffset.x}px; --snowui-tooltip-layer-y: ${incomingLayerOffset.y}px;`,
     );
     const outgoingLayerStyle = $derived(
-        `--snowui-tooltip-layer-width: ${outgoingLayerSize.width}px; --snowui-tooltip-layer-height: ${outgoingLayerSize.height}px; --snowui-tooltip-layer-x: ${outgoingLayerOffset.x}px; --snowui-tooltip-layer-y: ${outgoingLayerOffset.y}px; --snowui-tooltip-layer-mask-angle: ${outgoingLayerMask.angle}deg; --snowui-tooltip-layer-seam: ${outgoingLayerSeam}%;`,
+        `--snowui-tooltip-layer-width: ${outgoingLayerSize.width}px; --snowui-tooltip-layer-height: ${outgoingLayerSize.height}px; --snowui-tooltip-layer-x: ${outgoingLayerOffset.x}px; --snowui-tooltip-layer-y: ${outgoingLayerOffset.y}px;`,
     );
     const effectivePortalLifecycleState = $derived<CoreState>(
         tooltipBehavior.lifecycleMotion && portalMotionReady
@@ -364,7 +347,7 @@
         switchContentDurationMs = 0;
         switchShellDistancePx = 0;
         switchContentDistancePx = 0;
-        switchContentSpeedProfile = "speed-ramp(0.9, 0.3, 0.05)";
+        switchContentSpeedProfile = "coordinated-ease(0.12)";
         measuredSize = { width: 0, height: 0 };
         pendingMeasuredSize = { width: 0, height: 0 };
         measuredOverlayId = undefined;
@@ -378,10 +361,6 @@
         incomingLayerReady = false;
         outgoingLayerOffset = { x: 0, y: 0 };
         outgoingLayerSize = { width: 0, height: 0 };
-        incomingLayerMask = EMPTY_LAYER_MASK;
-        outgoingLayerMask = EMPTY_LAYER_MASK;
-        incomingLayerSeam = 100;
-        outgoingLayerSeam = 100;
         outgoingOverlay = null;
         cancelSwitchMotion();
     }
@@ -413,7 +392,7 @@
         switchContentDurationMs = 0;
         switchShellDistancePx = 0;
         switchContentDistancePx = 0;
-        switchContentSpeedProfile = "speed-ramp(0.9, 0.3, 0.05)";
+        switchContentSpeedProfile = "coordinated-ease(0.12)";
         outgoingOverlay = null;
         outgoingTargetRect = undefined;
         outgoingAlignedRect = undefined;
@@ -422,74 +401,8 @@
         shellMotionOffset = { x: 0, y: 0 };
         incomingLayerOffset = { x: 0, y: 0 };
         outgoingLayerOffset = { x: 0, y: 0 };
-        incomingLayerMask = EMPTY_LAYER_MASK;
-        outgoingLayerMask = EMPTY_LAYER_MASK;
-        incomingLayerSeam = 100;
-        outgoingLayerSeam = 100;
         moveMode = "snap";
         switchPhase = "idle";
-    }
-
-    function getProjectionRange(
-        rect: TooltipVisualRect,
-        ux: number,
-        uy: number,
-    ) {
-        const values = [
-            rect.left * ux + rect.top * uy,
-            (rect.left + rect.width) * ux + rect.top * uy,
-            rect.left * ux + (rect.top + rect.height) * uy,
-            (rect.left + rect.width) * ux +
-                (rect.top + rect.height) * uy,
-        ];
-        return { min: Math.min(...values), max: Math.max(...values) };
-    }
-
-    function createLayerMasks(
-        oldRect: TooltipVisualRect,
-        newRect: TooltipVisualRect,
-    ): { outgoing: TooltipLayerMask; incoming: TooltipLayerMask } {
-        const overlap: TooltipVisualRect = {
-            left: Math.max(oldRect.left, newRect.left),
-            top: Math.max(oldRect.top, newRect.top),
-            width:
-                Math.min(oldRect.left + oldRect.width, newRect.left + newRect.width) -
-                Math.max(oldRect.left, newRect.left),
-            height:
-                Math.min(oldRect.top + oldRect.height, newRect.top + newRect.height) -
-                Math.max(oldRect.top, newRect.top),
-        };
-        if (overlap.width <= 0 || overlap.height <= 0) {
-            return { outgoing: EMPTY_LAYER_MASK, incoming: EMPTY_LAYER_MASK };
-        }
-
-        const dx =
-            newRect.left + newRect.width / 2 -
-            (oldRect.left + oldRect.width / 2);
-        const dy =
-            newRect.top + newRect.height / 2 -
-            (oldRect.top + oldRect.height / 2);
-        const length = Math.hypot(dx, dy);
-        const ux = length > 0.5 ? dx / length : 1;
-        const uy = length > 0.5 ? dy / length : 0;
-        const angle = (Math.atan2(ux, -uy) * 180) / Math.PI;
-        const overlapRange = getProjectionRange(overlap, ux, uy);
-
-        const createMask = (rect: TooltipVisualRect): TooltipLayerMask => {
-            const range = getProjectionRange(rect, ux, uy);
-            const span = Math.max(range.max - range.min, 1);
-            return {
-                enabled: true,
-                angle,
-                start: ((overlapRange.max - range.min) / span) * 100,
-                end: ((overlapRange.min - range.min) / span) * 100,
-            };
-        };
-
-        return {
-            outgoing: createMask(oldRect),
-            incoming: createMask(newRect),
-        };
     }
 
     function getMovementUnit(
@@ -525,20 +438,17 @@
         );
     }
 
-    function getDistanceDuration(distance: number, speed: number) {
-        return distance / speed;
-    }
-
     function getMotionProgress(elapsed: number, duration: number) {
         if (duration <= 0) return 1;
         return Math.min(elapsed / duration, 1);
     }
 
     type TooltipMotionTuning = {
-        shellSpeed: number;
-        contentSpeed: number;
-        contentEndSpeed: number;
-        contentDecelerateFrom: number;
+        baseDuration: number;
+        minDuration: number;
+        maxDuration: number;
+        durationPerPixel: number;
+        contentLag: number;
     };
 
     function readPositiveNumber(style: CSSStyleDeclaration, name: string, fallback: number) {
@@ -557,79 +467,67 @@
         const style = sizeShellRef ? getComputedStyle(sizeShellRef) : undefined;
         if (!style) {
             return {
-                shellSpeed: TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
-                contentSpeed: TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
-                contentEndSpeed:
-                    TOOLTIP_CONTINUOUS_CONTENT_END_SPEED_PX_PER_MS,
-                contentDecelerateFrom:
-                    TOOLTIP_CONTINUOUS_CONTENT_DECELERATE_FROM,
+                baseDuration: TOOLTIP_CONTINUOUS_BASE_DURATION_MS,
+                minDuration: TOOLTIP_CONTINUOUS_MIN_DURATION_MS,
+                maxDuration: TOOLTIP_CONTINUOUS_MAX_DURATION_MS,
+                durationPerPixel: TOOLTIP_CONTINUOUS_DURATION_PER_PX_MS,
+                contentLag: TOOLTIP_CONTINUOUS_CONTENT_LAG,
             };
         }
 
-        const contentSpeed = readPositiveNumber(
+        const minDuration = readPositiveNumber(
             style,
-            "--snowui-tooltip-test-content-speed",
-            TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS,
+            "--snowui-tooltip-test-min-duration",
+            TOOLTIP_CONTINUOUS_MIN_DURATION_MS,
         );
         return {
-            shellSpeed: readPositiveNumber(
+            baseDuration: readPositiveNumber(
                 style,
-                "--snowui-tooltip-test-shell-speed",
-                TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS,
+                "--snowui-tooltip-test-base-duration",
+                TOOLTIP_CONTINUOUS_BASE_DURATION_MS,
             ),
-            contentSpeed,
-            contentEndSpeed: Math.min(
-                contentSpeed,
+            minDuration,
+            maxDuration: Math.max(
+                minDuration,
                 readPositiveNumber(
                     style,
-                    "--snowui-tooltip-test-content-end-speed",
-                    TOOLTIP_CONTINUOUS_CONTENT_END_SPEED_PX_PER_MS,
+                    "--snowui-tooltip-test-max-duration",
+                    TOOLTIP_CONTINUOUS_MAX_DURATION_MS,
                 ),
             ),
-            contentDecelerateFrom: readUnitNumber(
+            durationPerPixel: readPositiveNumber(
                 style,
-                "--snowui-tooltip-test-content-decelerate-from",
-                TOOLTIP_CONTINUOUS_CONTENT_DECELERATE_FROM,
+                "--snowui-tooltip-test-duration-per-pixel",
+                TOOLTIP_CONTINUOUS_DURATION_PER_PX_MS,
+            ),
+            contentLag: readUnitNumber(
+                style,
+                "--snowui-tooltip-test-content-lag",
+                TOOLTIP_CONTINUOUS_CONTENT_LAG,
             ),
         };
     }
 
-    function getSpeedRampDuration(
+    function getContinuousDuration(
         distance: number,
-        startSpeed: number,
-        endSpeed: number,
-        decelerateFrom: number,
+        tuning: TooltipMotionTuning,
     ) {
-        const averageSpeed =
-            startSpeed * decelerateFrom +
-            ((startSpeed + endSpeed) / 2) * (1 - decelerateFrom);
-        return distance / averageSpeed;
+        return Math.min(
+            tuning.maxDuration,
+            Math.max(
+                tuning.minDuration,
+                tuning.baseDuration + distance * tuning.durationPerPixel,
+            ),
+        );
     }
 
-    function getSpeedRampProgress(
-        elapsed: number,
-        distance: number,
-        duration: number,
-        startSpeed: number,
-        endSpeed: number,
-        decelerateFrom: number,
-    ) {
-        if (distance <= 0 || duration <= 0 || elapsed >= duration) return 1;
-        const decelerateAt = duration * decelerateFrom;
-        if (elapsed <= decelerateAt) {
-            return Math.min((startSpeed * elapsed) / distance, 1);
-        }
-        const decelerateDuration = duration - decelerateAt;
-        const decelerateElapsed = elapsed - decelerateAt;
-        const acceleration = (endSpeed - startSpeed) / decelerateDuration;
-        const movedBeforeDeceleration = startSpeed * decelerateAt;
-        const movedDuringDeceleration =
-            startSpeed * decelerateElapsed +
-            (acceleration * decelerateElapsed * decelerateElapsed) / 2;
-        return Math.min(
-            (movedBeforeDeceleration + movedDuringDeceleration) / distance,
-            1,
-        );
+    function getCoordinatedProgress(progress: number) {
+        return (1 - Math.cos(Math.PI * progress)) / 2;
+    }
+
+    function getContentProgress(shellProgress: number, lag: number) {
+        if (shellProgress >= 1) return 1;
+        return Math.pow(shellProgress, 1 + lag);
     }
 
     function interpolate(start: number, end: number, progress: number) {
@@ -1063,9 +961,6 @@
                       height: targetRect.height,
                   }
                 : targetRect;
-            const layerMasks = canJoinContentTrack
-                ? createLayerMasks(oldTarget, incomingTrackRect)
-                : { outgoing: EMPTY_LAYER_MASK, incoming: EMPTY_LAYER_MASK };
             const initialBaseBounds = sizeMotionEnabled
                 ? getFloatingVisualBounds(
                       bestPos,
@@ -1075,9 +970,9 @@
                 : targetRect;
             const motionTuning = readMotionTuning();
             const shellDistance = getRectCenterDistance(startRect, targetRect);
-            const shellDuration = getDistanceDuration(
+            const motionDuration = getContinuousDuration(
                 shellDistance,
-                motionTuning.shellSpeed,
+                motionTuning,
             );
             const alignment = canJoinContentTrack
                 ? {
@@ -1088,13 +983,9 @@
             const contentDistance = canJoinContentTrack
                 ? Math.hypot(alignment.x, alignment.y)
                 : 0;
-            const contentDuration = getSpeedRampDuration(
-                contentDistance,
-                motionTuning.contentSpeed,
-                motionTuning.contentEndSpeed,
-                motionTuning.contentDecelerateFrom,
-            );
-            const totalDuration = Math.max(shellDuration, contentDuration);
+            const shellDuration = motionDuration;
+            const contentDuration = canJoinContentTrack ? motionDuration : 0;
+            const totalDuration = motionDuration;
             const revision = ++switchMotionRevision;
             moveMode = "snap";
             switchPhase = "prepare";
@@ -1106,7 +997,7 @@
             switchContentDurationMs = contentDuration;
             switchShellDistancePx = shellDistance;
             switchContentDistancePx = contentDistance;
-            switchContentSpeedProfile = `speed-ramp(${motionTuning.contentDecelerateFrom}, ${motionTuning.contentSpeed}, ${motionTuning.contentEndSpeed})`;
+            switchContentSpeedProfile = `coordinated-ease(${motionTuning.contentLag})`;
             shellMotionOffset = {
                 x: startRect.left - initialBaseBounds.left,
                 y: startRect.top - initialBaseBounds.top,
@@ -1130,10 +1021,6 @@
                 outgoingContentRect = undefined;
                 outgoingLayerOffset = { x: 0, y: 0 };
             }
-            outgoingLayerMask = layerMasks.outgoing;
-            incomingLayerMask = layerMasks.incoming;
-            outgoingLayerSeam = layerMasks.outgoing.start;
-            incomingLayerSeam = layerMasks.incoming.start;
 
             tick().then(() => {
                 if (revision !== switchMotionRevision) return;
@@ -1146,17 +1033,16 @@
                     const animate = (now: number) => {
                         if (revision !== switchMotionRevision) return;
                         const elapsed = now - startedAt;
-                        const shellProgress = getMotionProgress(
+                        const timelineProgress = getMotionProgress(
                             elapsed,
-                            shellDuration,
+                            totalDuration,
                         );
-                        const contentProgress = getSpeedRampProgress(
-                            elapsed,
-                            contentDistance,
-                            contentDuration,
-                            motionTuning.contentSpeed,
-                            motionTuning.contentEndSpeed,
-                            motionTuning.contentDecelerateFrom,
+                        const shellProgress = getCoordinatedProgress(
+                            timelineProgress,
+                        );
+                        const contentProgress = getContentProgress(
+                            shellProgress,
+                            motionTuning.contentLag,
                         );
                         const currentSize = {
                             width: interpolate(
@@ -1238,10 +1124,6 @@
             shellMotionOffset = { x: 0, y: 0 };
             incomingLayerOffset = { x: 0, y: 0 };
             outgoingLayerOffset = { x: 0, y: 0 };
-            outgoingLayerMask = EMPTY_LAYER_MASK;
-            incomingLayerMask = EMPTY_LAYER_MASK;
-            outgoingLayerSeam = 100;
-            incomingLayerSeam = 100;
             outgoingOverlay = null;
             outgoingTargetRect = undefined;
             outgoingAlignedRect = undefined;
@@ -1254,7 +1136,7 @@
             switchContentDurationMs = 0;
             switchShellDistancePx = 0;
             switchContentDistancePx = 0;
-            switchContentSpeedProfile = "speed-ramp(0.9, 0.3, 0.05)";
+            switchContentSpeedProfile = "coordinated-ease(0.12)";
         }
 
         incomingLayerReady = true;
@@ -1393,7 +1275,7 @@
                 switchContentDurationMs = 0;
                 switchShellDistancePx = 0;
                 switchContentDistancePx = 0;
-                switchContentSpeedProfile = "speed-ramp(0.9, 0.3, 0.05)";
+                switchContentSpeedProfile = "coordinated-ease(0.12)";
             }
         };
         updateReducedMotion();
@@ -1533,7 +1415,6 @@
                                 class="snowui-tooltip-content-layer"
                                 data-tooltip-layer="outgoing"
                                 data-move-mode={moveMode}
-                                data-overlap-mask={outgoingLayerMask.enabled}
                                 style={outgoingLayerStyle}
                                 aria-hidden="true"
                             >
@@ -1551,7 +1432,6 @@
                             class="snowui-tooltip-content-layer"
                             data-tooltip-layer="incoming"
                             data-move-mode={moveMode}
-                            data-overlap-mask={incomingLayerMask.enabled}
                             data-layer-ready={incomingLayerReady}
                             style={incomingLayerStyle}
                         >
@@ -1655,6 +1535,24 @@
             var(--snowui-tooltip-motion-y, 0),
             0
         );
+    }
+
+    :global(:where(.snowui-tooltip-motion-shell)[data-switch-phase="moving"]) {
+        will-change: transform;
+    }
+
+    :global(
+        :where(.snowui-tooltip-motion-shell)[data-switch-phase="moving"]
+            :where(.snowui-tooltip-size-shell)
+    ) {
+        will-change: width, height;
+    }
+
+    :global(
+        :where(.snowui-tooltip-motion-shell)[data-switch-phase="moving"]
+            :where(.snowui-tooltip-content-layer)
+    ) {
+        will-change: transform;
     }
 
     :global(:where(.snowui-tooltip-size-shell)) {
@@ -1789,44 +1687,6 @@
         :where(.snowui-tooltip-content-layer)[data-layer-ready="false"]
     ) {
         visibility: hidden;
-    }
-
-    :global(
-        :where(.snowui-tooltip-content-layer)[data-overlap-mask="true"][data-tooltip-layer="outgoing"]
-    ) {
-        -webkit-mask-image: linear-gradient(
-            var(--snowui-tooltip-layer-mask-angle),
-            #000 0%,
-            #000 var(--snowui-tooltip-layer-seam),
-            transparent var(--snowui-tooltip-layer-seam),
-            transparent 100%
-        );
-        mask-image: linear-gradient(
-            var(--snowui-tooltip-layer-mask-angle),
-            #000 0%,
-            #000 var(--snowui-tooltip-layer-seam),
-            transparent var(--snowui-tooltip-layer-seam),
-            transparent 100%
-        );
-    }
-
-    :global(
-        :where(.snowui-tooltip-content-layer)[data-overlap-mask="true"][data-tooltip-layer="incoming"]
-    ) {
-        -webkit-mask-image: linear-gradient(
-            var(--snowui-tooltip-layer-mask-angle),
-            transparent 0%,
-            transparent var(--snowui-tooltip-layer-seam),
-            #000 var(--snowui-tooltip-layer-seam),
-            #000 100%
-        );
-        mask-image: linear-gradient(
-            var(--snowui-tooltip-layer-mask-angle),
-            transparent 0%,
-            transparent var(--snowui-tooltip-layer-seam),
-            #000 var(--snowui-tooltip-layer-seam),
-            #000 100%
-        );
     }
 
     :global(
