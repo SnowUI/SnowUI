@@ -1,6 +1,6 @@
 # Checkbox 组件
 
-> **版本**: v1.2.27
+> **版本**: v1.2.28
 > **职责**: 复选框控件，用于选择多个选项或表示开关状态。
 
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
@@ -41,6 +41,10 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 ## 更新日志 (Changelog)
 
 - **Checkbox-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v1.2.28 (2026-08-20)
+
+- **CB-Corner.1** Checkbox 外壳继续复用与 Button 相同的 `.snowui-rounded-rectangle` / `superellipse(1.1)` iOS 连续圆角；内部 Hover 覆盖层显式继承 `border-radius` 与 `corner-shape`，确保基础边框、选中背景和 Hover 表面始终共享同一轮廓。
 
 ### v1.2.27 (2026-08-20)
 

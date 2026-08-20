@@ -1,6 +1,6 @@
 <!-- 
  Checkbox 组件：复选框控件
- v1.2.27
+ v1.2.28
 
  1. 核心能力:
     - 支持选中、未选中、不确定三种状态
@@ -335,6 +335,7 @@
         position: absolute;
         inset: 0;
         border-radius: inherit;
+        corner-shape: inherit;
         opacity: 0;
         pointer-events: none;
         transition: opacity var(--snowui-checkbox-motion-duration-resolved)
