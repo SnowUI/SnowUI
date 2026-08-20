@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.12.0
+> **版本**: v1.13.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -39,6 +39,7 @@
 
 ## 变更记录
 
+- v1.13.0 (2026-08-21): Tooltip 稳定切换改为 `120 / 140 / 280ms / 0.45ms/px` 与 `0.08` 内容滞后；retarget 改为 `45 / 70 / 120ms / 0.25ms/px` 与 `0.02` 内容滞后。
 - v1.12.0 (2026-08-21): 新增 Tooltip 连续交接快速重定向的 `60 / 90 / 160ms / 0.35ms/px` 时程与 `0.04` 内容相位滞后 token。
 - v1.11.0 (2026-08-21): Tooltip 连续交接从外框 / 内容独立速度 token 改为 base、min、max、per-pixel 有界时程与内容相位滞后 token。
 - v1.10.0 (2026-08-19): Button hover 颜色时长与背景像素外扩统一为 `150ms ease-in-out`，进入与退出时同时开始、同时结束。

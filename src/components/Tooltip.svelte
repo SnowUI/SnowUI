@@ -1,8 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.13.0
+ Tooltip 文字提示组件 v1.14.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-21): 进行中的连续切换改目标时使用 90–160ms cubic ease-out 快速重定向，避免反复重启完整时间线造成追随变慢。
+ 变更 (2026-08-21): 稳定切换收敛为 140–280ms，进行中改目标使用 70–120ms cubic ease-out，避免侧边栏短距离切换仍被最慢时长钳制。
  变更 (2026-08-21): 删除按含 padding 图层计算的二次 mask；真实内容矩形保持 4px 投影间距，圆角外框成为唯一裁切窗口。
  变更 (2026-08-21): 连续裁切改为有界协调时间线；外框平滑加减速，内容以轻微相位滞后同步收敛，打断时直接从当前画面重定向。
  变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
@@ -281,7 +281,7 @@
     let switchContentDurationMs = $state(0);
     let switchShellDistancePx = $state(0);
     let switchContentDistancePx = $state(0);
-    let switchContentSpeedProfile = $state("coordinated-ease(0.12)");
+    let switchContentSpeedProfile = $state("coordinated-ease(0.08)");
     let switchMotionRevision = 0;
     let prefersReducedMotion = $state(false);
     let reducedMotionMedia: MediaQueryList | undefined;
@@ -357,7 +357,7 @@
         switchContentDurationMs = 0;
         switchShellDistancePx = 0;
         switchContentDistancePx = 0;
-        switchContentSpeedProfile = "coordinated-ease(0.12)";
+        switchContentSpeedProfile = "coordinated-ease(0.08)";
         measuredSize = { width: 0, height: 0 };
         pendingMeasuredSize = { width: 0, height: 0 };
         measuredOverlayId = undefined;
@@ -402,7 +402,7 @@
         switchContentDurationMs = 0;
         switchShellDistancePx = 0;
         switchContentDistancePx = 0;
-        switchContentSpeedProfile = "coordinated-ease(0.12)";
+        switchContentSpeedProfile = "coordinated-ease(0.08)";
         outgoingOverlay = null;
         outgoingTargetRect = undefined;
         outgoingAlignedRect = undefined;
@@ -1174,7 +1174,7 @@
             switchContentDurationMs = 0;
             switchShellDistancePx = 0;
             switchContentDistancePx = 0;
-            switchContentSpeedProfile = "coordinated-ease(0.12)";
+            switchContentSpeedProfile = "coordinated-ease(0.08)";
         }
 
         incomingLayerReady = true;
@@ -1315,7 +1315,7 @@
                 switchContentDurationMs = 0;
                 switchShellDistancePx = 0;
                 switchContentDistancePx = 0;
-                switchContentSpeedProfile = "coordinated-ease(0.12)";
+                switchContentSpeedProfile = "coordinated-ease(0.08)";
             }
         };
         updateReducedMotion();

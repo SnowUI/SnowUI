@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.7.0
+ * v1.8.0
  */
 export const examples = [
     {
@@ -24,15 +24,21 @@ export const examples = [
     <Button>
         Complex Tooltip
         <Tooltip>
-            <div class="flex-row items-center gap-8">
-                <span>Tooltip with</span>
-                <Button size="sm" variant="filled" theme="dark">Button</Button>
-            </div>
+            <Frame column class="items-start gap-4">
+                <Frame class="items-center gap-8">
+                    <Text>构建已完成</Text>
+                    <Badge variant="border" count="Ready" />
+                </Frame>
+                <Text class="text-12 text-48">所有检查均已通过</Text>
+            </Frame>
         </Tooltip>
     </Button>
 </div>`,
 
-        logic: ["Complex"],
+        expected: {
+            render: "Tooltip 按真实复杂内容尺寸包裹两层排版、Text 与 Badge，不把内容退化为纯文本",
+        },
+        logic: ["Complex", "Snippet", "IntrinsicSize"],
     },
     {
         name: "C1: 静态模式 (Static Mode)",
@@ -122,7 +128,7 @@ export const examples = [
         expected: {
             render: "多个相邻按钮分别显示不同 Tooltip 内容",
             interaction:
-                "任一 Tooltip 成功显示后，hover 其他 Tooltip 立即响应；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 4px 的内容带，内容带与共享圆角外框同帧进入 200–320ms 有界协调时间线；外框平滑加减速，内容轻微滞后并同步结束；连续快速改目标时从当前画面重定向，不排队、不等待、不禁用裁切；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
+                "任一 Tooltip 成功显示后，hover 其他 Tooltip 立即响应；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 4px 的内容带，内容带与共享圆角外框同帧进入 140–280ms 有界协调时间线；外框平滑加减速，内容轻微滞后并同步结束；连续快速改目标时从当前画面进入 70–120ms 重定向，不排队、不等待、不禁用裁切；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
             accessibility:
                 "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
         },
@@ -147,6 +153,56 @@ export const examples = [
             interaction: "调整任一参数后，下一次相邻 Tooltip 连续切换立即使用新的有界协调时间线；调节器不构成 Tooltip 公开 API",
         },
         logic: ["MotionTuning", "TestOnly", "ContinuousTooltip"],
+    },
+    {
+        name: "E3: 复杂内容连续切换 (Complex Continuous Content)",
+        code: `E3
+<div class="p-40 flex-row gap-4">
+    <Button>
+        状态
+        <Tooltip>
+            <Frame column class="items-start gap-4">
+                <Frame class="items-center gap-8">
+                    <Text>部署状态</Text>
+                    <Badge variant="border" count="Ready" />
+                </Frame>
+                <Text class="text-12 text-48">生产环境运行正常</Text>
+            </Frame>
+        </Tooltip>
+    </Button>
+    <Button>
+        快捷键
+        <Tooltip>
+            <Frame class="items-center gap-8">
+                <Text>打开命令面板</Text>
+                <Kbd>⌘ K</Kbd>
+            </Frame>
+        </Tooltip>
+    </Button>
+    <Button>
+        成员
+        <Tooltip>
+            <Frame column class="items-start gap-4">
+                <Text>设计系统团队</Text>
+                <Frame class="items-center gap-8">
+                    <Badge count="8" />
+                    <Text class="text-12 text-48">3 人正在编辑</Text>
+                </Frame>
+            </Frame>
+        </Tooltip>
+    </Button>
+</div>`,
+        expected: {
+            render: "三个 Tooltip 分别保留多层 Frame、Badge、Kbd 与不同宽高的真实内容结构",
+            interaction: "连续 hover 时共享外框按每个复杂内容的真实宽高移动和变形；满足 4px 门槛时内容带不重叠，快速改目标后只保留最新复杂内容",
+            accessibility: "旧复杂内容在交接期间 aria-hidden；最终 tooltip 只暴露最新内容",
+        },
+        logic: [
+            "Complex",
+            "ContinuousTooltip",
+            "IntrinsicSize",
+            "ContentIsolation",
+        ],
     },
     {
         name: "F1: 动效感知立即关闭 (Dismiss On Motion)",

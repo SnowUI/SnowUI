@@ -13,11 +13,11 @@
     import Tooltip from "../components/Tooltip.svelte";
 
     let motion = $state({
-        baseDuration: 180,
-        minDuration: 200,
-        maxDuration: 320,
-        durationPerPixel: 0.5,
-        contentLag: 0.12,
+        baseDuration: 120,
+        minDuration: 140,
+        maxDuration: 280,
+        durationPerPixel: 0.45,
+        contentLag: 0.08,
     });
 
     const motionStyle = $derived(
