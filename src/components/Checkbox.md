@@ -1,6 +1,6 @@
 # Checkbox 组件
 
-> **版本**: v1.2.19
+> **版本**: v1.2.27
 > **职责**: 复选框控件，用于选择多个选项或表示开关状态。
 
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
@@ -18,7 +18,7 @@
 | `ariaLabel` | `string` | - | 无可见 label 时的无障碍名称 | Accessibility |
 | `disabled` | `boolean` | `false` | 禁用状态 | **State** |
 | `value` | `any` | - | 表单值 | Data |
-| `size` | `number` | `16` | 组件尺寸（像素，梯度与 Icon 一致：16/20/24/28/32/40/48/80） | Style |
+| `size` | `number` | `16` | 组件尺寸（像素，梯度与 Icon 一致：12/16/20/24/28/32/40/48/80） | Style |
 | `children` | `Snippet` | - | 标签内容 | Content |
 | `enableResponsive` | `boolean` | `false` | 启用响应式 | Capability |
 | `enableContext` | `boolean` | `false` | 启用上下文 | Capability |
@@ -34,12 +34,50 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 - `.snowui-checkbox-label` 是可选 label，默认 Hug，不承担 Fill。
 - visual 与 label 的距离由 `--snowui-checkbox-gap` 管理，可通过 `--snowui-checkbox-gap-override` 覆盖。
 - `size` 只影响视觉体尺寸，不改变 label 的布局策略。
+- `size` 包含 inset 边框；例如 `size={32}` 的视觉体外框始终为 32×32px，边框不增加布局宽高。
 
 ---
 
 ## 更新日志 (Changelog)
 
 - **Checkbox-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v1.2.27 (2026-08-20)
+
+- **CB-Hover.4** 按用户裁决将未选中边框 Hover 覆盖层从 `4%` 提升为 `20%` 黑色；基础边框仍为 `20%` 黑色，默认叠加结果等效约 `36%` 黑色，填充保持不变。该值与独立覆盖层实现已登记为 `StyleSpec §2.4.3` 限定例外。
+
+### v1.2.26 (2026-08-20)
+
+- **CB-Hover.3** Hover 改为独立覆盖层淡入，不再直接插值半透明 inset `box-shadow`。未选中态只叠加 `4%` 主色边框层；选中态用 `20%` Static White 覆盖完整表面，消除边框先变透明再恢复的闪烁。
+
+### v1.2.25 (2026-08-20)
+
+- **CB-Hover.2** 未选中 Hover 保持填充背景不变，仅把基础 `20%` 黑色边框作为底色叠加 `4%` 主色，使边框按 Hover 规则加深；选中态继续保持填充与边框同色。
+
+### v1.2.24 (2026-08-20)
+
+- **CB-Hover.1** Hover 色同时覆盖视觉体填充与 inset 边框：未选中态两者统一为 `4%` 主色混合值，checked / indeterminate 两者统一为主色叠加 `20%` Static White，避免边框与填充分层。
+
+### v1.2.23 (2026-08-20)
+
+- **CB-Motion.4** 勾选与横线描边在整个退场周期固定使用 Static White，避免取消选择后因继承色立即恢复为黑色而产生残影。
+- **CB-Test.1** Test 基础示例补充 indeterminate 横线状态。
+
+### v1.2.22 (2026-08-20)
+
+- **CB-Visual.2** checked / indeterminate 图形改为 Workshop `14763:16992` 的 28×28 基准比例：勾选路径使用设计稿精确坐标，横线宽度为外框的 `12/28`，两者随 visual 整体等比缩放。
+- **CB-Motion.3** 取消选择时不反向播放勾选绘制；勾选以常规状态时序随选中底色淡出，完全不可见后再无动画复位路径。
+
+### v1.2.21 (2026-08-20)
+
+- **CB-Size.1** 明确 `size` 是包含 inset 边框的视觉体外部尺寸，并用 `border-box` 固化该边界。
+- **CB-Motion.2** 常规状态过渡统一为 `150ms ease-out`；checked 勾选作为独立路径绘制，放慢为进入 `200ms ease-out`、退出 `120ms ease-in`。
+
+### v1.2.20 (2026-08-20)
+
+- **CB-Visual.1** checked / indeterminate 图形改为 Workshop `14756:16934` 的 32×32、2px 圆头描边路径，并随组件尺寸整体缩放。
+- **CB-Motion.1** checked 勾选改为路径绘制；减少动效时直接提交最终路径。选中态背景、边框和颜色保持不变。
+- **CB-Scale.1** 未选中边框以 32px 时 2px 为基准，按 `size × 0.0625` 等比缩放；公开 border-width override 仍优先。
 
 ### v1.2.19 (2026-06-23)
 
@@ -207,7 +245,7 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 
 - **勾选图标**: 选中状态显示
 - **横线图标**: 不确定状态显示
-- 使用 SVG 路径绘制，支持自定义颜色
+- 使用 28×28 SVG 描边路径绘制，随组件尺寸缩放并继承选中态颜色
 
 ## 无障碍性
 
@@ -286,7 +324,7 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 --snowui-checkbox-size-resolved: var(--snowui-checkbox-size-override, var(--snowui-checkbox-size));
 --snowui-checkbox-radius: calc(var(--snowui-checkbox-size-resolved) * 0.3125); /* 16px 时为 5px */
 --snowui-checkbox-radius-resolved: var(--snowui-checkbox-radius-override, var(--snowui-checkbox-radius));
---snowui-checkbox-border-width: var(--border-2); /* 1px */
+--snowui-checkbox-border-width: calc(var(--snowui-checkbox-size-resolved) * 0.0625); /* 16px 时 1px，32px 时 2px */
 --snowui-checkbox-border-width-resolved: var(--snowui-checkbox-border-width-override, var(--snowui-checkbox-border-width));
 --primary: var(--primary, var(--black-100, #000000)); /* 使用全局 Primary Token (默认黑色) */
 ```
@@ -295,14 +333,14 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 
 #### Unchecked
 - **Visual**: 透明背景 + `var(--black-20)` 边框
-- **Icon**: `opacity: 0`, `scale(0.5)`
-- **Hover**: 使用 `background-image` 叠加 **4%** `currentColor` (跟随父级文本颜色)
+- **Icon**: 勾选与横线均不可见
+- **Hover**: 填充保持不变；独立 inset 覆盖层在基础 **20%** 黑色边框上再叠加 **20%** 黑色，默认等效约 **36%** 黑色；仅此状态适用 `StyleSpec §2.4.3` 例外
 
 #### Checked / Indeterminate
-- **触发**: 通过 CSS `:has(input:checked)` 检测
+- **触发**: 原生 input 的 `:checked` / `:indeterminate` 通过 sibling 选择器驱动
 - **Visual**: `var(--primary)` 背景 + 边框
-- **Icon**: `opacity: 1`, `scale(1)` (弹性过渡), color: `var(--static-white-100)`
-- **Hover**: 使用 `background-image` 叠加 **20%** `currentColor` (White)
+- **Icon**: color: `var(--static-white-100)`；checked 使用路径绘制，indeterminate 保留缩放 / 透明度过渡
+- **Hover**: 填充与 inset 边框统一在主色上混合 **20%** Static White
 
 #### Disabled
 - **Attr**: `[data-disabled="true"]`
@@ -313,5 +351,7 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 - **点击区域**: 原生 `<input>` 使用 `position: absolute; inset: 0` 覆盖整个 label 区域，确保点击响应灵敏。
 - **Focus**: 支持键盘导航，聚焦时显示 `20% primary` 的 Ring。
 - **动画**:
-  - 容器: hover 背景仍保持直接切换，避免颜色插值闪动
-  - 图标: 默认继承 Frame `control` 通用时序（默认 `300ms ease-out`）
+  - 容器: hover 填充与 inset 边框使用相同颜色和时序
+  - checked 勾选: 参考 Fluid Functionalism 的 pathLength 语义，进入使用 `200ms ease-out` 绘制；取消选择时以常规 `150ms ease-out` 随底色淡出，不反向绘制
+  - indeterminate 横线: 与 Radio 状态动效一致，使用 `150ms ease-out`
+  - `prefers-reduced-motion: reduce`: 取消视觉体、勾选与横线过渡，直接显示最终状态

@@ -1,7 +1,7 @@
 # Radio 组件
 
-> **版本**: v1.3.10
-> **变更记录 (2026-03-10)**: 撤回单层边框粗细过渡尝试，恢复常驻细边框 + 叠加选中环层方案。
+> **版本**: v1.3.17
+> **变更记录 (2026-08-20)**: Filled Hover 只改变黑色选中环；Outline Hover 分别改变 Dot 与外框。
 > **职责**: 单选按钮控件，用于在多个选项中选择一个。
 
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
@@ -33,6 +33,7 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 - `.snowui-radio-label` 是可选 label，默认 Hug，不承担 Fill。
 - visual 与 label 的距离由 `--snowui-radio-gap` 管理，可通过 `--snowui-radio-gap-override` 覆盖。
 - `size` 只影响视觉体尺寸，不改变 label 的布局策略。
+- `size` 包含 inset 边框；例如 `size={32}` 的视觉体外框始终为 32×32px，边框不增加布局宽高。
 - `as="badge"` 只表示 Radio 作为 Image 的角标挂件，不改变 Radio 内部布局模型。
 
 ---
@@ -40,6 +41,36 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 ## 更新日志 (Changelog)
 
 - **Radio-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v1.3.17 (2026-08-20)
+
+- **RD-Hover.5** Filled 选中 Hover 只在粗黑选中环上叠加 `20%` Static White，中间白色孔保持不变；Outline 选中 Hover 将 Dot 调整为主色叠加 `20%` Static White，并在基础外框上额外叠加 `20%` 黑色。
+
+### v1.3.16 (2026-08-20)
+
+- **RD-Hover.4** 按用户裁决将未选中边框 Hover 覆盖层从 `4%` 提升为 `20%` 黑色；基础边框仍为单层 `20%` 黑色，默认叠加结果等效约 `36%` 黑色，填充保持不变。该值与独立覆盖层实现已登记为 `StyleSpec §2.4.3` 限定例外。
+
+### v1.3.15 (2026-08-20)
+
+- **RD-Hover.3** Hover 改为位于基础边框和选中环之上的独立覆盖层，避免半透明 `box-shadow` 插值产生闪烁，也不再改写点击后的选中环颜色。
+- **RD-Ring.1** 未选中态只绘制单层 `20%` 黑色基础边框；独立选中环默认宽度为 0，仅在 Filled 选中时以 `150ms` 展开，避免两层基础边框叠加。
+
+### v1.3.14 (2026-08-20)
+
+- **RD-Hover.2** 未选中 Hover 保持填充背景不变，仅把基础 `20%` 黑色边框作为底色叠加 `4%` 主色，使 Checkbox 与 Radio 使用相同的边框加深规则。
+
+### v1.3.13 (2026-08-20)
+
+- **RD-Hover.1** Hover 色同时覆盖填充、基础 inset 边框与 Filled 选中环；选中和未选中状态均使用各自既有 Hover 填充色统一整个视觉表面。
+
+### v1.3.12 (2026-08-20)
+
+- **RD-Size.1** 明确 `size` 是包含 inset 边框的视觉体外部尺寸，并用 `border-box` 固化该边界。
+- **RD-Motion.1** dot、基础边框与 Filled 选中环统一使用与 Checkbox 常规状态一致的 `150ms ease-out`，替代原 300ms 默认节奏。
+
+### v1.3.11 (2026-08-20)
+
+- **RD-Scale.1** 未选中边框以 Workshop `14756:16934` 的 32px / 2px 为基准，按 `size × 0.0625` 等比缩放；公开 border-width override 仍优先，Filled 选中环结构与动效不变。
 
 ### v1.3.10 (2026-04-28)
 
@@ -288,20 +319,23 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 
 #### Unchecked
 - **Visual**: 透明背景 + `var(--black-20)` 边框
+- **Border Width**: `size × 0.0625`（16px 时 1px，32px 时 2px）
 - **Border Radius**: `var(--radius-full, 50%)` (圆形)
-- **Hover**: 在 `.snowui-radio-visual` 同层直接切换背景变量到 `4%` 主色混合值，避免边框收缩结束后出现独立层闪现
+- **Hover**: 填充保持不变；独立 Hover 层在单层 `20%` 黑色边框上再叠加 `20%` 黑色 inset ring，默认等效约 `36%` 黑色；仅此状态适用 `StyleSpec §2.4.3` 例外
 
 #### Checked (Outline 变体)
 - **触发**: 根节点 `[data-checked="true"]` 驱动
 - **Visual**: 边框不变，内部显示 `--radio-primary` 色 Dot
 - **Dot**: `scale(1)` (弹性过渡)
+- **Hover**: Dot 在主色上叠加 `20%` Static White；独立边框覆盖层在基础 `20%` 黑色外框上再叠加 `20%` 黑色，默认外框等效约 `36%` 黑色
 - **交互**: 允许再次点击取消，不再把 checked 态视为不可操作状态
 
 #### Checked (Filled 变体)
 - **触发**: `[data-variant="filled"][data-checked="true"]`
 - **Visual**: 边框加粗 `--radio-filled-border` 并变色为 `--radio-primary`
 - **Background**: `transparent` (中空效果)
-- **实现细节**: 组件始终保留一层细边框；选中态粗边框作为独立选中环层叠加，退选时通过缩放 + 透明度过渡回收，不再执行 inset 宽度收缩动画
+- **实现细节**: 组件始终保留一层细边框；独立选中环默认宽度为 0，仅在 Filled 选中时以 `150ms` 展开为粗边框
+- **Hover**: 独立覆盖层只在粗黑选中环上叠加 `20%` Static White；中间白色孔不变，选中环的点击动效不变
 
 #### Disabled
 - **Attr**: `[data-disabled="true"]`
@@ -312,5 +346,6 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 - **点击区域**: 原生 `<input>` 使用 `position: absolute; inset: 0` 覆盖整个 label 区域
 - **取消选中逻辑**: 组件拦截 click / `Space`，统一走内部 `toggle` 逻辑，而不是完全依赖原生 radio 的不可取消行为
 - **Focus**: 支持键盘导航，聚焦时显示 `4% currentColor` 的 Ring
-- **动画**: Dot 与 Filled 描边默认继承 Frame `control / border` 通用时序（默认 `300ms ease-out`），外部仍可通过组件 CSS 变量覆写。
-- **选中态无 Hover**: 用户要求选中态不响应 hover
+- **动画**: Dot、基础边框与 Filled 描边默认使用 `150ms ease-out`，与 Checkbox 常规状态节奏一致；外部仍可通过组件 CSS 变量覆写。
+- **减少动效**: `prefers-reduced-motion: reduce` 下取消视觉体、Dot 与选中环过渡，直接提交最终状态。
+- **选中态 Hover**: Outline 分别处理 Dot 与外框；Filled 只处理粗选中环，白色孔不变

@@ -1,6 +1,6 @@
 <!-- 
  Checkbox 组件：复选框控件
- v1.2.19
+ v1.2.27
 
  1. 核心能力:
     - 支持选中、未选中、不确定三种状态
@@ -168,29 +168,23 @@
         aria-label={ariaLabel}
     />
     <div class="snowui-checkbox-visual snowui-rounded-rectangle">
+        <div class="snowui-checkbox-hover-layer"></div>
         <svg
             class="snowui-checkbox-icon"
-            viewBox="2 2 12 12"
+            viewBox="0 0 28 28"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
-            {#if indeterminate}
-                <!-- Minus Icon (圆角) - 从32x32缩放到16x16 -->
-                <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M4.75 8C4.75 7.586 5.086 7.25 5.5 7.25H10.5C10.914 7.25 11.25 7.586 11.25 8C11.25 8.414 10.914 8.75 10.5 8.75H5.5C5.086 8.75 4.75 8.414 4.75 8Z"
-                    fill="currentColor"
-                />
-            {:else if checked}
-                <!-- Check Icon (圆角) - 从32x32缩放到16x16 -->
-                <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
-                    d="M11.009 6.199C11.313 6.480 11.332 6.954 11.051 7.259L8.240 10.304C7.836 10.741 7.144 10.732 6.752 10.285L5.186 8.494C4.913 8.182 4.944 7.708 5.256 7.436C5.568 7.163 6.042 7.194 6.314 7.506L7.515 8.878L9.949 6.241C10.230 5.937 10.704 5.918 11.009 6.199Z"
-                    fill="currentColor"
-                />
-            {/if}
+            <path
+                class="snowui-checkbox-check-path"
+                d="M8 13.7333L11.4697 17.6106C11.6596 17.8228 11.9882 17.8338 12.1918 17.6346L20 10"
+                pathLength="1"
+            />
+            <path
+                class="snowui-checkbox-indeterminate-path"
+                d="M8 14H20"
+                pathLength="1"
+            />
         </svg>
     </div>
     {#if children}
@@ -241,7 +235,9 @@
             --snowui-checkbox-radius-override,
             var(--snowui-checkbox-radius)
         );
-        --snowui-checkbox-border-width: var(--border-2);
+        --snowui-checkbox-border-width: calc(
+            var(--snowui-checkbox-size-resolved) * 0.0625
+        );
         --snowui-checkbox-border-width-resolved: var(
             --snowui-checkbox-border-width-override,
             var(--snowui-checkbox-border-width)
@@ -265,9 +261,9 @@
             --snowui-checkbox-overlay-opacity-override,
             var(--snowui-checkbox-overlay-opacity)
         );
-        --snowui-checkbox-motion-duration: var(
-            --snowui-frame-control-motion-duration,
-            300ms
+        --snowui-checkbox-motion-duration: min(
+            var(--snowui-frame-control-motion-duration, 300ms),
+            150ms
         );
         --snowui-checkbox-motion-duration-resolved: var(
             --snowui-checkbox-motion-duration-override,
@@ -281,10 +277,12 @@
             --snowui-checkbox-motion-easing-override,
             var(--snowui-checkbox-motion-easing)
         );
+        --snowui-checkbox-check-enter-duration: 200ms;
         color: var(--snowui-checkbox-color-resolved);
     }
 
     :global(:where(.snowui-checkbox-visual)) {
+        box-sizing: border-box;
         width: var(--snowui-checkbox-size-resolved);
         height: var(--snowui-checkbox-size-resolved);
         border-radius: var(--snowui-checkbox-radius-resolved);
@@ -299,7 +297,11 @@
         background-color: var(--background-3, #fff);
         background-image: none;
         flex-shrink: 0;
-        transition: background-color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
+        transition:
+            box-shadow var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out),
+            background-color var(--snowui-frame-color-motion-duration, 0.15s)
+                var(--snowui-frame-color-motion-easing, ease-out);
     }
 
     /* Level 4: Component States (标准权重胜过 Utilities) */
@@ -320,12 +322,47 @@
 
     /* Level 2 Extension: Internal icons */
     :global(:where(.snowui-checkbox-icon)) {
+        position: relative;
+        z-index: 1;
         width: 100%;
         height: 100%;
         display: block;
         color: currentColor;
+        overflow: visible;
+    }
+
+    :global(:where(.snowui-checkbox-hover-layer)) {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--snowui-checkbox-motion-duration-resolved)
+            var(--snowui-checkbox-motion-easing-resolved);
+    }
+
+    :global(:where(.snowui-checkbox-icon path)) {
+        fill: none;
+        stroke: var(--static-white-100, #fff);
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+
+    :global(:where(.snowui-checkbox-check-path)) {
+        opacity: 0;
+        stroke-dasharray: 1;
+        stroke-dashoffset: 1;
+        transition:
+            opacity var(--snowui-checkbox-motion-duration-resolved)
+                var(--snowui-checkbox-motion-easing-resolved),
+            stroke-dashoffset 0s linear
+                var(--snowui-checkbox-motion-duration-resolved);
+    }
+
+    :global(:where(.snowui-checkbox-indeterminate-path)) {
         opacity: 0;
         transform: scale(0.5);
+        transform-origin: center;
         transition:
             opacity var(--snowui-checkbox-motion-duration-resolved)
                 var(--snowui-checkbox-motion-easing-resolved),
@@ -335,59 +372,70 @@
 
     /* Icon 可见 (Level 4 Trigger) */
     :global(
-            .snowui-checkbox-sr-only:checked
+            .snowui-checkbox-sr-only:checked:not(:indeterminate)
                 + .snowui-checkbox-visual
-                .snowui-checkbox-icon
+                .snowui-checkbox-check-path
         ),
     :global(
             .snowui-checkbox-sr-only:indeterminate
                 + .snowui-checkbox-visual
-                .snowui-checkbox-icon
+                .snowui-checkbox-indeterminate-path
         ) {
         color: var(--static-white-100, #fff);
         opacity: 1;
-        transform: scale(1);
     }
+
     :global(
-            .snowui-checkbox-sr-only:checked
+            .snowui-checkbox-sr-only:checked:not(:indeterminate)
                 + .snowui-checkbox-visual
-                .snowui-checkbox-icon
-                path
-        ),
+                .snowui-checkbox-check-path
+        ) {
+        stroke-dashoffset: 0;
+        transition:
+            stroke-dashoffset var(--snowui-checkbox-check-enter-duration)
+                ease-out,
+            opacity 0s linear;
+    }
+
     :global(
             .snowui-checkbox-sr-only:indeterminate
                 + .snowui-checkbox-visual
-                .snowui-checkbox-icon
-                path
+                .snowui-checkbox-indeterminate-path
         ) {
-        fill: var(--static-white-100, #fff);
+        transform: scale(1);
     }
 
     /* ========== Hover State (Level 2 Extension) ========== */
-    /* Unchecked Hover - 直接背景混色 4% currentColor */
+    /* Unchecked Hover - 独立覆盖层只加深边框，保持填充不变 */
     :global(.snowui-checkbox:not([data-disabled="true"]):hover)
         :global(
             .snowui-checkbox-sr-only:not(:checked):not(:indeterminate)
                 + .snowui-checkbox-visual
+                .snowui-checkbox-hover-layer
         ) {
-        background-color: color-mix(
-            in srgb,
-            var(--snowui-checkbox-primary) 4%,
-            transparent
-        );
+        opacity: 1;
+        box-shadow: inset 0 0 0 var(--snowui-checkbox-border-width-resolved)
+            color-mix(in srgb, var(--black-100, #000) 20%, transparent);
     }
 
-    /* Checked/Indeterminate Hover - primary 上叠加 20% static white */
-    :global(.snowui-checkbox:not([data-disabled="true"]):hover)
-        :global(.snowui-checkbox-sr-only:checked + .snowui-checkbox-visual),
+    /* Checked/Indeterminate Hover - 独立覆盖层在完整表面叠加 20% static white */
     :global(.snowui-checkbox:not([data-disabled="true"]):hover)
         :global(
-            .snowui-checkbox-sr-only:indeterminate + .snowui-checkbox-visual
+            .snowui-checkbox-sr-only:checked
+                + .snowui-checkbox-visual
+                .snowui-checkbox-hover-layer
+        ),
+    :global(.snowui-checkbox:not([data-disabled="true"]):hover)
+        :global(
+            .snowui-checkbox-sr-only:indeterminate
+                + .snowui-checkbox-visual
+                .snowui-checkbox-hover-layer
         ) {
+        opacity: 1;
         background-color: color-mix(
             in srgb,
             var(--static-white-100, #fff) 20%,
-            var(--snowui-checkbox-primary)
+            transparent
         );
     }
 
@@ -402,5 +450,21 @@
     :global(:where(.snowui-checkbox-label)) {
         font-size: var(--snowui-checkbox-label-font-size-override, inherit);
         line-height: var(--snowui-checkbox-label-line-height-override, inherit);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-checkbox)) {
+            --snowui-checkbox-check-enter-duration: 0s;
+            --snowui-checkbox-motion-duration-resolved: 0s;
+        }
+
+        :global(:where(.snowui-checkbox-indeterminate-path)) {
+            transition: none;
+        }
+
+        :global(:where(.snowui-checkbox-visual)),
+        :global(:where(.snowui-checkbox-hover-layer)) {
+            transition: none;
+        }
     }
 </style>

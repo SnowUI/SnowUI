@@ -1,6 +1,6 @@
 <!-- 
  Radio 组件：单选按钮控件
- v1.3.10
+ v1.3.17
 
  1. 核心能力:
     - 支持单选和分组模式
@@ -184,6 +184,8 @@
         tabindex={disabled ? -1 : 0}
     />
     <div class="snowui-radio-visual">
+        <div class="snowui-radio-active-ring"></div>
+        <div class="snowui-radio-hover-layer"></div>
         {#if variant === "outline"}
             <div class="snowui-radio-dot"></div>
         {/if}
@@ -217,7 +219,9 @@
             --snowui-radio-radius-override,
             var(--snowui-radio-radius)
         );
-        --snowui-radio-border-width: var(--border-2);
+        --snowui-radio-border-width: calc(
+            var(--snowui-radio-size-resolved) * 0.0625
+        );
         --snowui-radio-border-width-resolved: var(
             --snowui-radio-border-width-override,
             var(--snowui-radio-border-width)
@@ -248,16 +252,12 @@
             var(--black-100, #000) 20%,
             transparent
         );
-        --snowui-radio-active-ring-width-current: var(
-            --snowui-radio-border-width-resolved
-        );
-        --snowui-radio-active-ring-color-current: var(
-            --snowui-radio-base-border-color-current
-        );
+        --snowui-radio-active-ring-width-current: 0px;
+        --snowui-radio-active-ring-color-current: transparent;
         --snowui-radio-background-current: var(--background-3, #fff);
-        --snowui-radio-motion-duration: var(
-            --snowui-frame-control-motion-duration,
-            300ms
+        --snowui-radio-motion-duration: min(
+            var(--snowui-frame-control-motion-duration, 300ms),
+            150ms
         );
         --snowui-radio-motion-duration-resolved: var(
             --snowui-radio-motion-duration-override,
@@ -271,9 +271,12 @@
             --snowui-radio-motion-easing-override,
             var(--snowui-radio-motion-easing)
         );
-        --snowui-radio-border-motion-duration: var(
-            --snowui-frame-border-motion-duration,
-            var(--snowui-radio-motion-duration-resolved)
+        --snowui-radio-border-motion-duration: min(
+            var(
+                --snowui-frame-border-motion-duration,
+                var(--snowui-radio-motion-duration-resolved)
+            ),
+            150ms
         );
         --snowui-radio-border-motion-duration-resolved: var(
             --snowui-radio-border-motion-duration-override,
@@ -308,6 +311,7 @@
     }
 
     :global(:where(.snowui-radio-visual)) {
+        box-sizing: border-box;
         width: var(--snowui-radio-size-resolved);
         height: var(--snowui-radio-size-resolved);
         border-radius: var(--snowui-radio-radius-resolved);
@@ -327,27 +331,41 @@
                 var(--snowui-radio-motion-easing-resolved);
     }
 
-    :global(:where(.snowui-radio-visual)::after) {
-        content: "";
+    :global(:where(.snowui-radio-active-ring)),
+    :global(:where(.snowui-radio-hover-layer)) {
         position: absolute;
         inset: 0;
         border-radius: inherit;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-radio-active-ring)) {
         box-shadow: inset 0 0 0 var(--snowui-radio-active-ring-width-current)
             var(--snowui-radio-active-ring-color-current);
-        pointer-events: none;
         transition: box-shadow var(--snowui-radio-border-motion-duration-resolved)
             var(--snowui-radio-border-motion-easing-resolved);
     }
 
+    :global(:where(.snowui-radio-hover-layer)) {
+        opacity: 0;
+        transition: opacity var(--snowui-radio-motion-duration-resolved)
+            var(--snowui-radio-motion-easing-resolved);
+    }
+
     /* Level 2 Extension: Internal dots */
     :global(:where(.snowui-radio-dot)) {
+        position: relative;
+        z-index: 1;
         width: var(--snowui-radio-dot-size-resolved);
         height: var(--snowui-radio-dot-size-resolved);
         border-radius: var(--snowui-radio-radius-resolved);
         background-color: var(--snowui-radio-primary);
         transform: scale(0);
-        transition: transform var(--snowui-radio-motion-duration-resolved)
-            var(--snowui-radio-motion-easing-resolved);
+        transition:
+            transform var(--snowui-radio-motion-duration-resolved)
+                var(--snowui-radio-motion-easing-resolved),
+            background-color var(--snowui-radio-motion-duration-resolved)
+                var(--snowui-radio-motion-easing-resolved);
     }
 
     /* Level 4: Component Variants & State (标准权重胜过 Utilities) */
@@ -376,23 +394,49 @@
 
     /* ========== Hover State (Level 2 Extension) ========== */
 
-    /* Unchecked Hover: 在同一视觉层上直接切背景变量，避免 border 过渡结束后出现“新层闪现” */
+    /* Unchecked Hover: 独立覆盖层只加深基础边框，保持填充不变 */
     :global(
             .snowui-radio:not([data-disabled="true"]):not([data-checked="true"]):hover
+                .snowui-radio-hover-layer
         ) {
-        --snowui-radio-background-current: color-mix(
+        opacity: 1;
+        box-shadow: inset 0 0 0 var(--snowui-radio-border-width-resolved)
+            color-mix(in srgb, var(--black-100, #000) 20%, transparent);
+    }
+
+    /* Outline checked Hover: 外框叠加 Black20，Dot 按 Black100 规则叠加 White20 */
+    :global(
+            .snowui-radio:not([data-disabled="true"])[data-variant="outline"][data-checked="true"]:hover
+                .snowui-radio-hover-layer
+        ) {
+        opacity: 1;
+        box-shadow: inset 0 0 0 var(--snowui-radio-border-width-resolved)
+            color-mix(in srgb, var(--black-100, #000) 20%, transparent);
+    }
+
+    :global(
+            .snowui-radio:not([data-disabled="true"])[data-variant="outline"][data-checked="true"]:hover
+                .snowui-radio-dot
+        ) {
+        background-color: color-mix(
             in srgb,
-            var(--snowui-radio-primary) 4%,
-            transparent
+            var(--static-white-100, #fff) 20%,
+            var(--snowui-radio-primary)
         );
     }
 
-    :global(.snowui-radio:not([data-disabled="true"])[data-checked="true"]:hover) {
-        --snowui-radio-background-current: color-mix(
-            in srgb,
-            var(--snowui-radio-primary) 4%,
-            transparent
-        );
+    /* Filled checked Hover: 只覆盖粗黑选中环，中间白色孔保持不变 */
+    :global(
+            .snowui-radio:not([data-disabled="true"])[data-variant="filled"][data-checked="true"]:hover
+                .snowui-radio-hover-layer
+        ) {
+        opacity: 1;
+        box-shadow: inset 0 0 0 var(--snowui-radio-filled-border-resolved)
+            color-mix(
+                in srgb,
+                var(--static-white-100, #fff) 20%,
+                transparent
+            );
     }
 
     /* Label Styling */
@@ -406,5 +450,14 @@
         + :global(:where(.snowui-radio-visual)) {
         box-shadow: 0 0 0 var(--border-8)
             color-mix(in srgb, currentColor 4%, transparent);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-radio-visual)),
+        :global(:where(.snowui-radio-active-ring)),
+        :global(:where(.snowui-radio-hover-layer)),
+        :global(:where(.snowui-radio-dot)) {
+            transition: none;
+        }
     }
 </style>

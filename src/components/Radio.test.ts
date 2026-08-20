@@ -36,6 +36,7 @@ export const examples = [
         name: "3: 尺寸",
         code: `3
 <div class="flex gap-4 items-center">
+    <Radio size={12}>12</Radio>
     <Radio size={16}>16</Radio>
     <Radio size={20}>20</Radio>
     <Radio size={24}>24</Radio>
@@ -46,7 +47,7 @@ export const examples = [
     <Radio size={80}>80</Radio>
 </div>`,
         expected: {
-            render: "Radio in 8 standard gradient sizes",
+            render: "Radio in all ResourceSize steps; size includes the inset border, so 32 stays 32×32px while the border scales to 2px",
             layout: "Flex row",
             interaction: "None",
             responsive: "None"
