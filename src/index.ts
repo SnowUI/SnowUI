@@ -1,5 +1,3 @@
-import './lib/tooltip-enhancement'
-
 // ── OSS 全量 re-export（Vite alias 升级路径：import { Frame } 会拿到 FramePro）──
 export {
     Avatar, AvatarGroup, Badge, Button, Card, ScrollArea, Checkbox, CodeBlock,
