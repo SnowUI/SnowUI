@@ -254,8 +254,8 @@
       "tier": "pro",
       "kind": "component",
       "source": "src/components/NumberFlow.svelte",
-      "documentation": "src/components/NumericText.md",
-      "description": "NumericText 提供 SwiftUI numericText 风格的单行文字 / 数字差异过渡，只动画发生变化的中间区间。",
+      "documentation": "src/components/NumberFlow.md",
+      "description": "展示持续变化的格式化数字，并以逐位滚轮、位数重排和容器宽度过渡表达数值变化。",
       "intents": [
         "数字滚动",
         "数值变化动画"

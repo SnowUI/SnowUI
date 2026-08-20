@@ -55,7 +55,6 @@
       "aliases": ["PRO Frame"]
     },
     "NumberFlow": {
-      "documentation": "src/components/NumericText.md",
       "intents": ["数字滚动", "数值变化动画"],
       "aliases": ["数字流动", "数字滚轮动画"],
       "related": ["NumericText"]
