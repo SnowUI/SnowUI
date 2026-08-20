@@ -1,6 +1,6 @@
 # Tooltip.svelte 文档
 
-> **版本**: v1.16.0
+> **版本**: v1.17.0
 > **职责**: 文字提示组件，在悬停时显示额外信息。
 
 **能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
@@ -119,10 +119,10 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
   - 新旧目标 Tooltip 矩形最短距离不超过 `4px` 时，旧、新内容沿实际二维移动向量拼成投影间距为 `4px` 的内容带；外框与内容带同帧进入 `180–360ms` 有界协调时间线，进行中改目标使用 `90–160ms` 重定向；`snowui-tooltip-size-shell` 的 `overflow: hidden` 与圆角共同形成唯一揭示边界；
   - 新旧目标 Tooltip 矩形最短距离超过 `4px` 时，不拼接、不保留旧内容，新内容保持局部对齐并随外框一起移动；
   - 动画中断时读取外框和当前内容层的实时矩形，再以各自当前可见位置作为下一段起点；
-  - 新一轮显示先完成不可见测量和定位，并为毛玻璃层保留一个不可见预绘制帧，再整体显示 Portal；稳定 Backdrop 首帧以完整 opacity 提供 blur，独立 Foreground 使用 `TOOLTIP_APPEAR_MOTION` 对背景色和内容执行 opacity + 轻微 scale。Portal 与 Backdrop 不参与该出现动效，因此渐显不会削弱滤镜；
+  - 新一轮显示先完成不可见测量和定位，并为毛玻璃层保留一个不可见预绘制帧，再整体显示 Portal；稳定 Backdrop 首帧以完整 opacity 提供 blur，独立 Foreground 通过 `getTooltipAppearMotion(finalPosition)` 执行 opacity、增强 scale 和 placement 定向滑入。top 从下向上、bottom 从上向下、left 从右向左、right 从左向右；具体数值以 Tooltip preset catalog 为准。Portal 与 Backdrop 不参与该出现动效，因此渐显不会削弱滤镜；
   - 外框隐藏后再次出现时重置运动基线，首帧直接定位到当前触发器，并在渐显结束后才开启后续尺寸动效；
   - 离开触发器超过 `300ms` 后恢复 `450ms` 首次延迟；
-  - 生命周期出现只在 `snowui-tooltip-foreground` 使用 `TOOLTIP_APPEAR_MOTION` 的显式 opacity / scale 通道；后续尺寸变化继续由 Frame `Idle -> Active` 形态时序承接；
+  - 生命周期出现只在 `snowui-tooltip-foreground` 使用 Tooltip appear preset 的显式 opacity / scale / x / y 通道；transform origin 固定在靠近触发器的一侧中心，后续尺寸变化继续由 Frame `Idle -> Active` 形态时序承接；
   - 内容宽高变化由 `snowui-tooltip-size-shell` 保存明确宽高。普通尺寸变化继续消费 Frame size motion bridge；连续切换时宽高并入与外框位置相同的逐帧平滑几何时间线。圆角和 padding 归 size shell，毛玻璃归稳定 Backdrop，背景色和内容归 Foreground；三个层级共享同一尺寸与裁切边界；
   - top / bottom 方向使用触发器中心作为固定锚点，尺寸外壳用静态 `transform: translateX(-50%)` 保持居中；left / right 方向使用触发器垂直中心作为固定锚点，尺寸外壳用静态 `transform: translateY(-50%)` 保持居中；宽高由 Frame size motion bridge 过渡，但居中偏移不参与过渡，因此连续切换和尺寸变化过程中 Tooltip 仍保持与触发器居中对齐；
   - 鼠标移开后按 `300ms` skip-delay 保留外框以承接相邻触发器切换；窗口内命中新 Tooltip 时取消隐藏并直接复用。超过窗口仍未命中时把 Foreground Frame 切到 `Disappear` 状态，使用参考 transitions.dev Tooltip 的 `50ms` 退出动效：背景色和内容淡出并缩到 `98%`；退出完成后再卸载包含 Backdrop 的共享外框。
@@ -150,6 +150,11 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.17.0 (2026-08-21)
+- Tooltip Foreground 以 `110ms` 从 `0.94` 放大到 `1`，并按最终 placement 从触发器方向反向滑入 `2px`；具体数值以 Tooltip preset catalog 为准。
+- top / bottom / left / right 分别从下 / 上 / 右 / 左进入，transform origin 对齐靠近触发器的一侧中心；Portal、size shell 与 Backdrop 继续保持稳定。
+- `prefers-reduced-motion: reduce` 下取消 Foreground 的 opacity、scale 与位移，直接显示最终稳定状态。
 
 ### v1.16.0 (2026-08-21)
 - 连续裁切揭示调整为最初版本约 `0.75` 倍速度，并优先使用整十毫秒时长。

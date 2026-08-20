@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.16.0
+ Tooltip 文字提示组件 v1.17.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 出现动效以 110ms 从 94% 放大到 100%，并按最终 placement 从触发器方向反向滑入 2px。
  变更 (2026-08-21): 连续裁切揭示调整为最初版本约 0.75 倍速度，稳定段 180–360ms、重定向段 90–160ms，外框、尺寸与内容保持原协调关系。
  变更 (2026-08-21): 全局定位、媒体查询、Overlay 响应与动效关闭监听收敛到唯一共享 Portal host，定位刷新合并为每帧最多一次。
  变更 (2026-08-21): 组合在 Link / Button 内部包装层时优先使用最近交互祖先作为触发器，避免折叠导航隐藏 label 后 Tooltip 失去 hover 命中区。
@@ -97,7 +98,6 @@
     import type { CoreState } from "../logic/frame-types";
     import { MORPH_MOTION } from "../motion/morph";
     import {
-        TOOLTIP_APPEAR_MOTION,
         TOOLTIP_APPEAR_TOTAL_MS,
         TOOLTIP_CONTINUOUS_BASE_DURATION_MS,
         TOOLTIP_CONTINUOUS_CONTENT_LAG,
@@ -111,6 +111,7 @@
         TOOLTIP_CONTINUOUS_RETARGET_MIN_DURATION_MS,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
+        getTooltipAppearMotion,
     } from "../motion/presets/tooltip";
     import {
         getTooltipHoverShowDelay,
@@ -328,18 +329,23 @@
             : "Idle",
     );
     const effectivePortalAppearMotion = $derived(
-        tooltipBehavior.lifecycleMotion ? TOOLTIP_APPEAR_MOTION : false,
+        tooltipBehavior.lifecycleMotion && !prefersReducedMotion
+            ? getTooltipAppearMotion(finalPosition)
+            : false,
     );
     const effectivePortalDisappearMotion = $derived(
-        tooltipBehavior.lifecycleMotion ? TOOLTIP_DISAPPEAR_MOTION : false,
+        tooltipBehavior.lifecycleMotion && !prefersReducedMotion
+            ? TOOLTIP_DISAPPEAR_MOTION
+            : false,
     );
     const effectiveSizeMotion = $derived(
         tooltipBehavior.sizeMotion ? TOOLTIP_SYNC_MOTION : false,
     );
     const tooltipTransformOrigin = $derived.by(() => {
-        if (finalPosition === "top") return "0% 100%";
-        if (finalPosition === "left") return "100% 0%";
-        return "0% 0%";
+        if (finalPosition === "top") return "50% 100%";
+        if (finalPosition === "bottom") return "50% 0%";
+        if (finalPosition === "left") return "100% 50%";
+        return "0% 50%";
     });
 
     function resetMotionBaseline() {

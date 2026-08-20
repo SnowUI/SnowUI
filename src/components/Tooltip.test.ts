@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.8.3
+ * v1.8.4
  */
 export const examples = [
     {
@@ -14,7 +14,12 @@ export const examples = [
         </Tooltip>
     </Button>
 </div>`,
-
+        expected: {
+            interaction:
+                "默认 top Tooltip 出现时，Foreground 从下向上滑入并更明显地放大；位移方向始终由碰撞计算后的最终 placement 决定",
+            accessibility:
+                "prefers-reduced-motion: reduce 下直接显示最终位置、尺寸、内容与可访问名称，不执行渐显、缩放或位移",
+        },
         logic: ["Basic", "Composition"],
     },
     {

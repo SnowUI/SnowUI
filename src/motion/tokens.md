@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.14.0
+> **版本**: v1.15.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -24,6 +24,7 @@
 | `MOTION_DURATION_CONTINUOUS_HOVER_MS` / `MOTION_DURATION_CONTINUOUS_HOVER_RESPONSE_MS` | 连续悬停背景移动 / 变形 60ms，首次显隐响应 0ms |
 | `MOTION_DURATION_BUTTON_HOVER_MS` / `MOTION_DURATION_BUTTON_HOVER_COLOR_MS` | Button 背景像素外扩与颜色 opacity 渐现 / 渐隐统一为 150ms，使用同一时间线 |
 | `MOTION_DURATION_*` / `MOTION_STAGGER_*` | 通用效果优先引用 250ms 基准；Badge、Tooltip、shake 等专项效果保留精确时长与 stagger |
+| `MOTION_DISTANCE_TOOLTIP_APPEAR_PX` | Tooltip Foreground 根据最终 placement 从触发器方向反向滑入的距离 |
 | `MOTION_EASING_*` | standard、JS motion 的 in-out / linear、Button hover 几何与颜色层 CSS `ease-in-out`，以及 Badge / Number / Check 各自精确 bounce 曲线 |
 | `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
 | `MOTION_DISTANCE_*` | Button hover 背景总宽 / 总高增加 2px，以及 text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
@@ -39,6 +40,7 @@
 
 ## 变更记录
 
+- v1.15.0 (2026-08-21): Tooltip Foreground 出现缩放起点由 `0.98` 调整为 `0.94`，出现时长收敛为 `110ms`，新增 `2px` placement 定向滑入距离。
 - v1.14.0 (2026-08-21): Tooltip 连续交接调整为最初版本约 `0.75` 倍速度：稳定段使用 `160 / 180 / 360ms / 0.6ms/px`，retarget 使用 `60 / 90 / 160ms / 0.35ms/px`；内容相位关系不变。
 - v1.13.0 (2026-08-21): Tooltip 稳定切换改为 `120 / 140 / 280ms / 0.45ms/px` 与 `0.08` 内容滞后；retarget 改为 `45 / 70 / 120ms / 0.25ms/px` 与 `0.02` 内容滞后。
 - v1.12.0 (2026-08-21): 新增 Tooltip 连续交接快速重定向的 `60 / 90 / 160ms / 0.35ms/px` 时程与 `0.04` 内容相位滞后 token。

@@ -2,6 +2,7 @@ import type { MotionConfig } from "../../logic/motion-config";
 import {
     MOTION_DURATION_TOOLTIP_APPEAR_MS,
     MOTION_DURATION_TOOLTIP_DISAPPEAR_MS,
+    MOTION_DISTANCE_TOOLTIP_APPEAR_PX,
     MOTION_EASING_TOOLTIP,
     MOTION_SCALE_TOOLTIP_APPEAR_FROM,
     MOTION_SCALE_TOOLTIP_APPEAR_TO,
@@ -26,6 +27,35 @@ export const TOOLTIP_APPEAR_MOTION: MotionConfig = {
     duration: MOTION_DURATION_TOOLTIP_APPEAR_MS,
     easing: MOTION_EASING_TOOLTIP,
 };
+
+export type TooltipMotionPosition = "top" | "bottom" | "left" | "right";
+
+export function getTooltipAppearMotion(
+    position: TooltipMotionPosition,
+): MotionConfig {
+    if (position === "top") {
+        return {
+            ...TOOLTIP_APPEAR_MOTION,
+            y: [MOTION_DISTANCE_TOOLTIP_APPEAR_PX, 0],
+        };
+    }
+    if (position === "bottom") {
+        return {
+            ...TOOLTIP_APPEAR_MOTION,
+            y: [-MOTION_DISTANCE_TOOLTIP_APPEAR_PX, 0],
+        };
+    }
+    if (position === "left") {
+        return {
+            ...TOOLTIP_APPEAR_MOTION,
+            x: [MOTION_DISTANCE_TOOLTIP_APPEAR_PX, 0],
+        };
+    }
+    return {
+        ...TOOLTIP_APPEAR_MOTION,
+        x: [-MOTION_DISTANCE_TOOLTIP_APPEAR_PX, 0],
+    };
+}
 
 export const TOOLTIP_DISAPPEAR_MOTION: MotionConfig = {
     opacity: [1, 0],
