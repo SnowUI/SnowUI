@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.6.3
+ * v1.6.4
  */
 export const examples = [
     {
@@ -122,7 +122,7 @@ export const examples = [
         expected: {
             render: "多个相邻按钮分别显示不同 Tooltip 内容",
             interaction:
-                "任一 Tooltip 成功显示后，300ms 内 hover 另一个 Tooltip 时立即显示；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 4px 的内容带，内容带与共享圆角外框从同一帧开始，但内容带使用独立且更慢的线性速度，各自时长由自身距离和速度决定；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
+                "任一 Tooltip 成功显示后，300ms 内 hover 另一个 Tooltip 时立即显示；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 4px 的内容带，内容带与共享圆角外框从同一帧开始；外框保持线性移动，内容带使用独立较慢速度与 cubic ease-out 缓出进度；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
             accessibility:
                 "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
         },

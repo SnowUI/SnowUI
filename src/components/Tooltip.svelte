@@ -1,8 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.8.4
+ Tooltip 文字提示组件 v1.8.5
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-20): 外框与 4px 拼接内容带从同一帧开始，但分别消费独立线性速度；内容带慢于外框，并分别按自身距离计算时长。
+ 变更 (2026-08-20): 外框保持线性移动，4px 拼接内容带使用较慢的独立速度与 cubic ease-out 缓出进度。
  变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
  变更 (2026-08-20): Button hover 伪元素 transition 不再被误判为触发器锚点运动。
  变更 (2026-08-12): 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
@@ -528,6 +528,10 @@
         return Math.min(elapsed / duration, 1);
     }
 
+    function getEaseOutProgress(progress: number) {
+        return 1 - (1 - progress) ** 3;
+    }
+
     function interpolate(start: number, end: number, progress: number) {
         return start + (end - start) * progress;
     }
@@ -1033,9 +1037,8 @@
                             elapsed,
                             shellDuration,
                         );
-                        const contentProgress = getMotionProgress(
-                            elapsed,
-                            contentDuration,
+                        const contentProgress = getEaseOutProgress(
+                            getMotionProgress(elapsed, contentDuration),
                         );
                         const currentSize = {
                             width: interpolate(
@@ -1367,6 +1370,7 @@
                 data-content-duration={switchContentDurationMs}
                 data-shell-distance={switchShellDistancePx}
                 data-content-distance={switchContentDistancePx}
+                data-content-easing="ease-out"
                 style={motionShellStyle}
             >
                 <Frame
