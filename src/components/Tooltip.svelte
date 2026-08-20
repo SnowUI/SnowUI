@@ -1,8 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.8.2
+ Tooltip 文字提示组件 v1.8.3
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-20): 目标 Tooltip 间距不超过 4px 时，先将新旧内容拼成带 4px 间距的内容带，再依次移动外框和内容带；超过阈值只移动外框。
+ 变更 (2026-08-20): 外框与 4px 拼接内容带从同一帧开始，以统一线性像素速度移动，并分别按自身距离计算时长；超过拼接阈值时内容随外框移动。
  变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示新旧内容。
  变更 (2026-08-20): Button hover 伪元素 transition 不再被误判为触发器锚点运动。
  变更 (2026-08-12): 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
@@ -94,6 +94,7 @@
     import {
         TOOLTIP_APPEAR_MOTION,
         TOOLTIP_APPEAR_TOTAL_MS,
+        TOOLTIP_CONTINUOUS_MOVE_SPEED_PX_PER_MS,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
     } from "../motion/presets/tooltip";
@@ -249,8 +250,8 @@
     let portalLifecycleState = $state<CoreState>("Idle");
     let coords = $state({ top: 0, left: 0 });
     let finalPosition: "top" | "bottom" | "left" | "right" = $state("top");
-    let moveMode: "snap" | "move" = $state("snap");
-    let switchPhase: "idle" | "prepare" | "shell" | "content" = $state("idle");
+    let moveMode: "snap" | "frame" = $state("snap");
+    let switchPhase: "idle" | "prepare" | "moving" = $state("idle");
     let measuredSize = $state({ width: 0, height: 0 });
     let pendingMeasuredSize = { width: 0, height: 0 };
     let measuredOverlayId: string | undefined;
@@ -279,8 +280,12 @@
     let overlayAppearTimer: number | undefined;
     let overlayDisappearTimer: number | undefined;
     let sizeMotionTimer: number | undefined;
-    let switchMotionTimer: number | undefined;
     let switchMotionFrame: number | undefined;
+    let animatedShellSize = $state<{ width: number; height: number }>();
+    let switchShellDurationMs = $state(0);
+    let switchContentDurationMs = $state(0);
+    let switchShellDistancePx = $state(0);
+    let switchContentDistancePx = $state(0);
     let switchMotionRevision = 0;
     let prefersReducedMotion = $state(false);
     let reducedMotionMedia: MediaQueryList | undefined;
@@ -300,11 +305,12 @@
         [userStyle].filter(Boolean).join("; ") || undefined,
     );
     const sizeShellStyle = $derived.by(() => {
-        if (!measuredSize.width || !measuredSize.height) return undefined;
+        const shellSize = animatedShellSize ?? measuredSize;
+        if (!shellSize.width || !shellSize.height) return undefined;
 
         return [
-            `--snowui-tooltip-measured-width: ${measuredSize.width}px`,
-            `--snowui-tooltip-measured-height: ${measuredSize.height}px`,
+            `--snowui-tooltip-measured-width: ${shellSize.width}px`,
+            `--snowui-tooltip-measured-height: ${shellSize.height}px`,
         ].join("; ");
     });
     const motionShellStyle = $derived(
@@ -348,6 +354,11 @@
         lastPositionTooltipId = undefined;
         moveMode = "snap";
         switchPhase = "idle";
+        animatedShellSize = undefined;
+        switchShellDurationMs = 0;
+        switchContentDurationMs = 0;
+        switchShellDistancePx = 0;
+        switchContentDistancePx = 0;
         measuredSize = { width: 0, height: 0 };
         pendingMeasuredSize = { width: 0, height: 0 };
         measuredOverlayId = undefined;
@@ -375,10 +386,6 @@
             window.cancelAnimationFrame(switchMotionFrame);
             switchMotionFrame = undefined;
         }
-        if (switchMotionTimer !== undefined) {
-            window.clearTimeout(switchMotionTimer);
-            switchMotionTimer = undefined;
-        }
     }
 
     function readVisualRect(element: HTMLElement | undefined): TooltipVisualRect | undefined {
@@ -395,7 +402,11 @@
 
     function finishSwitchMotion(revision: number) {
         if (revision !== switchMotionRevision) return;
-        switchMotionTimer = undefined;
+        animatedShellSize = undefined;
+        switchShellDurationMs = 0;
+        switchContentDurationMs = 0;
+        switchShellDistancePx = 0;
+        switchContentDistancePx = 0;
         outgoingOverlay = null;
         outgoingTargetRect = undefined;
         outgoingAlignedRect = undefined;
@@ -493,6 +504,31 @@
         if (length <= 0.5) return { x: 1, y: 0 };
 
         return { x: dx / length, y: dy / length };
+    }
+
+    function getRectCenterDistance(
+        startRect: TooltipVisualRect,
+        targetRect: TooltipVisualRect,
+    ) {
+        return Math.hypot(
+            targetRect.left + targetRect.width / 2 -
+                (startRect.left + startRect.width / 2),
+            targetRect.top + targetRect.height / 2 -
+                (startRect.top + startRect.height / 2),
+        );
+    }
+
+    function getDistanceDuration(distance: number) {
+        return distance / TOOLTIP_CONTINUOUS_MOVE_SPEED_PX_PER_MS;
+    }
+
+    function getMotionProgress(elapsed: number, duration: number) {
+        if (duration <= 0) return 1;
+        return Math.min(elapsed / duration, 1);
+    }
+
+    function interpolate(start: number, end: number, progress: number) {
+        return start + (end - start) * progress;
     }
 
     function concatenateContentRect(
@@ -862,7 +898,7 @@
         if (!hasMeasuredPosition) {
             moveMode = "snap";
         } else if (isSwitchingTooltip) {
-            moveMode = canSmoothMove ? "move" : "snap";
+            moveMode = canSmoothMove ? "frame" : "snap";
         }
         if (
             measuredSize.width !== tooltipWidth ||
@@ -923,9 +959,30 @@
                       { width: startRect.width, height: startRect.height },
                   )
                 : targetRect;
+            const shellDistance = getRectCenterDistance(startRect, targetRect);
+            const shellDuration = getDistanceDuration(shellDistance);
+            const alignment = canJoinContentTrack
+                ? {
+                      x: targetRect.left - incomingTrackRect.left,
+                      y: targetRect.top - incomingTrackRect.top,
+                  }
+                : { x: 0, y: 0 };
+            const contentDistance = canJoinContentTrack
+                ? Math.hypot(alignment.x, alignment.y)
+                : 0;
+            const contentDuration = getDistanceDuration(contentDistance);
+            const totalDuration = Math.max(shellDuration, contentDuration);
             const revision = ++switchMotionRevision;
             moveMode = "snap";
             switchPhase = "prepare";
+            animatedShellSize = {
+                width: startRect.width,
+                height: startRect.height,
+            };
+            switchShellDurationMs = shellDuration;
+            switchContentDurationMs = contentDuration;
+            switchShellDistancePx = shellDistance;
+            switchContentDistancePx = contentDistance;
             shellMotionOffset = {
                 x: startRect.left - initialBaseBounds.left,
                 y: startRect.top - initialBaseBounds.top,
@@ -957,57 +1014,95 @@
             tick().then(() => {
                 if (revision !== switchMotionRevision) return;
                 switchMotionFrame = window.requestAnimationFrame(() => {
-                    switchMotionFrame = undefined;
                     if (revision !== switchMotionRevision) return;
-                    moveMode = "move";
-                    switchPhase = "shell";
-                    shellMotionOffset = { x: 0, y: 0 };
-                    if (canJoinContentTrack) {
-                        incomingLayerOffset = {
-                            x: incomingTrackRect.left - targetRect.left,
-                            y: incomingTrackRect.top - targetRect.top,
-                        };
-                        outgoingLayerOffset = {
-                            x: oldTarget.left - targetRect.left,
-                            y: oldTarget.top - targetRect.top,
-                        };
-                    } else {
-                        incomingLayerOffset = { x: 0, y: 0 };
-                    }
-                    switchMotionTimer = window.setTimeout(
-                        () => {
-                            switchMotionTimer = undefined;
-                            if (revision !== switchMotionRevision) return;
-                            if (!canJoinContentTrack) {
-                                finishSwitchMotion(revision);
-                                return;
-                            }
+                    moveMode = "frame";
+                    switchPhase = "moving";
+                    const startedAt = performance.now();
 
-                            switchPhase = "content";
-                            const alignment = {
-                                x: targetRect.left - incomingTrackRect.left,
-                                y: targetRect.top - incomingTrackRect.top,
+                    const animate = (now: number) => {
+                        if (revision !== switchMotionRevision) return;
+                        const elapsed = now - startedAt;
+                        const shellProgress = getMotionProgress(
+                            elapsed,
+                            shellDuration,
+                        );
+                        const contentProgress = getMotionProgress(
+                            elapsed,
+                            contentDuration,
+                        );
+                        const currentSize = {
+                            width: interpolate(
+                                startRect.width,
+                                targetRect.width,
+                                shellProgress,
+                            ),
+                            height: interpolate(
+                                startRect.height,
+                                targetRect.height,
+                                shellProgress,
+                            ),
+                        };
+                        animatedShellSize = currentSize;
+                        const currentBaseBounds = getFloatingVisualBounds(
+                            bestPos,
+                            bestCoords,
+                            currentSize,
+                        );
+                        const currentShell = {
+                            left: interpolate(
+                                startRect.left,
+                                targetRect.left,
+                                shellProgress,
+                            ),
+                            top: interpolate(
+                                startRect.top,
+                                targetRect.top,
+                                shellProgress,
+                            ),
+                        };
+                        shellMotionOffset = {
+                            x: currentShell.left - currentBaseBounds.left,
+                            y: currentShell.top - currentBaseBounds.top,
+                        };
+
+                        if (canJoinContentTrack) {
+                            const contentShift = {
+                                x: alignment.x * contentProgress,
+                                y: alignment.y * contentProgress,
                             };
-                            incomingLayerOffset = { x: 0, y: 0 };
+                            incomingLayerOffset = {
+                                x:
+                                    incomingTrackRect.left +
+                                    contentShift.x -
+                                    currentShell.left,
+                                y:
+                                    incomingTrackRect.top +
+                                    contentShift.y -
+                                    currentShell.top,
+                            };
                             outgoingLayerOffset = {
                                 x:
-                                    oldTarget.left -
-                                    targetRect.left +
-                                    alignment.x,
+                                    oldTarget.left +
+                                    contentShift.x -
+                                    currentShell.left,
                                 y:
-                                    oldTarget.top -
-                                    targetRect.top +
-                                    alignment.y,
+                                    oldTarget.top +
+                                    contentShift.y -
+                                    currentShell.top,
                             };
-                            outgoingLayerSeam = layerMasks.outgoing.end;
-                            incomingLayerSeam = layerMasks.incoming.end;
-                            switchMotionTimer = window.setTimeout(
-                                () => finishSwitchMotion(revision),
-                                TOOLTIP_SYNC_MOTION.duration,
-                            );
-                        },
-                        TOOLTIP_SYNC_MOTION.duration,
-                    );
+                        } else {
+                            incomingLayerOffset = { x: 0, y: 0 };
+                        }
+
+                        if (elapsed >= totalDuration) {
+                            switchMotionFrame = undefined;
+                            finishSwitchMotion(revision);
+                            return;
+                        }
+                        switchMotionFrame = window.requestAnimationFrame(animate);
+                    };
+
+                    animate(startedAt);
                 });
             });
         } else if (isSwitchingTooltip) {
@@ -1026,6 +1121,11 @@
             switchStartRect = undefined;
             moveMode = "snap";
             switchPhase = "idle";
+            animatedShellSize = undefined;
+            switchShellDurationMs = 0;
+            switchContentDurationMs = 0;
+            switchShellDistancePx = 0;
+            switchContentDistancePx = 0;
         }
 
         incomingLayerReady = true;
@@ -1159,6 +1259,11 @@
                 outgoingLayerOffset = { x: 0, y: 0 };
                 moveMode = "snap";
                 switchPhase = "idle";
+                animatedShellSize = undefined;
+                switchShellDurationMs = 0;
+                switchContentDurationMs = 0;
+                switchShellDistancePx = 0;
+                switchContentDistancePx = 0;
             }
         };
         updateReducedMotion();
@@ -1251,6 +1356,10 @@
                 class="snowui-tooltip-motion-shell"
                 data-move-mode={moveMode}
                 data-switch-phase={switchPhase}
+                data-shell-duration={switchShellDurationMs}
+                data-content-duration={switchContentDurationMs}
+                data-shell-distance={switchShellDistancePx}
+                data-content-distance={switchContentDistancePx}
                 style={motionShellStyle}
             >
                 <Frame
@@ -1260,7 +1369,7 @@
                     whileActive={effectiveSizeMotion}
                     bind:element={sizeShellRef}
                     data-variant={renderedOverlay.variant}
-                    data-size-motion={sizeMotionEnabled}
+                    data-size-motion={sizeMotionEnabled && animatedShellSize === undefined}
                     class={[
                         "snowui-tooltip-content",
                         "snowui-tooltip-size-shell",
@@ -1398,12 +1507,6 @@
 {/if}
 
 <style>
-    @property --snowui-tooltip-layer-seam {
-        syntax: "<percentage>";
-        inherits: false;
-        initial-value: 100%;
-    }
-
     :global(:where(.snowui-tooltip-portal)) {
         position: fixed;
         z-index: 9999;
@@ -1421,11 +1524,6 @@
             var(--snowui-tooltip-motion-y, 0),
             0
         );
-    }
-
-    :global(:where(.snowui-tooltip-motion-shell)[data-move-mode="move"]) {
-        transition: transform var(--snowui-tooltip-move-duration, 150ms)
-            var(--snowui-tooltip-move-easing, ease-out);
     }
 
     :global(:where(.snowui-tooltip-size-shell)) {
@@ -1560,15 +1658,6 @@
         :where(.snowui-tooltip-content-layer)[data-layer-ready="false"]
     ) {
         visibility: hidden;
-    }
-
-    :global(:where(.snowui-tooltip-content-layer)[data-move-mode="move"]) {
-        transition:
-            transform var(--snowui-tooltip-move-duration, 150ms)
-                var(--snowui-tooltip-move-easing, ease-out),
-            --snowui-tooltip-layer-seam
-                var(--snowui-tooltip-move-duration, 150ms)
-                var(--snowui-tooltip-move-easing, ease-out);
     }
 
     :global(

@@ -7,6 +7,7 @@ import {
     MOTION_SCALE_TOOLTIP_APPEAR_TO,
     MOTION_SCALE_TOOLTIP_DISAPPEAR_FROM,
     MOTION_SCALE_TOOLTIP_DISAPPEAR_TO,
+    MOTION_SPEED_TOOLTIP_CONTINUOUS_PX_PER_MS,
 } from "../tokens";
 import { getMotionTotalDurationMs } from "./utils";
 
@@ -33,3 +34,6 @@ export const TOOLTIP_APPEAR_TOTAL_MS = getMotionTotalDurationMs(
 export const TOOLTIP_DISAPPEAR_TOTAL_MS = getMotionTotalDurationMs(
     TOOLTIP_DISAPPEAR_MOTION,
 );
+
+export const TOOLTIP_CONTINUOUS_MOVE_SPEED_PX_PER_MS =
+    MOTION_SPEED_TOOLTIP_CONTINUOUS_PX_PER_MS;

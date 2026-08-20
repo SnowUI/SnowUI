@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.16.0
+> **版本**: v1.17.0
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -11,6 +11,7 @@
 | `GENERIC_SCALE_APPEAR_MOTION` | 普通组件显式 opt-in 保留 generic opacity + scale 进入 | Frame 默认 fallback、语义明确的 overlay / Tooltip / Dialog | SnowUI 旧 generic appear 组合的兼容显式 preset |
 | `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION` | Popover、Listbox、Menu dropdown，仅 opacity | Tooltip、Dialog、普通内容替换 | SnowUI dropdown overlay |
 | `TOOLTIP_APPEAR_MOTION` / `TOOLTIP_DISAPPEAR_MOTION` | Tooltip Foreground 的 opacity + scale；不得用于 Portal、size shell 或 Backdrop | Dropdown、Dialog、承载 backdrop-filter 的祖先 | transitions.dev Tooltip + SnowUI backdrop-filter 合成约束 |
+| `TOOLTIP_CONTINUOUS_MOVE_SPEED_PX_PER_MS` | 连续 Tooltip 切换中，外框与拼接内容带从同一帧开始、以相同线性像素速度移动；各自时长由自身距离计算 | Tooltip 首次出现、远距离直接定位、reduced-motion | 用户指定外框与内容同时同速、距离越长时长越长 + 原 `75px / 150ms` 视觉基线 |
 | `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION` | Dialog / Modal 内容面板 | Tooltip、Dropdown | transitions.dev Modal open / close |
 | `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION` | Dialog 遮罩 opacity | 内容面板 scale | SnowUI Dialog 当前遮罩行为 |
 | `REPLACEMENT_APPEAR_MOTION` | Icon / Text / CodeBlock 等内容替换 | Overlay、Dialog | SnowUI replacement default |
@@ -43,6 +44,7 @@
 
 ## 变更记录
 
+- v1.17.0 (2026-08-20): Tooltip 连续切换改用统一 `0.5px/ms` 线性速度；外框与内容带同时开始，各自按移动距离计算时长。
 - v1.16.0 (2026-08-19): Button hover 颜色与背景外扩统一为 `150ms ease-in-out`，进入与退出使用同一时间线。
 - v1.15.0 (2026-08-19): Button hover 几何改为 `150ms ease-in-out`，缩短亚像素边缘重绘窗口并缓和进入 / 退出首段；颜色继续使用更慢的 `300ms ease-in-out`。
 - v1.14.0 (2026-08-19): Button hover 颜色层使用 `300ms ease-in-out` opacity 渐现 / 渐隐，慢于 `200ms ease` 背景外扩。
