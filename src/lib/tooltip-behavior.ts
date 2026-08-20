@@ -14,9 +14,9 @@ export interface ResolvedTooltipBehaviorEnhancement {
 
 const DEFAULT_TOOLTIP_BEHAVIOR: ResolvedTooltipBehaviorEnhancement = {
     lifecycleMotion: true,
-    smoothMove: false,
-    sizeMotion: false,
-    switchHideDelayMs: 0,
+    smoothMove: true,
+    sizeMotion: true,
+    switchHideDelayMs: TOOLTIP_SKIP_DELAY_DURATION_MS,
 };
 
 let tooltipBehavior = DEFAULT_TOOLTIP_BEHAVIOR;
@@ -37,3 +37,4 @@ export function resetTooltipBehaviorEnhancement(): void {
 export function getTooltipBehaviorEnhancement(): ResolvedTooltipBehaviorEnhancement {
     return tooltipBehavior;
 }
+import { TOOLTIP_SKIP_DELAY_DURATION_MS } from "./tooltip-delay";

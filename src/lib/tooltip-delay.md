@@ -1,6 +1,6 @@
 # tooltip-delay.ts
 
-> **版本**: v1.0.1
+> **版本**: v1.1.0
 > **职责**: 协调页面内所有 Tooltip 的 hover warmup / cooldown 时序。
 > **依赖方**: [`../components/Tooltip.svelte`](../components/Tooltip.svelte)
 
@@ -14,7 +14,7 @@
 | 首次 hover 未满 `450ms` 就移开 | 不进入立即显示模式 |
 
 cooldown 窗口为 `300ms`。该规则参考 Radix Tooltip 的 `delayDuration` / `skipDelayDuration` 语义。
-PRO 共享 Portal 的相邻切换保留窗口必须与该 `300ms` 值一致；窗口内进入另一 Tooltip 时，不卸载外框，也不重新执行出现动效。
+OSS 共享 Portal 的相邻切换保留窗口必须与该 `300ms` 值一致；窗口内进入另一 Tooltip 时，不卸载外框，也不重新执行出现动效。
 
 ## 公开 API
 
@@ -35,5 +35,6 @@ PRO 共享 Portal 的相邻切换保留窗口必须与该 `300ms` 值一致；�
 
 ## 变更记录
 
+- v1.1.0 (2026-08-20): 共享 Portal 保留窗口迁为 OSS 默认行为，不再依赖 PRO 注册。
 - v1.0.1 (2026-08-12): 明确 PRO 共享 Portal 的保留窗口必须与 300ms skip-delay 一致，避免相邻触发器 gap 导致外框中断。
 - v1.0.0 (2026-06-02): 建立 Tooltip warmup / cooldown 协调。

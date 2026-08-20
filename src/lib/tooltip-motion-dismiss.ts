@@ -105,6 +105,9 @@ function getDocumentState(document: Document): DocumentMotionDismissState {
     const state: DocumentMotionDismissState = {
         registrations: new Map(),
         handleTransitionRun: (event) => {
+            // ::before / ::after 通常承载 hover 背景、边框与装饰层；事件 target
+            // 会被重定向到宿主，但伪元素自身的 inset 不会移动宿主锚点。
+            if (event.pseudoElement) return;
             if (!affectsGeometry(event.propertyName)) return;
             // A descendant geometry transition can still resize or move the
             // trigger's border box, so retain the conservative dismissal path.

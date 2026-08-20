@@ -1,6 +1,6 @@
 # tooltip-overlay.ts
 
-> **版本**: v1.1.0
+> **版本**: v1.2.0
 > **职责**: 协调页面内非受控 Tooltip 共用一个 Portal 外框。
 > **依赖方**: [`../components/Tooltip.svelte`](../components/Tooltip.svelte)
 
@@ -44,5 +44,6 @@
 
 ## 变更记录
 
+- v1.2.0 (2026-08-20): 共享 Portal、300ms 保留窗口和连续切换迁为 OSS 默认能力；视觉切换改由 Tooltip 的二维裁切窗口承接。
 - v1.1.0 (2026-08-12): 外框保留时间统一为 300ms skip-delay；修复正 `delayMs` 被固定 80ms 覆盖的问题。
 - v1.0.1 (2026-07-28): 新增立即动效关闭 revision。

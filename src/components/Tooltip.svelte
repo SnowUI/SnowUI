@@ -1,8 +1,10 @@
 <!--
- Tooltip 文字提示组件 v1.7.6
+ Tooltip 文字提示组件 v1.8.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
- 变更 (2026-08-12): PRO 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
+ 变更 (2026-08-20): 连续 Tooltip 成为 OSS 默认能力；共享圆角外框支持任意二维方向移动，并以裁切窗口揭示固定在新旧位置的内容。
+ 变更 (2026-08-20): Button hover 伪元素 transition 不再被误判为触发器锚点运动。
+ 变更 (2026-08-12): 相邻 Tooltip 的外框保留时间对齐 300ms skip-delay 窗口，避免穿过按钮 gap 时先消失再出现。
  变更 (2026-08-12): 毛玻璃 Backdrop 与 opacity/scale Foreground 分层，恢复 Tooltip 渐显且不再削弱首帧背景模糊。
  变更 (2026-08-12): 毛玻璃 Portal 显示前保留一个不可见预绘制帧，且出现时不再执行 transform，避免实际滤镜像素晚于 Tooltip。
  变更 (2026-08-12): 出现 preset 不再对毛玻璃 Portal 做 opacity 渐显，使背景模糊与 Tooltip 在同一可见首帧生效。
@@ -13,7 +15,7 @@
  变更 (2026-06-06): Tooltip 首次定位使用测量后的目标宽高计算坐标，避免第一次出现时与触发按钮间距偏小。
  变更 (2026-06-06): Tooltip 尺寸 shell 改用静态 transform 负责锚点居中，避免多次切换时 translate 过渡残留导致位置偏移。
  变更 (2026-06-06): Tooltip Portal 层移除 Frame Active 全属性 transition，避免 snap 定位仍被 top/left 过渡影响。
- 变更 (2026-06-06): Tooltip 近距离移动新增同排/同轴限制，跨上下两排快速切换时直接定位到新触发器，避免移动中位置偏离当前按钮。
+ 变更 (2026-06-06): Tooltip 近距离移动曾新增同排/同轴限制；该限制已在 v1.8.0 被二维裁切窗口替代。
  变更 (2026-06-18): Tooltip 出现/消失动效改为引用 TOOLTIP_APPEAR_MOTION / TOOLTIP_DISAPPEAR_MOTION。
  变更 (2026-06-18): Tooltip / Popover 共享首次 hover 延迟由 overlay trigger timing token 管理。
  变更 (2026-06-06): Tooltip 出现动效时长从 150ms 调整为 100ms。
@@ -23,7 +25,7 @@
  变更 (2026-06-06): Tooltip 外框隐藏后再次出现会重置运动基线，首帧直接定位到当前触发器，不继承上一轮位移或宽度动效。
  变更 (2026-06-06): Tooltip 改为锚点居中定位，宽度变化、对齐偏移与移动使用同一 150ms Frame motion timing。
  变更 (2026-06-06): Tooltip 外框宽高变化动效加快一倍，尺寸 shell 使用 150ms Frame size motion。
- 变更 (2026-06-06): Tooltip 尺寸动画改为外框自身形态变化，避免遮罩裁切长外框的视觉。
+ 变更 (2026-06-06): Tooltip 尺寸动画曾改为仅做外框形态变化；该规则已在 v1.8.0 被连续裁切揭示替代。
  变更 (2026-06-06): Tooltip 外框宽高变化改为明确尺寸 shell，并消费 Frame size motion bridge。
  变更 (2026-06-06): 共享 Portal 切换触发器时增加近距平滑移动 / 远距直接定位规则。
  变更 (2026-06-06): 非受控 hover 模式改为页面级共享 Portal，连续切换触发器时复用同一个 Tooltip 外框，仅更新内容与定位。
@@ -44,8 +46,6 @@
 <script module lang="ts">
     const TOOLTIP_MOVE_MAX_DISTANCE_PX = 240;
     const TOOLTIP_MOVE_MAX_VIEWPORT_RATIO = 0.25;
-    const TOOLTIP_MOVE_MAX_CROSS_AXIS_PX = 48;
-
     let nextTooltipId = 0;
     let overlayHost: { id: string; setHost: (value: boolean) => void } | undefined;
     const overlayHostCandidates = new Set<{
@@ -83,7 +83,7 @@
 
 <script lang="ts">
     import { type Snippet } from "svelte";
-    import { tick, onMount, onDestroy } from "svelte";
+    import { tick, onMount, onDestroy, untrack } from "svelte";
     import { getText, getSkeleton, getSize } from "../context";
     import { resizeManager } from "../logic/observer.svelte";
     import type { CoreState } from "../logic/frame-types";
@@ -152,6 +152,27 @@
         [key: string]: any;
     }
 
+    interface TooltipVisualRect {
+        left: number;
+        top: number;
+        width: number;
+        height: number;
+    }
+
+    interface TooltipLayerMask {
+        enabled: boolean;
+        angle: number;
+        start: number;
+        end: number;
+    }
+
+    const EMPTY_LAYER_MASK: TooltipLayerMask = {
+        enabled: false,
+        angle: 90,
+        start: 100,
+        end: 100,
+    };
+
     const inheritedTooltipPart = useComponentPart<Props>("Tooltip");
     let {
         open = $bindable(undefined),
@@ -219,12 +240,27 @@
     );
     let handledImmediateDismissRevision = 0;
     let renderedOverlay = $state<TooltipOverlayState | null>(null);
+    let outgoingOverlay = $state<TooltipOverlayState | null>(null);
     let overlayVisible = $derived(isOverlayHost && renderedOverlay !== null);
     let portalLifecycleState = $state<CoreState>("Idle");
     let coords = $state({ top: 0, left: 0 });
     let finalPosition: "top" | "bottom" | "left" | "right" = $state("top");
     let moveMode: "snap" | "move" = $state("snap");
     let measuredSize = $state({ width: 0, height: 0 });
+    let pendingMeasuredSize = { width: 0, height: 0 };
+    let measuredOverlayId: string | undefined;
+    let activeTargetRect: TooltipVisualRect | undefined;
+    let outgoingTargetRect: TooltipVisualRect | undefined;
+    let switchStartRect: TooltipVisualRect | undefined;
+    let shellMotionOffset = $state({ x: 0, y: 0 });
+    let incomingLayerOffset = $state({ x: 0, y: 0 });
+    let incomingLayerReady = $state(false);
+    let outgoingLayerOffset = $state({ x: 0, y: 0 });
+    let outgoingLayerSize = $state({ width: 0, height: 0 });
+    let incomingLayerMask = $state<TooltipLayerMask>(EMPTY_LAYER_MASK);
+    let outgoingLayerMask = $state<TooltipLayerMask>(EMPTY_LAYER_MASK);
+    let incomingLayerSeam = $state(100);
+    let outgoingLayerSeam = $state(100);
     let hasMeasuredPosition = false;
     let lastPositionTooltipId: string | undefined;
     let overlayWasVisible = false;
@@ -236,6 +272,11 @@
     let overlayAppearTimer: number | undefined;
     let overlayDisappearTimer: number | undefined;
     let sizeMotionTimer: number | undefined;
+    let switchMotionTimer: number | undefined;
+    let switchMotionFrame: number | undefined;
+    let switchMotionRevision = 0;
+    let prefersReducedMotion = $state(false);
+    let reducedMotionMedia: MediaQueryList | undefined;
     let unregisterOverlayHost: (() => void) | undefined;
     const tooltipBehavior = getTooltipBehaviorEnhancement();
 
@@ -255,10 +296,19 @@
         if (!measuredSize.width || !measuredSize.height) return undefined;
 
         return [
-            `width: ${measuredSize.width}px`,
-            `height: ${measuredSize.height}px`,
+            `--snowui-tooltip-measured-width: ${measuredSize.width}px`,
+            `--snowui-tooltip-measured-height: ${measuredSize.height}px`,
         ].join("; ");
     });
+    const motionShellStyle = $derived(
+        `--snowui-tooltip-motion-x: ${shellMotionOffset.x}px; --snowui-tooltip-motion-y: ${shellMotionOffset.y}px;`,
+    );
+    const incomingLayerStyle = $derived(
+        `--snowui-tooltip-layer-width: ${measuredSize.width}px; --snowui-tooltip-layer-height: ${measuredSize.height}px; --snowui-tooltip-layer-x: ${incomingLayerOffset.x}px; --snowui-tooltip-layer-y: ${incomingLayerOffset.y}px; --snowui-tooltip-layer-mask-angle: ${incomingLayerMask.angle}deg; --snowui-tooltip-layer-seam: ${incomingLayerSeam}%;`,
+    );
+    const outgoingLayerStyle = $derived(
+        `--snowui-tooltip-layer-width: ${outgoingLayerSize.width}px; --snowui-tooltip-layer-height: ${outgoingLayerSize.height}px; --snowui-tooltip-layer-x: ${outgoingLayerOffset.x}px; --snowui-tooltip-layer-y: ${outgoingLayerOffset.y}px; --snowui-tooltip-layer-mask-angle: ${outgoingLayerMask.angle}deg; --snowui-tooltip-layer-seam: ${outgoingLayerSeam}%;`,
+    );
     const effectivePortalLifecycleState = $derived<CoreState>(
         tooltipBehavior.lifecycleMotion && portalMotionReady
             ? portalLifecycleState
@@ -291,6 +341,124 @@
         lastPositionTooltipId = undefined;
         moveMode = "snap";
         measuredSize = { width: 0, height: 0 };
+        pendingMeasuredSize = { width: 0, height: 0 };
+        measuredOverlayId = undefined;
+        activeTargetRect = undefined;
+        outgoingTargetRect = undefined;
+        switchStartRect = undefined;
+        shellMotionOffset = { x: 0, y: 0 };
+        incomingLayerOffset = { x: 0, y: 0 };
+        incomingLayerReady = false;
+        outgoingLayerOffset = { x: 0, y: 0 };
+        outgoingLayerSize = { width: 0, height: 0 };
+        incomingLayerMask = EMPTY_LAYER_MASK;
+        outgoingLayerMask = EMPTY_LAYER_MASK;
+        incomingLayerSeam = 100;
+        outgoingLayerSeam = 100;
+        outgoingOverlay = null;
+        cancelSwitchMotion();
+    }
+
+    function cancelSwitchMotion() {
+        switchMotionRevision += 1;
+        if (switchMotionFrame !== undefined) {
+            window.cancelAnimationFrame(switchMotionFrame);
+            switchMotionFrame = undefined;
+        }
+        if (switchMotionTimer !== undefined) {
+            window.clearTimeout(switchMotionTimer);
+            switchMotionTimer = undefined;
+        }
+    }
+
+    function readVisualRect(element: HTMLElement | undefined): TooltipVisualRect | undefined {
+        if (!element) return undefined;
+        const rect = element.getBoundingClientRect();
+        if (!rect.width || !rect.height) return undefined;
+        return {
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+        };
+    }
+
+    function finishSwitchMotion(revision: number) {
+        if (revision !== switchMotionRevision) return;
+        switchMotionTimer = undefined;
+        outgoingOverlay = null;
+        outgoingTargetRect = undefined;
+        switchStartRect = undefined;
+        shellMotionOffset = { x: 0, y: 0 };
+        incomingLayerOffset = { x: 0, y: 0 };
+        outgoingLayerOffset = { x: 0, y: 0 };
+        incomingLayerMask = EMPTY_LAYER_MASK;
+        outgoingLayerMask = EMPTY_LAYER_MASK;
+        incomingLayerSeam = 100;
+        outgoingLayerSeam = 100;
+        moveMode = "snap";
+    }
+
+    function getProjectionRange(
+        rect: TooltipVisualRect,
+        ux: number,
+        uy: number,
+    ) {
+        const values = [
+            rect.left * ux + rect.top * uy,
+            (rect.left + rect.width) * ux + rect.top * uy,
+            rect.left * ux + (rect.top + rect.height) * uy,
+            (rect.left + rect.width) * ux +
+                (rect.top + rect.height) * uy,
+        ];
+        return { min: Math.min(...values), max: Math.max(...values) };
+    }
+
+    function createLayerMasks(
+        oldRect: TooltipVisualRect,
+        newRect: TooltipVisualRect,
+    ): { outgoing: TooltipLayerMask; incoming: TooltipLayerMask } {
+        const overlap: TooltipVisualRect = {
+            left: Math.max(oldRect.left, newRect.left),
+            top: Math.max(oldRect.top, newRect.top),
+            width:
+                Math.min(oldRect.left + oldRect.width, newRect.left + newRect.width) -
+                Math.max(oldRect.left, newRect.left),
+            height:
+                Math.min(oldRect.top + oldRect.height, newRect.top + newRect.height) -
+                Math.max(oldRect.top, newRect.top),
+        };
+        if (overlap.width <= 0 || overlap.height <= 0) {
+            return { outgoing: EMPTY_LAYER_MASK, incoming: EMPTY_LAYER_MASK };
+        }
+
+        const dx =
+            newRect.left + newRect.width / 2 -
+            (oldRect.left + oldRect.width / 2);
+        const dy =
+            newRect.top + newRect.height / 2 -
+            (oldRect.top + oldRect.height / 2);
+        const length = Math.hypot(dx, dy);
+        const ux = length > 0.5 ? dx / length : 1;
+        const uy = length > 0.5 ? dy / length : 0;
+        const angle = (Math.atan2(ux, -uy) * 180) / Math.PI;
+        const overlapRange = getProjectionRange(overlap, ux, uy);
+
+        const createMask = (rect: TooltipVisualRect): TooltipLayerMask => {
+            const range = getProjectionRange(rect, ux, uy);
+            const span = Math.max(range.max - range.min, 1);
+            return {
+                enabled: true,
+                angle,
+                start: ((overlapRange.max - range.min) / span) * 100,
+                end: ((overlapRange.min - range.min) / span) * 100,
+            };
+        };
+
+        return {
+            outgoing: createMask(oldRect),
+            incoming: createMask(newRect),
+        };
     }
 
     function clearOverlayLifecycleTimers() {
@@ -306,11 +474,13 @@
             window.clearTimeout(sizeMotionTimer);
             sizeMotionTimer = undefined;
         }
+        cancelSwitchMotion();
     }
 
     $effect(() => {
         const overlayState = currentOverlay;
         const dismissRevision = immediateDismissRevision;
+        const previousRenderedOverlay = untrack(() => renderedOverlay);
 
         if (dismissRevision !== handledImmediateDismissRevision) {
             handledImmediateDismissRevision = dismissRevision;
@@ -326,7 +496,7 @@
             if (
                 tooltipBehavior.lifecycleMotion &&
                 overlayWasVisible &&
-                renderedOverlay
+                previousRenderedOverlay
             ) {
                 overlayWasVisible = false;
                 portalLifecycleState = "Disappear";
@@ -358,6 +528,23 @@
         if (overlayDisappearTimer !== undefined) {
             window.clearTimeout(overlayDisappearTimer);
             overlayDisappearTimer = undefined;
+        }
+        if (
+            previousRenderedOverlay &&
+            previousRenderedOverlay.id !== overlayState.id
+        ) {
+            cancelSwitchMotion();
+            switchStartRect = readVisualRect(sizeShellRef);
+            outgoingOverlay = previousRenderedOverlay;
+            outgoingTargetRect = activeTargetRect ?? switchStartRect;
+            if (outgoingTargetRect) {
+                outgoingLayerSize = {
+                    width: outgoingTargetRect.width,
+                    height: outgoingTargetRect.height,
+                };
+            }
+            measuredOverlayId = undefined;
+            incomingLayerReady = false;
         }
         renderedOverlay = overlayState;
 
@@ -420,12 +607,14 @@
                 parseFloat(shellStyle?.paddingTop ?? "0") +
                 parseFloat(shellStyle?.paddingBottom ?? "0");
 
-            measuredSize = {
+            pendingMeasuredSize = {
                 width: Math.ceil((borderBox?.inlineSize ?? el.offsetWidth) + paddingX),
                 height: Math.ceil(
                     (borderBox?.blockSize ?? el.offsetHeight) + paddingY,
                 ),
             };
+            measuredOverlayId = renderedOverlay?.id ?? tooltipId;
+            tick().then(updatePosition);
         };
 
         updateMeasuredSize();
@@ -475,13 +664,27 @@
         const overlayState = currentOverlay ?? renderedOverlay;
         const activeTriggerEl = overlayState?.triggerEl ?? triggerEl;
         if (!activeTriggerEl) return;
+        const activeTooltipId = overlayState?.id ?? tooltipId;
+        if (
+            currentOverlay &&
+            renderedOverlay?.id === activeTooltipId &&
+            measuredOverlayId !== activeTooltipId
+        ) {
+            return;
+        }
 
         const activePosition = (overlayState?.position ?? position) as FloatingSide;
         const activeOffset = overlayState?.offset ?? offset;
         const triggerRect = activeTriggerEl.getBoundingClientRect();
         const tooltipRect = tooltipRef.getBoundingClientRect();
-        const tooltipWidth = measuredSize.width || tooltipRect.width;
-        const tooltipHeight = measuredSize.height || tooltipRect.height;
+        const targetSize =
+            measuredOverlayId === activeTooltipId &&
+            pendingMeasuredSize.width &&
+            pendingMeasuredSize.height
+                ? pendingMeasuredSize
+                : measuredSize;
+        const tooltipWidth = targetSize.width || tooltipRect.width;
+        const tooltipHeight = targetSize.height || tooltipRect.height;
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
         const viewportPadding = 8;
@@ -537,36 +740,122 @@
             }
         }
 
-        finalPosition = bestPos;
-        const distance = Math.hypot(
-            bestCoords.top - coords.top,
-            bestCoords.left - coords.left,
+        const targetBounds = getFloatingVisualBounds(
+            bestPos,
+            bestCoords,
+            { width: tooltipWidth, height: tooltipHeight },
         );
+        const targetRect: TooltipVisualRect = {
+            left: targetBounds.left,
+            top: targetBounds.top,
+            width: tooltipWidth,
+            height: tooltipHeight,
+        };
+        const startRect = switchStartRect ?? readVisualRect(sizeShellRef);
+        const distance = startRect
+            ? Math.hypot(
+                  targetRect.top - startRect.top,
+                  targetRect.left - startRect.left,
+              )
+            : 0;
         const maxMoveDistance = Math.min(
             TOOLTIP_MOVE_MAX_DISTANCE_PX,
             Math.min(viewportWidth, viewportHeight) * TOOLTIP_MOVE_MAX_VIEWPORT_RATIO,
         );
-        const activeTooltipId = overlayState?.id ?? tooltipId;
         const isSwitchingTooltip =
             lastPositionTooltipId !== undefined &&
             lastPositionTooltipId !== activeTooltipId;
-        const crossAxisDistance =
-            bestPos === "top" || bestPos === "bottom"
-                ? Math.abs(bestCoords.top - coords.top)
-                : Math.abs(bestCoords.left - coords.left);
         const canSmoothMove =
             tooltipBehavior.smoothMove &&
+            !prefersReducedMotion &&
             distance <= maxMoveDistance &&
-            crossAxisDistance <= TOOLTIP_MOVE_MAX_CROSS_AXIS_PX;
+            startRect !== undefined &&
+            outgoingOverlay !== null &&
+            outgoingTargetRect !== undefined;
 
         if (!hasMeasuredPosition) {
             moveMode = "snap";
         } else if (isSwitchingTooltip) {
             moveMode = canSmoothMove ? "move" : "snap";
         }
+        if (
+            measuredSize.width !== tooltipWidth ||
+            measuredSize.height !== tooltipHeight
+        ) {
+            measuredSize = { width: tooltipWidth, height: tooltipHeight };
+        }
+        finalPosition = bestPos;
+        coords = bestCoords;
+
+        if (isSwitchingTooltip && canSmoothMove && startRect && outgoingTargetRect) {
+            const oldTarget = outgoingTargetRect;
+            const layerMasks = createLayerMasks(oldTarget, targetRect);
+            const initialBaseBounds = sizeMotionEnabled
+                ? getFloatingVisualBounds(
+                      bestPos,
+                      bestCoords,
+                      { width: startRect.width, height: startRect.height },
+                  )
+                : targetRect;
+            const revision = ++switchMotionRevision;
+            moveMode = "snap";
+            shellMotionOffset = {
+                x: startRect.left - initialBaseBounds.left,
+                y: startRect.top - initialBaseBounds.top,
+            };
+            incomingLayerOffset = {
+                x: targetRect.left - startRect.left,
+                y: targetRect.top - startRect.top,
+            };
+            outgoingLayerOffset = {
+                x: oldTarget.left - startRect.left,
+                y: oldTarget.top - startRect.top,
+            };
+            outgoingLayerMask = layerMasks.outgoing;
+            incomingLayerMask = layerMasks.incoming;
+            outgoingLayerSeam = layerMasks.outgoing.start;
+            incomingLayerSeam = layerMasks.incoming.start;
+
+            tick().then(() => {
+                if (revision !== switchMotionRevision) return;
+                switchMotionFrame = window.requestAnimationFrame(() => {
+                    switchMotionFrame = undefined;
+                    if (revision !== switchMotionRevision) return;
+                    moveMode = "move";
+                    shellMotionOffset = { x: 0, y: 0 };
+                    incomingLayerOffset = { x: 0, y: 0 };
+                    outgoingLayerOffset = {
+                        x: oldTarget.left - targetRect.left,
+                        y: oldTarget.top - targetRect.top,
+                    };
+                    outgoingLayerSeam = layerMasks.outgoing.end;
+                    incomingLayerSeam = layerMasks.incoming.end;
+                    switchMotionTimer = window.setTimeout(
+                        () => finishSwitchMotion(revision),
+                        TOOLTIP_SYNC_MOTION.duration,
+                    );
+                });
+            });
+        } else if (isSwitchingTooltip) {
+            cancelSwitchMotion();
+            shellMotionOffset = { x: 0, y: 0 };
+            incomingLayerOffset = { x: 0, y: 0 };
+            outgoingLayerOffset = { x: 0, y: 0 };
+            outgoingLayerMask = EMPTY_LAYER_MASK;
+            incomingLayerMask = EMPTY_LAYER_MASK;
+            outgoingLayerSeam = 100;
+            incomingLayerSeam = 100;
+            outgoingOverlay = null;
+            outgoingTargetRect = undefined;
+            switchStartRect = undefined;
+            moveMode = "snap";
+        }
+
+        incomingLayerReady = true;
+
         hasMeasuredPosition = true;
         lastPositionTooltipId = activeTooltipId;
-        coords = bestCoords;
+        activeTargetRect = targetRect;
         if (!portalReady && portalReadyFrame === undefined) {
             const readyTooltipId = activeTooltipId;
             portalReadyFrame = window.requestAnimationFrame(() => {
@@ -678,6 +967,23 @@
     let originalCursor = "";
 
     onMount(() => {
+        reducedMotionMedia = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+        const updateReducedMotion = () => {
+            prefersReducedMotion = reducedMotionMedia?.matches ?? false;
+            if (prefersReducedMotion && outgoingOverlay) {
+                cancelSwitchMotion();
+                outgoingOverlay = null;
+                outgoingTargetRect = undefined;
+                switchStartRect = undefined;
+                shellMotionOffset = { x: 0, y: 0 };
+                incomingLayerOffset = { x: 0, y: 0 };
+                outgoingLayerOffset = { x: 0, y: 0 };
+                moveMode = "snap";
+            }
+        };
+        updateReducedMotion();
+        reducedMotionMedia?.addEventListener("change", updateReducedMotion);
+
         unregisterOverlayHost = registerOverlayHostCandidate(tooltipId, (value) => {
             isOverlayHost = value;
         });
@@ -696,6 +1002,10 @@
 
         window.addEventListener("scroll", updatePosition, true);
         window.addEventListener("resize", updatePosition);
+
+        return () => {
+            reducedMotionMedia?.removeEventListener("change", updateReducedMotion);
+        };
     });
 
     onDestroy(() => {
@@ -755,59 +1065,85 @@
             loopMotion={renderedOverlay.loopMotion}
             class="snowui-tooltip-portal"
             style={portalStyle}
-            data-move-mode={moveMode}
             data-ready={portalReady}
         >
-            <Frame
-                enableResponsive={false}
-                enableContext={false}
-                enableScaleObserver={false}
-                whileActive={effectiveSizeMotion}
-                bind:element={sizeShellRef}
-                data-variant={renderedOverlay.variant}
-                data-size-motion={sizeMotionEnabled}
-                class={[
-                    "snowui-tooltip-content",
-                    "snowui-tooltip-size-shell",
-                    "snowui-rounded-rectangle",
-                    `snowui-tooltip-pos-${finalPosition}`,
-                    renderedOverlay.className,
-                ]
-                    .filter(Boolean)
-                    .join(" ")}
-                style={[sizeShellStyle, renderedOverlay.style]
-                    .filter(Boolean)
-                    .join("; ")}
-                role="tooltip"
-                {...renderedOverlay.rest}
+            <div
+                class="snowui-tooltip-motion-shell"
+                data-move-mode={moveMode}
+                style={motionShellStyle}
             >
-                <span class="snowui-tooltip-backdrop" aria-hidden="true"></span>
                 <Frame
                     enableResponsive={false}
                     enableContext={false}
-                    enableDefaultMotion={false}
                     enableScaleObserver={false}
-                    currentState={effectivePortalLifecycleState}
-                    whileAppear={effectivePortalAppearMotion}
-                    whileDisappear={effectivePortalDisappearMotion}
-                    class="snowui-tooltip-foreground"
-                    style={foregroundStyle}
+                    whileActive={effectiveSizeMotion}
+                    bind:element={sizeShellRef}
+                    data-variant={renderedOverlay.variant}
+                    data-size-motion={sizeMotionEnabled}
+                    class={[
+                        "snowui-tooltip-content",
+                        "snowui-tooltip-size-shell",
+                        "snowui-rounded-rectangle",
+                        `snowui-tooltip-pos-${finalPosition}`,
+                        renderedOverlay.className,
+                    ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    style={[sizeShellStyle, renderedOverlay.style]
+                        .filter(Boolean)
+                        .join("; ")}
+                    role="tooltip"
+                    {...renderedOverlay.rest}
                 >
+                    <span class="snowui-tooltip-backdrop" aria-hidden="true"></span>
                     <Frame
                         enableResponsive={false}
                         enableContext={false}
+                        enableDefaultMotion={false}
                         enableScaleObserver={false}
-                        bind:element={sizeContentRef}
-                        class="snowui-tooltip-inner"
+                        currentState={effectivePortalLifecycleState}
+                        whileAppear={effectivePortalAppearMotion}
+                        whileDisappear={effectivePortalDisappearMotion}
+                        class="snowui-tooltip-foreground snowui-tooltip-shared-foreground"
+                        style={foregroundStyle}
                     >
-                        {#if renderedOverlay.children}
-                            {@render renderedOverlay.children()}
-                        {:else if renderedOverlay.fallbackContent}
-                            {renderedOverlay.fallbackContent}
+                        {#if outgoingOverlay}
+                            <span
+                                class="snowui-tooltip-content-layer"
+                                data-tooltip-layer="outgoing"
+                                data-move-mode={moveMode}
+                                data-overlap-mask={outgoingLayerMask.enabled}
+                                style={outgoingLayerStyle}
+                                aria-hidden="true"
+                            >
+                                <span class="snowui-tooltip-inner">
+                                    {#if outgoingOverlay.children}
+                                        {@render outgoingOverlay.children()}
+                                    {:else if outgoingOverlay.fallbackContent}
+                                        {outgoingOverlay.fallbackContent}
+                                    {/if}
+                                </span>
+                            </span>
                         {/if}
+                        <span
+                            class="snowui-tooltip-content-layer"
+                            data-tooltip-layer="incoming"
+                            data-move-mode={moveMode}
+                            data-overlap-mask={incomingLayerMask.enabled}
+                            data-layer-ready={incomingLayerReady}
+                            style={incomingLayerStyle}
+                        >
+                            <span bind:this={sizeContentRef} class="snowui-tooltip-inner">
+                                {#if renderedOverlay.children}
+                                    {@render renderedOverlay.children()}
+                                {:else if renderedOverlay.fallbackContent}
+                                    {renderedOverlay.fallbackContent}
+                                {/if}
+                            </span>
+                        </span>
                     </Frame>
                 </Frame>
-            </Frame>
+            </div>
         </Frame>
     {/if}
 
@@ -880,6 +1216,12 @@
 {/if}
 
 <style>
+    @property --snowui-tooltip-layer-seam {
+        syntax: "<percentage>";
+        inherits: false;
+        initial-value: 100%;
+    }
+
     :global(:where(.snowui-tooltip-portal)) {
         position: fixed;
         z-index: 9999;
@@ -890,12 +1232,18 @@
         opacity: 0;
     }
 
-    :global(:where(.snowui-tooltip-portal)[data-move-mode="move"]) {
-        transition:
-            top var(--snowui-tooltip-move-duration, 150ms)
-                var(--snowui-tooltip-move-easing, ease-out),
-            left var(--snowui-tooltip-move-duration, 150ms)
-                var(--snowui-tooltip-move-easing, ease-out);
+    :global(:where(.snowui-tooltip-motion-shell)) {
+        position: relative;
+        transform: translate3d(
+            var(--snowui-tooltip-motion-x, 0),
+            var(--snowui-tooltip-motion-y, 0),
+            0
+        );
+    }
+
+    :global(:where(.snowui-tooltip-motion-shell)[data-move-mode="move"]) {
+        transition: transform var(--snowui-tooltip-move-duration, 150ms)
+            var(--snowui-tooltip-move-easing, ease-out);
     }
 
     :global(:where(.snowui-tooltip-size-shell)) {
@@ -903,6 +1251,8 @@
         position: relative;
         box-sizing: border-box;
         overflow: hidden;
+        width: var(--snowui-tooltip-measured-width);
+        height: var(--snowui-tooltip-measured-height);
         transition:
             width var(--snowui-frame-size-motion-duration, 300ms)
                 var(--snowui-frame-size-motion-easing, ease-out),
@@ -994,6 +1344,89 @@
         will-change: opacity, transform;
     }
 
+    :global(:where(.snowui-tooltip-shared-foreground)) {
+        display: block;
+        padding: 0;
+    }
+
+    :global(:where(.snowui-tooltip-content-layer)) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        box-sizing: border-box;
+        width: var(--snowui-tooltip-layer-width);
+        height: var(--snowui-tooltip-layer-height);
+        padding: var(
+            --snowui-tooltip-padding-override,
+            var(--snowui-tooltip-padding)
+        );
+        color: inherit;
+        white-space: nowrap;
+        pointer-events: none;
+        transform: translate3d(
+            var(--snowui-tooltip-layer-x, 0),
+            var(--snowui-tooltip-layer-y, 0),
+            0
+        );
+    }
+
+    :global(
+        :where(.snowui-tooltip-content-layer)[data-layer-ready="false"]
+    ) {
+        visibility: hidden;
+    }
+
+    :global(:where(.snowui-tooltip-content-layer)[data-move-mode="move"]) {
+        transition:
+            transform var(--snowui-tooltip-move-duration, 150ms)
+                var(--snowui-tooltip-move-easing, ease-out),
+            --snowui-tooltip-layer-seam
+                var(--snowui-tooltip-move-duration, 150ms)
+                var(--snowui-tooltip-move-easing, ease-out);
+    }
+
+    :global(
+        :where(.snowui-tooltip-content-layer)[data-overlap-mask="true"][data-tooltip-layer="outgoing"]
+    ) {
+        -webkit-mask-image: linear-gradient(
+            var(--snowui-tooltip-layer-mask-angle),
+            #000 0%,
+            #000 var(--snowui-tooltip-layer-seam),
+            transparent var(--snowui-tooltip-layer-seam),
+            transparent 100%
+        );
+        mask-image: linear-gradient(
+            var(--snowui-tooltip-layer-mask-angle),
+            #000 0%,
+            #000 var(--snowui-tooltip-layer-seam),
+            transparent var(--snowui-tooltip-layer-seam),
+            transparent 100%
+        );
+    }
+
+    :global(
+        :where(.snowui-tooltip-content-layer)[data-overlap-mask="true"][data-tooltip-layer="incoming"]
+    ) {
+        -webkit-mask-image: linear-gradient(
+            var(--snowui-tooltip-layer-mask-angle),
+            transparent 0%,
+            transparent var(--snowui-tooltip-layer-seam),
+            #000 var(--snowui-tooltip-layer-seam),
+            #000 100%
+        );
+        mask-image: linear-gradient(
+            var(--snowui-tooltip-layer-mask-angle),
+            transparent 0%,
+            transparent var(--snowui-tooltip-layer-seam),
+            #000 var(--snowui-tooltip-layer-seam),
+            #000 100%
+        );
+    }
+
     :global(
         :where(.snowui-tooltip-content)[data-variant="light"]
             :where(.snowui-tooltip-foreground)
@@ -1008,5 +1441,13 @@
         gap: var(--snowui-tooltip-gap-override, var(--snowui-tooltip-gap));
         white-space: nowrap;
         pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-tooltip-motion-shell)),
+        :global(:where(.snowui-tooltip-content-layer)),
+        :global(:where(.snowui-tooltip-size-shell)) {
+            transition: none;
+        }
     }
 </style>

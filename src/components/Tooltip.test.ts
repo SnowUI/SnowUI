@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.5.1
+ * v1.6.0
  */
 export const examples = [
     {
@@ -122,9 +122,18 @@ export const examples = [
         expected: {
             render: "多个相邻按钮分别显示不同 Tooltip 内容",
             interaction:
-                "任一 Tooltip 成功显示后，300ms 内 hover 另一个 Tooltip 时立即显示；指针穿过相邻按钮 gap 并停留 150ms 时，共享外框仍保持挂载，内容更新并移动到当前按钮上方；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
+                "任一 Tooltip 成功显示后，300ms 内 hover 另一个 Tooltip 时立即显示；近距离横向、纵向或斜向切换时，共享圆角外框沿二维向量移动，旧、新内容保持各自位置并仅由外框裁切显露；内容目标矩形相交时交集只绘制其中一层，不出现文字重叠；超过距离阈值直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
+            accessibility:
+                "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
         },
-        logic: ["Warmup", "Cooldown", "SharedDelay", "SharedOverlay"],
+        logic: [
+            "Warmup",
+            "Cooldown",
+            "SharedDelay",
+            "SharedOverlay",
+            "TwoDimensionalReveal",
+            "ReducedMotion",
+        ],
     },
     {
         name: "F1: 动效感知立即关闭 (Dismiss On Motion)",
@@ -169,7 +178,7 @@ export const examples = [
 </style>`,
         expected: {
             render: "按钮内图标 hover 后持续旋转",
-            interaction: "Tooltip 显示后，后代图标的 animationstart 不会使 Tooltip 消失",
+            interaction: "Tooltip 显示后，后代图标的 animationstart 与 Button ::before / ::after hover 背景 transition 不会使 Tooltip 消失",
         },
         logic: ["DismissOnMotion", "DescendantAnimation", "Regression"],
     },
