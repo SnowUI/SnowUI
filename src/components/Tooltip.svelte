@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.19.0
+ Tooltip 文字提示组件 v1.19.1
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 宽度回弹拆为 800ms 独立时间线，重定向为 480ms；位置和内容先行收敛，宽度按 placement 保持触发器侧锚点。
  变更 (2026-08-21): 连续切换的宽度使用独立欠阻尼曲线，快速接近目标后轻微回弹；位置、高度和内容时间线保持不变。
  变更 (2026-08-21): 连续裁切内容带的新旧内容投影间距由 4px 增加为 16px；是否允许拼接的目标 Tooltip 距离门槛仍为 4px。
  变更 (2026-08-21): 出现动效以 110ms 从 94% 放大到 100%，并按最终 placement 从触发器方向反向滑入 2px。
@@ -111,6 +112,8 @@
         TOOLTIP_CONTINUOUS_RETARGET_DURATION_PER_PX_MS,
         TOOLTIP_CONTINUOUS_RETARGET_MAX_DURATION_MS,
         TOOLTIP_CONTINUOUS_RETARGET_MIN_DURATION_MS,
+        TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_DURATION_MS,
+        TOOLTIP_CONTINUOUS_WIDTH_SPRING_DURATION_MS,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
         getTooltipAppearMotion,
@@ -286,6 +289,7 @@
     let switchMotionFrame: number | undefined;
     let animatedShellSize = $state<{ width: number; height: number }>();
     let switchShellDurationMs = $state(0);
+    let switchWidthDurationMs = $state(0);
     let switchContentDurationMs = $state(0);
     let switchShellDistancePx = $state(0);
     let switchContentDistancePx = $state(0);
@@ -367,6 +371,7 @@
         pendingSwitchRetarget = false;
         animatedShellSize = undefined;
         switchShellDurationMs = 0;
+        switchWidthDurationMs = 0;
         switchContentDurationMs = 0;
         switchShellDistancePx = 0;
         switchContentDistancePx = 0;
@@ -412,6 +417,7 @@
         if (revision !== switchMotionRevision) return;
         animatedShellSize = undefined;
         switchShellDurationMs = 0;
+        switchWidthDurationMs = 0;
         switchContentDurationMs = 0;
         switchShellDistancePx = 0;
         switchContentDistancePx = 0;
@@ -568,6 +574,35 @@
 
     function interpolate(start: number, end: number, progress: number) {
         return start + (end - start) * progress;
+    }
+
+    function getWidthAnchoredLeft(
+        startRect: TooltipVisualRect,
+        targetRect: TooltipVisualRect,
+        width: number,
+        progress: number,
+        position: FloatingSide,
+    ) {
+        if (position === "left") {
+            return (
+                interpolate(
+                    startRect.left + startRect.width,
+                    targetRect.left + targetRect.width,
+                    progress,
+                ) - width
+            );
+        }
+        if (position === "right") {
+            return interpolate(startRect.left, targetRect.left, progress);
+        }
+        return (
+            interpolate(
+                startRect.left + startRect.width / 2,
+                targetRect.left + targetRect.width / 2,
+                progress,
+            ) -
+            width / 2
+        );
     }
 
     function concatenateContentRect(
@@ -1036,8 +1071,14 @@
                 ? Math.hypot(alignment.x, alignment.y)
                 : 0;
             const shellDuration = motionDuration;
+            const widthDuration =
+                Math.abs(targetRect.width - startRect.width) > 0.5
+                    ? isRetargeting
+                        ? TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_DURATION_MS
+                        : TOOLTIP_CONTINUOUS_WIDTH_SPRING_DURATION_MS
+                    : motionDuration;
             const contentDuration = canJoinContentTrack ? motionDuration : 0;
-            const totalDuration = motionDuration;
+            const totalDuration = Math.max(motionDuration, widthDuration);
             const revision = ++switchMotionRevision;
             moveMode = "snap";
             switchPhase = "prepare";
@@ -1047,6 +1088,7 @@
                 height: startRect.height,
             };
             switchShellDurationMs = shellDuration;
+            switchWidthDurationMs = widthDuration;
             switchContentDurationMs = contentDuration;
             switchShellDistancePx = shellDistance;
             switchContentDistancePx = contentDistance;
@@ -1084,20 +1126,21 @@
                     moveMode = "frame";
                     switchPhase = "moving";
                     const startedAt = performance.now();
+                    let contentSettled = false;
 
                     const animate = (now: number) => {
                         if (revision !== switchMotionRevision) return;
                         const elapsed = now - startedAt;
                         const timelineProgress = getMotionProgress(
                             elapsed,
-                            totalDuration,
+                            motionDuration,
                         );
                         const shellProgress = getCoordinatedProgress(
                             timelineProgress,
                             isRetargeting,
                         );
                         const widthProgress = getTooltipWidthSpringProgress(
-                            timelineProgress,
+                            getMotionProgress(elapsed, widthDuration),
                         );
                         const contentProgress = getContentProgress(
                             shellProgress,
@@ -1122,10 +1165,12 @@
                             currentSize,
                         );
                         const currentShell = {
-                            left: interpolate(
-                                startRect.left,
-                                targetRect.left,
+                            left: getWidthAnchoredLeft(
+                                startRect,
+                                targetRect,
+                                currentSize.width,
                                 shellProgress,
+                                bestPos,
                             ),
                             top: interpolate(
                                 startRect.top,
@@ -1167,6 +1212,16 @@
                             incomingLayerOffset = { x: 0, y: 0 };
                         }
 
+                        if (!contentSettled && elapsed >= motionDuration) {
+                            contentSettled = true;
+                            outgoingOverlay = null;
+                            outgoingTargetRect = undefined;
+                            outgoingAlignedRect = undefined;
+                            outgoingContentRect = undefined;
+                            outgoingLayerOffset = { x: 0, y: 0 };
+                            incomingLayerOffset = { x: 0, y: 0 };
+                        }
+
                         if (elapsed >= totalDuration) {
                             switchMotionFrame = undefined;
                             finishSwitchMotion(revision);
@@ -1194,6 +1249,7 @@
             pendingSwitchRetarget = false;
             animatedShellSize = undefined;
             switchShellDurationMs = 0;
+            switchWidthDurationMs = 0;
             switchContentDurationMs = 0;
             switchShellDistancePx = 0;
             switchContentDistancePx = 0;
@@ -1383,6 +1439,7 @@
                 pendingSwitchRetarget = false;
                 animatedShellSize = undefined;
                 switchShellDurationMs = 0;
+                switchWidthDurationMs = 0;
                 switchContentDurationMs = 0;
                 switchShellDistancePx = 0;
                 switchContentDistancePx = 0;
@@ -1466,6 +1523,7 @@
                 data-switch-phase={switchPhase}
                 data-retargeting={switchRetargeting}
                 data-shell-duration={switchShellDurationMs}
+                data-width-duration={switchWidthDurationMs}
                 data-content-duration={switchContentDurationMs}
                 data-shell-distance={switchShellDistancePx}
                 data-content-distance={switchContentDistancePx}
