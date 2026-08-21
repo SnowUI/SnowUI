@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.8.4
+ * v1.8.5
  */
 export const examples = [
     {
@@ -133,7 +133,7 @@ export const examples = [
         expected: {
             render: "多个相邻按钮分别显示不同 Tooltip 内容",
             interaction:
-                "任一 Tooltip 成功显示后，hover 其他 Tooltip 立即响应；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 4px 的内容带，内容带与共享圆角外框同帧进入 180–360ms 有界协调时间线；外框平滑加减速，内容轻微滞后并同步结束；连续快速改目标时从当前画面进入 90–160ms 重定向，不排队、不等待、不禁用裁切；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
+                "任一 Tooltip 成功显示后，hover 其他 Tooltip 立即响应；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 16px 的内容带，内容带与共享圆角外框同帧进入 180–360ms 有界协调时间线；外框平滑加减速，内容轻微滞后并同步结束；连续快速改目标时从当前画面进入 90–160ms 重定向，不排队、不等待、不禁用裁切；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
             accessibility:
                 "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
             performance:
@@ -201,7 +201,7 @@ export const examples = [
 </div>`,
         expected: {
             render: "三个 Tooltip 分别保留多层 Frame、Badge、Kbd 与不同宽高的真实内容结构",
-            interaction: "连续 hover 时共享外框按每个复杂内容的真实宽高移动和变形；满足 4px 门槛时内容带不重叠，快速改目标后只保留最新复杂内容",
+            interaction: "连续 hover 时共享外框按每个复杂内容的真实宽高移动和变形；满足 4px 门槛时内容带以 16px 间距拼接且不重叠，快速改目标后只保留最新复杂内容",
             accessibility: "旧复杂内容在交接期间 aria-hidden；最终 tooltip 只暴露最新内容",
         },
         logic: [

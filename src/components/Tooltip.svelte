@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.17.0
+ Tooltip 文字提示组件 v1.18.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 连续裁切内容带的新旧内容投影间距由 4px 增加为 16px；是否允许拼接的目标 Tooltip 距离门槛仍为 4px。
  变更 (2026-08-21): 出现动效以 110ms 从 94% 放大到 100%，并按最终 placement 从触发器方向反向滑入 2px。
  变更 (2026-08-21): 连续裁切揭示调整为最初版本约 0.75 倍速度，稳定段 180–360ms、重定向段 90–160ms，外框、尺寸与内容保持原协调关系。
  变更 (2026-08-21): 全局定位、媒体查询、Overlay 响应与动效关闭监听收敛到唯一共享 Portal host，定位刷新合并为每帧最多一次。
@@ -53,7 +54,7 @@
 <script module lang="ts">
     const TOOLTIP_MOVE_MAX_DISTANCE_PX = 240;
     const TOOLTIP_MOVE_MAX_VIEWPORT_RATIO = 0.25;
-    const TOOLTIP_CONTENT_TRACK_GAP_PX = 4;
+    const TOOLTIP_CONTENT_TRACK_GAP_PX = 16;
     const TOOLTIP_CONTENT_TRACK_MAX_TARGET_GAP_PX = 4;
     let nextTooltipId = 0;
     let overlayHost: { id: string; setHost: (value: boolean) => void } | undefined;
