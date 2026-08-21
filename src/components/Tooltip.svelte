@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.18.0
+ Tooltip 文字提示组件 v1.19.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 连续切换的宽度使用独立欠阻尼曲线，快速接近目标后轻微回弹；位置、高度和内容时间线保持不变。
  变更 (2026-08-21): 连续裁切内容带的新旧内容投影间距由 4px 增加为 16px；是否允许拼接的目标 Tooltip 距离门槛仍为 4px。
  变更 (2026-08-21): 出现动效以 110ms 从 94% 放大到 100%，并按最终 placement 从触发器方向反向滑入 2px。
  变更 (2026-08-21): 连续裁切揭示调整为最初版本约 0.75 倍速度，稳定段 180–360ms、重定向段 90–160ms，外框、尺寸与内容保持原协调关系。
@@ -113,6 +114,7 @@
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
         getTooltipAppearMotion,
+        getTooltipWidthSpringProgress,
     } from "../motion/presets/tooltip";
     import {
         getTooltipHoverShowDelay,
@@ -1094,6 +1096,9 @@
                             timelineProgress,
                             isRetargeting,
                         );
+                        const widthProgress = getTooltipWidthSpringProgress(
+                            timelineProgress,
+                        );
                         const contentProgress = getContentProgress(
                             shellProgress,
                             contentLag,
@@ -1102,7 +1107,7 @@
                             width: interpolate(
                                 startRect.width,
                                 targetRect.width,
-                                shellProgress,
+                                widthProgress,
                             ),
                             height: interpolate(
                                 startRect.height,

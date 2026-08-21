@@ -1,6 +1,6 @@
 # tooltip.ts 文档
 
-> **版本**: v1.5.0
+> **版本**: v1.6.0
 > **职责**: 提供 Tooltip 出现 / 消失 preset。
 
 `TOOLTIP_APPEAR_MOTION`、`getTooltipAppearMotion()` 与 `TOOLTIP_DISAPPEAR_MOTION` 专用于 Tooltip Foreground，不与 dropdown overlay 或 Dialog 共用。
@@ -15,6 +15,7 @@
 2. 出现时必须通过 `getTooltipAppearMotion(position)` 根据最终 placement 生成定向位移：top 从下向上、bottom 从上向下、left 从右向左、right 从左向右。
 3. Tooltip 首次 hover 延迟不在本文件，归 `lib/overlay-trigger-timing.ts`。
 4. 退出卸载时间使用 `TOOLTIP_DISAPPEAR_TOTAL_MS`。
+5. 连续切换的宽度变化使用 `getTooltipWidthSpringProgress()`；该曲线只控制宽度，不替换位置、高度或内容进度。
 
 ## 问题与修复记录
 
@@ -53,6 +54,7 @@
 
 ## 变更记录
 
+- v1.6.0 (2026-08-21): 参考 beUI Pro Morphic Tooltip 的宽度弹性，增加归一化欠阻尼曲线；约在进度 `45%` 越过目标 `4%` 后回弹，并在既有时间线结束帧精确收敛。
 - v1.5.0 (2026-08-21): Tooltip Foreground 以 `110ms` 从 `0.94` 放大到 `1`，并新增按最终 placement 朝 Tooltip 位置移动的 `2px` 定向滑入；transform origin 对齐触发器侧边中心。
 - v1.4.0 (2026-08-20): Tooltip 生命周期动效改为 OSS 默认能力；preset 数值和分层边界不变。
 - v1.3.0 (2026-08-12): 采用稳定 Backdrop + 动画 Foreground 分层，恢复 opacity + scale 出现效果，同时保持首帧完整毛玻璃。

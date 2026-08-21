@@ -18,6 +18,8 @@ import {
     MOTION_DURATION_TOOLTIP_CONTINUOUS_RETARGET_PER_PX_MS,
     MOTION_PROGRESS_TOOLTIP_CONTINUOUS_CONTENT_LAG,
     MOTION_PROGRESS_TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG,
+    MOTION_SPRING_TOOLTIP_WIDTH_DAMPING,
+    MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY,
 } from "../tokens";
 import { getMotionTotalDurationMs } from "./utils";
 
@@ -94,6 +96,26 @@ export const TOOLTIP_CONTINUOUS_RETARGET_DURATION_PER_PX_MS =
     MOTION_DURATION_TOOLTIP_CONTINUOUS_RETARGET_PER_PX_MS;
 export const TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG =
     MOTION_PROGRESS_TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG;
+
+/**
+ * Normalized underdamped spring used only for continuous Tooltip width changes.
+ * It reaches the target quickly, overshoots by about 4%, then settles exactly
+ * at the end of the existing coordinated timeline.
+ */
+export function getTooltipWidthSpringProgress(progress: number) {
+    if (progress <= 0) return 0;
+    if (progress >= 1) return 1;
+
+    const response = (value: number) =>
+        1 -
+        Math.exp(-MOTION_SPRING_TOOLTIP_WIDTH_DAMPING * value) *
+            (Math.cos(MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY * value) +
+                (MOTION_SPRING_TOOLTIP_WIDTH_DAMPING /
+                    MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY) *
+                    Math.sin(MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY * value));
+
+    return response(progress) / response(1);
+}
 
 /** @deprecated Continuous Tooltip now uses one bounded coordinated timeline. */
 export const TOOLTIP_CONTINUOUS_SHELL_SPEED_PX_PER_MS = 0.5;
