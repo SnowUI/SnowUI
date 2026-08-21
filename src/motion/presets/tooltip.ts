@@ -104,23 +104,37 @@ export const TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_DURATION_MS =
     MOTION_DURATION_TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_MS;
 
 /**
- * Normalized underdamped spring used only for continuous Tooltip width changes.
+ * Underdamped spring used only for continuous Tooltip width changes.
  * It reaches the target smoothly, overshoots by about 3%, then settles exactly
  * at the end of its independent width timeline.
  */
-export function getTooltipWidthSpringProgress(progress: number) {
-    if (progress <= 0) return 0;
-    if (progress >= 1) return 1;
+export function getTooltipWidthSpringState(
+    startWidth: number,
+    targetWidth: number,
+    initialVelocityPxPerSecond: number,
+    elapsedMs: number,
+) {
+    const elapsedSeconds = Math.max(0, elapsedMs) / 1000;
+    const displacement = startWidth - targetWidth;
+    const decay = MOTION_SPRING_TOOLTIP_WIDTH_DAMPING;
+    const angularFrequency = MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY;
+    const sineCoefficient =
+        (initialVelocityPxPerSecond + decay * displacement) / angularFrequency;
+    const phase = angularFrequency * elapsedSeconds;
+    const cosine = Math.cos(phase);
+    const sine = Math.sin(phase);
+    const envelope = Math.exp(-decay * elapsedSeconds);
+    const relativeWidth =
+        envelope * (displacement * cosine + sineCoefficient * sine);
+    const velocityPxPerSecond =
+        envelope *
+        ((-decay * displacement + angularFrequency * sineCoefficient) * cosine +
+            (-decay * sineCoefficient - angularFrequency * displacement) * sine);
 
-    const response = (value: number) =>
-        1 -
-        Math.exp(-MOTION_SPRING_TOOLTIP_WIDTH_DAMPING * value) *
-            (Math.cos(MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY * value) +
-                (MOTION_SPRING_TOOLTIP_WIDTH_DAMPING /
-                    MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY) *
-                    Math.sin(MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY * value));
-
-    return response(progress) / response(1);
+    return {
+        width: targetWidth + relativeWidth,
+        velocityPxPerSecond,
+    };
 }
 
 /** @deprecated Continuous Tooltip now uses one bounded coordinated timeline. */
