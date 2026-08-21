@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.20.0
+ Tooltip 文字提示组件 v1.20.1
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 旧内容层在 450ms 清理时不再把 incoming 偏移瞬间归零；incoming 继续跟随宽度弹簧补偿到最终收敛，消除文字单帧抖动。
  变更 (2026-08-21): 删除快速重定向专属时长、cubic ease-out、内容滞后和状态标记；运动中改目标仍从当前可见画面接管，但与普通连续切换使用同一时间线。
  变更 (2026-08-21): 内容移动恢复原 180–360ms，仅旧层保留到 450ms；小宽度差提供 1.5px 回弹下限，避免 E1 亚像素回弹与内容抖动。
  变更 (2026-08-21): 内容带持续到宽度首次回弹点约 450ms，避免 E1 长内容切短内容时裁切提前消失并留下孤立宽度变化。
@@ -1258,7 +1259,6 @@
                             outgoingAlignedRect = undefined;
                             outgoingContentRect = undefined;
                             outgoingLayerOffset = { x: 0, y: 0 };
-                            incomingLayerOffset = { x: 0, y: 0 };
                         }
 
                         if (elapsed >= totalDuration) {
