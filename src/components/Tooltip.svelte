@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.22.1
+ Tooltip 文字提示组件 v1.22.2
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 快速重定向只在位置与内容交接尚未完成时生效；独立宽度回弹尾段不再压缩下一次连续裁切时间线。
  变更 (2026-08-21): 不拼接内容带时，新内容在宽高过渡期间按最终 placement 保持局部对齐，不再默认停留在外框左上角。
  变更 (2026-08-21): 恢复默认开启的快速重定向，并新增 rapidRetarget 开关；关闭后运动中改目标继续使用普通协调时间线。
  变更 (2026-08-21): widthRebound 默认值改为 false；需要宽度越界回弹时显式开启。
@@ -278,6 +279,7 @@
     let finalPosition: "top" | "bottom" | "left" | "right" = $state("top");
     let moveMode: "snap" | "frame" = $state("snap");
     let switchPhase: "idle" | "prepare" | "moving" = $state("idle");
+    let switchHandoffActive = false;
     let switchRetargeting = $state(false);
     let pendingSwitchRetarget = false;
     let measuredSize = $state({ width: 0, height: 0 });
@@ -386,6 +388,7 @@
         lastPositionTooltipId = undefined;
         moveMode = "snap";
         switchPhase = "idle";
+        switchHandoffActive = false;
         switchRetargeting = false;
         pendingSwitchRetarget = false;
         animatedShellSize = undefined;
@@ -451,6 +454,7 @@
         outgoingLayerOffset = { x: 0, y: 0 };
         moveMode = "snap";
         switchPhase = "idle";
+        switchHandoffActive = false;
         switchRetargeting = false;
     }
 
@@ -719,7 +723,7 @@
             previousRenderedOverlay &&
             previousRenderedOverlay.id !== overlayState.id
         ) {
-            const wasSwitching = switchPhase !== "idle";
+            const wasSwitching = switchHandoffActive;
             const currentShellRect = readVisualRect(sizeShellRef);
             const currentIncomingContentRect = readVisualRect(sizeContentRef);
             const currentOutgoingContentRect = readVisualRect(outgoingContentRef);
@@ -1120,6 +1124,7 @@
             const revision = ++switchMotionRevision;
             moveMode = "snap";
             switchPhase = "prepare";
+            switchHandoffActive = true;
             switchRetargeting = isRetargeting;
             animatedShellSize = {
                 width: startRect.width,
@@ -1171,6 +1176,12 @@
                     const animate = (now: number) => {
                         if (revision !== switchMotionRevision) return;
                         const elapsed = now - startedAt;
+                        if (
+                            switchHandoffActive &&
+                            elapsed >= motionDuration
+                        ) {
+                            switchHandoffActive = false;
+                        }
                         const timelineProgress = getMotionProgress(
                             elapsed,
                             motionDuration,
@@ -1304,6 +1315,7 @@
             switchStartRect = undefined;
             moveMode = "snap";
             switchPhase = "idle";
+            switchHandoffActive = false;
             switchRetargeting = false;
             pendingSwitchRetarget = false;
             animatedShellSize = undefined;
@@ -1500,6 +1512,7 @@
                 outgoingLayerOffset = { x: 0, y: 0 };
                 moveMode = "snap";
                 switchPhase = "idle";
+                switchHandoffActive = false;
                 animatedShellSize = undefined;
                 switchShellDurationMs = 0;
                 switchWidthDurationMs = 0;

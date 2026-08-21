@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.10.1
+ * v1.10.2
  */
 export const examples = [
     {
@@ -109,7 +109,7 @@ export const examples = [
         expected: {
             render: "左侧显式开启 widthRebound，右侧使用默认关闭；两侧按钮与 Tooltip 内容一一对应",
             interaction:
-                "两侧都保留连续移动与裁切揭示；左侧宽度使用 1000ms 欠阻尼回弹，右侧宽度随 180–360ms 协调时间线单调收敛且不越过目标宽度",
+                "两侧都保留连续移动与裁切揭示；左侧宽度使用 1000ms 欠阻尼回弹，内容交接结束后即使宽度仍在回弹，复制与下载间再次切换也使用完整普通内容时间线；右侧宽度随 180–360ms 协调时间线单调收敛且不越过目标宽度",
             accessibility:
                 "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
             performance:
