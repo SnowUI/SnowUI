@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.21.0
+ Tooltip 文字提示组件 v1.21.1
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): widthRebound 默认值改为 false；需要宽度越界回弹时显式开启。
  变更 (2026-08-21): 新增默认开启的 widthRebound；关闭时连续切换宽度沿协调时间线直接收敛，不产生越界回弹。
  变更 (2026-08-21): 旧内容层在 450ms 清理时不再把 incoming 偏移瞬间归零；incoming 继续跟随宽度弹簧补偿到最终收敛，消除文字单帧抖动。
  变更 (2026-08-21): 删除快速重定向专属时长、cubic ease-out、内容滞后和状态标记；运动中改目标仍从当前可见画面接管，但与普通连续切换使用同一时间线。
@@ -200,7 +201,7 @@
         offset = 4,
         variant = "light",
         dismissOnMotion = true,
-        widthRebound = true,
+        widthRebound = false,
         class: className = "",
         style: userStyle = "",
         as = undefined,

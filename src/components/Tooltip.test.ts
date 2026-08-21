@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.9.0
+ * v1.9.1
  */
 export const examples = [
     {
@@ -80,7 +80,20 @@ export const examples = [
         code: `E1
 <div class="p-40 flex-row gap-40">
     <div class="flex-col gap-12">
-        <Text>开启宽度回弹（默认）</Text>
+        <Text>开启宽度回弹</Text>
+        <div class="flex-row gap-12">
+            <Button>保存<Tooltip widthRebound>保存当前配置</Tooltip></Button>
+            <Button>复制<Tooltip widthRebound>复制分享链接</Tooltip></Button>
+            <Button>下载<Tooltip widthRebound>下载完整报告文件</Tooltip></Button>
+        </div>
+        <div class="flex-row gap-12">
+            <Button>归档<Tooltip widthRebound>移动到团队归档区，稍后仍可恢复</Tooltip></Button>
+            <Button>权限<Tooltip widthRebound>管理成员访问权限与角色</Tooltip></Button>
+            <Button>删除<Tooltip widthRebound>删除后进入回收站，30 天内可以找回</Tooltip></Button>
+        </div>
+    </div>
+    <div class="flex-col gap-12">
+        <Text>关闭宽度回弹（默认）</Text>
         <div class="flex-row gap-12">
             <Button>保存<Tooltip>保存当前配置</Tooltip></Button>
             <Button>复制<Tooltip>复制分享链接</Tooltip></Button>
@@ -92,22 +105,9 @@ export const examples = [
             <Button>删除<Tooltip>删除后进入回收站，30 天内可以找回</Tooltip></Button>
         </div>
     </div>
-    <div class="flex-col gap-12">
-        <Text>关闭宽度回弹</Text>
-        <div class="flex-row gap-12">
-            <Button>保存<Tooltip widthRebound={false}>保存当前配置</Tooltip></Button>
-            <Button>复制<Tooltip widthRebound={false}>复制分享链接</Tooltip></Button>
-            <Button>下载<Tooltip widthRebound={false}>下载完整报告文件</Tooltip></Button>
-        </div>
-        <div class="flex-row gap-12">
-            <Button>归档<Tooltip widthRebound={false}>移动到团队归档区，稍后仍可恢复</Tooltip></Button>
-            <Button>权限<Tooltip widthRebound={false}>管理成员访问权限与角色</Tooltip></Button>
-            <Button>删除<Tooltip widthRebound={false}>删除后进入回收站，30 天内可以找回</Tooltip></Button>
-        </div>
-    </div>
 </div>`,
         expected: {
-            render: "左侧使用默认宽度回弹，右侧使用 widthRebound=false；两侧按钮与 Tooltip 内容一一对应",
+            render: "左侧显式开启 widthRebound，右侧使用默认关闭；两侧按钮与 Tooltip 内容一一对应",
             interaction:
                 "两侧都保留连续移动与裁切揭示；左侧宽度使用 1000ms 欠阻尼回弹，右侧宽度随 180–360ms 协调时间线单调收敛且不越过目标宽度",
             accessibility:
@@ -130,18 +130,18 @@ export const examples = [
         code: `E2
 <div class="p-40 flex-row gap-40">
     <div class="flex-col gap-12">
-        <Button>开启 · 短<Tooltip>短提示</Tooltip></Button>
-        <Button>开启 · 中<Tooltip>中等长度的提示内容</Tooltip></Button>
-        <Button>开启 · 长<Tooltip>这是一段用于观察宽度变宽与缩小回弹的较长提示内容</Tooltip></Button>
+        <Button>开启 · 短<Tooltip widthRebound>短提示</Tooltip></Button>
+        <Button>开启 · 中<Tooltip widthRebound>中等长度的提示内容</Tooltip></Button>
+        <Button>开启 · 长<Tooltip widthRebound>这是一段用于观察宽度变宽与缩小回弹的较长提示内容</Tooltip></Button>
     </div>
     <div class="flex-col gap-12">
-        <Button>关闭 · 短<Tooltip widthRebound={false}>短提示</Tooltip></Button>
-        <Button>关闭 · 中<Tooltip widthRebound={false}>中等长度的提示内容</Tooltip></Button>
-        <Button>关闭 · 长<Tooltip widthRebound={false}>这是一段用于观察宽度直接收敛的较长提示内容</Tooltip></Button>
+        <Button>关闭 · 短<Tooltip>短提示</Tooltip></Button>
+        <Button>关闭 · 中<Tooltip>中等长度的提示内容</Tooltip></Button>
+        <Button>关闭 · 长<Tooltip>这是一段用于观察宽度直接收敛的较长提示内容</Tooltip></Button>
     </div>
 </div>`,
         expected: {
-            render: "仅显示两列按钮与 Tooltip；左列开启默认回弹，右列显式关闭回弹，不再显示动效控制项",
+            render: "仅显示两列按钮与 Tooltip；左列显式开启回弹，右列使用默认关闭，不再显示动效控制项",
             interaction: "依次 hover 同列按钮即可直接比较有回弹与无回弹的宽度变化；两列都保留连续裁切揭示",
         },
         logic: ["WidthRebound", "Comparison", "ContinuousTooltip"],
