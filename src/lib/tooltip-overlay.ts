@@ -16,6 +16,7 @@ export interface TooltipOverlayState {
     children?: Snippet;
     fallbackContent: string;
     dismissOnMotion: boolean;
+    widthRebound: boolean;
     continuousMotion?: boolean;
     loopMotion?: any;
     rest: Record<string, any>;

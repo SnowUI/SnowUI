@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.8.5
+ * v1.9.0
  */
 export const examples = [
     {
@@ -78,62 +78,38 @@ export const examples = [
     {
         name: "E1: 共享延迟切换 (Warmup / Cooldown)",
         code: `E1
-<div class="p-40 flex-row gap-12">
-    <Button>
-        保存
-        <Tooltip>保存当前配置</Tooltip>
-    </Button>
-    <Button>
-        复制
-        <Tooltip>复制分享链接</Tooltip>
-    </Button>
-    <Button>
-        下载
-        <Tooltip>下载完整报告文件</Tooltip>
-    </Button>
-    <Button>
-        归档
-        <Tooltip>移动到团队归档区，稍后仍可恢复</Tooltip>
-    </Button>
-    <Button>
-        权限
-        <Tooltip>管理成员访问权限与角色</Tooltip>
-    </Button>
-    <Button>
-        删除
-        <Tooltip>删除后进入回收站，30 天内可以找回</Tooltip>
-    </Button>
-</div>
-<div class="p-40 flex-row gap-12">
-    <Button>
-        保存
-        <Tooltip>保存当前配置</Tooltip>
-    </Button>
-    <Button>
-        复制
-        <Tooltip>复制分享链接</Tooltip>
-    </Button>
-    <Button>
-        下载
-        <Tooltip>下载完整报告文件</Tooltip>
-    </Button>
-    <Button>
-        归档
-        <Tooltip>移动到团队归档区，稍后仍可恢复</Tooltip>
-    </Button>
-    <Button>
-        权限
-        <Tooltip>管理成员访问权限与角色</Tooltip>
-    </Button>
-    <Button>
-        删除
-        <Tooltip>删除后进入回收站，30 天内可以找回</Tooltip>
-    </Button>
+<div class="p-40 flex-row gap-40">
+    <div class="flex-col gap-12">
+        <Text>开启宽度回弹（默认）</Text>
+        <div class="flex-row gap-12">
+            <Button>保存<Tooltip>保存当前配置</Tooltip></Button>
+            <Button>复制<Tooltip>复制分享链接</Tooltip></Button>
+            <Button>下载<Tooltip>下载完整报告文件</Tooltip></Button>
+        </div>
+        <div class="flex-row gap-12">
+            <Button>归档<Tooltip>移动到团队归档区，稍后仍可恢复</Tooltip></Button>
+            <Button>权限<Tooltip>管理成员访问权限与角色</Tooltip></Button>
+            <Button>删除<Tooltip>删除后进入回收站，30 天内可以找回</Tooltip></Button>
+        </div>
+    </div>
+    <div class="flex-col gap-12">
+        <Text>关闭宽度回弹</Text>
+        <div class="flex-row gap-12">
+            <Button>保存<Tooltip widthRebound={false}>保存当前配置</Tooltip></Button>
+            <Button>复制<Tooltip widthRebound={false}>复制分享链接</Tooltip></Button>
+            <Button>下载<Tooltip widthRebound={false}>下载完整报告文件</Tooltip></Button>
+        </div>
+        <div class="flex-row gap-12">
+            <Button>归档<Tooltip widthRebound={false}>移动到团队归档区，稍后仍可恢复</Tooltip></Button>
+            <Button>权限<Tooltip widthRebound={false}>管理成员访问权限与角色</Tooltip></Button>
+            <Button>删除<Tooltip widthRebound={false}>删除后进入回收站，30 天内可以找回</Tooltip></Button>
+        </div>
+    </div>
 </div>`,
         expected: {
-            render: "多个相邻按钮分别显示不同 Tooltip 内容",
+            render: "左侧使用默认宽度回弹，右侧使用 widthRebound=false；两侧按钮与 Tooltip 内容一一对应",
             interaction:
-                "任一 Tooltip 成功显示后，hover 其他 Tooltip 立即响应；横向、纵向或斜向切换中，若两个目标 Tooltip 矩形最短距离不超过 4px，先把新旧内容沿移动方向拼成间距为 16px 的内容带；所有切换的位置与内容都使用 180–360ms 正弦协调时间线和 0.08 内容滞后；运动中改目标接管当前裁切窗口内实际可见面积更大的内容层，并在取消旧时间线的同一帧冻结它的实时位置，不设置专属快速重定向参数；旧内容层保留到宽度首次回弹点 450ms，清理旧层时不重置新内容偏移，新内容保持稳定视口位置直到宽度弹簧收敛；宽度始终从当前可见宽度使用同一套 1000ms 欠阻尼弹簧，自然约 3% 回弹小于 1.5px 时使用 1.5px 可见下限，不继承累计速度；目标间距超过 4px 时不拼接，新内容随外框一起移动；超过连续移动距离阈值时直接定位；离开全部触发器超过 300ms 后外框退出并恢复 450ms 首次延迟",
+                "两侧都保留连续移动与裁切揭示；左侧宽度使用 1000ms 欠阻尼回弹，右侧宽度随 180–360ms 协调时间线单调收敛且不越过目标宽度",
             accessibility:
                 "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
             performance:
@@ -150,16 +126,25 @@ export const examples = [
         ],
     },
     {
-        name: "E2: 连续裁切动效调节器 (Motion Tuning)",
+        name: "E2: 宽度回弹对照 (Width Rebound Comparison)",
         code: `E2
-<div class="p-40">
-    <TooltipMotionController />
+<div class="p-40 flex-row gap-40">
+    <div class="flex-col gap-12">
+        <Button>开启 · 短<Tooltip>短提示</Tooltip></Button>
+        <Button>开启 · 中<Tooltip>中等长度的提示内容</Tooltip></Button>
+        <Button>开启 · 长<Tooltip>这是一段用于观察宽度变宽与缩小回弹的较长提示内容</Tooltip></Button>
+    </div>
+    <div class="flex-col gap-12">
+        <Button>关闭 · 短<Tooltip widthRebound={false}>短提示</Tooltip></Button>
+        <Button>关闭 · 中<Tooltip widthRebound={false}>中等长度的提示内容</Tooltip></Button>
+        <Button>关闭 · 长<Tooltip widthRebound={false}>这是一段用于观察宽度直接收敛的较长提示内容</Tooltip></Button>
+    </div>
 </div>`,
         expected: {
-            render: "显示三个相邻 Tooltip 触发按钮，以及基础时长、最短 / 最长时长、距离增量和内容相位滞后控制项",
-            interaction: "调整任一参数后，下一次相邻 Tooltip 连续切换立即使用新的有界协调时间线；调节器不构成 Tooltip 公开 API",
+            render: "仅显示两列按钮与 Tooltip；左列开启默认回弹，右列显式关闭回弹，不再显示动效控制项",
+            interaction: "依次 hover 同列按钮即可直接比较有回弹与无回弹的宽度变化；两列都保留连续裁切揭示",
         },
-        logic: ["MotionTuning", "TestOnly", "ContinuousTooltip"],
+        logic: ["WidthRebound", "Comparison", "ContinuousTooltip"],
     },
     {
         name: "E3: 复杂内容连续切换 (Complex Continuous Content)",

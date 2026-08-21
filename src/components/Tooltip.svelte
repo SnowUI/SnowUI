@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.20.1
+ Tooltip 文字提示组件 v1.21.0
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 新增默认开启的 widthRebound；关闭时连续切换宽度沿协调时间线直接收敛，不产生越界回弹。
  变更 (2026-08-21): 旧内容层在 450ms 清理时不再把 incoming 偏移瞬间归零；incoming 继续跟随宽度弹簧补偿到最终收敛，消除文字单帧抖动。
  变更 (2026-08-21): 删除快速重定向专属时长、cubic ease-out、内容滞后和状态标记；运动中改目标仍从当前可见画面接管，但与普通连续切换使用同一时间线。
  变更 (2026-08-21): 内容移动恢复原 180–360ms，仅旧层保留到 450ms；小宽度差提供 1.5px 回弹下限，避免 E1 亚像素回弹与内容抖动。
@@ -177,6 +178,7 @@
         offset?: number;
         variant?: "dark" | "light";
         dismissOnMotion?: boolean;
+        widthRebound?: boolean;
         children?: Snippet;
         [key: string]: any;
     }
@@ -198,6 +200,7 @@
         offset = 4,
         variant = "light",
         dismissOnMotion = true,
+        widthRebound = true,
         class: className = "",
         style: userStyle = "",
         as = undefined,
@@ -474,80 +477,13 @@
         return Math.min(elapsed / duration, 1);
     }
 
-    type TooltipMotionTuning = {
-        baseDuration: number;
-        minDuration: number;
-        maxDuration: number;
-        durationPerPixel: number;
-        contentLag: number;
-    };
-
-    function readPositiveNumber(style: CSSStyleDeclaration, name: string, fallback: number) {
-        const value = Number.parseFloat(style.getPropertyValue(name));
-        return Number.isFinite(value) && value > 0 ? value : fallback;
-    }
-
-    function readUnitNumber(style: CSSStyleDeclaration, name: string, fallback: number) {
-        const value = Number.parseFloat(style.getPropertyValue(name));
-        return Number.isFinite(value) && value >= 0 && value <= 1
-            ? value
-            : fallback;
-    }
-
-    function readMotionTuning(): TooltipMotionTuning {
-        const style = sizeShellRef ? getComputedStyle(sizeShellRef) : undefined;
-        if (!style) {
-            return {
-                baseDuration: TOOLTIP_CONTINUOUS_BASE_DURATION_MS,
-                minDuration: TOOLTIP_CONTINUOUS_MIN_DURATION_MS,
-                maxDuration: TOOLTIP_CONTINUOUS_MAX_DURATION_MS,
-                durationPerPixel: TOOLTIP_CONTINUOUS_DURATION_PER_PX_MS,
-                contentLag: TOOLTIP_CONTINUOUS_CONTENT_LAG,
-            };
-        }
-
-        const minDuration = readPositiveNumber(
-            style,
-            "--snowui-tooltip-test-min-duration",
-            TOOLTIP_CONTINUOUS_MIN_DURATION_MS,
-        );
-        return {
-            baseDuration: readPositiveNumber(
-                style,
-                "--snowui-tooltip-test-base-duration",
-                TOOLTIP_CONTINUOUS_BASE_DURATION_MS,
-            ),
-            minDuration,
-            maxDuration: Math.max(
-                minDuration,
-                readPositiveNumber(
-                    style,
-                    "--snowui-tooltip-test-max-duration",
-                    TOOLTIP_CONTINUOUS_MAX_DURATION_MS,
-                ),
-            ),
-            durationPerPixel: readPositiveNumber(
-                style,
-                "--snowui-tooltip-test-duration-per-pixel",
-                TOOLTIP_CONTINUOUS_DURATION_PER_PX_MS,
-            ),
-            contentLag: readUnitNumber(
-                style,
-                "--snowui-tooltip-test-content-lag",
-                TOOLTIP_CONTINUOUS_CONTENT_LAG,
-            ),
-        };
-    }
-
-    function getContinuousDuration(
-        distance: number,
-        tuning: TooltipMotionTuning,
-    ) {
+    function getContinuousDuration(distance: number) {
         return Math.min(
-            tuning.maxDuration,
+            TOOLTIP_CONTINUOUS_MAX_DURATION_MS,
             Math.max(
-                tuning.minDuration,
-                tuning.baseDuration + distance * tuning.durationPerPixel,
+                TOOLTIP_CONTINUOUS_MIN_DURATION_MS,
+                TOOLTIP_CONTINUOUS_BASE_DURATION_MS +
+                    distance * TOOLTIP_CONTINUOUS_DURATION_PER_PX_MS,
             ),
         );
     }
@@ -1085,10 +1021,10 @@
                       { width: startRect.width, height: startRect.height },
                   )
                 : targetRect;
-            const motionTuning = readMotionTuning();
             const shellDistance = getRectCenterDistance(startRect, targetRect);
-            const contentLag = motionTuning.contentLag;
-            const motionDuration = getContinuousDuration(shellDistance, motionTuning);
+            const contentLag = TOOLTIP_CONTINUOUS_CONTENT_LAG;
+            const motionDuration = getContinuousDuration(shellDistance);
+            const shouldReboundWidth = overlayState?.widthRebound ?? widthRebound;
             const alignment = canJoinContentTrack
                 ? {
                       x: targetRect.left - incomingTrackRect.left,
@@ -1100,6 +1036,7 @@
                 : 0;
             const shellDuration = motionDuration;
             const widthDuration =
+                shouldReboundWidth &&
                 Math.abs(targetRect.width - startRect.width) > 0.5
                     ? TOOLTIP_CONTINUOUS_WIDTH_SPRING_DURATION_MS
                     : motionDuration;
@@ -1109,7 +1046,9 @@
             const contentRetentionDuration = canJoinContentTrack
                 ? Math.max(
                       motionDuration,
-                      TOOLTIP_CONTINUOUS_WIDTH_REVEAL_DURATION_MS,
+                      shouldReboundWidth
+                          ? TOOLTIP_CONTINUOUS_WIDTH_REVEAL_DURATION_MS
+                          : motionDuration,
                   )
                 : 0;
             const totalDuration = Math.max(
@@ -1178,11 +1117,17 @@
                         const contentBaseProgress = getCoordinatedProgress(
                             contentTimelineProgress,
                         );
-                        const currentWidth = getTooltipWidthSpringState(
-                            startRect.width,
-                            targetRect.width,
-                            elapsed,
-                        );
+                        const currentWidth = shouldReboundWidth
+                            ? getTooltipWidthSpringState(
+                                  startRect.width,
+                                  targetRect.width,
+                                  elapsed,
+                              )
+                            : interpolate(
+                                  startRect.width,
+                                  targetRect.width,
+                                  shellProgress,
+                              );
                         const contentProgress = getContentProgress(
                             contentBaseProgress,
                             contentLag,
@@ -1394,6 +1339,9 @@
             get dismissOnMotion() {
                 return dismissOnMotion;
             },
+            get widthRebound() {
+                return widthRebound;
+            },
             loopMotion,
             rest: forwardedRest,
         };
@@ -1558,6 +1506,7 @@
                 data-switch-phase={switchPhase}
                 data-shell-duration={switchShellDurationMs}
                 data-width-duration={switchWidthDurationMs}
+                data-width-rebound={renderedOverlay.widthRebound}
                 data-content-duration={switchContentDurationMs}
                 data-shell-distance={switchShellDistancePx}
                 data-content-distance={switchContentDistancePx}
