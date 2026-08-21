@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.19.8
+ Tooltip 文字提示组件 v1.19.9
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 快速重定向接管当前裁切窗口内可见面积更大的内容层，并在取消旧时间线的同一帧冻结实时位置，避免丢失连续裁切和内容跳动。
  变更 (2026-08-21): 内容移动恢复原 180–360ms，仅旧层保留到 450ms；小宽度差提供 1.5px 回弹下限，避免 E1 亚像素回弹与内容抖动。
  变更 (2026-08-21): 内容带持续到宽度首次回弹点约 450ms，避免 E1 长内容切短内容时裁切提前消失并留下孤立宽度变化。
  变更 (2026-08-21): 宽度完全退出快速重定向分支；每次改目标都从当前宽度以同一 1000ms / 3% 弹簧重新响应。
@@ -248,6 +249,8 @@
     let sizeShellRef = $state<HTMLElement>();
     let incomingLayerRef = $state<HTMLElement>();
     let sizeContentRef = $state<HTMLElement>();
+    let outgoingLayerRef = $state<HTMLElement>();
+    let outgoingContentRef = $state<HTMLElement>();
     let placeholderRef = $state<HTMLElement>();
     let triggerEl: HTMLElement | null = null;
     let tooltipId = createTooltipId();
@@ -659,6 +662,24 @@
         return Math.hypot(gapX, gapY);
     }
 
+    function getVisibleRectArea(
+        rect: TooltipVisualRect | undefined,
+        clippingRect: TooltipVisualRect | undefined,
+    ) {
+        if (!rect || !clippingRect) return 0;
+        const width = Math.max(
+            0,
+            Math.min(rect.left + rect.width, clippingRect.left + clippingRect.width) -
+                Math.max(rect.left, clippingRect.left),
+        );
+        const height = Math.max(
+            0,
+            Math.min(rect.top + rect.height, clippingRect.top + clippingRect.height) -
+                Math.max(rect.top, clippingRect.top),
+        );
+        return width * height;
+    }
+
     function clearOverlayLifecycleTimers() {
         if (overlayAppearTimer !== undefined) {
             window.clearTimeout(overlayAppearTimer);
@@ -734,6 +755,32 @@
             previousRenderedOverlay.id !== overlayState.id
         ) {
             const wasSwitching = switchPhase !== "idle";
+            const currentShellRect = readVisualRect(sizeShellRef);
+            const currentIncomingContentRect = readVisualRect(sizeContentRef);
+            const currentOutgoingContentRect = readVisualRect(outgoingContentRef);
+            const canPromoteIncoming =
+                incomingLayerReady &&
+                (!outgoingOverlay ||
+                    getVisibleRectArea(
+                        currentIncomingContentRect,
+                        currentShellRect,
+                    ) >=
+                        getVisibleRectArea(
+                            currentOutgoingContentRect,
+                            currentShellRect,
+                        ));
+            const visibleOverlay = canPromoteIncoming
+                ? previousRenderedOverlay
+                : (outgoingOverlay ?? previousRenderedOverlay);
+            const visibleLayerRect = readVisualRect(
+                canPromoteIncoming ? incomingLayerRef : outgoingLayerRef,
+            );
+            const visibleContentRect = canPromoteIncoming
+                ? currentIncomingContentRect
+                : currentOutgoingContentRect;
+            const visibleAlignedRect = canPromoteIncoming
+                ? activeTargetRect
+                : outgoingAlignedRect;
             cancelSwitchMotion();
             if (overlayState.continuousMotion === false) {
                 pendingSwitchRetarget = false;
@@ -744,12 +791,12 @@
                 outgoingTargetRect = undefined;
             } else {
                 pendingSwitchRetarget = wasSwitching;
-                switchStartRect = readVisualRect(sizeShellRef);
-                outgoingOverlay = previousRenderedOverlay;
-                outgoingAlignedRect = activeTargetRect ?? switchStartRect;
-                outgoingContentRect = readVisualRect(sizeContentRef);
+                switchStartRect = currentShellRect;
+                outgoingOverlay = visibleOverlay;
+                outgoingAlignedRect = visibleAlignedRect ?? switchStartRect;
+                outgoingContentRect = visibleContentRect;
                 outgoingTargetRect =
-                    readVisualRect(incomingLayerRef) ??
+                    visibleLayerRect ??
                     outgoingAlignedRect ??
                     switchStartRect;
                 if (outgoingTargetRect) {
@@ -757,6 +804,12 @@
                         width: outgoingTargetRect.width,
                         height: outgoingTargetRect.height,
                     };
+                    if (switchStartRect) {
+                        outgoingLayerOffset = {
+                            x: outgoingTargetRect.left - switchStartRect.left,
+                            y: outgoingTargetRect.top - switchStartRect.top,
+                        };
+                    }
                 }
             }
             measuredOverlayId = undefined;
@@ -1593,13 +1646,17 @@
                     >
                         {#if outgoingOverlay}
                             <span
+                                bind:this={outgoingLayerRef}
                                 class="snowui-tooltip-content-layer"
                                 data-tooltip-layer="outgoing"
                                 data-move-mode={moveMode}
                                 style={outgoingLayerStyle}
                                 aria-hidden="true"
                             >
-                                <span class="snowui-tooltip-inner">
+                                <span
+                                    bind:this={outgoingContentRef}
+                                    class="snowui-tooltip-inner"
+                                >
                                     {#if outgoingOverlay.children}
                                         {@render outgoingOverlay.children()}
                                     {:else if outgoingOverlay.fallbackContent}
