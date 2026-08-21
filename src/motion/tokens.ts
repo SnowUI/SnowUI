@@ -58,7 +58,7 @@ export const MOTION_PROGRESS_TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG = 0.02;
 export const MOTION_DURATION_TOOLTIP_CONTINUOUS_WIDTH_SPRING_MS = 800;
 export const MOTION_DURATION_TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_MS = 480;
 /** Normalized damping used by the continuous Tooltip width spring. */
-export const MOTION_SPRING_TOOLTIP_WIDTH_DAMPING = 7.3;
+export const MOTION_SPRING_TOOLTIP_WIDTH_DAMPING = 6;
 /** Normalized angular frequency used by the continuous Tooltip width spring. */
 export const MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY = 7;
 /** @deprecated Continuous Tooltip now uses bounded duration tokens. */

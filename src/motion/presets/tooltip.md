@@ -1,6 +1,6 @@
 # tooltip.ts 文档
 
-> **版本**: v1.6.1
+> **版本**: v1.6.2
 > **职责**: 提供 Tooltip 出现 / 消失 preset。
 
 `TOOLTIP_APPEAR_MOTION`、`getTooltipAppearMotion()` 与 `TOOLTIP_DISAPPEAR_MOTION` 专用于 Tooltip Foreground，不与 dropdown overlay 或 Dialog 共用。
@@ -54,6 +54,7 @@
 
 ## 变更记录
 
+- v1.6.2 (2026-08-21): 欠阻尼宽度曲线的越界提高到约 `7%`，变宽与变窄分别沿正、负宽度差自然越过目标后回弹。
 - v1.6.1 (2026-08-21): 宽度弹性改为独立 `800ms` 时间线，快速重定向为 `480ms`；不再把参考页约 `0.8s` 的回弹压缩进位置的短时间线。
 - v1.6.0 (2026-08-21): 参考 beUI Pro Morphic Tooltip 的宽度弹性，增加归一化欠阻尼曲线；约在进度 `45%` 越过目标 `4%` 后回弹，并在既有时间线结束帧精确收敛。
 - v1.5.0 (2026-08-21): Tooltip Foreground 以 `110ms` 从 `0.94` 放大到 `1`，并新增按最终 placement 朝 Tooltip 位置移动的 `2px` 定向滑入；transform origin 对齐触发器侧边中心。

@@ -105,7 +105,7 @@ export const TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_DURATION_MS =
 
 /**
  * Normalized underdamped spring used only for continuous Tooltip width changes.
- * It reaches the target quickly, overshoots by about 4%, then settles exactly
+ * It reaches the target quickly, overshoots by about 7%, then settles exactly
  * at the end of its independent width timeline.
  */
 export function getTooltipWidthSpringProgress(progress: number) {
