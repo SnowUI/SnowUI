@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.19.6
+ Tooltip 文字提示组件 v1.19.7
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 内容带持续到宽度首次回弹点约 450ms，避免 E1 长内容切短内容时裁切提前消失并留下孤立宽度变化。
  变更 (2026-08-21): 宽度完全退出快速重定向分支；每次改目标都从当前宽度以同一 1000ms / 3% 弹簧重新响应。
  变更 (2026-08-21): 快速重定向不再切换速率；宽度弹簧统一为 1000ms，并继承上一段的实时速度。
  变更 (2026-08-21): 宽度越界进一步收敛到约 3%，稳定 / 重定向弹性放慢至 1000ms / 640ms。
@@ -118,6 +119,7 @@
         TOOLTIP_CONTINUOUS_RETARGET_MAX_DURATION_MS,
         TOOLTIP_CONTINUOUS_RETARGET_MIN_DURATION_MS,
         TOOLTIP_CONTINUOUS_WIDTH_SPRING_DURATION_MS,
+        TOOLTIP_CONTINUOUS_WIDTH_REVEAL_DURATION_MS,
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
         getTooltipAppearMotion,
@@ -1079,7 +1081,12 @@
                 Math.abs(targetRect.width - startRect.width) > 0.5
                     ? TOOLTIP_CONTINUOUS_WIDTH_SPRING_DURATION_MS
                     : motionDuration;
-            const contentDuration = canJoinContentTrack ? motionDuration : 0;
+            const contentDuration = canJoinContentTrack
+                ? Math.max(
+                      motionDuration,
+                      TOOLTIP_CONTINUOUS_WIDTH_REVEAL_DURATION_MS,
+                  )
+                : 0;
             const totalDuration = Math.max(motionDuration, widthDuration);
             const revision = ++switchMotionRevision;
             moveMode = "snap";
@@ -1141,13 +1148,21 @@
                             timelineProgress,
                             isRetargeting,
                         );
+                        const contentTimelineProgress = getMotionProgress(
+                            elapsed,
+                            contentDuration,
+                        );
+                        const contentBaseProgress = getCoordinatedProgress(
+                            contentTimelineProgress,
+                            isRetargeting,
+                        );
                         const currentWidth = getTooltipWidthSpringState(
                             startRect.width,
                             targetRect.width,
                             elapsed,
                         );
                         const contentProgress = getContentProgress(
-                            shellProgress,
+                            contentBaseProgress,
                             contentLag,
                         );
                         const currentSize = {
@@ -1212,7 +1227,7 @@
                             incomingLayerOffset = { x: 0, y: 0 };
                         }
 
-                        if (!contentSettled && elapsed >= motionDuration) {
+                        if (!contentSettled && elapsed >= contentDuration) {
                             contentSettled = true;
                             outgoingOverlay = null;
                             outgoingTargetRect = undefined;
