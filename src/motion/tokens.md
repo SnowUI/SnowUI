@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.16.0
+> **版本**: v1.17.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -29,8 +29,8 @@
 | `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
 | `MOTION_DISTANCE_*` | Button hover 背景总宽 / 总高增加 2px，以及 text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
 | `MOTION_BLUR_*` | 2px、3px、10px 三档实际 blur 来源 |
-| `MOTION_DURATION_TOOLTIP_*` | Tooltip Foreground 出现 / 消失，以及所有连续交接共用的 base / min / max / per-pixel 有界时程 |
-| `MOTION_PROGRESS_TOOLTIP_CONTINUOUS_CONTENT_LAG` | Tooltip 所有连续交接共用的内容相位滞后；内容与外框在同一结束帧收敛 |
+| `MOTION_DURATION_TOOLTIP_*` | Tooltip Foreground 出现 / 消失，以及普通连续交接与快速重定向各自的 base / min / max / per-pixel 有界时程 |
+| `MOTION_PROGRESS_TOOLTIP_CONTINUOUS_*_CONTENT_LAG` | Tooltip 普通连续交接与快速重定向各自的内容相位滞后；内容与外框在同一结束帧收敛 |
 | `MOTION_DELAY_TOOLTIP_APPEAR_MS` | 兼容保留的旧 Tooltip 出现 delay；已标记 deprecated，默认 preset 不再消费 |
 | `MOTION_SCALE_DROPDOWN_*` | Popover、Listbox、Menu dropdown |
 | `MOTION_SCALE_TOOLTIP_*` | Tooltip Foreground 出现 / 消失 scale |
@@ -40,6 +40,7 @@
 
 ## 变更记录
 
+- v1.17.0 (2026-08-21): 恢复 Tooltip 快速重定向的 `60 / 90 / 160ms / 0.35ms/px` 和 `0.02` 内容滞后 token；由公开 `rapidRetarget` 开关决定是否消费，默认开启。
 - v1.16.0 (2026-08-21): 删除 Tooltip 快速重定向专属的 duration、per-pixel、content lag 和宽度时长兼容别名；所有连续改目标统一消费普通连续交接 token。
 - v1.15.0 (2026-08-21): Tooltip Foreground 出现缩放起点由 `0.98` 调整为 `0.94`，出现时长收敛为 `110ms`，新增 `2px` placement 定向滑入距离。
 - v1.14.0 (2026-08-21): Tooltip 连续交接调整为最初版本约 `0.75` 倍速度：稳定段使用 `160 / 180 / 360ms / 0.6ms/px`，retarget 使用 `60 / 90 / 160ms / 0.35ms/px`；内容相位关系不变。

@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.9.1
+ * v1.10.0
  */
 export const examples = [
     {
@@ -195,6 +195,28 @@ export const examples = [
             "IntrinsicSize",
             "ContentIsolation",
         ],
+    },
+    {
+        name: "E4: 快速重定向对照 (Rapid Retarget Comparison)",
+        code: `E4
+<div class="p-40 flex-row gap-40">
+    <div class="flex-col gap-4">
+        <Text>快速重定向（默认开启）</Text>
+        <Button>保存<Tooltip>保存当前配置</Tooltip></Button>
+        <Button>复制<Tooltip>复制分享链接</Tooltip></Button>
+        <Button>下载<Tooltip>下载完整报告文件</Tooltip></Button>
+    </div>
+    <div class="flex-col gap-4">
+        <Text>普通时间线</Text>
+        <Button>保存<Tooltip rapidRetarget={false}>保存当前配置</Tooltip></Button>
+        <Button>复制<Tooltip rapidRetarget={false}>复制分享链接</Tooltip></Button>
+        <Button>下载<Tooltip rapidRetarget={false}>下载完整报告文件</Tooltip></Button>
+    </div>
+</div>`,
+        expected: {
+            interaction: "快速扫过同列按钮时，左列的中断段使用 90–160ms 缓出快速接管；右列始终使用普通 180–360ms 协调时间线。两列均从当前可见画面接管且不排队",
+        },
+        logic: ["RapidRetarget", "Comparison", "ContinuousTooltip"],
     },
     {
         name: "F1: 动效感知立即关闭 (Dismiss On Motion)",

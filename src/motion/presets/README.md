@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.25.0
+> **版本**: v1.26.0
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -11,7 +11,7 @@
 | `GENERIC_SCALE_APPEAR_MOTION` | 普通组件显式 opt-in 保留 generic opacity + scale 进入 | Frame 默认 fallback、语义明确的 overlay / Tooltip / Dialog | SnowUI 旧 generic appear 组合的兼容显式 preset |
 | `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION` | Popover、Listbox、Menu dropdown，仅 opacity | Tooltip、Dialog、普通内容替换 | SnowUI dropdown overlay |
 | `TOOLTIP_APPEAR_MOTION` / `getTooltipAppearMotion()` / `TOOLTIP_DISAPPEAR_MOTION` | Tooltip Foreground 的 opacity + scale 与按最终 placement 定向滑入；不得用于 Portal、size shell 或 Backdrop | Dropdown、Dialog、承载 backdrop-filter 的祖先 | transitions.dev Tooltip + SnowUI backdrop-filter 合成约束 |
-| `TOOLTIP_CONTINUOUS_*_DURATION_*` / `TOOLTIP_CONTINUOUS_CONTENT_LAG` | 连续 Tooltip 统一以 `180–360ms` 正弦协调时间线呈现；执行中改目标从当前可见画面重新使用同一时间线和 `0.08` 内容滞后，不设快速重定向专属参数 | Tooltip 首次出现、远距离直接定位、reduced-motion | 参考视频协调交接 + 高频 hover 与复杂 Snippet 验证 |
+| `TOOLTIP_CONTINUOUS_*_DURATION_*` / `TOOLTIP_CONTINUOUS_*_CONTENT_LAG` | 普通连续 Tooltip 使用 `180–360ms` 正弦协调时间线；默认快速重定向使用 `90–160ms` cubic ease-out 与 `0.02` 内容滞后，关闭 `rapidRetarget` 后中断继续使用普通时间线 | Tooltip 首次出现、远距离直接定位、reduced-motion | 参考视频协调交接 + 高频 hover 与复杂 Snippet 验证 |
 | `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION` | Dialog / Modal 内容面板 | Tooltip、Dropdown | transitions.dev Modal open / close |
 | `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION` | Dialog 遮罩 opacity | 内容面板 scale | SnowUI Dialog 当前遮罩行为 |
 | `REPLACEMENT_APPEAR_MOTION` | Icon / Text / CodeBlock 等内容替换 | Overlay、Dialog | SnowUI replacement default |
@@ -44,6 +44,7 @@
 
 ## 变更记录
 
+- v1.26.0 (2026-08-21): 恢复默认开启、可通过 `rapidRetarget` 关闭的 Tooltip 快速重定向 preset；中断段使用 `90–160ms` cubic ease-out 与 `0.02` 内容滞后，宽度回弹时间线保持独立。
 - v1.25.0 (2026-08-21): 删除 Tooltip 快速重定向的专属时长、cubic ease-out、内容滞后和 preset 导出；运动中改目标仍从当前画面接管，但与普通连续切换使用同一正弦时间线。
 - v1.24.0 (2026-08-21): Tooltip Foreground 以 `110ms` 从 `0.94` 放大到 `1`，并通过 `getTooltipAppearMotion()` 按最终 placement 从触发器方向反向滑入 `2px`。
 - v1.23.0 (2026-08-21): Tooltip 连续裁切揭示调整为最初版本约 `0.75` 倍速度；稳定段为 `180–360ms`，retarget 为 `90–160ms`，内容相位关系不变。

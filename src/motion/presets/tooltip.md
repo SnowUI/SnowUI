@@ -1,6 +1,6 @@
 # tooltip.ts 文档
 
-> **版本**: v1.6.9
+> **版本**: v1.7.0
 > **职责**: 提供 Tooltip 出现 / 消失 preset。
 
 `TOOLTIP_APPEAR_MOTION`、`getTooltipAppearMotion()` 与 `TOOLTIP_DISAPPEAR_MOTION` 专用于 Tooltip Foreground，不与 dropdown overlay 或 Dialog 共用。
@@ -16,7 +16,7 @@
 3. Tooltip 首次 hover 延迟不在本文件，归 `lib/overlay-trigger-timing.ts`。
 4. 退出卸载时间使用 `TOOLTIP_DISAPPEAR_TOTAL_MS`。
 5. 连续切换的宽度变化使用 `getTooltipWidthSpringState()`；该曲线只控制宽度，不替换位置、高度或内容进度。
-6. 运动中改目标不设置 retarget 专属 token 或 preset；从当前可见画面重新使用普通连续切换时间线。
+6. `rapidRetarget` 默认开启；运动中改目标从当前可见画面使用 `90–160ms` cubic ease-out 与 `0.02` 内容滞后接管。关闭后使用普通 `180–360ms` 正弦协调时间线。
 
 ## 问题与修复记录
 
@@ -55,6 +55,7 @@
 
 ## 变更记录
 
+- v1.7.0 (2026-08-21): 恢复快速重定向的专属时长、cubic ease-out 与内容滞后；新增默认开启的 `rapidRetarget` 开关，宽度回弹仍保持独立时间线。
 - v1.6.9 (2026-08-21): 删除快速重定向专属参数及宽度 retarget 兼容别名；运动中改目标改为与普通连续切换共用同一时间线。
 - v1.6.8 (2026-08-21): 小宽度差增加 `1.5px` 双向回弹下限；内容移动与 `450ms` 旧层保留时长解耦。
 - v1.6.7 (2026-08-21): 新增 `450ms` 宽度首次回弹点时长，供连续内容带覆盖主要宽度形变阶段。
