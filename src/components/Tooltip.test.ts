@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.10.0
+ * v1.10.1
  */
 export const examples = [
     {
@@ -141,7 +141,7 @@ export const examples = [
     </div>
 </div>`,
         expected: {
-            render: "仅显示两列按钮与 Tooltip；左列显式开启回弹，右列使用默认关闭，不再显示动效控制项",
+            render: "仅显示两列按钮与 Tooltip；左列显式开启回弹，右列使用默认关闭。长内容切换到短内容时，短内容在尚未收敛的外框中继续按 top placement 水平居中，不贴在外框左侧",
             interaction: "依次 hover 同列按钮即可直接比较有回弹与无回弹的宽度变化；两列都保留连续裁切揭示",
         },
         logic: ["WidthRebound", "Comparison", "ContinuousTooltip"],

@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.22.0
+ Tooltip 文字提示组件 v1.22.1
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 不拼接内容带时，新内容在宽高过渡期间按最终 placement 保持局部对齐，不再默认停留在外框左上角。
  变更 (2026-08-21): 恢复默认开启的快速重定向，并新增 rapidRetarget 开关；关闭后运动中改目标继续使用普通协调时间线。
  变更 (2026-08-21): widthRebound 默认值改为 false；需要宽度越界回弹时显式开启。
  变更 (2026-08-21): 新增默认开启的 widthRebound；关闭时连续切换宽度沿协调时间线直接收敛，不产生越界回弹。
@@ -524,6 +525,30 @@
 
     function interpolate(start: number, end: number, progress: number) {
         return start + (end - start) * progress;
+    }
+
+    function getLocallyAlignedContentOffset(
+        containerSize: { width: number; height: number },
+        contentSize: { width: number; height: number },
+        position: FloatingSide,
+    ) {
+        const widthDifference = containerSize.width - contentSize.width;
+        const heightDifference = containerSize.height - contentSize.height;
+
+        return {
+            x:
+                position === "left"
+                    ? widthDifference
+                    : position === "right"
+                      ? 0
+                      : widthDifference / 2,
+            y:
+                position === "top"
+                    ? heightDifference
+                    : position === "bottom"
+                      ? 0
+                      : heightDifference / 2,
+        };
     }
 
     function getWidthAnchoredLeft(
@@ -1112,14 +1137,16 @@
                 x: startRect.left - initialBaseBounds.left,
                 y: startRect.top - initialBaseBounds.top,
             };
-            incomingLayerOffset = {
-                x: canJoinContentTrack
-                    ? incomingTrackRect.left - startRect.left
-                    : 0,
-                y: canJoinContentTrack
-                    ? incomingTrackRect.top - startRect.top
-                    : 0,
-            };
+            incomingLayerOffset = canJoinContentTrack
+                ? {
+                      x: incomingTrackRect.left - startRect.left,
+                      y: incomingTrackRect.top - startRect.top,
+                  }
+                : getLocallyAlignedContentOffset(
+                      startRect,
+                      targetRect,
+                      bestPos,
+                  );
             outgoingLayerOffset = {
                 x: oldTarget.left - startRect.left,
                 y: oldTarget.top - startRect.top,
@@ -1234,7 +1261,12 @@
                                     currentShell.top,
                             };
                         } else {
-                            incomingLayerOffset = { x: 0, y: 0 };
+                            incomingLayerOffset =
+                                getLocallyAlignedContentOffset(
+                                    currentSize,
+                                    targetRect,
+                                    bestPos,
+                                );
                         }
 
                         if (
