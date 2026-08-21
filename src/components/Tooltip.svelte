@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.19.7
+ Tooltip 文字提示组件 v1.19.8
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 内容移动恢复原 180–360ms，仅旧层保留到 450ms；小宽度差提供 1.5px 回弹下限，避免 E1 亚像素回弹与内容抖动。
  变更 (2026-08-21): 内容带持续到宽度首次回弹点约 450ms，避免 E1 长内容切短内容时裁切提前消失并留下孤立宽度变化。
  变更 (2026-08-21): 宽度完全退出快速重定向分支；每次改目标都从当前宽度以同一 1000ms / 3% 弹簧重新响应。
  变更 (2026-08-21): 快速重定向不再切换速率；宽度弹簧统一为 1000ms，并继承上一段的实时速度。
@@ -1082,12 +1083,19 @@
                     ? TOOLTIP_CONTINUOUS_WIDTH_SPRING_DURATION_MS
                     : motionDuration;
             const contentDuration = canJoinContentTrack
+                ? motionDuration
+                : 0;
+            const contentRetentionDuration = canJoinContentTrack
                 ? Math.max(
                       motionDuration,
                       TOOLTIP_CONTINUOUS_WIDTH_REVEAL_DURATION_MS,
                   )
                 : 0;
-            const totalDuration = Math.max(motionDuration, widthDuration);
+            const totalDuration = Math.max(
+                motionDuration,
+                widthDuration,
+                contentRetentionDuration,
+            );
             const revision = ++switchMotionRevision;
             moveMode = "snap";
             switchPhase = "prepare";
@@ -1227,7 +1235,10 @@
                             incomingLayerOffset = { x: 0, y: 0 };
                         }
 
-                        if (!contentSettled && elapsed >= contentDuration) {
+                        if (
+                            !contentSettled &&
+                            elapsed >= contentRetentionDuration
+                        ) {
                             contentSettled = true;
                             outgoingOverlay = null;
                             outgoingTargetRect = undefined;

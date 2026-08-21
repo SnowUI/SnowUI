@@ -20,6 +20,7 @@ import {
     MOTION_PROGRESS_TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG,
     MOTION_DURATION_TOOLTIP_CONTINUOUS_WIDTH_SPRING_MS,
     MOTION_DURATION_TOOLTIP_CONTINUOUS_WIDTH_REVEAL_MS,
+    MOTION_DISTANCE_TOOLTIP_CONTINUOUS_WIDTH_MIN_REBOUND_PX,
     MOTION_DURATION_TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_MS,
     MOTION_SPRING_TOOLTIP_WIDTH_DAMPING,
     MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY,
@@ -128,7 +129,21 @@ export function getTooltipWidthSpringState(
     const envelope = Math.exp(-decay * elapsedSeconds);
     const relativeWidth =
         envelope * (displacement * cosine + sineCoefficient * sine);
-    return targetWidth + relativeWidth;
+    const naturalPeakRatio = Math.exp(
+        (-decay * Math.PI) / angularFrequency,
+    );
+    const naturalPeakDistance = Math.abs(displacement) * naturalPeakRatio;
+    const reboundScale =
+        naturalPeakDistance > 0
+            ? Math.max(
+                  1,
+                  MOTION_DISTANCE_TOOLTIP_CONTINUOUS_WIDTH_MIN_REBOUND_PX /
+                      naturalPeakDistance,
+              )
+            : 1;
+    const isPastTarget = relativeWidth * displacement < 0;
+
+    return targetWidth + relativeWidth * (isPastTarget ? reboundScale : 1);
 }
 
 /** @deprecated Continuous Tooltip now uses one bounded coordinated timeline. */
