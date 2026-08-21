@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.19.5
+ Tooltip 文字提示组件 v1.19.6
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-21): 宽度完全退出快速重定向分支；每次改目标都从当前宽度以同一 1000ms / 3% 弹簧重新响应。
  变更 (2026-08-21): 快速重定向不再切换速率；宽度弹簧统一为 1000ms，并继承上一段的实时速度。
  变更 (2026-08-21): 宽度越界进一步收敛到约 3%，稳定 / 重定向弹性放慢至 1000ms / 640ms。
  变更 (2026-08-21): 宽度越界收敛到约 5%，稳定 / 重定向弹性放慢至 900ms / 560ms。
@@ -291,7 +292,6 @@
     let positionUpdateFrame: number | undefined;
     let switchMotionFrame: number | undefined;
     let animatedShellSize = $state<{ width: number; height: number }>();
-    let switchWidthVelocityPxPerSecond = 0;
     let switchShellDurationMs = $state(0);
     let switchWidthDurationMs = $state(0);
     let switchContentDurationMs = $state(0);
@@ -374,7 +374,6 @@
         switchRetargeting = false;
         pendingSwitchRetarget = false;
         animatedShellSize = undefined;
-        switchWidthVelocityPxPerSecond = 0;
         switchShellDurationMs = 0;
         switchWidthDurationMs = 0;
         switchContentDurationMs = 0;
@@ -421,7 +420,6 @@
     function finishSwitchMotion(revision: number) {
         if (revision !== switchMotionRevision) return;
         animatedShellSize = undefined;
-        switchWidthVelocityPxPerSecond = 0;
         switchShellDurationMs = 0;
         switchWidthDurationMs = 0;
         switchContentDurationMs = 0;
@@ -1077,12 +1075,8 @@
                 ? Math.hypot(alignment.x, alignment.y)
                 : 0;
             const shellDuration = motionDuration;
-            const initialWidthVelocityPxPerSecond = isRetargeting
-                ? switchWidthVelocityPxPerSecond
-                : 0;
             const widthDuration =
-                Math.abs(targetRect.width - startRect.width) > 0.5 ||
-                Math.abs(initialWidthVelocityPxPerSecond) > 1
+                Math.abs(targetRect.width - startRect.width) > 0.5
                     ? TOOLTIP_CONTINUOUS_WIDTH_SPRING_DURATION_MS
                     : motionDuration;
             const contentDuration = canJoinContentTrack ? motionDuration : 0;
@@ -1147,20 +1141,17 @@
                             timelineProgress,
                             isRetargeting,
                         );
-                        const widthState = getTooltipWidthSpringState(
+                        const currentWidth = getTooltipWidthSpringState(
                             startRect.width,
                             targetRect.width,
-                            initialWidthVelocityPxPerSecond,
                             elapsed,
                         );
-                        switchWidthVelocityPxPerSecond =
-                            widthState.velocityPxPerSecond;
                         const contentProgress = getContentProgress(
                             shellProgress,
                             contentLag,
                         );
                         const currentSize = {
-                            width: widthState.width,
+                            width: currentWidth,
                             height: interpolate(
                                 startRect.height,
                                 targetRect.height,
@@ -1257,7 +1248,6 @@
             switchRetargeting = false;
             pendingSwitchRetarget = false;
             animatedShellSize = undefined;
-            switchWidthVelocityPxPerSecond = 0;
             switchShellDurationMs = 0;
             switchWidthDurationMs = 0;
             switchContentDurationMs = 0;
@@ -1448,7 +1438,6 @@
                 switchRetargeting = false;
                 pendingSwitchRetarget = false;
                 animatedShellSize = undefined;
-                switchWidthVelocityPxPerSecond = 0;
                 switchShellDurationMs = 0;
                 switchWidthDurationMs = 0;
                 switchContentDurationMs = 0;

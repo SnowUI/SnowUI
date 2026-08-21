@@ -100,6 +100,7 @@ export const TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG =
     MOTION_PROGRESS_TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG;
 export const TOOLTIP_CONTINUOUS_WIDTH_SPRING_DURATION_MS =
     MOTION_DURATION_TOOLTIP_CONTINUOUS_WIDTH_SPRING_MS;
+/** @deprecated Width no longer has a retarget timing; kept for HMR compatibility. */
 export const TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_DURATION_MS =
     MOTION_DURATION_TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_MS;
 
@@ -111,30 +112,20 @@ export const TOOLTIP_CONTINUOUS_RETARGET_WIDTH_SPRING_DURATION_MS =
 export function getTooltipWidthSpringState(
     startWidth: number,
     targetWidth: number,
-    initialVelocityPxPerSecond: number,
     elapsedMs: number,
 ) {
     const elapsedSeconds = Math.max(0, elapsedMs) / 1000;
     const displacement = startWidth - targetWidth;
     const decay = MOTION_SPRING_TOOLTIP_WIDTH_DAMPING;
     const angularFrequency = MOTION_SPRING_TOOLTIP_WIDTH_FREQUENCY;
-    const sineCoefficient =
-        (initialVelocityPxPerSecond + decay * displacement) / angularFrequency;
+    const sineCoefficient = (decay * displacement) / angularFrequency;
     const phase = angularFrequency * elapsedSeconds;
     const cosine = Math.cos(phase);
     const sine = Math.sin(phase);
     const envelope = Math.exp(-decay * elapsedSeconds);
     const relativeWidth =
         envelope * (displacement * cosine + sineCoefficient * sine);
-    const velocityPxPerSecond =
-        envelope *
-        ((-decay * displacement + angularFrequency * sineCoefficient) * cosine +
-            (-decay * sineCoefficient - angularFrequency * displacement) * sine);
-
-    return {
-        width: targetWidth + relativeWidth,
-        velocityPxPerSecond,
-    };
+    return targetWidth + relativeWidth;
 }
 
 /** @deprecated Continuous Tooltip now uses one bounded coordinated timeline. */
