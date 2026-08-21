@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.10.2
+ * v1.10.3
  */
 export const examples = [
     {
@@ -130,18 +130,18 @@ export const examples = [
         code: `E2
 <div class="p-40 flex-row gap-40">
     <div class="flex-col gap-12">
-        <Button>开启 · 短<Tooltip widthRebound>短提示</Tooltip></Button>
-        <Button>开启 · 中<Tooltip widthRebound>中等长度的提示内容</Tooltip></Button>
-        <Button>开启 · 长<Tooltip widthRebound>这是一段用于观察宽度变宽与缩小回弹的较长提示内容</Tooltip></Button>
+        <Button>开启 · 短<Tooltip widthRebound variant="dark">短提示</Tooltip></Button>
+        <Button>开启 · 中<Tooltip widthRebound variant="dark">中等长度的提示内容</Tooltip></Button>
+        <Button>开启 · 长<Tooltip widthRebound variant="dark">这是一段用于观察宽度变宽与缩小回弹的较长提示内容</Tooltip></Button>
     </div>
     <div class="flex-col gap-12">
-        <Button>关闭 · 短<Tooltip>短提示</Tooltip></Button>
-        <Button>关闭 · 中<Tooltip>中等长度的提示内容</Tooltip></Button>
-        <Button>关闭 · 长<Tooltip>这是一段用于观察宽度直接收敛的较长提示内容</Tooltip></Button>
+        <Button>关闭 · 短<Tooltip variant="dark">短提示</Tooltip></Button>
+        <Button>关闭 · 中<Tooltip variant="dark">中等长度的提示内容</Tooltip></Button>
+        <Button>关闭 · 长<Tooltip variant="dark">这是一段用于观察宽度直接收敛的较长提示内容</Tooltip></Button>
     </div>
 </div>`,
         expected: {
-            render: "仅显示两列按钮与 Tooltip；左列显式开启回弹，右列使用默认关闭。长内容切换到短内容时，短内容在尚未收敛的外框中继续按 top placement 水平居中，不贴在外框左侧",
+            render: "仅显示两列按钮与 dark Tooltip；左列显式开启回弹，右列使用默认关闭。长内容切换到短内容时，短内容在尚未收敛的外框中继续按 top placement 水平居中，不贴在外框左侧",
             interaction: "依次 hover 同列按钮即可直接比较有回弹与无回弹的宽度变化；两列都保留连续裁切揭示",
         },
         logic: ["WidthRebound", "Comparison", "ContinuousTooltip"],
