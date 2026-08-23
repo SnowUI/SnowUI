@@ -1,7 +1,8 @@
 <!--
- Tooltip 文字提示组件 v1.22.2
+ Tooltip 文字提示组件 v1.22.3
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
+ 变更 (2026-08-24): warm 切换在新内容提交后立即测量并定位，删除 prepare 后额外等待的启动帧，使连续切换在首个可用绘制帧进入 moving。
  变更 (2026-08-21): 快速重定向只在位置与内容交接尚未完成时生效；独立宽度回弹尾段不再压缩下一次连续裁切时间线。
  变更 (2026-08-21): 不拼接内容带时，新内容在宽高过渡期间按最终 placement 保持局部对齐，不再默认停留在外框左上角。
  变更 (2026-08-21): 恢复默认开启的快速重定向，并新增 rapidRetarget 开关；关闭后运动中改目标继续使用普通协调时间线。
@@ -787,6 +788,26 @@
         }
         renderedOverlay = overlayState;
 
+        if (
+            previousRenderedOverlay &&
+            previousRenderedOverlay.id !== overlayState.id
+        ) {
+            const switchingToId = overlayState.id;
+            tick().then(() => {
+                if (
+                    currentOverlay?.id !== switchingToId ||
+                    renderedOverlay?.id !== switchingToId ||
+                    !sizeContentRef
+                ) {
+                    return;
+                }
+                pendingMeasuredSize = measureTooltipContentSize(sizeContentRef);
+                measuredOverlayId = switchingToId;
+                cancelPositionUpdate();
+                updatePosition();
+            });
+        }
+
         if (!overlayWasVisible) {
             resetMotionBaseline();
             portalLifecycleState = "Appear";
@@ -829,32 +850,58 @@
         const overlayState = currentOverlay;
         void overlayState?.id;
         void overlayState?.fallbackContent;
-        if (overlayVisible && overlayState) tick().then(schedulePositionUpdate);
+        if (overlayVisible && overlayState) {
+            const overlayId = overlayState.id;
+            tick().then(() => {
+                if (
+                    lastPositionTooltipId === overlayId &&
+                    measuredOverlayId === overlayId
+                ) {
+                    return;
+                }
+                schedulePositionUpdate();
+            });
+        }
     });
+
+    function measureTooltipContentSize(
+        el: HTMLElement,
+        entry?: ResizeObserverEntry,
+    ) {
+        const borderBox = entry?.borderBoxSize?.[0];
+        const shellStyle = sizeShellRef
+            ? getComputedStyle(sizeShellRef)
+            : undefined;
+        const paddingX =
+            parseFloat(shellStyle?.paddingLeft ?? "0") +
+            parseFloat(shellStyle?.paddingRight ?? "0");
+        const paddingY =
+            parseFloat(shellStyle?.paddingTop ?? "0") +
+            parseFloat(shellStyle?.paddingBottom ?? "0");
+
+        return {
+            width: Math.ceil((borderBox?.inlineSize ?? el.offsetWidth) + paddingX),
+            height: Math.ceil(
+                (borderBox?.blockSize ?? el.offsetHeight) + paddingY,
+            ),
+        };
+    }
 
     $effect(() => {
         const el = sizeContentRef;
         if (!el) return;
 
         const updateMeasuredSize = (entry?: ResizeObserverEntry) => {
-            const borderBox = entry?.borderBoxSize?.[0];
-            const shellStyle = sizeShellRef
-                ? getComputedStyle(sizeShellRef)
-                : undefined;
-            const paddingX =
-                parseFloat(shellStyle?.paddingLeft ?? "0") +
-                parseFloat(shellStyle?.paddingRight ?? "0");
-            const paddingY =
-                parseFloat(shellStyle?.paddingTop ?? "0") +
-                parseFloat(shellStyle?.paddingBottom ?? "0");
-
-            pendingMeasuredSize = {
-                width: Math.ceil((borderBox?.inlineSize ?? el.offsetWidth) + paddingX),
-                height: Math.ceil(
-                    (borderBox?.blockSize ?? el.offsetHeight) + paddingY,
-                ),
-            };
-            measuredOverlayId = renderedOverlay?.id ?? tooltipId;
+            const nextMeasuredSize = measureTooltipContentSize(el, entry);
+            const nextMeasuredOverlayId = renderedOverlay?.id ?? tooltipId;
+            const needsPositionUpdate =
+                measuredOverlayId !== nextMeasuredOverlayId ||
+                lastPositionTooltipId !== nextMeasuredOverlayId ||
+                pendingMeasuredSize.width !== nextMeasuredSize.width ||
+                pendingMeasuredSize.height !== nextMeasuredSize.height;
+            pendingMeasuredSize = nextMeasuredSize;
+            measuredOverlayId = nextMeasuredOverlayId;
+            if (!needsPositionUpdate) return;
             tick().then(schedulePositionUpdate);
         };
 
@@ -1166,142 +1213,138 @@
 
             tick().then(() => {
                 if (revision !== switchMotionRevision) return;
-                switchMotionFrame = window.requestAnimationFrame(() => {
+                moveMode = "frame";
+                switchPhase = "moving";
+                const startedAt = performance.now();
+                let contentSettled = false;
+
+                const animate = (now: number) => {
                     if (revision !== switchMotionRevision) return;
-                    moveMode = "frame";
-                    switchPhase = "moving";
-                    const startedAt = performance.now();
-                    let contentSettled = false;
-
-                    const animate = (now: number) => {
-                        if (revision !== switchMotionRevision) return;
-                        const elapsed = now - startedAt;
-                        if (
-                            switchHandoffActive &&
-                            elapsed >= motionDuration
-                        ) {
-                            switchHandoffActive = false;
-                        }
-                        const timelineProgress = getMotionProgress(
-                            elapsed,
-                            motionDuration,
-                        );
-                        const shellProgress = getCoordinatedProgress(
-                            timelineProgress,
-                            isRetargeting,
-                        );
-                        const contentTimelineProgress = getMotionProgress(
-                            elapsed,
-                            contentDuration,
-                        );
-                        const contentBaseProgress = getCoordinatedProgress(
-                            contentTimelineProgress,
-                            isRetargeting,
-                        );
-                        const currentWidth = shouldReboundWidth
-                            ? getTooltipWidthSpringState(
-                                  startRect.width,
-                                  targetRect.width,
-                                  elapsed,
-                              )
-                            : interpolate(
-                                  startRect.width,
-                                  targetRect.width,
-                                  shellProgress,
-                              );
-                        const contentProgress = getContentProgress(
-                            contentBaseProgress,
-                            contentLag,
-                        );
-                        const currentSize = {
-                            width: currentWidth,
-                            height: interpolate(
-                                startRect.height,
-                                targetRect.height,
-                                shellProgress,
-                            ),
-                        };
-                        animatedShellSize = currentSize;
-                        const currentBaseBounds = getFloatingVisualBounds(
+                    const elapsed = now - startedAt;
+                    if (
+                        switchHandoffActive &&
+                        elapsed >= motionDuration
+                    ) {
+                        switchHandoffActive = false;
+                    }
+                    const timelineProgress = getMotionProgress(
+                        elapsed,
+                        motionDuration,
+                    );
+                    const shellProgress = getCoordinatedProgress(
+                        timelineProgress,
+                        isRetargeting,
+                    );
+                    const contentTimelineProgress = getMotionProgress(
+                        elapsed,
+                        contentDuration,
+                    );
+                    const contentBaseProgress = getCoordinatedProgress(
+                        contentTimelineProgress,
+                        isRetargeting,
+                    );
+                    const currentWidth = shouldReboundWidth
+                        ? getTooltipWidthSpringState(
+                              startRect.width,
+                              targetRect.width,
+                              elapsed,
+                          )
+                        : interpolate(
+                              startRect.width,
+                              targetRect.width,
+                              shellProgress,
+                          );
+                    const contentProgress = getContentProgress(
+                        contentBaseProgress,
+                        contentLag,
+                    );
+                    const currentSize = {
+                        width: currentWidth,
+                        height: interpolate(
+                            startRect.height,
+                            targetRect.height,
+                            shellProgress,
+                        ),
+                    };
+                    animatedShellSize = currentSize;
+                    const currentBaseBounds = getFloatingVisualBounds(
+                        bestPos,
+                        bestCoords,
+                        currentSize,
+                    );
+                    const currentShell = {
+                        left: getWidthAnchoredLeft(
+                            startRect,
+                            targetRect,
+                            currentSize.width,
+                            shellProgress,
                             bestPos,
-                            bestCoords,
-                            currentSize,
-                        );
-                        const currentShell = {
-                            left: getWidthAnchoredLeft(
-                                startRect,
-                                targetRect,
-                                currentSize.width,
-                                shellProgress,
-                                bestPos,
-                            ),
-                            top: interpolate(
-                                startRect.top,
-                                targetRect.top,
-                                shellProgress,
-                            ),
-                        };
-                        shellMotionOffset = {
-                            x: currentShell.left - currentBaseBounds.left,
-                            y: currentShell.top - currentBaseBounds.top,
-                        };
-
-                        if (canJoinContentTrack) {
-                            const contentShift = {
-                                x: alignment.x * contentProgress,
-                                y: alignment.y * contentProgress,
-                            };
-                            incomingLayerOffset = {
-                                x:
-                                    incomingTrackRect.left +
-                                    contentShift.x -
-                                    currentShell.left,
-                                y:
-                                    incomingTrackRect.top +
-                                    contentShift.y -
-                                    currentShell.top,
-                            };
-                            outgoingLayerOffset = {
-                                x:
-                                    oldTarget.left +
-                                    contentShift.x -
-                                    currentShell.left,
-                                y:
-                                    oldTarget.top +
-                                    contentShift.y -
-                                    currentShell.top,
-                            };
-                        } else {
-                            incomingLayerOffset =
-                                getLocallyAlignedContentOffset(
-                                    currentSize,
-                                    targetRect,
-                                    bestPos,
-                                );
-                        }
-
-                        if (
-                            !contentSettled &&
-                            elapsed >= contentRetentionDuration
-                        ) {
-                            contentSettled = true;
-                            outgoingOverlay = null;
-                            outgoingTargetRect = undefined;
-                            outgoingAlignedRect = undefined;
-                            outgoingContentRect = undefined;
-                            outgoingLayerOffset = { x: 0, y: 0 };
-                        }
-
-                        if (elapsed >= totalDuration) {
-                            switchMotionFrame = undefined;
-                            finishSwitchMotion(revision);
-                            return;
-                        }
-                        switchMotionFrame = window.requestAnimationFrame(animate);
+                        ),
+                        top: interpolate(
+                            startRect.top,
+                            targetRect.top,
+                            shellProgress,
+                        ),
+                    };
+                    shellMotionOffset = {
+                        x: currentShell.left - currentBaseBounds.left,
+                        y: currentShell.top - currentBaseBounds.top,
                     };
 
-                    animate(startedAt);
-                });
+                    if (canJoinContentTrack) {
+                        const contentShift = {
+                            x: alignment.x * contentProgress,
+                            y: alignment.y * contentProgress,
+                        };
+                        incomingLayerOffset = {
+                            x:
+                                incomingTrackRect.left +
+                                contentShift.x -
+                                currentShell.left,
+                            y:
+                                incomingTrackRect.top +
+                                contentShift.y -
+                                currentShell.top,
+                        };
+                        outgoingLayerOffset = {
+                            x:
+                                oldTarget.left +
+                                contentShift.x -
+                                currentShell.left,
+                            y:
+                                oldTarget.top +
+                                contentShift.y -
+                                currentShell.top,
+                        };
+                    } else {
+                        incomingLayerOffset = getLocallyAlignedContentOffset(
+                            currentSize,
+                            targetRect,
+                            bestPos,
+                        );
+                    }
+
+                    if (
+                        !contentSettled &&
+                        elapsed >= contentRetentionDuration
+                    ) {
+                        contentSettled = true;
+                        outgoingOverlay = null;
+                        outgoingTargetRect = undefined;
+                        outgoingAlignedRect = undefined;
+                        outgoingContentRect = undefined;
+                        outgoingLayerOffset = { x: 0, y: 0 };
+                    }
+
+                    if (elapsed >= totalDuration) {
+                        switchMotionFrame = undefined;
+                        finishSwitchMotion(revision);
+                        return;
+                    }
+                    switchMotionFrame = window.requestAnimationFrame(animate);
+                };
+
+                animate(startedAt);
             });
         } else if (isSwitchingTooltip) {
             cancelSwitchMotion();

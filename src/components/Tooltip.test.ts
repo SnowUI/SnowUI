@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.10.3
+ * v1.10.4
  */
 export const examples = [
     {
@@ -113,7 +113,7 @@ export const examples = [
             accessibility:
                 "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
             performance:
-                "多 Tooltip 实例只有唯一共享 Portal host 监听 Overlay、scroll、resize 和 reduced-motion；同帧的多次定位请求合并为一次，实例数增加不得线性增加全局监听",
+                "多 Tooltip 实例只有唯一共享 Portal host 监听 Overlay、scroll、resize 和 reduced-motion；warm 切换在新内容提交后的首个可用绘制帧进入 moving，同帧的重复定位请求仍合并，实例数增加不得线性增加全局监听",
         },
         logic: [
             "Warmup",
@@ -123,6 +123,7 @@ export const examples = [
             "TwoDimensionalContentTrack",
             "FourPixelJoinThreshold",
             "ReducedMotion",
+            "FirstPaintSwitchStart",
         ],
     },
     {
