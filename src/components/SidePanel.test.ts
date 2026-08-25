@@ -34,7 +34,7 @@ export const examples = [
         expected: {
             render: "右侧 460px 浮层面板出现，上工具栏含预览切换/上一项/下一项；默认只读无下工具栏，底滚动遮罩仍在",
             layout: "面板与页面上右下保持 16px 间距，内容区独立滚动",
-            interaction: "Escape 或点击面板外关闭；指针在左边缘即可调整宽度",
+            interaction: "Escape 或点击面板外关闭；左侧边框全高均可拖拽调整宽度，边缘不显示宽度调整指示器",
             performance: "滚动条仅在内容溢出时显示",
             responsive: "窄屏时宽度不超过视口减 32px",
         },

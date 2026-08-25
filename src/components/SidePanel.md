@@ -1,6 +1,6 @@
 # SidePanel
 
-> **版本**: v1.3.1
+> **版本**: v1.4.0
 > **包归属**: PRO  
 > **职责**: 右侧详情弹出窗，支持浮层与页面右侧内嵌两种预览形态。
 
@@ -10,7 +10,7 @@
 - 组件视觉复用 Dialog 所属的 `.snowui-quick-action-panel` 面板基类，背景为 `Background/3`，背景模糊为 `blur(var(--size-10))`（基础 40px）。该视觉基类与出现/退出位移共同承接在外层 `.snowui-side-panel-motion-shell`，避免 transform 祖先隔离内层 `aside` 的 backdrop 采样；内层 `aside` 只保持稳定局部坐标系、内容与交互。不直接以 `Dialog` 为宿主。
 - 关闭：`closeOnEscape`（默认 true）+ `closeOnOutside`（默认 true，点击面板外关闭）。点击 `.snowui-table-row` 不关闭，便于已打开时切换行只换内容、不播退场/进场。
 - 内容区 `overflow-y: auto` + overlay scrollbar（根挂 `snowui-overlay-scrollbar-host`，hover 显示），与页面滚动隔离（`overscroll-behavior: contain`）；body 与直系子项 `min-width: 0` 防止长文案顶破右侧 padding。
-- 默认宽度为 `460px`，圆角 `20px`（`--radius-5`）；浮层模式与页面上、右、下边缘保持 16px 间距；宽度通过左边缘 `Indicator` 调整（`pinOffset` 4px）；命中带遵循 Indicator line 全高协议（视觉默认 16px）。
+- 默认宽度为 `460px`，圆角 `20px`（`--radius-5`）；浮层模式与页面上、右、下边缘保持 16px 间距；左侧边框全高均可拖拽调整宽度，边缘不显示宽度调整指示器。内部复用透明 Indicator 交互层保留 Pointer、键盘与 ARIA 调宽协议。
 - 内嵌模式（`placement="inline"`）默认去掉浮层阴影，使用真实边框 `border: var(--border-1) solid var(--black-10)`（1px / Black/10%），保证圆角边缘连续可见；高度默认 `100dvh - 32px`，可用根 `style` / `class` 或 `--snowui-side-panel-height-override` 覆盖。
 - 浮层以及独立内嵌模式的面板本体使用 `SIDE_PANEL_APPEAR_MOTION` / `SIDE_PANEL_DISAPPEAR_MOTION`。SidePanel 的**默认内嵌集成效果**以 `SidePanel-Demo.svelte` 为基准：面板仍浮在页面内容上方，由页面常驻 fixed rail 承载；指定内容区同步让出 `panelWidth + 16px`，形成“浮动停靠 + 挤压指定内容”的效果。
 - 浮层 / 内嵌切换复用同一个稳定渲染宿主；组件只把该宿主在 `document.body` 与原 rail 位置之间迁移，不销毁并重建内容子树，避免切换时面板丢失或未提交的表单 DOM 状态被清空。
@@ -24,7 +24,7 @@
 - 上、下工具栏的内置 icon-only Button 显式使用 `emphasis="muted"`，并在 hover 时显示自身 `ariaLabel` 的 Tooltip；调用方显式传入的 `bottomLeading` / `bottomTrailing` 不会被改写。可通过 `parts.Button.emphasis` 统一覆盖内置按钮的强调级别。
 - 内置 placement、previous、next、copy、delete、cancel、save、close 文案通过 `LocaleProvider` / `useLocale()` 读取；对应 key 为 `sidePanel.placement.toInline`、`sidePanel.placement.toFloating`、`sidePanel.previous`、`sidePanel.next`、`sidePanel.copy`、`sidePanel.delete`、`sidePanel.cancel`、`sidePanel.save`、`sidePanel.close`。无 Provider 时为 `zh-CN`。`title` 与 actions 数组的 `label` / `ariaLabel` 属于调用方业务文案，保持最高优先级且不翻译。
 - 下栏优先级：Snippet **>** actions 数组 **>** 默认可编辑按钮。
-- 内置 Button / Indicator 通过 `parts.Button` / `parts.Indicator` 批量配置。
+- 内置 Button 与透明调宽交互层通过 `parts.Button` / `parts.Indicator` 批量配置；组件固定隐藏 Indicator 视觉。
 - 内容区滚动渐隐使用 `.snowui-scroll-mask` + `data-scroll-mask`。上/下 solid-ratio **0.8**。
 
 ## Props
@@ -49,7 +49,7 @@
 | `onPrevious` / `onNext` | `() => void \| Promise<void>` | — | 上一项 / 下一项（上栏内置按钮） |
 | `onCopy` / `onDelete` | `() => void \| Promise<void>` | — | 下栏默认复制 / 删除 |
 | `onClose` | `() => void \| Promise<void>` | — | 关闭前回调 |
-| `parts` | `{ Button?: ..., Indicator?: ... }` | — | 内置工具栏 Button 与宽度 Indicator |
+| `parts` | `{ Button?: ..., Indicator?: ... }` | — | 内置工具栏 Button 与透明调宽交互层；Indicator 视觉固定隐藏 |
 
 `SidePanelToolbarAction` 字段：
 
@@ -287,6 +287,7 @@ SidePanel 本身提供高度能力，但页面负责决定它相对于哪个空�
 
 ## Changelog
 
+- **SP-Init.31 / v1.4.0 (2026-08-25)**：左侧边框全高保持可拖拽调宽，移除可见宽度调整短条；透明 Indicator 交互层继续承接 Pointer、键盘、ARIA 与滚动条避让。
 - **SP-Init.30 / v1.3.2 (2026-08-09)**：适配 Button bare 默认 100%，内置 icon-only 工具操作显式使用 `emphasis="muted"` 保留原弱化视觉。
 
 - **SP-Init.29 / v1.3.1 (2026-07-20)**：修复从浮层切换到内嵌预览时，Portal 分支切换可能导致 SidePanel 消失的问题；改为迁移稳定渲染宿主并保留内容子树。

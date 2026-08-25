@@ -60,7 +60,7 @@
         width?: number;
         minWidth?: number;
         maxWidth?: number;
-        /** 是否允许通过右侧 Indicator 调整展开宽度。 */
+        /** 是否允许通过右侧边缘调整展开宽度。 */
         resizable?: boolean;
         activeItemId?: string;
         /** 是否记忆 active item 与 Section 折叠状态。 */
@@ -573,8 +573,8 @@
             axis="width"
             edge="end"
             pinOffset="var(--snowui-sidebar-resize-indicator-offset-override, var(--padding-1))"
-            hitAreaPadding="var(--padding-1)"
             class="snowui-sidebar-resize-indicator"
+            style="--snowui-indicator-color-override: transparent; --snowui-indicator-active-color-override: transparent"
             value={resolvedWidth}
             minSize={minWidth}
             maxSize={maxWidth}

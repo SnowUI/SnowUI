@@ -1,6 +1,6 @@
 # Sidebar（PRO Block）
 
-> **版本**: v1.7.3
+> **版本**: v1.8.0
 > **职责**: 提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。
 > **归属**: PRO Blocks / Template Block
 
@@ -14,10 +14,10 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 | `navigationVariant` | `"icon" \| "text"` | `"icon"` | 导航结构变体；`text` 折叠后只保留始终可见的展开按钮 |
 | `collapsed` | `boolean` | — | 受控折叠状态 |
 | `defaultCollapsed` | `boolean` | `false` | 非受控初始折叠状态 |
-| `width` | `number` | `220` | 展开宽度，支持 `bind:width`；拖拽右侧 Indicator 时实时更新 |
+| `width` | `number` | `220` | 展开宽度，支持 `bind:width`；拖拽右侧边框时实时更新 |
 | `minWidth` | `number` | `160` | 可拖拽展开宽度下限 |
 | `maxWidth` | `number` | `480` | 可拖拽展开宽度上限 |
-| `resizable` | `boolean` | `true` | 是否渲染右侧 Indicator 并允许调整展开宽度 |
+| `resizable` | `boolean` | `true` | 是否启用右侧边框调宽命中层 |
 | `activeItemId` | `string` | — | 唯一 active item 来源 |
 | `persistence` | `boolean` | `true` | 是否记忆 active item 与各 Section 折叠状态 |
 | `persistenceKey` | `string` | `"default"` | localStorage 实例命名空间；同一页面存在多个 Sidebar 时必须分别设置 |
@@ -25,7 +25,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 | `onWidthChange` | `(width: number) => void` | — | 展开宽度变化回调 |
 | `onActiveItemChange` | `(itemId: string) => void` | — | 导航选择回调 |
 | `children` | `Snippet` | — | 显式组合内容；可与 `sections` 同时使用 |
-| `parts` | `ComponentPartsOf` | — | 配置内置 Indicator，以及默认生成的 SnowUILogo / SidebarSection / SidebarItem |
+| `parts` | `ComponentPartsOf` | — | 配置调宽交互层使用的 Indicator，以及默认生成的 SnowUILogo / SidebarSection / SidebarItem；组件固定隐藏 Indicator 视觉 |
 
 默认 Logo 的 host 为 `as="logo"`，内部以 `SnowUILogo as="logo-icon" variant="icon"` 与 `SnowUILogo as="logo-wordmark" variant="text"` 明确区分图形和字标。直接子节点 `as="logo"` 会被安置到 Header 并完整替换默认 Logo；自定义 Logo 同样必须用它的直接子节点 `as="logo-icon"` 标记折叠后保留的图形，其余直接子节点视为展开态文字或字标并在折叠时隐藏。直接子节点 `as="footer"` 会被安置到底部覆盖 Footer。它们不抑制 `sections` 生成的 Body 内容，其余显式子节点会与 `sections` 依次渲染在 Body。第三方内容不支持 `as` 时，用对应角色的 `Frame` 包裹。Sidebar 根输出 `data-collapsed`，并提供 Sidebar Context。
 
@@ -46,9 +46,9 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 ## 布局与行为
 
-- 展开默认宽度 `220px`，折叠宽度 `60px`，高度 `100%`。`resizable={true}` 时，展开宽度可通过右边缘 `Indicator` 在默认 `160px`～`480px` 范围内拖拽，并通过 `width` / `bind:width` 与 `onWidthChange` 对外同步；设为 `false` 时不渲染 Indicator。
+- 展开默认宽度 `220px`，折叠宽度 `60px`，高度 `100%`。`resizable={true}` 时，右侧边框全高均可在默认 `160px`～`480px` 范围内拖拽调整展开宽度，并通过 `width` / `bind:width` 与 `onWidthChange` 对外同步；边缘不显示宽度调整指示器。设为 `false` 时不渲染透明调宽命中层。
 - 折叠与展开以 Sidebar 根宽度为主时间轴：展开宽度 → 60px 使用 `SIDE_PANEL_DISAPPEAR_MOTION` 的临界阻尼 spring timing，60px → 上次展开宽度使用 `SIDE_PANEL_APPEAR_MOTION` 的同系 timing；该 timing 复用 Frame 默认 move spring。拖拽期间临时关闭宽度 transition，使边缘与指针同步；`enableDefaultMotion={false}` 与系统 reduced motion 均关闭该过渡。
-- 右侧宽度 Indicator 仅在 `resizable={true}` 且展开态存在，鼠标进入 Sidebar 任意区域即显示；视觉中心默认距右边缘 `4px`，默认 16px 高视觉条的命中范围只覆盖视觉条上下各 `4px`，合计 24px，不再沿 Sidebar 全高截获指针。Indicator 与 Sidebar 的可见 overlay scrollbar Thumb 重叠时由 Indicator 通用能力自动隐藏，并关闭自身 Pointer、hover、拖拽与键盘命中，只保留滚动条交互。折叠不会覆盖已调整的展开宽度，再次展开时恢复该宽度。
+- 右侧透明调宽命中层仅在 `resizable={true}` 且展开态存在，沿 Sidebar 右侧边框全高铺开，不渲染可见短条。命中层与 Sidebar 的可见 overlay scrollbar Thumb 重叠时由 Indicator 通用能力自动关闭自身 Pointer、hover、拖拽与键盘命中，只保留滚动条交互。折叠不会覆盖已调整的展开宽度，再次展开时恢复该宽度。
 - 根容器默认 padding 为左右 `12px`（`var(--padding-3)`）、上下 `16px`（`var(--padding-4)`）；这是 Sidebar 组件默认值，不由使用方重复补 class 或 style。
 - Header 固定，`ScrollArea` 独立滚动并延伸到 Sidebar 底部；Footer 固定覆盖在 Body 之上。Sidebar 根的 Header / Body 默认 gap 为 `var(--gap-3)`（12px），即 Logo 区域与下方导航区域之间的默认间距；它与 Body 内相邻导航内容的 4px gap 是两个独立层级。
 - Body 纵向 overlay scrollbar 根据根横向 padding 自动外移，轨道右边缘始终距 Sidebar 右边框 `4px`；默认 12px 横向 padding 时其 `right` 偏移为 `-8px`。
@@ -97,8 +97,8 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 |:---|:---|:---|
 | `collapsed` | Context + `data-collapsed` | 通过 SidePanel spring timing 控制根宽度与子组件折叠视觉 |
 | `navigationVariant` | `data-navigation-variant` | `icon` 保留折叠图标轨；`text` 折叠后只保留展开按钮 |
-| `width` | bindable + Indicator | 右边缘拖拽更新展开宽度；折叠后保留 |
-| `resizable` | Indicator 条件渲染 | 关闭时不搭建拖拽宽度能力 |
+| `width` | bindable + 透明 Indicator 交互层 | 右侧边框全高拖拽更新展开宽度；折叠后保留 |
+| `resizable` | 透明 Indicator 交互层条件渲染 | 关闭时不搭建拖拽宽度能力 |
 | `activeItemId` | Context | SidebarItem 推导 active |
 | `persistence` / `persistenceKey` | localStorage + Context | 默认记忆 active 与 Section 折叠状态；可关闭或按实例隔离 |
 | `SidebarItemData.tags` | 透传 SidebarItem Snippet | 数据模式与显式组合模式共享任意标签能力 |
@@ -115,6 +115,12 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
 ## 更新日志 (Changelog)
+
+### v1.8.0 (2026-08-25)
+
+#### 交互变更
+- 右侧边框全高改为可拖拽调宽，不再把 Pointer 命中限制在短条附近。
+- 移除可见宽度调整短条，保留透明 Indicator 交互层承接 Pointer、键盘、ARIA 与滚动条避让。
 
 ### v1.7.3 (2026-08-17)
 
