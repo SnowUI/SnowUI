@@ -1,6 +1,6 @@
 # 通用效果 Motion Preset
 
-> **版本**: v1.6.0
+> **版本**: v1.7.0
 > **职责**: 将通用单 Frame 效果与 Button 背景层 CSS 动效整理为语义 preset。
 
 ## 导出
@@ -8,7 +8,7 @@
 | 需求语义 | preset |
 | :--- | :--- |
 | hover 轻微放大 | `HOVER_SCALE_UP_MOTION` |
-| Button 默认 hover 背景总宽与总高固定增加 `2px`，背景几何与颜色统一以 `150ms ease-in-out` 同步变化 | `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` |
+| Button 默认 hover 只放大背景层到 `1.06`，使用 `200ms ease` | `BUTTON_HOVER_SCALE_UP_MOTION` |
 | hover 上浮并放大 | `HOVER_LIFT_MOTION` |
 | 数字向上弹入 | `NUMBER_POP_APPEAR_MOTION` |
 | 短文字替换 | `TEXT_SWAP_APPEAR_MOTION` |
@@ -20,7 +20,7 @@
 
 ## 使用边界
 
-- 本文件收录单个 Frame 可表达的 opacity、scale、x/y、blur 与 timing 组合，以及由组件背景伪元素消费、但仍需共享 token 管理的 Button 固定像素扩张。
+- 本文件收录单个 Frame 可表达的 opacity、scale、x/y、blur 与 timing 组合，以及由组件背景伪元素消费、但仍需共享 token 管理的 Button 背景缩放。
 - Badge 双层动画、Avatar hover-out 强回弹、Success check 路径绘制、error shake 分段、shimmer 循环等专项动画继续由共享专项能力或组件内部实现负责。
 - 组件命中这里的语义时直接引用 preset，不复制具体数值。
 

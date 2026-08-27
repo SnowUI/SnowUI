@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.26.0
+> **版本**: v1.27.0
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -19,7 +19,7 @@
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
 | `CONTINUOUS_HOVER_MOTION` | Sidebar、Listbox、Popover、TableBody、Accordion、Tab / Segmented 的共享 hover 背景移动 | 单项独立 hover、生命周期进入 | Fluid Functionalism proximity hover |
 | `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
-| `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` | 独立动作 Button 的背景总宽与总高固定增加 `2px`（四边各外扩 `1px`），几何与颜色叠层统一以 `150ms ease-in-out` 变化。sm / md / lg、不同内容宽度统一，内容与布局尺寸不变 | bare、复合控件项、非 Button hover、生命周期出现 | Test A2 sm `Small` 原 `1.05` 实际增量按 2px 档位取整 + filled 高对比边缘亚像素重绘实测 + Owner 指定固定像素同步反馈 |
+| `BUTTON_HOVER_SCALE_UP_MOTION` | 独立动作 Button 只将背景层从 `scale(1)` 放大到 `scale(1.06)`，使用 `200ms ease`；Borderless 以隐藏的 `0.84` 为背景起点并收敛到同一终点，内容、命中区与布局尺寸不变 | bare、复合控件项、非 Button hover、生命周期出现 | 2026-08-19 Owner 确认的 Borderless 与背景层放大方案，2026-08-27 明确恢复 |
 | `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
 | `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
 | `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |
@@ -35,7 +35,7 @@
 2. 第二个组件复用同一语义值时，必须抽到 preset。
 3. 组件文档应引用 preset 名称；如写具体数字，必须注明以本 catalog 为准。
 4. 触发延迟不是 MotionConfig，归共享 lib 管理。
-5. 自然语言出现“放大”时必须结合触发语义选择：Button 默认 hover 用 `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` 固定增加背景像素，其他 hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
+5. 自然语言出现“放大”时必须结合触发语义选择：Button 默认 hover 用 `BUTTON_HOVER_SCALE_UP_MOTION` 只缩放背景层，其他 hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
 6. 自然语言出现“尺寸变化 / 展开 / 收起 / 高度变化 / 宽度变化”时，优先使用 `RESIZE_MOTION`；只有语义明确不同且已存在专项 preset 时例外。
 7. Tab / Segmented indicator 同时移动和变形时必须使用 `TAB_INDICATOR_MOTION`，不得使用普通 `RESIZE_MOTION` 或分别维护 transform / size 时序。
 8. `GENERIC_APPEAR_MOTION` 默认只包含 opacity；需要生命周期缩放时必须显式声明 scale 或选择含 scale 的组件族 preset。
@@ -43,6 +43,8 @@
 10. SnowUI 组件源码拥有明确默认视觉时必须显式引用 preset，不得写 `whileXxx={true}` 绑定可变的 Frame 默认值；旧 generic opacity + scale 视觉统一迁移到 `GENERIC_SCALE_APPEAR_MOTION`。
 
 ## 变更记录
+
+- v1.27.0 (2026-08-27): 恢复 Owner 已确认的 Button 背景层 `1 → 1.06` 与 Borderless `0.84 → 1.06` 比例放大方案；背景使用 `200ms ease`，内容与布局不缩放。
 
 - v1.26.0 (2026-08-21): 恢复默认开启、可通过 `rapidRetarget` 关闭的 Tooltip 快速重定向 preset；中断段使用 `90–160ms` cubic ease-out 与 `0.02` 内容滞后，宽度回弹时间线保持独立。
 - v1.25.0 (2026-08-21): 删除 Tooltip 快速重定向的专属时长、cubic ease-out、内容滞后和 preset 导出；运动中改目标仍从当前画面接管，但与普通连续切换使用同一正弦时间线。

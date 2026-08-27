@@ -1,6 +1,7 @@
 /**
  * Button.test.ts
- * v1.13.0
+ * v1.14.0
+ * 变更记录 (2026-08-27): 恢复背景层比例放大：普通背景 1 -> 1.06，Borderless 0.84 -> 1.06；内容与布局不变。
  * 变更记录 (2026-08-19): hover 颜色与背景外扩统一为 150ms ease-in-out，同步进入与退出。
  * 变更记录 (2026-08-19): hover 颜色层改为 300ms ease-in-out 渐现 / 渐隐，慢于 200ms 背景外扩。
  * 变更记录 (2026-08-19): hover 从按尺寸比例 scale 改为固定像素背景扩张；sm/md/lg 的背景总宽、总高统一增加 2px。
@@ -42,10 +43,10 @@ export const examples = [
         expected: {
             render: "全部 variant 与 bare 保持各自原有背景、边框和前景色。",
             layout: "hover 缩放只影响绘制，Button 与自适应父容器的布局尺寸不变。",
-            interaction: "独立动作默认只扩张背景层；sm、md、lg 的背景总宽与总高都增加 2px（四边各 1px），文字与 Icon 保持原尺寸。几何与 hover 背景颜色统一以 150ms ease-in-out 同步变化；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 使用同一像素扩张与颜色渐现，bare 不出现背景或内置放大。",
-            performance: "基础背景层只动画绝对定位 inset；hover 颜色叠层只动画 opacity，不逐帧重算 color-mix 背景，也不触发布局重排。",
-            responsive: "固定 2px 背景增量不随 Button size、内容宽度或根字号改变。",
-            accessibility: "prefers-reduced-motion: reduce 下直接提交四边 1px 外扩和最终颜色，不执行 inset 或 opacity 过渡。",
+            interaction: "独立动作默认只缩放背景层到 1.06，文字与 Icon 保持原尺寸；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 从隐藏的 0.84 背景显示并放大到 1.06，最终颜色保持 Light 4% / Dark 10%；bare 不出现背景或内置放大。",
+            performance: "基础背景层与 hover 颜色叠层只动画 transform / opacity，不逐帧重算 color-mix 背景，也不触发布局重排。",
+            responsive: "背景按比例缩放，Button 根尺寸、内容与父容器布局保持不变。",
+            accessibility: "prefers-reduced-motion: reduce 下直接提交 scale(1.06) 和最终颜色，不执行 transform 或 opacity 过渡。",
         },
 
         logic: ["Style", "Motion", "Layout", "Accessibility"],
@@ -68,7 +69,7 @@ export const examples = [
         expected: {
             render: "三种尺寸的 filled Button 均保持 Primary 背景与 Static White 文字，文字清晰可见。",
             layout: "尺寸与原有 padding、圆角和内容布局不变。",
-            interaction: "hover 颜色与背景外扩统一以 150ms ease-in-out 同步变化，并将 sm/md/lg 背景层的总宽、总高统一增加 2px，不改变前景色或内容尺寸。",
+            interaction: "sm/md/lg 的 hover 均只将背景层从 scale(1) 放大到 scale(1.06)，不改变前景色、内容尺寸或布局。",
             performance: "宿主基线与组件样式的先后加载不影响 filled 前景色。",
             responsive: "sm、md、lg 使用同一变体颜色契约。",
         },

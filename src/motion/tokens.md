@@ -1,6 +1,6 @@
 # motion/tokens.ts 文档
 
-> **版本**: v1.17.0
+> **版本**: v1.18.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
 
 `tokens.ts` 是 motion 数值的最低层单一来源。组件不直接复制这些值；组件应优先引用 `motion/presets/` 中的语义 preset。
@@ -22,12 +22,12 @@
 | `MOTION_DURATION_RESIZE_MS` | Card、Accordion、Panel 等明确尺寸变化节奏 |
 | `MOTION_DURATION_TAB_INDICATOR_MS` | Tab / Segmented indicator 位置与尺寸同步变化 |
 | `MOTION_DURATION_CONTINUOUS_HOVER_MS` / `MOTION_DURATION_CONTINUOUS_HOVER_RESPONSE_MS` | 连续悬停背景移动 / 变形 60ms，首次显隐响应 0ms |
-| `MOTION_DURATION_BUTTON_HOVER_MS` / `MOTION_DURATION_BUTTON_HOVER_COLOR_MS` | Button 背景像素外扩与颜色 opacity 渐现 / 渐隐统一为 150ms，使用同一时间线 |
+| `MOTION_DURATION_BUTTON_HOVER_MS` | Button 背景层比例放大使用 200ms；颜色继续使用 Frame 通用 150ms 时间线 |
 | `MOTION_DURATION_*` / `MOTION_STAGGER_*` | 通用效果优先引用 250ms 基准；Badge、Tooltip、shake 等专项效果保留精确时长与 stagger |
 | `MOTION_DISTANCE_TOOLTIP_APPEAR_PX` | Tooltip Foreground 根据最终 placement 从触发器方向反向滑入的距离 |
-| `MOTION_EASING_*` | standard、JS motion 的 in-out / linear、Button hover 几何与颜色层 CSS `ease-in-out`，以及 Badge / Number / Check 各自精确 bounce 曲线 |
+| `MOTION_EASING_*` | standard、JS motion 的 in-out / linear、Button hover 背景 CSS `ease`，以及 Badge / Number / Check 各自精确 bounce 曲线 |
 | `MOTION_SPRING_MOVE_*` | Frame 默认位移临界阻尼 spring：stiffness 300 / damping 34.6410161514 / mass 1；不会越过目标产生回弹 |
-| `MOTION_DISTANCE_*` | Button hover 背景总宽 / 总高增加 2px，以及 text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
+| `MOTION_DISTANCE_*` | text swap、page slide、panel reveal、Badge、Success check 等精确位移 |
 | `MOTION_BLUR_*` | 2px、3px、10px 三档实际 blur 来源 |
 | `MOTION_DURATION_TOOLTIP_*` | Tooltip Foreground 出现 / 消失，以及普通连续交接与快速重定向各自的 base / min / max / per-pixel 有界时程 |
 | `MOTION_PROGRESS_TOOLTIP_CONTINUOUS_*_CONTENT_LAG` | Tooltip 普通连续交接与快速重定向各自的内容相位滞后；内容与外框在同一结束帧收敛 |
@@ -36,9 +36,11 @@
 | `MOTION_SCALE_TOOLTIP_*` | Tooltip Foreground 出现 / 消失 scale |
 | `MOTION_SCALE_DIALOG_*` | Dialog / Modal 内容面板 |
 | `MOTION_SCALE_GENERIC_*` | 显式 scale-in 原语、replacement 等需要缩放的 preset；generic appear 本身不再默认消费 |
-| `MOTION_SCALE_ICON_SWAP_FROM` / `MOTION_SCALE_HOVER_*` | Icon 替换与 hover 放大 |
+| `MOTION_SCALE_ICON_SWAP_FROM` / `MOTION_SCALE_HOVER_*` / `MOTION_SCALE_BUTTON_HOVER_TO` | Icon 替换、通用 hover 与 Button 背景层放大 |
 
 ## 变更记录
+
+- v1.18.0 (2026-08-27): 恢复 Button 背景层 `1 → 1.06`、`200ms ease` token；移除固定 2px 增量和 Button 专属颜色 timing token，颜色回归 Frame 通用时间线。
 
 - v1.17.0 (2026-08-21): 恢复 Tooltip 快速重定向的 `60 / 90 / 160ms / 0.35ms/px` 和 `0.02` 内容滞后 token；由公开 `rapidRetarget` 开关决定是否消费，默认开启。
 - v1.16.0 (2026-08-21): 删除 Tooltip 快速重定向专属的 duration、per-pixel、content lag 和宽度时长兼容别名；所有连续改目标统一消费普通连续交接 token。

@@ -1,6 +1,7 @@
 # Button.svelte 文档
 
-> **版本**: v2.16.0
+> **版本**: v2.17.0
+> **变更记录 (2026-08-27)**: 恢复 Owner 在 2026-08-19 确认的背景层比例放大方案：gray / filled / outline 从 `1` 放大到 `1.06`，Borderless 从隐藏的 `0.84` 背景显示并放大到 `1.06`，最终颜色保持 Light 4% / Dark 10%；文字、Icon、Spinner、命中区和布局不变。背景缩放使用 `BUTTON_HOVER_SCALE_UP_MOTION` 的 `200ms ease`，颜色使用通用 `150ms ease-out`。
 > **变更记录 (2026-08-19)**: Button hover 的背景颜色与背景外扩统一使用 `150ms ease-in-out`，进入和退出时同时开始、同时结束；固定 `1px` 外扩、radius 同步、内容与布局尺寸均不变。
 > **变更记录 (2026-08-19)**: Button 背景 inset 与 radius 的几何动效由 `200ms ease` 优化为 `150ms ease-in-out`，减少 filled 高对比边缘停留在亚像素重绘状态的时间，并缓和 hover 进入 / 退出首段的视觉抖动；固定 `1px` 外扩、radius 同步、`300ms ease-in-out` 颜色渐变、内容与布局尺寸均不变。
 > **变更记录 (2026-08-19)**: Button 的独立 hover 背景每边外扩 `1px` 时，背景圆角半径同步增加 `1px`，并与 inset 共用当前 `150ms ease-in-out` 几何动效。该规则同时作用于 `iconOnly` 与普通圆角矩形 Button；`iconOnly` 不建立圆形语义或独立曲线分支，根圆角、连续角、内容和布局尺寸保持不变。
@@ -45,7 +46,7 @@
 | bare | `boolean` | `false` | 无外壳按钮模式，不限制内容类型。忽略 `variant`，外壳 padding / radius 为 0，保留内容 gap；与 `iconOnly` 同时使用时获得对应尺寸上下文与最小透明点击热区。默认使用 `currentColor × opacity: 1`。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 的强调级别；`muted` 使用 `currentColor × opacity: 0.4 -> 1`。 |
 | backgroundBlur | `boolean` | `false` | 开启按钮背景模糊，默认强度为 `1.25rem`。 |
-| scaleOnHover | `boolean` | `true` | 兼容 Prop 名；控制背景层 hover 固定像素扩张。开启时背景总宽、总高统一增加 `2px`，内容不缩放。复合控件项从 owner 继承 `false`，实例显式值优先。 |
+| scaleOnHover | `boolean` | `true` | 控制背景层内置 `scale(1.06)` hover；内容不缩放。复合控件项从 owner 继承 `false`，实例显式值优先。 |
 | toggle | `boolean` | `false` | Toggle 模式语法糖。等价于显式声明 `Click={{ Idle: "Active", Active: "Idle" }} whileClick={false}`；Active 配色由 `data-state="Active"` 自动套 Indigo；`aria-pressed` 自动输出。 |
 | as | `'more' \| 'badge' \| 'icon' \| 'prev' \| 'next' \| 'close' \| 'item' \| 'current' \| 'page' \| 'leading' \| 'trailing'` | - | 角色化：作为 Text 展开按钮、Breadcrumb item、Pagination 模板，或接入 Image / ImageViewer / Field 宿主定位协议；进入 Image / ImageViewer 宿主时会翻译为对应 `pin-*` 方位 |
 
@@ -60,7 +61,7 @@ Button 的内部布局不接入三槽位模型：
 - 文字型 Button 默认 `white-space: nowrap`，保证按钮文案作为一个操作短语保持单行；特殊长文案可由使用方通过外部 style / class 显式覆盖。
 - 默认最小宽度为 `max-content`，即“内容 + gap + padding”的自然下限；外层 fill 布局可以把 Button 拉宽，但不能把 Button 压到吞掉默认 padding。
 - Button 自身负责 padding / gap / radius / font-size / line-height，并通过 `--snowui-button-*-override` 变量允许外部覆盖。
-- gray / filled / outline / borderless 通过共享 `.snowui-rounded-rectangle` 消费 `--corner-shape-rounded-rectangle: superellipse(1.1)`；该曲线只比普通 `round` 略微平滑，同时不改变 `--snowui-button-radius` 或 `--snowui-button-radius-override` 解析出的根 corner area。独立 hover 背景伪元素显式 `corner-shape: inherit`；每边外扩 `1px` 时，背景圆角半径同步增加 `1px` 并使用同一段动效，使背景保持原轮廓的等距外扩。`iconOnly` 只是内容布局，不建立圆形语义或圆角特例。不支持 `corner-shape` 时自然回退为现有 `border-radius`。bare 与 ButtonGroup 嵌入态的半径仍为 `0`，外壳所有权不变。
+- gray / filled / outline / borderless 通过共享 `.snowui-rounded-rectangle` 消费 `--corner-shape-rounded-rectangle: superellipse(1.1)`；该曲线只比普通 `round` 略微平滑，同时不改变 `--snowui-button-radius` 或 `--snowui-button-radius-override` 解析出的根 corner area。独立 hover 背景伪元素显式继承同一 `border-radius` 与 `corner-shape`，并随背景 transform 等比放大；根 Button 的圆角、内容和布局尺寸保持不变。`iconOnly` 只是内容布局，不建立圆形语义或圆角特例。不支持 `corner-shape` 时自然回退为现有 `border-radius`。bare 与 ButtonGroup 嵌入态的半径仍为 `0`，外壳所有权不变。
 - `iconOnly` 是单视觉内容布局的唯一开关，默认 `false`；Button 不读取 children 的 DOM 类型推断该状态。内容可以是 Icon、Logo 或其他单一视觉原子。
 - `as="leading"` / `as="trailing"` 只表示 Button 作为 Field / Input 等外层槽位宿主的配件；不会改变 Button 内部布局模型。
 - `as="item"` 表示 Button 作为 Breadcrumb 的路径片段；当前页不可交互规则由 Breadcrumb 标记 `aria-current="page"` 后触发。Button 未显式写 `variant` 时可继承 Breadcrumb 的 `variant`，显式 Button `variant` 优先。
@@ -344,7 +345,7 @@ Button 放入 Pagination 时使用角色模板：
 |:---|:---|
 | **Filled** | 20% overlay (`currentColor`) |
 | **Gray/Outline** | Light: 4% overlay, Dark: 10% overlay |
-| **Borderless** | Light: 4%、Dark: 10%；hover 颜色与独立背景层统一以 `150ms ease-in-out` 变化，背景向四边各外扩 `1px`，最终颜色保持不变 |
+| **Borderless** | Light: 4%、Dark: 10%；独立背景层常态隐藏并保持 `scale(0.84)`，hover 时显示并以 `200ms ease` 放大到 `scale(1.06)`；颜色以通用 `150ms ease-out` 变化，最终颜色保持不变 |
 
 ---
 
@@ -366,6 +367,10 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.17.0 (2026-08-27)
+
+- **BTN-Hover.14** 恢复 2026-08-19 Owner 已确认的背景层比例方案并取代 BTN-Hover.9–13 的现行效果：gray / filled / outline 为 `1 → 1.06`，Borderless 为隐藏的 `0.84 → 1.06`，背景 transform 使用 `200ms ease`，颜色使用通用 `150ms ease-out`；内容、命中区、布局和复合控件关闭规则不变。
 
 ### v2.16.0 (2026-08-19)
 
