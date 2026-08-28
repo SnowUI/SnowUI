@@ -60,7 +60,7 @@
 
 主布局模型：**内联外壳布局（Inline Shell Layout）**
 
-根为 `inline-flex` 外壳；内容整体 Hug；padding 决定可见面积；不接入三槽位协议。
+根为 `inline-flex` 外壳；内容整体 Hug；padding 决定可见面积；不接入三槽位协议。文字由 flex 在外壳内严格几何居中，不应用额外光学偏移。
 
 ### 开发者关键字
 

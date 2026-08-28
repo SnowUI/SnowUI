@@ -1,6 +1,6 @@
 # Badge.svelte 文档
 
-> **版本**: v1.3.1
+> **版本**: v1.3.2
 > **职责**: 徽标组件，用于显示数字或状态指示。
 
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
@@ -34,7 +34,7 @@ Badge 的根节点是 inline-level 定位外壳，内容整体 Hug：
 
 - 根节点保持 `inline-flex`，负责宿主定位、尺寸测量和 Frame 位移动效。
 - 内层 `.snowui-badge-surface` 负责 background / padding / radius / min-width / font-size / line-height，并作为完整视觉 Badge 承担 scale / opacity / blur 动效。
-- 内部 `snowui-morph-container` 使用 Grid Stacking 保持数字变化时的布局稳定性，这是 Badge 私有结构，不改变主布局模型。
+- 内部 `snowui-morph-container` 使用 Grid Stacking 保持数字变化时的布局稳定性；内容层以容器 50% 为锚点并回移自身 50%，固定尺寸小于文字最小宽度时仍以 Badge 中心为原点对称溢出，不依赖 Grid 的安全溢出回退。文字和数字均保持严格几何居中。这是 Badge 私有结构，不改变主布局模型。
 - `dot` 模式仍属于内联外壳布局的特化：外壳收敛为固定点尺寸，padding 清零。
 - `as="badge"` 只表示 Badge 作为 Icon / Avatar 的外层挂件角色，不改变 Badge 内部布局模型。
 
@@ -160,8 +160,8 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 
 组件内部使用 `Grid Stacking` (Morph Container) 确保布局稳定性：
 
-- **Container**: `display: grid; width: 100%; height: 100%;`
-- **Item**: `display: flex; align-items: center; justify-content: center;`；filled / dot 使用 `line-height: 1`，border 继承 surface 的 `var(--leading-12)`
+- **Container**: `display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: start; width: 100%; height: 100%; min-width: 0; min-height: 0;`；显式的 `minmax(0, 1fr)` 禁止轨道被文字 min-content 撑大
+- **Item**: 自然宽高，通过 `left/top: 50%` 与 `translate(-50%, -50%)` 围绕容器中心定位；内部继续使用 `display: flex; align-items: center; justify-content: center; text-align: center;`；filled / dot 使用 `line-height: 1`，border 继承 surface 的 `var(--leading-12)`；文字和数字均不应用额外光学偏移
 
 ---
 
@@ -180,6 +180,11 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.2 (2026-08-28)
+
+#### 修复
+- 内容层改由 Grid 以自然宽度直接居中，并允许在 16px / 12px 固定 Badge 中围绕几何中心对称溢出，修复文本标签的光学偏移与小尺寸数字向右偏移。
 
 ### v1.3.1 (2026-07-30)
 

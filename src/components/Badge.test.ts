@@ -1,6 +1,6 @@
 /**
  * Badge.test.ts
- * v1.3.1
+ * v1.3.2
  * 
  * 测试覆盖：Badge.md 定义的所有功能点
  */
@@ -15,7 +15,10 @@ export const examples = [
     <Badge count="New" />
 </div>`,
 
-        logic: ["Count"],
+        expected: {
+            render: "数字和文本标签均在 Badge surface 中水平、垂直居中。",
+        },
+        logic: ["Count", "CenteredContent"],
     },
     {
         name: "A2: 最大值限制 (Max)",

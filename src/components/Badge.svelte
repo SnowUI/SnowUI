@@ -1,5 +1,5 @@
 <!--
- Badge 组件：徽标组件 v1.3.1
+ Badge 组件：徽标组件 v1.3.2
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
  详见：Badge.md
@@ -696,10 +696,13 @@
     /* 布局稳定性：Grid Stacking */
     :global(:where(.snowui-morph-container)) {
         display: grid;
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: minmax(0, 1fr);
+        place-items: start;
         width: 100%;
         height: 100%;
+        min-width: 0;
+        min-height: 0;
         border-radius: inherit;
         corner-shape: inherit;
     }
@@ -709,9 +712,17 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 100%;
-        height: 100%;
+        justify-self: start;
+        align-self: start;
+        position: relative;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        height: max-content;
+        min-width: 0;
         line-height: 1;
+        text-align: center;
     }
 
     @media (prefers-reduced-motion: reduce) {
