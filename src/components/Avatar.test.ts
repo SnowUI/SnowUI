@@ -1,10 +1,10 @@
 /**
  * Avatar.test.ts
- * v2.12.3
+ * v2.12.4
  *
  * 变更记录 (2026-02-03):
  * - 示例1覆盖全部尺寸
- * - 示例2覆盖全部尺寸与不同默认 Gradient 配色
+ * - 示例2覆盖全部尺寸、六种具名默认 Gradient 配色与稳定用户 ID seed
  * - 示例3覆盖全部尺寸与不同徽标组合
  * - 示例3验证 Badge / Icon 子内容进入 DOM；示例5验证 empty 与其他头像同排中线对齐
  */
@@ -25,14 +25,18 @@ export const examples = [
     {
         name: "2: 默认 Gradient 与尺寸",
         code: `2
-<Avatar aria-label="A" size={16} />
-<Avatar aria-label="B" size={20} />
-<Avatar aria-label="C" size={24} />
-<Avatar aria-label="D" size={28} />
-<Avatar aria-label="E" size={32} />
-<Avatar aria-label="F" size={40} />
-<Avatar aria-label="G" size={48} />
-<Avatar aria-label="H" size={80} />`,
+<Avatar fallbackColor="blue" aria-label="Blue default avatar" size={16} />
+<Avatar fallbackColor="cyan" aria-label="Cyan default avatar" size={20} />
+<Avatar fallbackColor="green" aria-label="Green default avatar" size={24} />
+<Avatar fallbackColor="red" aria-label="Red default avatar" size={28} />
+<Avatar fallbackColor="orange" aria-label="Orange default avatar" size={32} />
+<Avatar fallbackColor="purple" aria-label="Purple default avatar" size={40} />
+<Avatar fallbackSeed="user-42" aria-label="Stable user 42" size={48} />
+<Avatar fallbackSeed="user-108" aria-label="Stable user 108" size={80} />`,
+        expected: {
+            render: "六种 fallbackColor 分别渲染对应具名 Gradient；fallbackSeed 由稳定用户 ID 确定性映射，相同 ID 跨刷新保持同色。",
+        },
+        logic: ["NamedFallbackColor", "StableFallbackSeed", "FixedAnonymousDefault"],
     },
     {
         name: "3: 徽标组合与尺寸",

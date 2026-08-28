@@ -1,6 +1,6 @@
 <!--
  Avatar 头像组件
-  v2.12.3
+  v2.12.4
 
  1. 核心能力 (Features):
     - 多样形态: 支持 circular, rounded, square 三种形状
@@ -28,6 +28,7 @@
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Gradient, {
         getStaticGradientSource,
+        type GradientVariant,
     } from "./Gradient.svelte";
     import {
         AVATAR_CONTEXT_KEY,
@@ -61,6 +62,8 @@
         size?: ResourceSize;
         fallback?: Component;
         fallbackText?: string;
+        fallbackColor?: GradientVariant;
+        fallbackSeed?: string | number;
         variant?: AvatarVariant;
         gradientMotion?: boolean;
         children?: Snippet;
@@ -75,6 +78,8 @@
         size = undefined,
         fallback = undefined,
         fallbackText = undefined,
+        fallbackColor = undefined,
+        fallbackSeed = undefined,
         variant = "default",
         gradientMotion = false,
         badgePosition = "top",
@@ -158,9 +163,10 @@
     let gradientHoverActive = $state(false);
     let gradientHoverUnmountTimer: ReturnType<typeof setTimeout> | undefined;
     const hasExplicitFallbackText = $derived(explicitFallbackText.length > 0);
-    const defaultGradientSeed = $derived(labelSource || avatarInstanceId);
     const resolvedDefaultGradientSeed = $derived(
-        labelSource || explicitFallbackText || defaultGradientSeed,
+        fallbackColor ??
+            fallbackSeed ??
+            (labelSource || explicitFallbackText || "blue"),
     );
     const defaultGradientStaticSource = $derived(
         getStaticGradientSource(resolvedDefaultGradientSeed),

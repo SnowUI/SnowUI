@@ -1,6 +1,8 @@
 # Avatar.svelte 文档
 
-> **版本**: v2.12.3
+> **变更记录 (2026-08-28)**: 默认 Gradient 新增 `fallbackColor` 与 `fallbackSeed`。显式颜色优先；稳定用户 ID 通过确定性哈希映射到六种具名配色；完全无身份信息时固定为 `blue`，不再依赖组件实例 ID。
+
+> **版本**: v2.12.4
 > **变更记录 (2026-08-15)**: 默认 Gradient hover 改为按需挂载预栅格 SVG 图层；不再创建运行时 filter DOM，并继承 Gradient 的共享视口暂停能力。
 > **变更记录 (2026-08-15)**: 将 Avatar hover alpha 艺术色与 Gradient、GradientMotion 的画面艺术色分项登记，明确 Avatar 只拥有自己的 hover 染色例外。
 > **变更记录 (2026-08-15)**: 正式登记默认 Gradient 与图片 / 普通组件头像 hover 六色为专业艺术色例外；例外不建立通用语义色，也不豁免 Avatar 的其他 Token / 样式规则。
@@ -36,8 +38,10 @@
 | :--- | :--- | :--- | :--- |
 | src | string \| Component | undefined | 头像图片 URL 或图标组件 |
 | size | 12\|16\|20\|24\|28\|32\|40\|48\|80 | 16 | 头像尺寸。未显式设置时，自动继承父级 `Frame` (如 `AvatarGroup`) 提供的尺寸上下文。 |
-| fallback | Component | undefined | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与基于名称的 `seed`。 |
-| variant | `'default' \| 'empty'` | `'default'` | `default` 使用按实例 / 名称稳定分散的 Gradient 配色；`empty` 使用灰色背景与默认用户图标。 |
+| fallback | Component | undefined | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与解析后的稳定 `seed`。 |
+| fallbackColor | `'blue' \| 'cyan' \| 'green' \| 'red' \| 'orange' \| 'purple'` | `undefined` | 显式选择默认 Gradient 的具名艺术配色；优先级高于 `fallbackSeed` 和名称回退。 |
+| fallbackSeed | `string \| number` | `undefined` | 稳定身份种子，推荐传入 `user.id`；组件以确定性哈希映射到六种具名配色，相同 seed 始终得到相同颜色，无需持久化颜色字段。 |
+| variant | `'default' \| 'empty'` | `'default'` | 默认样式使用稳定身份 seed 或显式具名颜色的 Gradient 配色；空头像样式使用灰色背景与默认用户图标。 |
 | gradientMotion | boolean | false | 是否常驻运行默认 Gradient fallback 的四层基础矢量形变；为 false 时 Gradient 仍会在 hover 期间按需运行水波形变和多色 Overlay |
 | badgePosition | 'top'\|'bottom' | 'top' | 徽章位置 |
 
@@ -58,7 +62,13 @@
 <!-- 使用图标资源 -->
 <Avatar src={User} />
 
-<!-- 无 src：显示默认随机 Gradient 头像 -->
+<!-- 稳定用户 ID：无需存储颜色 -->
+<Avatar fallbackSeed={user.id} aria-label={user.name} />
+
+<!-- 显式选择具名默认头像颜色 -->
+<Avatar fallbackColor="purple" aria-label="SnowUI member" />
+
+<!-- 无身份信息：固定使用 blue，不在刷新时随机变化 -->
 <Avatar />
 
 <!-- 显式开启默认 Gradient 的基础矢量形变 -->
@@ -84,7 +94,7 @@
 
 ## 智能行为
 
-1. **默认回退**: 无图片或图片加载失败时，优先显示显式 `fallback` 组件；未传时 `default` 使用 Gradient，`empty` 使用灰色用户图标。名称只作为 Gradient seed，不再生成首字母；Gradient 常态基础形变默认关闭，可用 `gradientMotion` 常驻开启，或由 hover 按需运行。
+1. **默认回退**: 无图片或图片加载失败时，优先显示显式 `fallback` 组件；未传时 `default` 使用 Gradient，`empty` 使用灰色用户图标。默认 Gradient 的选择优先级为 `fallbackColor` → `fallbackSeed` → `aria-label` / `data-name` / `title` → 固定 `blue`。推荐把稳定 `user.id` 传给 `fallbackSeed`；哈希结果跨刷新稳定，不需要存储颜色。名称只作为兼容 seed，不生成首字母；Gradient 常态基础形变默认关闭，可用 `gradientMotion` 常驻开启，或由 hover 按需运行。
 2. **回退延迟**: 内部固定延迟显示回退图标，减少加载闪烁。
 3. **角色识别**: 内部组件 (`Badge`, `Icon`) 若设置 `as="badge"` 将自动获得定位与尺寸逻辑。
 4. **子组件定位**: 提供基于 `em` 的自适应 Context 渲染样式。
@@ -164,7 +174,7 @@
 - 所有 hover 规则排除 `.snowui-disabled`、`[data-disabled="true"]` 与 `:disabled`；reduced-motion 下关闭淡入淡出并保留静态随机色反馈。
 
 **默认 / 空头像**
-- `default`：常态直接渲染按 seed 选择的共享 Gradient 静态图，seed 优先使用 `aria-label` / `data-name` / `title`，无名称时使用实例 ID，使同屏默认头像自然分散到六种配色。完整 Gradient 组件只在 hover 期间按需挂载并在退出动效完成后释放；`gradientMotion` 开启时保持常驻。
+- `default`：常态直接渲染按 seed 选择的共享 Gradient 静态图。`fallbackColor` 可精确指定 `blue / cyan / green / red / orange / purple`；否则 `fallbackSeed`（推荐稳定 `user.id`）通过确定性哈希选色，再回退到 `aria-label` / `data-name` / `title`。完全无身份信息时固定使用 `blue`，不以组件实例 ID 或运行时随机数选色。完整 Gradient 组件只在 hover 期间按需挂载并在退出动效完成后释放；`gradientMotion` 开启时保持常驻。
 - `empty`：保留 `var(--black-4)` 灰色背景与 Components 内置语义 `user` 图标，明确表达尚无头像内容；应用级 `IconProvider` 可替换。
 
 ### 5. Hover 规范 (Hover Spec)
@@ -209,6 +219,11 @@
 ---
 
 ## 更新日志
+
+### v2.12.4 (2026-08-28)
+
+- 新增 `fallbackColor` 六种具名默认 Gradient 配色与 `fallbackSeed` 稳定身份映射；推荐传入 `user.id`，相同 seed 跨刷新保持同色。
+- 默认配色优先级调整为显式颜色、稳定 seed、名称回退、固定 `blue`；完全匿名头像不再依赖组件实例 ID。
 
 ### v2.12.3 (2026-08-15)
 
