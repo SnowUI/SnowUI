@@ -1,6 +1,6 @@
 /**
  * Accordion.test.ts
- * v1.5.0
+ * v1.6.1
  *
  * 测试覆盖：对齐 Figma 设计稿的 2 种类型 × 3 种尺寸示例。
  */
@@ -79,7 +79,10 @@ export const examples = [
         { title: "支持哪些支付方式？", content: "支持银行卡、余额和企业账户支付。" },
     ]}
 />`,
-        logic: ["filled", "default-variant", "size-sm", "figma", "BuiltInMode"],
+        expected: {
+            render: "标题继承宿主前景色，展开正文使用主题自适应 Black/40%。",
+        },
+        logic: ["filled", "default-variant", "size-sm", "figma", "BuiltInMode", "content-black-40"],
     },
     {
         name: "A2: divided sm",
@@ -122,5 +125,19 @@ export const examples = [
 <Accordion variant="filled" size="md" defaultValue="shipping" style="width: min(100%, 31.25rem);">${disabledItems}
 </Accordion>`,
         logic: ["disabled-item"],
+    },
+    {
+        name: "D2: continuous hover opt-out",
+        code: `D2
+<Accordion continuousHover={false} variant="filled" size="md" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
+</Accordion>`,
+        expected: {
+            render: "默认 Accordion 只创建一个整项 Continuous Hover 背景；关闭后不创建共享层。",
+            layout: "共享层在收起项匹配 title 高度，在展开项匹配 title 与 content 的完整实时高度。",
+            interaction: "默认背景在 Item 间连续移动；disabled Item 阻断背景；关闭后恢复 title 普通 hover。",
+            performance: "容器级 rAF 与共享 ResizeObserver 追踪 Item，不为每个 Item 创建视觉层。",
+            responsive: "展开动效和宽度变化期间重新测量当前 Item。",
+        },
+        logic: ["ContinuousHover", "ExpandedGeometry", "DisabledBlocker", "OptOut"],
     },
 ] as const;

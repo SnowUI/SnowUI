@@ -1,6 +1,6 @@
 <!--
   AccordionItem 组件：Accordion 内部单个折叠项容器
-  v1.2.4
+  v1.3.1
 
   外层 AccordionItem 负责一整项的背景、圆角、分隔线与展开高度。
   内部通过直系 Frame as="title" / Frame as="content" 承载标题与内容三槽位布局。
@@ -118,7 +118,10 @@
         titleElement = getDirectRoleElement("title");
         contentElement = getDirectRoleElement("content");
 
-        titleElement?.classList.add("snowui-accordion-title-item");
+        titleElement?.classList.add(
+            "snowui-accordion-title-item",
+            "snowui-hoverable",
+        );
         contentElement?.classList.add("snowui-accordion-content");
 
         if (titleElement) {
@@ -155,13 +158,36 @@
         return title === titleElement && title?.parentElement === itemElement;
     }
 
+    function isContentEventTarget(target: EventTarget | null) {
+        if (!itemElement || !target) return false;
+        const content = (target as Element).closest?.('[data-as="content"]');
+        return content === contentElement && content?.parentElement === itemElement;
+    }
+
+    function isInteractiveContentTarget(target: EventTarget | null) {
+        if (!(target instanceof Element) || !contentElement) return false;
+        const interactive = target.closest(
+            'a, button, input, label, select, textarea, summary, [role="button"], [role="link"], [role="checkbox"], [role="menuitem"], [contenteditable]:not([contenteditable="false"])',
+        );
+        return !!interactive && contentElement.contains(interactive);
+    }
+
     function toggle() {
         if (itemDisabled) return;
         accordion?.toggle(value);
     }
 
     function handleClick(event: MouseEvent) {
-        if (!isTitleEventTarget(event.target)) return;
+        if (isTitleEventTarget(event.target)) {
+            toggle();
+            return;
+        }
+        if (
+            !open ||
+            event.defaultPrevented ||
+            !isContentEventTarget(event.target) ||
+            isInteractiveContentTarget(event.target)
+        ) return;
         toggle();
     }
 
@@ -300,6 +326,10 @@
         cursor: default;
     }
 
+    :global(:where(.snowui-accordion[data-continuous-hover-enabled="true"] .snowui-accordion-title-item)) {
+        --snowui-hover-overlay-opacity: 0%;
+    }
+
     :global(:where(.snowui-accordion-title-item > :not([data-as]))),
     :global(:where(.snowui-accordion-content > :not([data-as]))) {
         min-width: 0;
@@ -357,6 +387,10 @@
             --snowui-accordion-content-line-height-override,
             var(--snowui-accordion-content-line-height)
         );
+        color: var(
+            --snowui-accordion-content-color-override,
+            var(--snowui-accordion-content-color, var(--black-40, #00000066))
+        );
         opacity: 0;
         pointer-events: none;
         overflow: hidden;
@@ -386,6 +420,10 @@
         );
         opacity: 1;
         pointer-events: auto;
+    }
+
+    :global(:where(.snowui-accordion-item[data-open="true"]:not([data-disabled="true"]) > .snowui-accordion-content)) {
+        cursor: pointer;
     }
 
     @media (prefers-reduced-motion: reduce) {

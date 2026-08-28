@@ -1,6 +1,6 @@
 # AccordionItem.svelte 文档
 
-> **版本**: v1.2.4
+> **版本**: v1.3.1
 > **职责**: 作为 Accordion 内部的单个折叠项容器。
 > **包归属**: OSS
 
@@ -25,14 +25,17 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 - AccordionItem 外层根为 `Frame tag="div" column`，负责整项背景、圆角、分隔线与展开状态。
 - 直系 `Frame as="title" row` 作为标题触发器，固定启用三槽位布局；直系 `as="leading"`、普通内容与直系 `as="trailing"` 分别落入三槽位。
 - 直系 `Frame as="content" row` 作为内容区，同样固定启用三槽位布局；折叠时保持宽度，使用向下高度收起与透明度渐隐。
-- title 与 content 都不设置独立文字颜色，默认继承父级 Accordion 或外层容器的 `color`。
+- title 继承父级 Accordion 或外层容器的 `color`；content 默认消费父 Accordion 的 `--snowui-accordion-content-color`，使用主题自适应 `Black/40%` 次要文字色。
 - title 默认渲染内置 `+ / -` trailing 图标；图标由两条线绘制，展开 / 收起时整颗图标容器旋转半圈，竖线淡入 / 淡出，动效时序消费 Frame motion bridge。外部在 title 内提供直系 `as="trailing"` 子项时，默认图标隐藏。
+- hover 背景由父级 Accordion 的唯一 Continuous Hover Background 表达：收起时覆盖 title，展开时覆盖整个 item。`continuousHover=false` 时 title 恢复普通 hover overlay。
+- 展开 content 的非交互区域点击会收起当前项；Link、Button、表单控件、交互 role 与可编辑内容不触发父项收起。
 
 ## 样式变量链
 
 | 变量 | 默认值 | 用途 |
 | :--- | :--- | :--- |
 | `--snowui-accordion-item-content-block-size-override` | `--snowui-accordion-content-max-block-size-override` / 测量高度 | 单个 content 展开最大高度覆盖入口 |
+| `--snowui-accordion-content-color-override` | `var(--black-40)` | 局部覆盖 content 文字颜色，不影响 title |
 
 ## 使用示例
 
@@ -79,10 +82,26 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 | :--- | :--- | :--- |
 | `value` | Context 查询 | 与 Accordion 当前展开值匹配 |
 | `disabled` | title DOM 属性 | 输出 `aria-disabled` 并阻止 title 交互 |
+| 展开 content 点击 | Item 事件委托 | 非交互区域收起；交互后代保持自身行为 |
 
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.1 (2026-08-28)
+
+- content 默认文字颜色改为主题自适应 `var(--black-40)`；title 继续继承宿主前景色。
+- 支持通过 `--snowui-accordion-content-color-override` 局部覆盖正文颜色。
+
+### v1.3.0 (2026-08-28)
+
+- title 的逐项 hover 改为父 Accordion 所有的唯一 Continuous Hover Background；展开状态覆盖完整 item，并随 content 高度同步变化。
+- 展开 content 的非交互区域新增点击收起；Link、Button、表单控件、交互 role 与可编辑内容明确排除。
+- 保留 `continuousHover=false` 时的 title 普通 hover fallback。
+
+### v1.2.5 (2026-08-28)
+
+- 恢复 title 的规范化背景 hover，使用共享 `snowui-hoverable` overlay，在 Light / Dark 下分别采用 4% / 10%，并排除 disabled；该实现自 v1.3.0 起仅作为 `continuousHover=false` 的 fallback。
 
 ### v1.2.4 (2026-08-17)
 

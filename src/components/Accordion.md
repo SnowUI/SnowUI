@@ -1,6 +1,6 @@
 # Accordion.svelte 文档
 
-> **版本**: v1.5.0
+> **版本**: v1.6.1
 > **职责**: 提供可展开 / 收起的内容分组容器，用于 FAQ、设置项、分段说明与信息折叠。
 > **包归属**: OSS（标准 UI 原语；不使用跨 Frame 协调、复杂 PRO 动效或产品级区块能力）
 
@@ -15,6 +15,9 @@
 - 支持非受控 `defaultValue` 与受控 `value`。
 - 支持 `variant="filled" | "divided"` 两种视觉形态。
 - 支持 `size="sm" | "md" | "lg"` 三档密度。
+- 展开正文默认使用主题自适应的 `Black/40%` 次要文字色；标题继续继承宿主前景色。
+- 默认使用唯一的 Continuous Hover Background 在 AccordionItem 之间连续移动；展开项的 hover 覆盖 title 与完整 content 区域。
+- 展开项的非交互内容区域均可点击收起；Link、Button、输入控件等交互后代保留自身行为，不触发收起。
 - 默认 trailing 图标为组件内部绘制的 `+ / -`，展开 / 收起时整颗图标使用 Frame motion bridge 时序旋转半圈；外部提供直系 `as="trailing"` 时会替换默认图标。
 
 ---
@@ -32,6 +35,7 @@
 | `variant` | `"filled" \| "divided"` | `"filled"` | 视觉形态；`divided` 与 DataTable 的分割线命名一致。 |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` | 尺寸密度；未显式传入时可从父级尺寸上下文推导。 |
 | `disabled` | `boolean` | `false` | 禁用整个 Accordion。 |
+| `continuousHover` | `boolean` | `true` | 是否使用容器级唯一连续 hover 背景；关闭后恢复 title 的普通 hover。 |
 | `items` | `{ title: string; content: string }[]` | `[]` | 默认内置模式的数据；内部 value 使用数组索引字符串。 |
 | `onValueChange` | `(value: string \| string[]) => void` | - | 展开值变化回调。 |
 | `parts` | `{ AccordionItem?; Frame? }` | - | 配置默认内置生成的 AccordionItem 与 title/content Frame。 |
@@ -64,6 +68,8 @@ padding 归属：`Frame as="title"` 负责可点击区 padding；`Frame as="cont
 gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与 Content 内部槽位间距由 `--snowui-accordion-trigger-gap` 管理。
 滚动归属：Accordion 自身不创建滚动区。
 
+hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，以直接 AccordionItem 为候选项；收起项匹配 title 高度，展开项匹配 title + content 的实时完整高度。disabled item 是明确阻断区，不参与最近项推断。关闭 `continuousHover` 后不创建共享层，并恢复 title 的普通 hover overlay。
+
 设计稿映射：
 
 | variant / size | Title padding | Content padding | Radius | Gap |
@@ -83,7 +89,8 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 | `--snowui-accordion-line-height` | `var(--leading-16)` | md 标题行高；sm/lg 分别映射 `--leading-14` / `--leading-18` |
 | `--snowui-accordion-content-font-size` | `var(--text-14)` | md 正文字号；sm/lg 分别映射 `--text-12` / `--text-16` |
 | `--snowui-accordion-content-line-height` | `var(--leading-14)` | md 正文行高；sm/lg 分别映射 `--leading-12` / `--leading-16` |
-| Content color | `inherit` | title 与 content 都继承父级文字颜色，不设置独立文本色 |
+| `--snowui-accordion-content-color` | `var(--black-40)` | 正文默认使用 40% 黑色语义 Token；Dark 主题自动映射为 40% 白色 |
+| `--snowui-accordion-content-color-override` | - | 局部覆盖正文文字颜色；不影响标题 |
 | `--snowui-accordion-padding-y` | `var(--padding-3)` | md Title 纵向 padding |
 | `--snowui-accordion-padding-x` | `var(--padding-2)` | divided md Title 横向 padding；filled md 覆写为 `--padding-4` |
 | `--snowui-accordion-content-padding-y` | `var(--padding-3)` | md Content 纵向 padding |
@@ -104,6 +111,7 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 - Title 输出 `aria-expanded`、`aria-controls`。
 - Content 输出 `role="region"` 与 `aria-labelledby`。
 - 禁用 Title 输出 `aria-disabled="true"`，并从 tab 顺序中移除。
+- 键盘 button 语义仍只归属 Title；展开 content 的普通指针点击可收起，但 Link、Button、Input、Label、Select、Textarea、Summary、显式交互 role 与可编辑区域不会触发父项收起。
 
 ## 使用示例
 
@@ -148,6 +156,7 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 | 类别 | 关键字 | 描述 |
 | :--- | :--- | :--- |
 | CSS 类名 | `snowui-accordion` | 根元素类名 |
+| CSS 类名 | `snowui-accordion-continuous-hover-layer` | Accordion 唯一连续 hover 背景层 |
 | Context Key | `ACCORDION_CONTEXT_KEY` | Accordion 与 AccordionItem 通信 |
 
 ### 模块索引
@@ -166,6 +175,7 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 | `value` / `defaultValue` | 状态逻辑 | 受控值优先 |
 | `variant` / `size` | CSS 类 | 映射为 `.snowui-accordion-{variant}` 与 `.snowui-accordion-{size}` |
 | `disabled` | Frame + Context | 根禁用并阻断所有 title 交互 |
+| `continuousHover` | ContinuousHoverController | 控制整项连续 hover；disabled item 作为阻断区 |
 | `items` | 默认内置 | 生成 AccordionItem + Frame title/content |
 | `children` | Snippet | 显式组合内容；存在时替换 items |
 | `...rest` | Frame 透传 | 保留 `as`、事件、状态、动效等 Frame 能力 |
@@ -179,6 +189,18 @@ gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.6.1 (2026-08-28)
+
+- 展开正文的默认文字颜色改为主题自适应 `var(--black-40)`；标题仍继承宿主前景色。
+- 新增 `--snowui-accordion-content-color-override`，允许调用方局部覆盖正文颜色。
+
+### v1.6.0 (2026-08-28)
+
+- Accordion 接入容器级唯一 Continuous Hover Background，在 Item 间以 60ms 专项时序连续移动和变形；展开项覆盖 title 与完整 content，并随展开高度同步重测。
+- 新增 `continuousHover`，默认开启；关闭后恢复 title 的普通 hover overlay。
+- 展开项的非交互 content 区域可点击收起；Link、Button、表单控件、交互 role 与可编辑内容保持自身行为。
+- disabled item 作为连续 hover 阻断区，不显示背景，也不回退点亮相邻项。
 
 ### v1.5.0 (2026-08-17)
 

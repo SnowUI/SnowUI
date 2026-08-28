@@ -1,6 +1,6 @@
 <!--
   Accordion 组件：可展开 / 收起的内容容器
-  v1.5.0
+  v1.6.1
 
   布局模型：复合管理布局。根层为 Frame，仅提供分组状态与 AccordionContext。
   内部内容由 AccordionItem 容器组成，单项内部使用 Frame as="title|content"。
@@ -20,6 +20,8 @@
     import { getSize, type AccordionValue, type AccordionType } from "../context";
     import { ACCORDION_CONTEXT_KEY } from "../keys";
     import { RESIZE_MOTION_STYLE } from "../motion/presets/resize";
+    import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
+    import { ContinuousHoverController } from "../logic/continuous-hover.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
 
     type AccordionVariant = "filled" | "divided";
@@ -38,6 +40,8 @@
         variant?: AccordionVariant;
         size?: AccordionSize;
         disabled?: boolean;
+        /** AccordionItem 之间是否使用容器级连续 hover 背景。 */
+        continuousHover?: boolean;
         role?: string;
         items?: AccordionEntry[];
         children?: Snippet;
@@ -57,6 +61,7 @@
         variant = "filled",
         size = undefined,
         disabled = false,
+        continuousHover = true,
         role = "presentation",
         items = [],
         children,
@@ -69,6 +74,21 @@
     }: Props = $props();
 
     const instanceId = `snowui-accordion-${++accordionIdSeed}`;
+    let accordionElement = $state<HTMLElement>();
+    const continuousHoverController = new ContinuousHoverController();
+    $effect(() => {
+        if (!accordionElement) return;
+        return continuousHoverController.attach(accordionElement, {
+            selector: ":scope > .snowui-accordion-item",
+            layerClass:
+                "snowui-accordion-continuous-hover-layer snowui-rounded-rectangle",
+            axis: "y",
+            enabled: continuousHover,
+            blockedSelector:
+                '.snowui-accordion-item[data-disabled="true"]',
+        });
+    });
+    $effect(() => continuousHoverController.setEnabled(continuousHover));
     const contextSize = getSize();
     const resolvedSize = $derived.by<AccordionSize>(() => {
         if (size) return size;
@@ -145,6 +165,7 @@
 </script>
 
 <Frame
+    bind:element={accordionElement}
     column
     enableAutoLayout={false}
     enableResponsive={true}
@@ -168,7 +189,9 @@
         radius: userRenderHints?.radius ?? "var(--radius-4)",
     }}
     {disabled}
-    style={[RESIZE_MOTION_STYLE, style].filter(Boolean).join("; ")}
+    style={[RESIZE_MOTION_STYLE, CONTINUOUS_HOVER_MOTION_STYLE, style]
+        .filter(Boolean)
+        .join("; ")}
     {...rest}
 >
     {#if children}
@@ -207,6 +230,7 @@
         --snowui-accordion-line-height: var(--leading-14);
         --snowui-accordion-content-font-size: var(--text-12);
         --snowui-accordion-content-line-height: var(--leading-12);
+        --snowui-accordion-content-color: var(--black-40, #00000066);
         --snowui-accordion-padding-y: var(--padding-2);
         --snowui-accordion-padding-x: var(--padding-2);
         --snowui-accordion-content-padding-y: var(--padding-2);
@@ -301,5 +325,26 @@
         --snowui-accordion-content-padding-y: var(--padding-4);
         --snowui-accordion-content-padding-x: var(--padding-5);
         --snowui-accordion-radius: var(--radius-6);
+    }
+
+    :global(:where(.snowui-accordion > .snowui-accordion-item)) {
+        position: relative;
+        z-index: 1;
+    }
+
+    :global(:where(.snowui-accordion-continuous-hover-layer)) {
+        border-radius: var(
+            --snowui-accordion-radius-override,
+            var(--snowui-accordion-radius)
+        );
+        background: color-mix(
+            in srgb,
+            currentColor var(--snowui-hover-opacity, 4%),
+            transparent
+        );
+    }
+
+    :global(:where([theme="dark"] .snowui-accordion-continuous-hover-layer)) {
+        --snowui-hover-opacity: 10%;
     }
 </style>
