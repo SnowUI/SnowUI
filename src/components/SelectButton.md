@@ -39,6 +39,7 @@ SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默
 
 - 主布局模型：宿主组件特化 + 复合管理布局。
 - 宿主：Button；状态控制器：Select。
+- 作为复合控件触发器，Button 宿主默认关闭 hover 背景放大；调用方仍可用 `scaleOnHover={true}` 显式开启。
 - 受控字段：children、as、value、disabled、id、trigger 事件与 ARIA。
 - 无视觉 wrapper 由 Select 提供；Button 仍是真实交互节点。
 - 依赖：Select、Button、Listbox、Input、MenuItem 与 Components 内置语义图标协议。
@@ -48,6 +49,7 @@ SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默
 ### v1.0.1 (2026-08-29)
 
 - 移除按钮触发模式外层误命中的 Field 边框，恢复真实 Button 宿主对完整视觉的唯一所有权。
+- SelectButton 默认关闭 Button 宿主的 hover 背景放大，保留颜色反馈与 `scaleOnHover={true}` 显式开启能力。
 
 ### v1.0.0 (2026-07-03)
 

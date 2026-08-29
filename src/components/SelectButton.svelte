@@ -114,7 +114,10 @@
             placementMode: selectionMode === "action" ? "bottom" : "selected",
             ...parts?.Listbox,
         },
-        Button: buttonProps,
+        Button: {
+            scaleOnHover: false,
+            ...buttonProps,
+        },
     });
 </script>
 

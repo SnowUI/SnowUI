@@ -44,8 +44,9 @@ export const examples = [
         expected: {
             layout: "选项文字单行显示，各项 fill Listbox 锁定宽度",
             render: "选中项不显示 check 图标",
+            interaction: "Button 宿主 hover 默认不放大背景",
         },
-        logic: ["ExplicitComposition"],
+        logic: ["ExplicitComposition", "ScaleOnHoverDefaultOff"],
     },
     {
         name: "SB-04: Input placeholder 回归",
