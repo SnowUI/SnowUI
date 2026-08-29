@@ -118,16 +118,15 @@ Button 的内部布局不接入三槽位模型：
 
 ## ButtonGroup 嵌入态
 
-Button 放入 ButtonGroup 后不需要写额外 prop：
+Button 放入 ButtonGroup 后不需要写额外 prop，ButtonGroup 默认在相邻单元格之间绘制分割线：
 
 ```svelte
 <ButtonGroup>
-  <Button onclick={copy}>
+  <Button as="item" onclick={copy}>
     <Icon><Copy /></Icon>
     <Text>Copy</Text>
   </Button>
-  <Separator column />
-  <Button onclick={openMore}>
+  <Button as="item" onclick={openMore}>
     <Icon><ArrowLineDown /></Icon>
     <Text>More</Text>
   </Button>
@@ -139,6 +138,7 @@ Button 放入 ButtonGroup 后不需要写额外 prop：
 - 嵌入态不绘制 Button 自己的外壳，避免与 ButtonGroup 外壳叠加。
 - 嵌入态会接收 ButtonGroup 分配的单元格 padding，让 hover / 点击响应覆盖完整单元格，而不是只覆盖内部图标和文字。
 - 单元格首尾位置由 ButtonGroup 自动标记，不需要在 Button 上手写 `as="first"` / `as="last"`。
+- 不需要分割线时在 ButtonGroup 上设置 `showSeparator={false}`；无需手工插入 Separator。
 - 嵌入态仍保留 `href` / `target` / `rel`、状态机、动效与 `aria-*` 等 Button 既有能力。
 - 纯图标单元格必须在 Button 上显式声明 `iconOnly`；ButtonGroup 嵌入态会覆盖 icon-only padding，确保图标单元格的点击和 hover 区域与普通单元格一致。
 

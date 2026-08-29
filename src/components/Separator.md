@@ -1,6 +1,6 @@
 # Separator.svelte 文档
 
-> **版本**: v1.0.0
+> **版本**: v1.0.1
 > **职责**: 提供通用 UI 分割线。
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -37,13 +37,7 @@ Separator 的尺寸由 `row` / `column`、`length`、`thickness` 与父级上下
 - 颜色：`var(--black-10)`。
 - 圆角：开启，使用 `var(--radius-full)`。
 
-在 ButtonGroup 内作为 `column` 使用时，Separator 会通过 ButtonGroup 上下文获得当前尺寸、颜色与高度：
-
-- `sm`: 高度 `var(--size-3)`，即 12px。
-- `md`: 高度 `var(--size-4)`，即 16px。
-- `lg`: 高度 `var(--size-5)`，即 20px。
-- `variant="filled"` 时颜色为 `var(--static-white-20)`。
-- 非 filled 变体时颜色为 `var(--black-10)`。
+ButtonGroup 自 v1.2.0 起自行绘制相邻 Button 之间的装饰性分割线；ButtonGroup 调用方不再需要插入 Separator。现有 ButtonGroup Context 解析仅作为旧代码兼容保留，不是新用法。
 
 ## 使用示例
 
@@ -78,10 +72,14 @@ Separator 的尺寸由 `row` / `column`、`length`、`thickness` 与父级上下
 
 ### 关联关系
 
-- **父组件**: 可被 ButtonGroup / Toolbar / Menu / Tabs 等复用
+- **父组件**: 可被 Toolbar / Menu / Tabs 等复用；ButtonGroup 仅保留迁移兼容
 - **依赖**: Frame
 
 ## 更新日志 (Changelog)
+
+### v1.0.1 (2026-08-29)
+
+- ButtonGroup 已拥有自己的内置分割线；Separator 的 ButtonGroup Context 解析仅保留旧代码兼容。
 
 ### v1.0.0 (2026-05-19)
 

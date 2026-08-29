@@ -1,8 +1,8 @@
 <!--
   ButtonGroup 组件：按钮分组容器
-  v1.1.0
+  v1.2.0
 
-  作为多个嵌入态 Button + Separator 的分组外壳。Button 负责单元格交互，ButtonGroup 负责统一外壳视觉与间距。
+  作为多个嵌入态 Button 的分组外壳。Button 负责单元格交互，ButtonGroup 负责统一外壳视觉、间距与内置分割线。
 -->
 
 <script lang="ts">
@@ -18,6 +18,7 @@
         variant?: ButtonGroupVariant;
         size?: ButtonGroupSize;
         disabled?: boolean;
+        showSeparator?: boolean;
         children?: Snippet;
         [key: string]: any;
     }
@@ -26,6 +27,7 @@
         variant = "gray",
         size = undefined,
         disabled = false,
+        showSeparator = true,
         class: className = "",
         style: userStyle = "",
         renderHints: userRenderHints = undefined,
@@ -173,6 +175,7 @@
         .join(" ")}
     data-variant={variant}
     data-disabled={disabled ? "true" : undefined}
+    data-show-separator={showSeparator ? "true" : "false"}
     {disabled}
     style={userStyle || undefined}
     enableAutoLayout={false}
@@ -256,6 +259,7 @@
             var(--border-1)
         );
         --snowui-button-group-separator-length: var(--size-3);
+        --snowui-button-group-separator-thickness: var(--border-1);
         --snowui-button-group-separator-color: var(--black-10, #0000001a);
         --snowui-button-group-separator-filled-color: var(--static-white-20, #ffffff33);
         --snowui-button-group-host-padding-top: 0px;
@@ -378,6 +382,10 @@
             --snowui-button-border-color,
             transparent
         );
+        --snowui-button-group-separator-color: var(
+            --static-white-20,
+            #ffffff33
+        );
     }
 
     :global(
@@ -488,7 +496,26 @@
         );
     }
 
+    :global(
+            :where(.snowui-button-group)[data-show-separator="true"]
+                > [data-as="item"]
+                ~ [data-as="item"]::after
+        ) {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 0;
+        z-index: 1;
+        width: var(--snowui-button-group-separator-thickness);
+        height: var(--snowui-button-group-separator-length);
+        border-radius: var(--radius-full);
+        background-color: var(--snowui-button-group-separator-color);
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+    }
+
+    /* v1.2 迁移兼容：旧手工 Separator 不再占位，避免与内置分割线重复。 */
     :global(:where(.snowui-button-group) > [data-as="separator"]) {
-        align-self: center;
+        display: none;
     }
 </style>

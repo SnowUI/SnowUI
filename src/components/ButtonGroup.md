@@ -1,7 +1,7 @@
 # ButtonGroup.svelte 文档
 
-> **版本**: v1.1.0
-> **职责**: 提供由多个 Button 单元格与 Separator 组成的拆分按钮容器。
+> **版本**: v1.2.0
+> **职责**: 提供带内置可选分割线的多 Button 拆分按钮容器。
 
 **继承**: 复用 Frame.svelte 的通用能力。
 **默认能力开关**: `enableAutoLayout=false`, `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。ButtonGroup 是内联外壳布局，`row` 只提供方向类，不接入三槽位默认 gap。
@@ -13,7 +13,8 @@
 | variant | `'gray' \| 'filled' \| 'outline' \| 'borderless'` | `'gray'` | 外壳视觉变体 |
 | size | `'sm' \| 'md' \| 'lg'` | `'sm'` | 尺寸档位 |
 | disabled | `boolean` | `false` | 禁用整个 ButtonGroup，并传递给内部嵌入态 Button |
-| children | `Snippet` | - | 直接放置 Button / Separator |
+| showSeparator | `boolean` | `true` | 是否显示相邻 Button 单元格之间的内置分割线 |
+| children | `Snippet` | - | 直接放置 `Button as="item"`；分割线由 ButtonGroup 内置 |
 | ...rest | `FrameProps` | - | 透传到根 Frame，保留状态、动效、事件、`data-*` 等能力 |
 
 ## 组件边界
@@ -27,7 +28,7 @@
 
 ## 结构规则
 
-单元格直接使用 `Button`，分割线使用 `Separator`：
+单元格直接使用 `Button`，相邻 item 之间默认由 ButtonGroup 绘制装饰性分割线：
 
 ```svelte
 <ButtonGroup>
@@ -35,13 +36,23 @@
     <Icon><Copy /></Icon>
     <Text>Copy</Text>
   </Button>
-  <Separator as="separator" column />
   <Button as="item" onclick={openMore}>
     <Icon><ChevronDown /></Icon>
     <Text>More</Text>
   </Button>
 </ButtonGroup>
 ```
+
+不需要分割线时关闭内置显示：
+
+```svelte
+<ButtonGroup showSeparator={false}>
+  <Button as="item">Previous</Button>
+  <Button as="item">Next</Button>
+</ButtonGroup>
+```
+
+旧代码中的直系 `Separator as="separator"` 会被 ButtonGroup 隐藏，避免升级后与内置分割线重复；应在迁移时删除这些手工 Separator。其他显式内容仍按普通容器内容渲染，不会被当作 ButtonGroup item。
 
 内部 Button 作为 ButtonGroup 的直系子项时自动进入嵌入态：
 
@@ -51,24 +62,16 @@
 - 默认继承 ButtonGroup 的 `size` / `variant` / `disabled`，实例显式传值可覆盖 size / variant。
 - ButtonGroup 会自动标记直系 Button 的单元格位置：`only` / `first` / `middle` / `last`，消费方不需要手写 `as="first"` / `as="last"`。
 
-若消费方想使用更短的 `<Line />` 写法，只建议在业务文件中对 `Separator` 做本地别名：
-
-```svelte
-<script>
-  import { Separator as Line } from "@snowui-design-system/components";
-</script>
-```
-
 ## 布局模型
 
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
 - ButtonGroup 根层管理外壳圆角、背景、边框与裁剪；视觉 padding 转交给嵌入态 Button，确保每个单元格的 hover / 点击热区覆盖自身完整单元格。
-- ButtonGroup 根层显式关闭 Auto Layout；Button 与 Separator 之间的布局 gap 恒为 `0`，内容到 Separator 的视觉距离只由相邻 Button 的内侧 padding 表达。Button hover 盒必须与 Separator 边界连续。
+- ButtonGroup 根层显式关闭 Auto Layout；Button 单元格之间的布局 gap 恒为 `0`，内容到内置分割线的视觉距离只由相邻 Button 的内侧 padding 表达。Button hover 盒必须与分割线边界连续。
 - 如果消费方在 ButtonGroup 根层追加 padding（例如 `class="p-40"` 或内联 `padding`），ButtonGroup 会把根层 padding 映射为首尾单元格 hover 覆盖的扩展区域；hover 仍然按单元格独立响应，并被根层圆角裁剪。
 - ButtonGroup 与 Button 相同的视觉规则统一使用 Button token：`--snowui-button-padding-block` / `--snowui-button-padding-inline`、`--snowui-button-radius`、`--snowui-button-background`、`--snowui-button-color`、`--snowui-button-border-*`、`--snowui-button-font-size`、`--snowui-button-line-height`。ButtonGroup 只保留分组专属的内侧间距、Separator 长度与外部 padding 扩展变量。
 - Button 管理单元格内部 Icon / Text / Spinner 的 gap。
-- Separator 不通过 margin 表达间距；单元格到分割线的空间由嵌入态 Button 的单元格 padding 承担。
+- 内置分割线不占布局、不通过 margin 表达间距；单元格到分割线的空间由嵌入态 Button 的单元格 padding 承担。
 - 外侧 padding 是单元格内容到 ButtonGroup 边缘的距离，沿用 Button 的 padding-x；内侧 padding 是单元格内容到 Separator 的距离，使用 ButtonGroup 的 gap。
 - 首单元格左侧使用外侧 padding，右侧使用内侧 padding；尾单元格右侧使用外侧 padding，左侧使用内侧 padding；中间单元格两侧都使用内侧 padding。多个单元格按 DOM 顺序自动应用。
 - ButtonGroup 根元素默认 `width: max-content` 且 `align-self: flex-start`，避免放在 `flex-col` 这类父容器中被 `align-items: stretch` 横向撑大。
@@ -85,12 +88,12 @@
 | md | `var(--padding-2)` | `var(--padding-4)` | `var(--gap-3)` | `calc((var(--gap-1) + var(--gap-2)) / 2)` | `var(--radius-4)` | `var(--text-14)` | `var(--leading-14)` | `var(--size-4)` |
 | lg | `var(--padding-3)` | `var(--padding-5)` | `var(--gap-4)` | `var(--gap-2)` | `var(--radius-5)` | `var(--text-16)` | `var(--leading-16)` | `var(--size-5)` |
 
-分割线：
+内置分割线：
 
 - 粗细：`var(--border-1)`，即 0.5px。
 - filled 变体颜色：`var(--static-white-20)`。
 - 非 filled 变体颜色：`var(--black-10)`。
-- 默认圆角，可在 Separator 上设置 `rounded={false}`。
+- 默认圆角；作为纯装饰层不输出额外 DOM，也不进入无障碍树。
 
 ## 验收覆盖
 
@@ -98,9 +101,9 @@
 
 - `sm` / `md` / `lg` 三个尺寸。
 - `gray` / `filled` / `outline` / `borderless` 四个变体。
-- 多个 Button 单元格、多个 Separator、每个 Button 独立 `onclick`。
+- 多个 Button 单元格、默认内置分割线、每个 Button 独立 `onclick`。
+- `showSeparator={false}` 关闭全部内置分割线。
 - ButtonGroup `disabled` 状态。
-- `Separator rounded={false}` 与 Separator 通用水平 / 垂直基础示例。
 
 
 ---
@@ -114,7 +117,6 @@
 
 - **ButtonGroup 组件**: [./ButtonGroup.svelte](./ButtonGroup.svelte)
 - **Button 嵌入态**: [./Button.svelte](./Button.svelte)
-- **Separator 组件**: [./Separator.svelte](./Separator.svelte)
 
 ### 关键 CSS 类
 
@@ -127,10 +129,15 @@
 
 ### 关联关系
 
-- **子组件**: Button、Separator
+- **子组件**: Button；分割线由 ButtonGroup 自有装饰层绘制
 - **依赖**: Frame、ButtonGroup Context
 
 ## 更新日志 (Changelog)
+
+### v1.2.0 (2026-08-29)
+
+- 相邻 Button 单元格默认显示 ButtonGroup 内置分割线，新增 `showSeparator` 公开开关并默认开启。
+- 旧的直系 `Separator as="separator"` 仅保留无重复显示的迁移兼容，调用方不再需要手工插入分割线。
 
 ### v1.1.0 (2026-08-19)
 
@@ -144,5 +151,4 @@
 
 #### 新功能
 - 初始版本，支持 Button 嵌入态、Separator 分割线、四种变体与三种尺寸。
-
 

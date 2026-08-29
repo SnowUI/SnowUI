@@ -151,7 +151,7 @@
       "kind": "component",
       "source": "src/components/ButtonGroup.svelte",
       "documentation": "src/components/ButtonGroup.md",
-      "description": "提供由多个 Button 单元格与 Separator 组成的拆分按钮容器。",
+      "description": "提供带内置可选分割线的多 Button 拆分按钮容器。",
       "intents": [
         "按钮组合",
         "相邻操作组"
