@@ -1,6 +1,6 @@
 # OverflowActions
 
-> **版本**: v1.0.0  
+> **版本**: v1.0.1
 > **职责**: 在有限宽度内保留一组操作，并把容纳不下的操作转移到 More 菜单。
 
 ## 使用
@@ -61,7 +61,9 @@ More 按钮使用 `SelectButton selectionMode="action"`，内部直接组合 `Li
 
 `OverflowAction` 的 `icon` 支持资源图标名称或 Snippet；MenuItem 自动复用相同 icon。内置资源图标使用 MenuItem 的默认 16px，文字使用 MenuItem 的默认 14px / 20px，不继承 More 触发按钮的 Icon-only 尺寸；自定义 Snippet 保留自身视觉。当前不提供菜单项图标或文字尺寸接口。`href` Action 在可见状态使用链接，在菜单中执行时导航到同一地址。每个 Action 的 `id` 在组内必须唯一。
 
-`buttonProps` 是组级 Button 默认值，并同时作用于完整 Action、Icon-only Action、隐藏测量副本与 More 触发按钮。优先级为 `buttonProps` → `parts.Button` / 子项 `parts.Button` → `OverflowAction` 直接 Props；越靠后优先级越高。More 默认只固定 `iconOnly` 等行为字段，未设置 `buttonProps` 时使用 Button 默认的 `variant="gray"` 与 `size="sm"`，不再默认使用 `bare`。
+`buttonProps` 是组级 Button 默认值，并同时作用于完整 Action、Icon-only Action、隐藏测量副本与 More 触发按钮。`parts.Button` 继续作为所有 Action 与 More 的组级 Button 覆盖；`parts.SelectButton` 只覆盖 More，并高于前两者。More 的可见实例与隐藏测量副本使用同一套最终 Props，单独改变 variant、size、bare、class 或 style 后不会造成响应式测量漂移。
+
+Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button` → `OverflowAction` 直接 Props；More 的优先级为 `buttonProps` → `parts.Button` → `parts.SelectButton` → More 受控行为字段，越靠后优先级越高。未单独指定 More 样式时，它与组级 Action 使用同一 Button 样式；若没有任何组级样式，则使用 Button 默认的 `variant="gray"` 与 `size="sm"`。显式 `OverflowAction as="item"` 的直接 Props 只属于该外置 Action，父组件不会反向读取这些子项来推断 More 样式；因此所有外置 Action 都只在自身直接指定样式、而父级没有组级样式时，More 仍使用 Button 默认样式。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
@@ -89,6 +91,11 @@ More 按钮使用 `SelectButton selectionMode="action"`，内部直接组合 `Li
 - [MenuItem.svelte](./MenuItem.svelte)
 
 ## 更新日志 (Changelog)
+
+### v1.0.1 (2026-08-29)
+
+- More 默认跟随组级 Button 样式，支持通过 `parts.SelectButton` 单独覆盖；显式外置 Action 的直接样式不反向影响 More。
+- More 的测量副本改为真实 SelectButton，确保单独样式覆盖后的响应式宽度准确。
 
 ### v1.0.0 (2026-08-12)
 

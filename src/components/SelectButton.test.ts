@@ -100,7 +100,11 @@ export const examples = [
 <SelectButton variant="filled" size="md" placeholder="Filled" options={[]} />
 <SelectButton variant="outline" size="lg" placeholder="Outline" options={[]} />
 <SelectButton bare placeholder="Bare" options={[]} />`,
-        logic: ["HostSpecialization", "Variant", "Size"],
+        expected: {
+            render: "每个实例只显示真实 Button 宿主的 variant，不出现 Select Field 外层边框。",
+            layout: "无视觉 wrapper 与 Button 宿主同尺寸，不额外增加 padding、border 或圆角。",
+        },
+        logic: ["HostSpecialization", "Variant", "Size", "VisualWrapper"],
     },
     {
         name: "SB-09: 禁用与 ARIA",

@@ -124,6 +124,12 @@
     const resolvedButtonProps = $derived(
         mergeComponentPartProps(buttonProps, parts?.Button ?? {}),
     );
+    const resolvedMoreButtonProps = $derived(
+        mergeComponentPartProps(
+            resolvedButtonProps,
+            parts?.SelectButton ?? {},
+        ),
+    );
 
     const context: OverflowActionsContext = {
         register(action) {
@@ -423,8 +429,7 @@
 
     {#if hasOverflow}
         <SelectButton
-            {...resolvedButtonProps}
-            {...parts?.SelectButton}
+            {...resolvedMoreButtonProps}
             iconOnly
             showIndicator={false}
             selectionMode="action"
@@ -460,9 +465,19 @@
 
     <span class="snowui-overflow-actions-more-measure" aria-hidden="true" inert>
         <span bind:this={moreMeasureElement}>
-            <Button {...resolvedButtonProps} iconOnly tabindex={-1} aria-label={moreLabel}>
-                <ComponentIcon name="three-dots" aria-hidden="true" />
-            </Button>
+            <SelectButton
+                {...resolvedMoreButtonProps}
+                iconOnly
+                showIndicator={false}
+                selectionMode="action"
+                ariaLabel={moreLabel}
+                tabindex={-1}
+                parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem }}
+            >
+                {#snippet label()}
+                    <ComponentIcon name="three-dots" aria-hidden="true" />
+                {/snippet}
+            </SelectButton>
         </span>
     </span>
 </Frame>

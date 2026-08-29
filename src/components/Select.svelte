@@ -1,6 +1,6 @@
 <!--
  Select 组件：自定义下拉选择框（Trigger + 外置 Listbox 组合架构）
- v3.2.1
+ v3.2.2
 
  文档: ./Select.md
 -->
@@ -380,7 +380,7 @@
     bind:element={selectEl}
     tag="div"
     row
-    class={`snowui-select snowui-rounded-rectangle${isEmbedded ? " snowui-field-host" : " snowui-field-bordered"}${userClass ? ` ${userClass}` : ""}`}
+    class={`snowui-select snowui-rounded-rectangle${isEmbedded ? " snowui-field-host" : buttonTrigger ? "" : " snowui-field-bordered"}${userClass ? ` ${userClass}` : ""}`}
     data-as={typeof rest.as === "string" ? rest.as : undefined}
     data-invalid={resolvedInvalid ? "true" : undefined}
     data-placeholder-visible={isPlaceholderVisible ? "true" : undefined}

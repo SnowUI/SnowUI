@@ -14,10 +14,10 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 />
 ```
 
-> **版本**: v3.2.1
+> **版本**: v3.2.2
 > **职责**: 自定义下拉选择组件；默认根据 options 内置 Listbox / MenuItem，高级场景支持显式组合，两种模式共用 `ListboxOwnerContext`。
 
-`buttonTrigger` 可将字段型 trigger 切换为真正的 bare `Button`；优先使用 `triggerContent` snippet，未提供时依次回退到选中项、`placeholder`、`ariaLabel`。适合 TableToolbar 的排序、筛选等图标操作。按钮保持 `aria-haspopup="listbox"`、`aria-expanded`、键盘导航和选中后焦点恢复。
+`buttonTrigger` 可将字段型 trigger 切换为真正的 bare `Button`；优先使用 `triggerContent` snippet，未提供时依次回退到选中项、`placeholder`、`ariaLabel`。适合 TableToolbar 的排序、筛选等图标操作。按钮保持 `aria-haspopup="listbox"`、`aria-expanded`、键盘导航和选中后焦点恢复。该模式的 Select 外层是无视觉 wrapper，不接入独立字段的 `.snowui-field-bordered` 外壳，最终背景、边框、尺寸与圆角只由真实 Button 宿主拥有。
 
 **2026-04-20 更新**: 新增搜索 + 自定义值支持 — `filterText` / `customOptions` 状态由 Select 持有，内嵌 `<Input as="search">` 可连接过滤逻辑；`allowCustomValue` prop 允许用户添加自定义选项。`Combobox` 已废弃。
 
@@ -491,6 +491,10 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 ---
 
 ## 更新日志 (Changelog)
+
+### v3.2.2 (2026-08-29)
+
+- `buttonTrigger` 的无视觉 wrapper 不再接入独立字段边框，避免通用 Field 样式覆盖真实 Button 宿主的 variant。
 
 ### v3.2.1 (2026-07-05)
 

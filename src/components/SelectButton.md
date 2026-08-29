@@ -1,6 +1,6 @@
 # SelectButton
 
-> **版本**: v1.0.0  
+> **版本**: v1.0.1
 > **职责**: 以真实 Button 为视觉宿主、复用 Select 单选能力的按钮型选择器。
 
 ## 使用
@@ -14,7 +14,7 @@
 />
 ```
 
-Button 的兼容 Props 在根级平铺；Button 是宿主，不提供 `parts.Button`。默认辅助子树为 Listbox → Input + MenuItem，通过 `parts.Listbox/Input/MenuItem` 配置。存在显式 children 时替换默认 Listbox。
+Button 的兼容 Props 在根级平铺；Button 是宿主，不提供 `parts.Button`。Select 只提供无视觉 wrapper，不额外绘制字段边框、背景或圆角，因此 SelectButton 的最终视觉始终由真实 Button 宿主及其公开 Props 决定。默认辅助子树为 Listbox → Input + MenuItem，通过 `parts.Listbox/Input/MenuItem` 配置。存在显式 children 时替换默认 Listbox。
 
 默认 label 显示当前选项或 placeholder；`label` snippet 只替换 label。默认 indicator 使用 `arrow-line-down`，可用 `showIndicator={false}` 隐藏或用 `indicator` snippet 替换。
 
@@ -44,6 +44,10 @@ SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默
 - 依赖：Select、Button、Listbox、Input、MenuItem 与 Components 内置语义图标协议。
 
 ## 更新日志 (Changelog)
+
+### v1.0.1 (2026-08-29)
+
+- 移除按钮触发模式外层误命中的 Field 边框，恢复真实 Button 宿主对完整视觉的唯一所有权。
 
 ### v1.0.0 (2026-07-03)
 

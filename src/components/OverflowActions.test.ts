@@ -84,4 +84,31 @@ export const examples = [
         expected: { render: "初始完整显示三个 Action；宽度不足时先统一隐藏文字，再按删除、复制、编辑的顺序从右向左逐个进入 More。组级 outline/md 应用于所有普通 Action 与 More，编辑显式 variant=filled 覆盖组级 outline。", layout: "完整、Icon-only 与 More 三阶段保持同一组级样式；More 默认与 Button 一样使用 gray，本例由 buttonProps 改为 outline。", interaction: "显式子项行为不变。", performance: "完整、紧凑与 More 测量使用同一 buttonProps。", responsive: "跟随效果区域实际宽度响应，先统一 compact，再由 overflowFrom=end 逐个隐藏。" },
         logic: ["ButtonProps", "ExplicitOverride", "Compact", "Progressive", "More", "Measure"],
     },
+    {
+        name: "OA-07:More 单独样式覆盖",
+        code: `OA-07
+<OverflowActions
+    availableWidth={160}
+    buttonProps={{ variant: "outline", size: "md" }}
+    parts={{ SelectButton: { variant: "filled", size: "lg" } }}
+    items={[
+        { id: "edit", label: "编辑", icon: "pencil-simple" },
+        { id: "copy", label: "复制", icon: "copy" },
+        { id: "delete", label: "删除", icon: "trash" },
+    ]}
+/>`,
+        expected: { render: "普通 Action 使用组级 outline/md，More 单独使用 filled/lg。", layout: "More 的可见实例与隐藏测量副本使用同一套最终样式，响应式计算包含单独指定后的实际宽度。", interaction: "More 仍保持 action 模式与完整菜单行为。", performance: "单独覆盖不新增独立测量链。", responsive: "More 样式改变后仍按真实宽度进入溢出状态。" },
+        logic: ["ButtonProps", "MoreOverride", "SelectButtonPart", "Measure"],
+    },
+    {
+        name: "OA-08:外置 Action 不推断 More 样式",
+        code: `OA-08
+<OverflowActions availableWidth={160} compact="none" overflow="progressive">
+    <OverflowAction as="item" id="edit" label="编辑" icon="pencil-simple" variant="outline" size="md" />
+    <OverflowAction as="item" id="copy" label="复制" icon="copy" variant="outline" size="md" />
+    <OverflowAction as="item" id="delete" label="删除" icon="trash" variant="outline" size="md" />
+</OverflowActions>`,
+        expected: { render: "三个显式外置 Action 各自使用 outline/md；父级未提供组级样式，因此 More 使用 Button 默认 gray/sm。", layout: "父组件不读取显式子项的直接 Props 推断 More 样式。", interaction: "外置 Action 与 More 保持各自的真实 Button 行为。", performance: "不增加对子项 DOM 或 Props 的反向扫描。", responsive: "More 使用默认样式的真实宽度参与溢出计算。" },
+        logic: ["ExplicitComposition", "DirectProps", "MoreDefault", "NoReverseInference"],
+    },
 ] as const;
