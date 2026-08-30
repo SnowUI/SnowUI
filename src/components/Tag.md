@@ -1,6 +1,7 @@
 # Tag.svelte 文档
 
-> **版本**: v1.2.1
+> **版本**: v1.2.2
+> **变更记录 (2026-08-30)**: 收起态内置 X 通过 Tag 直属规则完整覆盖共享按钮的 `flex` shorthand，确保视觉隐藏时不保留 12px 布局占位。
 > **变更记录 (2026-05-22)**: `shape="left-arrow" / "right-arrow"` 改为内部 SVG 背景路径，根据当前 Tag 宽高生成完整圆角箭头轮廓；所有外角均圆角化，尽量复原 Workshop `node-id=11951-40471` 中的箭头 Tag。
 > **变更记录 (2026-05-21)**: 激活态内置 X 颜色改为 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%，不再使用黑色。
 > **变更记录 (2026-08-16)**: 内置 X 改由 Components 自有 `ComponentIcon name="close"` 解析；无外部资源包时保持相同默认形状，应用级 `IconProvider` 可统一替换。
@@ -234,6 +235,10 @@
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.2.2 (2026-08-30)
+
+- 修复 closable Tag 非 hover 时隐藏 X 被共享 `flex` shorthand 恢复为 12px 占位，造成右侧多余空间的问题。
 
 ### v1.2.1 (2026-08-16)
 

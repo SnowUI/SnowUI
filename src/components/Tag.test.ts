@@ -1,6 +1,6 @@
 /**
  * Tag.test.ts
- * v1.0.0
+ * v1.2.2
  *
  * 测试覆盖：Tag.md 定义的所有功能点
  */
@@ -35,6 +35,11 @@ export const examples = [
         说明:边距按"靠近边的元素类型"自动调整 —— 文字距边 8px、Icon/X 距边 4px。组件通过 MutationObserver 检测真实首/末位节点（含文本节点），写入 data-edge-left / data-edge-right;closable 的 X 不计入末位检测，由 hover 状态另行收紧右 padding。
     </div>
 </div>`,
+        expected: {
+            layout: "closable Tag 非 hover 时隐藏 X 不占位，与同内容非 closable Tag 等宽",
+            interaction: "hover 时 X 展开为 12px，移出后完全收起",
+        },
+        logic: ["EdgePadding", "HiddenCloseNoLayoutSpace", "CloseHoverExpansion"],
     },
 
     // === B: 激活态 ===

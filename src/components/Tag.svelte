@@ -1,5 +1,5 @@
 <!--
-  Tag 组件：标签 v1.2.1
+  Tag 组件：标签 v1.2.2
 
   布局模型：内联外壳布局（与 Button 一致），不接入三槽位。
   - 子元素通过 gap 自然排列；外部覆盖 `--snowui-tag-gap`（或传 gap）即可同步影响所有子元素之间的间距，包括内置 X 与文字、外部 Icon 与文字。
@@ -447,13 +447,13 @@
     /* 内置删除 X：视觉/hover 复用 .snowui-clear-icon-btn；
        Tag 只补充自身显示时机：默认 width=0 + overflow:hidden 不占位，
        hover Tag 时 width 展开到 icon-size，由 Frame 桥接动效平滑过渡撑出 Tag 宽度。 */
-    :global(:where(.snowui-tag-close)) {
+    :global(:where(.snowui-tag) > .snowui-tag-close) {
         --snowui-clear-icon-size-override: var(--snowui-tag-icon-size);
         --snowui-clear-icon-opacity-override: 0;
         --snowui-clear-icon-hover-opacity-override: var(--snowui-tag-close-opacity-hover);
 
         width: 0;
-        flex-basis: 0;
+        flex: 0 0 0;
         overflow: hidden;
         transition:
             width var(--snowui-frame-color-motion-duration, 0.15s)
@@ -465,10 +465,10 @@
     }
 
     /* Hover Tag 时 X 显形并撑出宽度 */
-    :global(:where(.snowui-tag):hover .snowui-tag-close) {
+    :global(:where(.snowui-tag):hover > .snowui-tag-close) {
         --snowui-clear-icon-opacity-override: var(--snowui-tag-close-opacity);
 
         width: var(--snowui-tag-icon-size);
-        flex-basis: var(--snowui-tag-icon-size);
+        flex: 0 0 var(--snowui-tag-icon-size);
     }
 </style>
