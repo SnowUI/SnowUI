@@ -1,6 +1,6 @@
 <!--
   ChartGroup 图表组合容器 (PRO)
-  v0.1.0 (2026-06-09)
+  v0.1.1 (2026-08-31)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。
   文档: ./ChartGroup.md
@@ -10,7 +10,11 @@
     import { onDestroy, setContext, type Snippet } from "svelte";
     import { Frame, type FrameProps, type RenderHints } from "@snowui-design-system/components";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
-    import { resolveVisibleXIndexes } from "../lib/chart/axis";
+    import {
+        CHART_PLOT_TOP_INSET,
+        CHART_X_AXIS_RESERVED_HEIGHT,
+        resolveVisibleXIndexes,
+    } from "../lib/chart/axis";
     import { toCssLength, toNumber } from "../lib/chart/geometry";
     import {
         CHART_GROUP_CONTEXT_KEY,
@@ -73,9 +77,9 @@
     }
 
     const DEFAULT_PLOT_BOUNDS = {
-        top: 16,
+        top: CHART_PLOT_TOP_INSET,
         right: 0,
-        bottom: 48,
+        bottom: CHART_X_AXIS_RESERVED_HEIGHT,
         left: 0,
     };
 

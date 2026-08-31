@@ -1,6 +1,6 @@
 # LineChart (折线图)
 
-> **版本**: v1.3.1
+> **版本**: v1.3.3
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
@@ -15,6 +15,8 @@
 - **Area 不拆分**: Area 是 `LineChart` 的序列填充形态；通过 `series[].area` 开启，不单独拆 `AreaChart`。
 - **多序列**: 一张图可同时渲染实线、虚线、ChartSpec 默认色序和不同 marker 策略。
 - **坐标轴内建**: 横坐标、纵坐标、网格线属于 LineChart 形态能力，放在组件内。
+- **Y 轴自适应宽度**: Y 轴不使用固定预留宽度；标签区宽度等于当前最宽可见标签的实际渲染宽度，标签右边缘与绘图区起点固定保留 `12px`。标签变宽时仅按实际增加的宽度压缩绘图区。
+- **无上下外边距**: 绘图区顶部与组件顶部对齐；显示 X 轴时底部仅保留 `8px` 标签间距和 `16px` 标签高度，标签底边与组件底部对齐；隐藏 X 轴时绘图区延伸到组件底部。
 - **分类轴点位模型**: 横坐标默认使用 `edge` 模式，首尾数据点与首尾 label 中心都对齐到绘图区两端；也可切换为 `cell` 模式让节点位于等宽分类 cell 中心。label 放不下时按当前点位模式重新计算并自动减少中间坐标和数据点，至少保留首尾。
 - **节点可定制**: 序列和单点都可配置 marker；单点配置优先级高于序列配置。
 - **hover label**: 默认 hover / focus 节点时在点上方 4px 显示数值 label，同时节点反色并在节点后方显示 0.5px 黑色竖线；字号 12px，常规体，颜色为 Black/100%（`var(--black-100)`），数字格式消费 `NumberFormats.md`，默认非整数显示 2 位小数。`alwaysShowHoverLabel` 可让数值 label 常显。
@@ -212,7 +214,8 @@ Marker 说明：
 - X 轴 label 自动显示规则：按每个 label 的估算显示宽度与当前 `xAxisMode` 下的 label cell 宽度判断；若完整 label 放不进 cell，或设置了 `xMaxLabelCount`，则按同一索引自动减少中间 label 和数据点。保留索引必须形成等差步数，若当前显示数量无法让原始步数均分，则继续减少显示数量；例如 20 个点限制最多 5 个时，因为 `20 - 1 = 19` 无法被 `5 - 1`、`4 - 1`、`3 - 1` 整除，所以只保留首尾。每次抽稀后按当前 `xAxisMode` 重新计算 label cell，直到布局稳定，并始终保留首尾 label。ellipsis 只作为极端兜底，不作为抽稀后的正常结果。
 - Y 轴 label 抽稀规则：自动生成刻度时优先通过 `yTickCount` / `yMaxLabelCount` 生成合适数量；显式传入 `yTicks` 或纵向空间不足时，按首尾保留、等步数的规则减少显示 label，水平网格线跟随可见 Y label。
 - X 轴 label cell 顶部到最下面 x 轴基线的间距为 `8px`。
-- Y 轴 label 右边缘到绘图区线段起点的间距为 `12px`。
+- 绘图区 `top=0`；有 X 轴时 `bottom=24px`，只包含上述 `8px` 间距和 `16px` label 高度；无 X 轴时 `bottom=0`，不再保留额外上下空间。
+- Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘到绘图区线段起点的间距固定为 `12px`。例如 formatter 输出 `100000` 时，绘图区只按该文本比短刻度新增的实际宽度缩小，固定间距不变。
 - 不接入三槽位协议，不承担通用子元素排列。
 
 详见 [LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
@@ -269,7 +272,7 @@ SVG 图层从下到上为：
 | :--- | :--- | :--- |
 | LineChart | [./LineChart.svelte](./LineChart.svelte) | 主组件 |
 | LineChart 示例 | [./LineChart.test.ts](./LineChart.test.ts) | Test 示例 |
-| Chart 共享逻辑 | [../lib/chart/](../lib/chart/) | 颜色、渐变、基础几何 helper、appearance timeline |
+| Chart 共享逻辑 | [../lib/chart/](../lib/chart/) | 颜色、渐变、基础几何 helper、Y 轴标签宽度测量、appearance timeline |
 
 ### 关键字映射
 
@@ -286,6 +289,16 @@ SVG 图层从下到上为：
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.3 (2026-08-31)
+
+#### 调整
+- 移除笛卡尔绘图区顶部和底部的额外留白；底部仅保留 X 轴标签自身所需的 `24px`。
+
+### v1.3.2 (2026-08-31)
+
+#### 调整
+- Y 轴改为按最宽可见标签的实际渲染宽度自适应，标签与绘图区之间固定保留 `12px`。
 
 ### v1.3.1 (2026-06-07)
 

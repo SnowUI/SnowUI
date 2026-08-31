@@ -1,5 +1,12 @@
 export type ChartXAxisMode = "edge" | "cell";
 
+export const CHART_Y_AXIS_LABEL_GAP = 12;
+export const CHART_AXIS_LABEL_HEIGHT = 16;
+export const CHART_X_AXIS_LABEL_GAP = 8;
+export const CHART_X_AXIS_RESERVED_HEIGHT =
+    CHART_X_AXIS_LABEL_GAP + CHART_AXIS_LABEL_HEIGHT;
+export const CHART_PLOT_TOP_INSET = 0;
+
 export function resolveCategoryLabels(
     fallbackLabels: string[],
     overrideLabels: string[],
@@ -156,6 +163,29 @@ export function formatAxisTick(value: number) {
     if (value === 0) return "0";
     if (Math.abs(value) >= 1000) return `${Math.round(value / 1000)}K`;
     return String(Math.round(value));
+}
+
+/**
+ * 测量当前实际渲染的轴标签宽度。
+ *
+ * 标签的字体、字号、字形特性和调用方 override 都由 SVG 的最终计算样式决定，
+ * 因此这里不能使用字符数量或固定 bounds 估算。
+ */
+export function measureRenderedAxisLabelWidth(
+    group: SVGGElement | null | undefined,
+) {
+    if (!group) return 0;
+    let width = 0;
+    for (const label of group.querySelectorAll<SVGTextElement>(
+        "[data-snowui-axis-measure-label]",
+    )) {
+        try {
+            width = Math.max(width, label.getComputedTextLength());
+        } catch {
+            width = Math.max(width, label.getBBox().width);
+        }
+    }
+    return Number.isFinite(width) ? Math.max(0, width) : 0;
 }
 
 export function sampleIndexes(count: number, maxVisibleCount: number) {

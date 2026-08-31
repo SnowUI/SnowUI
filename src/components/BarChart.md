@@ -1,6 +1,6 @@
 # BarChart (柱状图)
 
-> **版本**: v1.0.0
+> **版本**: v1.0.2
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。
@@ -16,6 +16,8 @@
 - **并排规则**: `mode="group"` 使用 `bars` 在同一单元内并排。默认柱间距 `barGap=4`，颜色使用 Chart 默认色序，可扩展为多柱。
 - **方向规则**: `orientation="vertical"` 为纵向柱状图，分类轴在横向；`orientation="horizontal"` 为横向条形图，分类轴在纵向。所有柱模式都支持两个方向。
 - **坐标轴内建**: 坐标轴、刻度、网格线属于 BarChart 形态能力，放在组件内。
+- **Y 轴自适应宽度**: Y 轴不使用固定预留宽度；标签区宽度等于当前最宽可见标签的实际渲染宽度，标签右边缘与绘图区起点固定保留 `12px`。纵向数值轴和横向分类轴使用同一 Chart 共享测量入口；标签变宽时仅按实际增加的宽度压缩绘图区。
+- **无上下外边距**: 绘图区顶部与组件顶部对齐；显示 X 轴时底部仅保留 `8px` 标签间距和 `16px` 标签高度，标签底边与组件底部对齐；隐藏 X 轴时绘图区延伸到组件底部。
 - **hover 规则**: 柱体 hover 使用 `StyleSpec.md §2.4` 的 overlay 机制，不改写柱体本身颜色。视觉透明度为 40% 及以上的实心柱按 filled Button hover 规则叠加 `StaticWhite/20%`；视觉透明度低于 40% 的浅透明柱按浅黑 hover 档位叠加 `Black/4%`。`overlay` 后层 10% 与多段式浅色段都会走 `Black/4%` overlay。
 - **hover label**: 默认 hover / focus 柱体时在柱体上方 4px 显示数值 label；字号 12px，常规体，颜色为 Black/100%（`var(--black-100)`），数字格式消费 `NumberFormats.md`，默认非整数显示 2 位小数。`stack` 分段柱中只有最上方分段 label 使用该颜色，其余分段 label 使用 `StaticWhite/100%`。`alwaysShowHoverLabel` 可让数值 label 常显；出现动效播放时，label 数值跟随当前柱高比例实时变化，从 `80%` 对应值变化到完整值。
 - **出现动效**: 所有分类单元共享一条 BarChart 出现动效时间轴；柱体初始显示为目标高度 / 宽度的 `80%`，再从左到右依次升高到 `100%`。相邻分类单元的启动间隔固定；整条时间轴应用 `easeOut` 缓动；单柱升高使用 Frame 默认 morph 时长 `300ms` 作为基准，每个分类单元的变高进度单独应用 `easeOut` 缓动，并且越靠右的单元升高时长越长。`stack` 模式把一个分类单元内的所有分段看作同一个动效整体：同一单元内的所有分段共享同一局部进度，从各自 `80%` 高度一起升高到 `100%`，不分别启动独立变高动效；`segmentGap` 在动效过程中保持固定像素间距，`segmentGap=0` 时始终无间距。
@@ -184,6 +186,8 @@ interface BarChartItem {
 - 根层为 `Frame`，内部为单个 SVG 绘图区。
 - 尺寸由 `width` / `height` 与 SVG 坐标算法决定；作为外部布局子项时表现为 Hug。
 - `orientation="vertical"` 时分类轴为横向 cell，柱位于 cell 中心；`orientation="horizontal"` 时分类轴为纵向 cell。
+- Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘与绘图区起点间距固定为 `12px`。
+- 绘图区 `top=0`；有 X 轴时 `bottom=24px`，只包含 `8px` label 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。纵向分类 label 与横向数值 label 均不得在组件底部额外留白。
 - 单元内部规则：
   - `single`: 一个单元一根柱。
   - `stack`: 一个单元一根多段柱；`segmentGap=0` 时中间段无间隔并只在整体首尾保留圆角；`segmentGap>0` 时每段独立圆角。
@@ -228,6 +232,7 @@ SVG 图层从下到上为：
 - `colors.ts`: Chart 默认色序、SnowUI 语意色解析、单色透明度梯度。
 - `gradients.ts`: CSS `linear-gradient(...)` 与渐变对象解析。
 - `geometry.ts`: 数值、CSS 长度与 clamp。
+- `axis.ts`: Y 轴可见标签实际渲染宽度测量。
 - Frame 默认 morph 时序: BarChart 出现动效的单柱升高基准时长来源。
 
 保留在组件内：
@@ -243,6 +248,8 @@ SVG 图层从下到上为：
 
 ### Changelog
 
+- 2026-08-31 v1.0.2 — 移除笛卡尔绘图区顶部和底部的额外留白；底部仅保留 X 轴标签自身所需的 `24px`。
+- 2026-08-31 v1.0.1 — Y 轴改为按最宽可见标签的实际渲染宽度自适应，标签与绘图区之间固定保留 `12px`。
 - 2026-06-05 v1.0.0 — 新增 BarChart，支持纵向 / 横向、单柱、多段、相叠、多柱并排、坐标轴与 Chart 出现动效；出现动效采用 80% 初始高度、固定分类间隔、Frame morph 基准时长与单柱独立缓动的逐柱升高形式，label 数值可随柱高补间变化。
 
 ### User Notes

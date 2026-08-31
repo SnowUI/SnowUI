@@ -1,6 +1,6 @@
 # ChartGroup 图表组合容器
 
-> **版本**: v0.1.0
+> **版本**: v0.1.1
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。
@@ -16,6 +16,7 @@
 - **子图表保持原子**: 子图表仍独立传入自身数据、颜色、轴线与出现动效配置；`ChartGroup` 不复制 BarChart / LineChart 的几何绘制算法。
 - **单元格 hover**: 当 `hoverMode="cell"` 时，容器在顶层绘制分类 cell 命中层；每个 cell 以分类中心为基准，左右各半个单元宽度，鼠标进入该区域即可触发共享 `activeCellIndex`。
 - **坐标轴控制**: `ChartGroup` 可统一下发坐标轴显示、网格、辅助线、X/Y label 抽稀、Y 轴 domain / ticks / formatter 与 LineChart 的 `xAxisMode`。子图表显式传入同名 prop 时优先使用子图表自身配置。
+- **共享垂直边界**: 默认绘图区顶部为 `0`；底部仅保留 X 轴 `8px` 间距和 `16px` 标签高度。共享命中层与 BarChart / LineChart 使用同一垂直边界。
 - **叠加画布**: 根层是 `position: relative` 的固定尺寸画布，子图表可通过 `class="absolute top-0 left-0"` 叠加。
 - **单坐标轴**: 组合图表推荐只让一个子图表渲染坐标轴，其余子图表关闭坐标轴、网格和辅助线。
 - **无内置业务外壳**: 不内置标题、卡片背景、legend 或 toolbar；这些由外部 Frame / Card 组合。
@@ -45,7 +46,7 @@
 | `xMaxLabelCount` | `number` | - | 共享 X 轴最多显示 label 数量 |
 | `yLabelAutoCull` | `boolean` | `true` | 共享 Y 轴 label 自动抽稀开关 |
 | `yMaxLabelCount` | `number` | - | 共享 Y 轴最多显示 label 数量 |
-| `plotBounds` | `{ top?: number; right?: number; bottom?: number; left?: number }` | `{ top: 16, right: 0, bottom: 48, left: 0 }` | 共享 cell hit layer 覆盖的绘图区边界 |
+| `plotBounds` | `{ top?: number; right?: number; bottom?: number; left?: number }` | `{ top: 0, right: 0, bottom: 24, left: 0 }` | 共享 cell hit layer 覆盖的绘图区边界 |
 | `hoverMode` | `"item" \| "cell"` | `"cell"` | 共享 hover 模式；`cell` 由容器命中层触发，`item` 不绘制共享 cell 命中层 |
 | `activeCellIndex` | `number \| null` | - | 受控当前 hover cell index |
 | `defaultActiveCellIndex` | `number \| null` | `null` | 非受控初始 hover cell index |
@@ -153,7 +154,7 @@ interface ChartGroupContext {
   <BarChart class="absolute top-0 left-0 z-0" data={bars} />
   <LineChart
     class="absolute top-0 left-0 z-10"
-    height={352}
+    height={376}
     showXAxis={false}
     showYAxis={false}
     showGrid={false}
@@ -180,6 +181,10 @@ interface ChartGroupContext {
 - **归属判断**: PRO。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
 
 ## 更新日志 (Changelog)
+
+### v0.1.1 (2026-08-31)
+
+- 移除默认绘图区的额外上下留白；默认边界改为 `top: 0`、`bottom: 24`。
 
 ### v0.1.0 (2026-06-09)
 

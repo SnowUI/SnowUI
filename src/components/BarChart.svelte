@@ -1,6 +1,6 @@
 <!--
   BarChart 柱状图组件 (PRO)
-  v1.0.0 (2026-06-05)
+  v1.0.2 (2026-08-31)
 
   职责:渲染支持纵向/横向、多段、相叠、多柱并排与坐标轴的柱状图。
   文档: ./BarChart.md
@@ -8,12 +8,13 @@
 
 <script lang="ts">
     import type { Snippet } from "svelte";
-    import { getContext, onDestroy, onMount } from "svelte";
+    import { getContext, onDestroy, onMount, tick } from "svelte";
     import {
         Frame,
         formatNumberLabel,
         getNumberFormat,
         mergeNumberFormatOptions,
+        resizeManager,
         type NumberFormatOptions,
         type RenderHints,
     } from "@snowui-design-system/components";
@@ -30,8 +31,14 @@
     } from "../lib/chart/colors";
     import { resolveColorGradient } from "../lib/chart/gradients";
     import {
+        CHART_AXIS_LABEL_HEIGHT,
+        CHART_PLOT_TOP_INSET,
+        CHART_X_AXIS_LABEL_GAP,
+        CHART_X_AXIS_RESERVED_HEIGHT,
+        CHART_Y_AXIS_LABEL_GAP,
         createNiceTicks,
         formatAxisTick,
+        measureRenderedAxisLabelWidth,
         normalizeTickValue,
         resolveCategoryLabels as resolveSharedCategoryLabels,
         resolveVisibleCategoryIndexes,
@@ -225,10 +232,10 @@
         { name: "Sat", value: 92 },
     ];
     const DEFAULT_BOUNDS: AxisBounds = {
-        top: 16,
+        top: CHART_PLOT_TOP_INSET,
         right: 0,
-        bottom: 48,
-        left: 52,
+        bottom: CHART_X_AXIS_RESERVED_HEIGHT,
+        left: 0,
     };
     // 初始高度比例。0.8 表示所有柱子从 80% 高度开始。
     const BAR_CHART_INITIAL_APPEARANCE_SCALE = 0.8;
@@ -328,6 +335,8 @@
     }: Props = $props();
 
     let rootElement = $state<HTMLElement>();
+    let yAxisMeasureGroup = $state<SVGGElement>();
+    let yAxisLabelWidth = $state(0);
     let internalAppearanceProgress = $state(0);
     let hasSyncedDefaultAppearanceProgress = $state(false);
     let appearanceFrame = $state<number | null>(null);
@@ -398,7 +407,12 @@
         ),
     );
     const bounds = $derived(
-        resolveBounds(effectiveShowXAxis, effectiveShowYAxis, orientation),
+        resolveBounds(
+            effectiveShowXAxis,
+            effectiveShowYAxis,
+            orientation,
+            yAxisLabelWidth,
+        ),
     );
     const plotWidth = $derived(
         Math.max(1, numericWidth - bounds.left - bounds.right),
@@ -445,6 +459,41 @@
             effectiveYMaxLabelCount,
         ),
     );
+    const yAxisLabels = $derived(
+        !effectiveShowYAxis
+            ? []
+            : orientation === "vertical"
+              ? visibleTicks.map((tick) =>
+                    (effectiveYTickFormatter ?? formatAxisTick)(tick),
+                )
+              : visibleLabels,
+    );
+
+    $effect(() => {
+        const group = yAxisMeasureGroup;
+        const labels = yAxisLabels;
+        if (!effectiveShowYAxis || labels.length === 0) {
+            yAxisLabelWidth = 0;
+            return;
+        }
+        if (!group) return;
+
+        const updateWidth = () => {
+            const nextWidth = measureRenderedAxisLabelWidth(group);
+            if (Math.abs(nextWidth - yAxisLabelWidth) > 0.01) {
+                yAxisLabelWidth = nextWidth;
+            }
+        };
+        let active = true;
+        const stopWatching = resizeManager.watch(group, updateWidth);
+        void tick().then(() => {
+            if (active) updateWidth();
+        });
+        return () => {
+            active = false;
+            stopWatching();
+        };
+    });
     const gridTicks = $derived(
         effectiveShowXAxis
             ? visibleTicks.filter((tick) => Math.abs(tick - safeMin) > 1e-9)
@@ -724,6 +773,7 @@
         hasXAxis: boolean,
         hasYAxis: boolean,
         chartOrientation: BarChartOrientation,
+        measuredYAxisWidth: number,
     ): AxisBounds {
         const needsLeft =
             hasYAxis || (chartOrientation === "horizontal" && hasYAxis);
@@ -734,7 +784,9 @@
                     ? 16
                     : DEFAULT_BOUNDS.right,
             bottom: hasXAxis ? DEFAULT_BOUNDS.bottom : 0,
-            left: needsLeft ? DEFAULT_BOUNDS.left : 0,
+            left: needsLeft
+                ? measuredYAxisWidth + CHART_Y_AXIS_LABEL_GAP
+                : DEFAULT_BOUNDS.left,
         };
     }
 
@@ -1903,6 +1955,20 @@
         width={numericWidth}
         height={numericHeight}
     >
+        {#if effectiveShowYAxis}
+            <g
+                bind:this={yAxisMeasureGroup}
+                class="snowui-bar-chart-axis-labels"
+                visibility="hidden"
+                pointer-events="none"
+                aria-hidden="true"
+            >
+                {#each yAxisLabels as label}
+                    <text data-snowui-axis-measure-label>{label}</text>
+                {/each}
+            </g>
+        {/if}
+
         <defs>
             {#each gradients as gradient}
                 {#if gradient}
@@ -2129,7 +2195,7 @@
         <g class="snowui-bar-chart-axis-labels">
             {#if effectiveShowYAxis}
                 {#if orientation === "vertical"}
-                    {#each visibleTicks as tick}
+                    {#each visibleTicks as tick, index}
                         {@const y = scaleValue(
                             tick,
                             safeMin,
@@ -2141,25 +2207,28 @@
                         )}
                         <text
                             class="snowui-bar-chart-y-label"
-                            x={bounds.left - 12}
+                            x={bounds.left - CHART_Y_AXIS_LABEL_GAP}
                             {y}
                             text-anchor="end"
                             dominant-baseline="middle"
                         >
-                            {(effectiveYTickFormatter ?? formatAxisTick)(tick)}
+                            {yAxisLabels[index]}
                         </text>
                     {/each}
                 {:else}
-                    {#each visibleLabels as label, index}
+                    {#each visibleLabels as _label, index}
                         <foreignObject
                             class="snowui-bar-chart-y-label-cell"
                             x="0"
                             y={resolveCategoryCellStart(index)}
-                            width={Math.max(0, bounds.left - 12)}
+                            width={Math.max(
+                                0,
+                                bounds.left - CHART_Y_AXIS_LABEL_GAP,
+                            )}
                             height={resolveCategoryCellSize()}
                         >
                             <div class="snowui-bar-chart-y-label-content">
-                                {label}
+                                {yAxisLabels[index]}
                             </div>
                         </foreignObject>
                     {/each}
@@ -2174,9 +2243,11 @@
                             class="snowui-bar-chart-x-label-cell"
                             x={resolveCategoryCenter(index) -
                                 Math.min(plotWidth, cellSize) / 2}
-                            y={bounds.top + plotHeight + 8}
+                            y={bounds.top +
+                                plotHeight +
+                                CHART_X_AXIS_LABEL_GAP}
                             width={Math.min(plotWidth, cellSize)}
-                            height="16"
+                            height={CHART_AXIS_LABEL_HEIGHT}
                         >
                             <div class="snowui-bar-chart-x-label-content">
                                 {label}
@@ -2197,7 +2268,10 @@
                         <text
                             class="snowui-bar-chart-x-value-label"
                             {x}
-                            y={bounds.top + plotHeight + 24}
+                            y={bounds.top +
+                                plotHeight +
+                                CHART_X_AXIS_LABEL_GAP +
+                                CHART_AXIS_LABEL_HEIGHT / 2}
                             text-anchor="middle"
                             dominant-baseline="middle"
                         >
@@ -2397,7 +2471,6 @@
         display: flex;
         width: 100%;
         height: 100%;
-        min-width: 20px;
         align-items: center;
         justify-content: center;
         overflow: hidden;
@@ -2417,6 +2490,10 @@
         font-feature-settings:
             "ss01" 1,
             "cv01" 1;
+    }
+
+    :global(:where(.snowui-bar-chart-x-label-content)) {
+        min-width: 20px;
     }
 
     :global(:where(.snowui-bar-chart-y-label-content)) {

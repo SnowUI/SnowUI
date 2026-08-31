@@ -1,6 +1,6 @@
 <!--
   LineChart 折线图组件 (PRO)
-  v1.2.0 (2026-06-03)
+  v1.3.3 (2026-08-31)
 
   职责:渲染带横坐标、纵坐标、网格、实线/虚线、面积填充、圆角转折线与可定制节点点样式的折线图。
   文档: ./LineChart.md
@@ -8,12 +8,13 @@
 
 <script lang="ts">
     import type { Snippet } from "svelte";
-    import { getContext, onDestroy, onMount } from "svelte";
+    import { getContext, onDestroy, onMount, tick } from "svelte";
     import {
         Frame,
         formatNumberLabel,
         getNumberFormat,
         mergeNumberFormatOptions,
+        resizeManager,
         type NumberFormatOptions,
         type RenderHints,
     } from "@snowui-design-system/components";
@@ -32,8 +33,14 @@
     } from "../lib/chart/appearance-timeline";
     import { resolveColorGradient } from "../lib/chart/gradients";
     import {
+        CHART_AXIS_LABEL_HEIGHT,
+        CHART_PLOT_TOP_INSET,
+        CHART_X_AXIS_LABEL_GAP,
+        CHART_X_AXIS_RESERVED_HEIGHT,
+        CHART_Y_AXIS_LABEL_GAP,
         createNiceTicks,
         formatAxisTick,
+        measureRenderedAxisLabelWidth,
         normalizeTickValue,
         resolveIndexedLabels,
         resolveVisibleXIndexes,
@@ -224,10 +231,10 @@
     }
 
     const DEFAULT_BOUNDS: AxisBounds = {
-        top: 16,
+        top: CHART_PLOT_TOP_INSET,
         right: 0,
-        bottom: 48,
-        left: 52,
+        bottom: CHART_X_AXIS_RESERVED_HEIGHT,
+        left: 0,
     };
     const LINE_CHART_SERIES_APPEARANCE_DURATION = 600;
     const LINE_CHART_APPEARANCE_EASE_OUT_POWER = 2;
@@ -313,6 +320,8 @@
     }: Props = $props();
 
     let rootElement = $state<HTMLElement>();
+    let yAxisMeasureGroup = $state<SVGGElement>();
+    let yAxisLabelWidth = $state(0);
     let internalAppearanceProgress = $state(0);
     let hasSyncedDefaultAppearanceProgress = $state(false);
     let appearanceFrame = $state<number | null>(null);
@@ -375,7 +384,11 @@
         yMaxLabelCount ?? chartGroup?.yMaxLabelCount(),
     );
     const bounds = $derived(
-        resolveBounds(effectiveShowXAxis, effectiveShowYAxis),
+        resolveBounds(
+            effectiveShowXAxis,
+            effectiveShowYAxis,
+            yAxisLabelWidth,
+        ),
     );
     const plotWidth = $derived(
         Math.max(1, numericWidth - bounds.left - bounds.right),
@@ -433,6 +446,39 @@
             effectiveYMaxLabelCount,
         ),
     );
+    const yAxisLabels = $derived(
+        effectiveShowYAxis
+            ? resolvedYTicks.map((tick) =>
+                  (effectiveYTickFormatter ?? formatAxisTick)(tick),
+              )
+            : [],
+    );
+
+    $effect(() => {
+        const group = yAxisMeasureGroup;
+        const labels = yAxisLabels;
+        if (!effectiveShowYAxis || labels.length === 0) {
+            yAxisLabelWidth = 0;
+            return;
+        }
+        if (!group) return;
+
+        const updateWidth = () => {
+            const nextWidth = measureRenderedAxisLabelWidth(group);
+            if (Math.abs(nextWidth - yAxisLabelWidth) > 0.01) {
+                yAxisLabelWidth = nextWidth;
+            }
+        };
+        let active = true;
+        const stopWatching = resizeManager.watch(group, updateWidth);
+        void tick().then(() => {
+            if (active) updateWidth();
+        });
+        return () => {
+            active = false;
+            stopWatching();
+        };
+    });
     const gridYTicks = $derived(
         effectiveShowXAxis
             ? resolvedYTicks.filter((tick) => Math.abs(tick - safeYMin) > 1e-9)
@@ -721,12 +767,18 @@
         );
     }
 
-    function resolveBounds(showXAxis: boolean, showYAxis: boolean): AxisBounds {
+    function resolveBounds(
+        showXAxis: boolean,
+        showYAxis: boolean,
+        measuredYAxisWidth: number,
+    ): AxisBounds {
         return {
             top: DEFAULT_BOUNDS.top,
             right: DEFAULT_BOUNDS.right,
             bottom: showXAxis ? DEFAULT_BOUNDS.bottom : 0,
-            left: showYAxis ? DEFAULT_BOUNDS.left : 0,
+            left: showYAxis
+                ? measuredYAxisWidth + CHART_Y_AXIS_LABEL_GAP
+                : DEFAULT_BOUNDS.left,
         };
     }
 
@@ -1859,6 +1911,20 @@
         width={numericWidth}
         height={numericHeight}
     >
+        {#if effectiveShowYAxis}
+            <g
+                bind:this={yAxisMeasureGroup}
+                class="snowui-line-chart-axis-labels"
+                visibility="hidden"
+                pointer-events="none"
+                aria-hidden="true"
+            >
+                {#each yAxisLabels as label}
+                    <text data-snowui-axis-measure-label>{label}</text>
+                {/each}
+            </g>
+        {/if}
+
         <defs>
             {#each gradients as gradient}
                 <linearGradient
@@ -2182,7 +2248,7 @@
 
         <g class="snowui-line-chart-axis-labels">
             {#if effectiveShowYAxis}
-                {#each resolvedYTicks as tick}
+                {#each resolvedYTicks as tick, index}
                     {@const y = scaleY(
                         tick,
                         safeYMin,
@@ -2192,12 +2258,12 @@
                     )}
                     <text
                         class="snowui-line-chart-y-label"
-                        x={bounds.left - 12}
+                        x={bounds.left - CHART_Y_AXIS_LABEL_GAP}
                         {y}
                         text-anchor="end"
                         dominant-baseline="middle"
                     >
-                        {(effectiveYTickFormatter ?? formatAxisTick)(tick)}
+                        {yAxisLabels[index]}
                     </text>
                 {/each}
             {/if}
@@ -2227,9 +2293,11 @@
                     <foreignObject
                         class="snowui-line-chart-x-label-cell"
                         x={cellX}
-                        y={bounds.top + plotHeight + 8}
+                        y={bounds.top +
+                            plotHeight +
+                            CHART_X_AXIS_LABEL_GAP}
                         width={xLabelDisplayWidth}
-                        height="16"
+                        height={CHART_AXIS_LABEL_HEIGHT}
                     >
                         <div
                             class="snowui-line-chart-x-label-content"
