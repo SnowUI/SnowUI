@@ -12,7 +12,8 @@ export const examples = [
         expected: {
             render: "Basic Switch states",
             layout: "Flex row",
-            interaction: "Click to toggle",
+            interaction: "Click toggles track color and thumb position within 150ms; reduced motion commits the final state immediately",
+            performance: "Track and thumb share one bounded transition timeline",
             responsive: "None"
         },
         logic: ["checked"]
@@ -34,6 +35,7 @@ export const examples = [
             render: "Switch in 8 standard gradient sizes",
             layout: "Flex row",
             interaction: "None",
+            performance: "All sizes use the same bounded state-transition duration",
             responsive: "None"
         },
         logic: ["size"]
@@ -50,6 +52,7 @@ export const examples = [
             render: "Switches with custom colors via utility classes",
             layout: "Flex row",
             interaction: "None",
+            performance: "Color changes use the same bounded state-transition duration",
             responsive: "None"
         },
         logic: ["class"]

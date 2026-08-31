@@ -1,6 +1,6 @@
 <!-- 
  Switch 组件：开关切换控件
- v1.1.16
+ v1.1.17
 
  1. 核心能力:
     - 双向绑定 checked 状态
@@ -197,9 +197,9 @@
             --snowui-switch-thumb-size-override,
             var(--snowui-switch-thumb-size)
         );
-        --snowui-switch-motion-duration: var(
-            --snowui-frame-control-motion-duration,
-            300ms
+        --snowui-switch-motion-duration: min(
+            var(--snowui-frame-control-motion-duration, 300ms),
+            150ms
         );
         --snowui-switch-motion-duration-resolved: var(
             --snowui-switch-motion-duration-override,
@@ -310,5 +310,11 @@
     :global(:where(.snowui-switch-label)) {
         font-size: var(--snowui-switch-label-font-size-override, inherit);
         line-height: var(--snowui-switch-label-line-height-override, inherit);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-switch)) {
+            --snowui-switch-motion-duration-resolved: 0s;
+        }
     }
 </style>

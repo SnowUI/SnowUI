@@ -1,6 +1,6 @@
 # Switch 组件
 
-> **版本**: v1.1.16
+> **版本**: v1.1.17
 > **职责**: 开关切换控件，用于在两个状态之间切换。
 
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
@@ -35,6 +35,11 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 ## 更新日志 (Changelog)
 
 - **Switch-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v1.1.17 (2026-08-31)
+
+#### 调整
+- **TG-Motion.1** Track 背景与 Thumb 位移继续消费 Frame `control` 通用时序桥接，并将默认时长上限收敛为与 Checkbox、Radio 一致的 `150ms`；`prefers-reduced-motion: reduce` 下取消过渡并直接提交最终状态。
 
 ### v1.1.16 (2026-04-28)
 
@@ -184,7 +189,8 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 
 ### 动画
 
-- **Transition**: Track 背景色与 Thumb 位置默认继承 Frame `control` 通用时序（默认 `300ms ease-out`）
+- **Transition**: Track 背景色与 Thumb 位置消费 Frame `control` 通用时序，默认上限为 `150ms ease-out`，与 Checkbox、Radio 的常规点击状态一致
+- **减少动效**: `prefers-reduced-motion: reduce` 下取消 Track 与 Thumb 过渡，直接提交最终状态
 - **阴影**: Thumb 带 Drop Shadow 2
 
 ## 无障碍性
