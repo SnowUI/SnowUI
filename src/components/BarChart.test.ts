@@ -1,6 +1,6 @@
 /**
  * BarChart.test.ts
- * v1.0.0
+ * v1.0.1
  *
  * 覆盖:BarChart 默认形态、多段无间隔、多段有间隔、双层相叠、多柱并排、横向柱状图、出现动效和坐标轴。
  * 示例不引用任何 --snowui-*-override / 设计 Token。
@@ -49,7 +49,7 @@ hoverPanelPlacement="pointer"
     />
 </Frame>`,
         expected: {
-            render: "800x400 纵向柱状图;包含 12 根月度柱;每个分类单元中一根 32px 宽柱;默认圆角 8px;柱色默认为 Primary;横坐标显示 Jan 到 Dec;纵坐标 nice ticks 与网格线对齐;Y 轴标签区宽度等于最宽可见刻度的实际渲染宽度且刻度右边缘与绘图区固定保留 12px;绘图区顶部与组件顶部对齐,底部只保留 8px 横轴标签间距和 16px 标签高度,标签底边与组件底部对齐;出现动效初始显示目标高度的 80%,随后从左到右逐柱升高到完整高度且柱间启动间隔固定;整条时间轴带 easeOut 缓动,单柱升高使用 Frame morph 默认 300ms 基准时长且每根柱独立 easeOut 缓动,越靠右的柱子升高速度越慢;BC-01 让 12px 常规体 label 一直显示,数值最多显示小数点后 2 位,颜色为 Black/100% 且不随柱体 hover overlay 变成白色",
+            render: "800x400 纵向柱状图;包含 12 根月度柱;每个分类单元中一根 32px 宽柱;默认圆角 8px;柱色默认为 Primary;横坐标显示 Jan 到 Dec;纵坐标 nice ticks 直接按原始 domain 选择步长,不先放大整个 range,并与网格线对齐;Y 轴标签区宽度等于最宽可见刻度的实际渲染宽度且刻度右边缘与绘图区固定保留 12px;BC-01 同时显示 Y 轴与顶部数值 label,绘图区顶部动态保留 28px,底部只保留 8px 横轴标签间距和 16px 标签高度,标签底边与组件底部对齐;出现动效初始显示目标高度的 80%,随后从左到右逐柱升高到完整高度且柱间启动间隔固定;整条时间轴带 easeOut 缓动,单柱升高使用 Frame morph 默认 300ms 基准时长且每根柱独立 easeOut 缓动,越靠右的柱子升高速度越慢;BC-01 让 12px 常规体 label 一直显示,数值最多显示小数点后 2 位,颜色为 Black/100% 且不随柱体 hover overlay 变成白色",
             interaction: "点击重新播放动效按钮时，所有柱先回到 80% 高度再从左到右升高到完整高度,常显 label 数值实时跟随当前柱高比例从 80% 对应值补到完整值;点击反转动效按钮时，柱体沿同一时间轴回退到 80% 高度;每根柱命中区可获得键盘焦点并暴露分类和值的 aria-label;hover 或 focus 柱体时在柱体上方 4px 显示数值 label;100% 实心柱 hover 使用 filled Button 同款 StaticWhite/20% overlay;alwaysShowHoverLabel=true 时数值 label 常显",
         },
         logic: ["Default", "Vertical", "Axis", "Grid", "Replay"],

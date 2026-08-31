@@ -23,6 +23,11 @@ export interface ChartGroupContext {
     xMaxLabelCount: () => number | undefined;
     yLabelAutoCull: () => boolean;
     yMaxLabelCount: () => number | undefined;
+    plotTopInset: () => number;
+    registerPlotTopInset?: (
+        source: string,
+        resolveInset: () => number,
+    ) => () => void;
     showHoverPanel?: () => boolean;
     showHoverLabel?: () => boolean | undefined;
     alwaysShowHoverLabel?: () => boolean;

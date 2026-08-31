@@ -99,7 +99,7 @@ CG-01
     </Frame>
 </Frame>`,
         expected: {
-            render: "ChartGroup 提供同一个 800x400 组合画布和共享分类单元格命中层;BarChart 位于底层,负责浅色柱背景、蓝色圆柱和唯一横坐标 label;LineChart 位于上层,关闭自身横纵坐标、网格和辅助线,使用 xAxisMode=cell 与柱中心对齐;LineChart 高度设为 376px,让其绘图区高度与 BarChart 仅扣除 24px X 轴标签空间后的绘图区一致;蓝色实线带面积填充和 marker,紫色虚线无 marker;两个图表各自播放出现动效",
+            render: "ChartGroup 提供同一个 800x400 组合画布和共享分类单元格命中层;BarChart 位于底层,负责浅色柱背景、蓝色圆柱和唯一横坐标 label;LineChart 位于上层,关闭自身横纵坐标、网格和辅助线,使用 xAxisMode=cell 与柱中心对齐;ChartGroup 收集 BarChart 与 LineChart 的顶部安全区需求并取最大值,当前顶部数值 label 与默认 8px marker 需要 32px,所有叠加图层和共享命中层从同一顶边开始;LineChart 高度设为 376px,让其绘图区高度与 BarChart 扣除 24px X 轴标签空间后的绘图区一致;蓝色实线带面积填充和 marker,紫色虚线无 marker;两个图表各自播放出现动效",
             interaction: "点击重新播放动效按钮时 BarChart 和 LineChart 同步从 0 播放到完整状态;点击反转动效按钮时两个图表同步回退;鼠标移入任一分类 cell 的绘图区时 ChartGroup 同步下发 activeCellIndex,BarChart 当前分类柱与 LineChart 当前分类 marker 一起响应;只使用 BarChart 的坐标轴,LineChart 不渲染坐标轴",
         },
         logic: ["ChartGroup", "OverlayCharts", "CellHover", "SingleAxis", "Replay"],

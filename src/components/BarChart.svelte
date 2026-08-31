@@ -32,7 +32,6 @@
     import { resolveColorGradient } from "../lib/chart/gradients";
     import {
         CHART_AXIS_LABEL_HEIGHT,
-        CHART_PLOT_TOP_INSET,
         CHART_X_AXIS_LABEL_GAP,
         CHART_X_AXIS_RESERVED_HEIGHT,
         CHART_Y_AXIS_LABEL_GAP,
@@ -40,6 +39,7 @@
         formatAxisTick,
         measureRenderedAxisLabelWidth,
         normalizeTickValue,
+        resolveCartesianChartTopInset,
         resolveCategoryLabels as resolveSharedCategoryLabels,
         resolveVisibleCategoryIndexes,
         resolveVisibleYTicks,
@@ -232,7 +232,7 @@
         { name: "Sat", value: 92 },
     ];
     const DEFAULT_BOUNDS: AxisBounds = {
-        top: CHART_PLOT_TOP_INSET,
+        top: 0,
         right: 0,
         bottom: CHART_X_AXIS_RESERVED_HEIGHT,
         left: 0,
@@ -399,6 +399,29 @@
     const effectiveYMaxLabelCount = $derived(
         yMaxLabelCount ?? chartGroup?.yMaxLabelCount(),
     );
+    const effectiveShowHoverLabel = $derived(
+        shouldRenderChartHoverLabel(
+            chartGroup?.showHoverLabel?.() ?? showHoverLabel,
+            showHoverPanel || Boolean(chartGroup?.showHoverPanel?.()),
+        ),
+    );
+    const ownPlotTopInset = $derived(
+        resolveCartesianChartTopInset({
+            showYAxis: orientation === "vertical" && effectiveShowYAxis,
+            showHoverLabel:
+                orientation === "vertical" && effectiveShowHoverLabel,
+        }),
+    );
+    const effectivePlotTopInset = $derived(
+        chartGroup?.plotTopInset() ?? ownPlotTopInset,
+    );
+
+    $effect(() =>
+        chartGroup?.registerPlotTopInset?.(
+            `bar-chart-top-${paintUid}`,
+            () => ownPlotTopInset,
+        ),
+    );
     const chartData = $derived(normalizeData(data));
     const categoryLabels = $derived(
         resolveSharedCategoryLabels(
@@ -412,6 +435,7 @@
             effectiveShowYAxis,
             orientation,
             yAxisLabelWidth,
+            effectivePlotTopInset,
         ),
     );
     const plotWidth = $derived(
@@ -554,12 +578,6 @@
             activeCellIndex,
             chartGroup,
             internalActiveCellIndex,
-        ),
-    );
-    const effectiveShowHoverLabel = $derived(
-        shouldRenderChartHoverLabel(
-            chartGroup?.showHoverLabel?.() ?? showHoverLabel,
-            showHoverPanel || Boolean(chartGroup?.showHoverPanel?.()),
         ),
     );
     const effectiveAlwaysShowHoverLabel = $derived(
@@ -774,11 +792,12 @@
         hasYAxis: boolean,
         chartOrientation: BarChartOrientation,
         measuredYAxisWidth: number,
+        plotTopInset: number,
     ): AxisBounds {
         const needsLeft =
             hasYAxis || (chartOrientation === "horizontal" && hasYAxis);
         return {
-            top: DEFAULT_BOUNDS.top,
+            top: plotTopInset,
             right:
                 chartOrientation === "horizontal" && hasXAxis
                     ? 16

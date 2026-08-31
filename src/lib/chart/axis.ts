@@ -5,7 +5,43 @@ export const CHART_AXIS_LABEL_HEIGHT = 16;
 export const CHART_X_AXIS_LABEL_GAP = 8;
 export const CHART_X_AXIS_RESERVED_HEIGHT =
     CHART_X_AXIS_LABEL_GAP + CHART_AXIS_LABEL_HEIGHT;
-export const CHART_PLOT_TOP_INSET = 0;
+export const CHART_PLOT_EDGE_GAP = 8;
+export const CHART_HOVER_LABEL_GAP = 4;
+export const CHART_HOVER_LABEL_HEIGHT = 16;
+
+export interface CartesianChartTopInsetOptions {
+    showYAxis?: boolean;
+    showHoverLabel?: boolean;
+    markExtent?: number;
+}
+
+/**
+ * Resolve the smallest safe top inset for Cartesian chart content.
+ *
+ * The inset is content-aware: ordinary marks keep an 8px edge gap, the
+ * highest Y-axis label reserves half of its 16px line box plus that gap, and
+ * a value label additionally reserves its 16px line box and 4px mark gap.
+ */
+export function resolveCartesianChartTopInset({
+    showYAxis = false,
+    showHoverLabel = false,
+    markExtent = 0,
+}: CartesianChartTopInsetOptions = {}) {
+    const safeMarkExtent = Number.isFinite(markExtent)
+        ? Math.max(0, Number(markExtent))
+        : 0;
+    const markInset = CHART_PLOT_EDGE_GAP + safeMarkExtent;
+    const yAxisInset = showYAxis
+        ? CHART_PLOT_EDGE_GAP + CHART_AXIS_LABEL_HEIGHT / 2
+        : 0;
+    const hoverLabelInset = showHoverLabel
+        ? CHART_PLOT_EDGE_GAP +
+          CHART_HOVER_LABEL_HEIGHT +
+          CHART_HOVER_LABEL_GAP +
+          safeMarkExtent
+        : 0;
+    return Math.ceil(Math.max(markInset, yAxisInset, hoverLabelInset));
+}
 
 export function resolveCategoryLabels(
     fallbackLabels: string[],
@@ -144,8 +180,7 @@ export function createNiceTicks(
         minValue -= padding;
         maxValue += padding;
     }
-    const range = niceNumber(maxValue - minValue, false);
-    const step = niceNumber(range / (safeCount - 1), true);
+    const step = niceNumber((maxValue - minValue) / (safeCount - 1), true);
     const niceMin = Math.floor(minValue / step) * step;
     const niceMax = Math.ceil(maxValue / step) * step;
     const ticks: number[] = [];

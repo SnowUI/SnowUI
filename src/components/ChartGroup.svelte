@@ -1,6 +1,6 @@
 <!--
   ChartGroup 图表组合容器 (PRO)
-  v0.1.1 (2026-08-31)
+  v0.1.2 (2026-08-31)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。
   文档: ./ChartGroup.md
@@ -11,8 +11,8 @@
     import { Frame, type FrameProps, type RenderHints } from "@snowui-design-system/components";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
     import {
-        CHART_PLOT_TOP_INSET,
         CHART_X_AXIS_RESERVED_HEIGHT,
+        resolveCartesianChartTopInset,
         resolveVisibleXIndexes,
     } from "../lib/chart/axis";
     import { toCssLength, toNumber } from "../lib/chart/geometry";
@@ -77,7 +77,6 @@
     }
 
     const DEFAULT_PLOT_BOUNDS = {
-        top: CHART_PLOT_TOP_INSET,
         right: 0,
         bottom: CHART_X_AXIS_RESERVED_HEIGHT,
         left: 0,
@@ -101,7 +100,7 @@
         xMaxLabelCount = undefined,
         yLabelAutoCull = true,
         yMaxLabelCount = undefined,
-        plotBounds = DEFAULT_PLOT_BOUNDS,
+        plotBounds = {},
         hoverMode = "cell",
         activeCellIndex = undefined,
         defaultActiveCellIndex = null,
@@ -138,11 +137,29 @@
     let rootElement = $state<HTMLElement>();
     let hoverPanelPointerFrame: number | null = null;
     let pendingHoverPanelPointer: { x: number; y: number } | null = null;
+    let plotTopInsetVersion = $state(0);
+    const plotTopInsetResolvers = new Map<string, () => number>();
 
     const numericWidth = $derived(toNumber(width, 800));
     const numericHeight = $derived(toNumber(height, 400));
+    const automaticPlotTopInset = $derived(
+        resolveCartesianChartTopInset({
+            showYAxis,
+            showHoverLabel: showHoverLabel === true,
+            markExtent: showHoverLabel === true ? 4 : 0,
+        }),
+    );
+    const registeredPlotTopInset = $derived.by(() => {
+        plotTopInsetVersion;
+        let inset = automaticPlotTopInset;
+        for (const resolveInset of plotTopInsetResolvers.values()) {
+            const value = resolveInset();
+            if (Number.isFinite(value)) inset = Math.max(inset, value);
+        }
+        return inset;
+    });
     const resolvedBounds = $derived({
-        top: plotBounds.top ?? DEFAULT_PLOT_BOUNDS.top,
+        top: Math.max(plotBounds.top ?? 0, registeredPlotTopInset),
         right: plotBounds.right ?? DEFAULT_PLOT_BOUNDS.right,
         bottom: plotBounds.bottom ?? DEFAULT_PLOT_BOUNDS.bottom,
         left: plotBounds.left ?? DEFAULT_PLOT_BOUNDS.left,
@@ -393,6 +410,18 @@
         return resolveCellCenter(index) - cellWidth / 2;
     }
 
+    function registerPlotTopInset(
+        source: string,
+        resolveInset: () => number,
+    ) {
+        plotTopInsetResolvers.set(source, resolveInset);
+        plotTopInsetVersion += 1;
+        return () => {
+            if (!plotTopInsetResolvers.delete(source)) return;
+            plotTopInsetVersion += 1;
+        };
+    }
+
     function scheduleHoverPanelPointer(x: number, y: number) {
         pendingHoverPanelPointer = { x, y };
         if (hoverPanelPointerFrame !== null) return;
@@ -460,6 +489,8 @@
         xMaxLabelCount: () => xMaxLabelCount,
         yLabelAutoCull: () => yLabelAutoCull,
         yMaxLabelCount: () => yMaxLabelCount,
+        plotTopInset: () => resolvedBounds.top,
+        registerPlotTopInset,
         showHoverPanel: () => showHoverPanel,
         showHoverLabel: () => showHoverLabel,
         alwaysShowHoverLabel: () => alwaysShowHoverLabel,

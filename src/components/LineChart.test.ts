@@ -1,6 +1,6 @@
 /**
  * LineChart.test.ts
- * v1.0.0
+ * v1.0.1
  *
  * 覆盖:LineChart 默认形态、实线/虚线、Area 填充、出现动效、横纵坐标、直线/圆角转折线、marker 定制、网格和辅助线。
  * 示例不引用任何 --snowui-*-override / 设计 Token。
@@ -50,7 +50,7 @@ alwaysShowHoverLabel={true}
     />
 </Frame>`,
         expected: {
-            render: "800x400 折线图;纵坐标刻度根据数据自动生成;Y 轴标签区宽度等于最宽可见刻度的实际渲染宽度且刻度右边缘与绘图区固定保留 12px;绘图区顶部与组件顶部对齐,底部只保留 8px 横轴标签间距和 16px 标签高度,标签底边与组件底部对齐;开启横线时默认 6 条横线且包含最底部 x 轴线;底部显示 Jan 到 Dec;横坐标默认 edge 模式，首尾数据点与首尾 label 中心都对齐到绘图区两端;默认线形为 8px 圆角转折线;主序列为 ChartSpec 第 1 色 1px 实线并显式开启 12x12 两层圆形节点;节点由下层 12x12 Black/100% 圆和上层 6x6 White/100% 圆组成，分别使用 var(--black-100) 与 var(--white-100)，且无阴影;辅序列为 ChartSpec 第 2 色 1px 虚线;主序列节点下方有 10% 黑色垂直辅助线;每条线自身绘制时长为 1000ms;多序列出现动效按 360ms 延迟依次启动且各自为缓出;线条 reveal 到节点位置时 marker 立即出现,不做透明度缓动;默认准备 12px 常规体 hover label,颜色为 Black/100%",
+            render: "800x400 折线图;纵坐标刻度直接按原始 domain 生成收紧的 nice ticks;Y 轴标签区宽度等于最宽可见刻度的实际渲染宽度且刻度右边缘与绘图区固定保留 12px;LC-01 同时显示 Y 轴、顶部数值 label 和 12px marker,绘图区顶部动态保留 34px,底部只保留 8px 横轴标签间距和 16px 标签高度,标签底边与组件底部对齐;开启横线时默认 6 条横线且包含最底部 x 轴线;底部显示 Jan 到 Dec;横坐标默认 edge 模式，首尾数据点与首尾 label 中心都对齐到绘图区两端;默认线形为 8px 圆角转折线;主序列为 ChartSpec 第 1 色 1px 实线并显式开启 12x12 两层圆形节点;节点由下层 12x12 Black/100% 圆和上层 6x6 White/100% 圆组成，分别使用 var(--black-100) 与 var(--white-100)，且无阴影;辅序列为 ChartSpec 第 2 色 1px 虚线;主序列节点下方有 10% 黑色垂直辅助线;每条线自身绘制时长为 1000ms;多序列出现动效按 360ms 延迟依次启动且各自为缓出;线条 reveal 到节点位置时 marker 立即出现,不做透明度缓动;默认准备 12px 常规体 hover label,颜色为 Black/100%",
             interaction: "点击重新播放动效按钮时，LineChart 从 0 重新播放到 1;marker 可获得键盘焦点并暴露序列名、月份和值的 aria-label;hover 或 focus marker 时节点下层圆变为 White/100%、上层圆变为 Black/100%，节点后方显示 0.5px Black/100% 圆头竖线，并在点上方 4px 显示数值 label;alwaysShowHoverLabel=true 时数值 label 常显",
         },
         logic: ["Default", "Axis", "SolidLine", "DashedLine", "Markers", "Guides", "Replay"],

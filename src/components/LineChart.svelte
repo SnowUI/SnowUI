@@ -34,7 +34,6 @@
     import { resolveColorGradient } from "../lib/chart/gradients";
     import {
         CHART_AXIS_LABEL_HEIGHT,
-        CHART_PLOT_TOP_INSET,
         CHART_X_AXIS_LABEL_GAP,
         CHART_X_AXIS_RESERVED_HEIGHT,
         CHART_Y_AXIS_LABEL_GAP,
@@ -42,6 +41,7 @@
         formatAxisTick,
         measureRenderedAxisLabelWidth,
         normalizeTickValue,
+        resolveCartesianChartTopInset,
         resolveIndexedLabels,
         resolveVisibleXIndexes,
         resolveVisibleYTicks,
@@ -231,7 +231,7 @@
     }
 
     const DEFAULT_BOUNDS: AxisBounds = {
-        top: CHART_PLOT_TOP_INSET,
+        top: 0,
         right: 0,
         bottom: CHART_X_AXIS_RESERVED_HEIGHT,
         left: 0,
@@ -383,11 +383,38 @@
     const effectiveYMaxLabelCount = $derived(
         yMaxLabelCount ?? chartGroup?.yMaxLabelCount(),
     );
+    const effectiveShowHoverLabel = $derived(
+        shouldRenderChartHoverLabel(
+            chartGroup?.showHoverLabel?.() ?? showHoverLabel,
+            showHoverPanel || Boolean(chartGroup?.showHoverPanel?.()),
+        ),
+    );
+    const topMarkExtent = $derived(
+        resolveLineTopMarkExtent(series, effectiveShowHoverLabel),
+    );
+    const ownPlotTopInset = $derived(
+        resolveCartesianChartTopInset({
+            showYAxis: effectiveShowYAxis,
+            showHoverLabel: effectiveShowHoverLabel,
+            markExtent: topMarkExtent,
+        }),
+    );
+    const effectivePlotTopInset = $derived(
+        chartGroup?.plotTopInset() ?? ownPlotTopInset,
+    );
+
+    $effect(() =>
+        chartGroup?.registerPlotTopInset?.(
+            `line-chart-top-${paintUid}`,
+            () => ownPlotTopInset,
+        ),
+    );
     const bounds = $derived(
         resolveBounds(
             effectiveShowXAxis,
             effectiveShowYAxis,
             yAxisLabelWidth,
+            effectivePlotTopInset,
         ),
     );
     const plotWidth = $derived(
@@ -530,12 +557,6 @@
             activeCellIndex,
             chartGroup,
             internalActiveCellIndex,
-        ),
-    );
-    const effectiveShowHoverLabel = $derived(
-        shouldRenderChartHoverLabel(
-            chartGroup?.showHoverLabel?.() ?? showHoverLabel,
-            showHoverPanel || Boolean(chartGroup?.showHoverPanel?.()),
         ),
     );
     const effectiveAlwaysShowHoverLabel = $derived(
@@ -771,9 +792,10 @@
         showXAxis: boolean,
         showYAxis: boolean,
         measuredYAxisWidth: number,
+        plotTopInset: number,
     ): AxisBounds {
         return {
-            top: DEFAULT_BOUNDS.top,
+            top: plotTopInset,
             right: DEFAULT_BOUNDS.right,
             bottom: showXAxis ? DEFAULT_BOUNDS.bottom : 0,
             left: showYAxis
@@ -1605,19 +1627,16 @@
         options: { ignoreVisibility?: boolean } = {},
     ) {
         const pointConfig = point.marker;
-        if (!options.ignoreVisibility && pointConfig === false) return undefined;
-        const baseConfig = pointConfig ?? seriesItem.markers;
-        if (!options.ignoreVisibility && baseConfig === false) return undefined;
+        const size = resolveMarkerSize(
+            seriesItem.markers,
+            pointConfig,
+            options.ignoreVisibility,
+        );
+        if (size === 0) return undefined;
         const seriesConfig =
             seriesItem.markers && seriesItem.markers !== true
                 ? seriesItem.markers
                 : {};
-        const pointSize =
-            typeof pointConfig === "object" ? pointConfig.size : undefined;
-        const size = Math.max(
-            1,
-            toNumber(pointSize ?? seriesConfig.size ?? 8, 8),
-        );
         const markerColor = resolveMarkerPaint(
             seriesConfig.color === "line"
                 ? seriesItem.color
@@ -1632,6 +1651,45 @@
             upperFill: "var(--white-100)",
             hitRadius: Math.max(size * 0.5 + 6, 12),
         };
+    }
+
+    function resolveMarkerSize(
+        seriesConfig: boolean | LineChartMarkerConfig,
+        pointConfig: boolean | LineChartPointMarkerConfig | undefined,
+        ignoreVisibility = false,
+    ) {
+        if (!ignoreVisibility && pointConfig === false) return 0;
+        const baseConfig = pointConfig ?? seriesConfig;
+        if (!ignoreVisibility && !baseConfig) return 0;
+        const seriesSize =
+            typeof seriesConfig === "object" ? seriesConfig.size : undefined;
+        const pointSize =
+            typeof pointConfig === "object" ? pointConfig.size : undefined;
+        return Math.max(1, toNumber(pointSize ?? seriesSize ?? 8, 8));
+    }
+
+    function resolveLineTopMarkExtent(
+        input: LineChartSeries[],
+        includeHoverMarkers: boolean,
+    ) {
+        let extent = 0;
+        for (const seriesItem of input) {
+            extent = Math.max(
+                extent,
+                Math.max(0, toNumber(seriesItem.strokeWidth ?? 1, 1)) / 2,
+            );
+            for (const rawPoint of seriesItem.data) {
+                const pointConfig =
+                    typeof rawPoint === "number" ? undefined : rawPoint.marker;
+                const markerSize = resolveMarkerSize(
+                    seriesItem.markers ?? false,
+                    pointConfig,
+                    includeHoverMarkers,
+                );
+                extent = Math.max(extent, markerSize / 2);
+            }
+        }
+        return extent;
     }
 
     function resolveHoverMarkerConfig(
