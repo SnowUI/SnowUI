@@ -182,12 +182,14 @@ export function createNiceTicks(
     }
     const step = niceNumber((maxValue - minValue) / (safeCount - 1), true);
     const niceMin = Math.floor(minValue / step) * step;
-    const niceMax = Math.ceil(maxValue / step) * step;
+    const niceMax = Math.floor(maxValue / step) * step;
     const ticks: number[] = [];
     for (let value = niceMin; value <= niceMax + step / 2; value += step) {
         ticks.push(normalizeTickValue(value));
     }
-    return ticks.length >= 2 ? ticks : [niceMin, niceMax];
+    return ticks.length >= 2
+        ? ticks
+        : [niceMin, normalizeTickValue(maxValue)];
 }
 
 export function normalizeTickValue(value: number) {

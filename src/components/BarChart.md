@@ -1,6 +1,6 @@
 # BarChart (柱状图)
 
-> **版本**: v1.0.3
+> **版本**: v1.0.4
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。
@@ -44,7 +44,7 @@
 | `roundedEnd` | `boolean` | `true` | 是否保留终点端圆角；纵向为顶部，横向为右侧 |
 | `xLabels` | `string[]` | `[]` / 继承 `ChartGroup` | 分类 label 覆盖；未传时使用 `ChartGroup.xLabels` 或 `data[].name` |
 | `yMin` | `number` | 自动 / 继承 `ChartGroup` | 数值轴 domain 最小值 |
-| `yMax` | `number` | 自动 / 继承 `ChartGroup` | 数值轴 domain 最大值 |
+| `yMax` | `number` | 自动 / 继承 `ChartGroup` | 数值轴 domain 最大值；自动时等于实际最大数据值，不向上取整 |
 | `yTicks` | `number[]` | 自动 nice ticks / 继承 `ChartGroup` | 数值轴刻度 |
 | `yTickCount` | `number` | `6` / 继承 `ChartGroup` | 自动 tick 目标数量 |
 | `yTickFormatter` | `(value: number) => string` | K 格式 / 继承 `ChartGroup` | 数值轴 label 格式化 |
@@ -187,6 +187,7 @@ interface BarChartItem {
 - 尺寸由 `width` / `height` 与 SVG 坐标算法决定；作为外部布局子项时表现为 Hug。
 - `orientation="vertical"` 时分类轴为横向 cell，柱位于 cell 中心；`orientation="horizontal"` 时分类轴为纵向 cell。
 - Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘与绘图区起点间距固定为 `12px`。
+- 自动 domain 上限直接使用当前数据最大值；nice ticks 只生成到不高于该值的最后一个易读刻度。最高柱可以高于最后一条网格线，顶部仅由 `8px / 16px / 28px` 内容安全区控制。显式 `yMax` 或 `yTicks` 不受此自动规则改写。
 - 绘图区顶部由共享内容感知规则计算：普通柱 `8px`，纵向数值 Y 轴 `16px`，顶部数值 label `28px`；三者取最大值。横向柱的数值 label 位于柱右侧，不额外增加顶部安全区。有 X 轴时 `bottom=24px`，只包含 `8px` label 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
 - 单元内部规则：
   - `single`: 一个单元一根柱。
@@ -248,6 +249,7 @@ SVG 图层从下到上为：
 
 ### Changelog
 
+- 2026-09-01 v1.0.4 — 自动 domain 上限改为实际最大数据值，最高 nice tick 不再超过最大值；无 Y 轴场景也不再因向上取整的 domain 产生额外顶部空白。
 - 2026-08-31 v1.0.3 — 顶部改为内容感知安全区，并收紧自动 nice domain，避免最高柱、Y 轴顶刻度或数值 label 贴边，同时减少过大的标尺上方空白。
 - 2026-08-31 v1.0.2 — 移除笛卡尔绘图区顶部和底部的额外留白；底部仅保留 X 轴标签自身所需的 `24px`。
 - 2026-08-31 v1.0.1 — Y 轴改为按最宽可见标签的实际渲染宽度自适应，标签与绘图区之间固定保留 `12px`。

@@ -1,6 +1,6 @@
 # LineChart (折线图)
 
-> **版本**: v1.3.4
+> **版本**: v1.3.5
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
@@ -36,7 +36,7 @@
 | `width` | `number \| string` | `800` | 图表整体宽度；数字按 px 语义转为 rem |
 | `height` | `number \| string` | `400` | 图表整体高度；数字按 px 语义转为 rem |
 | `yMin` | `number` | 自动 / 继承 `ChartGroup` | 纵坐标最小值；未传时根据数据生成 nice domain，正数数据默认包含 `0` |
-| `yMax` | `number` | 自动 / 继承 `ChartGroup` | 纵坐标最大值；未传时根据数据生成 nice domain |
+| `yMax` | `number` | 自动 / 继承 `ChartGroup` | 纵坐标最大值；自动时等于实际最大数据值，不向上取整 |
 | `yTicks` | `number[]` | 自动 nice ticks / 继承 `ChartGroup` | 纵坐标刻度 |
 | `yTickCount` | `number` | `6` / 继承 `ChartGroup` | 未传 `yTicks` 时用于生成 nice ticks 的目标刻度数量 |
 | `yTickFormatter` | `(value: number) => string` | K 格式 / 继承 `ChartGroup` | 纵坐标格式化 |
@@ -140,7 +140,7 @@ interface LineChartSeries {
 
 纵坐标刻度说明：
 
-- 未传 `yTicks` 时，组件根据 `series` 数据值自动生成 nice ticks。
+- 未传 `yMax` / `yTicks` 时，domain 上限等于 `series` 的实际最大数据值，nice ticks 只生成到不高于该值的最后一个易读刻度；最高点可以高于最后一条网格线。
 - 正数数据默认包含 `0` 作为纵轴起点；存在负数时使用数据最小值参与计算。
 - 步长按 `1 / 2 / 5 × 10^n` 取整，目标刻度数量由 `yTickCount` 控制。
 - `yMaxLabelCount` 会限制纵坐标 label 数量；未传 `yTicks` 时优先以 `min(yTickCount, yMaxLabelCount)` 生成 nice ticks，传入大量 `yTicks` 时再按等步数抽稀显示。
@@ -289,6 +289,11 @@ SVG 图层从下到上为：
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.5 (2026-09-01)
+
+#### 调整
+- 自动 domain 上限改为实际最大数据值，最高 nice tick 不再超过最大值；顶部只由内容安全区决定。
 
 ### v1.3.4 (2026-08-31)
 

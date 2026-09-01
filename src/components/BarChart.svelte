@@ -849,10 +849,11 @@
         const maxSeed = Number.isFinite(explicitMax)
             ? Number(explicitMax)
             : dataMax;
-        const ticks = createNiceTicks(minSeed, maxSeed, targetTickCount);
+        const domainMax = maxSeed > minSeed ? maxSeed : minSeed + 1;
+        const ticks = createNiceTicks(minSeed, domainMax, targetTickCount);
         return {
             min: ticks[0] ?? minSeed,
-            max: ticks[ticks.length - 1] ?? maxSeed,
+            max: domainMax,
             ticks,
         };
     }
