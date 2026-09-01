@@ -46,7 +46,7 @@ export const examples = [
         logic: ["Filter", "Search"],
     },
     {
-        name: "LB-03：多选项滚动（超出 max-height）",
+        name: "LB-03：默认完整显示十项后滚动",
         code: `LB-03
 <Select placeholder="请选择" style="width: 20rem;">
     <Listbox>
@@ -60,13 +60,15 @@ export const examples = [
         <MenuItem as="item" value="8">Option 8</MenuItem>
         <MenuItem as="item" value="9">Option 9</MenuItem>
         <MenuItem as="item" value="10">Option 10</MenuItem>
+        <MenuItem as="item" value="11">Option 11</MenuItem>
+        <MenuItem as="item" value="12">Option 12</MenuItem>
     </Listbox>
 </Select>`,
         expected: {
-            render: "浮层高度限制在 256px，超出时出现垂直滚动条",
-            layout: "选项列表可滚动，面板圆角和阴影不受裁切",
+            render: "浮层按实际 Item 高度完整显示十项，第十一、十二项进入滚动区域",
+            layout: "默认高度不会裁出半个 Item；选项列表可滚动，面板圆角和阴影不受裁切",
         },
-        logic: ["Scroll", "MaxHeight"],
+        logic: ["Scroll", "DefaultVisibleItems", "WholeItemHeight"],
     },
     {
         name: "LB-04：含默认值时选中项对齐 Trigger",
@@ -149,7 +151,7 @@ export const examples = [
     />
 </Select>`,
         expected: {
-            render: "无需显式书写 Input / MenuItem；默认显示搜索框，面板最大高度为 200px，溢出时显示浮层滚动条",
+            render: "无需显式书写 Input / MenuItem；默认显示搜索框，面板按实际 Item 高度完整显示最多 10 项，溢出时显示浮层滚动条",
         },
         logic: ["BuiltInMode", "Input", "MenuItem"],
     },

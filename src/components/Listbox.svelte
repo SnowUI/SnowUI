@@ -1,6 +1,6 @@
 <!--
  Listbox 组件：浮层选项列表面板
- v1.2.2
+ v1.3.0
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -98,7 +98,7 @@
         items = [],
         parts = undefined,
         search = undefined,
-        maxHeight = 200,
+        maxHeight = undefined,
         minWidth = undefined,
         scrollbar = true,
         matchTriggerWidth = true,
@@ -131,6 +131,7 @@
     const configuredMaxHeight = $derived(
         typeof maxHeight === "number" ? `${maxHeight}px` : maxHeight,
     );
+    const hasExplicitMaxHeight = $derived(maxHeight !== undefined);
     const owner = getListboxOwner();
     // Listbox 浮层即使在组件树中位于 Field 内，实际也已 Portal 到 body。
     // 截断 Field Context，避免浮层搜索 Input 误进入 embedded 模式而丢失独立外壳。
@@ -201,6 +202,8 @@
 
     const LISTBOX_VIEWPORT_GAP = 8;
     const LISTBOX_TRIGGER_GAP = 4;
+    const LISTBOX_DEFAULT_MAX_VISIBLE_ITEMS = 10;
+    const LISTBOX_MIN_VISIBLE_ITEMS = 2;
     // Portal action：将节点挂到 document.body
     function portal(node: HTMLElement) {
         document.body.appendChild(node);
@@ -209,6 +212,58 @@
                 node.remove();
             },
         };
+    }
+
+    function getVisibleOptionElements() {
+        if (!listboxEl) return [];
+        return Array.from(
+            listboxEl.querySelectorAll<HTMLElement>('[role="option"]'),
+        ).filter((element) => {
+            const style = getComputedStyle(element);
+            return style.display !== "none" && element.offsetHeight > 0;
+        });
+    }
+
+    function resolveAutomaticMaxHeight(availableHeight: number) {
+        if (!listboxEl || !scrollListboxEl) return availableHeight;
+        const optionElements = getVisibleOptionElements();
+        if (optionElements.length === 0) return listboxEl.offsetHeight;
+
+        const chromeHeight = Math.max(
+            0,
+            listboxEl.offsetHeight - scrollListboxEl.clientHeight,
+        );
+        const itemHeights = optionElements.map((element) => element.offsetHeight);
+        const maxVisibleCount = Math.min(
+            LISTBOX_DEFAULT_MAX_VISIBLE_ITEMS,
+            itemHeights.length,
+        );
+        const minVisibleCount = Math.min(
+            LISTBOX_MIN_VISIBLE_ITEMS,
+            itemHeights.length,
+        );
+        let visibleCount = maxVisibleCount;
+        const heightForCount = (count: number) =>
+            chromeHeight + itemHeights
+                .slice(0, count)
+                .reduce((sum, height) => sum + height, 0);
+
+        while (
+            visibleCount > minVisibleCount &&
+            heightForCount(visibleCount) > availableHeight
+        ) {
+            visibleCount -= 1;
+        }
+        return heightForCount(visibleCount);
+    }
+
+    function syncResolvedMaxHeight(availableHeight: number) {
+        const nextMaxHeight = hasExplicitMaxHeight
+            ? Math.max(0, availableHeight)
+            : resolveAutomaticMaxHeight(availableHeight);
+        if (Math.abs(nextMaxHeight - listboxMaxHeight) <= 0.5) return false;
+        listboxMaxHeight = nextMaxHeight;
+        return true;
     }
 
     // 计算 Listbox 定位
@@ -234,13 +289,25 @@
         if (placementMode === "bottom") {
             listboxPlacement = "bottom";
             listboxTop = triggerRect.bottom + LISTBOX_TRIGGER_GAP;
-            listboxMaxHeight = Math.max(
+            const availableHeight = Math.max(
                 0,
                 window.innerHeight -
                     triggerRect.bottom -
                     LISTBOX_VIEWPORT_GAP -
                     LISTBOX_TRIGGER_GAP,
             );
+            if (syncResolvedMaxHeight(availableHeight)) {
+                tick().then(updatePosition);
+            }
+            return;
+        }
+
+        const viewportMaxHeight = Math.max(
+            0,
+            window.innerHeight - LISTBOX_VIEWPORT_GAP * 2,
+        );
+        if (syncResolvedMaxHeight(viewportMaxHeight)) {
+            tick().then(updatePosition);
             return;
         }
 
@@ -262,13 +329,16 @@
         if (!alignItemEl) {
             listboxPlacement = "bottom";
             listboxTop = triggerRect.bottom + LISTBOX_TRIGGER_GAP;
-            listboxMaxHeight = Math.max(
+            const availableHeight = Math.max(
                 0,
                 window.innerHeight -
                     triggerRect.bottom -
                     LISTBOX_VIEWPORT_GAP -
                     LISTBOX_TRIGGER_GAP,
             );
+            if (syncResolvedMaxHeight(availableHeight)) {
+                tick().then(updatePosition);
+            }
             return;
         }
 
@@ -296,10 +366,12 @@
 
         listboxPlacement = "bottom";
         listboxTop = clampedTop;
-        listboxMaxHeight = Math.max(
-            0,
-            window.innerHeight - clampedTop - LISTBOX_VIEWPORT_GAP,
-        );
+        if (hasExplicitMaxHeight) {
+            listboxMaxHeight = Math.max(
+                0,
+                window.innerHeight - clampedTop - LISTBOX_VIEWPORT_GAP,
+            );
+        }
     }
 
     // 展开时计算定位
@@ -319,6 +391,7 @@
         owner.options.length;
         owner.customOptions.length;
         owner.filterText;
+        tick().then(updatePosition);
     });
 
     // 滚动活跃选项到可视区域
@@ -404,7 +477,9 @@
         class="snowui-listbox-portal-anchor"
         style="top: {listboxTop}px; left: {listboxLeft}px; width: max-content; min-width: {matchTriggerWidth && hasLockedWidth
             ? `max(${configuredMinWidth}, ${listboxWidth}px)`
-            : configuredMinWidth}; --snowui-listbox-max-height: {configuredMaxHeight}; --snowui-listbox-available-height: {listboxMaxHeight}px; max-height: min(var(--snowui-listbox-max-height, 200px), var(--snowui-listbox-available-height));{userStyle
+            : configuredMinWidth}; --snowui-listbox-available-height: {listboxMaxHeight}px;{hasExplicitMaxHeight
+            ? ` --snowui-listbox-max-height: ${configuredMaxHeight}; max-height: min(var(--snowui-listbox-max-height), var(--snowui-listbox-available-height));`
+            : ` max-height: var(--snowui-listbox-available-height);`}{userStyle
             ? ` ${userStyle}`
             : ''}"
         data-placement={listboxPlacement}

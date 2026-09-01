@@ -2,12 +2,14 @@
 
 ## 默认内置模式 / 显式组合模式
 
-- 默认内置模式（推荐）：`items` 自动生成固定搜索框与 `<MenuItem as="item">`，默认最大高度为 `200px`，内容溢出时显示浮层滚动条；通过 `parts.Input` / `parts.MenuItem` 配置内置组件。
+- 默认内置模式（推荐）：`items` 自动生成固定搜索框与 `<MenuItem as="item">`。未设置 `maxHeight` 时，面板高度按实际可见 MenuItem 的高度计算：默认最多完整显示 10 项，超过后显示浮层滚动条；通过 `parts.Input` / `parts.MenuItem` 配置内置组件。
 - 显式组合模式：显式书写 MenuItem，用于复杂内容或逐项 Props 差异；存在 children 时不再生成 items。
 
-默认内置模式可用 `search={false}` 隐藏搜索框、`maxHeight` 修改最大高度、`scrollbar={false}` 隐藏浮层滚动条。搜索框默认 placeholder 为“搜索”，有搜索框时面板默认最小宽度为 160px。显式组合模式使用 `search` 时同样自动插入 Input；不设置时也可手动书写 `<Input as="search">`。`maxHeight` 与 `scrollbar` 始终作为 Listbox 面板能力生效。
+默认内置模式可用 `search={false}` 隐藏搜索框、`maxHeight` 显式修改最大高度、`scrollbar={false}` 隐藏浮层滚动条。搜索框默认 placeholder 为“搜索”，有搜索框时面板默认最小宽度为 160px。显式组合模式使用 `search` 时同样自动插入 Input；不设置时也可手动书写 `<Input as="search">`。`maxHeight` 与 `scrollbar` 始终作为 Listbox 面板能力生效。
 
-> **版本**: v1.2.2
+未设置 `maxHeight` 时，可用视口空间只改变完整可见的 Item 数量，不产生半项高度：面板在 2～10 项之间选择能够容纳的完整项数；即使触发器下方空间不足，也至少为现有选项中的前 2 项保留完整高度。少于 2 项时按实际项数 Hug。显式 `maxHeight` 继续按调用方给定的长度与视口可用高度取较小值。
+
+> **版本**: v1.3.0
 > **状态**: 已实现
 > **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局；补充关键字表格、用户定义区与更新日志，以满足组件开发链路检查。
 > **职责**: 浮层选项列表面板，作为 Select 的下拉面板。Portal 到 body，position:fixed 定位，选中项中心对齐 Trigger，遵循 Quick Action 视觉规范。支持内嵌 `<Input as="search">` 搜索/过滤。
@@ -51,7 +53,7 @@ Portal anchor div (position:fixed; width/max-height only)
 - 宽度：与锚点（Field 或 Select 容器）等宽
 - `matchTriggerWidth={false}` 时不继承锚点宽度，浮层按最长选项 Hug；所有选项在确定的面板宽度内 fill
 - 垂直：选中项中心与 Trigger 中心对齐（无选中值时取中间项）；计算基于 `getBoundingClientRect()` 的真实视觉位置，兼容有无搜索 Input
-- 最大高度：默认 `200px`；通过 `maxHeight` 配置，并继续兼容 inline `style="max-height: ..."` 覆盖
+- 最大高度：未设置 `maxHeight` 时按实际 Item 高度完整显示最多 10 项，并在视口收窄时至少保留 2 个完整项；通过 `maxHeight` 配置，并继续兼容 inline `style="max-height: ..."` 覆盖
 - 每次打开前重新计算位置
 
 ### 与宿主的关系
@@ -74,7 +76,7 @@ Portal anchor div (position:fixed; width/max-height only)
 | `children` | `Snippet` | — | 自定义选项内容（传入 `<ListboxOption>` 子项）|
 | `items` | `ListboxItem[]` | `[]` | 默认内置模式的稳定选项数据 |
 | `search` | `boolean` | `true` | 默认内置模式是否生成固定搜索框 |
-| `maxHeight` | `number \| string` | `200` | 面板最大高度；数字按 px 处理 |
+| `maxHeight` | `number \| string` | 未设置 | 面板最大高度；数字按 px 处理。未设置时按实际 Item 高度完整显示最多 10 项，视口不足时至少显示 2 项 |
 | `scrollbar` | `boolean` | `true` | 溢出时是否显示浮层滚动条 |
 | `parts` | `{ Input?, MenuItem? }` | — | 配置默认内置的搜索 Input 与 MenuItem |
 | `matchTriggerWidth` | `boolean` | `true` | 是否与触发锚点等宽；`false` 时浮层及选项按内容 Hug |
@@ -133,7 +135,7 @@ Listbox 自身不接受外部 props — 所有状态通过 `ListboxOwnerContext`
 | 边框 | `none` |
 | padding | portal：`8px`，四周统一；header：底部 `4px` |
 | 滚动 | `.snowui-listbox` 使用 `overflow-y: scroll` + `scrollbar-width: none` 隐藏原生滚动条 |
-| 最大高度 | 默认 `200px`，由 `maxHeight` 设置，JS 再按可用视口高度收窄；inline `style="max-height:">` 可覆盖 |
+| 最大高度 | 默认按实际 Item 高度完整显示最多 10 项；JS 按可用视口高度收窄到完整项数且至少保留 2 项；显式 `maxHeight` 保持长度上限；inline `style="max-height:">` 可覆盖 |
 | 滚动条样式 | 自定义浮层滚动条（透明轨道，默认 4px，hover 后 8px 并向左增粗，支持拖拽），挂载在 `.snowui-listbox-body`，不覆盖 Input 区域 |
 | 宽度 | 与锚点元素等宽 |
 
@@ -268,6 +270,12 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 - **关联规范**: [../../../specs/HTMLSpec.md](../../../specs/HTMLSpec.md)
 
 ## 更新日志 (Changelog)
+
+### v1.3.0 (2026-09-01)
+
+#### 调整
+- 未显式设置 `maxHeight` 时，面板改为按实际可见 Item 高度完整显示最多 10 项；视口空间不足时按完整项数收窄，并至少保留 2 项高度，避免末项只显示一部分后在 hover / 键盘高亮时触发自动滚动。
+- 显式 `maxHeight` 与调用方 inline `max-height` 覆盖保持兼容。
 
 ### v1.2.2 (2026-07-05)
 
