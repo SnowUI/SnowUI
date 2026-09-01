@@ -1,6 +1,6 @@
 # Table（语义表格）
 
-> **版本**: v2.5.1
+> **版本**: v2.5.2
 > **职责**: 提供 OSS 原生表格语义、自动固有列宽、局部横向滚动与加载展示。
 
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
@@ -154,7 +154,7 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 > `mask-image` 需同时写 `-webkit-mask-image`；`.snowui-table-cell-content` / `.snowui-table-head-content` 上加 `transition: mask-image ...` 让渐隐随 hover 平滑出现。
 
-滚动归属：Table **自己创建唯一的局部横向 viewport**，并通过共享 `useOverlayScrollbar` 将同一条横向轨道 sticky 到当前页面视口底部。轨道只在表格固有最小宽度超过宿主时显示，表格离开视口或到达底端后收回表格边界。不把宽表宽度传播为页面最小宽度，不应再用外层 ScrollArea 包裹 Table，也不得创建第二条同步滚动条。`minWidth` 仍可进一步扩大表格的固有宽度。Table / DataTable 仍不创建纵向滚动容器。吸底轨道必须高于 table 内容层；即使 `TableBody` 默认连续 Hover 将 table 提升为内容层，轨道仍完整接收 hover、pointer down 与拖动，不得由其下方的数据行截获。
+滚动归属：Table **自己创建唯一的局部横向 viewport**，并通过共享 `useOverlayScrollbar` 将同一条横向轨道 sticky 到当前页面视口底部。轨道只在表格固有最小宽度超过宿主时显示，表格离开视口或到达底端后收回表格边界。不把宽表宽度传播为页面最小宽度，不应再用外层 ScrollArea 包裹 Table，也不得创建第二条同步滚动条。`minWidth` 仍可进一步扩大表格的固有宽度。Table / DataTable 仍不创建纵向滚动容器。吸底轨道必须高于 table 内容层；即使 `TableBody` 默认连续 Hover 将 table 提升为内容层，轨道仍完整接收 hover、pointer down 与拖动，不得由其下方的数据行截获。连续 Hover 层由局部横向 viewport 承载，其背景只绘制在当前可见的表格范围内，不得把隐藏列对应的背景泄露到 viewport 外。
 
 ## API
 
@@ -201,6 +201,7 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 ## Changelog
 
+- 2026-09-02：v2.5.2，连续 Hover 层由 Table 局部横向 viewport 承载并裁切，宽表隐藏列不再把行背景绘制到当前可见边界之外。
 - 2026-09-01：v2.5.1，修复吸底横向滚动条与数据行重叠时无法操作的问题。根因是连续 Hover 将 table 提升至 `z-index: 1`，轨道仍处于默认层级；Table 现在固定让横向轨道处于内容层之上，并通过真实命中与拖动回归验证。
 - 2026-09-01：v2.5.0，Table 内置局部横向 viewport 和视口贴底 overlay 轨道；未设置显式宽度时，整表最小宽度由各列 min-content 与 Cell padding 自动汇总，保留最长不可断单词 / 片段。
 - 2026-09-01：v2.4.1，调整容器响应曲线，使窄表格在常见移动宽度即收敛到每侧 2px；原生相邻列的最小视觉间距固定为 4px。

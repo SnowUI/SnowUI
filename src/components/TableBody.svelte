@@ -40,7 +40,7 @@
     let continuousHoverController: ContinuousHoverController | undefined;
     $effect(() => {
         if (!bodyElement || !continuousHover) return;
-        const overlayHost = bodyElement.closest<HTMLElement>(".snowui-table-viewport");
+        const overlayHost = bodyElement.closest<HTMLElement>(".snowui-table-scroll-viewport");
         if (!overlayHost) return;
         continuousHoverController ??= new ContinuousHoverController();
         return continuousHoverController.attach(bodyElement, {

@@ -195,7 +195,7 @@
          * 内容层之上，否则吸底到数据行上时可见但无法接收指针。 */
         z-index: 2;
     }
-    :global(:where(.snowui-table-viewport[data-continuous-hover-overlay-host="true"] .snowui-table)) {
+    :global(:where(.snowui-table-scroll-viewport[data-continuous-hover-overlay-host="true"] .snowui-table)) {
         position: relative;
         z-index: 1;
     }
