@@ -163,8 +163,6 @@
     const automaticPlotTopInset = $derived(
         resolveCartesianChartTopInset({
             showYAxis,
-            showHoverLabel: showHoverLabel === true,
-            markExtent: showHoverLabel === true ? 4 : 0,
         }),
     );
     const registeredPlotTopInset = $derived.by(() => {

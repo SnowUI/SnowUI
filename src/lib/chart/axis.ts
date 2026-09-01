@@ -6,12 +6,8 @@ export const CHART_X_AXIS_LABEL_GAP = 8;
 export const CHART_X_AXIS_RESERVED_HEIGHT =
     CHART_X_AXIS_LABEL_GAP + CHART_AXIS_LABEL_HEIGHT;
 export const CHART_PLOT_EDGE_GAP = 8;
-export const CHART_HOVER_LABEL_GAP = 4;
-export const CHART_HOVER_LABEL_HEIGHT = 16;
-
 export interface CartesianChartTopInsetOptions {
     showYAxis?: boolean;
-    showHoverLabel?: boolean;
     markExtent?: number;
 }
 
@@ -19,12 +15,12 @@ export interface CartesianChartTopInsetOptions {
  * Resolve the smallest safe top inset for Cartesian chart content.
  *
  * The inset is content-aware: ordinary marks keep an 8px edge gap, the
- * highest Y-axis label reserves half of its 16px line box plus that gap, and
- * a value label additionally reserves its 16px line box and 4px mark gap.
+ * highest Y-axis label reserves half of its 16px line box plus that gap.
+ * Hover value labels do not influence this inset; they keep their mark-relative
+ * position and may extend above the plot when a mark reaches the top edge.
  */
 export function resolveCartesianChartTopInset({
     showYAxis = false,
-    showHoverLabel = false,
     markExtent = 0,
 }: CartesianChartTopInsetOptions = {}) {
     const safeMarkExtent = Number.isFinite(markExtent)
@@ -34,13 +30,7 @@ export function resolveCartesianChartTopInset({
     const yAxisInset = showYAxis
         ? CHART_PLOT_EDGE_GAP + CHART_AXIS_LABEL_HEIGHT / 2
         : 0;
-    const hoverLabelInset = showHoverLabel
-        ? CHART_PLOT_EDGE_GAP +
-          CHART_HOVER_LABEL_HEIGHT +
-          CHART_HOVER_LABEL_GAP +
-          safeMarkExtent
-        : 0;
-    return Math.ceil(Math.max(markInset, yAxisInset, hoverLabelInset));
+    return Math.ceil(Math.max(markInset, yAxisInset));
 }
 
 export function resolveCategoryLabels(
@@ -82,11 +72,16 @@ export function resolveVisibleCategoryIndexes(
 ) {
     const count = labels.length;
     if (count === 0) return [];
-    const explicitMaxCount = resolveMaxLabelCount(maxLabelCount, count);
-    let indexes = sampleIndexes(count, explicitMaxCount);
+    const candidates = resolveNonEmptyLabelIndexes(labels);
+    if (candidates.length === 0) return [];
+    const explicitMaxCount = resolveMaxLabelCount(
+        maxLabelCount,
+        candidates.length,
+    );
+    let indexes = sampleCandidateIndexes(candidates, explicitMaxCount);
     if (!autoCull) return indexes;
     if (measuredWidths?.length === count) {
-        for (let iteration = 0; iteration < count; iteration += 1) {
+        for (let iteration = 0; iteration < candidates.length; iteration += 1) {
             if (
                 canFitCategoryLabels(
                     indexes,
@@ -99,21 +94,24 @@ export function resolveVisibleCategoryIndexes(
                 return indexes;
             }
             if (indexes.length <= 2) return [];
-            const nextIndexes = sampleIndexes(count, indexes.length - 1);
+            const nextIndexes = sampleCandidateIndexes(
+                candidates,
+                indexes.length - 1,
+            );
             if (isSameIndexes(indexes, nextIndexes)) return [];
             indexes = nextIndexes;
         }
         return [];
     }
     if (count <= 2) return indexes;
-    for (let iteration = 0; iteration < count; iteration += 1) {
+    for (let iteration = 0; iteration < candidates.length; iteration += 1) {
         const cellSize = availableSize / Math.max(1, indexes.length);
         const maxLabelWidth = resolveMaxLabelWidth(labels, indexes);
         if (Math.max(20, maxLabelWidth) <= cellSize || indexes.length <= 2) {
             return indexes;
         }
-        const nextIndexes = sampleIndexes(
-            count,
+        const nextIndexes = sampleCandidateIndexes(
+            candidates,
             Math.max(
                 2,
                 Math.floor(availableSize / Math.max(20, maxLabelWidth)),
@@ -136,12 +134,17 @@ export function resolveVisibleXIndexes(
 ) {
     const count = labels.length;
     if (count === 0) return [];
+    const candidates = resolveNonEmptyLabelIndexes(labels);
+    if (candidates.length === 0) return [];
 
-    const explicitMaxCount = resolveMaxLabelCount(maxLabelCount, count);
-    let indexes = sampleIndexes(count, explicitMaxCount);
+    const explicitMaxCount = resolveMaxLabelCount(
+        maxLabelCount,
+        candidates.length,
+    );
+    let indexes = sampleCandidateIndexes(candidates, explicitMaxCount);
     if (!autoCull) return indexes;
 
-    for (let iteration = 0; iteration < count; iteration += 1) {
+    for (let iteration = 0; iteration < candidates.length; iteration += 1) {
         if (
             canFitXLabels(
                 labels,
@@ -156,7 +159,10 @@ export function resolveVisibleXIndexes(
             return indexes;
         }
         if (indexes.length <= 2) return [];
-        const nextIndexes = sampleIndexes(count, indexes.length - 1);
+        const nextIndexes = sampleCandidateIndexes(
+            candidates,
+            indexes.length - 1,
+        );
         if (isSameIndexes(indexes, nextIndexes)) return [];
         indexes = nextIndexes;
     }
@@ -275,6 +281,18 @@ export function sampleIndexes(count: number, maxVisibleCount: number) {
     const visibleCount = resolveEqualStepVisibleCount(count, safeVisibleCount);
     const step = (count - 1) / (visibleCount - 1);
     return Array.from({ length: visibleCount }, (_, index) => index * step);
+}
+
+function resolveNonEmptyLabelIndexes(labels: string[]) {
+    return labels.flatMap((label, index) =>
+        label.trim().length > 0 ? [index] : [],
+    );
+}
+
+function sampleCandidateIndexes(candidates: number[], maxVisibleCount: number) {
+    return sampleIndexes(candidates.length, maxVisibleCount).map(
+        (index) => candidates[index],
+    );
 }
 
 export function resolveMaxLabelCount(

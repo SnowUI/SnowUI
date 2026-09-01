@@ -483,7 +483,7 @@
     :global(:where(.snowui-chart-hover-panel-rows)) {
         display: grid;
         grid-template-columns: max-content max-content max-content;
-        column-gap: var(--gap-1);
+        column-gap: 0;
         row-gap: calc(var(--gap-1) / 2);
         align-items: center;
     }
@@ -498,6 +498,7 @@
         border-radius: 9999px;
         background: var(--snowui-chart-hover-panel-dot-color);
         opacity: var(--snowui-chart-hover-panel-dot-opacity);
+        margin-right: var(--gap-1);
     }
 
     :global(:where(.snowui-chart-hover-panel-name)) {
@@ -507,5 +508,6 @@
     :global(:where(.snowui-chart-hover-panel-value)) {
         color: var(--snowui-chart-hover-panel-value-color);
         text-align: right;
+        margin-left: var(--gap-2);
     }
 </style>

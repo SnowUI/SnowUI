@@ -411,13 +411,10 @@
             showHoverPanel || Boolean(chartGroup?.showHoverPanel?.()),
         ),
     );
-    const topMarkExtent = $derived(
-        resolveLineTopMarkExtent(series, effectiveShowHoverLabel),
-    );
+    const topMarkExtent = $derived(resolveLineTopMarkExtent(series));
     const ownPlotTopInset = $derived(
         resolveCartesianChartTopInset({
             showYAxis: effectiveShowYAxis,
-            showHoverLabel: effectiveShowHoverLabel,
             markExtent: topMarkExtent,
         }),
     );
@@ -1710,10 +1707,7 @@
         return Math.max(1, toNumber(pointSize ?? seriesSize ?? 8, 8));
     }
 
-    function resolveLineTopMarkExtent(
-        input: LineChartSeries[],
-        includeHoverMarkers: boolean,
-    ) {
+    function resolveLineTopMarkExtent(input: LineChartSeries[]) {
         let extent = 0;
         for (const seriesItem of input) {
             extent = Math.max(
@@ -1726,7 +1720,7 @@
                 const markerSize = resolveMarkerSize(
                     seriesItem.markers ?? false,
                     pointConfig,
-                    includeHoverMarkers,
+                    true,
                 );
                 extent = Math.max(extent, markerSize / 2);
             }
@@ -2453,7 +2447,7 @@
         --snowui-line-chart-axis-line-color: var(--black-40);
         --snowui-line-chart-hover-label-color: var(
             --snowui-line-chart-hover-label-color-override,
-            var(--black-100)
+            var(--black-100, #000000)
         );
         --snowui-line-chart-stroke-width: 1;
         --snowui-line-chart-marker-size: 8;

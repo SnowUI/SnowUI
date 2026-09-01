@@ -1,6 +1,6 @@
 # ChartGroup 图表组合容器
 
-> **版本**: v0.2.0
+> **版本**: v0.2.1
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。
@@ -18,7 +18,7 @@
 - **坐标轴控制**: `ChartGroup` 可统一下发坐标轴显示、网格、辅助线、X/Y label 抽稀、Y 轴 domain / ticks / formatter 与 LineChart 的 `xAxisMode`。子图表显式传入同名 prop 时优先使用子图表自身配置。
 - **响应式画布**: 根层观察最终显示尺寸；`width="100%"` / `height="100%"` 时共享命中层和 hover panel bounds 使用真实画布尺寸。
 - **完整分类语义**: ChartGroup 始终把完整 `xLabels` 和完整分类 cell 下发给子图表；抽稀只由实际绘制坐标轴的子图表执行，不减少共享命中 cell 或 active index 范围。
-- **共享垂直边界**: 顶部使用内容感知安全区；ChartGroup 收集 BarChart / LineChart 子图的需求并取最大值，使所有叠加图层和共享命中层使用同一顶边。底部仅保留 X 轴 `8px` 间距和 `16px` 标签高度。
+- **共享垂直边界**: 顶部使用内容感知安全区；ChartGroup 收集 BarChart / LineChart 子图的图形、marker 与 Y 轴需求并取最大值，使所有叠加图层和共享命中层使用同一顶边。hover 数值不增加共享顶部高度，仍保持在图形上方 `4px`，必要时可溢出绘图区顶边。底部仅保留 X 轴 `8px` 间距和 `16px` 标签高度。
 - **叠加画布**: 根层是 `position: relative` 的固定尺寸画布，子图表可通过 `class="absolute top-0 left-0"` 叠加。
 - **单坐标轴**: 组合图表推荐只让一个子图表渲染坐标轴，其余子图表关闭坐标轴、网格和辅助线。
 - **无内置业务外壳**: 不内置标题、卡片背景、legend 或 toolbar；这些由外部 Frame / Card 组合。
@@ -186,6 +186,10 @@ interface ChartGroupContext {
 - **归属判断**: PRO。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
 
 ## 更新日志 (Changelog)
+
+### v0.2.1 (2026-09-02)
+
+- 共享顶部安全区不再因 hover 数值增高；子图表的数值 label 保持图形上方 `4px`，必要时可溢出统一绘图区顶边。
 
 ### v0.1.2 (2026-08-31)
 

@@ -1,6 +1,6 @@
 # LineChart (折线图)
 
-> **版本**: v1.4.0
+> **版本**: v1.4.1
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
@@ -16,10 +16,10 @@
 - **多序列**: 一张图可同时渲染实线、虚线、ChartSpec 默认色序和不同 marker 策略。
 - **坐标轴内建**: 横坐标、纵坐标、网格线属于 LineChart 形态能力，放在组件内。
 - **Y 轴自适应宽度**: Y 轴不使用固定预留宽度；标签区宽度等于当前最宽可见标签的实际渲染宽度，标签右边缘与绘图区起点固定保留 `12px`。标签变宽时仅按实际增加的宽度压缩绘图区。
-- **动态顶部安全区**: 线条或 marker 的最高可见边缘距组件顶部至少 `8px`；显示 Y 轴时至少 `16px`；显示顶部数值 label 时再计入 `16px` label、`4px` label 间距和 marker 半径。显示 X 轴时底部仅保留 `8px` 标签间距和 `16px` 标签高度。
+- **动态顶部安全区**: 线条或 marker 的最高可见边缘距组件顶部至少 `8px`；显示 Y 轴时至少 `16px`。顶部数值 label 不额外增加安全区，仍保持在节点上方 `4px`，必要时可溢出绘图区顶边；marker 半径的安全区不依赖是否显示数值 label。显示 X 轴时底部仅保留 `8px` 标签间距和 `16px` 标签高度。
 - **分类轴点位模型**: 横坐标默认使用 `edge` 模式，首尾数据点与首尾 label 中心都对齐到绘图区两端；也可切换为 `cell` 模式让节点位于等宽分类 cell 中心。label 放不下时按当前点位模式重新计算并自动减少中间坐标和数据点，至少保留首尾。
 - **节点可定制**: 序列和单点都可配置 marker；单点配置优先级高于序列配置。
-- **hover label**: 默认 hover / focus 节点时在点上方 4px 显示数值 label，同时节点反色并在节点后方显示 0.5px 黑色竖线；字号 12px，常规体，颜色为 Black/100%（`var(--black-100)`），数字格式消费 `NumberFormats.md`，默认非整数显示 2 位小数。`alwaysShowHoverLabel` 可让数值 label 常显。
+- **hover label**: 默认 hover / focus 节点时在点上方 4px 显示数值 label，不因触及绘图区顶边改变位置；同时节点反色并在节点后方显示 0.5px 黑色竖线。字号 12px、常规体，默认 Black/100%。数字格式消费 `NumberFormats.md`，默认非整数显示 2 位小数。`alwaysShowHoverLabel` 可让数值 label 常显。
 - **圆角转折线**: LineChart 只保留圆角转折线；主体保持直线，只在折点处按 `cornerRadius` 生成局部圆角，`cornerRadius=0` 时为直线。
 - **Chart 通用出现动效**: 每条序列自身绘制时长固定为 `1000ms`，与 CircularChart 一致；线与 Area 从左到右缓出揭示。多序列按 `360ms` 延迟依次启动，每条序列拥有独立缓出时间轴；marker 在线条 reveal 到对应点位时立即出现，不做透明度缓动。
 
@@ -198,7 +198,7 @@ Marker 说明：
 | `--snowui-line-chart-axis-color-override` | 坐标轴标签颜色 |
 | `--snowui-line-chart-grid-color-override` | 网格线颜色 |
 | `--snowui-line-chart-axis-line-color-override` | x 轴基线颜色 |
-| `--snowui-line-chart-hover-label-color-override` | hover label 颜色 |
+| `--snowui-line-chart-hover-label-color-override` | hover label 强制颜色 |
 
 ---
 
@@ -214,7 +214,7 @@ Marker 说明：
 - X 轴 label 自动显示规则：按最终字体实测完整文字宽度与当前 `xAxisMode` 的原始数据位置判断，相邻可见文字至少间隔 `4px`。抽稀只减少 label，不删除或重排数据点、折线路径、marker、guide 与命中 cell。保留索引必须形成等差步数；若首尾两个完整 label 仍放不下，则隐藏全部 X label。
 - Y 轴 label 抽稀规则：自动生成刻度时优先通过 `yTickCount` / `yMaxLabelCount` 生成合适数量；显式传入 `yTicks` 或纵向空间不足时，按首尾保留、等步数的规则减少显示 label，水平网格线跟随可见 Y label。
 - X 轴 label cell 顶部到最下面 x 轴基线的间距为 `8px`。
-- 绘图区顶部由共享内容感知规则计算：线条宽度的一半或当前最大 marker 半径作为图形向上溢出量；普通图形保持 `8px` 安全距离，Y 轴顶刻度至少需要 `16px`，顶部数值 label 需要 `28px + 图形溢出量`。有 X 轴时 `bottom=24px`，只包含上述 `8px` 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
+- 绘图区顶部由共享内容感知规则计算：线条宽度的一半或当前最大 marker 半径作为图形向上溢出量；普通图形保持 `8px` 安全距离，Y 轴顶刻度至少需要 `16px`。顶部数值 label 不增加该值，继续保持节点上方 `4px` 并可溢出绘图区顶边；marker 的溢出量始终计入，不依赖 label 是否显示。有 X 轴时 `bottom=24px`，只包含上述 `8px` 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
 - Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘到绘图区线段起点的间距固定为 `12px`。例如 formatter 输出 `100000` 时，绘图区只按该文本比短刻度新增的实际宽度缩小，固定间距不变。
 - 不接入三槽位协议，不承担通用子元素排列。
 
@@ -289,6 +289,11 @@ SVG 图层从下到上为：
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.4.1 (2026-09-02)
+
+#### 调整
+- 顶部数值 label 不再增加安全区，仍保持节点上方 `4px` 并可溢出绘图区顶边；默认颜色为 Black/100%。
 
 ### v1.3.5 (2026-09-01)
 

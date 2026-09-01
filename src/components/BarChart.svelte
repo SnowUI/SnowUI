@@ -144,6 +144,8 @@
         gradientId?: string;
         gradient?: ReturnType<typeof resolveColorGradient>;
         opacity: number;
+        isStackTop: boolean;
+        hoverLabelBarIndex: number;
         hoverOverlayColor: string;
         hoverOverlayOpacity: string;
         path: string;
@@ -151,7 +153,6 @@
         hitPath: string;
         labelText: string;
         finalLabelText: string;
-        labelColor: string;
         labelX: number;
         labelY: number;
         boundsX: number;
@@ -445,8 +446,6 @@
     const ownPlotTopInset = $derived(
         resolveCartesianChartTopInset({
             showYAxis: orientation === "vertical" && effectiveShowYAxis,
-            showHoverLabel:
-                orientation === "vertical" && effectiveShowHoverLabel,
         }),
     );
     const effectivePlotTopInset = $derived(
@@ -715,7 +714,11 @@
     const valueLabelCategoryTexts = $derived(
         categoryLabels.map((label, groupIndex) => {
             const groupLabels = bars
-                .filter((item) => item.groupIndex === groupIndex)
+                .filter(
+                    (item) =>
+                        item.groupIndex === groupIndex &&
+                        isBarHoverLabelEligible(item),
+                )
                 .map((item) => item.finalLabelText);
             return groupLabels.reduce(
                 (widest, candidate) =>
@@ -1185,6 +1188,10 @@
             const labelProgress = timelines[groupIndex]?.labelProgress ?? 1;
             const opacity = timelines[groupIndex]?.opacityProgress ?? 1;
             const units = resolveUnitBars(item, chartMode);
+            const stackTotal = units.reduce(
+                (total, unit) => total + unit.value,
+                0,
+            );
             const visibleUnitCount = chartMode === "group" ? units.length : 1;
             const category = resolveCategoryGeometry(
                 groupIndex,
@@ -1319,7 +1326,10 @@
                     rect,
                     chartOrientation,
                 );
-                const currentLabelValue = unit.value * labelProgress;
+                const isStackTop =
+                    chartMode === "stack" && unitIndex === units.length - 1;
+                const labelValue = isStackTop ? stackTotal : unit.value;
+                const currentLabelValue = labelValue * labelProgress;
                 const labelContext: BarChartValueLabelContext = {
                     item,
                     unit,
@@ -1334,7 +1344,7 @@
                     progress: 1,
                 };
                 const finalValueLabel = formatBarValueLabel(
-                    unit.value,
+                    labelValue,
                     finalLabelContext,
                 );
                 const labelFractionFormat = createHoverLabelFractionFormat(
@@ -1360,6 +1370,9 @@
                     gradientId: gradient?.id,
                     gradient,
                     opacity: itemOpacity,
+                    isStackTop,
+                    hoverLabelBarIndex:
+                        chartMode === "stack" ? units.length - 1 : unitIndex,
                     hoverOverlayColor:
                         resolveBarHoverOverlayColor(visualOpacity),
                     hoverOverlayOpacity:
@@ -1369,11 +1382,6 @@
                     hitPath,
                     labelText: valueLabel,
                     finalLabelText: finalValueLabel,
-                    labelColor: resolveBarLabelColor(
-                        chartMode,
-                        unitIndex,
-                        units.length,
-                    ),
                     labelX: labelPosition.x,
                     labelY: labelPosition.y,
                     boundsX: fullRect.x,
@@ -1463,7 +1471,11 @@
     }
 
     function hoverLabelKey(item: NormalizedBar) {
-        return `${item.groupIndex}:${item.barIndex}:${item.segmentIndex}`;
+        return `${item.groupIndex}:${item.hoverLabelBarIndex}`;
+    }
+
+    function isBarHoverLabelEligible(item: NormalizedBar) {
+        return mode !== "stack" || item.isStackTop;
     }
 
     function clearHoverLabelUnmount(key: string) {
@@ -1514,9 +1526,10 @@
 
     function shouldRenderBarHoverLabel(item: NormalizedBar, key: string) {
         return (
-            shouldRenderHoverLabel(key) ||
-            isBarCellActive(item) ||
-            isPersistentValueLabelVisible(item)
+            isBarHoverLabelEligible(item) &&
+            (shouldRenderHoverLabel(key) ||
+                isBarCellActive(item) ||
+                isPersistentValueLabelVisible(item))
         );
     }
 
@@ -1675,17 +1688,6 @@
             x: rect.x + rect.width / 2,
             y: rect.y - 4,
         };
-    }
-
-    function resolveBarLabelColor(
-        chartMode: BarChartMode,
-        index: number,
-        count: number,
-    ) {
-        if (chartMode === "stack" && index < count - 1) {
-            return "var(--static-white-100, #ffffff)";
-        }
-        return "var(--snowui-bar-chart-hover-label-color)";
     }
 
     function resolveHoverPanelColor(item: NormalizedBar) {
@@ -2396,7 +2398,6 @@
                                 skeleton={false}
                                 pointer-events="none"
                                 aria-hidden="true"
-                                style={`--snowui-bar-chart-hover-label-fill: ${item.labelColor};`}
                             >
                                 {item.labelText}
                             </Frame>
@@ -2575,7 +2576,7 @@
         --snowui-bar-chart-axis-line-color: var(--black-40);
         --snowui-bar-chart-hover-label-color: var(
             --snowui-bar-chart-hover-label-color-override,
-            var(--black-100)
+            var(--black-100, #000000)
         );
 
         position: relative;
@@ -2678,14 +2679,8 @@
     }
 
     :global(:where(.snowui-bar-chart-hover-label)) {
-        color: var(
-            --snowui-bar-chart-hover-label-fill,
-            var(--snowui-bar-chart-hover-label-color)
-        );
-        fill: var(
-            --snowui-bar-chart-hover-label-fill,
-            var(--snowui-bar-chart-hover-label-color)
-        );
+        color: var(--snowui-bar-chart-hover-label-color);
+        fill: currentColor;
         font-family: var(--font, Inter), sans-serif;
         font-size: 12px;
         font-weight: 400;
