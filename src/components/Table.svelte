@@ -5,6 +5,7 @@
     import type { ResourceSize } from "../context";
     import { getTableContext, provideTableContext, type TableColumnRegistration } from "../lib/table-context.svelte";
     import { createEdgeFadeMaskImage } from "../lib/edge-fade";
+    import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
     import { TableTruncationManager } from "../lib/table-truncation";
     interface Props extends Omit<FrameProps, "children"> {
         columnWidths?: Record<string, number>;
@@ -36,10 +37,23 @@
     let registeredColumns = $state.raw<TableColumnRegistration[]>([]);
     let tableElement = $state<HTMLElement>();
     let viewportElement = $state<HTMLElement>();
+    let horizontalTrackElement = $state<HTMLElement>();
     let autoLockedColumnWidths = $state<Record<string, number>>({});
     let hasAutoLockedColumnWidths = $state(false);
     const parentTable = getTableContext();
     const truncationManager = new TableTruncationManager();
+    const horizontalScrollbar = useOverlayScrollbar(
+        () => viewportElement,
+        () => horizontalTrackElement,
+        "horizontal",
+    );
+
+    function syncHorizontalThumb(node: HTMLElement) {
+        $effect(() => {
+            node.style.width = `${horizontalScrollbar.thumbSize}px`;
+            node.style.transform = `translate3d(${horizontalScrollbar.thumbOffset}px,0,0)`;
+        });
+    }
 
     provideTableContext({
         getColumnWidth: (columnId) =>
@@ -113,45 +127,81 @@
 </script>
 
 <Frame
-    bind:element={viewportElement}
-    class={`snowui-table-viewport ${userClass}`}
+    class={`snowui-table-viewport snowui-overlay-scrollbar-host ${userClass}`}
     data-role-layout={parentTable.isDataTable() ? parentTable.getRoleLayout() : undefined}
+    data-axis="horizontal"
+    data-horizontal-track-position={horizontalScrollbar.hasOverflow ? "viewport" : undefined}
     style={fadeMaskVars}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
     {...rest}
 >
-    <Frame
-        tag="table"
-        bind:element={tableElement}
-        class="snowui-table"
-        style={tableStyle}
-        aria-label={ariaLabel}
-        enableAutoLayout={false}
-        enableResponsive={false}
-        enableContext={false}
-        enableScaleObserver={false}
+    <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+    <div
+        bind:this={viewportElement}
+        class="snowui-table-scroll-viewport snowui-overlay-scrollbar-viewport"
+        data-scroll-axis="horizontal"
+        role="region"
+        aria-label={ariaLabel ? `${ariaLabel} horizontal scroll` : "Scrollable table"}
+        tabindex="0"
     >
-        {#if children}{@render children()}{/if}
-    </Frame>
+        <Frame
+            tag="table"
+            bind:element={tableElement}
+            class="snowui-table"
+            style={tableStyle}
+            aria-label={ariaLabel}
+            enableAutoLayout={false}
+            enableResponsive={false}
+            enableContext={false}
+            enableScaleObserver={false}
+        >
+            {#if children}{@render children()}{/if}
+        </Frame>
+    </div>
+    <div
+        bind:this={horizontalTrackElement}
+        class="snowui-table-scrollbar snowui-overlay-scrollbar"
+        data-axis="horizontal"
+        data-visible={horizontalScrollbar.hasOverflow ? "true" : undefined}
+        aria-hidden="true"
+    >
+        <div use:syncHorizontalThumb class="snowui-overlay-scrollbar-thumb"></div>
+    </div>
 </Frame>
 
 <style>
     :global(:where(.snowui-table-viewport)) {
         width: 100%;
         min-width: 0;
+        position: relative;
         overflow: visible;
         container-type: inline-size;
-        --snowui-table-responsive-cell-padding-inline: clamp(calc(var(--padding-1) / 2), 2cqi, var(--padding-3));
+        --snowui-table-responsive-cell-padding-inline: clamp(
+            calc(var(--padding-1) / 2),
+            calc((100cqi - (var(--size-16) * 7)) / 16),
+            var(--padding-3)
+        );
     }
-    :global(:where(.snowui-table-viewport[data-continuous-hover-overlay-host="true"] > .snowui-table)) {
+    :global(:where(.snowui-table-scroll-viewport)) {
+        width: 100%;
+        min-width: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+    :global(:where(.snowui-table-scrollbar)) {
+        /* Continuous Hover 会将 table 提升到 z-index: 1；轨道必须稳定处于
+         * 内容层之上，否则吸底到数据行上时可见但无法接收指针。 */
+        z-index: 2;
+    }
+    :global(:where(.snowui-table-viewport[data-continuous-hover-overlay-host="true"] .snowui-table)) {
         position: relative;
         z-index: 1;
     }
     :global(:where(.snowui-table)) {
-        width: max-content;
-        min-width: 100%;
+        width: 100%;
+        min-width: min-content;
         border-spacing: 0;
         border-collapse: separate;
         table-layout: auto;

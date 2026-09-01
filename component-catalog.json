@@ -899,7 +899,7 @@
       "kind": "component",
       "source": "src/components/Table.svelte",
       "documentation": "src/components/Table.md",
-      "description": "提供 OSS 原生表格语义、列宽与加载展示；宽表参与页面固有宽度计算，由页面容器负责横向滚动。",
+      "description": "提供 OSS 原生表格语义、自动固有列宽、局部横向滚动与加载展示。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,

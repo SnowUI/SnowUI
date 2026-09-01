@@ -1,7 +1,7 @@
 # Table（语义表格）
 
-> **版本**: v2.4.0
-> **职责**: 提供 OSS 原生表格语义、列宽与加载展示；宽表参与页面固有宽度计算，由页面容器负责横向滚动。
+> **版本**: v2.5.1
+> **职责**: 提供 OSS 原生表格语义、自动固有列宽、局部横向滚动与加载展示。
 
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
 
@@ -29,17 +29,20 @@ Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、
 
 结构：
 
-- Root Frame（表格边界，不承担滚动）
-  - Native table（原生表格排版）
+- Root Frame（表格边界与 overlay scrollbar host）
+  - Horizontal viewport（可聚焦的局部滚动区）
+    - Native table（原生表格排版）
     - TableHeader / TableBody（`thead` / `tbody`）
       - TableRow（`tr`）
         - TableHead / TableCell（`th` / `td`）
 
 局部布局来源：Root Frame 不声明 `row` / `column`，不启用通用槽位排列；`table` 及各语义子项显式关闭 Auto Layout，保持浏览器原生表格布局。TableHead 内部的排序按钮和 Indicator、TableCell 的可选内容 row 属于各子组件的局部布局。
 
-padding 归属：Table 根层和原生 table 不制造 padding；表头与数据单元格分别由 TableHead / TableCell 负责 padding。普通、selection 与 actions 单元格的左右 padding 按 Table 自身容器宽度在 `2px → 12px` 之间流动（`clamp(calc(var(--padding-1) / 2), 2cqi, var(--padding-3))`），上下 padding 保持 8px；已登记的 Head/Cell padding override 仍可整体接管。
+padding 归属：Table 根层和原生 table 不制造 padding；表头与数据单元格分别由 TableHead / TableCell 负责 padding。普通、selection 与 actions 单元格的左右 padding 按 Table 自身容器宽度在 `2px → 12px` 之间流动：窄容器优先收敛到每侧 2px，使相邻列的最小视觉间距为 4px；宽容器恢复每侧 12px。上下 padding 保持 8px；已登记的 Head/Cell padding override 仍可整体接管。
 
 gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell padding；TableCell 复合内容的 gap 由 TableCell 自身控制。
+
+固有最小宽度：未声明 `columnWidths` / `minWidth` 时，原生 `table-layout:auto` 以各列内容的 min-content 宽度自动形成整表最小宽度，并至少填满宿主。普通可换行单元格以“最长不可断单词 / 片段 + 单元格左右 padding”为列的自动下限，不会逐字拆分标识符。`lines={1}` / `nowrap` 内容的整行是不可断片段，因而会产生更保守的列下限。任一显式 `columnWidths`、拖动列宽或固定宽度都属于调用方主动覆盖，该列改按 TableCell / TableHead 的截断规则处理。
 
 普通 Table 不提供 checkbox 选择列或按钮操作列。`TableHead/TableCell as="selection|actions"` 只有位于 PRO DataTable Context 中才激活；选择状态、角色布局与批量操作均由 DataTable 持有。
 
@@ -53,7 +56,7 @@ DataTable selection 角色中，TableHead 的全选 Checkbox 与 TableCell 的�
 
 Spinner 本体由 TableBody 内部创建，不要求页面在 Demo 或业务模板中手写。页面提供真实请求函数，并选择手动按钮调用 `DataTableRenderState.loadMore()` 或声明 `loadMoreMode="auto"`；DataTable 内部负责自动观察、请求节流、并发保护、逐条合并数据、hasMore、Spinner 时机与新增行渐显。
 
-DataTable 的自动加载由其内部表尾哨兵负责。页面只需声明 `loadMoreMode="auto"` 和数据源；默认需让表格底部越过最近纵向滚动区域底部，再继续下滚 80px 才触发，连续请求至少间隔 500ms。Table / DataTable 仍不创建纵向滚动容器，也不改变 ScrollArea 或页面的滚动归属。
+DataTable 的自动加载由其内部表尾哨兵负责。页面只需声明 `loadMoreMode="auto"` 和数据源；默认需让表格底部越过最近纵向滚动区域底部，再继续下滚 80px 才触发，连续请求至少间隔 500ms。Table / DataTable 仍不创建纵向滚动容器，也不改变外层 ScrollArea 或页面的纵向滚动归属。
 
 DataTable 每收到一条数据就提交一条可见 row，并通过 Table Context 让对应行的普通 `TableCell` 进入 Frame `Appear` 状态，显式执行纯 `opacity: 0 → 1` 动效，不产生尺寸缩放。selection / actions 角色 Cell 不消费该内部动效，避免行级 opacity 与控件自身 hover opacity 相乘导致 Checkbox / actions 暂时不可见。第一条新行开始渐显时立即隐藏 Spinner；后续数据按 DataTable 内部配置的展示间隔逐条出现，各行动效彼此重叠。展示间隔为 0 时，同批本地数据在同一轮更新中提交。TableRow / TableCell 显式传入的 `whileAppear` 仍优先于内部动效。
 
@@ -151,14 +154,14 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 > `mask-image` 需同时写 `-webkit-mask-image`；`.snowui-table-cell-content` / `.snowui-table-head-content` 上加 `transition: mask-image ...` 让渐隐随 hover 平滑出现。
 
-滚动归属：Table **不创建横向滚动容器**。内部 table 使用内容宽度并至少填满宿主；`minWidth` 可进一步扩大表格的固有宽度。宽表的 `overflow-x`、滚动条样式与页面级可访问性由外层页面容器统一负责。
+滚动归属：Table **自己创建唯一的局部横向 viewport**，并通过共享 `useOverlayScrollbar` 将同一条横向轨道 sticky 到当前页面视口底部。轨道只在表格固有最小宽度超过宿主时显示，表格离开视口或到达底端后收回表格边界。不把宽表宽度传播为页面最小宽度，不应再用外层 ScrollArea 包裹 Table，也不得创建第二条同步滚动条。`minWidth` 仍可进一步扩大表格的固有宽度。Table / DataTable 仍不创建纵向滚动容器。吸底轨道必须高于 table 内容层；即使 `TableBody` 默认连续 Hover 将 table 提升为内容层，轨道仍完整接收 hover、pointer down 与拖动，不得由其下方的数据行截获。
 
 ## API
 
 | 属性 | 类型 | 默认值 | 说明 |
 | :--- | :--- | :--- | :--- |
 | columnWidths | `Record<string, number>` | `{}` | 受控列宽，可 `bind:` |
-| minWidth | `number \| string` | - | 表格最小宽度；超出页面容器时由页面处理横向滚动 |
+| minWidth | `number \| string` | - | 显式扩大表格最小宽度；未设置时由各列 min-content + Cell padding 自动汇总，溢出由 Table 内置局部横向 viewport 承接 |
 | onColumnWidthsChange | `(widths) => void` | - | 拖动列宽后的完整快照 |
 | ariaLabel | `string` | - | 表格无障碍名称 |
 | loadingSpinnerSize | `ResourceSize` | `16` | 已有数据继续加载时，表体末尾居中 Spinner 的尺寸 |
@@ -198,6 +201,9 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 ## Changelog
 
+- 2026-09-01：v2.5.1，修复吸底横向滚动条与数据行重叠时无法操作的问题。根因是连续 Hover 将 table 提升至 `z-index: 1`，轨道仍处于默认层级；Table 现在固定让横向轨道处于内容层之上，并通过真实命中与拖动回归验证。
+- 2026-09-01：v2.5.0，Table 内置局部横向 viewport 和视口贴底 overlay 轨道；未设置显式宽度时，整表最小宽度由各列 min-content 与 Cell padding 自动汇总，保留最长不可断单词 / 片段。
+- 2026-09-01：v2.4.1，调整容器响应曲线，使窄表格在常见移动宽度即收敛到每侧 2px；原生相邻列的最小视觉间距固定为 4px。
 - 2026-08-14：v2.4.0，Table viewport 建立 inline-size 容器；TableHead / TableCell 左右 padding 随表格自身宽度从默认 12px 流动到最小 2px，DataTable 组合自然继承。
 - 2026-08-06：v2.3.0，新增密集表格语义快路径和表级单帧截断批处理；默认单元格不再初始化逐格 Frame 运行时与尺寸观察，关闭角色能力时跳过无效 overlay DOM / 样式，视觉与完整能力回退保持不变。
 - 2026-08-06：v2.2.0，普通数据列的 TableHead 默认允许拖动改宽；固定列使用 `resizable={false}` 显式关闭，排序的数据规则保持现有边界。

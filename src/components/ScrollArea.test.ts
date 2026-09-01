@@ -1,8 +1,9 @@
 /**
  * ScrollArea.test.ts
- * v1.1.0
+ * v1.2.0
  * 变更记录 (2026-06-21): 新增纵向、横向、双轴与组合示例。
  * 变更记录 (2026-07-22): 明确纵向 Thumb 常态 8px hover 命中宽度。
+ * 变更记录 (2026-09-01): 新增横向轨道贴近视口底部的长内容场景。
  */
 export const examples = [
     {
@@ -81,5 +82,23 @@ export const examples = [
             responsive: "外层 Frame 可继续接管 ScrollArea 的布局位置。",
         },
         logic: ["FrameProps", "As", "Composition"],
+    },
+    {
+        name: "SA-05: 长内容视口横向轨道",
+        code: `SA-05
+<ScrollArea axis="horizontal" horizontalTrackPosition="viewport" ariaLabel="长表格横向内容" style="width: 18rem;">
+    <Frame column style="width: 48rem; min-height: 48rem;" class="gap-8">
+        <Text>Wide content starts here</Text>
+        <Text>Horizontal track stays reachable at the viewport bottom while this area is visible.</Text>
+    </Frame>
+</ScrollArea>`,
+        expected: {
+            render: "宽且高的内容显示固定 8px 的横向自建滚动条。",
+            layout: "内容区域经过当前视口时，横向轨道贴近视口底部；到达容器末端后回到容器底边。",
+            interaction: "Thumb 拖动与键盘横向滚动继续作用于同一个 viewport。",
+            performance: "复用横向 useOverlayScrollbar 状态，不创建第二个同步滚动容器。",
+            responsive: "容器继续独立收窄，不把最小内容宽度传播为页面最小宽度。",
+        },
+        logic: ["Horizontal", "ViewportTrack", "LongContent"],
     },
 ] as const;

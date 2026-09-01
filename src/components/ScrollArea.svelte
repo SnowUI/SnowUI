@@ -6,6 +6,7 @@
 
 <script module lang="ts">
     export type ScrollAreaAxis = "vertical" | "horizontal" | "both";
+    export type ScrollAreaHorizontalTrackPosition = "container" | "viewport";
 </script>
 
 <script lang="ts">
@@ -16,6 +17,7 @@
     interface Props
         extends Omit<FrameProps, "children" | "enableAutoLayout"> {
         axis?: ScrollAreaAxis;
+        horizontalTrackPosition?: ScrollAreaHorizontalTrackPosition;
         ariaLabel?: string;
         viewport?: HTMLElement;
         onscroll?: (event: Event) => void;
@@ -25,6 +27,7 @@
 
     let {
         axis = "vertical",
+        horizontalTrackPosition = "container",
         ariaLabel = "Scrollable content",
         viewport = $bindable(),
         onscroll,
@@ -75,6 +78,7 @@
     {...rest}
     class={rootClass}
     data-axis={axis}
+    data-horizontal-track-position={horizontalTrackPosition}
     enableAutoLayout={false}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
@@ -141,6 +145,15 @@
         overflow: hidden;
     }
 
+    :global(
+        :where(
+            .snowui-scroll-area[data-horizontal-track-position="viewport"]
+                > .snowui-scroll-area-viewport
+        )
+    ) {
+        height: auto;
+    }
+
     :global(:where(.snowui-scroll-area-viewport)) {
         width: 100%;
         height: 100%;
@@ -184,4 +197,5 @@
     :global(:where(.snowui-scroll-area-scrollbar[data-axis="horizontal"])) {
         z-index: 1;
     }
+
 </style>

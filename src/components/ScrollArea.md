@@ -1,7 +1,7 @@
 # ScrollArea（可滚动区域）
 
-> **版本**: v1.2.0
-> **更新**: 2026-07-22
+> **版本**: v1.3.0
+> **更新**: 2026-09-01
 > **职责**: 提供隐藏原生滚动条、使用 SnowUI 自建滚动条的通用可滚动容器
 > **布局模型**: 复合管理布局
 > **文档**: ./ScrollArea.md
@@ -15,6 +15,7 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 - 内容溢出时启用对应 SnowUI overlay scrollbar；纵向条在鼠标移入区域时使用 Frame 默认动效渐显、移出时渐隐，横向条常显
 - Thumb 支持拖动并与原生滚动位置同步
 - 横向 Thumb 始终为 8px；纵向 Thumb 默认视觉宽 4px、hover 视觉宽 8px，常态 hover 命中宽度保持 8px
+- 长内容可把横向轨道贴近当前视口底部，容器离开视口后轨道仍收回到自身底边
 - 继承 Frame 的布局、状态、动效、响应式和属性透传能力
 
 ---
@@ -26,6 +27,7 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | `axis` | `"vertical" \| "horizontal" \| "both"` | `"vertical"` | 允许滚动的方向 |
+| `horizontalTrackPosition` | `"container" \| "viewport"` | `"container"` | 横向轨道停靠在容器底边，或在长容器经过页面视口时贴近视口底部 |
 | `ariaLabel` | `string` | `"Scrollable content"` | viewport 的无障碍标签；viewport 使用 `role="region"` |
 | `viewport` | `HTMLElement`（可绑定） | - | 暴露内部可滚动 viewport，供读取或设置原生滚动位置 |
 | `onscroll` | `(event: Event) => void` | - | viewport 原生 scroll 事件 |
@@ -48,9 +50,20 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 </ScrollArea>
 ```
 
+### 长内容保持横向轨道可达
+
+```svelte
+<ScrollArea axis="horizontal" horizontalTrackPosition="viewport">
+    <Frame width="max-content">...</Frame>
+</ScrollArea>
+```
+
+`viewport` 只改变横向轨道的停靠位置，不把内容最小宽度传播给页面，也不创建第二个滚动容器。轨道在 ScrollArea 穿过当前页面视口时贴近视口底部；到达 ScrollArea 底端后回到容器底边。
+
 ### 选择原则
 
 - 页面或普通容器需要 SnowUI 自建滚动条：使用 ScrollArea。
+- Table 已内置同源的局部横向 viewport 与视口贴底轨道：直接使用 Table，不再外包 ScrollArea。
 - 只需要浏览器原生滚动：直接使用 `overflow`，无需 ScrollArea。
 - 组件内部有特殊 Portal、固定头部或 Pin 区域时，可以继续直接复用 `useOverlayScrollbar`；不得复制滚动条算法或视觉 CSS。
 
@@ -83,6 +96,7 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 | 关键字 | 处理方式 | 说明 |
 | :--- | :--- | :--- |
 | `axis` | `data-scroll-axis` + 条件轨道 | 控制 viewport overflow 与渲染的轨道 |
+| `horizontalTrackPosition` | `data-horizontal-track-position` | `viewport` 使用 sticky 轨道保持长内容中的横向控制可达 |
 | `ariaLabel` | viewport ARIA | 输出 `role="region"` 与 `aria-label` |
 | `viewport` | `$bindable` | 绑定内部滚动元素 |
 | `onscroll` | viewport 事件 | 不挂到根 Frame |
@@ -103,6 +117,10 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.0 (2026-09-01)
+
+- 新增 `horizontalTrackPosition="viewport"`，长横向内容经过页面视口时保持横向轨道可达，同时仍由当前 ScrollArea 独占横向滚动。
 
 ### v1.2.0 (2026-07-22)
 

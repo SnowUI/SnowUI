@@ -37,7 +37,10 @@ export type {
     IndicatorEdge,
     IndicatorAppearance,
 } from "./components/Indicator.svelte";
-export type ScrollAreaAxis = "vertical" | "horizontal" | "both";
+export type {
+    ScrollAreaAxis,
+    ScrollAreaHorizontalTrackPosition,
+} from "./components/ScrollArea.svelte";
 export { default as Pagination } from "./components/Pagination.svelte";
 export type { PaginationWidthMode } from "./components/Pagination.svelte";
 export { default as Table } from "./components/Table.svelte";

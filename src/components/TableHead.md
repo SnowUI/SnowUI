@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v2.2.0
+> **版本**: v2.3.0
 > **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -35,7 +35,9 @@
 
 不需要 `sortable` prop。DataTable 根据同名原始字段或 `sorters[columnId]` 自动判断列是否可排序；独立 TableHead 在声明 `sortDirection` / `onSortChange` 时也自动启用交互。没有任何排序规则的列不渲染按钮。
 
-普通数据列只要声明 `columnId`，默认就在列尾渲染 Indicator 并允许拖动修改宽度；不需要重复声明 `resizable`。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。普通与角色表头的左右 padding 与 TableCell 使用同一容器响应规则，在 2px 到 12px 之间流动，上下保持 8px。
+普通数据列只要声明 `columnId`，默认就在列尾渲染 Indicator 并允许拖动修改宽度；不需要重复声明 `resizable`。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。普通与角色表头的左右 padding 与 TableCell 使用同一容器响应规则，在 2px 到 12px 之间流动；常见窄屏宽度使用每侧 2px，使相邻列最小视觉间距为 4px，上下保持 8px。
+
+未显式固定列宽时，表头的不换行 min-content 与同列 TableCell 共同参与 Table 自动列宽；因此列标题不会因窄宿主被逐字压缩。显式 `columnWidths`、拖动列宽或其他固定宽度优先，宽度不足时仍使用表头省略规则。
 
 未声明任何 `defaultSort` 时，TableHead 不会把第一列视为隐式默认排序列。当所有列均未激活排序时，DataTable 保留上层传入的 rows / filteredRows 顺序。
 
@@ -101,6 +103,8 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 ## Changelog
 
+- 2026-09-01：v2.3.0，未显式固定列宽时，表头不换行 min-content 参与 Table 自动总最小宽度。
+- 2026-09-01：v2.2.1，表头跟随 Table 新响应曲线，在常见窄屏容器收敛到每侧 2px，并明确相邻列最小视觉间距为 4px。
 - 2026-08-14：v2.2.0，普通、selection、actions 与 overlay 角色表头的左右 padding 改为按 Table 容器宽度响应，范围为 2px 到 12px。
 - 2026-08-06：v2.1.0，普通数据列的 `resizable` 默认值改为 `true`；声明 `columnId` 后即可拖动改宽，固定列可显式传入 `resizable={false}`；selection/actions 角色列保持不可拖动。
 - 2026-08-03：v1.9.2，selection Checkbox 的 1px 增量改为固定 `0.0625rem` 特例，不再复用边框 Token。

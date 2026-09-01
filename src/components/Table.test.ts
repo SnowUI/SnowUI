@@ -52,7 +52,7 @@ export const examples = [{
         layout: "八个普通数据列展示 Table-Demo 表格一的订阅内容，不含 checkbox 列和按钮列。",
         interaction: "仅保留普通数据行的默认 hover；没有搜索、排序、筛选、分页或加载更多交互。",
         performance: "静态数据直接由 OSS Table 语义组件渲染，不创建 PRO 数据状态。",
-        responsive: "最小宽度为 960px，超出窄容器时由页面滚动容器承接；表头与数据 Cell 左右 padding 按 Table 容器宽度在 2px 到 12px 之间响应。",
+        responsive: "显式最小宽度为 960px，超出窄容器时由 Table 内置局部横向 viewport 承接，同一轨道贴近视口底部；未声明 minWidth / columnWidths 时由各列 min-content 与 Cell padding 自动汇总整表最小宽度。表头与数据 Cell 左右 padding 按 Table 容器宽度在 2px 到 12px 之间响应，窄容器收敛到每侧 2px，使相邻列最小间距为 4px。",
     },
     logic: ["Semantic", "DisplayOnly", "OSSBoundary"],
 }, {

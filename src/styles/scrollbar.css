@@ -5,6 +5,7 @@
 /* Log (2026-04-24): 从 Textarea / Listbox 提炼 .snowui-overlay-scrollbar 浮层滚动条通用样式。 */
 /* Log (2026-06-21): 纵向 overlay scrollbar 改为宿主区域 hover 时以 Frame 默认动效渐显/渐隐；横向溢出时保持常显。 */
 /* Log (2026-07-22): 纵向 overlay Thumb 常态视觉维持 4px，透明 hover 命中区扩大为 8px。 */
+/* Log (2026-09-01): viewport 贴底横向轨道提炼为共享宿主布局，供 ScrollArea / Table 复用。 */
 
 /*
  * ⚠️ ::-webkit-scrollbar 不可嵌套于 :where()，必须使用直接选择器。
@@ -175,6 +176,28 @@
     opacity: 0;
     transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
         var(--snowui-frame-color-motion-easing, ease-out);
+}
+
+/*
+ * 长内容的横向滚动仍局限在宿主内，但轨道随纵向阅读贴近视口底部。
+ * 该规则属于 overlay-scrollbar 共享能力，组件不得重复实现一套 sticky 定位。
+ */
+:where(
+    .snowui-overlay-scrollbar-host[data-horizontal-track-position="viewport"]
+) {
+    overflow: visible;
+    padding-bottom: var(--snowui-scrollbar-edge-gap, var(--padding-1));
+}
+
+:where(
+    .snowui-overlay-scrollbar-host[data-horizontal-track-position="viewport"]
+        > .snowui-overlay-scrollbar[data-axis="horizontal"]
+) {
+    position: sticky;
+    right: auto;
+    bottom: var(--snowui-scrollbar-edge-gap);
+    left: var(--snowui-scrollbar-edge-gap);
+    width: calc(100% - (var(--snowui-scrollbar-edge-gap) * 2));
 }
 
 .snowui-overlay-scrollbar[data-axis="horizontal"][data-visible="true"],
