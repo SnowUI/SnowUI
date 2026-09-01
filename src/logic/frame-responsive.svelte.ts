@@ -167,7 +167,7 @@ export class FrameResponsive {
 
     #captureOriginalStyles(node: HTMLElement) {
         this.#originalStyles = Object.fromEntries(
-            ["gap", "padding-top", "padding-right", "padding-bottom", "padding-left"].map(
+            ["gap", "padding", "padding-top", "padding-right", "padding-bottom", "padding-left"].map(
                 (property) => [property, snapshotStyle(node, property)],
             ),
         );
@@ -175,8 +175,28 @@ export class FrameResponsive {
 
     #restoreSpacing(node: HTMLElement) {
         if (!this.#originalStyles) return;
-        for (const [property, snapshot] of Object.entries(this.#originalStyles)) {
-            restoreStyle(node, property, snapshot);
+        restoreStyle(node, "gap", this.#originalStyles.gap);
+
+        const paddingProperties = [
+            "padding-top",
+            "padding-right",
+            "padding-bottom",
+            "padding-left",
+        ];
+        node.style.removeProperty("padding");
+        for (const property of paddingProperties) {
+            node.style.removeProperty(property);
+        }
+
+        const padding = this.#originalStyles.padding;
+        if (padding.value) {
+            node.style.setProperty("padding", padding.value, padding.priority);
+        }
+        for (const property of paddingProperties) {
+            const snapshot = this.#originalStyles[property];
+            if (snapshot.value) {
+                node.style.setProperty(property, snapshot.value, snapshot.priority);
+            }
         }
     }
 
