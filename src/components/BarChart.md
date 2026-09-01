@@ -1,6 +1,6 @@
 # BarChart (柱状图)
 
-> **版本**: v1.0.4
+> **版本**: v1.1.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。
@@ -16,6 +16,9 @@
 - **并排规则**: `mode="group"` 使用 `bars` 在同一单元内并排。默认柱间距 `barGap=4`，颜色使用 Chart 默认色序，可扩展为多柱。
 - **方向规则**: `orientation="vertical"` 为纵向柱状图，分类轴在横向；`orientation="horizontal"` 为横向条形图，分类轴在纵向。所有柱模式都支持两个方向。
 - **坐标轴内建**: 坐标轴、刻度、网格线属于 BarChart 形态能力，放在组件内。
+- **响应式密度**: BarChart 直接观察根层最终显示尺寸并以实测宽高重算 SVG 几何，不要求页面自行创建 ResizeObserver。柱粗细可随分类 cell 收窄，但不得小于 `2px`；同一分类内并排柱和相邻分类柱的视觉间距不得小于 `4px`。
+- **横向密度**: 横向柱高沿用柱粗细下限 `2px`，上下相邻柱间距沿用 `4px`；分类 Y label 按最终绘图区高度、`16px` 行高与 `4px` 上下间距抽稀，首尾仍放不下时全部隐藏。
+- **标签抽稀**: `xLabelAutoCull` 只减少纵向图的分类轴 label，不删除柱体、坐标轴、命中 cell 或数据；横向图的底部数值刻度按绘图区实际宽度自动抽稀。两者的可见 label 都必须完整显示且相邻文字至少保留 `4px`；空间不足时保留首尾并等步抽稀，若首尾两个完整 label 仍放不下则隐藏全部横轴 label。常驻顶部数值使用独立的 `valueLabelAutoCull` / `valueMaxLabelCount`，按最终数值文本宽度抽稀；被省略的数值仍会在对应柱 hover / focus 时显示。
 - **Y 轴自适应宽度**: Y 轴不使用固定预留宽度；标签区宽度等于当前最宽可见标签的实际渲染宽度，标签右边缘与绘图区起点固定保留 `12px`。纵向数值轴和横向分类轴使用同一 Chart 共享测量入口；标签变宽时仅按实际增加的宽度压缩绘图区。
 - **动态顶部安全区**: 普通柱距组件顶部至少 `8px`；纵向图显示 Y 轴时最小为 `16px`；显示顶部数值 label 时为 `28px`。显示 X 轴时底部仅保留 `8px` 标签间距和 `16px` 标签高度，标签底边与组件底部对齐；隐藏 X 轴时绘图区延伸到组件底部。
 - **hover 规则**: 柱体 hover 使用 `StyleSpec.md §2.4` 的 overlay 机制，不改写柱体本身颜色。视觉透明度为 40% 及以上的实心柱按 filled Button hover 规则叠加 `StaticWhite/20%`；视觉透明度低于 40% 的浅透明柱按浅黑 hover 档位叠加 `Black/4%`。`overlay` 后层 10% 与多段式浅色段都会走 `Black/4%` overlay。
@@ -33,11 +36,11 @@
 | `data` | `BarChartItem[]` | 内置默认数据 | 分类单元数据 |
 | `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | 图表方向 |
 | `mode` | `"single" \| "stack" \| "overlay" \| "group"` | `"single"` | 单元内部柱模式 |
-| `width` | `number \| string` | `800` | 图表整体宽度 |
-| `height` | `number \| string` | `400` | 图表整体高度 |
-| `barWidth` | `number \| string` | `32` | 单根柱粗细；纵向时为宽度，横向时为高度 |
-| `barGap` | `number \| string` | `4` | `group` 模式中同一单元内相邻柱间距 |
-| `groupGap` | `number \| string` | `20` | 分类单元内容与 cell 边缘的预留间距 |
+| `width` | `number \| string` | `800` | 图表整体宽度；支持 `100%`，内部按最终显示宽度重算几何 |
+| `height` | `number \| string` | `400` | 图表整体高度；内部按最终显示高度重算几何 |
+| `barWidth` | `number \| string` | `32` | 单根柱粗细；纵向时为宽度，横向时为高度；响应式下限 `2px` |
+| `barGap` | `number \| string` | `4` | `group` 模式中同一单元内相邻柱间距；下限 `4px` |
+| `groupGap` | `number \| string` | `20` | 分类单元内容与 cell 边缘的预留间距；下限 `4px` |
 | `segmentGap` | `number \| string` | `0` | `stack` 模式中分段间隔；`0` 表示无间隔 |
 | `cornerRadius` | `number \| string` | `8` | 柱圆角大小 |
 | `roundedStart` | `boolean` | `true` | 是否保留起点端圆角；纵向为底部，横向为左侧 |
@@ -63,8 +66,10 @@
 | `onCellHoverChange` | `(index: number \| null) => void` | - | 分类单元 hover 变化回调 |
 | `valueFormat` | `NumberFormatOptions` | NumberFormats 默认 | 柱体数值 label 的组件级数字格式；可设置 `notation: "auto"` / `"compact"` 使用英文 `k/m/b/t` 缩写 |
 | `labelFormatter` | `(value, context) => string` | - | 柱体数值 label 自定义格式化；优先级高于全局、组件和数据项 `valueFormat` |
-| `xLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 是否自动减少分类 label 和对应数据 |
+| `xLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 按最终显示尺寸减少分类 label；完整文字间距最小 `4px`，首尾仍放不下时全部隐藏；不删除柱体、坐标轴或命中 cell |
 | `xMaxLabelCount` | `number` | - / 继承 `ChartGroup` | 分类 label 最大显示数量 |
+| `valueLabelAutoCull` | `boolean` | `true` | `alwaysShowHoverLabel` 常驻数值是否按最终显示尺寸自动抽稀；hover / focus 数值不受影响 |
+| `valueMaxLabelCount` | `number` | - | 常驻顶部数值最大显示数量 |
 | `yLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 是否自动减少数值轴 label |
 | `yMaxLabelCount` | `number` | - / 继承 `ChartGroup` | 数值轴 label 最大显示数量 |
 | `colors` | `(BarChartColor \| undefined)[]` | - | 调色板；空项回退当前 `colorMode` |
@@ -184,7 +189,7 @@ interface BarChartItem {
 主布局模型:**内禀原子布局**。
 
 - 根层为 `Frame`，内部为单个 SVG 绘图区。
-- 尺寸由 `width` / `height` 与 SVG 坐标算法决定；作为外部布局子项时表现为 Hug。
+- 根层 CSS 尺寸由 `width` / `height` 决定，SVG 坐标算法使用根层最终实测尺寸；`width="100%"` 可直接 Fill，无需页面监听容器后回传像素宽度。
 - `orientation="vertical"` 时分类轴为横向 cell，柱位于 cell 中心；`orientation="horizontal"` 时分类轴为纵向 cell。
 - Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘与绘图区起点间距固定为 `12px`。
 - 自动 domain 上限直接使用当前数据最大值；nice ticks 只生成到不高于该值的最后一个易读刻度。最高柱可以高于最后一条网格线，顶部仅由 `8px / 16px / 28px` 内容安全区控制。显式 `yMax` 或 `yTicks` 不受此自动规则改写。
@@ -194,6 +199,7 @@ interface BarChartItem {
   - `stack`: 一个单元一根多段柱；`segmentGap=0` 时中间段无间隔并只在整体首尾保留圆角；`segmentGap>0` 时每段独立圆角。
   - `overlay`: 一个单元两层同轴柱，后层 10%，前层 100%。
   - `group`: 一个单元多根并排柱，粗细统一，颜色可逐根定义。
+- 响应式收窄时先压缩柱粗细至 `2px`；同分类并排柱间距和相邻分类柱间距都保留至少 `4px`。横坐标和常驻顶部数值分别按自身文本需求抽稀，柱体数量、数据 domain、命中 cell 和动效顺序保持完整。
 - 不接入三槽位协议，不承担通用子元素排列。
 
 详见 [LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
@@ -249,6 +255,7 @@ SVG 图层从下到上为：
 
 ### Changelog
 
+- 2026-09-01 v1.1.0 — BarChart 改为按根层最终显示尺寸自行响应；柱宽下限为 `2px`，柱间距下限为 `4px`；修复短横坐标 label 在 cell 小于 `20px` 时仍被误判为可容纳的问题；横坐标抽稀不再删除柱体，并为常驻顶部数值增加独立自动抽稀。
 - 2026-09-01 v1.0.4 — 自动 domain 上限改为实际最大数据值，最高 nice tick 不再超过最大值；无 Y 轴场景也不再因向上取整的 domain 产生额外顶部空白。
 - 2026-08-31 v1.0.3 — 顶部改为内容感知安全区，并收紧自动 nice domain，避免最高柱、Y 轴顶刻度或数值 label 贴边，同时减少过大的标尺上方空白。
 - 2026-08-31 v1.0.2 — 移除笛卡尔绘图区顶部和底部的额外留白；底部仅保留 X 轴标签自身所需的 `24px`。

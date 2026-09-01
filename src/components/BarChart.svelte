@@ -1,6 +1,6 @@
 <!--
   BarChart 柱状图组件 (PRO)
-  v1.0.2 (2026-08-31)
+  v1.1.0 (2026-09-01)
 
   职责:渲染支持纵向/横向、多段、相叠、多柱并排与坐标轴的柱状图。
   文档: ./BarChart.md
@@ -36,16 +36,23 @@
         CHART_X_AXIS_RESERVED_HEIGHT,
         CHART_Y_AXIS_LABEL_GAP,
         createNiceTicks,
+        estimateLabelWidth,
         formatAxisTick,
         measureRenderedAxisLabelWidth,
+        measureRenderedAxisLabelWidths,
         normalizeTickValue,
         resolveCartesianChartTopInset,
         resolveCategoryLabels as resolveSharedCategoryLabels,
         resolveVisibleCategoryIndexes,
+        resolveVisibleXIndexes,
         resolveVisibleYTicks,
         resolveYTickTargetCount,
     } from "../lib/chart/axis";
     import { clamp, toCssLength, toNumber } from "../lib/chart/geometry";
+    import {
+        resolveCartesianChartSize,
+        watchCartesianChartSize,
+    } from "../lib/chart/size";
     import {
         addHoverLabelKey,
         createHoverLabelFractionFormat,
@@ -143,6 +150,7 @@
         fullPath: string;
         hitPath: string;
         labelText: string;
+        finalLabelText: string;
         labelColor: string;
         labelX: number;
         labelY: number;
@@ -192,6 +200,8 @@
         ) => string;
         xLabelAutoCull?: boolean;
         xMaxLabelCount?: number;
+        valueLabelAutoCull?: boolean;
+        valueMaxLabelCount?: number;
         yLabelAutoCull?: boolean;
         yMaxLabelCount?: number;
         colors?: (BarChartColor | undefined)[];
@@ -303,6 +313,8 @@
         labelFormatter = undefined,
         xLabelAutoCull = undefined,
         xMaxLabelCount = undefined,
+        valueLabelAutoCull = true,
+        valueMaxLabelCount = undefined,
         yLabelAutoCull = undefined,
         yMaxLabelCount = undefined,
         colors = undefined,
@@ -335,8 +347,14 @@
     }: Props = $props();
 
     let rootElement = $state<HTMLElement>();
+    let measuredWidth = $state(0);
+    let measuredHeight = $state(0);
     let yAxisMeasureGroup = $state<SVGGElement>();
+    let xAxisMeasureGroup = $state<SVGGElement>();
+    let xValueAxisMeasureGroup = $state<SVGGElement>();
     let yAxisLabelWidth = $state(0);
+    let measuredCategoryLabelWidths = $state<number[]>([]);
+    let measuredValueTickWidths = $state<number[]>([]);
     let internalAppearanceProgress = $state(0);
     let hasSyncedDefaultAppearanceProgress = $state(false);
     let appearanceFrame = $state<number | null>(null);
@@ -359,11 +377,30 @@
         CHART_GROUP_CONTEXT_KEY,
     );
 
-    const numericWidth = $derived(toNumber(width, 800));
-    const numericHeight = $derived(toNumber(height, 400));
-    const numericBarWidth = $derived(Math.max(1, toNumber(barWidth, 32)));
-    const numericBarGap = $derived(Math.max(0, toNumber(barGap, 4)));
-    const numericGroupGap = $derived(Math.max(0, toNumber(groupGap, 20)));
+    $effect(() => {
+        const root = rootElement;
+        if (!root) return;
+        return watchCartesianChartSize(root, ({ width, height }) => {
+            const nextWidth = width;
+            const nextHeight = height;
+            if (Math.abs(nextWidth - measuredWidth) > 0.01) {
+                measuredWidth = nextWidth;
+            }
+            if (Math.abs(nextHeight - measuredHeight) > 0.01) {
+                measuredHeight = nextHeight;
+            }
+        });
+    });
+
+    const numericWidth = $derived(
+        resolveCartesianChartSize(measuredWidth, width, 800),
+    );
+    const numericHeight = $derived(
+        resolveCartesianChartSize(measuredHeight, height, 400),
+    );
+    const numericBarWidth = $derived(Math.max(2, toNumber(barWidth, 32)));
+    const numericBarGap = $derived(Math.max(4, toNumber(barGap, 4)));
+    const numericGroupGap = $derived(Math.max(4, toNumber(groupGap, 20)));
     const numericSegmentGap = $derived(Math.max(0, toNumber(segmentGap, 0)));
     const numericCornerRadius = $derived(
         Math.max(0, toNumber(cornerRadius, 8)),
@@ -429,6 +466,13 @@
             effectiveXLabels,
         ),
     );
+    const categoryLabelWidths = $derived(
+        categoryLabels.map(
+            (label, index) =>
+                measuredCategoryLabelWidths[index] ??
+                estimateLabelWidth(label) + 2,
+        ),
+    );
     const bounds = $derived(
         resolveBounds(
             effectiveShowXAxis,
@@ -444,25 +488,26 @@
     const plotHeight = $derived(
         Math.max(1, numericHeight - bounds.top - bounds.bottom),
     );
-    const visibleIndexes = $derived(
+    const visibleCategoryLabelIndexes = $derived(
         resolveVisibleCategoryIndexes(
             categoryLabels,
             orientation === "vertical" ? plotWidth : plotHeight,
             effectiveXLabelAutoCull,
             effectiveXMaxLabelCount,
+            orientation === "vertical"
+                ? categoryLabelWidths
+                : categoryLabels.map(() => CHART_AXIS_LABEL_HEIGHT),
+            4,
         ),
     );
-    const visibleData = $derived(
-        visibleIndexes.map((index) => chartData[index]),
-    );
-    const visibleLabels = $derived(
-        visibleIndexes.map(
+    const visibleCategoryLabels = $derived(
+        visibleCategoryLabelIndexes.map(
             (index) => categoryLabels[index] ?? String(index + 1),
         ),
     );
     const domain = $derived(
         resolveValueDomain(
-            visibleData,
+            chartData,
             mode,
             effectiveYMin,
             effectiveYMax,
@@ -475,13 +520,30 @@
     );
     const safeMin = $derived(domain.min);
     const safeMax = $derived(domain.max);
-    const visibleTicks = $derived(
-        resolveVisibleYTicks(
-            domain.ticks,
-            plotHeight,
-            effectiveYLabelAutoCull,
-            effectiveYMaxLabelCount,
+    const formattedDomainTickLabels = $derived(
+        domain.ticks.map((tick) =>
+            (effectiveYTickFormatter ?? formatAxisTick)(tick),
         ),
+    );
+    const visibleTicks = $derived(
+        orientation === "vertical"
+            ? resolveVisibleYTicks(
+                  domain.ticks,
+                  plotHeight,
+                  effectiveYLabelAutoCull,
+                  effectiveYMaxLabelCount,
+              )
+            : resolveVisibleXIndexes(
+                  formattedDomainTickLabels,
+                  plotWidth,
+                  "edge",
+                  effectiveYLabelAutoCull,
+                  effectiveYMaxLabelCount,
+                  measuredValueTickWidths,
+                  4,
+              )
+                  .map((index) => domain.ticks[index])
+                  .filter(Number.isFinite),
     );
     const yAxisLabels = $derived(
         !effectiveShowYAxis
@@ -490,8 +552,88 @@
               ? visibleTicks.map((tick) =>
                     (effectiveYTickFormatter ?? formatAxisTick)(tick),
                 )
-              : visibleLabels,
+              : visibleCategoryLabels,
     );
+
+    $effect(() => {
+        const group = xValueAxisMeasureGroup;
+        const labels = formattedDomainTickLabels;
+        if (
+            !effectiveShowXAxis ||
+            orientation !== "horizontal" ||
+            labels.length === 0
+        ) {
+            measuredValueTickWidths = [];
+            return;
+        }
+        if (!group) return;
+
+        const updateWidths = () => {
+            const nextWidths = measureRenderedAxisLabelWidths(group).map(
+                (value) => value + 2,
+            );
+            if (
+                nextWidths.length !== measuredValueTickWidths.length ||
+                nextWidths.some(
+                    (value, index) =>
+                        Math.abs(
+                            value - (measuredValueTickWidths[index] ?? 0),
+                        ) > 0.01,
+                )
+            ) {
+                measuredValueTickWidths = nextWidths;
+            }
+        };
+        let active = true;
+        const stopWatching = resizeManager.watch(group, updateWidths);
+        void tick().then(() => {
+            if (active) updateWidths();
+        });
+        return () => {
+            active = false;
+            stopWatching();
+        };
+    });
+
+    $effect(() => {
+        const group = xAxisMeasureGroup;
+        const labels = categoryLabels;
+        if (
+            !effectiveShowXAxis ||
+            orientation !== "vertical" ||
+            labels.length === 0
+        ) {
+            measuredCategoryLabelWidths = [];
+            return;
+        }
+        if (!group) return;
+
+        const updateWidths = () => {
+            const nextWidths = measureRenderedAxisLabelWidths(group).map(
+                (value) => value + 2,
+            );
+            if (
+                nextWidths.length !== measuredCategoryLabelWidths.length ||
+                nextWidths.some(
+                    (value, index) =>
+                        Math.abs(
+                            value - (measuredCategoryLabelWidths[index] ?? 0),
+                        ) > 0.01,
+                )
+            ) {
+                measuredCategoryLabelWidths = nextWidths;
+            }
+        };
+        let active = true;
+        const stopWatching = resizeManager.watch(group, updateWidths);
+        void tick().then(() => {
+            if (active) updateWidths();
+        });
+        return () => {
+            active = false;
+            stopWatching();
+        };
+    });
 
     $effect(() => {
         const group = yAxisMeasureGroup;
@@ -539,13 +681,13 @@
     );
     const appearanceTimelines = $derived(
         resolveBarChartAppearanceTimelines(
-            visibleData.length,
+            chartData.length,
             effectiveAppearanceProgress,
         ),
     );
     const bars = $derived(
         buildBars(
-            visibleData,
+            chartData,
             mode,
             orientation,
             numericWidth,
@@ -568,6 +710,28 @@
             monochromeColor,
             mutedMonochromeColor,
             appearanceTimelines,
+        ),
+    );
+    const valueLabelCategoryTexts = $derived(
+        categoryLabels.map((label, groupIndex) => {
+            const groupLabels = bars
+                .filter((item) => item.groupIndex === groupIndex)
+                .map((item) => item.finalLabelText);
+            return groupLabels.reduce(
+                (widest, candidate) =>
+                    estimateLabelWidth(candidate) > estimateLabelWidth(widest)
+                        ? candidate
+                        : widest,
+                label,
+            );
+        }),
+    );
+    const visibleValueLabelIndexes = $derived(
+        resolveVisibleCategoryIndexes(
+            valueLabelCategoryTexts,
+            orientation === "vertical" ? plotWidth : plotHeight,
+            valueLabelAutoCull,
+            valueMaxLabelCount,
         ),
     );
     const effectiveHoverMode = $derived(
@@ -600,9 +764,9 @@
         [
             `--snowui-bar-chart-width: ${toCssLength(width)}`,
             `--snowui-bar-chart-height: ${toCssLength(height)}`,
-            `--snowui-bar-chart-bar-width: ${toCssLength(barWidth)}`,
-            `--snowui-bar-chart-bar-gap: ${toCssLength(barGap)}`,
-            `--snowui-bar-chart-group-gap: ${toCssLength(groupGap)}`,
+            `--snowui-bar-chart-bar-width: ${toCssLength(numericBarWidth)}`,
+            `--snowui-bar-chart-bar-gap: ${toCssLength(numericBarGap)}`,
+            `--snowui-bar-chart-group-gap: ${toCssLength(numericGroupGap)}`,
             `--snowui-bar-chart-segment-gap: ${toCssLength(segmentGap)}`,
             `--snowui-bar-chart-corner-radius: ${toCssLength(cornerRadius)}`,
             style,
@@ -698,7 +862,7 @@
 
     function getAppearanceDuration() {
         if (typeof appearanceDuration === "number") return appearanceDuration;
-        return resolveBarChartAppearanceDuration(visibleData.length);
+        return resolveBarChartAppearanceDuration(chartData.length);
     }
 
     function playAppearance() {
@@ -1204,6 +1368,7 @@
                     fullPath,
                     hitPath,
                     labelText: valueLabel,
+                    finalLabelText: finalValueLabel,
                     labelColor: resolveBarLabelColor(
                         chartMode,
                         unitIndex,
@@ -1313,7 +1478,14 @@
             key,
             pointerHoverLabelKeys,
             focusHoverLabelKeys,
-            effectiveAlwaysShowHoverLabel,
+            false,
+        );
+    }
+
+    function isPersistentValueLabelVisible(item: NormalizedBar) {
+        return (
+            effectiveAlwaysShowHoverLabel &&
+            visibleValueLabelIndexes.includes(item.groupIndex)
         );
     }
 
@@ -1325,19 +1497,27 @@
     }
 
     function isBarHoverLabelVisible(item: NormalizedBar, key: string) {
-        return isHoverLabelVisible(key) || isBarCellActive(item);
+        return (
+            isHoverLabelVisible(key) ||
+            isBarCellActive(item) ||
+            isPersistentValueLabelVisible(item)
+        );
     }
 
     function shouldRenderHoverLabel(key: string) {
         return shouldRenderHoverLabelKey(
             key,
             mountedHoverLabelKeys,
-            effectiveAlwaysShowHoverLabel,
+            false,
         );
     }
 
     function shouldRenderBarHoverLabel(item: NormalizedBar, key: string) {
-        return shouldRenderHoverLabel(key) || isBarCellActive(item);
+        return (
+            shouldRenderHoverLabel(key) ||
+            isBarCellActive(item) ||
+            isPersistentValueLabelVisible(item)
+        );
     }
 
     function resolveHoverLabelBoxX(item: NormalizedBar) {
@@ -1569,7 +1749,7 @@
         return {
             label:
                 typeof effectiveActiveCellIndex === "number"
-                    ? visibleLabels[effectiveActiveCellIndex]
+                    ? categoryLabels[effectiveActiveCellIndex]
                     : undefined,
             rows: hoverPanelRows,
             x: hoverPanelAnchor.x + anchorOffset.x,
@@ -1754,10 +1934,21 @@
         const axisLength =
             chartOrientation === "vertical" ? chartPlotWidth : chartPlotHeight;
         const cellSize = axisLength / Math.max(1, count);
-        const maxGroupSize = Math.max(1, cellSize - categoryGap);
+        const safeUnitCount = Math.max(1, unitCount);
+        const safeThickness = Math.max(2, thickness);
+        const safeGap = Math.max(4, gap);
+        const safeCategoryGap = Math.max(4, categoryGap);
+        const minimumGroupSize =
+            safeUnitCount * 2 +
+            Math.max(0, safeUnitCount - 1) * safeGap;
+        const maxGroupSize = Math.max(
+            minimumGroupSize,
+            cellSize - safeCategoryGap,
+        );
         const groupSize = Math.min(
             maxGroupSize,
-            unitCount * thickness + Math.max(0, unitCount - 1) * gap,
+            safeUnitCount * safeThickness +
+                Math.max(0, safeUnitCount - 1) * safeGap,
         );
         const cellStart =
             (chartOrientation === "vertical"
@@ -1765,7 +1956,13 @@
                 : chartBounds.top) +
             cellSize * index;
         const groupStart = cellStart + (cellSize - groupSize) / 2;
-        return { groupStart, groupSize, unitCount, thickness, gap };
+        return {
+            groupStart,
+            groupSize,
+            unitCount: safeUnitCount,
+            thickness: safeThickness,
+            gap: safeGap,
+        };
     }
 
     function resolveBarRect(
@@ -1922,33 +2119,47 @@
         if (orientation === "vertical") {
             return (
                 bounds.left +
-                (plotWidth / Math.max(1, visibleLabels.length)) * (index + 0.5)
+                (plotWidth / Math.max(1, categoryLabels.length)) * (index + 0.5)
             );
         }
         return (
             bounds.top +
-            (plotHeight / Math.max(1, visibleLabels.length)) * (index + 0.5)
-        );
-    }
-
-    function resolveCategoryCellStart(index: number) {
-        if (orientation === "vertical") {
-            return (
-                bounds.left +
-                (plotWidth / Math.max(1, visibleLabels.length)) * index
-            );
-        }
-        return (
-            bounds.top +
-            (plotHeight / Math.max(1, visibleLabels.length)) * index
+            (plotHeight / Math.max(1, categoryLabels.length)) * (index + 0.5)
         );
     }
 
     function resolveCategoryCellSize() {
         return (
             (orientation === "vertical" ? plotWidth : plotHeight) /
-            Math.max(1, visibleLabels.length)
+            Math.max(1, categoryLabels.length)
         );
+    }
+
+    function resolveCategoryLabelBox(index: number) {
+        const width = Math.min(
+            plotWidth,
+            Math.max(1, categoryLabelWidths[index] ?? 0),
+        );
+        const idealX = resolveCategoryCenter(index) - width / 2;
+        return {
+            x: Math.min(
+                Math.max(bounds.left, idealX),
+                Math.max(bounds.left, bounds.left + plotWidth - width),
+            ),
+            width,
+        };
+    }
+
+    function resolveCategoryYLabelBox(index: number) {
+        const height = Math.min(plotHeight, CHART_AXIS_LABEL_HEIGHT);
+        const idealY = resolveCategoryCenter(index) - height / 2;
+        return {
+            y: Math.min(
+                Math.max(bounds.top, idealY),
+                Math.max(bounds.top, bounds.top + plotHeight - height),
+            ),
+            height,
+        };
     }
 </script>
 
@@ -1975,6 +2186,34 @@
         width={numericWidth}
         height={numericHeight}
     >
+        {#if effectiveShowXAxis && orientation === "vertical"}
+            <g
+                bind:this={xAxisMeasureGroup}
+                class="snowui-bar-chart-axis-labels"
+                visibility="hidden"
+                pointer-events="none"
+                aria-hidden="true"
+            >
+                {#each categoryLabels as label}
+                    <text data-snowui-axis-measure-label>{label}</text>
+                {/each}
+            </g>
+        {/if}
+
+        {#if effectiveShowXAxis && orientation === "horizontal"}
+            <g
+                bind:this={xValueAxisMeasureGroup}
+                class="snowui-bar-chart-axis-labels"
+                visibility="hidden"
+                pointer-events="none"
+                aria-hidden="true"
+            >
+                {#each formattedDomainTickLabels as label}
+                    <text data-snowui-axis-measure-label>{label}</text>
+                {/each}
+            </g>
+        {/if}
+
         {#if effectiveShowYAxis}
             <g
                 bind:this={yAxisMeasureGroup}
@@ -2174,7 +2413,7 @@
                 aria-label="柱状图数据单元格"
                 onpointerleave={() => hideCellHover(effectiveActiveCellIndex ?? -1)}
             >
-                {#each visibleLabels as label, index}
+                {#each categoryLabels as label, index}
                     {@const cellSize = resolveCategoryCellSize()}
                     <rect
                         class="snowui-bar-chart-cell-hit-area"
@@ -2236,19 +2475,20 @@
                         </text>
                     {/each}
                 {:else}
-                    {#each visibleLabels as _label, index}
+                    {#each visibleCategoryLabelIndexes as categoryIndex, labelIndex}
+                        {@const labelBox = resolveCategoryYLabelBox(categoryIndex)}
                         <foreignObject
                             class="snowui-bar-chart-y-label-cell"
                             x="0"
-                            y={resolveCategoryCellStart(index)}
+                            y={labelBox.y}
                             width={Math.max(
                                 0,
                                 bounds.left - CHART_Y_AXIS_LABEL_GAP,
                             )}
-                            height={resolveCategoryCellSize()}
+                            height={labelBox.height}
                         >
                             <div class="snowui-bar-chart-y-label-content">
-                                {yAxisLabels[index]}
+                                {yAxisLabels[labelIndex]}
                             </div>
                         </foreignObject>
                     {/each}
@@ -2257,16 +2497,16 @@
 
             {#if effectiveShowXAxis}
                 {#if orientation === "vertical"}
-                    {#each visibleLabels as label, index}
-                        {@const cellSize = resolveCategoryCellSize()}
+                    {#each visibleCategoryLabelIndexes as categoryIndex}
+                        {@const label = categoryLabels[categoryIndex] ?? String(categoryIndex + 1)}
+                        {@const labelBox = resolveCategoryLabelBox(categoryIndex)}
                         <foreignObject
                             class="snowui-bar-chart-x-label-cell"
-                            x={resolveCategoryCenter(index) -
-                                Math.min(plotWidth, cellSize) / 2}
+                            x={labelBox.x}
                             y={bounds.top +
                                 plotHeight +
                                 CHART_X_AXIS_LABEL_GAP}
-                            width={Math.min(plotWidth, cellSize)}
+                            width={labelBox.width}
                             height={CHART_AXIS_LABEL_HEIGHT}
                         >
                             <div class="snowui-bar-chart-x-label-content">
@@ -2292,7 +2532,11 @@
                                 plotHeight +
                                 CHART_X_AXIS_LABEL_GAP +
                                 CHART_AXIS_LABEL_HEIGHT / 2}
-                            text-anchor="middle"
+                            text-anchor={tick === safeMin
+                                ? "start"
+                                : tick === safeMax
+                                  ? "end"
+                                  : "middle"}
                             dominant-baseline="middle"
                         >
                             {(effectiveYTickFormatter ?? formatAxisTick)(tick)}
@@ -2510,10 +2754,6 @@
         font-feature-settings:
             "ss01" 1,
             "cv01" 1;
-    }
-
-    :global(:where(.snowui-bar-chart-x-label-content)) {
-        min-width: 20px;
     }
 
     :global(:where(.snowui-bar-chart-y-label-content)) {

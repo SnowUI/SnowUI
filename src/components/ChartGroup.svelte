@@ -1,6 +1,6 @@
 <!--
   ChartGroup 图表组合容器 (PRO)
-  v0.1.2 (2026-08-31)
+  v0.2.0 (2026-09-01)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。
   文档: ./ChartGroup.md
@@ -13,9 +13,12 @@
     import {
         CHART_X_AXIS_RESERVED_HEIGHT,
         resolveCartesianChartTopInset,
-        resolveVisibleXIndexes,
     } from "../lib/chart/axis";
-    import { toCssLength, toNumber } from "../lib/chart/geometry";
+    import { toCssLength } from "../lib/chart/geometry";
+    import {
+        resolveCartesianChartSize,
+        watchCartesianChartSize,
+    } from "../lib/chart/size";
     import {
         CHART_GROUP_CONTEXT_KEY,
         type ChartGroupContext,
@@ -135,13 +138,28 @@
     let hoverPanelEntries = $state<Record<string, ChartHoverPanelData>>({});
     let hoverPanelPointer = $state({ x: 0, y: 0 });
     let rootElement = $state<HTMLElement>();
+    let measuredWidth = $state(0);
+    let measuredHeight = $state(0);
     let hoverPanelPointerFrame: number | null = null;
     let pendingHoverPanelPointer: { x: number; y: number } | null = null;
     let plotTopInsetVersion = $state(0);
     const plotTopInsetResolvers = new Map<string, () => number>();
 
-    const numericWidth = $derived(toNumber(width, 800));
-    const numericHeight = $derived(toNumber(height, 400));
+    $effect(() => {
+        const root = rootElement;
+        if (!root) return;
+        return watchCartesianChartSize(root, ({ width, height }) => {
+            if (Math.abs(width - measuredWidth) > 0.01) measuredWidth = width;
+            if (Math.abs(height - measuredHeight) > 0.01) measuredHeight = height;
+        });
+    });
+
+    const numericWidth = $derived(
+        resolveCartesianChartSize(measuredWidth, width, 800),
+    );
+    const numericHeight = $derived(
+        resolveCartesianChartSize(measuredHeight, height, 400),
+    );
     const automaticPlotTopInset = $derived(
         resolveCartesianChartTopInset({
             showYAxis,
@@ -173,19 +191,7 @@
             numericHeight - resolvedBounds.top - resolvedBounds.bottom,
         ),
     );
-    const visibleXIndexes = $derived(
-        resolveVisibleXIndexes(
-            xLabels,
-            plotWidth,
-            xAxisMode,
-            xLabelAutoCull,
-            xMaxLabelCount,
-        ),
-    );
-    const visibleXLabels = $derived(
-        visibleXIndexes.map((index) => xLabels[index] ?? String(index + 1)),
-    );
-    const cellCount = $derived(Math.max(1, visibleXLabels.length));
+    const cellCount = $derived(Math.max(1, xLabels.length));
     const cellWidth = $derived(plotWidth / cellCount);
     const controlledActiveCellIndex = $derived(
         activeCellIndex !== undefined,
@@ -221,7 +227,7 @@
         if (entries.length === 0 || !showHoverPanel) return null;
         const activeLabel =
             typeof effectiveActiveCellIndex === "number"
-                ? visibleXLabels[effectiveActiveCellIndex]
+                ? xLabels[effectiveActiveCellIndex]
                 : undefined;
         const resolvedAnchor = resolveGroupHoverPanelAnchor(entries);
         return {
@@ -474,7 +480,7 @@
         hoverMode: () => hoverMode,
         activeCellIndex: () => effectiveActiveCellIndex,
         setActiveCellIndex,
-        xLabels: () => visibleXLabels,
+        xLabels: () => xLabels,
         yMin: () => yMin,
         yMax: () => yMax,
         yTicks: () => yTicks,
@@ -542,7 +548,7 @@
                     height={plotHeight}
                     tabindex="0"
                     role="button"
-                    aria-label={visibleXLabels[index] ?? `Cell ${index + 1}`}
+                    aria-label={xLabels[index] ?? `Cell ${index + 1}`}
                     use:cellHit={index}
                 />
             {/each}

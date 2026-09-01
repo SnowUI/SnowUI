@@ -1,6 +1,6 @@
 <!--
   LineChart 折线图组件 (PRO)
-  v1.3.3 (2026-08-31)
+  v1.4.0 (2026-09-01)
 
   职责:渲染带横坐标、纵坐标、网格、实线/虚线、面积填充、圆角转折线与可定制节点点样式的折线图。
   文档: ./LineChart.md
@@ -38,17 +38,22 @@
         CHART_X_AXIS_RESERVED_HEIGHT,
         CHART_Y_AXIS_LABEL_GAP,
         createNiceTicks,
+        estimateLabelWidth,
         formatAxisTick,
         measureRenderedAxisLabelWidth,
+        measureRenderedAxisLabelWidths,
         normalizeTickValue,
         resolveCartesianChartTopInset,
         resolveIndexedLabels,
         resolveVisibleXIndexes,
         resolveVisibleYTicks,
-        resolveXLabelCellWidth,
         resolveYTickTargetCount,
     } from "../lib/chart/axis";
     import { clamp, toCssLength, toNumber } from "../lib/chart/geometry";
+    import {
+        resolveCartesianChartSize,
+        watchCartesianChartSize,
+    } from "../lib/chart/size";
     import {
         addHoverLabelKey,
         hideHoverLabelKeyState,
@@ -321,7 +326,11 @@
 
     let rootElement = $state<HTMLElement>();
     let yAxisMeasureGroup = $state<SVGGElement>();
+    let xAxisMeasureGroup = $state<SVGGElement>();
     let yAxisLabelWidth = $state(0);
+    let measuredWidth = $state(0);
+    let measuredHeight = $state(0);
+    let measuredXLabelWidths = $state<number[]>([]);
     let internalAppearanceProgress = $state(0);
     let hasSyncedDefaultAppearanceProgress = $state(false);
     let appearanceFrame = $state<number | null>(null);
@@ -344,8 +353,21 @@
         CHART_GROUP_CONTEXT_KEY,
     );
 
-    const numericWidth = $derived(toNumber(width, 800));
-    const numericHeight = $derived(toNumber(height, 400));
+    $effect(() => {
+        const root = rootElement;
+        if (!root) return;
+        return watchCartesianChartSize(root, ({ width, height }) => {
+            if (Math.abs(width - measuredWidth) > 0.01) measuredWidth = width;
+            if (Math.abs(height - measuredHeight) > 0.01) measuredHeight = height;
+        });
+    });
+
+    const numericWidth = $derived(
+        resolveCartesianChartSize(measuredWidth, width, 800),
+    );
+    const numericHeight = $derived(
+        resolveCartesianChartSize(measuredHeight, height, 400),
+    );
     const effectiveXLabels = $derived(xLabels ?? chartGroup?.xLabels() ?? []);
     const effectiveYMin = $derived(yMin ?? chartGroup?.yMin());
     const effectiveYMax = $derived(yMax ?? chartGroup?.yMax());
@@ -434,6 +456,12 @@
     const rawXLabels = $derived(
         resolveIndexedLabels(effectiveXLabels, rawXCellCount),
     );
+    const xLabelWidths = $derived(
+        rawXLabels.map(
+            (label, index) =>
+                measuredXLabelWidths[index] ?? estimateLabelWidth(label) + 4,
+        ),
+    );
     const visibleXIndexes = $derived(
         resolveVisibleXIndexes(
             rawXLabels,
@@ -441,16 +469,11 @@
             effectiveXAxisMode,
             effectiveXLabelAutoCull,
             effectiveXMaxLabelCount,
+            xLabelWidths,
+            4,
         ),
     );
-    const resolvedXLabels = $derived(
-        visibleXIndexes.map((index) => rawXLabels[index] ?? String(index + 1)),
-    );
-    const xCellCount = $derived(Math.max(resolvedXLabels.length, 1));
-    const xCellWidth = $derived(
-        resolveXLabelCellWidth(plotWidth, xCellCount, effectiveXAxisMode),
-    );
-    const xLabelDisplayWidth = $derived(Math.min(plotWidth, xCellWidth));
+    const xCellCount = $derived(Math.max(rawXCellCount, 1));
     const yDomain = $derived(
         resolveYDomain(
             series,
@@ -480,6 +503,41 @@
               )
             : [],
     );
+
+    $effect(() => {
+        const group = xAxisMeasureGroup;
+        const labels = rawXLabels;
+        if (!effectiveShowXAxis || labels.length === 0) {
+            measuredXLabelWidths = [];
+            return;
+        }
+        if (!group) return;
+
+        const updateWidths = () => {
+            const nextWidths = measureRenderedAxisLabelWidths(group).map(
+                (value) => value + 4,
+            );
+            if (
+                nextWidths.length !== measuredXLabelWidths.length ||
+                nextWidths.some(
+                    (value, index) =>
+                        Math.abs(value - (measuredXLabelWidths[index] ?? 0)) >
+                        0.01,
+                )
+            ) {
+                measuredXLabelWidths = nextWidths;
+            }
+        };
+        let active = true;
+        const stopWatching = resizeManager.watch(group, updateWidths);
+        void tick().then(() => {
+            if (active) updateWidths();
+        });
+        return () => {
+            active = false;
+            stopWatching();
+        };
+    });
 
     $effect(() => {
         const group = yAxisMeasureGroup;
@@ -529,7 +587,7 @@
     const normalizedSeries = $derived(
         normalizeSeries(
             series,
-            resolvedXLabels,
+            rawXLabels,
             resolvedColors,
             paintUid,
             numericWidth,
@@ -538,7 +596,6 @@
             plotWidth,
             plotHeight,
             xCellCount,
-            visibleXIndexes,
             effectiveXAxisMode,
             safeYMin,
             safeYMax,
@@ -815,7 +872,6 @@
         chartPlotWidth: number,
         chartPlotHeight: number,
         cellCount: number,
-        visibleIndexes: number[],
         xMode: LineChartXAxisMode,
         minValue: number,
         maxValue: number,
@@ -846,10 +902,7 @@
             );
             const stroke =
                 typeof color === "string" ? color : `url(#${gradient?.id})`;
-            const sampledData = visibleIndexes
-                .map((originalIndex) => item.data[originalIndex])
-                .filter((rawPoint) => rawPoint !== undefined);
-            const points = sampledData
+            const points = item.data
                 .map((rawPoint, index) =>
                     normalizePoint(
                         rawPoint,
@@ -1004,25 +1057,13 @@
         chartPlotWidth: number,
         mode: LineChartXAxisMode,
     ) {
-        if (mode === "edge" && count > 1) {
-            return center - labelWidth / 2;
-        }
+        void count;
+        void mode;
         return clamp(
             center - labelWidth / 2,
             left,
             left + chartPlotWidth - labelWidth,
         );
-    }
-
-    function resolveXLabelTextAlign(
-        index: number,
-        count: number,
-        mode: LineChartXAxisMode,
-    ) {
-        void index;
-        void count;
-        void mode;
-        return "center";
     }
 
     function createLinearPath(points: NormalizedPoint[]) {
@@ -1810,7 +1851,7 @@
         return {
             label:
                 typeof effectiveActiveCellIndex === "number"
-                    ? resolvedXLabels[effectiveActiveCellIndex]
+                    ? rawXLabels[effectiveActiveCellIndex]
                     : undefined,
             rows: hoverPanelRows,
             x: hoverPanelAnchor.x + anchorOffset.x,
@@ -1970,6 +2011,20 @@
         width={numericWidth}
         height={numericHeight}
     >
+        {#if effectiveShowXAxis}
+            <g
+                bind:this={xAxisMeasureGroup}
+                class="snowui-line-chart-axis-labels"
+                visibility="hidden"
+                pointer-events="none"
+                aria-hidden="true"
+            >
+                {#each rawXLabels as label}
+                    <text data-snowui-axis-measure-label>{label}</text>
+                {/each}
+            </g>
+        {/if}
+
         {#if effectiveShowYAxis}
             <g
                 bind:this={yAxisMeasureGroup}
@@ -2141,7 +2196,7 @@
                 aria-label="折线图数据单元格"
                 onpointerleave={() => hideCellHover(effectiveActiveCellIndex ?? -1)}
             >
-                {#each resolvedXLabels as label, index}
+                {#each rawXLabels as label, index}
                     {@const hoverCellWidth = resolveXHoverCellWidth(
                         xCellCount,
                         plotWidth,
@@ -2328,9 +2383,10 @@
             {/if}
 
             {#if effectiveShowXAxis}
-                {#each resolvedXLabels as label, index}
+                {#each visibleXIndexes as originalIndex}
+                    {@const label = rawXLabels[originalIndex] ?? String(originalIndex + 1)}
                     {@const cellCenter = scaleX(
-                        index,
+                        originalIndex,
                         xCellCount,
                         bounds.left,
                         plotWidth,
@@ -2338,16 +2394,18 @@
                     )}
                     {@const cellX = resolveXLabelCellX(
                         cellCenter,
-                        xLabelDisplayWidth,
+                        Math.min(
+                            plotWidth,
+                            Math.max(1, xLabelWidths[originalIndex] ?? 0),
+                        ),
                         xCellCount,
                         bounds.left,
                         plotWidth,
                         effectiveXAxisMode,
                     )}
-                    {@const labelTextAlign = resolveXLabelTextAlign(
-                        index,
-                        xCellCount,
-                        effectiveXAxisMode,
+                    {@const labelWidth = Math.min(
+                        plotWidth,
+                        Math.max(1, xLabelWidths[originalIndex] ?? 0),
                     )}
                     <foreignObject
                         class="snowui-line-chart-x-label-cell"
@@ -2355,13 +2413,10 @@
                         y={bounds.top +
                             plotHeight +
                             CHART_X_AXIS_LABEL_GAP}
-                        width={xLabelDisplayWidth}
+                        width={labelWidth}
                         height={CHART_AXIS_LABEL_HEIGHT}
                     >
-                        <div
-                            class="snowui-line-chart-x-label-content"
-                            style={`text-align: ${labelTextAlign};`}
-                        >
+                        <div class="snowui-line-chart-x-label-content">
                             {label}
                         </div>
                     </foreignObject>
@@ -2602,10 +2657,8 @@
         display: block;
         width: 100%;
         height: 100%;
-        min-width: 20px;
         overflow: hidden;
         white-space: nowrap;
-        text-overflow: ellipsis;
         text-align: center;
         font-family: var(--font, Inter), sans-serif;
         font-size: var(

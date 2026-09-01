@@ -1,6 +1,6 @@
 # LineChart (折线图)
 
-> **版本**: v1.3.5
+> **版本**: v1.4.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
@@ -33,7 +33,7 @@
 | :--- | :--- | :--- | :--- |
 | `series` | `LineChartSeries[]` | `[]` | 图表序列数据；组件不内置模拟数据 |
 | `xLabels` | `string[]` | `[]` / 继承 `ChartGroup` | 横坐标标签；未传时使用 `ChartGroup.xLabels` 或按数据点索引生成内部坐标标签 |
-| `width` | `number \| string` | `800` | 图表整体宽度；数字按 px 语义转为 rem |
+| `width` | `number \| string` | `800` | 图表整体宽度；支持 `100%`，内部按根层最终实测宽度重算几何 |
 | `height` | `number \| string` | `400` | 图表整体高度；数字按 px 语义转为 rem |
 | `yMin` | `number` | 自动 / 继承 `ChartGroup` | 纵坐标最小值；未传时根据数据生成 nice domain，正数数据默认包含 `0` |
 | `yMax` | `number` | 自动 / 继承 `ChartGroup` | 纵坐标最大值；自动时等于实际最大数据值，不向上取整 |
@@ -56,7 +56,7 @@
 | `valueFormat` | `NumberFormatOptions` | NumberFormats 默认 | 节点数值 label 的组件级数字格式；可设置 `notation: "auto"` / `"compact"` 使用英文 `k/m/b/t` 缩写 |
 | `labelFormatter` | `(value, context) => string` | - | 节点数值 label 自定义格式化；优先级高于全局、组件、序列和点级 `valueFormat` |
 | `xAxisMode` | `"cell" \| "edge"` | `"edge"` / 继承 `ChartGroup` | 横坐标点位模式；`edge` 表示首尾数据点与首尾 label 中心都对齐到绘图区两端，`cell` 为分类 cell 中心 |
-| `xLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 是否根据 label 宽度自动减少横坐标 label 与对应数据点 |
+| `xLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 是否根据完整 label 实测宽度自动减少横坐标 label；不删除数据点、路径或命中 cell |
 | `xMaxLabelCount` | `number` | - / 继承 `ChartGroup` | 横坐标最多显示 label 数量；始终保留首尾，并按等步数减少中间 label 与对应数据点 |
 | `yLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 是否根据纵向空间自动减少纵坐标 label |
 | `yMaxLabelCount` | `number` | - / 继承 `ChartGroup` | 纵坐标最多显示 label 数量；未传 `yTicks` 时也会作为生成 nice ticks 的上限 |
@@ -207,11 +207,11 @@ Marker 说明：
 主布局模型:**内禀原子布局**。
 
 - 根层为 `Frame`，内部为单个 SVG 绘图区。
-- 尺寸由 `width` / `height` 与 SVG 坐标算法决定；作为外部布局子项时表现为 Hug。
+- 根层直接观察最终显示尺寸并重算 SVG 坐标；`width="100%"` / `height="100%"` 不要求页面回传容器尺寸。
 - 横向分类轴按 `max(xLabels.length, ...series.data.length)` 计算点位数量；`cell` 模式节点位置为 `bounds.left + (plotWidth / count) * (index + 0.5)`，`edge` 模式节点位置为 `bounds.left + (plotWidth / (count - 1)) * index`，单点时居中。
 - X 轴 label 使用当前点位间距作为 cell 宽度，文字居中且单行省略；整体高度为 `16px`。
 - `edge` 模式下首尾 label 的中心与首尾数据点同 x 坐标，label cell 允许向绘图区外侧延伸。
-- X 轴 label 自动显示规则：按每个 label 的估算显示宽度与当前 `xAxisMode` 下的 label cell 宽度判断；若完整 label 放不进 cell，或设置了 `xMaxLabelCount`，则按同一索引自动减少中间 label 和数据点。保留索引必须形成等差步数，若当前显示数量无法让原始步数均分，则继续减少显示数量；例如 20 个点限制最多 5 个时，因为 `20 - 1 = 19` 无法被 `5 - 1`、`4 - 1`、`3 - 1` 整除，所以只保留首尾。每次抽稀后按当前 `xAxisMode` 重新计算 label cell，直到布局稳定，并始终保留首尾 label。ellipsis 只作为极端兜底，不作为抽稀后的正常结果。
+- X 轴 label 自动显示规则：按最终字体实测完整文字宽度与当前 `xAxisMode` 的原始数据位置判断，相邻可见文字至少间隔 `4px`。抽稀只减少 label，不删除或重排数据点、折线路径、marker、guide 与命中 cell。保留索引必须形成等差步数；若首尾两个完整 label 仍放不下，则隐藏全部 X label。
 - Y 轴 label 抽稀规则：自动生成刻度时优先通过 `yTickCount` / `yMaxLabelCount` 生成合适数量；显式传入 `yTicks` 或纵向空间不足时，按首尾保留、等步数的规则减少显示 label，水平网格线跟随可见 Y label。
 - X 轴 label cell 顶部到最下面 x 轴基线的间距为 `8px`。
 - 绘图区顶部由共享内容感知规则计算：线条宽度的一半或当前最大 marker 半径作为图形向上溢出量；普通图形保持 `8px` 安全距离，Y 轴顶刻度至少需要 `16px`，顶部数值 label 需要 `28px + 图形溢出量`。有 X 轴时 `bottom=24px`，只包含上述 `8px` 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
@@ -327,7 +327,7 @@ SVG 图层从下到上为：
 #### 调整
 - 移除组件内部示例数据默认值，`series` 与 `xLabels` 默认改为 `[]`。
 - `LC-01` 与 `LC-09` 示例显式传入月度数据；`LC-09` 改为完整坐标图，展示真实图表形态下的圆角转折线。
-- 横坐标支持 `cell` / `edge` 两种点位模型；`edge` 下首尾数据点、辅助线和首尾 label 中心都对齐到绘图区两端；label 过长时按当前点位模式重新计算并自动抽稀坐标和数据点，保留索引必须形成等差步数，至少保留首尾。
+- 横坐标支持 `cell` / `edge` 两种点位模型；`edge` 下首尾数据点和辅助线对齐到绘图区两端，首尾 label box 可向绘图区内部移动以完整显示。label 过长时只抽稀文字，全部数据点与交互仍位于原始索引位置。
 - 只保留圆角转折线，删除 `curve` API；`cornerRadius=0` 时为直线。
 - 纵坐标刻度改为根据数据自动生成 nice ticks；默认色序回到 ChartSpec；折线默认线宽改为 1px。
 - Area API 收敛为 `area: boolean`，固定使用当前线色渐变到 0% 透明度；marker 默认尺寸改为 12px，单点不允许改色。

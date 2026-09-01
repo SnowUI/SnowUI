@@ -77,17 +77,39 @@ export function resolveVisibleCategoryIndexes(
     availableSize: number,
     autoCull: boolean,
     maxLabelCount: number | undefined,
+    measuredWidths?: number[],
+    minGap = 4,
 ) {
     const count = labels.length;
-    if (count <= 2)
-        return Array.from({ length: count }, (_, index) => index);
+    if (count === 0) return [];
     const explicitMaxCount = resolveMaxLabelCount(maxLabelCount, count);
     let indexes = sampleIndexes(count, explicitMaxCount);
     if (!autoCull) return indexes;
+    if (measuredWidths?.length === count) {
+        for (let iteration = 0; iteration < count; iteration += 1) {
+            if (
+                canFitCategoryLabels(
+                    indexes,
+                    measuredWidths,
+                    availableSize,
+                    count,
+                    minGap,
+                )
+            ) {
+                return indexes;
+            }
+            if (indexes.length <= 2) return [];
+            const nextIndexes = sampleIndexes(count, indexes.length - 1);
+            if (isSameIndexes(indexes, nextIndexes)) return [];
+            indexes = nextIndexes;
+        }
+        return [];
+    }
+    if (count <= 2) return indexes;
     for (let iteration = 0; iteration < count; iteration += 1) {
         const cellSize = availableSize / Math.max(1, indexes.length);
         const maxLabelWidth = resolveMaxLabelWidth(labels, indexes);
-        if (maxLabelWidth <= Math.max(20, cellSize) || indexes.length <= 2) {
+        if (Math.max(20, maxLabelWidth) <= cellSize || indexes.length <= 2) {
             return indexes;
         }
         const nextIndexes = sampleIndexes(
@@ -109,34 +131,36 @@ export function resolveVisibleXIndexes(
     mode: ChartXAxisMode,
     autoCull: boolean,
     maxLabelCount: number | undefined,
+    measuredWidths?: number[],
+    minGap = 4,
 ) {
     const count = labels.length;
-    if (count <= 2)
-        return Array.from({ length: count }, (_, index) => index);
+    if (count === 0) return [];
 
     const explicitMaxCount = resolveMaxLabelCount(maxLabelCount, count);
     let indexes = sampleIndexes(count, explicitMaxCount);
     if (!autoCull) return indexes;
 
     for (let iteration = 0; iteration < count; iteration += 1) {
-        if (canFitXLabels(labels, indexes, plotWidth, mode) || indexes.length <= 2) {
-            return indexes;
-        }
-
-        const maxVisibleCount = Math.min(
-            indexes.length - 1,
-            resolveMaxVisibleXLabelCount(
+        if (
+            canFitXLabels(
+                labels,
+                indexes,
                 plotWidth,
-                resolveMaxLabelWidth(labels, indexes),
                 mode,
                 count,
-            ),
-        );
-        const nextIndexes = sampleIndexes(count, maxVisibleCount);
-        if (isSameIndexes(indexes, nextIndexes)) return indexes;
+                minGap,
+                measuredWidths,
+            )
+        ) {
+            return indexes;
+        }
+        if (indexes.length <= 2) return [];
+        const nextIndexes = sampleIndexes(count, indexes.length - 1);
+        if (isSameIndexes(indexes, nextIndexes)) return [];
         indexes = nextIndexes;
     }
-    return indexes;
+    return [];
 }
 
 export function resolveVisibleYTicks(
@@ -225,6 +249,24 @@ export function measureRenderedAxisLabelWidth(
     return Number.isFinite(width) ? Math.max(0, width) : 0;
 }
 
+export function measureRenderedAxisLabelWidths(
+    group: SVGGElement | null | undefined,
+) {
+    if (!group) return [];
+    return Array.from(
+        group.querySelectorAll<SVGTextElement>(
+            "[data-snowui-axis-measure-label]",
+        ),
+        (label) => {
+            try {
+                return label.getComputedTextLength();
+            } catch {
+                return label.getBBox().width;
+            }
+        },
+    ).map((width) => (Number.isFinite(width) ? Math.max(0, width) : 0));
+}
+
 export function sampleIndexes(count: number, maxVisibleCount: number) {
     const safeVisibleCount = Math.min(count, Math.max(2, maxVisibleCount));
     if (safeVisibleCount >= count) {
@@ -257,22 +299,64 @@ export function isSameIndexes(a: number[], b: number[]) {
     );
 }
 
+function canFitCategoryLabels(
+    indexes: number[],
+    widths: number[],
+    availableSize: number,
+    categoryCount: number,
+    minGap: number,
+) {
+    const safeAvailableSize = Math.max(0, availableSize);
+    const safeGap = Math.max(0, minGap);
+    const cellSize = safeAvailableSize / Math.max(1, categoryCount);
+    let previousEnd = -Infinity;
+
+    for (const index of indexes) {
+        const width = Math.max(0, widths[index] ?? 0);
+        if (width > safeAvailableSize) return false;
+        const center = cellSize * (index + 0.5);
+        const start = Math.min(
+            Math.max(0, center - width / 2),
+            Math.max(0, safeAvailableSize - width),
+        );
+        if (start < previousEnd + safeGap) return false;
+        previousEnd = start + width;
+    }
+    return true;
+}
+
 function canFitXLabels(
     labels: string[],
     indexes: number[],
     plotWidth: number,
     mode: ChartXAxisMode,
+    totalCount: number,
+    minGap: number,
+    measuredWidths?: number[],
 ) {
-    if (indexes.length <= 1) return true;
-    const labelCellWidth = resolveXLabelCellWidth(
-        plotWidth,
-        indexes.length,
-        mode,
+    const widths = labels.map(
+        (label, index) =>
+            measuredWidths?.[index] ?? estimateLabelWidth(label) + 2,
     );
-    return indexes.every((index) => {
-        const label = labels[index] ?? "";
-        return estimateLabelWidth(label) <= labelCellWidth;
-    });
+    const safePlotWidth = Math.max(0, plotWidth);
+    const safeGap = Math.max(0, minGap);
+    let previousEnd = -Infinity;
+
+    for (const index of indexes) {
+        const width = Math.max(0, widths[index] ?? 0);
+        if (width > safePlotWidth) return false;
+        const center =
+            mode === "edge"
+                ? safePlotWidth * (index / Math.max(1, totalCount - 1))
+                : (safePlotWidth / Math.max(1, totalCount)) * (index + 0.5);
+        const start = Math.min(
+            Math.max(0, center - width / 2),
+            Math.max(0, safePlotWidth - width),
+        );
+        if (start < previousEnd + safeGap) return false;
+        previousEnd = start + width;
+    }
+    return true;
 }
 
 function resolveMaxLabelWidth(labels: string[], indexes: number[]) {
@@ -280,20 +364,6 @@ function resolveMaxLabelWidth(labels: string[], indexes: number[]) {
         ...indexes.map((index) => estimateLabelWidth(labels[index] ?? "")),
         1,
     );
-}
-
-function resolveMaxVisibleXLabelCount(
-    plotWidth: number,
-    requiredLabelWidth: number,
-    mode: ChartXAxisMode,
-    totalCount: number,
-) {
-    const safeLabelWidth = Math.max(20, requiredLabelWidth);
-    const visibleCount =
-        mode === "edge"
-            ? Math.floor(plotWidth / safeLabelWidth) + 1
-            : Math.floor(plotWidth / safeLabelWidth);
-    return Math.min(totalCount, Math.max(2, visibleCount));
 }
 
 function resolveEqualStepVisibleCount(count: number, maxVisibleCount: number) {
