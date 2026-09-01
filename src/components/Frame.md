@@ -23,7 +23,7 @@
 > - **[OSS] §2** 基础属性 (含 `stateContent` / `stateClass` / `stateStyle`) + §2.1 尺寸控制
 > - **[OSS] §3** 交互与状态 (核心状态、形态、事件、状态驱动内容、原生事件同步)
 > - **[OSS] §4** 文本截断（迁移说明）
-> - **[OSS] §5** 响应式能力（断点 + Scale）
+> - **[OSS] §5** 响应式能力（容器内容适配 + Scale）
 > - **[OSS] §6** 布局与样式（Direction / 布局稳定性 / Surface Hover 覆写）
 > - **[OSS] §7.0–§7.6** 动效能力（默认动效、while* 关键字、事件/形态/响应式驱动、动效参数、滚动联动、共享元素 FLIP）
 > - **[OSS] §9** Frame 演进（CSS 行为 / Scope / Access）
@@ -72,7 +72,7 @@ FramePro 在 OSS Frame 之上只增加三类跨组件协调能力：
 | Skeleton / loading 协议 | ✅ OSS | 1 | `frame-skeleton-runtime.svelte.ts` |
 | DOM prop 过滤（aria / data-* / native events） | ✅ OSS | 1 | `frame-dom-runtime.svelte.ts` |
 | 静态 size context（setContext） | ✅ OSS | 1 | （无外部观察器，简单 setContext） |
-| 断点响应式 class（`enableResponsive`） | ✅ OSS | 1 | `frame-responsive.svelte.ts` |
+| 容器内容适配（`enableResponsive`） | ✅ OSS | 1 | `frame-responsive.svelte.ts` |
 | CSS 行为工具类（hoverable / field-bordered） | ✅ OSS | 1 | `layout.css` |
 | SnowUI 原生宿主基线（box sizing / margin / 字体与颜色继承） | ✅ OSS | 1 | `layout.css` |
 | 解析 `while*` props → motion 配置 | ✅ OSS | 1 | `frame-motion-defaults.ts` |
@@ -130,7 +130,7 @@ FramePro 在 OSS Frame 之上只增加三类跨组件协调能力：
 | **新增 `orchestrate*`（父控子动效启动时机）** | **PRO**：`frame-orchestrator.svelte.ts` | 父 Frame 修改子 Frame 们的播放时机，半径 N |
 | **新增 `Click={{ target: "#chart", action: "play" }}`（事件联动其他组件）** | **PRO**：`frame-actions.svelte.ts` 跨组件部分 | A Frame 的事件触发 B Frame 的动效，半径 ≥ 2 |
 | **新增 `styles={{ "#deep_btn": { size: "$#root.width / 10" } }}`** | **PRO**：`frame-orchestrator.svelte.ts` + `frame-inline-style.svelte.ts` | 容器通过 ID 寻址改深层 Target 样式，半径 N |
-| 新增响应式断点 | OSS：`frame-responsive.svelte.ts` | 纯 CSS class，半径 1 |
+| 新增容器内容适配规则 | OSS：`frame-responsive.svelte.ts` | 只测量并调整自身布局，半径 1 |
 | 新增 loading 态骨架变体 | OSS：`frame-skeleton-runtime.svelte.ts` | 渲染协议，半径 1 |
 
 ### 1.5 Tree-shaking 强制要求
@@ -165,7 +165,7 @@ v1.0.0 的动机：v0.x 把 CodeBlock 这类只是想做"自身状态切换 + �
 | `../logic/frame-types.ts` | 所有 props 类型定义 |
 | `../logic/frame-identity.svelte.ts` | 组件身份与 ID 解析 |
 | `../logic/frame-layout.svelte.ts` | 布局 class 拼装 |
-| `../logic/frame-responsive.svelte.ts` | 响应式断点 class |
+| `../logic/frame-responsive.svelte.ts` | 基于容器宽度的内容适配与间距下限 |
 | `../logic/frame-dom-runtime.svelte.ts` | DOM prop 过滤、aria、data-* |
 | `../logic/frame-skeleton-runtime.svelte.ts` | Skeleton 渲染协议 |
 | `../styles/layout.css` | CSS 行为工具类 |
@@ -194,7 +194,7 @@ v1.0.0 的动机：v0.x 把 CodeBlock 这类只是想做"自身状态切换 + �
 
 | 关键字 / 能力 | 说明 |
 |:---|:---|
-| `enableResponsive` | 响应式断点 class 监听 |
+| `enableResponsive` | 容器内容适配监听；显式设为 `false` 时关闭 |
 | `enableContext` | 向子组件提供 Frame Context（`currentState` / `interactionState` / loading / skeleton / while* 等）；子组件可只读消费 |
 | `enableScaleObserver` | 观察自身尺寸驱动比例响应 |
 | `loading` + `skeleton` | Skeleton 协议与加载态渲染；组件根通过 `renderHints` 自注册，父 Frame 只探测首层已注册 child，未注册 Frame 使用通用 fallback || `tag` / `as` / `class` / `style` / `...rest` | 基础 DOM 与样式透传 |
@@ -228,6 +228,8 @@ Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级�
 - **新建组件优先尝试 OSS**：除非你已经确定要做跨组件编排，否则默认 OSS。把组件放进 PRO 之前问自己："这个能力会改另一个 Frame 吗？" 不会就留 OSS。
 - **子组件消费父状态优先放 OSS**：只要子组件只是读取最近父 Frame 的 `currentState` 并改变自身公开 prop 对应的展示（例如 `Icon.stateIcon`、`Text.stateText`），它仍是半径 1 的自包含能力，不应进入 FramePro。
 - **尺寸观察统一走共享入口**：Frame responsive 与兼容 Scale Observer 只使用 `resizeManager.watch()`；服务端导入不创建 Observer，能力缺失时只关闭尺寸增强，同一帧通知在下一动画帧统一交付。组件、PRO、Site 与 Playground 不得直接 `new ResizeObserver`。
+- **响应不依赖设备断点**：Frame 先保持首选布局，只在直系内容宽度超过当前容器时压缩间距；仍放不下且显式传入 `responsive` 时，才切换方向、对齐与子项尺寸策略。
+- **4px 是下限而不是目标值**：首选 gap / padding 大于 4px 时可向下压缩到 4px；原值为 0–3px 时不得放大，也不得继续压缩。`responsive.minGap` 可调整 gap 下限；`minPadding` 可用数字统一设置四边，或用 `all`、`x`、`y`、`top`、`right`、`bottom`、`left` 分层设置。
 
 ---
 

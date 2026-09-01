@@ -203,4 +203,55 @@
     bottom: var(--pin-offset-y, var(--pin-offset, var(--gap-2)));
     right: var(--pin-offset-x, var(--pin-offset, var(--gap-2)));
 }
+
+/* === 容器宽度不足时的显式回退布局 ===
+ * 置于协议末尾，确保显式响应规则高于 row / column 的共享默认。 */
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-align="start"]) {
+    align-items: flex-start;
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-align="center"]) {
+    align-items: center;
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-align="end"]) {
+    align-items: flex-end;
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-align="stretch"]) {
+    align-items: stretch;
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-justify="start"]) {
+    justify-content: flex-start;
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-justify="center"]) {
+    justify-content: center;
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-justify="end"]) {
+    justify-content: flex-end;
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-justify="between"]) {
+    justify-content: space-between;
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-children-width="fill"] > :not([data-as])) {
+    flex: 1 1 0;
+    width: 100%;
+    min-width: var(--snowui-frame-responsive-child-min-width, 0);
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-children-width="hug"] > :not([data-as])) {
+    flex: 0 0 auto;
+    width: fit-content;
+    max-width: 100%;
+    min-width: var(--snowui-frame-responsive-child-min-width, 0);
+}
+
+:where([data-auto-layout][data-responsive-layout="true"][data-responsive-children-min-width="true"] > :not([data-as])) {
+    min-width: var(--snowui-frame-responsive-child-min-width);
+}
 }

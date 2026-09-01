@@ -60,12 +60,14 @@
     const identity = new Identity(frameProps);
 
     // === 2. 响应式 (Responsive) ===
-    // OSS 不支持 orchestrate*，所以 needsResponsive 仅依赖 frameProps.responsive
+    // 所有普通 Frame 默认获得 4px 间距下限保护；responsive 只控制放不下时的结构切换。
     const needsResponsive = $derived(
-        enableResponsive && frameProps.responsive !== undefined,
+        enableResponsive,
     );
     // svelte-ignore state_referenced_locally
-    const responsive = needsResponsive ? new FrameResponsive() : null;
+    const responsive = needsResponsive
+        ? new FrameResponsive(() => frameProps)
+        : null;
 
     // === 3. 布局 (Layout) ===
     // svelte-ignore state_referenced_locally

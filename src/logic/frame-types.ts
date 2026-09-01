@@ -96,6 +96,53 @@ export interface RenderHints {
     rows?: number;
 }
 
+export type FrameResponsiveDirection =
+    | "row"
+    | "column"
+    | "row-reverse"
+    | "column-reverse";
+
+export type FrameResponsiveAlignment = "start" | "center" | "end" | "stretch";
+
+export interface FrameResponsivePaddingMinimum {
+    /** 四边共同下限。 */
+    all?: number;
+    /** 左右共同下限。 */
+    x?: number;
+    /** 上下共同下限。 */
+    y?: number;
+    top?: number;
+    right?: number;
+    bottom?: number;
+    left?: number;
+}
+
+/**
+ * Frame 的内容适配规则。
+ *
+ * 不使用设备断点；当首选布局在当前容器宽度内放不下时自动启用，
+ * 宽度恢复后自动回到首选布局。
+ */
+export interface FrameResponsiveProps {
+    /** 放不下时采用的排列方向。未传入时不改变方向。 */
+    direction?: FrameResponsiveDirection;
+    /** 放不下时的交叉轴对齐。 */
+    align?: FrameResponsiveAlignment;
+    /** 放不下时的主轴对齐。 */
+    justify?: "start" | "center" | "end" | "between";
+    /** 放不下时，普通直系子项按内容收缩或填满容器。 */
+    childrenWidth?: "hug" | "fill";
+    /** 放不下时，普通直系子项的最小宽度；数字按 px 处理。 */
+    childrenMinWidth?: number | string;
+    /** gap 的响应式下限；数字按 px 处理，默认 4px。 */
+    minGap?: number;
+    /**
+     * padding 的响应式下限；数字同时作用于四边，对象支持 all / x / y / 单边覆盖，
+     * 所有数字均按 px 处理，默认 4px。
+     */
+    minPadding?: number | FrameResponsivePaddingMinimum;
+}
+
 export interface FrameProps {
     /**
      * 复合组件内部专用：为该 Frame 直接承载的子组件建立 parts 边界。
@@ -337,7 +384,12 @@ export interface FrameProps {
     expanded?: boolean;
 
     // === 3. 响应式能力 (Responsiveness) ===
-    responsive?: Record<string, any>;
+    /**
+     * 基于 Frame 当前容器宽度的内容适配规则。
+     * 未传入时不改变布局；所有启用响应能力的 Frame 仍会在必要时把大于 4px 的
+     * gap / padding 向下压缩到 4px，原值小于 4px 时保持不变。
+     */
+    responsive?: FrameResponsiveProps | false;
 
     // === 3.1 断点触发布局 (Breakpoint Layout) ===
     xs?: "row" | "column" | "grid" | "row-reverse" | "column-reverse";

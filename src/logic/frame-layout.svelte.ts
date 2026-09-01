@@ -15,11 +15,16 @@ export class FrameLayout {
     constructor(props: FrameProps, responsive: FrameResponsive | null) {
         this.#props = props;
         this.#responsive = responsive;
+        responsive?.bindProps(() => this.#props);
     }
 
     get direction() {
         // 1. 获取基础方向
         let activeDir = this.#getBaseDirection();
+
+        // 内容放不下时，优先使用显式的 fit-based 回退方向。
+        const fitDirection = this.#responsive?.fitDirection;
+        if (fitDirection) return fitDirection;
 
         // 2. 能力开关关闭时，不应用任何断点覆写
         if (!this.#responsive) {
