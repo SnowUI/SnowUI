@@ -23,4 +23,22 @@ export const examples = [
         },
         logic: ["SI-Init.1"],
     },
+    {
+        name: "SI-02：二级 Item 层级连接线",
+        code: `SI-02
+<Frame style="width: 220px;">
+    <Sidebar persistence={false}>
+        <SidebarItem id="form" label="Form" icon="table" />
+        <SidebarItem id="input" label="Input" depth={1} />
+        <SidebarItem id="listbox" label="Listbox" depth={1} />
+    </Sidebar>
+</Frame>`,
+        expected: {
+            render: "Input 与 Listbox 的 leading 槽显示 L 形层级连接线，不显示普通 Icon",
+            layout: "连接线双臂等长；竖线中心与 Form Icon 中心同列，横线中心与二级文字中心同轴；弯曲圆角 4px",
+            style: "连接线为密集的 1px Black/40% 点线",
+            accessibility: "连接线为伪元素装饰，不进入无障碍树",
+        },
+        logic: ["SI-Init.2"],
+    },
 ] as const;

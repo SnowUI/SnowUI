@@ -28,6 +28,7 @@ export interface SidebarItemData {
     label: string;
     icon?: string | Snippet;
     iconCollection?: string;
+    depth?: 0 | 1;
     href?: string;
     disabled?: boolean;
     updated?: boolean;

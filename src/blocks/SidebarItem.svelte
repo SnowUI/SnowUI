@@ -1,4 +1,4 @@
-<!-- SidebarItem PRO Block v1.5.0. 文档: ./SidebarItem.md -->
+<!-- SidebarItem PRO Block v1.6.0. 文档: ./SidebarItem.md -->
 <script lang="ts">
     import type { Snippet } from "svelte";
     import {
@@ -18,6 +18,7 @@
         label: string;
         icon?: string | Snippet;
         iconCollection?: string;
+        depth?: 0 | 1;
         href?: string;
         updated?: boolean;
         tags?: Snippet;
@@ -33,6 +34,7 @@
         label,
         icon = undefined,
         iconCollection = undefined,
+        depth = 0,
         href = undefined,
         updated = false,
         tags = undefined,
@@ -49,6 +51,7 @@
     const active = $derived(sidebar?.activeItemId === id);
     const iconSnippet = $derived(typeof icon === "function" ? icon : undefined);
     const iconName = $derived(typeof icon === "string" ? icon : undefined);
+    const nested = $derived(depth === 1);
     const actionList = $derived(Array.isArray(actions) ? actions : []);
     const actionsSnippet = $derived(typeof actions === "function" ? actions : undefined);
 
@@ -74,14 +77,22 @@
     class={["snowui-sidebar-item", "snowui-rounded-rectangle", userClass].filter(Boolean).join(" ")}
     data-active={active ? "true" : "false"}
     data-sidebar-item-id={id}
+    data-depth={nested ? "1" : undefined}
     data-collapsed={collapsed ? "true" : "false"}
     data-disabled={disabled ? "true" : undefined}
     {...rest}
 >
     {#snippet mainContent()}
-        {#if iconSnippet || iconName}
-            <span data-as="leading" class="snowui-sidebar-item-leading" aria-hidden="true">
-                {#if iconSnippet}
+        {#if nested || iconSnippet || iconName}
+            <span
+                data-as="leading"
+                data-hierarchy-connector={nested ? "true" : undefined}
+                class="snowui-sidebar-item-leading"
+                aria-hidden="true"
+            >
+                {#if nested}
+                    <!-- 层级关系是 Sidebar 装饰几何，由伪元素绘制。 -->
+                {:else if iconSnippet}
                     {@render iconSnippet()}
                 {:else if iconName}
                     <ComponentIcon name={iconName} collection={iconCollection} size={20} />
@@ -229,6 +240,19 @@
         align-items: center;
         justify-content: center;
         opacity: 1;
+    }
+    :global(:where(.snowui-sidebar-item-leading[data-hierarchy-connector="true"]))::before {
+        position: absolute;
+        bottom: calc(50% - (var(--border-2) / 2));
+        left: calc(50% - (var(--border-2) / 2));
+        box-sizing: border-box;
+        width: 50%;
+        height: 50%;
+        border-bottom: var(--border-2) dotted var(--black-40, #00000066);
+        border-left: var(--border-2) dotted var(--black-40, #00000066);
+        border-bottom-left-radius: var(--radius-1);
+        content: "";
+        pointer-events: none;
     }
     :global(:where(.snowui-sidebar-item-content)) {
         display: inline-flex;

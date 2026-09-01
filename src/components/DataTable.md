@@ -23,7 +23,7 @@ padding 归属：DataTable 根层不制造 padding；工具栏、表格 Cell、�
 
 gap 归属：Root FramePro 统一控制直系区域间距，默认为 `var(--gap-3)`（12px）；子组件内部 gap 由子组件自身控制。
 
-滚动归属：DataTable 不创建滚动区。Table 可将宽表宽度传递给页面，横向滚动由页面容器负责；纵向虚拟化或固定表头仍由上层业务区域明确提供。`loadMoreMode="auto"` 只在 DataTable 内部观察表尾哨兵：优先使用最近的纵向滚动祖先作为 root，找不到时使用页面视口，不改变滚动容器归属。
+滚动归属：DataTable 不另建滚动区，水平溢出直接继承内部 Table 的局部横向 viewport 与视口贴底轨道；纵向虚拟化或固定表头仍由上层业务区域明确提供。`loadMoreMode="auto"` 只在 DataTable 内部观察表尾哨兵：优先使用最近的纵向滚动祖先作为 root，找不到时使用页面视口，不改变纵向滚动容器归属。
 
 | 属性 | 类型 | 默认值 | 说明 |
 | :--- | :--- | :--- | :--- |
