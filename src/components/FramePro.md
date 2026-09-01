@@ -89,7 +89,7 @@ Toast 是当前的直接例子：
 | **状态变量** | `stateVars`, `stateClass`, `stateStyle` |
 | **状态触发** | `Click`, `Drag`, `Hover`, `Focus`, `Key`, `Scroll` |
 | **形态** | `collapsed`, `expanded` |
-| **响应式** | `responsive`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl` |
+| **响应式** | `responsive` 内容适配；`xs`–`2xl` 仅作旧断点兼容 |
 | **布局** | `row`, `column`, `grid`, `reverse`, `morph`, `contentFill`, `contentHug`, `pinOffset`, `pinOffsetX`, `pinOffsetY` |
 | **动效触发** | `whileLoad`, `whileReload`, `whileAppear`, `whileDisappear`, `whileIdle`, `whileActive`, `whileDisabled`, `whileClick`, `whileDrag`, `whileHover`, `whileFocus`, `whileKey`, `whileScroll`, `whileValidating`, `whileUploading`, `whileEditing` |
 | **形态动效** | `whileCollapsed`, `whileExpanded` |
@@ -401,7 +401,7 @@ Frame 自动感知并同步所有原生 DOM 事件，确保内部状态机与外
 
 | 关键字 | 描述 |
 | :--- | :--- |
-| responsive | 允许针对不同容器断点覆写组件的 Props、样式或形态 |
+| responsive | 继承 Frame 的内容适配规则：间距先压缩到下限，仍放不下时回退方向、对齐与普通子项尺寸；`minPadding` 支持 all / x / y / 四个单边下限 |
 
 > **开关语义**：当 `enableResponsive={false}` 时，不初始化断点检测；`xs/sm/md/lg/xl/2xl` 覆写不会生效，布局仅使用基础方向（`row/column/grid` + `reverse`）。
 

@@ -127,9 +127,7 @@
     // === 2. 响应式 (Responsive) ===
     // 根据开关决定是否启用
     const needsResponsive = $derived(
-        enableResponsive &&
-            (frameProps.responsive !== undefined ||
-                frameProps.orchestrateOrder?.startsWith("visual-")),
+        enableResponsive,
     );
     // svelte-ignore state_referenced_locally
     const responsive = needsResponsive ? new FrameResponsive() : null;
