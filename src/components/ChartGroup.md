@@ -1,6 +1,6 @@
 # ChartGroup 图表组合容器
 
-> **版本**: v0.3.0
+> **版本**: v0.4.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。
@@ -54,7 +54,7 @@
 | `defaultActiveCellIndex` | `number \| null` | `null` | 仅初始化内部非受控索引，后续修改不重置状态；activeCellIndex 有定义时此值不参与当前选择。null 表示初始无激活项。 |
 | `onCellHoverChange` | `(index: number \| null) => void` | — | 共享索引发生变化时接收新索引或 null；由指针、分类格焦点及子图交互触发。内部交互将有限数值限制在有效分类范围内；受控模式只通知，不替调用方改值，无取消返回值。 |
 | `showHitLayer` | `boolean` | `true` | 控制组级 SVG 分类命中层；仅在 hoverMode=cell 且 showHoverPanel=false 时渲染。开启共享面板后改由根层指针坐标与子图命中处理，false 不等于禁用子图交互。 |
-| `adaptiveContrast` | `boolean` | `false` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认关闭；由 OSS Adaptive Contrast 共享能力实现。 |
+| `adaptiveContrast` | `boolean` | `true` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 |
 | `showHoverPanel` | `boolean` | `true` | 将子图上报的数据合并为唯一共享面板；cell 模式下根层指针位置更新当前分类。默认开启；关闭时不显示共享面板，子图按自身 showHoverPanel 配置显示独立面板；若需要数值标签，可同时关闭子图面板或显式设置 showHoverLabel；空数据没有面板。 |
 | `showHoverLabel` | `boolean` | — | 统一控制子图数值标签；未传时沿用子图配置并根据共享面板推导默认显示。显式 true/false 优先于子图同名配置；true 允许数值标签与共享面板同时显示。 |
 | `alwaysShowHoverLabel` | `boolean` | `false` | 为子图开启数值标签常显；与子图自身 alwaysShowHoverLabel 按逻辑或合并，因此组级 false 不关闭子图显式常显。仍受最终 showHoverLabel 控制。 |
@@ -191,9 +191,13 @@ interface ChartGroupContext {
 
 ## 自适应黑白对比接入
 
-使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。应用通过本组件的 `adaptiveContrast` 开启，不穿透私有 SVG。
+使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
 
 ## 更新日志 (Changelog)
+
+### v0.4.0 (2026-09-03)
+
+- `adaptiveContrast` 改为默认开启，保留显式关闭与子图覆盖。
 
 ### v0.3.0 (2026-09-03)
 

@@ -77,6 +77,7 @@
         mutedMonochromeColor?: GaugeChartColor;
         hoverThicknessGrowth?: number | string;
         startDirection?: StartDirection;
+        showBaseLayer?: boolean;
         appearMotion?: boolean;
         appearOnView?: boolean;
         appearanceProgress?: number;
@@ -154,6 +155,7 @@
         mutedMonochromeColor = "Black4",
         hoverThicknessGrowth = 4,
         startDirection = "left",
+        showBaseLayer = false,
         appearMotion = true,
         appearOnView = true,
         appearanceProgress = undefined,
@@ -1045,34 +1047,36 @@
                 </mask>
             {/each}
         </defs>
-        <g class="snowui-gauge-chart-base-layer" aria-hidden="true">
-            {#each segments as segment, index}
-                <path
-                    class="snowui-gauge-chart-segment-base"
-                    d={segment.basePath}
-                    fill={segmentPaints[index].fill}
-                    fill-opacity="0.04"
-                    stroke={segment.seamStrokeWidth > 0
-                        ? segmentPaints[index].fill
-                        : "none"}
-                    stroke-width={segment.seamStrokeWidth}
-                    stroke-opacity="0.04"
-                    pointer-events="none"
-                />
-                {#if segment.seamStrokeWidth > 0}
+        {#if showBaseLayer}
+            <g class="snowui-gauge-chart-base-layer" aria-hidden="true">
+                {#each segments as segment, index}
                     <path
-                        class="snowui-gauge-chart-segment-seam-blur"
+                        class="snowui-gauge-chart-segment-base"
                         d={segment.basePath}
-                        fill="none"
-                        stroke={segmentPaints[index].fill}
+                        fill={segmentPaints[index].fill}
+                        fill-opacity="0.04"
+                        stroke={segment.seamStrokeWidth > 0
+                            ? segmentPaints[index].fill
+                            : "none"}
                         stroke-width={segment.seamStrokeWidth}
                         stroke-opacity="0.04"
-                        style="filter: blur(0.5px)"
                         pointer-events="none"
                     />
-                {/if}
-            {/each}
-        </g>
+                    {#if segment.seamStrokeWidth > 0}
+                        <path
+                            class="snowui-gauge-chart-segment-seam-blur"
+                            d={segment.basePath}
+                            fill="none"
+                            stroke={segmentPaints[index].fill}
+                            stroke-width={segment.seamStrokeWidth}
+                            stroke-opacity="0.04"
+                            style="filter: blur(0.5px)"
+                            pointer-events="none"
+                        />
+                    {/if}
+                {/each}
+            </g>
+        {/if}
         <g class="snowui-gauge-chart-fill-layer">
             {#each segments as segment, index}
                 {#if segment.visible}

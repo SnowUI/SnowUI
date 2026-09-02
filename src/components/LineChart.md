@@ -1,6 +1,6 @@
 # LineChart (折线图)
 
-> **版本**: v1.5.0
+> **版本**: v1.6.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
@@ -46,7 +46,7 @@
 | `showGuides` | `boolean` | `false` / 继承 `ChartGroup` | 是否允许序列绘制节点垂直辅助线 |
 | `showHoverLabel` | `boolean` | 按 `showHoverPanel` 推导 | hover / focus 节点时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 |
 | `alwaysShowHoverLabel` | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
-| `adaptiveContrast` | `boolean` | 继承 ChartGroup，否则 `false` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认关闭；由 OSS Adaptive Contrast 共享能力实现。 |
+| `adaptiveContrast` | `boolean` | 继承 ChartGroup，否则 `true` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 |
 | `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前节点 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
 | `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
@@ -67,6 +67,7 @@
 | `color` | `LineChartColor` | - | 单色模式主色；传入后同时作为 `monochromeFade` 与 `monochrome` 的默认颜色 |
 | `monochromeColor` | `LineChartColor` | `"Primary"` | `monochromeFade` 的单色来源；第一条序列为 100%，最后一条序列为 20%，中间按序列数量均匀递减 |
 | `mutedMonochromeColor` | `LineChartColor` | `"Black4"` | `monochrome` 的单色来源；默认所有未自定义序列为 4% 黑色本体颜色，描边透明度保持 100% |
+| `showBaseLayer` | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。同时控制完整折线及 Area 底层，不关闭真实 Area 渐变。 |
 | `appearMotion` | `boolean` | `true` | 是否启用出现动效 |
 | `appearOnView` | `boolean` | `true` | 是否在触发锚点进入视口默认位置时自动播放出现动效 |
 | `appearanceProgress` | `number` | - | 受控出现进度，范围 `0..1`；传入后组件只根据该进度渲染，不自行播放 |
@@ -242,7 +243,7 @@ SVG 图层从下到上为：
 
 1. `defs`: 颜色渐变、Area 渐变、序列 reveal clipPath。
 2. grid / axis layer: 水平网格线和 x 轴基线。
-3. base layer: 完整 Area 与折线路径的同色 4% 占位层，不参与出现动效。
+3. base layer: `showBaseLayer=true` 时绘制完整 Area 与折线路径的同色 4% 占位层，不参与出现动效；默认不渲染。
 4. area layer: 真实 Area 路径，按对应序列 clipPath 从左到右揭示。
 5. guide layer: 节点垂直辅助线，跟随对应序列进度显隐。
 6. series layer: 真实折线路径，按对应序列 clipPath 从左到右揭示。
@@ -291,9 +292,14 @@ SVG 图层从下到上为：
 
 ## 自适应黑白对比接入
 
-使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。应用通过本组件的 `adaptiveContrast` 开启，不穿透私有 SVG。
+使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
 
 ## 更新日志 (Changelog)
+
+### v1.6.0 (2026-09-03)
+
+- 新增 `showBaseLayer=false`，按需开启最终尺寸的同色轮廓；真实图形和出现动效保持原有行为。
+- `adaptiveContrast` 改为默认开启，保留显式关闭与子图覆盖。
 
 ### v1.5.0 (2026-09-03)
 

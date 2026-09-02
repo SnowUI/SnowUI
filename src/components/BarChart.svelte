@@ -214,6 +214,7 @@
         color?: BarChartColor;
         monochromeColor?: BarChartColor;
         mutedMonochromeColor?: BarChartColor;
+        showBaseLayer?: boolean;
         appearMotion?: boolean;
         appearOnView?: boolean;
         appearanceProgress?: number;
@@ -328,6 +329,7 @@
         color = undefined,
         monochromeColor = "Primary",
         mutedMonochromeColor = "Black4",
+        showBaseLayer = false,
         appearMotion = true,
         appearOnView = true,
         appearanceProgress = undefined,
@@ -382,7 +384,7 @@
     const chartGroup = getContext<ChartGroupContext | undefined>(
         CHART_GROUP_CONTEXT_KEY,
     );
-    const effectiveAdaptiveContrast = $derived(adaptiveContrast ?? chartGroup?.adaptiveContrast?.() ?? false);
+    const effectiveAdaptiveContrast = $derived(adaptiveContrast ?? chartGroup?.adaptiveContrast?.() ?? true);
     const contrastMaskId = `chart-contrast-${paintUid}`;
 
     $effect(() => {
@@ -2334,17 +2336,19 @@
             {/if}
         {/if}
 
-        <g class="snowui-bar-chart-base-layer" aria-hidden="true">
-            {#each bars as item}
-                <path
-                    class="snowui-bar-chart-bar-base"
-                    d={item.fullPath}
-                    fill={item.fill}
-                    fill-opacity="0.04"
-                    pointer-events="none"
-                />
-            {/each}
-        </g>
+        {#if showBaseLayer}
+            <g class="snowui-bar-chart-base-layer" aria-hidden="true">
+                {#each bars as item}
+                    <path
+                        class="snowui-bar-chart-bar-base"
+                        d={item.fullPath}
+                        fill={item.fill}
+                        fill-opacity="0.04"
+                        pointer-events="none"
+                    />
+                {/each}
+            </g>
+        {/if}
 
         <g class="snowui-bar-chart-series-layer">
             {#each bars as item}

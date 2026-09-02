@@ -1,6 +1,6 @@
 # GaugeChart (仪表图)
 
-> **版本**: v1.3.0
+> **版本**: v1.4.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、透明间隔、渐变颜色、4% 同色占位层与顺序出现动效的半圆仪表比例图。颜色、几何与出现时间轴能力与 CircularChart 保持同类心智。
@@ -15,7 +15,7 @@
 - **颜色优先级**:`data[i].color → colors[i] → colorMode 对应回退色`。单项颜色只影响当前扇区，不会传递给后续扇区。
 - **尺寸基准**:`cornerRadius` 与 `separatorWidth` 都表示 320px 宽仪表图下的设计基准值。组件内部统一按 `width / 320` 等比缩放，数字和字符串数字都按基准值理解。
 - **透明间隔**:扇区间隔在 path 几何阶段通过 `padAngle + padRadius` 生成，贯穿内外圆弧并透出真实背景；不绘制固定白色 stroke，也不使用后置 gap mask。
-- **图层结构**:base layer 常驻 4% 同色占位层；fill layer 负责真实填充与出现动效；hit layer 使用完整扇区 path 负责 hover / focus / aria。
+- **图层结构**:base layer 由 `showBaseLayer` 控制，默认关闭，开启时绘制 4% 同色占位层；fill layer 负责真实填充与出现动效；hit layer 使用完整扇区 path 负责 hover / focus / aria。
 - **Hover 强调**:每个扇区独立排队执行进入与离开动画；hover / focus 时扇区不位移，仅外半径缓动增加 `hoverThicknessGrowth`；中心标签上方显示百分比，下方显示当前项名称。
 
 共享纯逻辑位于 `pro/src/lib/chart/`：颜色、渐变、几何基准缩放、圆环扇区 path 与出现时间轴。GaugeChart 自身保留半圆圆心、起始方向、中心标签和 hover 状态管理。
@@ -41,7 +41,8 @@
 | `mutedMonochromeColor` | `GaugeChartColor` | `"Black4"` | `monochrome` 的单色来源；默认所有未自定义扇区为 4% 黑色本体颜色，填充透明度保持 100% |
 | `hoverThicknessGrowth` | `number \| string` | `4` | hover 强调时扇区向外增厚的距离；内半径不变，扇区不位移 |
 | `startDirection` | `"left" \| "right"` | `"left"` | 出现动效起始方向；只影响填充顺序和扫描方向，不旋转数据排布 |
-| `appearMotion` | `boolean` | `true` | 是否启用出现动效；关闭时直接显示完整填充层，占位层仍存在 |
+| `showBaseLayer` | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。 |
+| `appearMotion` | `boolean` | `true` | 是否启用出现动效；关闭时直接显示完整填充层，占位层是否显示仍由 showBaseLayer 决定 |
 | `appearOnView` | `boolean` | `true` | 锚点进入视口默认位置时自动播放出现动效 |
 | `appearanceProgress` | `number` | - | 受控出现进度，范围 `0..1`；传入后组件只渲染外部进度 |
 | `defaultAppearanceProgress` | `number` | `0` | 非受控初始出现进度 |
@@ -256,6 +257,10 @@ interface GaugeChartItem {
 ---
 
 ## 7. 更新日志 (Changelog)
+
+### v1.4.0 (2026-09-03)
+
+- 新增 `showBaseLayer=false`，按需开启最终尺寸的同色轮廓；真实图形和出现动效保持原有行为。
 
 ### 2026-09-02
 

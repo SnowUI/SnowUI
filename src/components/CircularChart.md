@@ -1,6 +1,6 @@
 # CircularChart (圆形图表)
 
-> **版本**: v1.1.0
+> **版本**: v1.2.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、隔断、整体尺寸的圆环/饼形比例图。Hover 动效参考 Apache ECharts `pie-borderRadius` 示例的强调反馈，并按 SnowUI 规范改为外侧增厚。
@@ -33,7 +33,7 @@
 - 扇区路径包含外圆弧、内圆弧和头尾切线圆角，圆角跟随真实扇区形状生成，不依赖后期裁切。
 - 扇区之间的透明间隔在 path 几何阶段生成：`separatorWidth` 会换算为 d3-shape 的 `padAngle`，并配合 `padRadius` 收缩内外圆弧。不绘制白色分隔线，也不使用后置 gap mask 挖空扇区。
 - 圆角仍由收缩后的扇区 path 生成，因此贯穿环厚的透明间隔与端部圆角可以同时成立。
-- 底层始终绘制一层同色 `4%` 透明度占位扇区，不参与出现动效；真实填充层在其上方播放。
+- `showBaseLayer=true` 时底层绘制一层同色 `4%` 透明度占位扇区，默认不绘制，不参与出现动效；真实填充层在其上方播放。
 - 最上层使用完整扇区 path 作为透明命中层，保证 hover / focus 的交互范围稳定。
 
 ### 2.3 颜色能力
@@ -92,6 +92,7 @@
 | `mutedMonochromeColor` | `CircularChartColor` | `"Black4"` | `monochrome` 的单色来源；默认所有未自定义扇区为 4% 黑色本体颜色，填充透明度保持 100% |
 | `hoverThicknessGrowth` | `number \| string` | `4` | hover 强调时扇区向外增厚的距离；内半径不变，扇区不位移 |
 | `startDirection` | `"top" \| "top-right" \| "right" \| "bottom-right" \| "bottom" \| "bottom-left" \| "left" \| "top-left"` | `"top"` | 出现动效起始方向；从圆心向该方向发射线，命中的扇区作为第一个播放扇区 |
+| `showBaseLayer` | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。 |
 | `appearMotion` | `boolean` | `true` | 是否启用出现动效 |
 | `appearOnView` | `boolean` | `true` | 是否在触发锚点进入视口默认位置时自动播放出现动效 |
 | `appearanceProgress` | `number` | - | 受控出现进度，范围 `0..1`；传入后组件只根据该进度渲染，不自行播放 |
@@ -232,7 +233,7 @@ interface CircularChartGradient {
 | 首次登场 / 滚动出现 | 所有扇区先显示完整同色 0.5px 内描边；再从 `startDirection` 命中的扇区起始边界开始，按顺时针方向逐扇区执行。默认总时长固定为 `1000ms`，不随扇区数量变化；下一个扇区只在上一个扇区填充完成后启动，不等待上一个扇区透明度补齐完成；填充方向为扇区起点到终点；整张图表使用图表级缓出时间分配，前段时长接近，越靠后的扇区时长越长；单个扇区内部填充保持线性；滚动时间轴由 `appearanceProgress` 直接反推同一时间轴，天然可逆 | 组件内部确定性时间轴；`appearanceProgress` 控制总进度 |
 | 扇区顺序与速度 | 第一个扇区立即启动；第 2 个扇区在第 1 个扇区填充完成后启动，第 3 个扇区在第 2 个扇区填充完成后启动，以此类推。CC-01 五扇区时前三段时长接近，后两段逐步变长，形成整张图表级别的缓出 | 组件内部时间轴 |
 | 填充透明度 | 单扇区填充路径叠加透明度遮罩。扇区启动时左侧透明度为 0%、中段为 62%、右侧扫描头为 100%；透明度与填充同时启动，并在 0.75s 内线性补齐到整段 100% 不透明。反向时间轴会按相同规则回退 | `appearanceProgress` 直接渲染 |
-| 底层占位扇区 | 在真实填充层下方始终绘制一层同色 4% 透明度扇区，不参与出现动效；动效完成前也能看到完整图表结构 | 组件内部 base layer |
+| 底层占位扇区 | `showBaseLayer=true` 时在真实填充层下方绘制一层同色 4% 透明度扇区，不参与出现动效；动效完成前也能看到完整图表结构 | 组件内部 base layer |
 | 扇区分隔线 | 间隔由 `separatorWidth` 调整；其数值表示 160x160 图表下的设计基准值，组件按 `size / 160` 等比缩放。间隔在 path 几何阶段通过 `padAngle + padRadius` 生成，让真实背景自然透出 | `separatorWidth` |
 | 扇区 hover 强调 | 每个扇区独立排队执行进入与离开动画；进入时外半径从 `R` 缓动到 `R + hoverThicknessGrowth`，离开时缓动回 `R`；内半径不变，扇区不位移 | 组件内部 `requestAnimationFrame + cubicOut` 几何动画 |
 | 扇区亮度反馈 | `filter: brightness(1.04)` | `--snowui-frame-color-motion-*` |
@@ -262,7 +263,7 @@ SnowUI 的最终实现为：
 
 - **几何阶段透明间隔**:先按数据值计算完整扇区角度，再将 `separatorWidth` 换算为 d3-shape 的 `padAngle`；同时使用 `padRadius` 收缩内外圆弧。间隔属于最终扇区 path，贯穿环厚并透出真实背景。
 - **完整扇区路径**:每个扇区按完整显示角度生成圆角 path，包含外圆弧、内圆弧、起止两端的切线圆角过渡。`cornerRadius` 的数值表示 160x160 图表下的设计基准值，组件按 `size / 160` 得到实际圆角；`cornerRadius="auto"` 等同基准值 `4`。最终路径会限制圆角不超过环厚的一半与当前扇区可容纳的角度。
-- **底层占位扇区**:填充层下方先绘制同一组完整扇区 path，颜色与对应数据项一致，透明度固定为 `4%`，始终存在且不参与出现动效。
+- **底层占位扇区**:填充层下方先绘制同一组完整扇区 path，颜色与对应数据项一致，透明度固定为 `4%`，仅 `showBaseLayer=true` 时存在，不参与出现动效。
 - **填充层**:fill layer 始终绘制与占位层相同的完整 padded path。出现动效只使用局部 `revealPath` mask 逐步揭示颜色，不使用局部圆角扇区替代填充几何。
 - **透明度层**:每个填充 path 套用独立 `linearGradient + mask`。启动瞬间尾部透明度为 `0%`、中段为 `62%`、扫描头为 `100%`；随后尾部和中段在 `0.75s` 内线性补齐到 `100%`。透明度时间轴与填充时间轴同时启动，但不决定下一个扇区何时启动。
 - **无可见分隔层**:扇区未填充时不绘制白色 outline、独立 separator path 或后置 gap mask。间隔直接存在于 path 几何中。
@@ -385,6 +386,10 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 ---
 
 ## 8. 更新日志 (Changelog)
+
+### v1.2.0 (2026-09-03)
+
+- 新增 `showBaseLayer=false`，按需开启最终尺寸的同色轮廓；真实图形和出现动效保持原有行为。
 
 ### 2026-09-02
 

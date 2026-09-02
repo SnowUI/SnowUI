@@ -214,6 +214,7 @@
         color?: LineChartColor;
         monochromeColor?: LineChartColor;
         mutedMonochromeColor?: LineChartColor;
+        showBaseLayer?: boolean;
         appearMotion?: boolean;
         appearOnView?: boolean;
         appearanceProgress?: number;
@@ -304,6 +305,7 @@
         color = undefined,
         monochromeColor = "Primary",
         mutedMonochromeColor = "Black4",
+        showBaseLayer = false,
         appearMotion = true,
         appearOnView = true,
         appearanceProgress = undefined,
@@ -356,7 +358,7 @@
     const chartGroup = getContext<ChartGroupContext | undefined>(
         CHART_GROUP_CONTEXT_KEY,
     );
-    const effectiveAdaptiveContrast = $derived(adaptiveContrast ?? chartGroup?.adaptiveContrast?.() ?? false);
+    const effectiveAdaptiveContrast = $derived(adaptiveContrast ?? chartGroup?.adaptiveContrast?.() ?? true);
     const contrastMaskId = `chart-contrast-${paintUid}`;
     const contrastSurfaces = $derived(chartGroup?.contrastSurfaces?.() ?? []);
 
@@ -2105,37 +2107,39 @@
             />
         {/if}
 
-        <g class="snowui-line-chart-base-layer" aria-hidden="true">
-            {#each normalizedSeries as item, seriesIndex}
-                {#if item.area}
+        {#if showBaseLayer}
+            <g class="snowui-line-chart-base-layer" aria-hidden="true">
+                {#each normalizedSeries as item, seriesIndex}
+                    {#if item.area}
+                        <path
+                            class="snowui-line-chart-area-base"
+                            d={item.area.path}
+                            fill={item.area.gradientId
+                                ? `url(#${item.area.gradientId})`
+                                : item.area.fill}
+                            fill-opacity="0.04"
+                            clip-path={`url(#${resolveSeriesClipId(seriesIndex)})`}
+                            pointer-events="none"
+                        />
+                    {/if}
                     <path
-                        class="snowui-line-chart-area-base"
-                        d={item.area.path}
-                        fill={item.area.gradientId
-                            ? `url(#${item.area.gradientId})`
-                            : item.area.fill}
-                        fill-opacity="0.04"
+                        class="snowui-line-chart-series-base"
+                        d={item.path}
+                        fill="none"
+                        stroke={item.gradientId
+                            ? `url(#${item.gradientId})`
+                            : item.stroke}
+                        stroke-width={item.strokeWidth}
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-dasharray={resolveDashArray(item.strokeStyle)}
+                        stroke-opacity="0.04"
                         clip-path={`url(#${resolveSeriesClipId(seriesIndex)})`}
                         pointer-events="none"
                     />
-                {/if}
-                <path
-                    class="snowui-line-chart-series-base"
-                    d={item.path}
-                    fill="none"
-                    stroke={item.gradientId
-                        ? `url(#${item.gradientId})`
-                        : item.stroke}
-                    stroke-width={item.strokeWidth}
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-dasharray={resolveDashArray(item.strokeStyle)}
-                    stroke-opacity="0.04"
-                    clip-path={`url(#${resolveSeriesClipId(seriesIndex)})`}
-                    pointer-events="none"
-                />
-            {/each}
-        </g>
+                {/each}
+            </g>
+        {/if}
 
         <g class="snowui-line-chart-area-layer">
             {#each normalizedSeries as item, seriesIndex}

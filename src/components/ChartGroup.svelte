@@ -110,7 +110,7 @@
         defaultActiveCellIndex = null,
         onCellHoverChange,
         showHitLayer = true,
-        adaptiveContrast = false,
+        adaptiveContrast = true,
         showHoverPanel = true,
         showHoverLabel = undefined,
         alwaysShowHoverLabel = false,
