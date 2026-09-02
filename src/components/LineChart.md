@@ -152,8 +152,8 @@ interface LineChartSeries {
 
 Area 填充说明：
 
-- `area: true` 使用当前序列线色生成纵向渐变，顶部不透明度固定为 `0.04`（4%），底部渐变到 `0`（全透明）。
-- Area 不提供颜色、透明度、渐变或 baseline 自定义；需要变化时通过线色或纵轴 domain 间接影响。
+- `area: true` 在序列使用普通颜色时生成纵向渐变，顶部不透明度为 `0.04`（4%），底部渐变到 `0`（全透明）。序列 `color` 显式使用 CSS 渐变或 `ChartGradient` 对象时，Area 直接沿用其色标及透明度；两个相同颜色且不透明的色标可形成实色面积。
+- Area 不提供独立于线条的颜色、透明度、渐变或 baseline 配置；通过序列 `color` 同时影响线条和面积，通过纵轴 domain 影响 baseline。
 - `area` 与 `strokeStyle` 独立，可组合出“虚线 + 半透明面积填充”。
 
 Marker 说明：
