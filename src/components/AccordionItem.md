@@ -1,6 +1,6 @@
 # AccordionItem.svelte 文档
 
-> **版本**: v1.3.1
+> **版本**: v1.3.2
 > **职责**: 作为 Accordion 内部的单个折叠项容器。
 > **包归属**: OSS
 
@@ -10,10 +10,10 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `value` | `string` | - | 与 Accordion 展开值匹配的唯一值。 |
-| `disabled` | `boolean` | `false` | 阻止当前 item 的 title 点击切换。 |
+| `value` | `string` | —（必填） | 当前折叠项的稳定标识，在同一 Accordion 内应唯一；与父级 value/defaultValue 匹配，不是可独立绑定的展开布尔值。 |
+| `disabled` | `boolean` | `false` | 禁用当前项的标题和正文收起交互；父级 Accordion.disabled 也会禁用此项，不能由此处 false 解除。 |
 | `size` | `never` | - | 不支持；尺寸只允许由父级 Accordion 控制。 |
-| `children` | `Snippet` | - | 标题或内容。 |
+| `children` | `Snippet` | — | 声明直系 Frame as="title" 与 Frame as="content"；标题内直系 as="trailing" 可替换默认展开图标。必须在 Accordion 内使用。 |
 | `...rest` | `FrameProps` | - | 透传到内部根 Frame。 |
 
 `AccordionItem` 不控制尺寸。字号、行高、padding、圆角、内置图标尺寸等视觉密度全部继承父级 `Accordion size` 生成的变量；`value` 只用于和父级 `value/defaultValue` 匹配展开状态。
@@ -87,6 +87,10 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.3.2 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.3.1 (2026-08-28)
 

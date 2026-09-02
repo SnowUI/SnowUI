@@ -1,6 +1,6 @@
 # ButtonGroup.svelte 文档
 
-> **版本**: v1.2.0
+> **版本**: v1.2.1
 > **职责**: 提供带内置可选分割线的多 Button 拆分按钮容器。
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -11,10 +11,10 @@
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | variant | `'gray' \| 'filled' \| 'outline' \| 'borderless'` | `'gray'` | 外壳视觉变体 |
-| size | `'sm' \| 'md' \| 'lg'` | `'sm'` | 尺寸档位 |
+| `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "sm"） | 控制外壳和嵌入 Button 的密度；显式值优先，其次父级尺寸上下文，再回退 sm。子 Button 的显式 size 可覆盖继承值。 |
 | disabled | `boolean` | `false` | 禁用整个 ButtonGroup，并传递给内部嵌入态 Button |
-| showSeparator | `boolean` | `true` | 是否显示相邻 Button 单元格之间的内置分割线 |
-| children | `Snippet` | - | 直接放置 `Button as="item"`；分割线由 ButtonGroup 内置 |
+| `showSeparator` | `boolean` | `true` | 显示相邻 Button 单元格之间的内置装饰分割线；false 关闭全部分割线，不改变各按钮的操作与分组布局。 |
+| `children` | `Snippet` | — | 显式放置可独立操作的 Button；直系 Button 自动成为分组单元格并继承组配置，分割线由组内建，无需手写 Separator。 |
 | ...rest | `FrameProps` | - | 透传到根 Frame，保留状态、动效、事件、`data-*` 等能力 |
 
 ## 组件边界
@@ -133,6 +133,10 @@
 - **依赖**: Frame、ButtonGroup Context
 
 ## 更新日志 (Changelog)
+
+### v1.2.1 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.2.0 (2026-08-29)
 

@@ -1,6 +1,6 @@
 # Accordion.svelte 文档
 
-> **版本**: v1.6.1
+> **版本**: v1.6.2
 > **职责**: 提供可展开 / 收起的内容分组容器，用于 FAQ、设置项、分段说明与信息折叠。
 > **包归属**: OSS（标准 UI 原语；不使用跨 Frame 协调、复杂 PRO 动效或产品级区块能力）
 
@@ -28,17 +28,18 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `type` | `"single" \| "multiple"` | `"single"` | 单开或多开模式。 |
-| `value` | `string \| string[]` | - | 受控展开值。`single` 使用字符串；`multiple` 使用字符串数组。 |
-| `defaultValue` | `string \| string[]` | - | 非受控初始展开值。 |
+| `role` | `string` | `"presentation"` | 根容器的 ARIA role；默认仅作展示分组，标题触发器与内容 region 的语义仍由 AccordionItem 管理。 |
+| `type` | `"single" \| "multiple"` | `"single"` | single 一次只展开一项；multiple 可同时展开多项。决定 value/defaultValue 与 onValueChange 的值形态。 |
+| `value` | `string \| string[]` | — | 当前展开值，支持 bind:value；优先于内部状态。single 使用字符串，multiple 使用数组；single 空字符串表示全部收起。 |
+| `defaultValue` | `string \| string[]` | — | 非受控初始展开值；仅初始化内部状态时读取，value 优先。items 模式使用索引字符串，显式 AccordionItem 使用其 value。 |
 | `collapsible` | `boolean` | `true` | 单开模式下，点击已展开项是否允许收起。 |
-| `variant` | `"filled" \| "divided"` | `"filled"` | 视觉形态；`divided` 与 DataTable 的分割线命名一致。 |
-| `size` | `"sm" \| "md" \| "lg"` | `"md"` | 尺寸密度；未显式传入时可从父级尺寸上下文推导。 |
+| `variant` | `"filled" \| "divided"` | `"filled"` | filled 为带背景的独立折叠项；divided 使用项间分割线。两者共享展开状态与交互。 |
+| `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "md"） | 尺寸密度；显式值优先，其次父级尺寸上下文，再回退 md。统一控制标题、正文、间距及子项尺寸。 |
 | `disabled` | `boolean` | `false` | 禁用整个 Accordion。 |
 | `continuousHover` | `boolean` | `true` | 是否使用容器级唯一连续 hover 背景；关闭后恢复 title 的普通 hover。 |
 | `items` | `{ title: string; content: string }[]` | `[]` | 默认内置模式的数据；内部 value 使用数组索引字符串。 |
-| `onValueChange` | `(value: string \| string[]) => void` | - | 展开值变化回调。 |
-| `parts` | `{ AccordionItem?; Frame? }` | - | 配置默认内置生成的 AccordionItem 与 title/content Frame。 |
+| `onValueChange` | `(value: string \| string[]) => void` | — | 用户切换展开项后回调；single 返回当前项字符串（全部收起时为空字符串），multiple 返回展开项数组。可配合 bind:value 同步页面状态。 |
+| `parts` | `ComponentPartsOf<{ AccordionItem: typeof AccordionItem; Frame: typeof Frame }>` | — | 仅配置 items 模式内建的 AccordionItem 与标题、正文 Frame；显式 children 不读取这些默认子项配置。 |
 | `children` | `Snippet` | - | 显式组合内容；存在时替换内置 items。 |
 | `...rest` | `FrameProps` | - | 透传到根 `Frame`。 |
 
@@ -171,7 +172,7 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 
 | 关键字 | 处理方式 | 说明 |
 | :--- | :--- | :--- |
-| `type` | 状态逻辑 | 控制单开或多开 |
+| `type` | `"single" \| "multiple"` | `"single"` | single 一次只展开一项；multiple 可同时展开多项。决定 value/defaultValue 与 onValueChange 的值形态。 |
 | `value` / `defaultValue` | 状态逻辑 | 受控值优先 |
 | `variant` / `size` | CSS 类 | 映射为 `.snowui-accordion-{variant}` 与 `.snowui-accordion-{size}` |
 | `disabled` | Frame + Context | 根禁用并阻断所有 title 交互 |
@@ -189,6 +190,10 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.6.2 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.6.1 (2026-08-28)
 

@@ -1,11 +1,15 @@
 # StyleButton
 
-> **版本**: v1.0.3  
+> **版本**: v1.0.4
 > **职责**: 以真实 Button 为宿主，在 SnowUI 与 Apple 视觉风格之间切换。
 
 ## 使用
 
 ```svelte
+<script lang="ts">
+  import { StyleButton } from "@snowui-design-system/components";
+</script>
+
 <StyleButton bare />
 ```
 
@@ -15,13 +19,16 @@ StyleButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。默认
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| `mode` | `"snowui" \| "apple"` | 当前页面风格 | 当前风格，可 `bind:mode` |
-| `defaultMode` | `"snowui" \| "apple"` | 当前页面风格 | 非受控初始风格 |
-| `applyToDocument` | `boolean` | `true` | 是否同步页面根节点 |
-| `ariaLabel` | `string` | 当前操作的本地化文案 | 覆盖按钮名称 |
-| `snowuiLogo` / `appleLogo` | `Snippet` | SnowUI Logo / Apple Logo | 覆盖对应内置 Logo |
-| `children` | `Snippet` | 无 | 图标后的可选内容 |
-| `onModeChange` | `(mode) => void` | 无 | 切换完成后的回调 |
+| `mode` | `"snowui" \| "apple"` | — | 当前视觉风格，支持 bind:mode。挂载时优先于 defaultMode；点击更新该值，同步页面属性时也会跟随根节点变化。 |
+| `defaultMode` | `"snowui" \| "apple"` | — | 挂载时的非受控初值；mode 优先。均未提供时读取页面根节点；applyToDocument=false 时回退为 snowui。 |
+| `applyToDocument` | `boolean` | `true` | 将当前状态同步到 document.documentElement：mode="ios"；SnowUI 时移除 mode。false 时不读写或观察页面属性，由调用方处理主题目标；不写入 storage。 |
+| `ariaLabel` | `string` | —（本地化的下一步操作） | 覆盖按钮的可访问名称；默认描述点击后切换到的状态，跟随 LocaleProvider。 |
+| `snowuiLogo` | `Snippet` | —（内置图形） | 替换当前为 snowui 时显示的 SnowUI Logo。仅改变图形，不接管切换逻辑。 |
+| `appleLogo` | `Snippet` | —（内置图形） | 替换当前为 apple 时显示的 Apple Logo。仅改变图形，不接管切换逻辑。 |
+| `children` | `Snippet` | — | 显示在状态图形之后的自定义内容；未提供时宿主 Button 自动使用 iconOnly 布局。 |
+| `disabled` | `boolean` | `false` | 禁用按钮操作；不会阻止外部绑定值或页面属性的同步。 |
+| `onModeChange` | `(mode: "snowui" \| "apple") => void` | — | 用户点击切换后接收新值；初始化、外部赋值及页面属性观察同步不会调用此回调。 |
+| `onclick` | `(event: MouseEvent) => void` | — | 有效点击时先调用，再执行状态切换；当前实现不会以 preventDefault() 取消后续切换。disabled 时不调用。 |
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
@@ -39,6 +46,10 @@ StyleButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。默认
 - 多实例通过观察根节点 `mode` 属性同步；`applyToDocument={false}` 时由受控 `mode` 同步。
 
 ## 更新日志 (Changelog)
+
+### v1.0.4 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.0.3 (2026-08-11)
 

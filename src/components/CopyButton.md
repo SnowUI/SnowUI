@@ -1,17 +1,41 @@
 # CopyButton
 
-> **版本**: v1.0.1
+> **版本**: v1.0.2
 > **职责**: 以真实 Button 为宿主的剪贴板复制与瞬时反馈按钮。
 
 ## 使用
 
 ```svelte
+<script lang="ts">
+  import { CopyButton } from "@snowui-design-system/components";
+</script>
+
 <CopyButton text="SnowUI" variant="outline" />
 ```
 
 平铺 Button 兼容 Props。`text` 提供静态内容，`getText` 提供同步或异步动态内容；复制成功触发 `onCopy`，失败触发 `onCopyError`。从复制开始到成功反馈结束的整个非 idle 阶段禁止重复触发；此时不设置 disabled，不改变按钮视觉，只关闭 Button 点击反馈并忽略后续点击。成功反馈在 `feedbackDuration` 后复位。不提供 parts。
 
 `showText={false}` 启用无文字模式，只显示 Copy / Check 图标，并自动提供复制状态的 `aria-label`。图标变化复用 CodeBlock 的 Frame `stateContent` 协议：内部 Icon Frame 在 Idle 渲染 Copy、Active 渲染 Check；Button 本身不进入 Active/toggle 视觉。带文字模式下文字始终保持“复制”，只有图标执行内容替换动效。
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| `text` | `string` | — | 要复制的静态文本；getText 存在时优先使用其返回值，两者均未提供时复制空字符串。 |
+| `getText` | `() => string \| Promise<string>` | — | 点击时读取复制内容，可返回 Promise；优先于 text。求值与写入剪贴板均在 pending 阶段，失败进入 onCopyError。 |
+| `feedbackDuration` | `number` | `1600` | 复制成功或失败后恢复 idle 的等待时间，单位 ms，负值按 0 处理；pending 与反馈期都忽略重复点击。 |
+| `showText` | `boolean` | `true` | 显示图标后的 children 或默认“复制”文字；false 时仅显示状态图标并启用 Button.iconOnly。 |
+| `ariaLabel` | `string` | — | 覆盖可访问名称；纯图标模式默认按成功状态使用“已复制”或“复制”，带文字模式默认由内容命名。 |
+| `disabled` | `boolean` | `false` | 阻止新的复制操作；已开始的异步复制不会因此取消。 |
+| `children` | `Snippet` | —（复制） | showText=true 时替换图标后的文字，成功时仍保持该内容；false 时忽略。 |
+| `icon` | `Snippet` | —（Copy 图标） | 替换非成功状态的图标；pending 和 error 仍使用该图标。 |
+| `successIcon` | `Snippet` | —（Check 图标） | 复制成功时的图标内容；优先于 successContent，通过内部状态内容替换显示。 |
+| `successContent` | `Snippet` | — | 成功图标区域的替代内容，仅在未提供 successIcon 时使用；不会替换按钮文字。 |
+| `onCopy` | `(text: string) => void` | — | 剪贴板写入成功后接收实际复制的文本；此时组件已进入 success 状态。 |
+| `onCopyError` | `(error: unknown) => void` | — | 动态内容读取或剪贴板写入失败时接收错误，组件进入 error 并等待反馈期复位。 |
+| `onclick` | `(event: MouseEvent) => void` | — | 仅 idle 且未禁用时，在读取文本和复制前调用；preventDefault() 不会取消复制，反馈期内不调用。 |
+
+其他兼容视觉、链接与事件入口参见 [Button](./Button.md)。CopyButton 接管 children、onclick、disabled、currentState、stateContent、whileActive、Click 和 Active，不能用这些宿主字段替代复制状态。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
@@ -35,6 +59,10 @@
 - pending / success 反馈期保持正常 Button 样式，但 `whileClick=false` 且业务点击被忽略，避免 Check 缩小和按钮闪动。
 
 ## 更新日志 (Changelog)
+
+### v1.0.2 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.0.1 (2026-08-11)
 

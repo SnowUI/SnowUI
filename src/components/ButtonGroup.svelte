@@ -1,6 +1,6 @@
 <!--
   ButtonGroup 组件：按钮分组容器
-  v1.2.0
+  v1.2.1
 
   作为多个嵌入态 Button 的分组外壳。Button 负责单元格交互，ButtonGroup 负责统一外壳视觉、间距与内置分割线。
 -->

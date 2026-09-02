@@ -1,6 +1,6 @@
 <!--
   Breadcrumb 组件：页面层级路径导航容器
-  v1.1.0
+  v1.1.1
 
   职责：
   - 只作为组合式容器，不生成 items / separator。

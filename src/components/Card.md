@@ -1,6 +1,6 @@
 # Card.svelte
 
-> **版本**: v1.0.0
+> **版本**: v1.0.1
 > **更新**: 2026-05-26
 > **职责**: 提供可承载自定义内容、Pin 子项与溢出滚动的通用表面容器，不内建标题或操作区。
 > **布局模型**: 槽位宿主布局 / 容器内组件间布局
@@ -8,7 +8,7 @@
 
 Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载和内容溢出滚动。Card 不内建标题、正文、图标或操作区；内部内容完全由使用方自定义。
 
-> **以下内容供 AI 阅读，用户可忽略。**
+用户 API 与组合说明如下；源码实现见 [Card.svelte](./Card.svelte)。
 
 ---
 
@@ -30,13 +30,13 @@ Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载�
 | 关键字 | 类型 | 默认值 | 描述 |
 |:---|:---|:---|:---|
 | `row` | `boolean` | `false` | 横向排列直系普通内容。与 Frame 写法一致 |
-| `column` | `boolean` | `true` | 纵向排列直系普通内容。默认方向 |
+| `column` | `boolean` | —（!row） | 纵向排列普通内容，未传时取 row 的反值；row 与 column 同时为 true 时 row 优先。 |
 | `wrap` | `boolean` | `false` | 普通内容是否允许换行；默认不换行 |
 | `contentFill` | `boolean` | `false` | 普通内容子项宽度填满 Card 内容区；优先级高于 `contentHug` |
 | `contentHug` | `boolean` | `false` | 普通内容子项宽度按内容收缩 |
 | `active` | `boolean` | `false` | 是否使用激活态外观 |
 | `selected` | `boolean` | `false` | 激活态语义别名；作用和效果与 `active` 相同 |
-| `interactive` | `boolean` | `false` | 是否启用可点击容器语义、cursor 与 hover 边框 |
+| `interactive` | `boolean` | `false` | 使容器具备交互外观、指针和 hover 边框；点击副作用仍由调用方事件负责，不自动导航、选择或生成按钮键盘行为。 |
 | `scrollable` | `boolean` | `true` | 内容溢出时是否启用内部滚动；无高度约束时内容自然撑高 |
 | `pinOffset` | `number \| string` | `12` | Pin 内容统一偏移，数字按 px 处理 |
 | `pinOffsetX` | `number \| string` | - | Pin 水平偏移，优先级高于 `pinOffset` |
@@ -182,6 +182,16 @@ Pin 内容不参与普通内容滚动流，仍以 Card 根容器为定位参照�
 
 ---
 
+## AI Zone
+
+- [Card.svelte](./Card.svelte) 拥有根表面、普通内容排列、Pin 与滚动宿主；selected/active 只映射视觉状态，不执行页面操作。
+- 根节点复用 Frame 处理公开属性、状态与尺寸协议；`useOverlayScrollbar` 和 `resizeManager` 分别拥有共享滚动条与尺寸观察能力，Card 不复制其运行时。
+- 内容完全由 children 提供，不生成标题或按钮，也不提供 parts；Pin 子项脱离普通滚动内容流。
+
 ## Changelog
+
+### v1.0.1 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 - v1.0.0: 初始版本，支持容器外观、row / column、wrap、active / selected、Pin 与内容溢出滚动。

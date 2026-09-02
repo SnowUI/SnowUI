@@ -2,7 +2,7 @@
 
 > **变更记录 (2026-08-28)**: 默认 Gradient 新增 `fallbackColor` 与 `fallbackSeed`。显式颜色优先；稳定用户 ID 通过确定性哈希映射到六种具名配色；完全无身份信息时固定为 `blue`，不再依赖组件实例 ID。
 
-> **版本**: v2.12.4
+> **版本**: v2.12.5
 > **变更记录 (2026-08-15)**: 默认 Gradient hover 改为按需挂载预栅格 SVG 图层；不再创建运行时 filter DOM，并继承 Gradient 的共享视口暂停能力。
 > **变更记录 (2026-08-15)**: 将 Avatar hover alpha 艺术色与 Gradient、GradientMotion 的画面艺术色分项登记，明确 Avatar 只拥有自己的 hover 染色例外。
 > **变更记录 (2026-08-15)**: 正式登记默认 Gradient 与图片 / 普通组件头像 hover 六色为专业艺术色例外；例外不建立通用语义色，也不豁免 Avatar 的其他 Token / 样式规则。
@@ -36,22 +36,24 @@
 
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
+| `children` | `Snippet` | — | 头像附属内容；as="badge" 声明角标，as="avatar-image" 声明外置头像视觉并覆盖默认回退层。 |
+| `fallbackText` | `string` | — | 图片不可用时显示的显式回退文字；去除首尾空格，非空时替代默认 Gradient，显式 fallback 组件仍优先。不会从姓名自动生成首字母。 |
 | src | string \| Component | undefined | 头像图片 URL 或图标组件 |
-| size | 12\|16\|20\|24\|28\|32\|40\|48\|80 | 16 | 头像尺寸。未显式设置时，自动继承父级 `Frame` (如 `AvatarGroup`) 提供的尺寸上下文。 |
+| `size` | `ResourceSize` | —（最终回退 16） | 头像尺寸档位为 12/16/20/24/28/32/40/48/80；显式值优先，其次父级头像或通用尺寸上下文，无上下文时为 16。 |
 | fallback | Component | undefined | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与解析后的稳定 `seed`。 |
 | fallbackColor | `'blue' \| 'cyan' \| 'green' \| 'red' \| 'orange' \| 'purple'` | `undefined` | 显式选择默认 Gradient 的具名艺术配色；优先级高于 `fallbackSeed` 和名称回退。 |
 | fallbackSeed | `string \| number` | `undefined` | 稳定身份种子，推荐传入 `user.id`；组件以确定性哈希映射到六种具名配色，相同 seed 始终得到相同颜色，无需持久化颜色字段。 |
 | variant | `'default' \| 'empty'` | `'default'` | 默认样式使用稳定身份 seed 或显式具名颜色的 Gradient 配色；空头像样式使用灰色背景与默认用户图标。 |
 | gradientMotion | boolean | false | 是否常驻运行默认 Gradient fallback 的四层基础矢量形变；为 false 时 Gradient 仍会在 hover 期间按需运行水波形变和多色 Overlay |
-| badgePosition | 'top'\|'bottom' | 'top' | 徽章位置 |
+| `badgePosition` | `"top" \| "bottom"` | `"top"` | as="badge" 子内容定位在头像右上或右下；Dot 角标同时参与头像切割。 |
 
 ## 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| badgePosition | `'top' \| 'bottom'` | `'top'` | 徽章位置关键字 |
-| as | `'badge'` | - | 角色化：作为容器的徽章 |
-| as | `'avatar-image'` | - | 角色化：子组件作为头像图片层覆盖默认回退；适用于 `<GradientMotion as="avatar-image" />` |
+| `badgePosition` | `"top" \| "bottom"` | `"top"` | as="badge" 子内容定位在头像右上或右下；Dot 角标同时参与头像切割。 |
+| `as` | `string` | — | 声明 Avatar 在外部宿主中的角色，例如在 AvatarGroup 内使用 "item"；头像内部子项的 "badge" / "avatar-image" 属于 children 的角色协议。 |
+| `as` | `string` | — | 声明 Avatar 在外部宿主中的角色，例如在 AvatarGroup 内使用 "item"；头像内部子项的 "badge" / "avatar-image" 属于 children 的角色协议。 |
 
 ## 使用示例
 
@@ -219,6 +221,10 @@
 ---
 
 ## 更新日志
+
+### v2.12.5 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v2.12.4 (2026-08-28)
 

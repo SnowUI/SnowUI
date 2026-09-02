@@ -1,6 +1,6 @@
 <!--
   AvatarGroup 组件：头像组组件
-  v1.8.6
+  v1.8.7
 -->
 
 <script module lang="ts">

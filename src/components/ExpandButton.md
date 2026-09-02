@@ -1,11 +1,16 @@
 # ExpandButton
 
-> **版本**: v1.0.1
+> **版本**: v1.0.2
 > **职责**: 以真实 Button 为宿主的展开 / 收起二态按钮。
 
 ## 使用
 
 ```svelte
+<script lang="ts">
+  import { ExpandButton } from "@snowui-design-system/components";
+  let expanded = $state(false);
+</script>
+
 <ExpandButton bind:expanded bare />
 ```
 
@@ -14,6 +19,22 @@
 - `icon` / `collapseIcon`：替换默认的放大、收起图标。
 - `ariaLabel` / `collapseAriaLabel`：两种状态的辅助文本。
 - 默认图标为 `arrows-out-simple` / `arrows-in-simple`，内容替换使用统一 replacement appear 动效。
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| `expanded` | `boolean` | — | 当前展开状态，支持 bind:expanded；未定义时使用 defaultExpanded。点击后写入新布尔值；内容区域由调用方显示或隐藏。 |
+| `defaultExpanded` | `boolean` | `false` | expanded 未定义时的回退状态；首次点击后使用组件写入的 expanded，不再由此值驱动。 |
+| `ariaLabel` | `string` | `"展开"` | 未展开时按钮的可访问名称，应描述将要执行的展开动作。 |
+| `collapseAriaLabel` | `string` | `"收起"` | 已展开时按钮的可访问名称，应描述将要执行的收起动作。 |
+| `icon` | `Snippet` | —（arrows-out-simple） | 未展开时的自定义图标；只替换图形，展开状态与 aria-expanded 仍由组件管理。 |
+| `collapseIcon` | `Snippet` | —（arrows-in-simple） | 已展开时的自定义图标；使用组件现有内容替换动效。 |
+| `children` | `Snippet` | — | 图标后的自定义内容；不提供时启用 Button.iconOnly。组件不自动创建或控制展开面板。 |
+| `onExpandedChange` | `(expanded: boolean) => void` | — | 点击切换后接收新状态，先于 onclick 调用；外部赋值不会触发。 |
+| `onclick` | `(event: MouseEvent) => void` | — | 状态写入及 onExpandedChange 之后调用，不能取消已经完成的切换；禁用时不调用。 |
+
+其他兼容视觉、链接与事件入口参见 [Button](./Button.md)。ExpandButton 接管 children、onclick 和 aria-expanded；继承 disabled 阻止用户切换。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
@@ -35,6 +56,10 @@
 - 作为父组件的默认内置依赖时，可消费 `parts.ExpandButton`。
 
 ## 更新日志 (Changelog)
+
+### v1.0.2 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.0.1 (2026-08-11)
 

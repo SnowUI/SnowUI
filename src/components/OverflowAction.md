@@ -1,12 +1,14 @@
 # OverflowAction
 
-> **版本**: v1.0.0  
+> **版本**: v1.0.1
 > **职责**: 为 OverflowActions 显式声明一个可测量、可转移到菜单的真实 Button 操作。
 
 ## API
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
+| `as` | `string` | — | 作为 OverflowActions 的直系子项时必须设置 "item"，以注册测量、溢出与菜单执行；未注册时不能参与父级响应式操作管理。 |
+| `parts` | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置当前操作内建 Button；优先级低于直接 Button Props、高于父级组默认，父级不读取此配置来推断 More 按钮样式。 |
 | `id` | `string` | 必填 | 组内稳定且唯一的操作标识 |
 | `label` | `string` | 必填 | 按钮文字、菜单文字与 Icon-only 无障碍名称 |
 | `icon` | `string \| Snippet` | 无 | 资源图标名或自定义图标；菜单复用同一内容 |
@@ -35,6 +37,10 @@ OverflowAction 只能作为 `OverflowActions` 的直系子项使用。组件保�
 - 测量副本必须不可聚焦、不可命中、不可进入无障碍树。
 
 ## 更新日志 (Changelog)
+
+### v1.0.1 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.0.0 (2026-08-12)
 

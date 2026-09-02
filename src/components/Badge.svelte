@@ -1,5 +1,5 @@
 <!--
- Badge 组件：徽标组件 v1.3.2
+ Badge 组件：徽标组件 v1.3.3
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
  详见：Badge.md

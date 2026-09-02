@@ -1,6 +1,6 @@
 # Button.svelte 文档
 
-> **版本**: v2.17.0
+> **版本**: v2.17.1
 > **变更记录 (2026-08-27)**: 恢复 Owner 在 2026-08-19 确认的背景层比例放大方案：gray / filled / outline 从 `1` 放大到 `1.06`，Borderless 从隐藏的 `0.84` 背景显示并放大到 `1.06`，最终颜色保持 Light 4% / Dark 10%；文字、Icon、Spinner、命中区和布局不变。背景缩放使用 `BUTTON_HOVER_SCALE_UP_MOTION` 的 `200ms ease`，颜色使用通用 `150ms ease-out`。
 > **变更记录 (2026-08-19)**: Button hover 的背景颜色与背景外扩统一使用 `150ms ease-in-out`，进入和退出时同时开始、同时结束；固定 `1px` 外扩、radius 同步、内容与布局尺寸均不变。
 > **变更记录 (2026-08-19)**: Button 背景 inset 与 radius 的几何动效由 `200ms ease` 优化为 `150ms ease-in-out`，减少 filled 高对比边缘停留在亚像素重绘状态的时间，并缓和 hover 进入 / 退出首段的视觉抖动；固定 `1px` 外扩、radius 同步、`300ms ease-in-out` 颜色渐变、内容与布局尺寸均不变。
@@ -24,8 +24,12 @@
 
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
+| `children` | `Snippet` | — | 按钮内的文字、图标或其他内容；纯图标用法须显式设置 iconOnly 并提供可访问名称，组件不通过内容自动推断。 |
+| `holdRepeatInterval` | `number` | `80` | 按住期间相邻周期 click 的间隔，单位 ms，最小按 1 处理；仅 holdRepeat=true 生效。 |
+| `holdRepeatDelay` | `number` | `260` | 开始周期连发前的等待时间，单位 ms，负值按 0 处理；仅 holdRepeat=true 生效，第一次周期点击还需等待 holdRepeatInterval。 |
+| `holdRepeat` | `boolean` | `false` | 开启指针按住连发；仅对未禁用的 button 宿主主按钮按压生效。按下立即触发一次 click，等待后周期触发，松开或取消停止；不为链接或键盘增加连发。 |
 | variant | 'gray'\|'filled'\|'outline'\|'borderless' | 'gray' | 按钮变体样式 |
-| size | 'sm'\|'md'\|'lg' | 'sm' | 按钮尺寸 |
+| `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "sm"） | 控制按钮字号、内边距、圆角及子图标尺寸；显式值优先，其次 ButtonGroup/集合及父级尺寸上下文，无上下文时为 sm。 |
 | iconOnly | `boolean` | `false` | 明确启用单视觉内容布局。使用对称 icon-only padding 与放大一级的尺寸上下文；不检查 children 类型。缺少 `aria-label`、`aria-labelledby` 或 `title` 时开发环境警告。 |
 | bare | `boolean` | `false` | 开启无外壳按钮模式，内容可包含文字、Icon 或其他元素。忽略 `variant`，移除 padding / radius / 背景 / 边框与 hover overlay，保留普通 Button 的内容 gap；前景色继承 `currentColor`，默认保持 100% 不透明。因为没有背景层，`scaleOnHover` 不产生视觉放大，文字与 Icon 保持原尺寸。与 `iconOnly` 同时使用时采用当前 `size` 档位的 12/16/20px 视觉尺寸上下文，并提供至少 16×16px 的透明点击热区。精确尺寸由子视觉自己声明。放入 Tab 时由 Tab 的 Button opacity override 接管透明度，不发生叠乘。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
@@ -41,7 +45,7 @@
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | variant | `'gray' \| 'filled' \| 'outline' \| 'borderless'` | `'gray'` | 按钮变体 |
-| size | `'sm' \| 'md' \| 'lg'` | `'sm'` | 按钮尺寸 |
+| `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "sm"） | 控制按钮字号、内边距、圆角及子图标尺寸；显式值优先，其次 ButtonGroup/集合及父级尺寸上下文，无上下文时为 sm。 |
 | iconOnly | `boolean` | `false` | 显式选择单视觉内容布局；未声明时始终按普通内容按钮处理。 |
 | bare | `boolean` | `false` | 无外壳按钮模式，不限制内容类型。忽略 `variant`，外壳 padding / radius 为 0，保留内容 gap；与 `iconOnly` 同时使用时获得对应尺寸上下文与最小透明点击热区。默认使用 `currentColor × opacity: 1`。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 的强调级别；`muted` 使用 `currentColor × opacity: 0.4 -> 1`。 |
@@ -367,6 +371,10 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.17.1 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v2.17.0 (2026-08-27)
 

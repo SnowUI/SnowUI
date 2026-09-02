@@ -4,7 +4,7 @@
 
 AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="item">`，AvatarGroup 只负责排列、叠放、溢出计数和统一 size Context，不拥有 Avatar 的业务数据，因此不提供 `parts.Avatar`。每个 Avatar 的差异 Props 直接写在对应实例上。
 
-> **版本**: v1.8.6
+> **版本**: v1.8.7
 > **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局，明确 row / stack 是头像集合布局。
 > **职责**: 头像组容器，负责定义内部头像的堆叠布局与溢出计数展示。
 
@@ -34,16 +34,18 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `size` | `number` | `undefined` | **主尺寸控制**。在 `stack` 模式下为容器尺寸，在 `row` 模式下为头像尺寸。 |
-| `layout` | `"row" \| "stack"` | `"row"` | 叠放布局。 |
-| `max` | `number` | `3` | 最大显示项数（包括溢出计数）。 |
+| `children` | `Snippet` | — | 按顺序提供 as="item" 的直接子元素，通常为 Avatar；这些子项参与排列、隐藏与 +N 计数，其他内容不计入。 |
+| `enableResponsive` | `boolean` | `true` | 启用根 Frame 的响应式能力；头像排列与溢出计数仍由 AvatarGroup 自身管理，关闭此项不会关闭溢出逻辑。 |
+| `size` | `ResourceSize` | — | 12/16/20/24/28/32/40/48/80；row 表示单个头像尺寸，stack 表示组容器尺寸并按 max 推导头像大小。未传时读取父级尺寸上下文。 |
+| `layout` | `"row" \| "stack"` | `"row"` | row 为水平重叠排列；stack 为圆形堆叠，最多四个显示位置。两种模式对 size 和 max 的解释不同，见对应属性。 |
+| `max` | `number` | —（按布局解析） | 未传时 row 不限制数量，stack 最多四个位置。row 显示最多 max 个头像，另加 +N；stack 的 max 包含 +N 的位置，最多四个。显式值向下取整且不小于 0，计数文案最高为 +99。 |
 | `enableContext` | `boolean` | `true` | 是否为子组件（Avatar/Icon/Badge）提供尺寸上下文。 |
 
 ### 2. 视觉规则
 
 1. **布局规则**：
    - `row`: 线性排列，数量不限；使用边框切割方式进行叠放。
-   - `stack`: 圆形堆叠，2/3 个头像固定位置排列，4 个及以上固定显示 3 个头像 + `+N`。当发生溢出时，`+N` 占用一个头像位置（如 `max=2` 或 `max=3` 时显示 1/2 个头像 + `+N`）。
+   - `stack`: 圆形堆叠，2/3 个头像固定位置排列，4 个及以上固定显示 3 个头像 + `+N`。当发生溢出时，`+N` 占用一个头像位置（stack 中如 `max=2` 或 `max=3` 时显示 1/2 个头像 + `+N`；row 则保留 max 个头像，另显示计数）。
 2. **位置与层级（stack 模式）**：
    - **中心点角度**（以圆心为原点，顺时针为负角）：  
      - `max=2`：`-45°`、`135°`  
@@ -81,6 +83,7 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
     <Avatar as="item" />
     <Avatar as="item" />
 </AvatarGroup>
+```
 
 ```svelte
 <AvatarGroup layout="stack" size={80} max={3}>
@@ -89,7 +92,6 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
     <Avatar as="item" />
     <Avatar as="item" />
 </AvatarGroup>
-```
 ```
 
 
@@ -114,7 +116,7 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 | 关键字 | 处理模块/文件 | 逻辑说明 |
 | :--- | :--- | :--- |
 | max | `AvatarGroup.svelte` | 基于 DOM 子元素数量计算溢出数并渲染 `+N`。支持最高 `+99` 封顶。 |
-| layout | `AvatarGroup.svelte` | 控制线性 (`row`) 或圆形堆叠 (`stack`) 布局。触发更新时会重置子元素 mask/position。 |
+| `layout` | `"row" \| "stack"` | `"row"` | row 为水平重叠排列；stack 为圆形堆叠，最多四个显示位置。两种模式对 size 和 max 的解释不同，见对应属性。 |
 | size | `AvatarGroup.svelte` | **主尺寸控制**。衍生出 `finalAvatarSize` 并通过 `resolvedSizeContext` 透传给子组件。 |
 
 ### 辅助标识符 (Secondary API)
@@ -141,6 +143,10 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.8.7 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 - **AvatarGroup-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
 

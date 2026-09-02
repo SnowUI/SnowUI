@@ -1,11 +1,15 @@
 # ColorSchemeButton
 
-> **版本**: v1.0.1  
+> **版本**: v1.0.2
 > **职责**: 以真实 Button 为宿主，在页面亮色与暗色方案之间切换。
 
 ## 使用
 
 ```svelte
+<script lang="ts">
+  import { ColorSchemeButton } from "@snowui-design-system/components";
+</script>
+
 <ColorSchemeButton bare />
 ```
 
@@ -17,13 +21,16 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| `scheme` | `"light" \| "dark"` | 当前页面方案 | 当前方案，可 `bind:scheme` |
-| `defaultScheme` | `"light" \| "dark"` | 当前页面方案 | 非受控初始方案 |
-| `applyToDocument` | `boolean` | `true` | 是否同步页面根节点 |
-| `ariaLabel` | `string` | 当前操作的本地化文案 | 覆盖按钮名称 |
-| `lightIcon` / `darkIcon` | `Snippet` | Sun / Moon | 覆盖对应内置图标 |
-| `children` | `Snippet` | 无 | 图标后的可选内容 |
-| `onSchemeChange` | `(scheme) => void` | 无 | 切换完成后的回调 |
+| `scheme` | `"light" \| "dark"` | — | 当前配色方案，支持 bind:scheme。挂载时优先于 defaultScheme；点击更新该值，同步页面属性时也会跟随根节点变化。 |
+| `defaultScheme` | `"light" \| "dark"` | — | 挂载时的非受控初值；scheme 优先。均未提供时读取页面根节点；applyToDocument=false 时回退为 light。 |
+| `applyToDocument` | `boolean` | `true` | 将当前状态同步到 document.documentElement：theme="dark"；亮色时移除 theme。false 时不读写或观察页面属性，由调用方处理主题目标；不写入 storage。 |
+| `ariaLabel` | `string` | —（本地化的下一步操作） | 覆盖按钮的可访问名称；默认描述点击后切换到的状态，跟随 LocaleProvider。 |
+| `lightIcon` | `Snippet` | —（内置图形） | 替换当前为 light 时显示的 Sun 图标。仅改变图形，不接管切换逻辑。 |
+| `darkIcon` | `Snippet` | —（内置图形） | 替换当前为 dark 时显示的 Moon 图标。仅改变图形，不接管切换逻辑。 |
+| `children` | `Snippet` | — | 显示在状态图形之后的自定义内容；未提供时宿主 Button 自动使用 iconOnly 布局。 |
+| `disabled` | `boolean` | `false` | 禁用按钮操作；不会阻止外部绑定值或页面属性的同步。 |
+| `onSchemeChange` | `(scheme: "light" \| "dark") => void` | — | 用户点击切换后接收新值；初始化、外部赋值及页面属性观察同步不会调用此回调。 |
+| `onclick` | `(event: MouseEvent) => void` | — | 有效点击时先调用，再执行状态切换；当前实现不会以 preventDefault() 取消后续切换。disabled 时不调用。 |
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
@@ -40,6 +47,10 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 - 状态切换不接入 replacement preset、CSS transition 或 View Transition。
 
 ## 更新日志 (Changelog)
+
+### v1.0.2 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.0.1 (2026-08-11)
 

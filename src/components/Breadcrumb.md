@@ -1,6 +1,6 @@
 # Breadcrumb (面包屑)
 
-> **版本**: v1.1.0
+> **版本**: v1.1.1
 > **职责**: 提供页面层级路径导航容器。
 > **设计稿**: [Workshop / Breadcrumb](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12046-1772&t=nY2VC3oisn12OH01-4)
 
@@ -28,9 +28,12 @@ Breadcrumb 支持两种模式：
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
+| `parts` | `ComponentPartsOf<{ Button: typeof Button; Text: typeof Text }>` | — | 配置 items 模式生成的 Button 与分隔 Text；不作用于显式 children，当前页及角色语义仍由 Breadcrumb 接管。 |
+| `separator` | `string` | `"/"` | 内建路径项之间的分隔文字；仅在 items 模式使用，显式组合时自行声明 as="separator"。 |
+| `items` | `BreadcrumbItem[]` | `[]` | 内建路径数据，每项含 label、可选 href/disabled；自动生成 Button 与分隔 Text，最后一项为不可交互的当前页。children 存在时忽略此数组。 |
 | ariaLabel | `string` | `"Breadcrumb"` | 根导航区域的无障碍标签 |
 | variant | `'gray' \| 'filled' \| 'outline' \| 'borderless'` | `'borderless'` | 内部 `Button as="item"` 的默认 Button 变体；parts 与子级 Button 显式 `variant` 可覆盖 |
-| children | `Snippet` | - | 子内容。推荐只放 `Button as="item"` 与 `Text as="separator"` |
+| `children` | `Snippet` | — | 显式声明 Button as="item" 与 Text as="separator"，替换内建 items 与 separator；最后一个 item 仍自动成为当前页。 |
 
 ### 子级角色
 
@@ -144,7 +147,7 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 | :--- | :--- | :--- |
 | ariaLabel | `aria-label` | 透出到根 `nav` |
 | variant | Breadcrumb context | 作为子级 `Button as="item"` 的默认 variant |
-| children | Snippet | 原样渲染到根容器 |
+| `children` | `Snippet` | — | 显式声明 Button as="item" 与 Text as="separator"，替换内建 items 与 separator；最后一个 item 仍自动成为当前页。 |
 | as="item" | DOM `data-as="item"` | Frame runtime 翻译；Breadcrumb action 识别 |
 | as="separator" | DOM `data-as="separator"` | Frame runtime 翻译；Breadcrumb action 识别 |
 
@@ -157,6 +160,10 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.1.1 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.1.0 (2026-08-19)
 

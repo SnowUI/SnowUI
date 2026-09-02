@@ -1,6 +1,6 @@
 # OverflowActions
 
-> **版本**: v1.0.1
+> **版本**: v1.0.2
 > **职责**: 在有限宽度内保留一组操作，并把容纳不下的操作转移到 More 菜单。
 
 ## 使用
@@ -46,24 +46,32 @@ More 按钮使用 `SelectButton selectionMode="action"`，内部直接组合 `Li
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| `items` | `OverflowActionsItem[]` | `[]` | 默认内置模式的数据；包含 action 与 separator |
-| `compact` | `"auto" \| "none"` | `"auto"` | 是否在溢出前统一尝试 Icon-only |
-| `overflow` | `"all" \| "progressive"` | `"all"` | 操作进入 More 菜单的方式 |
-| `overflowFrom` | `"start" \| "end"` | `"end"` | progressive 模式的收起方向 |
-| `availableWidth` | `number` | 容器实测宽度 | 外部提供的可用宽度；DataTable 用它避免每个单元格单独观察尺寸 |
+| `items` | `OverflowActionsItem[]` | `[]` | 默认内建操作与分隔项数组；action 提供 id、label，可选 icon/disabled/href/onAction，separator 提供 type="separator" 与 id。每个 id 唯一；children 存在时改用显式子项。 |
+| `compact` | `"auto" \| "none"` | `"auto"` | auto 在宽度不足且所有 Action 都有 icon 与 label 时先统一隐藏文字；none 跳过此步骤，直接按 overflow 转移操作。 |
+| `overflow` | `"all" \| "progressive"` | `"all"` | all 在放不下时将全部操作转入 More；progressive 按 overflowFrom 逐项转入，保留可容纳的操作。菜单展开时冻结布局。 |
+| `overflowFrom` | `"start" \| "end"` | `"end"` | progressive 模式从数据/组合顺序的开头或末尾依次转移操作；all 模式不区分方向。 |
+| `availableWidth` | `number` | —（实测容器宽度） | 外部给定可用于操作组布局的宽度，单位 px；提供后不再注册自身尺寸观察，适合 DataTable 复用列宽。 |
 | `moreLabel` | `string` | `"更多操作"` | More 按钮的无障碍名称 |
 | `align` | `"start" \| "end"` | `"end"` | Listbox 水平对齐 |
 | `disabled` | `boolean` | `false` | 禁用全部操作 |
-| `buttonProps` | `Omit<ButtonProps, 受控行为字段>` | 无 | 所有 Action Button 与 More Button 的组级默认 Props；可配置 variant / size / bare / emphasis / class / style 等视觉能力 |
-| `children` | `Snippet` | 无 | 显式组合模式内容 |
-| `parts` | `ComponentPartsOf` | 无 | 配置内建 Button / SelectButton / Listbox / MenuItem / Separator |
-| `onAction` | `(event: OverflowActionsActionEvent) => void` | 无 | 任一可见按钮或菜单项执行后的统一回调 |
+| `buttonProps` | `GlobalButtonProps` | — | 所有 Action、More 与隐藏测量副本共享的 Button 默认 Props；支持 variant/size/bare/emphasis/class/style，排除由操作组接管的内容、角色、点击、链接、禁用与名称字段。 |
+| `children` | `Snippet` | — | 声明直系 OverflowAction as="item" 与 Separator as="separator"；存在时替换 items 内建操作，结构项不作为独立溢出候选。 |
+| `parts` | `Parts` | — | 配置默认生成的 Button、SelectButton、Listbox、MenuItem、Separator；More 的 parts.SelectButton 高于组级 parts.Button。公开 Parts 结构与覆盖优先级见下文。 |
+| `onAction` | `(event: OverflowActionsActionEvent) => void` | — | 操作执行后回调：id 为稳定标识，source 为 "button" 或 "menu"；item 为匹配的内建数据（显式模式通常无），originalEvent 为可选鼠标事件。 |
 
 `OverflowAction` 的 `icon` 支持资源图标名称或 Snippet；MenuItem 自动复用相同 icon。内置资源图标使用 MenuItem 的默认 16px，文字使用 MenuItem 的默认 14px / 20px，不继承 More 触发按钮的 Icon-only 尺寸；自定义 Snippet 保留自身视觉。当前不提供菜单项图标或文字尺寸接口。`href` Action 在可见状态使用链接，在菜单中执行时导航到同一地址。每个 Action 的 `id` 在组内必须唯一。
 
 `buttonProps` 是组级 Button 默认值，并同时作用于完整 Action、Icon-only Action、隐藏测量副本与 More 触发按钮。`parts.Button` 继续作为所有 Action 与 More 的组级 Button 覆盖；`parts.SelectButton` 只覆盖 More，并高于前两者。More 的可见实例与隐藏测量副本使用同一套最终 Props，单独改变 variant、size、bare、class 或 style 后不会造成响应式测量漂移。
 
 Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button` → `OverflowAction` 直接 Props；More 的优先级为 `buttonProps` → `parts.Button` → `parts.SelectButton` → More 受控行为字段，越靠后优先级越高。未单独指定 More 样式时，它与组级 Action 使用同一 Button 样式；若没有任何组级样式，则使用 Button 默认的 `variant="gray"` 与 `size="sm"`。显式 `OverflowAction as="item"` 的直接 Props 只属于该外置 Action，父组件不会反向读取这些子项来推断 More 样式；因此所有外置 Action 都只在自身直接指定样式、而父级没有组级样式时，More 仍使用 Button 默认样式。
+
+### 数据类型与继承边界
+
+`OverflowActionsItem` 是两种数据的联合：操作为 `{ type?: "action"; id: string; label: string; icon?: string | Snippet; disabled?: boolean; href?: string; onAction?: () => void }`，结构项为 `{ type: "separator"; id: string }`。单项 onAction 在组级 onAction 之前调用。
+
+`GlobalButtonProps` 为 Button Props 排除 `children / as / iconOnly / disabled / href / onclick / aria-label / title`。`Parts` 为 `ComponentPartsOf<{ Button: typeof Button; SelectButton: typeof SelectButton; Listbox: typeof Listbox; MenuItem: typeof MenuItem; Separator: typeof Separator }>`。每个键配置对应默认子组件的公开 Props，完整覆盖顺序见上文。
+
+其余兼容 Frame Props 透传根容器，共享关键字参见 [FramePro](../../../pro/src/components/FramePro.md) 的 OSS 子集；不引入 PRO 专属能力。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
@@ -91,6 +99,10 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - [MenuItem.svelte](./MenuItem.svelte)
 
 ## 更新日志 (Changelog)
+
+### v1.0.2 (2026-09-02)
+
+- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 ### v1.0.1 (2026-08-29)
 

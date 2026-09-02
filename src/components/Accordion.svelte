@@ -1,6 +1,6 @@
 <!--
   Accordion 组件：可展开 / 收起的内容容器
-  v1.6.1
+  v1.6.2
 
   布局模型：复合管理布局。根层为 Frame，仅提供分组状态与 AccordionContext。
   内部内容由 AccordionItem 容器组成，单项内部使用 Frame as="title|content"。
