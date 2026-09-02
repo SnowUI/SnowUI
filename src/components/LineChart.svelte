@@ -1,6 +1,6 @@
 <!--
   LineChart 折线图组件 (PRO)
-  v1.4.0 (2026-09-01)
+  v1.4.2 (2026-09-02)
 
   职责:渲染带横坐标、纵坐标、网格、实线/虚线、面积填充、圆角转折线与可定制节点点样式的折线图。
   文档: ./LineChart.md
@@ -282,7 +282,7 @@
         alwaysShowHoverLabel = false,
         showHoverPanel = true,
         hoverPanelVariant = "light",
-        hoverPanelPlacement = "anchor-top",
+        hoverPanelPlacement = "pointer",
         showHoverPanelLabel = false,
         hoverMode = undefined,
         activeCellIndex = undefined,

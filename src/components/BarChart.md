@@ -1,6 +1,6 @@
 # BarChart (柱状图)
 
-> **版本**: v1.1.2
+> **版本**: v1.2.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。
@@ -12,7 +12,7 @@
 - **PRO Chart 原子组件**: `BarChart` 只负责柱状图本体，不内置标题、卡片背景、legend 或 toolbar。
 - **单元模型**: 一个分类项是一个 **bar unit**。单元统一控制柱粗细、圆角、方向和分类坐标；单元内部可以渲染单柱、多段、相叠柱或多根并排柱。
 - **多段式统一规则**: 三段式是多段式的特例。`mode="stack"` 使用 `segments` 渲染任意段数；`segmentGap={0}` 表示中间无间隔，`segmentGap>0` 表示分段之间有透明间隔且每段独立圆角。hover / focus / 常显数值只在最顶段上方显示一次，值为全部分段之和。
-- **相叠规则**: `mode="overlay"` 使用 `value` 作为前层，`backgroundValue` 作为后层。后层透明度固定为 10%，前层为 100%，二者同轴相叠。
+- **相叠规则**: `mode="overlay"` 使用 `bars` 的前两项有效数据，第一项为后层、第二项为前层；两层各自独立命名和取值，共享零基线同轴相叠，不累加。后层为 10% 不透明度、前层为 100%；前层可高于后层。
 - **并排规则**: `mode="group"` 使用 `bars` 在同一单元内并排。默认柱间距 `barGap=4`，颜色使用 Chart 默认色序，可扩展为多柱。
 - **方向规则**: `orientation="vertical"` 为纵向柱状图，分类轴在横向；`orientation="horizontal"` 为横向条形图，分类轴在纵向。所有柱模式都支持两个方向。
 - **坐标轴内建**: 坐标轴、刻度、网格线属于 BarChart 形态能力，放在组件内。
@@ -34,7 +34,7 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `data` | `BarChartItem[]` | 内置默认数据 | 分类单元数据 |
+| `data` | `BarChartItem[]` | 内置默认数据 | 分类数据；overlay 推荐用每类 bars 的前两项表示后层与前层，名称、数值、颜色和数字格式分别配置，详见数据结构。 |
 | `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | 图表方向 |
 | `mode` | `"single" \| "stack" \| "overlay" \| "group"` | `"single"` | 单元内部柱模式 |
 | `width` | `number \| string` | `800` | 图表整体宽度；支持 `100%`，内部按最终显示宽度重算几何 |
@@ -60,7 +60,7 @@
 | `alwaysShowHoverLabel` | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
 | `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前柱 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
-| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"anchor-top"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
+| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
 | `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
 | `hoverMode` | `"item" \| "cell"` | `"cell"` / 继承 `ChartGroup` | hover 命中模式；`cell` 时按分类中心左右半格生成整格命中区，同一分类单元内的所有柱 / 分段一起响应 |
 | `activeCellIndex` | `number \| null` | - | 受控当前 hover 分类单元；未传时可继承 `ChartGroup` |
@@ -137,7 +137,29 @@ interface BarChartItem {
   segments?: BarChartSegment[];
   bars?: BarChartBar[];
   backgroundValue?: number;
+  backgroundName?: string;
 }
+```
+
+`mode="overlay"` 的推荐数据是 `data[].bars`，每个分类传入两项真实数据柱：
+
+| 字段 | 默认 / 规则 | 描述 |
+| --- | --- | --- |
+| `data[].name` | 必填 | 分类名称，例如流量来源或月份；`xLabels` 可覆盖轴标签。 |
+| `data[].bars` | 未提供时兼容旧字段 | 按输入顺序取前两项有限数值数据，第一项后层、第二项前层；两者从同一零基线开始。传空数组则没有柱体，不回退旧字段；只有一项有效数据时作为 100% 不透明度的单柱显示。多余有效项不绘制，也不参与 domain。 |
+| `bars[].name` | 回退 `data[].name` | 数据系列名称，例如上一季度 / 本季度；用于 HoverPanel、hover 描述与读屏，不按绘制层硬编码名称。 |
+| `bars[].value` | 必填 | 原始数值，支持 `0`；前后层独立参与自动 domain。后层不固定高度，前层可大于后层，不相加、不互相钳制。 |
+| `bars[].color` | 回退分类颜色与图表调色板 | 当前数据柱的颜色；两层可同色或独立指定颜色，后层仍为 10% 不透明度。 |
+| `bars[].valueFormat` | 继承分类与组件数字格式 | 当前数据柱的数字格式，同时用于 hover 数值、HoverPanel 和读屏描述。 |
+
+旧字段 `value/backgroundValue/backgroundName` 仅在未传 `bars` 时生效：`backgroundValue` 指定真实后层值，名称使用 `backgroundName ?? name`；`value` 指定前层值，名称使用 `name`。未传 `backgroundValue` 时只渲染前层，不再复制前层值生成一根虚构后层。新代码应使用 `bars`；其他模式忽略 `backgroundValue/backgroundName`。
+
+```svelte
+<BarChart mode="overlay" data={[
+  { name: 'Organic search', bars: [{ name: 'Previous quarter', value: 8400 }, { name: 'Current quarter', value: 10200 }] },
+  { name: 'Direct traffic', bars: [{ name: 'Previous quarter', value: 7600 }, { name: 'Current quarter', value: 6800 }] },
+  { name: 'Referrals', bars: [{ name: 'Previous quarter', value: 4200 }, { name: 'Current quarter', value: 5100 }] }
+]} />
 ```
 
 数值格式优先级：`labelFormatter → segment/bar.valueFormat → item.valueFormat → 组件 valueFormat → NumberFormatContext → NumberFormats 默认值`。
@@ -255,6 +277,19 @@ SVG 图层从下到上为：
 ## 8. AI Zone
 
 ### Changelog
+
+### v1.2.0 (2026-09-02)
+
+- overlay 复用 `bars` 表达两项独立对比数据，自动 domain、颜色、数字格式、命中和面板统一消费相同数据；支持后层逐项变化和前层超过后层。
+- 保留旧字段兼容，未命名后层回退分类名，移除 `Background` 硬编码；缺少后层值时不再复制前层数据。
+
+### v1.1.4 (2026-09-02)
+
+- 新增可选的 `data[].backgroundName`，用于业务化命名 overlay 后层；未提供时保留原名称，几何、颜色与 hover 行为不变。
+
+### v1.1.3 (2026-09-02)
+
+- HoverPanel 默认定位改为 `pointer`，随鼠标移动；区域 hover 默认保持 `cell`，显式的 placement / hoverMode 配置继续优先。
 
 - 2026-09-02 — HoverPanel 改为默认开启，默认外观保持 light。
 - 2026-09-02 v1.1.2 — `stack` 数值 label 改为仅在最顶段显示一次并展示全部分段总和，颜色恢复默认 Black/100%；稀疏 X label 自动忽略空项抽稀；HoverPanel 保留 label 与数值行区域 `2px` 间距，名称与数值间距改为 `8px`。

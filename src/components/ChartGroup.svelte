@@ -1,6 +1,6 @@
 <!--
   ChartGroup 图表组合容器 (PRO)
-  v0.2.2 (2026-09-02)
+  v0.2.3 (2026-09-02)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。
   文档: ./ChartGroup.md
@@ -113,7 +113,7 @@
         showHoverLabel = undefined,
         alwaysShowHoverLabel = false,
         hoverPanelVariant = "light",
-        hoverPanelPlacement = "anchor-side",
+        hoverPanelPlacement = "pointer",
         showHoverPanelLabel = false,
         children,
         class: userClass = "",

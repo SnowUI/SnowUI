@@ -1,6 +1,6 @@
 # ChartGroup 图表组合容器
 
-> **版本**: v0.2.2
+> **版本**: v0.2.3
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。
@@ -58,7 +58,7 @@
 | `showHoverLabel` | `boolean` | — | 统一控制子图数值标签；未传时沿用子图配置并根据共享面板推导默认显示。显式 true/false 优先于子图同名配置；true 允许数值标签与共享面板同时显示。 |
 | `alwaysShowHoverLabel` | `boolean` | `false` | 为子图开启数值标签常显；与子图自身 alwaysShowHoverLabel 按逻辑或合并，因此组级 false 不关闭子图显式常显。仍受最终 showHoverLabel 控制。 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | 唯一共享面板的外观：light 为浅色，dark 为深色，surface 为带背景模糊的表面；不修改柱体、折线或子图数值标签颜色。 |
-| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"anchor-side"` | 共享面板定位：anchor-side 跟随数据图形侧边，anchor-top 对齐最高数据锚点，pointer 跟随指针；pin-* 固定在绘图区对应方位。面板碰撞处理由共享 ChartHoverPanel 完成。 |
+| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | 共享面板定位：anchor-side 跟随数据图形侧边，anchor-top 对齐最高数据锚点，pointer 跟随指针；pin-* 固定在绘图区对应方位。面板碰撞处理由共享 ChartHoverPanel 完成。 |
 | `showHoverPanelLabel` | `boolean` | `false` | 在共享面板顶部显示当前分类名称；优先读取 xLabels 中的激活项，没有对应标签时回退到首个子图面板 label。 |
 | `children` | `Snippet` | — | 显式组合子图的无参数 Snippet；不会自动生成 BarChart、LineChart、标题或图例。子图通过各自 width/height 和根定位样式共享同一画布。 |
 | `loading` | `boolean` | — | 透传根 Frame 的 loading 状态，只控制组合宿主的加载呈现，不负责数据请求或子图出现时间轴。 |
@@ -189,6 +189,10 @@ interface ChartGroupContext {
 - **归属判断**: PRO。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
 
 ## 更新日志 (Changelog)
+
+### v0.2.3 (2026-09-02)
+
+- HoverPanel 默认定位改为 `pointer`，随鼠标移动；区域 hover 默认保持 `cell`，显式的 placement / hoverMode 配置继续优先。
 
 ### 2026-09-02
 

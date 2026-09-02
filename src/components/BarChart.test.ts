@@ -156,15 +156,15 @@ BC-04
 alwaysShowHoverLabel={true}
 hoverPanelPlacement="anchor-top"
     data={[
-        { name: "Design", value: 72, backgroundValue: 100 },
-        { name: "Code", value: 58, backgroundValue: 100 },
-        { name: "QA", value: 84, backgroundValue: 100 },
-        { name: "Ship", value: 46, backgroundValue: 100 }
+        { name: "Organic search", bars: [{ name: "Previous quarter", value: 84 }, { name: "Current quarter", value: 102 }] },
+        { name: "Direct traffic", bars: [{ name: "Previous quarter", value: 76 }, { name: "Current quarter", value: 68 }] },
+        { name: "Referrals", bars: [{ name: "Previous quarter", value: 42 }, { name: "Current quarter", value: 51 }] },
+        { name: "Social", bars: [{ name: "Previous quarter", value: 58 }, { name: "Current quarter", value: 46 }] }
     ]}
 />
 </Frame>`,
         expected: {
-            render: "每个单元后层柱透明度为 10%;前层柱为 100%;双层同轴相叠且都使用同一圆角",
+            render: "上一季度与本季度流量分别命名和取值;各分类后层高度不同且前层可超过后层;后层 10%、前层 100%,共享零基线与自动 domain",
             interaction: "后层 10% 柱 hover 使用 Black/4% overlay;前层 100% 柱 hover 使用 filled Button 同款 StaticWhite/20% overlay",
         },
         logic: ["Overlay", "BackgroundOpacity", "ForegroundOpacity"],

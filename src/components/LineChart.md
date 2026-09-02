@@ -1,6 +1,6 @@
 # LineChart (折线图)
 
-> **版本**: v1.4.1
+> **版本**: v1.4.2
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
@@ -48,7 +48,7 @@
 | `alwaysShowHoverLabel` | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
 | `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前节点 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
-| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"anchor-top"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
+| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
 | `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
 | `hoverMode` | `"item" \| "cell"` | `"cell"` / 继承 `ChartGroup` | hover 命中模式；`cell` 时按分类点位中心左右半格生成整格命中区，并响应共享 hover |
 | `activeCellIndex` | `number \| null` | - | 受控当前 hover 分类点位；未传时可继承 `ChartGroup` |
@@ -289,6 +289,10 @@ SVG 图层从下到上为：
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.4.2 (2026-09-02)
+
+- HoverPanel 默认定位改为 `pointer`，随鼠标移动；区域 hover 默认保持 `cell`，显式的 placement / hoverMode 配置继续优先。
 
 ### 2026-09-02
 

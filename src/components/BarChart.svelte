@@ -1,6 +1,6 @@
 <!--
   BarChart 柱状图组件 (PRO)
-  v1.1.0 (2026-09-01)
+  v1.2.0 (2026-09-02)
 
   职责:渲染支持纵向/横向、多段、相叠、多柱并排与坐标轴的柱状图。
   文档: ./BarChart.md
@@ -111,6 +111,7 @@
         segments?: BarChartSegment[];
         bars?: BarChartBar[];
         backgroundValue?: number;
+        backgroundName?: string;
     }
 
     export interface BarChartValueLabelContext {
@@ -305,7 +306,7 @@
         alwaysShowHoverLabel = false,
         showHoverPanel = true,
         hoverPanelVariant = "light",
-        hoverPanelPlacement = "anchor-top",
+        hoverPanelPlacement = "pointer",
         showHoverPanelLabel = false,
         hoverMode = undefined,
         activeCellIndex = undefined,
@@ -1043,10 +1044,7 @@
                     return item.bars.map((bar) => bar.value);
                 }
                 if (chartMode === "overlay") {
-                    return [
-                        item.value ?? 0,
-                        item.backgroundValue ?? item.value ?? 0,
-                    ];
+                    return resolveUnitBars(item, chartMode).map((bar) => bar.value);
                 }
                 return [item.value ?? 0];
             })
@@ -1314,7 +1312,7 @@
                     cornerFlags,
                 );
                 const itemOpacity =
-                    chartMode === "overlay" && unitIndex === 0 ? 0.1 : opacity;
+                    chartMode === "overlay" && units.length > 1 && unitIndex === 0 ? 0.1 : opacity;
                 const visualOpacity =
                     chartMode === "stack" && !(unit.color ?? item.color)
                         ? resolveMonochromeFadeOpacity(
@@ -1406,20 +1404,26 @@
             return item.bars.filter((bar) => Number.isFinite(bar.value));
         }
         if (chartMode === "overlay") {
-            const foregroundValue = item.value ?? 0;
+            // 两层复用数据柱协议：同一份数据同时决定 domain、图形与悬浮信息。
+            if (item.bars !== undefined) {
+                return item.bars.filter((bar) => Number.isFinite(bar.value)).slice(0, 2);
+            }
+            // 兼容旧字段，但不按绘制层命名，也不制造未提供的后层数据。
+            const foreground = {
+                name: item.name,
+                value: item.value ?? 0,
+                color: item.color,
+                valueFormat: item.valueFormat,
+            };
+            if (item.backgroundValue === undefined) return [foreground];
             return [
                 {
-                    name: "Background",
-                    value: item.backgroundValue ?? Math.max(foregroundValue, 0),
+                    name: item.backgroundName ?? item.name,
+                    value: item.backgroundValue,
                     color: item.color,
                     valueFormat: item.valueFormat,
                 },
-                {
-                    name: item.name,
-                    value: foregroundValue,
-                    color: item.color,
-                    valueFormat: item.valueFormat,
-                },
+                foreground,
             ];
         }
         return [
