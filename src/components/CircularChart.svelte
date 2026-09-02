@@ -180,7 +180,7 @@
         maxItems = 10,
         showCenterLabel = true,
         hoverMode = "cell",
-        showHoverPanel = false,
+        showHoverPanel = true,
         hoverPanelVariant = "light",
         hoverPanelPlacement = "pointer",
         showHoverPanelLabel = false,
@@ -891,6 +891,8 @@
     }
 
     function isAngleInArc(angle: number, start: number, end: number) {
+        // 完整圆周归一化后起止角相同，但所有方向都属于这个扇区。
+        if (end - start >= Math.PI * 2) return true;
         const normalizedAngle = normalizeAngle(angle);
         const normalizedStart = normalizeAngle(start);
         const normalizedEnd = normalizeAngle(end);

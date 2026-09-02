@@ -55,7 +55,7 @@
 | `maxItems` | `number` | `10` | 最多显示项数，内部上限固定为 10 |
 | `showCenterLabel` | `boolean` | `true` | hover / focus 时是否显示中心标签 |
 | `hoverMode` | `"cell" \| "item"` | `"cell"` | hover 命中模式；`cell` 使用整图角度命中，扇区间隔处也保持当前扇区，`item` 仅命中可见扇区图形 |
-| `showHoverPanel` | `boolean` | `false` / 有 `center-label` 时自动开启 | 是否开启 Chart hover 面板，内容按当前扇区自动生成；默认关闭时 hover / focus 显示中心 hover label |
+| `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前扇区自动生成；默认开启并保留中心 hover label；无静态 center-label 时可设为 false 关闭面板，有静态 center-label 时仍自动开启 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
 | `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；所有图表都可使用 `pointer` |
 | `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前扇区名称 |
@@ -256,6 +256,10 @@ interface GaugeChartItem {
 ---
 
 ## 7. 更新日志 (Changelog)
+
+### 2026-09-02
+
+- HoverPanel 改为默认开启，默认外观保持 light。
 
 ### v1.3.0 (2026-06-04)
 

@@ -280,7 +280,7 @@
         showGuides = undefined,
         showHoverLabel = undefined,
         alwaysShowHoverLabel = false,
-        showHoverPanel = false,
+        showHoverPanel = true,
         hoverPanelVariant = "light",
         hoverPanelPlacement = "anchor-top",
         showHoverPanelLabel = false,

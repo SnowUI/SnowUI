@@ -168,7 +168,7 @@
         maxItems = 10,
         showCenterLabel = true,
         hoverMode = "cell",
-        showHoverPanel = false,
+        showHoverPanel = true,
         hoverPanelVariant = "light",
         hoverPanelPlacement = "pointer",
         showHoverPanelLabel = false,

@@ -286,4 +286,14 @@ hoverPanelPlacement="anchor-side"
         },
         logic: ["HoverPanel", "SurfaceVariant", "PinPlacement", "HoverLabelCoexist"],
     },
+    {
+        name: "BC-09: 默认开启亮色 HoverPanel",
+        code: `BC-09
+<BarChart data={[{ name: "Revenue", value: 42 }]} />`,
+        expected: {
+            render: "不传 showHoverPanel 时默认启用 light 面板；未 hover / focus 时不显示",
+            interaction: "鼠标悬停或键盘聚焦数据项时显示面板；面板显示当前数据项的信息",
+        },
+        logic: ["HoverPanel", "Default", "LightVariant", "Keyboard"],
+    },
 ];

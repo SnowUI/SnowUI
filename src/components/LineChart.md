@@ -46,7 +46,7 @@
 | `showGuides` | `boolean` | `false` / 继承 `ChartGroup` | 是否允许序列绘制节点垂直辅助线 |
 | `showHoverLabel` | `boolean` | 按 `showHoverPanel` 推导 | hover / focus 节点时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 |
 | `alwaysShowHoverLabel` | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
-| `showHoverPanel` | `boolean` | `false` | 是否开启 Chart hover 面板，内容按当前节点 / cell 自动生成；默认关闭时 hover / focus 显示 hover label |
+| `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前节点 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
 | `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"anchor-top"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
 | `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
@@ -150,7 +150,7 @@ interface LineChartSeries {
 
 Area 填充说明：
 
-- `area: true` 使用当前序列线色生成纵向渐变，顶部透明度固定为 `0.08`，底部渐变到 `0`。
+- `area: true` 使用当前序列线色生成纵向渐变，顶部不透明度固定为 `0.04`（4%），底部渐变到 `0`（全透明）。
 - Area 不提供颜色、透明度、渐变或 baseline 自定义；需要变化时通过线色或纵轴 domain 间接影响。
 - `area` 与 `strokeStyle` 独立，可组合出“虚线 + 半透明面积填充”。
 
@@ -289,6 +289,10 @@ SVG 图层从下到上为：
 ---
 
 ## 更新日志 (Changelog)
+
+### 2026-09-02
+
+- HoverPanel 改为默认开启，默认外观保持 light。
 
 ### v1.4.1 (2026-09-02)
 

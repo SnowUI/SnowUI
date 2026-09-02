@@ -294,4 +294,17 @@ CG-01
         },
         logic: ["ChartGroup", "HoverPanel", "PointerPlacement", "HoverLabelCoexist"],
     },
+    {
+        name: "CG-07: 默认开启亮色 HoverPanel",
+        code: `CG-07
+<ChartGroup width={320} height={200} xLabels={["Jan"]} yMax={100}>
+    <BarChart class="absolute top-0 left-0" width={320} height={200} data={[{ name: "Jan", value: 42 }]} />
+    <LineChart class="absolute top-0 left-0" width={320} height={176} showXAxis={false} xAxisMode="cell" series={[{ name: "Revenue", data: [64] }]} />
+</ChartGroup>`,
+        expected: {
+            render: "不传 showHoverPanel 时默认启用 light 面板；未 hover / focus 时不显示",
+            interaction: "鼠标悬停或键盘聚焦数据项时显示面板；ChartGroup 只显示一个合并子图数据的共享面板",
+        },
+        logic: ["HoverPanel", "Default", "LightVariant", "Keyboard"],
+    },
 ] as const;

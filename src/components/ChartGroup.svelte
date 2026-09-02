@@ -1,13 +1,13 @@
 <!--
   ChartGroup 图表组合容器 (PRO)
-  v0.2.0 (2026-09-01)
+  v0.2.2 (2026-09-02)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。
   文档: ./ChartGroup.md
 -->
 
 <script lang="ts">
-    import { onDestroy, setContext, type Snippet } from "svelte";
+    import { onDestroy, setContext, untrack, type Snippet } from "svelte";
     import { Frame, type FrameProps, type RenderHints } from "@snowui-design-system/components";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
     import {
@@ -109,7 +109,7 @@
         defaultActiveCellIndex = null,
         onCellHoverChange,
         showHitLayer = true,
-        showHoverPanel = false,
+        showHoverPanel = true,
         showHoverLabel = undefined,
         alwaysShowHoverLabel = false,
         hoverPanelVariant = "light",
@@ -419,10 +419,11 @@
         resolveInset: () => number,
     ) {
         plotTopInsetResolvers.set(source, resolveInset);
-        plotTopInsetVersion += 1;
+        // 注册是写入操作，不能让子图的 effect 订阅注册版本并互相触发重注册。
+        untrack(() => { plotTopInsetVersion += 1; });
         return () => {
             if (!plotTopInsetResolvers.delete(source)) return;
-            plotTopInsetVersion += 1;
+            untrack(() => { plotTopInsetVersion += 1; });
         };
     }
 

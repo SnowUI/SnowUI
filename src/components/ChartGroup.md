@@ -1,6 +1,6 @@
 # ChartGroup 图表组合容器
 
-> **版本**: v0.2.1
+> **版本**: v0.2.2
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。
@@ -31,43 +31,45 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `width` | `number \| string` | `800` | 组合画布整体宽度 |
-| `height` | `number \| string` | `400` | 组合画布整体高度 |
-| `xLabels` | `string[]` | `[]` | 分类单元格标签；用于生成共享 cell hit layer、aria-label，并可下发给子图表作为横坐标 label |
-| `yMin` | `number` | - | 共享 Y 轴 domain 最小值 |
-| `yMax` | `number` | - | 共享 Y 轴 domain 最大值 |
-| `yTicks` | `number[]` | - | 共享显式 Y 轴刻度 |
-| `yTickCount` | `number` | `6` | 共享自动 Y 轴刻度目标数量 |
-| `yTickFormatter` | `(value: number) => string` | - | 共享 Y 轴 label 格式化 |
-| `showXAxis` | `boolean` | `true` | 下发给子图表的横轴显示开关 |
-| `showYAxis` | `boolean` | `false` | 下发给子图表的纵轴显示开关 |
-| `showGrid` | `boolean` | `false` | 下发给子图表的网格线显示开关 |
-| `showGuides` | `boolean` | `false` | 下发给子图表的辅助线显示开关 |
-| `xAxisMode` | `"edge" \| "cell"` | `"edge"` | 下发给 LineChart 的横坐标点位模型 |
-| `xLabelAutoCull` | `boolean` | `true` | 共享 X 轴 label 自动抽稀开关 |
-| `xMaxLabelCount` | `number` | - | 共享 X 轴最多显示 label 数量 |
-| `yLabelAutoCull` | `boolean` | `true` | 共享 Y 轴 label 自动抽稀开关 |
-| `yMaxLabelCount` | `number` | - | 共享 Y 轴最多显示 label 数量 |
-| `plotBounds` | `{ top?: number; right?: number; bottom?: number; left?: number }` | `{ right: 0, bottom: 24, left: 0 }` + 动态 top | 共享 cell hit layer 覆盖的绘图区边界；`top` 只能增加子图计算出的安全区 |
-| `hoverMode` | `"item" \| "cell"` | `"cell"` | 共享 hover 模式；`cell` 由容器命中层触发，`item` 不绘制共享 cell 命中层 |
-| `activeCellIndex` | `number \| null` | - | 受控当前 hover cell index |
-| `defaultActiveCellIndex` | `number \| null` | `null` | 非受控初始 hover cell index |
-| `onCellHoverChange` | `(index: number \| null) => void` | - | hover cell 变化回调 |
-| `showHitLayer` | `boolean` | `true` | 是否渲染顶层 cell 命中层 |
-| `showHoverPanel` | `boolean` | `false` | 是否开启共享 Chart hover 面板；默认关闭时子图表使用自身 hover label |
-| `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
-| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"anchor-side"` | hover 面板定位；默认位于 plot area 左侧中线，左侧碰撞时改右侧 |
-| `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
-| `children` | `Snippet` | - | 子图表内容 |
-| `loading` | `boolean` | - | Frame loading 协议 |
-| `skeleton` | `boolean` | - | Frame skeleton 协议 |
-| `renderHints` | `RenderHints` | - | 骨架屏渲染提示 |
-| `enableResponsive` | `boolean` | `true` | 是否启用 Frame responsive |
-| `enableContext` | `boolean` | `true` | 是否启用 Frame context |
-| `enableScaleObserver` | `boolean` | `false` | 是否启用 Frame scale observer |
-| `enableDefaultMotion` | `boolean` | `true` | 是否启用 Frame 默认动效 |
-| `class` | `string` | `""` | 根层附加 class |
-| `style` | `string` | `""` | 根层附加 style |
+| `width` | `number \| string` | `800` | 根画布宽度；数字按 px 语义转换为 CSS 长度，字符串支持百分比等 CSS 长度。共享命中区与面板以最终实测尺寸计算；子图仍须自行设置 width，叠加时通常都传 100%。 |
+| `height` | `number \| string` | `400` | 根画布高度；支持数字或 CSS 长度。百分比高度要求父容器有确定高度。此值不自动配置子图高度；关闭 X 轴的叠加子图需扣除唯一 X 轴占用的 24px。 |
+| `xLabels` | `string[]` | `[]` | 完整分类标签，数组顺序就是共享 activeCellIndex 的索引；同时作为子图未指定 xLabels 时的回退。抽稀不改变此数组和命中数量；空数组仍保留一个回退命中单元格。 |
+| `yMin` | `number` | — | 向子图下发 Y 轴下界；未传时各子图按自身数据计算。组合图需显式统一上下界，ChartGroup 不汇总所有子图的数据 domain。子图显式值优先。 |
+| `yMax` | `number` | — | 向子图下发 Y 轴上界；未传时各子图分别按自身数据计算最大值，可能产生不同标尺。比较同单位数据时显式设置共同上界；子图显式值优先。 |
+| `yTicks` | `number[]` | — | 向子图下发显式数值刻度数组，用于替代自动 ticks；显示数量仍可抽稀，子图显式 yTicks 优先。 |
+| `yTickCount` | `number` | `6` | 自动刻度的目标数量，非保证精确数量；实际刻度由子图 domain、nice step 和标签抽稀共同决定。显式 yTicks 优先。 |
+| `yTickFormatter` | `(value: number) => string` | — | 将每个数值刻度转换为显示字符串；只改变轴文案，不改变原始数值、domain 或悬浮值。子图显式 formatter 优先，未传时使用子图默认格式。 |
+| `showXAxis` | `boolean` | `true` | 下发 X 轴显示默认值，包括轴线和标签；ChartGroup 自身不绘制坐标轴。叠加组合只让一个子图开启，其他子图显式关闭。 |
+| `showYAxis` | `boolean` | `false` | 下发 Y 轴标签显示默认值，并参与组级顶部安全区计算。子图显式值优先；左右轴留白由各子图自行测量，容器不自动对齐不同的 Y 轴标签宽度。 |
+| `showGrid` | `boolean` | `false` | 下发网格线显示默认值，网格由子图绘制并跟随可见 Y ticks；叠加时只保留一个网格绘制者。子图显式值优先。 |
+| `showGuides` | `boolean` | `false` | 下发辅助线开关；LineChart 可绘制数据点辅助线，BarChart 当前没有额外 guide 图形。子图显式配置优先。 |
+| `xAxisMode` | `"edge" \| "cell"` | `"edge"` | 下发 LineChart 点位模型：edge 将首尾点放在绘图区两端，cell 放在分类格中心。BarChart 叠加折线时使用 cell；容器共享命中区域始终按分类格划分。 |
+| `xLabelAutoCull` | `boolean` | `true` | 下发 X 轴标签自动抽稀开关，依据子图实测文字与可用宽度减少可见标签；不删除数据、路径、分类格或共享索引。子图显式值优先。 |
+| `xMaxLabelCount` | `number` | — | 下发 X 轴可见标签数量上限，子图可因空间不足显示更少标签；不改变完整分类和可悬浮数据，子图显式值优先。 |
+| `yLabelAutoCull` | `boolean` | `true` | 下发 Y 轴标签自动抽稀开关，空间不足时减少可见标签；实际布局由各子图处理，子图显式值优先。 |
+| `yMaxLabelCount` | `number` | — | 下发 Y 轴可见标签数量上限；未提供 yTicks 时也参与子图自动刻度数量计算，子图显式值优先。 |
+| `plotBounds` | `{ top?: number; right?: number; bottom?: number; left?: number }` | `{}` | 相对根画布的绘图区内缩，字段 top/right/bottom/left 均为 px 数字。用于共享命中与面板 bounds；top 只能增加所有子图的最大安全区。其余边不改写子图自身几何，关闭全部 X 轴时可显式设 bottom: 0。 |
+| `hoverMode` | `"item" \| "cell"` | `"cell"` | cell 协调同一分类的共享 hover；item 不创建组级 cell 命中层，保留子图自身命中。此值也作为子图 hoverMode 的回退；子图显式值优先。 |
+| `activeCellIndex` | `number \| null` | — | 受控分类索引，按 xLabels 从 0 开始；null 明确表示没有激活项，undefined 使用内部非受控状态。非 bindable；受控调用方需在 onCellHoverChange 中回写值。 |
+| `defaultActiveCellIndex` | `number \| null` | `null` | 仅初始化内部非受控索引，后续修改不重置状态；activeCellIndex 有定义时此值不参与当前选择。null 表示初始无激活项。 |
+| `onCellHoverChange` | `(index: number \| null) => void` | — | 共享索引发生变化时接收新索引或 null；由指针、分类格焦点及子图交互触发。内部交互将有限数值限制在有效分类范围内；受控模式只通知，不替调用方改值，无取消返回值。 |
+| `showHitLayer` | `boolean` | `true` | 控制组级 SVG 分类命中层；仅在 hoverMode=cell 且 showHoverPanel=false 时渲染。开启共享面板后改由根层指针坐标与子图命中处理，false 不等于禁用子图交互。 |
+| `showHoverPanel` | `boolean` | `true` | 将子图上报的数据合并为唯一共享面板；cell 模式下根层指针位置更新当前分类。默认开启；关闭时不显示共享面板，子图按自身 showHoverPanel 配置显示独立面板；若需要数值标签，可同时关闭子图面板或显式设置 showHoverLabel；空数据没有面板。 |
+| `showHoverLabel` | `boolean` | — | 统一控制子图数值标签；未传时沿用子图配置并根据共享面板推导默认显示。显式 true/false 优先于子图同名配置；true 允许数值标签与共享面板同时显示。 |
+| `alwaysShowHoverLabel` | `boolean` | `false` | 为子图开启数值标签常显；与子图自身 alwaysShowHoverLabel 按逻辑或合并，因此组级 false 不关闭子图显式常显。仍受最终 showHoverLabel 控制。 |
+| `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | 唯一共享面板的外观：light 为浅色，dark 为深色，surface 为带背景模糊的表面；不修改柱体、折线或子图数值标签颜色。 |
+| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"anchor-side"` | 共享面板定位：anchor-side 跟随数据图形侧边，anchor-top 对齐最高数据锚点，pointer 跟随指针；pin-* 固定在绘图区对应方位。面板碰撞处理由共享 ChartHoverPanel 完成。 |
+| `showHoverPanelLabel` | `boolean` | `false` | 在共享面板顶部显示当前分类名称；优先读取 xLabels 中的激活项，没有对应标签时回退到首个子图面板 label。 |
+| `children` | `Snippet` | — | 显式组合子图的无参数 Snippet；不会自动生成 BarChart、LineChart、标题或图例。子图通过各自 width/height 和根定位样式共享同一画布。 |
+| `loading` | `boolean` | — | 透传根 Frame 的 loading 状态，只控制组合宿主的加载呈现，不负责数据请求或子图出现时间轴。 |
+| `skeleton` | `boolean` | — | 透传根 Frame 的骨架呈现开关；须配合 loading 才进入加载占位，单独设 true 不会隐藏图表。未传时沿用 Frame 的继承与默认值，骨架形状来自 renderHints。 |
+| `renderHints` | `RenderHints` | — | 配置根骨架的 variant、width、height、radius；未指定字段分别回退为 rect、画布宽高和 0.75rem。不能替代真实画布 width/height。 |
+| `enableResponsive` | `boolean` | `true` | 是否开启根 Frame 的响应能力；图表画布的实测尺寸监听独立存在，百分比 width/height 不依赖此开关。 |
+| `enableContext` | `boolean` | `true` | 是否开启根 Frame 通用 Context 能力；不关闭 ChartGroup 为子图提供的共享分类、轴和悬浮协议。 |
+| `enableScaleObserver` | `boolean` | `false` | 根 Frame scale observer 的兼容开关，默认关闭；不控制图表自身实测尺寸监听。 |
+| `enableDefaultMotion` | `boolean` | `true` | 是否启用根 Frame 的默认动效；不会统一开启或关闭子图自身 appearance 动效，子图使用各自公开动效 Props 和实例方法。 |
+| `class` | `string` | `""` | 附加到根 Frame 的 class，与内部根类名合并；不下发给子图表。 |
+| `style` | `string` | `""` | 根 Frame 的追加 inline style，位于画布尺寸变量声明之后；用于宿主定位等公开覆盖，不下发给子图内部。 |
 
 其余未声明属性会透传给根层 `Frame`。
 
@@ -145,7 +147,7 @@ interface ChartGroupContext {
 ## 5. 无障碍与 Frame 集成
 
 - 根层使用 `role="group"` 和 `aria-label="组合图表"`。
-- `hoverMode="cell"` 时，每个 cell hit rect 使用 `role="button"`、`tabindex="0"` 和分类 label 作为 `aria-label`。
+- 未开启共享面板且 `hoverMode="cell"`、`showHitLayer=true` 时，每个 cell hit rect 使用 `role="button"`、`tabindex="0"` 和分类 label 作为 `aria-label`。
 - 支持 `loading`、`skeleton`、`renderHints`。
 - 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
 - `class`、`style` 与未声明属性透传到根层 Frame。
@@ -155,10 +157,11 @@ interface ChartGroupContext {
 ## 6. 示例
 
 ```svelte
-<ChartGroup width={800} height={400} xLabels={labels}>
-  <BarChart class="absolute top-0 left-0 z-0" data={bars} />
+<ChartGroup width="100%" height={400} xLabels={labels} xAxisMode="cell" yMin={0} yMax={120}>
+  <BarChart style="position: absolute; inset: 0;" width="100%" height={400} data={bars} />
   <LineChart
-    class="absolute top-0 left-0 z-10"
+    style="position: absolute; top: 0; left: 0; z-index: 1;"
+    width="100%"
     height={376}
     showXAxis={false}
     showYAxis={false}
@@ -186,6 +189,15 @@ interface ChartGroupContext {
 - **归属判断**: PRO。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
 
 ## 更新日志 (Changelog)
+
+### 2026-09-02
+
+- HoverPanel 改为默认开启，默认外观保持 light。
+
+### v0.2.2 (2026-09-02)
+
+- 修复多个子图注册顶部安全区时相互触发 effect 重注册，导致页面忙循环的问题；注册与清理不订阅内部版本，动态安全区仍由子图的响应式 resolver 更新。
+- 补全全部具名 Property 的行为、优先级和限制，补充 showHoverLabel 与 alwaysShowHoverLabel；同步 Site 的拟真组合示例。
 
 ### v0.2.1 (2026-09-02)
 

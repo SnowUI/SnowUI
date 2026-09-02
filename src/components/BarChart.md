@@ -58,7 +58,7 @@
 | `showGuides` | `boolean` | `false` / 继承 `ChartGroup` | 保留 Chart API 命名；当前不绘制额外 guide |
 | `showHoverLabel` | `boolean` | 按 `showHoverPanel` 推导 | hover / focus 柱体时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 |
 | `alwaysShowHoverLabel` | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
-| `showHoverPanel` | `boolean` | `false` | 是否开启 Chart hover 面板，内容按当前柱 / cell 自动生成；默认关闭时 hover / focus 显示 hover label |
+| `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前柱 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
 | `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"anchor-top"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
 | `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
@@ -256,6 +256,7 @@ SVG 图层从下到上为：
 
 ### Changelog
 
+- 2026-09-02 — HoverPanel 改为默认开启，默认外观保持 light。
 - 2026-09-02 v1.1.2 — `stack` 数值 label 改为仅在最顶段显示一次并展示全部分段总和，颜色恢复默认 Black/100%；稀疏 X label 自动忽略空项抽稀；HoverPanel 保留 label 与数值行区域 `2px` 间距，名称与数值间距改为 `8px`。
 - 2026-09-02 v1.1.1 — 顶部数值 label 不再把安全区增至 `28px`，仍保持柱顶上方 `4px` 并允许溢出绘图区顶边。
 - 2026-09-01 v1.1.0 — BarChart 改为按根层最终显示尺寸自行响应；柱宽下限为 `2px`，柱间距下限为 `4px`；修复短横坐标 label 在 cell 小于 `20px` 时仍被误判为可容纳的问题；横坐标抽稀不再删除柱体，并为常驻顶部数值增加独立自动抽稀。
