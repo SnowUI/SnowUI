@@ -58,7 +58,7 @@ import { AdaptiveContrastMask } from '@snowui-design-system/components/lib/adapt
 
 组件必须在开启时才渲染遮罩、登记表面；关闭时不启动该能力专属 Observer、监听或持续测量。渲染层不创建 Portal、ResizeObserver、timer 或 rAF。背景 transition 结束后刷新最终色，不承诺逐帧采样过渡色。
 
-独立导入其他 OSS 组件不依赖此模块。接入组件的动态 boolean 分支仍可能保留遮罩静态代码，不能宣称传 false 就产生零字节。2026-09-03 使用 Site 的 Vite 8.2.1 / Svelte 构建三个独立入口，遍历入口 chunk 的静态依赖：普通 Button 的反白模块集合为空；LineChart 的开/关入口都保留同一组共享模块，Rollup `renderedLength` 合计 4,726 字符（颜色模块 418，遮罩 4,308，转出入口 0）。这是 tree-shaking 后、最终压缩前的模块代码长度，不是网络传输增量或 gzip 包体。默认关闭无需初始化的边界由真实浏览器关闭/卸载测试验证。
+独立导入其他 OSS 组件不依赖此模块。接入组件的动态 boolean 分支仍可能保留遮罩静态代码，不能宣称传 false 就产生零字节。2026-09-03 使用 Site 的 Vite 8.2.1 / Svelte 构建三个独立入口，遍历入口 chunk 的静态依赖：普通 Button 的反白模块集合为空；LineChart 的开/关入口都保留同一组共享模块，Rollup `renderedLength` 合计 4,726 字符（颜色模块 418，遮罩 4,308，转出入口 0）。这是 tree-shaking 后、最终压缩前的模块代码长度，不是网络传输增量或 gzip 包体。显式关闭无需初始化的边界由真实浏览器关闭/卸载测试验证。
 
 ## 维护与验收
 
