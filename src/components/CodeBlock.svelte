@@ -1,6 +1,6 @@
 <!--
   CodeBlock 组件：代码块显示，支持行号、复制、全屏放大
-  v1.6.3
+  v1.7.0
 
   布局模型：默认态为复合管理布局；singleLine 变体为槽位宿主布局
 
@@ -25,6 +25,7 @@
 </script>
 
 <script lang="ts">
+    import { formatCodeBlock } from "../internal/code-block/format";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Indicator from "./Indicator.svelte";
     import CopyButton from "./CopyButton.svelte";
@@ -124,6 +125,8 @@
         code?: string;
         /** 语言标识，显示在工具栏 */
         language?: string;
+        /** 是否自动格式化展示与复制内容；默认开启，singleLine 保留原文 */
+        format?: boolean;
         /** 是否显示语言标识 */
         showLanguage?: boolean;
         /** 是否显示行号；普通态与全屏态保持一致 */
@@ -155,6 +158,7 @@
         variant = "default",
         code = "",
         language = "",
+        format = true,
         showLanguage = true,
         showLineNumbers = false,
         showCopyButton = true,
@@ -206,7 +210,23 @@
 
     /* ─── 计算属性 ─── */
     const isSingleLine = $derived(variant === "singleLine");
-    const resolvedCode = $derived(code || childCode);
+    const rawCode = $derived(code || childCode);
+    let formatted = $state<{ source: string; language: string; output: string }>();
+    const resolvedCode = $derived(
+        format && !isSingleLine && formatted?.source === rawCode && formatted.language === language
+            ? formatted.output
+            : rawCode,
+    );
+    $effect(() => {
+        const source = rawCode;
+        const currentLanguage = language;
+        if (!format || isSingleLine) return;
+        let disposed = false;
+        void formatCodeBlock(source, currentLanguage).then((output) => {
+            if (!disposed) formatted = { source, language: currentLanguage, output };
+        });
+        return () => { disposed = true; };
+    });
     const lines = $derived(resolvedCode ? resolvedCode.split("\n") : []);
     const resolvedVisibleLines = $derived(Math.max(1, visibleLines || 15));
     const autoVisibleLines = $derived(

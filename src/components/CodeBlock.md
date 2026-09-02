@@ -5,8 +5,8 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.6.3
-> **更新**: 2026-08-17
+> **版本**: v1.7.0
+> **更新**: 2026-09-03
 > **职责**: 展示代码、基础语法着色与行号，并提供复制、全屏和可选尺寸调整能力。
 > **布局模型**: 默认态为复合管理布局；`singleLine` 为槽位宿主布局
 > **文档**: ./CodeBlock.md
@@ -23,7 +23,7 @@
 | 类别 | 关键字 |
 |:---|:---|
 | **内容** | `code`, `language`, `children` |
-| **功能开关** | `showLanguage`, `showLineNumbers`, `showCopyButton`, `showExpandButton` |
+| **功能开关** | `format`, `showLanguage`, `showLineNumbers`, `showCopyButton`, `showExpandButton` |
 | **布局** | `variant="default|singleLine"`, `visibleLines`, 默认态拖拽高度 |
 | **行为** | `copyTimeout`；复制能力由默认内置 CopyButton 承担 |
 | **默认内置组件** | `parts.CopyButton` 配置内置 bare CopyButton；`parts.ExpandButton` 配置内置 bare ExpandButton；`parts.Indicator` 配置缩放手柄 |
@@ -38,14 +38,16 @@
 |:---|:---|:---|:---|
 | `variant` | `"default" \| "singleLine"` | `"default"` | `singleLine` 使用 Input 同类 Leading / Content / Trailing 三槽布局；固定为单行展示，不生成高度拖拽、语言、行号、全屏或纵向滚动结构 |
 | `code` | `string` | `""` | 要显示的代码字符串 |
-| `language` | `string` | — | 语言标识，显示在工具栏（如 `"tsx"`, `"css"`） |
+| `language` | `string` | `""` | 语言标识，同时选择格式化解析器；支持 svelte、js/javascript、jsx、ts/typescript、tsx、html、css/scss/less、json/jsonc、yaml/yml、markdown/md、graphql/gql。空值根据代码识别 Svelte/HTML、JSON 或 JS/TS；未知的显式语言保留原文。 |
+| `format` | `boolean` | `true` | 默认按 language 格式化代码；普通态、全屏、行号与复制共享格式化结果。设为 false 保留原文；singleLine 始终保留原文。解析失败、未知语言或输入超过 200,000 字符时保留原文。 |
 | `showLanguage` | `boolean` | `true` | 是否显示语言标识 |
 | `showLineNumbers` | `boolean` | `false` | 是否显示代码行号；普通态与全屏态保持一致，避免切换末帧发生代码横向跳变 |
 | `showCopyButton` | `boolean` | `true` | 是否显示复制按钮 |
 | `showExpandButton` | `boolean` | `true` | 是否显示全屏放大按钮 |
-| `visibleLines` | `number` | `15` | 默认状态最多显示几行代码；内容不足时自适应高度，超出后滚动；全屏模式不受此限制 |
+| `visibleLines` | `number` | `5` | 默认状态最多显示几行代码；内容不足时自适应高度，超出后滚动；全屏模式不受此限制 |
 | `copyTimeout` | `number` | `2000` | 复制成功图标（Check）的停留时长（ms），超时后恢复 Copy 图标 |
 | `children` | `Snippet` | — | 代码内容或附件源；纯文本会作为代码，`as="trailing"` 会替换右侧动作区 |
+| `parts` | `ComponentPartsOf` | — | 内置 CopyButton、ExpandButton、Indicator 的配置入口；操作按钮通过 emphasis 配置强调程度。 |
 | `...rest` | — | — | 透传至根 Frame（class、style、动效关键字等） |
 
 ---
@@ -80,6 +82,21 @@
 ```
 
 ---
+
+## 自动代码格式化
+
+默认 `format={true}`。使用 Prettier 的浏览器入口与官方 Svelte 插件，按需加载解析器；统一 Tab 缩进（宽度 4）、80 字符目标行宽、JS 单引号、分号、无尾逗号和多属性逐行排版。保留 Svelte 区块顺序和文本空白语义；长字符串不会强制截断。HTML/Markdown 中的空白和代码内容由对应解析器处理，不使用正则改写源码。
+
+- `code` 或 children 文本是只读输入；只格式化展示副本，不修改调用方的数据或示例执行代码。
+- 普通态、全屏、行号、高亮和复制共享同一份可见文本。
+- `format={false}`、`variant="singleLine"`、不支持的显式语言、无效语法或超过 200,000 字符的输入保持原文；格式化不是 lint，不执行代码或补全缺失逻辑。
+- SSR 先输出原文，客户端加载解析器后更新显示；加载期间原文仍可读可复制。异步结果仅提交到对应的当前输入，切换代码、语言或开关不会应用过期结果。依赖加载失败时保留原文。
+- 解析器来自随包声明的 MIT 依赖 `prettier` / `prettier-plugin-svelte`；运行时不向格式化服务发送代码。格式化模块位于 `internal/code-block/format.ts`，由 CodeBlock 拥有，未新增 Frame 能力或公共格式化 API。
+
+```svelte
+<CodeBlock language="svelte" code={exampleSource} />
+<CodeBlock language="svelte" code={exampleSource} format={false} />
+```
 
 ## 语法着色
 
@@ -160,7 +177,7 @@
 
 ## 滚动条与高度
 
-默认代码区高度由代码内容和 `visibleLines` 共同控制：内容不足 `visibleLines` 时按内容自适应（hug 高度），内容超过后固定到 `visibleLines` 行并滚动。默认 `visibleLines={15}`，与 Textarea 的自动高度上限保持一致。右下角提供与 Textarea 一致的拖拽手柄；拖拽后进入手动高度，代码区占满容器剩余高度并滚动。
+默认代码区高度由代码内容和 `visibleLines` 共同控制：内容不足 `visibleLines` 时按内容自适应（hug 高度），内容超过后固定到 `visibleLines` 行并滚动。默认 `visibleLines={5}`，与 Textarea 的自动高度上限保持一致。右下角提供与 Textarea 一致的拖拽手柄；拖拽后进入手动高度，代码区占满容器剩余高度并滚动。
 
 消费方可通过 `style` 提供初始高度；首次拖拽后，交互产生的手动高度优先于初始 `style` 中的 `height`，避免外部初始值持续覆盖拖拽写回。其余用户样式仍保持最高合并优先级。
 
@@ -268,6 +285,7 @@ pnpm build`}
 
 | 日期 | 版本 | 说明 |
 |:---|:---|:---|
+| 2026-09-03 | v1.7.0 | 新增默认开启的 format，按语言格式化展示及复制内容；支持显式关闭、异步竞态保护、原文回退与单行变体保留。 |
 | 2026-08-17 | v1.6.3 | 默认态、全屏态与 `singleLine` 接入共享 Overlay 横向滚动条；代码横向溢出时常显并支持拖拽，不再隐藏原生条后缺少可见滚动反馈 |
 | 2026-08-15 | v1.6.2 | 内部 `pre` / `code` 显式使用 `border-box`，与既有 padding、margin、font reset 一起隔离可选 `snowui-base.css` 的元素级影响 |
 | 2026-08-12 | v1.6.1 | `singleLine` 的 padding、gap 与圆角对齐 Input 标准态：上下 12px、左右 16px、gap 8px、圆角 16px |

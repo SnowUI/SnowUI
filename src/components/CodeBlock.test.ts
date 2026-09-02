@@ -1,9 +1,19 @@
 /**
  * CodeBlock.test.ts
- * v1.3.1
+ * v1.4.0
+ * 变更记录 (2026-09-03): 增加默认代码格式化与保留原文对照。
  * 变更记录 (2026-08-17): 补充默认态与 singleLine 横向溢出回归，验证共享横向滚动条常显与拖拽。
  */
 export const examples = [
+    {
+        name: "CB-08：默认格式化与保留原文",
+        code: `CB-08
+<Frame column gap={4} width="100%">
+    <CodeBlock language="svelte" visibleLines={12} code={'<Button disabled={false} title="SnowUI" onclick={()=>console.log("hello")}>Open</Button>'} />
+    <CodeBlock language="svelte" format={false} code={'<Button disabled={false} title="SnowUI" onclick={()=>console.log("hello")}>Open</Button>'} />
+</Frame>`,
+        logic: ["format", "language", "code"],
+    },
     {
         name: "CB-01：基础代码块",
         code: `CB-01

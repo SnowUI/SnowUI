@@ -50,7 +50,7 @@
       "related": ["Input"]
     },
     "CodeBlock": {
-      "intents": ["代码展示", "代码复制", "代码展开"],
+      "intents": ["代码展示", "代码复制", "代码展开", "代码格式化"],
       "aliases": ["代码块", "单行代码条"],
       "related": ["CopyButton", "ExpandButton"]
     },
