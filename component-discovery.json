@@ -2,62 +2,190 @@
   "schemaVersion": 1,
   "components": {
     "Segmented": {
-      "intents": ["互斥参数选择", "过滤器单选", "响应式节点选择"],
-      "aliases": ["节点选择", "Mobile Tablet Desktop 选择", "分段选择器"],
+      "intents": [
+        "互斥参数选择",
+        "过滤器单选",
+        "响应式节点选择"
+      ],
+      "aliases": [
+        "节点选择",
+        "Mobile Tablet Desktop 选择",
+        "分段选择器"
+      ],
       "whenToUse": "多个互斥参数或过滤器之间单选，使用 radiogroup 语义。",
       "avoidWhen": "切换内容面板时使用 Tab。",
-      "related": ["Tab", "Button"]
+      "related": [
+        "Tab",
+        "Button"
+      ]
     },
     "Tab": {
-      "intents": ["内容面板切换", "视图切换"],
-      "aliases": ["Tab 切换", "Preview Code 切换", "标签页"],
+      "intents": [
+        "内容面板切换",
+        "视图切换"
+      ],
+      "aliases": [
+        "Tab 切换",
+        "Preview Code 切换",
+        "标签页"
+      ],
       "whenToUse": "选项对应不同内容区域或视图。",
       "avoidWhen": "只改变参数或过滤器时使用 Segmented。",
-      "related": ["Segmented", "Button"]
+      "related": [
+        "Segmented",
+        "Button"
+      ]
     },
     "Sidebar": {
-      "intents": ["文档侧边导航", "可折叠侧栏", "可调宽侧栏"],
-      "aliases": ["左侧导航", "侧边栏"],
-      "related": ["SidebarSection", "SidebarItem"]
+      "intents": [
+        "文档侧边导航",
+        "可折叠侧栏",
+        "可调宽侧栏"
+      ],
+      "aliases": [
+        "左侧导航",
+        "侧边栏"
+      ],
+      "related": [
+        "SidebarSection",
+        "SidebarItem"
+      ]
     },
     "SearchBox": {
-      "intents": ["站点搜索", "带快捷键的搜索框", "响应式搜索框"],
-      "aliases": ["顶部搜索", "窄屏搜索按钮"],
-      "related": ["SearchInput"]
+      "intents": [
+        "站点搜索",
+        "带快捷键的搜索框",
+        "响应式搜索框"
+      ],
+      "aliases": [
+        "顶部搜索",
+        "窄屏搜索按钮"
+      ],
+      "related": [
+        "SearchInput"
+      ]
     },
     "DataTable": {
-      "intents": ["数据表格", "排序分页表格", "带操作的数据列表"],
-      "aliases": ["高级表格", "数据表"],
-      "related": ["TableToolbar", "Table", "SidePanel"]
+      "intents": [
+        "数据表格",
+        "排序分页表格",
+        "带操作的数据列表"
+      ],
+      "aliases": [
+        "高级表格",
+        "数据表"
+      ],
+      "related": [
+        "TableToolbar",
+        "Table",
+        "SidePanel"
+      ]
     },
     "TableToolbar": {
-      "intents": ["表格工具栏", "表格搜索筛选操作"],
-      "aliases": ["Table 顶部操作区"],
-      "related": ["DataTable", "OverflowActions"]
+      "intents": [
+        "表格工具栏",
+        "表格搜索筛选操作"
+      ],
+      "aliases": [
+        "Table 顶部操作区"
+      ],
+      "related": [
+        "DataTable",
+        "OverflowActions"
+      ]
     },
     "SidePanel": {
-      "intents": ["侧边详情面板", "行预览面板", "浮动编辑面板"],
-      "aliases": ["右侧面板", "详情抽屉"],
-      "related": ["DataTable"]
+      "intents": [
+        "侧边详情面板",
+        "行预览面板",
+        "浮动编辑面板"
+      ],
+      "aliases": [
+        "右侧面板",
+        "详情抽屉"
+      ],
+      "related": [
+        "DataTable"
+      ]
     },
     "Field": {
-      "intents": ["表单字段组合", "标签帮助错误信息"],
-      "aliases": ["表单项", "带 label 的输入"],
-      "related": ["Input", "Textarea", "Select"]
+      "intents": [
+        "表单字段组合",
+        "标签帮助错误信息"
+      ],
+      "aliases": [
+        "表单项",
+        "带 label 的输入"
+      ],
+      "related": [
+        "Input",
+        "Textarea",
+        "Select"
+      ]
     },
     "ImageViewer": {
-      "intents": ["图片预览", "图片全屏查看", "图片组导航"],
-      "aliases": ["图片查看器", "灯箱"],
-      "related": ["Image", "ImageGroup"]
+      "intents": [
+        "图片预览",
+        "图片全屏查看",
+        "图片组导航"
+      ],
+      "aliases": [
+        "图片查看器",
+        "灯箱"
+      ],
+      "related": [
+        "Image",
+        "ImageGroup"
+      ]
     },
     "Frame": {
       "canonical": "FramePro",
-      "aliases": ["PRO Frame"]
+      "aliases": [
+        "PRO Frame"
+      ]
     },
     "NumberFlow": {
-      "intents": ["数字滚动", "数值变化动画"],
-      "aliases": ["数字流动", "数字滚轮动画"],
-      "related": ["NumericText"]
+      "intents": [
+        "数字滚动",
+        "数值变化动画"
+      ],
+      "aliases": [
+        "数字流动",
+        "数字滚轮动画"
+      ],
+      "related": [
+        "NumericText"
+      ]
+    },
+    "BarChart": {
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ]
+    },
+    "LineChart": {
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ]
+    },
+    "ChartGroup": {
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ]
     }
   }
 }

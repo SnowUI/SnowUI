@@ -1,10 +1,15 @@
+import type { AdaptiveContrastSurface } from "@snowui-design-system/components/lib/adaptive-contrast";
 import type { ChartHoverPanelData } from "./hover-panel";
 import type { ChartHoverPanelPlacement } from "./hover-panel";
 
 export type ChartGroupHoverMode = "item" | "cell";
 export type ChartGroupXAxisMode = "edge" | "cell";
 
+
 export interface ChartGroupContext {
+    adaptiveContrast?: () => boolean;
+    contrastSurfaces?: () => AdaptiveContrastSurface[];
+    setContrastSurfaces?: (source: string, surfaces: AdaptiveContrastSurface[] | null) => void;
     hoverMode: () => ChartGroupHoverMode;
     activeCellIndex: () => number | null;
     setActiveCellIndex: (index: number | null) => void;

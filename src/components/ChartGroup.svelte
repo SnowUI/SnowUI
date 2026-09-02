@@ -1,6 +1,6 @@
 <!--
   ChartGroup 图表组合容器 (PRO)
-  v0.2.3 (2026-09-02)
+  v0.3.0 (2026-09-03)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。
   文档: ./ChartGroup.md
@@ -62,6 +62,7 @@
         defaultActiveCellIndex?: number | null;
         onCellHoverChange?: (index: number | null) => void;
         showHitLayer?: boolean;
+        adaptiveContrast?: boolean;
         showHoverPanel?: boolean;
         showHoverLabel?: boolean;
         alwaysShowHoverLabel?: boolean;
@@ -109,6 +110,7 @@
         defaultActiveCellIndex = null,
         onCellHoverChange,
         showHitLayer = true,
+        adaptiveContrast = false,
         showHoverPanel = true,
         showHoverLabel = undefined,
         alwaysShowHoverLabel = false,
@@ -475,7 +477,17 @@
         hoverPanelPointerFrame = null;
     }
 
+    // 反白表面只传递绘制数据，不通过 Context 暴露子图 DOM。
+    let contrastPaints = $state<Record<string, import("@snowui-design-system/components/lib/adaptive-contrast").AdaptiveContrastSurface[]>>({});
     const context: ChartGroupContext = {
+        adaptiveContrast: () => adaptiveContrast,
+        contrastSurfaces: () => Object.values(contrastPaints).flat(),
+        setContrastSurfaces: (source, surfaces) => untrack(() => {
+            const next = { ...contrastPaints };
+            if (surfaces) next[source] = surfaces;
+            else delete next[source];
+            contrastPaints = next;
+        }),
         hoverMode: () => hoverMode,
         activeCellIndex: () => effectiveActiveCellIndex,
         setActiveCellIndex,

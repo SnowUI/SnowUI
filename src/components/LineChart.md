@@ -1,6 +1,6 @@
 # LineChart (折线图)
 
-> **版本**: v1.4.2
+> **版本**: v1.5.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
@@ -46,6 +46,7 @@
 | `showGuides` | `boolean` | `false` / 继承 `ChartGroup` | 是否允许序列绘制节点垂直辅助线 |
 | `showHoverLabel` | `boolean` | 按 `showHoverPanel` 推导 | hover / focus 节点时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 |
 | `alwaysShowHoverLabel` | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
+| `adaptiveContrast` | `boolean` | 继承 ChartGroup，否则 `false` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认关闭；由 OSS Adaptive Contrast 共享能力实现。 |
 | `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前节点 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
 | `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
@@ -288,7 +289,15 @@ SVG 图层从下到上为：
 
 ---
 
+## 自适应黑白对比接入
+
+使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。应用通过本组件的 `adaptiveContrast` 开启，不穿透私有 SVG。
+
 ## 更新日志 (Changelog)
+
+### v1.5.0 (2026-09-03)
+
+- `adaptiveContrast` 接入 OSS 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
 
 ### v1.4.2 (2026-09-02)
 

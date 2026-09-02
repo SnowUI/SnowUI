@@ -1,12 +1,14 @@
 <!--
   BarChart 柱状图组件 (PRO)
-  v1.2.0 (2026-09-02)
+  v1.3.0 (2026-09-03)
 
   职责:渲染支持纵向/横向、多段、相叠、多柱并排与坐标轴的柱状图。
   文档: ./BarChart.md
 -->
 
 <script lang="ts">
+    import { AdaptiveContrastMask } from "@snowui-design-system/components/lib/adaptive-contrast-renderer";
+    import { getAdaptiveContrastColor } from "@snowui-design-system/components/lib/adaptive-contrast";
     import type { Snippet } from "svelte";
     import { getContext, onDestroy, onMount, tick } from "svelte";
     import {
@@ -188,6 +190,7 @@
         showGuides?: boolean;
         showHoverLabel?: boolean;
         alwaysShowHoverLabel?: boolean;
+        adaptiveContrast?: boolean;
         showHoverPanel?: boolean;
         hoverPanelVariant?: ChartHoverPanelVariant;
         hoverPanelPlacement?: ChartHoverPanelPlacement;
@@ -304,6 +307,7 @@
         showGuides = undefined,
         showHoverLabel = undefined,
         alwaysShowHoverLabel = false,
+        adaptiveContrast = undefined,
         showHoverPanel = true,
         hoverPanelVariant = "light",
         hoverPanelPlacement = "pointer",
@@ -378,6 +382,8 @@
     const chartGroup = getContext<ChartGroupContext | undefined>(
         CHART_GROUP_CONTEXT_KEY,
     );
+    const effectiveAdaptiveContrast = $derived(adaptiveContrast ?? chartGroup?.adaptiveContrast?.() ?? false);
+    const contrastMaskId = `chart-contrast-${paintUid}`;
 
     $effect(() => {
         const root = rootElement;
@@ -802,6 +808,14 @@
         internalAppearanceProgress = clamp(defaultAppearanceProgress, 0, 1);
         hasSyncedDefaultAppearanceProgress = true;
     });
+
+    const ownContrastSurfaces = $derived(bars.map((bar) => ({ path: bar.path, fill: bar.fill, opacity: bar.opacity })));
+    $effect(() => {
+        if (!chartGroup?.setContrastSurfaces || !(effectiveAdaptiveContrast || chartGroup.adaptiveContrast?.())) return;
+        chartGroup.setContrastSurfaces(contrastMaskId, ownContrastSurfaces);
+        return () => chartGroup?.setContrastSurfaces?.(contrastMaskId, null);
+    });
+    const contrastSurfaces = $derived(chartGroup?.contrastSurfaces?.() ?? ownContrastSurfaces);
 
     onMount(() => {
         const mediaQuery = window.matchMedia?.(
@@ -2234,6 +2248,9 @@
             </g>
         {/if}
 
+        {#if effectiveAdaptiveContrast}
+            <AdaptiveContrastMask id={contrastMaskId} width={numericWidth} height={numericHeight} surfaces={contrastSurfaces} />
+        {/if}
         <defs>
             {#each gradients as gradient}
                 {#if gradient}
@@ -2373,39 +2390,48 @@
                         onblur={() => hideBarHoverLabel(item, "focus")}
                     />
                     {#if effectiveShowHoverLabel && shouldRenderBarHoverLabel(item, labelKey)}
-                        <foreignObject
-                            x={resolveHoverLabelBoxX(item)}
-                            y={resolveHoverLabelBoxY(item)}
-                            width={BAR_CHART_HOVER_LABEL_WIDTH}
-                            height={BAR_CHART_HOVER_LABEL_HEIGHT}
-                            pointer-events="none"
-                            overflow="visible"
-                        >
-                            <Frame
-                                class="snowui-bar-chart-hover-label"
-                                data-align={orientation === "horizontal"
-                                    ? "start"
-                                    : "center"}
-                                currentState={isBarHoverLabelVisible(
-                                    item,
-                                    labelKey,
-                                )
-                                    ? "Appear"
-                                    : "Disappear"}
-                                whileAppear={BAR_CHART_HOVER_LABEL_APPEAR_MOTION}
-                                whileDisappear={BAR_CHART_HOVER_LABEL_DISAPPEAR_MOTION}
-                                enableResponsive={false}
-                                enableContext={false}
-                                enableScaleObserver={false}
-                                enableDefaultMotion={false}
-                                loading={false}
-                                skeleton={false}
+                        {#snippet contrastLabel(inverse: boolean)}
+                            <foreignObject
+                                mask={inverse ? `url(#${contrastMaskId})` : undefined}
+                                aria-hidden={inverse ? "true" : undefined}
+                                x={resolveHoverLabelBoxX(item)}
+                                y={resolveHoverLabelBoxY(item)}
+                                width={BAR_CHART_HOVER_LABEL_WIDTH}
+                                height={BAR_CHART_HOVER_LABEL_HEIGHT}
                                 pointer-events="none"
-                                aria-hidden="true"
+                                overflow="visible"
                             >
-                                {item.labelText}
-                            </Frame>
-                        </foreignObject>
+                                <Frame
+                                    class="snowui-bar-chart-hover-label"
+                                    style={effectiveAdaptiveContrast ? `color: ${getAdaptiveContrastColor(inverse)};` : undefined}
+                                    data-align={orientation === "horizontal"
+                                        ? "start"
+                                        : "center"}
+                                    currentState={isBarHoverLabelVisible(
+                                        item,
+                                        labelKey,
+                                    )
+                                        ? "Appear"
+                                        : "Disappear"}
+                                    whileAppear={BAR_CHART_HOVER_LABEL_APPEAR_MOTION}
+                                    whileDisappear={BAR_CHART_HOVER_LABEL_DISAPPEAR_MOTION}
+                                    enableResponsive={false}
+                                    enableContext={false}
+                                    enableScaleObserver={false}
+                                    enableDefaultMotion={false}
+                                    loading={false}
+                                    skeleton={false}
+                                    pointer-events="none"
+                                    aria-hidden="true"
+                                >
+                                    {item.labelText}
+                                </Frame>
+                            </foreignObject>
+                        {/snippet}
+                        {@render contrastLabel(false)}
+                        {#if effectiveAdaptiveContrast}
+                            {@render contrastLabel(true)}
+                        {/if}
                     {/if}
                 </g>
             {/each}

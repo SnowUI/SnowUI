@@ -1,12 +1,14 @@
 <!--
   LineChart 折线图组件 (PRO)
-  v1.4.2 (2026-09-02)
+  v1.5.0 (2026-09-03)
 
   职责:渲染带横坐标、纵坐标、网格、实线/虚线、面积填充、圆角转折线与可定制节点点样式的折线图。
   文档: ./LineChart.md
 -->
 
 <script lang="ts">
+    import { AdaptiveContrastMask } from "@snowui-design-system/components/lib/adaptive-contrast-renderer";
+    import { getAdaptiveContrastColor, isAdaptiveContrastMonochrome } from "@snowui-design-system/components/lib/adaptive-contrast";
     import type { Snippet } from "svelte";
     import { getContext, onDestroy, onMount, tick } from "svelte";
     import {
@@ -183,6 +185,7 @@
         showGuides?: boolean;
         showHoverLabel?: boolean;
         alwaysShowHoverLabel?: boolean;
+        adaptiveContrast?: boolean;
         showHoverPanel?: boolean;
         hoverPanelVariant?: ChartHoverPanelVariant;
         hoverPanelPlacement?: ChartHoverPanelPlacement;
@@ -280,6 +283,7 @@
         showGuides = undefined,
         showHoverLabel = undefined,
         alwaysShowHoverLabel = false,
+        adaptiveContrast = undefined,
         showHoverPanel = true,
         hoverPanelVariant = "light",
         hoverPanelPlacement = "pointer",
@@ -352,6 +356,9 @@
     const chartGroup = getContext<ChartGroupContext | undefined>(
         CHART_GROUP_CONTEXT_KEY,
     );
+    const effectiveAdaptiveContrast = $derived(adaptiveContrast ?? chartGroup?.adaptiveContrast?.() ?? false);
+    const contrastMaskId = `chart-contrast-${paintUid}`;
+    const contrastSurfaces = $derived(chartGroup?.contrastSurfaces?.() ?? []);
 
     $effect(() => {
         const root = rootElement;
@@ -2033,6 +2040,9 @@
             </g>
         {/if}
 
+        {#if effectiveAdaptiveContrast}
+            <AdaptiveContrastMask id={contrastMaskId} width={numericWidth} height={numericHeight} surfaces={contrastSurfaces} />
+        {/if}
         <defs>
             {#each gradients as gradient}
                 <linearGradient
@@ -2170,7 +2180,7 @@
                     class="snowui-line-chart-series"
                     d={item.path}
                     fill="none"
-                    stroke={item.gradientId
+                    stroke={effectiveAdaptiveContrast && !item.gradientId && isAdaptiveContrastMonochrome(item.stroke) ? getAdaptiveContrastColor() : item.gradientId
                         ? `url(#${item.gradientId})`
                         : item.stroke}
                     stroke-width={item.strokeWidth}
@@ -2180,6 +2190,21 @@
                     stroke-opacity={resolveSeriesOpacity(seriesIndex)}
                     clip-path={`url(#${resolveSeriesClipId(seriesIndex)})`}
                 />
+                {#if effectiveAdaptiveContrast && !item.gradientId && isAdaptiveContrastMonochrome(item.stroke)}
+                    <path
+                        class="snowui-line-chart-series-contrast"
+                        mask={`url(#${contrastMaskId})`}
+                        d={item.path}
+                        fill="none"
+                        stroke={getAdaptiveContrastColor(true)}
+                        stroke-width={item.strokeWidth}
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-dasharray={resolveDashArray(item.strokeStyle)}
+                        stroke-opacity={resolveSeriesOpacity(seriesIndex)}
+                        clip-path={`url(#${resolveSeriesClipId(seriesIndex)})`}
+                    />
+                {/if}
             {/each}
         </g>
 
@@ -2290,63 +2315,79 @@
                             />
                             {#if marker || isPointInteractionActive(labelKey, pointIndex)}
                                 {@const visualMarker = marker ?? hoverMarker}
-                                <g class="snowui-line-chart-marker-visual">
-                                    <circle
-                                        class="snowui-line-chart-marker-lower"
-                                        cx={point.x}
-                                        cy={point.y}
-                                        r={visualMarker.lowerRadius}
-                                        fill={visualMarker.lowerFill}
-                                    />
-                                    <circle
-                                        class="snowui-line-chart-marker-upper"
-                                        cx={point.x}
-                                        cy={point.y}
-                                        r={visualMarker.upperRadius}
-                                        fill={visualMarker.upperFill}
-                                    />
-                                </g>
+                                {@const contrastMarker = effectiveAdaptiveContrast && isAdaptiveContrastMonochrome(visualMarker.lowerFill) && isAdaptiveContrastMonochrome(visualMarker.upperFill)}
+                                {#snippet contrastDot(inverse: boolean)}
+                                    <g class="snowui-line-chart-marker-visual" mask={inverse ? `url(#${contrastMaskId})` : undefined}>
+                                        <circle
+                                            class="snowui-line-chart-marker-lower"
+                                            cx={point.x}
+                                            cy={point.y}
+                                            r={visualMarker.lowerRadius}
+                                            fill={visualMarker.lowerFill}
+                                            style={contrastMarker ? `fill: ${getAdaptiveContrastColor(isPointInteractionActive(labelKey, pointIndex) !== inverse)}` : undefined}
+                                        />
+                                        <circle
+                                            class="snowui-line-chart-marker-upper"
+                                            cx={point.x}
+                                            cy={point.y}
+                                            r={visualMarker.upperRadius}
+                                            fill={visualMarker.upperFill}
+                                            style={contrastMarker ? `fill: ${getAdaptiveContrastColor(isPointInteractionActive(labelKey, pointIndex) === inverse)}` : undefined}
+                                        />
+                                    </g>
+                                {/snippet}
+                                {@render contrastDot(false)}
+                                {#if contrastMarker}{@render contrastDot(true)}{/if}
                             {/if}
                             {#if effectiveShowHoverLabel && shouldRenderPointHoverLabel(labelKey, pointIndex)}
-                                <foreignObject
-                                    x={resolveHoverLabelBoxX(point)}
-                                    y={resolveHoverLabelBoxY(
-                                        point,
-                                        hoverMarker.lowerRadius,
-                                    )}
-                                    width={LINE_CHART_HOVER_LABEL_WIDTH}
-                                    height={LINE_CHART_HOVER_LABEL_HEIGHT}
-                                    pointer-events="none"
-                                    overflow="visible"
-                                >
-                                    <Frame
-                                        class="snowui-line-chart-hover-label"
-                                        currentState={isPointHoverLabelVisible(
-                                            labelKey,
-                                            pointIndex,
-                                        )
-                                            ? "Appear"
-                                            : "Disappear"}
-                                        whileAppear={LINE_CHART_HOVER_LABEL_APPEAR_MOTION}
-                                        whileDisappear={LINE_CHART_HOVER_LABEL_DISAPPEAR_MOTION}
-                                        enableResponsive={false}
-                                        enableContext={false}
-                                        enableScaleObserver={false}
-                                        enableDefaultMotion={false}
-                                        loading={false}
-                                        skeleton={false}
-                                        pointer-events="none"
-                                        aria-hidden="true"
-                                    >
-                                        {formatValue(
-                                            point.value,
-                                            series[seriesIndex],
+                                {#snippet contrastLabel(inverse: boolean)}
+                                    <foreignObject
+                                        mask={inverse ? `url(#${contrastMaskId})` : undefined}
+                                        aria-hidden={inverse ? "true" : undefined}
+                                        x={resolveHoverLabelBoxX(point)}
+                                        y={resolveHoverLabelBoxY(
                                             point,
-                                            seriesIndex,
-                                            pointIndex,
+                                            hoverMarker.lowerRadius,
                                         )}
-                                    </Frame>
-                                </foreignObject>
+                                        width={LINE_CHART_HOVER_LABEL_WIDTH}
+                                        height={LINE_CHART_HOVER_LABEL_HEIGHT}
+                                        pointer-events="none"
+                                        overflow="visible"
+                                    >
+                                        <Frame
+                                            class="snowui-line-chart-hover-label"
+                                            style={effectiveAdaptiveContrast ? `color: ${getAdaptiveContrastColor(inverse)};` : undefined}
+                                            currentState={isPointHoverLabelVisible(
+                                                labelKey,
+                                                pointIndex,
+                                            )
+                                                ? "Appear"
+                                                : "Disappear"}
+                                            whileAppear={LINE_CHART_HOVER_LABEL_APPEAR_MOTION}
+                                            whileDisappear={LINE_CHART_HOVER_LABEL_DISAPPEAR_MOTION}
+                                            enableResponsive={false}
+                                            enableContext={false}
+                                            enableScaleObserver={false}
+                                            enableDefaultMotion={false}
+                                            loading={false}
+                                            skeleton={false}
+                                            pointer-events="none"
+                                            aria-hidden="true"
+                                        >
+                                            {formatValue(
+                                                point.value,
+                                                series[seriesIndex],
+                                                point,
+                                                seriesIndex,
+                                                pointIndex,
+                                            )}
+                                        </Frame>
+                                    </foreignObject>
+                                {/snippet}
+                                {@render contrastLabel(false)}
+                                {#if effectiveAdaptiveContrast}
+                                    {@render contrastLabel(true)}
+                                {/if}
                             {/if}
                         </g>
                     {/if}
@@ -2498,6 +2539,7 @@
     }
 
     :global(:where(.snowui-line-chart-series)),
+    :global(:where(.snowui-line-chart-series-contrast)),
     :global(:where(.snowui-line-chart-series-base)) {
         vector-effect: non-scaling-stroke;
     }

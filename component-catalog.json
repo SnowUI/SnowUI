@@ -19,8 +19,14 @@
       "source": "src/components/BarChart.svelte",
       "documentation": "src/components/BarChart.md",
       "description": "渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。",
-      "intents": [],
-      "aliases": [],
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ],
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
       "whenToUse": null,
       "avoidWhen": null,
       "related": [],
@@ -36,8 +42,14 @@
       "source": "src/components/ChartGroup.svelte",
       "documentation": "src/components/ChartGroup.md",
       "description": "承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。",
-      "intents": [],
-      "aliases": [],
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ],
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
       "whenToUse": null,
       "avoidWhen": null,
       "related": [],
@@ -239,8 +251,14 @@
       "source": "src/components/LineChart.svelte",
       "documentation": "src/components/LineChart.md",
       "description": "渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。",
-      "intents": [],
-      "aliases": [],
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ],
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
       "whenToUse": null,
       "avoidWhen": null,
       "related": [],

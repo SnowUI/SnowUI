@@ -3,17 +3,38 @@
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable", "ES2022.Intl"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable",
+      "ES2022.Intl"
+    ],
     "moduleResolution": "bundler",
-    "customConditions": ["svelte"],
-    "types": ["vite/client"],
+    "customConditions": [
+      "svelte"
+    ],
+    "types": [
+      "vite/client"
+    ],
     "verbatimModuleSyntax": true,
     "paths": {
       "@snowui-design-system/components/internal/component-icon": [
         "../components/src/internal/component-icon/index.ts",
         "./node_modules/@snowui-design-system/components/src/internal/component-icon/index.ts"
+      ],
+      "@snowui-design-system/components/lib/adaptive-contrast": [
+        "../components/src/lib/adaptive-contrast.ts",
+        "./node_modules/@snowui-design-system/components/src/lib/adaptive-contrast.ts"
+      ],
+      "@snowui-design-system/components/lib/adaptive-contrast-renderer": [
+        "../components/src/lib/adaptive-contrast-renderer.ts",
+        "./node_modules/@snowui-design-system/components/src/lib/adaptive-contrast-renderer.ts"
       ]
     }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte"]
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.svelte"
+  ]
 }
