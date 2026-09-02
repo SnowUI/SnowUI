@@ -218,7 +218,6 @@
     let centerLabelUnmountTimer: ReturnType<typeof setTimeout> | null = null;
     let hoverPanelPointerFrame: number | null = null;
     let pendingHoverPanelPointer: { x: number; y: number } | null = null;
-    const hoverQueues = new Map<number, Promise<void>>();
     const animationFrames = new Map<number, number>();
     const numberFormatContext = getNumberFormat();
 
@@ -618,51 +617,47 @@
     }
 
     function animateSegmentGrowth(index: number, target: number) {
-        return new Promise<void>((resolve) => {
-            const startValue = animatedGrowths[index] ?? 0;
-            const distance = target - startValue;
+        // 每个扇区只有一个有效帧链，新目标直接接管当前画面。
+        const previousFrame = animationFrames.get(index);
+        if (previousFrame !== undefined) cancelAnimationFrame(previousFrame);
+        animationFrames.delete(index);
+        const startValue = animatedGrowths[index] ?? 0;
+        const distance = target - startValue;
+        if (target > 0) addActiveAnimationIndex(index);
 
-            if (Math.abs(distance) < 0.001) {
-                setSegmentGrowth(index, target);
-                resolve();
-                return;
+        const finish = () => {
+            setSegmentGrowth(index, target);
+            animationFrames.delete(index);
+            if (target <= 0) removeActiveAnimationIndex(index);
+        };
+        if (
+            Math.abs(distance) < 0.001 ||
+            window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+        ) {
+            finish();
+            return;
+        }
+
+        const startedAt = performance.now();
+        const step = (now: number) => {
+            const progress = Math.min(1, (now - startedAt) / HOVER_MOTION_DURATION);
+            setSegmentGrowth(index, startValue + distance * cubicOut(progress));
+            if (progress < 1) {
+                animationFrames.set(index, requestAnimationFrame(step));
+            } else {
+                finish();
             }
-
-            const startedAt = performance.now();
-            const step = (now: number) => {
-                const progress = Math.min(
-                    1,
-                    (now - startedAt) / HOVER_MOTION_DURATION,
-                );
-                const easedProgress = cubicOut(progress);
-                setSegmentGrowth(index, startValue + distance * easedProgress);
-
-                if (progress < 1) {
-                    animationFrames.set(index, requestAnimationFrame(step));
-                    return;
-                }
-
-                setSegmentGrowth(index, target);
-                animationFrames.delete(index);
-                resolve();
-            };
-
-            animationFrames.set(index, requestAnimationFrame(step));
-        });
+        };
+        animationFrames.set(index, requestAnimationFrame(step));
     }
 
-    function enqueueSegmentAnimation(index: number, target: number) {
-        const previous = hoverQueues.get(index) ?? Promise.resolve();
-        const next = previous.then(async () => {
-            if (target > 0) addActiveAnimationIndex(index);
-            await animateSegmentGrowth(index, target);
-            if (target <= 0) removeActiveAnimationIndex(index);
-        });
-
-        const tracked = next.finally(() => {
-            if (hoverQueues.get(index) === tracked) hoverQueues.delete(index);
-        });
-        hoverQueues.set(index, tracked);
+    function updateActiveSegmentGrowth(previousIndex: number | null) {
+        const nextIndex = hoveredIndex ?? focusedIndex;
+        if (previousIndex === nextIndex) return;
+        if (previousIndex !== null) animateSegmentGrowth(previousIndex, 0);
+        if (nextIndex !== null) {
+            animateSegmentGrowth(nextIndex, numericHoverThicknessGrowth);
+        }
     }
 
     function handleSegmentEnter(index: number) {
@@ -675,25 +670,24 @@
     }
 
     function handleSegmentFocus(index: number) {
+        const previousIndex = hoveredIndex ?? focusedIndex;
         hoverPanelPointer = { x: center, y: center };
         focusedIndex = index;
-        enqueueSegmentAnimation(index, numericHoverThicknessGrowth);
+        updateActiveSegmentGrowth(previousIndex);
     }
 
     function handleSegmentBlur(index: number) {
+        const previousIndex = hoveredIndex ?? focusedIndex;
         if (focusedIndex === index) focusedIndex = null;
-        enqueueSegmentAnimation(index, 0);
+        updateActiveSegmentGrowth(previousIndex);
     }
 
     function setHoveredSegmentIndex(index: number | null) {
-        const previousIndex = hoveredIndex;
         updateChartCursor(index);
-        if (previousIndex === index) return;
+        if (hoveredIndex === index) return;
+        const previousIndex = hoveredIndex ?? focusedIndex;
         hoveredIndex = index;
-        if (previousIndex !== null) enqueueSegmentAnimation(previousIndex, 0);
-        if (index !== null) {
-            enqueueSegmentAnimation(index, numericHoverThicknessGrowth);
-        }
+        updateActiveSegmentGrowth(previousIndex);
     }
 
     function updateChartCursor(index: number | null) {

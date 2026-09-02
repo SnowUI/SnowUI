@@ -235,7 +235,7 @@ interface CircularChartGradient {
 | 填充透明度 | 单扇区填充路径叠加透明度遮罩。扇区启动时左侧透明度为 0%、中段为 62%、右侧扫描头为 100%；透明度与填充同时启动，并在 0.75s 内线性补齐到整段 100% 不透明。反向时间轴会按相同规则回退 | `appearanceProgress` 直接渲染 |
 | 底层占位扇区 | `showBaseLayer=true` 时在真实填充层下方绘制一层同色 4% 透明度扇区，不参与出现动效；动效完成前也能看到完整图表结构 | 组件内部 base layer |
 | 扇区分隔线 | 间隔由 `separatorWidth` 调整；其数值表示 160x160 图表下的设计基准值，组件按 `size / 160` 等比缩放。间隔在 path 几何阶段通过 `padAngle + padRadius` 生成，让真实背景自然透出 | `separatorWidth` |
-| 扇区 hover 强调 | 每个扇区独立排队执行进入与离开动画；进入时外半径从 `R` 缓动到 `R + hoverThicknessGrowth`，离开时缓动回 `R`；内半径不变，扇区不位移 | 组件内部 `requestAnimationFrame + cubicOut` 几何动画 |
+| 扇区 hover 强调 | 每个扇区仅保留当前动画；hover / focus 目标改变时立即取消旧帧，从当前外半径向最新目标过渡，不排队或补播；进入时增厚到 `R + hoverThicknessGrowth`，离开且没有焦点时回到 `R`，保持原有 `300ms cubicOut`；内半径不变，扇区不位移，减少动效时直接到达目标 | 组件内部 `requestAnimationFrame + cubicOut` 几何动画 |
 | 扇区亮度反馈 | `filter: brightness(1.04)` | `--snowui-frame-color-motion-*` |
 | 中心标签进入 | `opacity + scale` | `--snowui-frame-appear-motion-*`（生命周期进入时序） / `--snowui-frame-control-motion-*` |
 
@@ -386,6 +386,10 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 ---
 
 ## 8. 更新日志 (Changelog)
+
+### 2026-09-03
+
+- 修复快速反复 hover / focus 后积压动画重播的问题，按最新交互状态从当前几何位置接管；鼠标离开时保留仍有效的键盘焦点。
 
 ### v1.2.0 (2026-09-03)
 
