@@ -29,6 +29,24 @@
  */
 export const examples = [
     {
+        name: "BTN-Click: hover 配套点击缩回与恢复",
+        code: `BTN-Click
+<Frame row class="gap-16">
+    <Button>Gray</Button>
+    <Button variant="filled">Filled</Button>
+    <Button variant="outline">Outline</Button>
+    <Button variant="borderless">Borderless</Button>
+    <Button scaleOnHover={false}>关闭 hover 与点击缩放</Button>
+    <Button toggle>Toggle</Button>
+</Frame>`,
+        expected: {
+            render: "内置 hover 放大与点击缩回 / 恢复共用 scaleOnHover 开关；文字、图标与布局不缩放。",
+            interaction: "点击从背景当前尺寸缩回统一的 1.03 倍，再恢复 1.06 倍 hover 大小，两段各用 hover 一半时长；重复点击重新接管，键盘与 Toggle 正常生效；减少动效不播放点击缩放。",
+        },
+        logic: ["HoverScale", "ClickMotion", "ScaleOnHover", "Keyboard", "ReducedMotion"],
+    },
+
+    {
         name: "A1: 基础样式 (Styles)",
         code: `A1
 <Button>Default</Button>

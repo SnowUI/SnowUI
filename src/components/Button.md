@@ -34,7 +34,7 @@
 | bare | `boolean` | `false` | 开启无外壳按钮模式，内容可包含文字、Icon 或其他元素。忽略 `variant`，移除 padding / radius / 背景 / 边框与 hover overlay，保留普通 Button 的内容 gap；前景色继承 `currentColor`，默认保持 100% 不透明。因为没有背景层，`scaleOnHover` 不产生视觉放大，文字与 Icon 保持原尺寸。与 `iconOnly` 同时使用时采用当前 `size` 档位的 12/16/20px 视觉尺寸上下文，并提供至少 16×16px 的透明点击热区。精确尺寸由子视觉自己声明。放入 Tab 时由 Tab 的 Button opacity override 接管透明度，不发生叠乘。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
 | backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
-| scaleOnHover | `boolean` | `true` | 是否启用 Button 内置背景层 hover 放大。独立动作默认开启；文字、Icon、Spinner 与命中区不缩放。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
+| scaleOnHover | `boolean` | `true` | 是否同时启用 Button 内置背景层 hover 放大及配套点击缩回 / 恢复动效。独立动作默认开启；文字、Icon、Spinner 与命中区不缩放。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
 | toggle | boolean | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 Secondary/Indigo 配色（gray / outline / borderless 生效，filled 排除）；`aria-pressed` 由 Frame 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
 | href | string | undefined | 链接地址 (渲染为 a 标签) |
 | target | string | undefined | 链接打开方式 |
@@ -50,7 +50,7 @@
 | bare | `boolean` | `false` | 无外壳按钮模式，不限制内容类型。忽略 `variant`，外壳 padding / radius 为 0，保留内容 gap；与 `iconOnly` 同时使用时获得对应尺寸上下文与最小透明点击热区。默认使用 `currentColor × opacity: 1`。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 的强调级别；`muted` 使用 `currentColor × opacity: 0.4 -> 1`。 |
 | backgroundBlur | `boolean` | `false` | 开启按钮背景模糊，默认强度为 `1.25rem`。 |
-| scaleOnHover | `boolean` | `true` | 控制背景层内置 `scale(1.06)` hover；内容不缩放。复合控件项从 owner 继承 `false`，实例显式值优先。 |
+| scaleOnHover | `boolean` | `true` | 统一控制背景层内置 hover 放大与配套点击缩回 / 恢复；内容不缩放。复合控件项从 owner 继承 `false`，实例显式值优先。 |
 | toggle | `boolean` | `false` | Toggle 模式语法糖。等价于显式声明 `Click={{ Idle: "Active", Active: "Idle" }} whileClick={false}`；Active 配色由 `data-state="Active"` 自动套 Indigo；`aria-pressed` 自动输出。 |
 | as | `'more' \| 'badge' \| 'icon' \| 'prev' \| 'next' \| 'close' \| 'item' \| 'current' \| 'page' \| 'leading' \| 'trailing'` | - | 角色化：作为 Text 展开按钮、Breadcrumb item、Pagination 模板，或接入 Image / ImageViewer / Field 宿主定位协议；进入 Image / ImageViewer 宿主时会翻译为对应 `pin-*` 方位 |
 
@@ -119,6 +119,14 @@ Button 的内部布局不接入三槽位模型：
 <!-- 加载状态 (继承自 Frame) -->
 <Button loading>Loading...</Button>
 ```
+
+## Hover 配套点击动效
+
+启用内置 hover 放大时，每次 click（包括键盘激活）从背景当前显示大小缩回标准 hover 区间的中点，再恢复到 hover 放大大小。所有变体（包括 Borderless）统一使用 `1.06 → 1.03 → 1.06`，缩回幅度为标准 `1.06 → 1` 的一半；Borderless 隐藏背景的 `0.84` 起点仅用于 hover，不参与点击缩回。缩回与恢复两段各使用 `BUTTON_HOVER_SCALE_UP_MOTION` 一半的时长，保持相同 easing，即每段速度为 hover 的两倍；当前 hover 为 200ms，点击为 100ms 缩回 + 100ms 恢复。文字、Icon、Spinner、命中区与布局保持原尺寸，点击回调、链接和 Toggle 状态立即生效，不等待动效。
+
+`scaleOnHover={false}`、复合控件的默认关闭值、bare、disabled 或显式 `whileHover` 接管时，都不运行这份配套动效。作为其他组件的子 Button 时，同样遵循宿主传递的开关；关闭 hover 放大就同时关闭点击缩放。显式重新开启复合控件子 Button 的 hover 放大时，点击效果也随之开启。连续点击从当前背景尺寸重新播放，不排队；点击结束后按实际 hover 状态恢复背景。减少动效模式直接保留当前 hover / idle 视觉，不播放点击缩放。
+
+实现只在有效点击时读取一次背景 transform，复用已有背景伪元素的 CSS animation；不增加 DOM、Observer、定时器或逐帧 JS 任务。SSR 不读取浏览器 API。
 
 ## ButtonGroup 嵌入态
 
@@ -371,6 +379,10 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### 2026-09-03
+
+- 为内置 hover 背景放大增加配套点击缩回 / 恢复，统一由 scaleOnHover 控制。
 
 ### v2.17.1 (2026-09-02)
 

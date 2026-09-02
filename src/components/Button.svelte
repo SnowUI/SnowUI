@@ -46,7 +46,7 @@
     emphasis?: "normal" | "muted";
     /** 是否启用背景内容模糊；默认 false。 */
     backgroundBlur?: boolean;
-    /** 是否启用 Button 内置的 hover 放大反馈；独立动作默认 true，复合控件项可由容器默认关闭。 */
+    /** 是否同时启用内置 hover 放大与配套点击缩回 / 恢复；复合控件项可由容器默认关闭。 */
     scaleOnHover?: boolean;
     /**
      * Toggle 模式：内部自动注入 `Click={{Idle:"Active",Active:"Idle"}}` 与 `whileClick=false` 默认值，
@@ -91,6 +91,7 @@
     onpointerup: userOnPointerUp,
     onpointerleave: userOnPointerLeave,
     onpointercancel: userOnPointerCancel,
+    onanimationend: userOnAnimationEnd,
     Click: clickProp = undefined,
     style: userStyle = "",
     class: className = "",
@@ -138,6 +139,28 @@
       ?? buttonSizeCtx?.scaleOnHover
       ?? true,
   );
+  const hasDefaultBackgroundMotion = $derived(
+    resolvedScaleOnHover && rest.whileHover === undefined && !bare && !resolvedDisabled,
+  );
+  let clickMotion = $state<{ phase: "a" | "b"; from: string } | undefined>();
+  let lastClickPhase: "a" | "b" = "b";
+
+  $effect(() => {
+    if (!hasDefaultBackgroundMotion) clickMotion = undefined;
+  });
+
+  $effect(() => {
+    if (!clickMotion || !hasDefaultBackgroundMotion) return;
+    const media = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    if (!media) return;
+    // 只在点击动画期间订阅；也覆盖 CSS 动画尚未开始就被取消的情况。
+    const cancelForReducedMotion = () => {
+      if (media.matches) clickMotion = undefined;
+    };
+    cancelForReducedMotion();
+    media.addEventListener("change", cancelForReducedMotion);
+    return () => media.removeEventListener("change", cancelForReducedMotion);
+  });
   // 计算最终尺寸：优先使用 prop size，其次映射上下文尺寸
   const resolvedSize = $derived.by(() => {
     if (size) return size;
@@ -266,14 +289,22 @@
     const scale = Array.isArray(BUTTON_HOVER_SCALE_UP_MOTION.scale)
       ? BUTTON_HOVER_SCALE_UP_MOTION.scale[1]
       : (BUTTON_HOVER_SCALE_UP_MOTION.scale ?? 1);
+    const baseScale = Array.isArray(BUTTON_HOVER_SCALE_UP_MOTION.scale)
+      ? BUTTON_HOVER_SCALE_UP_MOTION.scale[0]
+      : 1;
     const duration = BUTTON_HOVER_SCALE_UP_MOTION.duration ?? 0;
     const easing = BUTTON_HOVER_SCALE_UP_MOTION.easing ?? "ease";
     const defaultHoverMotionStyle = [
       `--snowui-button-hover-scale-to: ${scale}`,
+      // 点击统一缩回标准 hover 区间中点，不使用 Borderless 的隐藏起点。
+      `--snowui-button-click-scale-to: ${(baseScale + scale) / 2}`,
       `--snowui-button-hover-motion-duration: ${duration}ms`,
       `--snowui-button-hover-motion-easing: ${easing}`,
     ].join("; ");
-    const styles = [defaultHoverMotionStyle, hostStyle, userStyle]
+    const clickMotionStyle = clickMotion
+      ? `--snowui-button-click-transform-from: ${clickMotion.from}`
+      : "";
+    const styles = [defaultHoverMotionStyle, clickMotionStyle, hostStyle, userStyle]
       .filter(Boolean)
       .join("; ");
     return styles || undefined;
@@ -412,6 +443,32 @@
     );
   }
 
+  function playBackgroundClickMotion() {
+    const node = buttonElement;
+    if (
+      !node || !hasDefaultBackgroundMotion ||
+      node.matches(":disabled, .snowui-disabled, [aria-disabled='true']") ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    ) return;
+
+    // 每次有效点击只读一次当前背景；连续点击从当前画面接管，不等待旧动画。
+    const from = getComputedStyle(node, "::before").transform;
+    lastClickPhase = lastClickPhase === "a" ? "b" : "a";
+    clickMotion = { phase: lastClickPhase, from };
+  }
+
+  function handleAnimationEnd(event: AnimationEvent) {
+    completeBackgroundClickMotion(event);
+    userOnAnimationEnd?.(event);
+  }
+
+  function completeBackgroundClickMotion(event: AnimationEvent) {
+    if (
+      event.target === buttonElement && event.pseudoElement === "::before" &&
+      event.animationName === `snowui-button-click-${clickMotion?.phase}`
+    ) clickMotion = undefined;
+  }
+
   // 处理点击 (Button 特有逻辑: 展开)
   function handleClick(event?: MouseEvent) {
     if (buttonElement?.getAttribute("aria-current") === "page") {
@@ -426,6 +483,8 @@
       clearHoldSuppressResetTimer();
       return;
     }
+
+    playBackgroundClickMotion();
 
     if (isExpandButton && textCtx) {
       const currentTarget =
@@ -551,6 +610,7 @@
   data-icon-only={iconOnly ? "true" : undefined}
   data-emphasis={bare ? emphasis : undefined}
   data-default-hover-scale={resolvedScaleOnHover && rest.whileHover === undefined ? "true" : undefined}
+  data-click-scale={hasDefaultBackgroundMotion ? clickMotion?.phase : undefined}
   data-embedded={isButtonGroupEmbedded ? "button-group" : undefined}
   data-leading={as === "leading" ? "true" : undefined}
   data-trailing={as === "trailing" ? "true" : undefined}
@@ -589,6 +649,7 @@
   onpointerup={handlePointerUp}
   onpointerleave={handlePointerLeave}
   onpointercancel={handlePointerCancel}
+  onanimationend={handleAnimationEnd}
   renderHints={buttonRenderHints}
   {...toggleDefaults}
   {...clickProps}
@@ -892,16 +953,46 @@
   }
 
   :global(
-      :where(.snowui-button).snowui-button-background-scale-surface:hover:not(.snowui-disabled):not(:disabled)
+      :where(.snowui-button).snowui-button-background-scale-surface:is(:hover, [data-click-scale]):not(.snowui-disabled):not(:disabled)
     ) {
     --snowui-button-background-hover-layer-opacity: 1;
     --snowui-button-background-layer-opacity: 1;
   }
 
   :global(
-      :where(.snowui-button)[data-default-hover-scale="true"]:hover:not(.snowui-disabled):not(:disabled)
+      :where(.snowui-button)[data-default-hover-scale="true"]:is(:hover, [data-click-scale]):not(.snowui-disabled):not(:disabled)
     ) {
     --snowui-button-hover-scale: var(--snowui-button-hover-scale-to);
+  }
+
+  :global(:where(.snowui-button)[data-click-scale="a"]) {
+    --snowui-button-click-animation: snowui-button-click-a;
+  }
+
+  :global(:where(.snowui-button)[data-click-scale="b"]) {
+    --snowui-button-click-animation: snowui-button-click-b;
+  }
+
+  :global(:where(.snowui-button).snowui-button-background-scale-surface)::before,
+  :global(:where(.snowui-button).snowui-button-background-scale-surface)::after,
+  :global(:where(.snowui-button).snowui-button-embedded-button-group[data-default-hover-scale="true"])::before {
+    animation-name: var(--snowui-button-click-animation, none);
+    /* 缩回、恢复各占一半时长，每段速度为 hover 的两倍。 */
+    animation-duration: var(--snowui-button-hover-motion-duration, 0.2s);
+    animation-timing-function: var(--snowui-button-hover-motion-easing, ease);
+  }
+
+  /* 两个同形名称交替触发，使快速重复点击无需强制重排即可重新播放。 */
+  @keyframes -global-snowui-button-click-a {
+    from { transform: var(--snowui-button-click-transform-from); }
+    50% { transform: scale(var(--snowui-button-click-scale-to)); }
+    to { transform: scale(var(--snowui-button-hover-scale-to)); }
+  }
+
+  @keyframes -global-snowui-button-click-b {
+    from { transform: var(--snowui-button-click-transform-from); }
+    50% { transform: scale(var(--snowui-button-click-scale-to)); }
+    to { transform: scale(var(--snowui-button-hover-scale-to)); }
   }
 
   /* Toggle / 瞬时反馈：Active 状态由 Frame 自动暴露的 data-state="Active" 触发，
@@ -1031,7 +1122,7 @@
   }
 
   :global(
-      :where(.snowui-button).snowui-button-embedded-button-group:hover:not(.snowui-disabled):not(:disabled)
+      :where(.snowui-button).snowui-button-embedded-button-group:is(:hover, [data-click-scale]):not(.snowui-disabled):not(:disabled)
     ) {
     --snowui-button-group-cell-hover-opacity: var(
       --snowui-hover-opacity,
@@ -1044,6 +1135,10 @@
       --snowui-button-background-hover-motion-duration: 0ms;
       --snowui-button-background-color-motion-duration: 0ms;
       transition: none;
+    }
+    :global(:where(.snowui-button)[data-default-hover-scale="true"])::before,
+    :global(:where(.snowui-button)[data-default-hover-scale="true"])::after {
+      animation: none;
     }
   }
 </style>

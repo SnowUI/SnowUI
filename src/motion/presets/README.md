@@ -19,7 +19,7 @@
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
 | `CONTINUOUS_HOVER_MOTION` | Sidebar、Listbox、Popover、TableBody、Accordion、Tab / Segmented 的共享 hover 背景移动 | 单项独立 hover、生命周期进入 | Fluid Functionalism proximity hover |
 | `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
-| `BUTTON_HOVER_SCALE_UP_MOTION` | 独立动作 Button 只将背景层从 `scale(1)` 放大到 `scale(1.06)`，使用 `200ms ease`；Borderless 以隐藏的 `0.84` 为背景起点并收敛到同一终点，内容、命中区与布局尺寸不变 | bare、复合控件项、非 Button hover、生命周期出现 | 2026-08-19 Owner 确认的 Borderless 与背景层放大方案，2026-08-27 明确恢复 |
+| `BUTTON_HOVER_SCALE_UP_MOTION` | 独立动作 Button 只将背景层从 `scale(1)` 放大到 `scale(1.06)`，使用 `200ms ease`；Borderless 以隐藏的 `0.84` 为背景起点并收敛到同一终点；配套点击统一缩回标准 hover 区间中点 `1.03`，再恢复 `1.06`，Borderless 同样适用，两段各使用本 preset 一半的时长及相同 easing，内容、命中区与布局尺寸不变 | bare、复合控件项、非 Button hover、生命周期出现 | 2026-08-19 Owner 确认的 Borderless 与背景层放大方案，2026-08-27 明确恢复 |
 | `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
 | `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
 | `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |
