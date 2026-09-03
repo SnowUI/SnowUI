@@ -33,6 +33,9 @@ export interface SectorChartSize extends CartesianChartSize {
     scale: number;
 }
 
+/** 用户指定的响应式最小显示宽度，固定为 CSS px。 */
+export const SECTOR_CHART_MIN_WIDTH = 40;
+
 /** 本体保留声明尺寸；根布局与浮层使用缩放后的尺寸。 */
 export function watchSectorChartSize(
     root: HTMLElement,

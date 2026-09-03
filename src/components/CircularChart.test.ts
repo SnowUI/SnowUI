@@ -556,9 +556,26 @@ CC-02
 </Frame>`,
         expected: {
             render: "显示默认中心标签与常驻中心内容两种用法；HoverPanel 使用默认大小",
-            responsive: "拖窄真实预览时，环厚、间隔、圆角、hover 增厚和中心内容同倍缩小；放宽恢复声明尺寸，不残留空白占位",
+            responsive: "无需开启响应式；拖窄真实预览时，环厚、间隔、圆角、hover 增厚和中心内容同倍缩小至最小 40px；放宽恢复声明尺寸，不残留空白占位",
             interaction: "缩小后 pointer 与键盘 focus 命中当前扇区，面板位置跟随实际显示尺寸",
         },
         logic: ["Responsive", "CenterLabel", "HoverPanel", "Keyboard"],
+    },
+    {
+        name: "CC-18: 默认响应式并排收缩与 40px 下限",
+        code: `CC-18
+<Frame row data-wrap="false" class="w-full gap-16">
+    <CircularChart size={320}>
+        <Frame as="center-label"><Text>72%</Text></Frame>
+    </CircularChart>
+    <CircularChart size={320}>
+        <Frame as="center-label"><Text>48%</Text></Frame>
+    </CircularChart>
+</Frame>`,
+        expected: {
+            responsive: "无需传入 enableResponsive；两张图表按并排剩余宽度等比收缩，最小宽度 40px；空间恢复后回到声明尺寸",
+            interaction: "中心内容同步缩放，HoverPanel 保持大小",
+        },
+        logic: ["Responsive", "MinWidth", "Flex", "HoverPanel"],
     },
 ] as const;

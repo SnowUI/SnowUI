@@ -1,6 +1,6 @@
 <!--
   CircularChart 圆形图表组件 (PRO)
-  v1.3.0 (2026-09-03)
+  v1.3.1 (2026-09-03)
 
   职责:渲染可调圆角、环厚、隔断、尺寸的圆环/饼形比例图。
   Hover:当前扇区仅向外增厚,不位移;中心标签显示当前项。
@@ -19,7 +19,7 @@
         type RenderHints,
     } from "@snowui-design-system/components";
     import type { MotionConfig } from "@snowui-design-system/components/logic/motion-config";
-    import { watchSectorChartSize, type SectorChartSize } from "../lib/chart/size";
+    import { SECTOR_CHART_MIN_WIDTH, watchSectorChartSize, type SectorChartSize } from "../lib/chart/size";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
     import { buildArcPath } from "../lib/chart/arc-path";
     import {
@@ -356,6 +356,8 @@
             `--snowui-circular-chart-label-scale: ${numericSize / BASE_GEOMETRY_SIZE}`,
             `--snowui-circular-chart-responsive-scale: ${displaySize.scale}`,
             `--snowui-circular-chart-max-width: ${enableResponsive ? "100%" : "none"}`,
+            `--snowui-circular-chart-min-width: ${enableResponsive ? SECTOR_CHART_MIN_WIDTH : 0}px`,
+            `--snowui-circular-chart-flex-shrink: ${enableResponsive ? 1 : 0}`,
             style,
         ]
             .filter(Boolean)
@@ -1281,7 +1283,7 @@
 
         position: relative;
         display: inline-grid;
-        flex: none;
+        flex: 0 var(--snowui-circular-chart-flex-shrink, 1) auto;
         place-items: center;
         --snowui-circular-chart-body-width: var(
             --snowui-circular-chart-size-override,
@@ -1299,7 +1301,8 @@
         );
         width: var(--snowui-circular-chart-body-width);
         height: calc(var(--snowui-circular-chart-body-height) * var(--snowui-circular-chart-responsive-scale, 1));
-        min-width: 0;
+        min-width: var(--snowui-circular-chart-min-width);
+        min-height: calc(var(--snowui-circular-chart-body-height) * var(--snowui-circular-chart-responsive-scale, 1));
         max-width: var(--snowui-circular-chart-max-width, 100%);
         color: var(--snowui-circular-chart-label-color);
         line-height: 1;
