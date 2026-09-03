@@ -36,7 +36,7 @@ GG-01
 </Frame>`,
         expected: {
             render: "320x160 半圆仪表图;填充前可见 4% 同色占位层;扇区有圆角与透明隔断;颜色序列与 CircularChart 一致",
-            interaction: "点击重新填充时从左到右顺序填充;点击反向回退时先进入完成态再从 100% 回退到 0;hover 任意扇区时该扇区仅向外增厚 4px、不位移",
+            interaction: "点击重新填充时从左到右顺序填充;点击反向回退时先进入完成态再从 100% 回退到 0;hover 任意扇区时该扇区仅向外增厚 4px、不位移;快速反复移入移出或切换扇区时立即转向最新状态，不积压重播;鼠标离开后保留键盘焦点强调",
         },
         logic: ["Default", "Hover", "Replay", "ReverseAppearance", "BaseLayer"],
     },

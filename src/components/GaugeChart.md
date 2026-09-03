@@ -1,6 +1,6 @@
 # GaugeChart (仪表图)
 
-> **版本**: v1.6.0
+> **版本**: v1.6.1
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、透明间隔、渐变颜色、4% 同色占位层与顺序出现动效的半圆仪表比例图。颜色、几何与出现时间轴能力与 CircularChart 保持同类心智。
@@ -19,7 +19,7 @@
 - **尺寸基准**:`cornerRadius` 与 `separatorWidth` 都表示 320px 宽仪表图下的设计基准值。组件内部统一按 `width / 320` 等比缩放，数字和字符串数字都按基准值理解。
 - **透明间隔**:扇区间隔在 path 几何阶段通过 `padAngle + padRadius` 生成，贯穿内外圆弧并透出真实背景；不绘制固定白色 stroke，也不使用后置 gap mask。
 - **图层结构**:base layer 由 `showBaseLayer` 控制，默认关闭，开启时绘制 4% 同色占位层；fill layer 负责真实填充与出现动效；hit layer 使用完整扇区 path 负责 hover / focus / aria。
-- **Hover 强调**:每个扇区独立排队执行进入与离开动画；hover / focus 时扇区不位移，仅外半径缓动增加 `hoverThicknessGrowth`；中心标签上方显示百分比，下方显示当前项名称。
+- **Hover 强调**:每个扇区从当前几何立即转向最新 hover / focus 目标，取消未完成的旧动画，不积压重播；hover / focus 时扇区不位移，仅外半径缓动增加 `hoverThicknessGrowth`；中心标签上方显示百分比，下方显示当前项名称。
 
 共享纯逻辑位于 `pro/src/lib/chart/`：颜色、渐变、几何基准缩放、圆环扇区 path 与出现时间轴。GaugeChart 自身保留半圆圆心、起始方向、中心标签和 hover 状态管理。
 
@@ -183,7 +183,7 @@ interface GaugeChartItem {
 | :--- | :--- | :--- |
 | 顺序出现 | 与 CircularChart 一致，默认总时长固定为 `1000ms`，不随扇区数量变化；整张图表使用图表级缓出时间分配：前段时长接近，越靠后的扇区时长越长；单段内部线性填充；透明度跟随填充进度完成；反向进度沿同一公式回退 | 组件内部确定性时间轴 |
 | 滚动出现 | `scrollAppearance` 按锚点与视口触发线距离映射到 `appearanceProgress` | 组件内部滚动监听 |
-| 扇区 hover 强调 | 每个扇区独立排队执行进入与离开动画；进入时外半径从 `R` 缓动到 `R + hoverThicknessGrowth`，离开时缓动回 `R`；内半径不变，扇区不位移 | 组件内部 `requestAnimationFrame + cubicOut` |
+| 扇区 hover 强调 | 每个扇区从当前几何立即转向最新 hover / focus 目标，取消未完成的旧动画，不积压重播；进入时外半径从 `R` 缓动到 `R + hoverThicknessGrowth`，离开时缓动回 `R`；内半径不变，扇区不位移 | 组件内部 `requestAnimationFrame + cubicOut`，`300ms`；减少动效时直接到达最终状态 |
 | 扇区亮度反馈 | `filter: brightness(1.04)` | `--snowui-frame-color-motion-*` |
 | 中心标签进入 | `opacity + scale` | `--snowui-frame-appear-motion-*` / `--snowui-frame-control-motion-*` |
 
@@ -270,6 +270,11 @@ interface GaugeChartItem {
 ---
 
 ## 7. 更新日志 (Changelog)
+
+### v1.6.1 (2026-09-04)
+
+- 修复快速反复移入移出与切换扇区后 hover 动画积压重播；新目标从当前几何立即接管。
+- 鼠标离开后保留仍在焦点中的扇区强调；减少动效时直接显示最终几何。
 
 ### v1.6.0 (2026-09-03)
 
