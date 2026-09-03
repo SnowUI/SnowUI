@@ -1,6 +1,6 @@
 # 通用效果 Motion Preset
 
-> **版本**: v1.7.0
+> **版本**: v1.8.0
 > **职责**: 将通用单 Frame 效果与 Button 背景层 CSS 动效整理为语义 preset。
 
 ## 导出
@@ -8,7 +8,7 @@
 | 需求语义 | preset |
 | :--- | :--- |
 | hover 轻微放大 | `HOVER_SCALE_UP_MOTION` |
-| Button 默认 hover 只放大背景层到 `1.06`，使用 `200ms ease` | `BUTTON_HOVER_SCALE_UP_MOTION` |
+| Button 背景 hover 时序与默认 / sm 基线；按最终 size 的标准高度反比补偿 hover、Borderless 起点与点击中点，具体值以 catalog 为准 | `BUTTON_HOVER_SCALE_UP_MOTION` / `getButtonBackgroundScale(size)` |
 | hover 上浮并放大 | `HOVER_LIFT_MOTION` |
 | 数字向上弹入 | `NUMBER_POP_APPEAR_MOTION` |
 | 短文字替换 | `TEXT_SWAP_APPEAR_MOTION` |
@@ -23,6 +23,7 @@
 - 本文件收录单个 Frame 可表达的 opacity、scale、x/y、blur 与 timing 组合，以及由组件背景伪元素消费、但仍需共享 token 管理的 Button 背景缩放。
 - Badge 双层动画、Avatar hover-out 强回弹、Success check 路径绘制、error shake 分段、shimmer 循环等专项动画继续由共享专项能力或组件内部实现负责。
 - 组件命中这里的语义时直接引用 preset，不复制具体数值。
+- `getButtonBackgroundScale(size)` 只返回 `hoverTo / borderlessFrom / clickTo`；使用最终解析的 `sm / md / lg`，不读取 DOM，不改变布局或背景等比缩放方式。标准高度比例不随根字号变化。
 
 ```svelte
 <script lang="ts">

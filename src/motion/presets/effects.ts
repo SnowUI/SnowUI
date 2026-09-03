@@ -23,6 +23,8 @@ import {
     MOTION_SCALE_HOVER_FROM,
     MOTION_SCALE_HOVER_TO,
     MOTION_SCALE_BUTTON_HOVER_TO,
+    MOTION_SCALE_BUTTON_BORDERLESS_FROM,
+    MOTION_BUTTON_REFERENCE_HEIGHT_PX,
     MOTION_SCALE_ICON_SWAP_FROM,
 } from "../tokens";
 
@@ -39,6 +41,19 @@ export const BUTTON_HOVER_SCALE_UP_MOTION: MotionConfig = {
     duration: MOTION_DURATION_BUTTON_HOVER_MS,
     easing: MOTION_EASING_BUTTON_HOVER,
 };
+
+/** 按标准高度反比补偿整段背景运动，保留默认 / sm 的视觉与等比圆角。 */
+export function getButtonBackgroundScale(size: keyof typeof MOTION_BUTTON_REFERENCE_HEIGHT_PX) {
+    const factor = MOTION_BUTTON_REFERENCE_HEIGHT_PX.sm / MOTION_BUTTON_REFERENCE_HEIGHT_PX[size];
+    const hoverTo = MOTION_SCALE_HOVER_FROM
+        + (MOTION_SCALE_BUTTON_HOVER_TO - MOTION_SCALE_HOVER_FROM) * factor;
+    return {
+        hoverTo,
+        borderlessFrom: MOTION_SCALE_HOVER_FROM
+            + (MOTION_SCALE_BUTTON_BORDERLESS_FROM - MOTION_SCALE_HOVER_FROM) * factor,
+        clickTo: (MOTION_SCALE_HOVER_FROM + hoverTo) / 2,
+    };
+}
 
 export const HOVER_LIFT_MOTION: MotionConfig = {
     ...HOVER_SCALE_UP_MOTION,

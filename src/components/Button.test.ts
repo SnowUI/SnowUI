@@ -1,6 +1,7 @@
 /**
  * Button.test.ts
- * v1.14.0
+ * v1.15.0
+ * 变更记录 (2026-09-04): 按标准高度补偿 md / lg 的背景 hover 与点击行程，补充三尺寸四变体对照。
  * 变更记录 (2026-08-27): 恢复背景层比例放大：普通背景 1 -> 1.06，Borderless 0.84 -> 1.06；内容与布局不变。
  * 变更记录 (2026-08-19): hover 颜色与背景外扩统一为 150ms ease-in-out，同步进入与退出。
  * 变更记录 (2026-08-19): hover 颜色层改为 300ms ease-in-out 渐现 / 渐隐，慢于 200ms 背景外扩。
@@ -87,11 +88,46 @@ export const examples = [
         expected: {
             render: "三种尺寸的 filled Button 均保持 Primary 背景与 Static White 文字，文字清晰可见。",
             layout: "尺寸与原有 padding、圆角和内容布局不变。",
-            interaction: "sm/md/lg 的 hover 均只将背景层从 scale(1) 放大到 scale(1.06)，不改变前景色、内容尺寸或布局。",
+            interaction: "sm/md/lg 的 hover 背景终点分别为 1.06/1.04/1.03；标准高度下上下外扩量一致，不改变前景色、内容尺寸或布局。",
             performance: "宿主基线与组件样式的先后加载不影响 filled 前景色。",
             responsive: "sm、md、lg 使用同一变体颜色契约。",
         },
         logic: ["Size", "FilledColor", "CascadeOrder"],
+    },
+    {
+        name: "A2B: 尺寸补偿 hover 对照",
+        code: `A2B
+<Frame column class="gap-16">
+    <Frame row class="gap-16 items-center">
+        <Text>sm · 默认</Text>
+        <Button>Button</Button>
+        <Button variant="filled">Button</Button>
+        <Button variant="outline">Button</Button>
+        <Button variant="borderless">Button</Button>
+    </Frame>
+    <Frame row class="gap-16 items-center">
+        <Text>md</Text>
+        <Button size="md">Button</Button>
+        <Button size="md" variant="filled">Button</Button>
+        <Button size="md" variant="outline">Button</Button>
+        <Button size="md" variant="borderless">Button</Button>
+    </Frame>
+    <Frame row class="gap-16 items-center">
+        <Text>lg</Text>
+        <Button size="lg">Button</Button>
+        <Button size="lg" variant="filled">Button</Button>
+        <Button size="lg" variant="outline">Button</Button>
+        <Button size="lg" variant="borderless">Button</Button>
+    </Frame>
+</Frame>`,
+        expected: {
+            render: "四种变体及三种尺寸保持各自颜色、圆角与内容；默认 / sm 的原效果不变。",
+            interaction: "hover 终点按 24/36/48 标准高度反比补偿为 1.06/1.04/1.03，Borderless 起点为 0.84/约 0.893333/0.92；点击缩回各尺寸放大量的一半。",
+            layout: "只缩放背景，不改变文字、图标、命中区或父容器布局；等比 transform 下不同宽高比的左右外扩量允许不同。",
+            accessibility: "减少动效直接提交各尺寸 hover 终点和最终颜色，不播放点击缩放。",
+            performance: "只按 resolvedSize 计算比例；不增加 DOM、Observer 或逐帧测量。",
+        },
+        logic: ["Size", "HoverScale", "ClickMotion", "ReducedMotion"],
     },
     {
         name: "A3: 禁用状态 (Disabled)",

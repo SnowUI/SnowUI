@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.17.1
+  v2.18.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -20,7 +20,10 @@
   import { onDestroy, setContext, type Snippet } from "svelte";
   import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
   import Frame, { type FrameProps } from "./Frame.svelte";
-  import { BUTTON_HOVER_SCALE_UP_MOTION } from "../motion/presets/effects";
+  import {
+    BUTTON_HOVER_SCALE_UP_MOTION,
+    getButtonBackgroundScale,
+  } from "../motion/presets/effects";
   import {
     mergeComponentPartProps,
     useComponentPart,
@@ -286,18 +289,15 @@
     return "";
   });
   const buttonStyle = $derived.by(() => {
-    const scale = Array.isArray(BUTTON_HOVER_SCALE_UP_MOTION.scale)
-      ? BUTTON_HOVER_SCALE_UP_MOTION.scale[1]
-      : (BUTTON_HOVER_SCALE_UP_MOTION.scale ?? 1);
-    const baseScale = Array.isArray(BUTTON_HOVER_SCALE_UP_MOTION.scale)
-      ? BUTTON_HOVER_SCALE_UP_MOTION.scale[0]
-      : 1;
+    const { hoverTo: scale, borderlessFrom, clickTo } =
+      getButtonBackgroundScale(resolvedSize);
     const duration = BUTTON_HOVER_SCALE_UP_MOTION.duration ?? 0;
     const easing = BUTTON_HOVER_SCALE_UP_MOTION.easing ?? "ease";
     const defaultHoverMotionStyle = [
       `--snowui-button-hover-scale-to: ${scale}`,
+      `--snowui-button-borderless-scale-from: ${borderlessFrom}`,
       // 点击统一缩回标准 hover 区间中点，不使用 Borderless 的隐藏起点。
-      `--snowui-button-click-scale-to: ${(baseScale + scale) / 2}`,
+      `--snowui-button-click-scale-to: ${clickTo}`,
       `--snowui-button-hover-motion-duration: ${duration}ms`,
       `--snowui-button-hover-motion-easing: ${easing}`,
     ].join("; ");
@@ -948,7 +948,7 @@
   :global(
       :where(.snowui-button).snowui-button-background-scale-surface[data-variant="borderless"]
     ) {
-    --snowui-button-hover-scale: 0.84;
+    --snowui-button-hover-scale: var(--snowui-button-borderless-scale-from);
     --snowui-button-background-layer-opacity: 0;
   }
 

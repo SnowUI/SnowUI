@@ -1,6 +1,6 @@
 # Motion Preset Catalog
 
-> **版本**: v1.27.0
+> **版本**: v1.28.0
 > **职责**: 登记 SnowUI 已转正的组件族动效 preset，作为“新组件用哪个动效值”的查询入口。
 
 组件默认动效值不得散落在组件内部。新增或修改组件时，先按语义查本目录：
@@ -19,7 +19,7 @@
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
 | `CONTINUOUS_HOVER_MOTION` | Sidebar、Listbox、Popover、TableBody、Accordion、Tab / Segmented 的共享 hover 背景移动 | 单项独立 hover、生命周期进入 | Fluid Functionalism proximity hover |
 | `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
-| `BUTTON_HOVER_SCALE_UP_MOTION` | 独立动作 Button 只将背景层从 `scale(1)` 放大到 `scale(1.06)`，使用 `200ms ease`；Borderless 以隐藏的 `0.84` 为背景起点并收敛到同一终点；配套点击统一缩回标准 hover 区间中点 `1.03`，再恢复 `1.06`，Borderless 同样适用，两段各使用本 preset 一半的时长及相同 easing，内容、命中区与布局尺寸不变 | bare、复合控件项、非 Button hover、生命周期出现 | 2026-08-19 Owner 确认的 Borderless 与背景层放大方案，2026-08-27 明确恢复 |
+| `BUTTON_HOVER_SCALE_UP_MOTION` / `getButtonBackgroundScale(size)` | 独立动作 Button 背景使用 `200ms ease`；标准高度 `H=24/36/48`，系数 `k=24/H`，hover 终点 `1+0.06k` 为 sm `1.06`、md `1.04`、lg `1.03`；Borderless 隐藏起点 `1-0.16k` 为 `0.84/0.893333…/0.92`；点击中点 `1+0.03k` 为 `1.03/1.02/1.015`，两段各 100ms。颜色、内容、命中区与布局不变；按 size 校准，不测量自定义高度，左右外扩仍取决于宽高比 | bare、默认关闭的复合控件项、非 Button hover、生命周期出现 | 保留 2026-08-27 恢复的默认 / sm 基线；2026-09-04 用户要求直接实现 md / lg 感知幅度补偿，等待视觉验收 |
 | `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
 | `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
 | `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |
@@ -43,6 +43,8 @@
 10. SnowUI 组件源码拥有明确默认视觉时必须显式引用 preset，不得写 `whileXxx={true}` 绑定可变的 Frame 默认值；旧 generic opacity + scale 视觉统一迁移到 `GENERIC_SCALE_APPEAR_MOTION`。
 
 ## 变更记录
+
+- v1.28.0 (2026-09-04): 新增 Button 标准高度反比补偿解析器；同步缩短 md / lg 的 hover、Borderless 隐藏起点与点击行程，保留默认 / sm 及原有时序。
 
 - v1.27.0 (2026-08-27): 恢复 Owner 已确认的 Button 背景层 `1 → 1.06` 与 Borderless `0.84 → 1.06` 比例放大方案；背景使用 `200ms ease`，内容与布局不缩放。
 

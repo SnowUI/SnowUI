@@ -95,6 +95,9 @@ export const MOTION_SCALE_ICON_SWAP_FROM = 0.25;
 export const MOTION_SCALE_HOVER_FROM = 1;
 export const MOTION_SCALE_HOVER_TO = 1.05;
 export const MOTION_SCALE_BUTTON_HOVER_TO = 1.06;
+export const MOTION_SCALE_BUTTON_BORDERLESS_FROM = 0.84;
+/** Button 标准高度的名义校准值；仅计算无量纲比例，不设置实际布局。 */
+export const MOTION_BUTTON_REFERENCE_HEIGHT_PX = { sm: 24, md: 36, lg: 48 } as const;
 export const MOTION_DISTANCE_AVATAR_LIFT_Y_PX = -4;
 export const MOTION_DISTANCE_TEXT_SWAP_Y_PX = 4;
 export const MOTION_DISTANCE_ERROR_SHAKE_X_PX = 6;
