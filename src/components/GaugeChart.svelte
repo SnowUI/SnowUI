@@ -1,6 +1,6 @@
 <!--
   GaugeChart 仪表图组件 (PRO)
-  v1.5.1 (2026-09-03)
+  v1.6.0 (2026-09-03)
 
   职责:渲染具备同色占位层、透明间隔、渐变填充与顺序出现动效的半圆仪表比例图。
   Hover:每个扇区独立完成向外增厚与复位动效;中心标签显示当前项。
@@ -67,6 +67,7 @@
     interface Props {
         data?: GaugeChartItem[];
         width?: number | string;
+        minWidth?: number | string;
         height?: number | string;
         ringThickness?: number | string;
         cornerRadius?: number | string | "auto";
@@ -145,6 +146,7 @@
     let {
         data = DEFAULT_DATA,
         width = 320,
+        minWidth = `${SECTOR_CHART_MIN_WIDTH}px`,
         height = 160,
         ringThickness = 32,
         cornerRadius = "auto",
@@ -351,7 +353,7 @@
             `--snowui-gauge-chart-label-scale: ${numericWidth / BASE_GEOMETRY_WIDTH}`,
             `--snowui-gauge-chart-responsive-scale: ${displaySize.scale}`,
             `--snowui-gauge-chart-max-width: ${enableResponsive ? "100%" : "none"}`,
-            `--snowui-gauge-chart-min-width: ${enableResponsive ? SECTOR_CHART_MIN_WIDTH : 0}px`,
+            `--snowui-gauge-chart-min-width: ${enableResponsive ? toCssLength(minWidth) : "0px"}`,
             `--snowui-gauge-chart-flex-shrink: ${enableResponsive ? 1 : 0}`,
             style,
         ]

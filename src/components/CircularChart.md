@@ -1,13 +1,13 @@
 # CircularChart (圆形图表)
 
-> **版本**: v1.3.1
+> **版本**: v1.4.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、隔断、整体尺寸的圆环/饼形比例图。Hover 动效参考 Apache ECharts `pie-borderRadius` 示例的强调反馈，并按 SnowUI 规范改为外侧增厚。
 > **参考**: ECharts [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 官方示例，以及本地 ECharts `src/chart/pie/pieLayout.ts`、`src/chart/helper/sectorHelper.ts` 源码。
 
 
-默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度为固定 40px；容器不足 40px 时保持下限。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `pro/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
+默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度由 `minWidth` 决定，默认 `"40px"`；容器不足下限时保持下限。将 `minWidth` 设为与图表宽度相同即可阻止自动缩小。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `pro/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
 
 ---
 
@@ -85,6 +85,7 @@
 | :--- | :--- | :--- | :--- |
 | `data` | `CircularChartItem[]` | 内置 5 项示例数据 | 比例数据数组；每项必填 name（名称）与 value（有限正数），可选 color、percentFormat。按输入顺序过滤非正数和非法值，再取前 maxItems 项；百分比分母是实际显示项之和。空数组或全部无效时回退内置 5 项演示数据，不代表空态；业务无数据时应由调用方单独显示说明。 |
 | `size` | `number \| string` | `240` | 图表正方形尺寸；推荐传正数，数字按 px 设计值转为 rem。字符串直接作为 CSS 长度，但 SVG 几何仅通过 parseFloat 取数，不进行单位换算，因此不支持可靠的百分比、calc() 或 CSS 变量自适应几何。 |
+| `minWidth` | `number \| string` | `"40px"` | 响应式最小显示宽度；数字与 size 使用相同的 px 设计值转 rem 规则，字符串直接作为 CSS 长度。默认固定 40 CSS px；设为与 size 相同可阻止自动缩小，设为更小值允许缩到该下限。仅 enableResponsive=true 时生效。 |
 | `ringThickness` | `number \| string` | `32` | 环厚，推荐非负数字（px 设计值）；内半径为 max(0, 外半径 − 环厚)。外半径为 size / 2 − hoverThicknessGrowth − 1，环厚达到它时形成实心饼图。字符串仅提取数值，不换算 CSS 单位。 |
 | `cornerRadius` | `number \| string \| "auto"` | `"auto"` | 扇区端部圆角；非负数值或数字字符串表示 160×160 基准下的 px 设计值，按 size / 160 缩放；auto 使用基准值 4。最终圆角受环厚和扇区可容纳角度限制；0 为直角。 |
 | `separatorWidth` | `number \| string \| "auto"` | `"auto"` | 扇区间透明隔断；非负数值或数字字符串表示 160×160 基准下的 px 设计值，按 size / 160 缩放；auto 使用基准值 2，0 关闭间隔。通过路径几何留空，透出真实背景。 |
@@ -120,7 +121,7 @@
 | `loading` | `boolean` | - | 透传 Frame 加载状态；未传时使用 Frame 的上下文/默认解析。与 skeleton 配合显示内置占位，不代表数据请求或业务完成。 |
 | `skeleton` | `boolean` | - | 透传 Frame 骨架开关；与 loading 或上层加载上下文配合生效，默认由 Frame 解析。图表自注册圆形骨架，不需要调用方复制 SVG 占位。 |
 | `renderHints` | `RenderHints` | - | 骨架提示对象；CircularChart 读取 variant、width、height、radius，缺省分别为 circle、size、size、全圆角。只改变加载占位，不改变真实图表几何。 |
-| `enableResponsive` | `boolean` | `true` | 默认在容器放不下时等比缩小图表本体，支持 flex 并排收缩，最小显示宽度固定 40px；HoverPanel 不缩放；false 保留声明尺寸。也透传至 Frame。 |
+| `enableResponsive` | `boolean` | `true` | 默认在容器放不下时等比缩小图表本体，支持 flex 并排收缩，最小显示宽度由 minWidth 决定（默认 40px），与图表宽度相同时不收缩；HoverPanel 不缩放；false 保留声明尺寸。也透传至 Frame。 |
 | `enableContext` | `boolean` | `true` | 透传 Frame 的上下文能力开关；当前组件自己的 size、颜色与出现进度仍由对应 Props 决定。 |
 | `enableScaleObserver` | `boolean` | `false` | 透传 Frame 的旧版尺寸观察兼容能力，默认关闭；不等同于百分比图表尺寸，不建议新示例依赖此迁移期入口。 |
 | `enableDefaultMotion` | `boolean` | `true` | 透传 Frame 默认外层动效能力；不接管图表内部出现时间轴和扇区 hover 增厚，后者分别由 appearMotion / appearanceProgress 与 hoverThicknessGrowth 控制。 |
@@ -390,6 +391,10 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 ---
 
 ## 8. 更新日志 (Changelog)
+
+### v1.4.0 (2026-09-03)
+
+- 新增 `minWidth`，默认 `"40px"`；与图表宽度相同即可阻止响应式收缩，数字尺寸使用相同单位规则。
 
 ### v1.3.1 (2026-09-03)
 

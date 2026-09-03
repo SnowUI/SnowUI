@@ -1,6 +1,6 @@
 <!--
   CircularChart 圆形图表组件 (PRO)
-  v1.3.1 (2026-09-03)
+  v1.4.0 (2026-09-03)
 
   职责:渲染可调圆角、环厚、隔断、尺寸的圆环/饼形比例图。
   Hover:当前扇区仅向外增厚,不位移;中心标签显示当前项。
@@ -78,6 +78,7 @@
     interface Props {
         data?: CircularChartItem[];
         size?: number | string;
+        minWidth?: number | string;
         ringThickness?: number | string;
         cornerRadius?: number | string | "auto";
         separatorWidth?: number | string | "auto";
@@ -157,6 +158,7 @@
     let {
         data = DEFAULT_DATA,
         size = 240,
+        minWidth = `${SECTOR_CHART_MIN_WIDTH}px`,
         ringThickness = 32,
         cornerRadius = "auto",
         separatorWidth = "auto",
@@ -356,7 +358,7 @@
             `--snowui-circular-chart-label-scale: ${numericSize / BASE_GEOMETRY_SIZE}`,
             `--snowui-circular-chart-responsive-scale: ${displaySize.scale}`,
             `--snowui-circular-chart-max-width: ${enableResponsive ? "100%" : "none"}`,
-            `--snowui-circular-chart-min-width: ${enableResponsive ? SECTOR_CHART_MIN_WIDTH : 0}px`,
+            `--snowui-circular-chart-min-width: ${enableResponsive ? toCssLength(minWidth) : "0px"}`,
             `--snowui-circular-chart-flex-shrink: ${enableResponsive ? 1 : 0}`,
             style,
         ]

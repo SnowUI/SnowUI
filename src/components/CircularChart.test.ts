@@ -578,4 +578,19 @@ CC-02
         },
         logic: ["Responsive", "MinWidth", "Flex", "HoverPanel"],
     },
+    {
+        name: "CC-19: 最小宽度等于图表宽度时不收缩",
+        code: `CC-19
+<Frame column class="w-full gap-16">
+    <Text>默认：容器放不下时缩小至 40px</Text>
+    <CircularChart size={100} />
+    <Text>最小宽度与图表宽度相同：保持 100</Text>
+    <CircularChart size={100} minWidth={100} />
+</Frame>`,
+        expected: {
+            responsive: "第一张图表默认缩小至 40px；第二张图表 minWidth 与声明宽度相同，窄容器中仍保持声明尺寸",
+            interaction: "两种尺寸策略下，hover 与 focus 均可显示未缩放的 HoverPanel",
+        },
+        logic: ["Responsive", "MinWidth", "HoverPanel"],
+    },
 ] as const;
