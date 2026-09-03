@@ -1,6 +1,6 @@
 <!--
   CircularChart 圆形图表组件 (PRO)
-  v1.2.3 (2026-09-03)
+  v1.3.0 (2026-09-03)
 
   职责:渲染可调圆角、环厚、隔断、尺寸的圆环/饼形比例图。
   Hover:当前扇区仅向外增厚,不位移;中心标签显示当前项。
@@ -19,6 +19,7 @@
         type RenderHints,
     } from "@snowui-design-system/components";
     import type { MotionConfig } from "@snowui-design-system/components/logic/motion-config";
+    import { watchSectorChartSize, type SectorChartSize } from "../lib/chart/size";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
     import { buildArcPath } from "../lib/chart/arc-path";
     import {
@@ -202,6 +203,8 @@
     }: Props = $props();
 
     let rootElement = $state<HTMLElement>();
+    let bodyElement = $state<HTMLElement>();
+    let displaySize = $state<SectorChartSize>({ width: 0, height: 0, scale: 1 });
     let centerElement = $state<HTMLElement>();
     let hoveredIndex = $state<number | null>(null);
     let focusedIndex = $state<number | null>(null);
@@ -324,13 +327,17 @@
             : {
                   label: activeItem?.name,
                   rows: hoverPanelRows,
-                  x: hoverPanelPointer.x,
-                  y: hoverPanelPointer.y,
+                  x: hoveredIndex === null && focusedIndex !== null
+                      ? (0.5) * (displaySize.width || numericSize)
+                      : hoverPanelPointer.x,
+                  y: hoveredIndex === null && focusedIndex !== null
+                      ? (0.5) * (displaySize.height || numericSize)
+                      : hoverPanelPointer.y,
                   bounds: {
                       left: 0,
                       top: 0,
-                      width: numericSize,
-                      height: numericSize,
+                      width: displaySize.width || numericSize,
+                      height: displaySize.height || numericSize,
                   },
                   placement: hoverPanelPlacement,
                   showLabel: showHoverPanelLabel,
@@ -347,6 +354,8 @@
             `--snowui-circular-chart-separator-width: ${toCssLength(numericSeparatorWidth)}`,
             `--snowui-circular-chart-hover-thickness-growth: ${toCssLength(hoverThicknessGrowth ?? hoverScaleSize ?? 4)}`,
             `--snowui-circular-chart-label-scale: ${numericSize / BASE_GEOMETRY_SIZE}`,
+            `--snowui-circular-chart-responsive-scale: ${displaySize.scale}`,
+            `--snowui-circular-chart-max-width: ${enableResponsive ? "100%" : "none"}`,
             style,
         ]
             .filter(Boolean)
@@ -372,6 +381,13 @@
             ),
         );
     }
+
+    $effect(() => {
+        if (!rootElement || !bodyElement) return;
+        return watchSectorChartSize(rootElement, bodyElement, (next) => {
+            displaySize = next;
+        });
+    });
 
     $effect(() => () => {
         animationFrames.forEach((frame) => cancelAnimationFrame(frame));
@@ -674,7 +690,6 @@
 
     function handleSegmentFocus(index: number) {
         const previousIndex = hoveredIndex ?? focusedIndex;
-        hoverPanelPointer = { x: center, y: center };
         focusedIndex = index;
         updateActiveSegmentGrowth(previousIndex);
     }
@@ -1025,200 +1040,202 @@
     aria-label="圆形图表"
     {...rest}
 >
-    <svg
-        class="snowui-circular-chart-svg"
-        viewBox={`0 0 ${numericSize} ${numericSize}`}
-        aria-hidden="true"
-    >
-        <defs>
-            {#each segmentPaints as paint, index}
-                {#if paint.colorGradient}
+    <div bind:this={bodyElement} class="snowui-circular-chart-body">
+        <svg
+            class="snowui-circular-chart-svg"
+            viewBox={`0 0 ${numericSize} ${numericSize}`}
+            aria-hidden="true"
+        >
+            <defs>
+                {#each segmentPaints as paint, index}
+                    {#if paint.colorGradient}
+                        <linearGradient
+                            id={paint.colorGradient.id}
+                            gradientUnits="userSpaceOnUse"
+                            x1={paint.colorGradient.coordinates.x1}
+                            y1={paint.colorGradient.coordinates.y1}
+                            x2={paint.colorGradient.coordinates.x2}
+                            y2={paint.colorGradient.coordinates.y2}
+                        >
+                            {#each paint.colorGradient.stops as stop}
+                                <stop
+                                    offset={stop.offset}
+                                    stop-color={stop.color}
+                                    stop-opacity={stop.opacity ?? 1}
+                                />
+                            {/each}
+                        </linearGradient>
+                    {/if}
                     <linearGradient
-                        id={paint.colorGradient.id}
+                        id={paint.opacityGradientId}
                         gradientUnits="userSpaceOnUse"
-                        x1={paint.colorGradient.coordinates.x1}
-                        y1={paint.colorGradient.coordinates.y1}
-                        x2={paint.colorGradient.coordinates.x2}
-                        y2={paint.colorGradient.coordinates.y2}
+                        x1={paint.opacityCoordinates.x1}
+                        y1={paint.opacityCoordinates.y1}
+                        x2={paint.opacityCoordinates.x2}
+                        y2={paint.opacityCoordinates.y2}
                     >
-                        {#each paint.colorGradient.stops as stop}
-                            <stop
-                                offset={stop.offset}
-                                stop-color={stop.color}
-                                stop-opacity={stop.opacity ?? 1}
-                            />
-                        {/each}
+                        <stop
+                            offset="0%"
+                            stop-color={paint.opacityTailColor}
+                            stop-opacity="1"
+                        />
+                        <stop
+                            offset="72%"
+                            stop-color={paint.opacityMidColor}
+                            stop-opacity="1"
+                        />
+                        <stop
+                            offset="100%"
+                            stop-color="white"
+                            stop-opacity="1"
+                        />
                     </linearGradient>
-                {/if}
-                <linearGradient
-                    id={paint.opacityGradientId}
-                    gradientUnits="userSpaceOnUse"
-                    x1={paint.opacityCoordinates.x1}
-                    y1={paint.opacityCoordinates.y1}
-                    x2={paint.opacityCoordinates.x2}
-                    y2={paint.opacityCoordinates.y2}
-                >
-                    <stop
-                        offset="0%"
-                        stop-color={paint.opacityTailColor}
-                        stop-opacity="1"
-                    />
-                    <stop
-                        offset="72%"
-                        stop-color={paint.opacityMidColor}
-                        stop-opacity="1"
-                    />
-                    <stop
-                        offset="100%"
-                        stop-color="white"
-                        stop-opacity="1"
-                    />
-                </linearGradient>
-                <mask id={paint.opacityMaskId} maskUnits="userSpaceOnUse">
-                    <path
-                        d={segments[index].revealPath}
-                        fill={`url(#${paint.opacityGradientId})`}
-                    />
-                </mask>
-            {/each}
-        </defs>
-        {#if showBaseLayer}
-            <g class="snowui-circular-chart-base-layer" aria-hidden="true">
-                {#each segments as segment, index}
-                    <path
-                        class="snowui-circular-chart-segment-base"
-                        d={segment.basePath}
-                        fill={segmentPaints[index].fill}
-                        fill-opacity="0.04"
-                        stroke={segment.seamStrokeWidth > 0
-                            ? segmentPaints[index].fill
-                            : "none"}
-                        stroke-width={segment.seamStrokeWidth}
-                        stroke-opacity="0.04"
-                        pointer-events="none"
-                    />
-                    {#if segment.seamStrokeWidth > 0}
+                    <mask id={paint.opacityMaskId} maskUnits="userSpaceOnUse">
                         <path
-                            class="snowui-circular-chart-segment-seam-blur"
+                            d={segments[index].revealPath}
+                            fill={`url(#${paint.opacityGradientId})`}
+                        />
+                    </mask>
+                {/each}
+            </defs>
+            {#if showBaseLayer}
+                <g class="snowui-circular-chart-base-layer" aria-hidden="true">
+                    {#each segments as segment, index}
+                        <path
+                            class="snowui-circular-chart-segment-base"
                             d={segment.basePath}
-                            fill="none"
-                            stroke={segmentPaints[index].fill}
+                            fill={segmentPaints[index].fill}
+                            fill-opacity="0.04"
+                            stroke={segment.seamStrokeWidth > 0
+                                ? segmentPaints[index].fill
+                                : "none"}
                             stroke-width={segment.seamStrokeWidth}
                             stroke-opacity="0.04"
-                            style="filter: blur(0.5px)"
                             pointer-events="none"
                         />
-                    {/if}
-                {/each}
-            </g>
-        {/if}
-        <g class="snowui-circular-chart-fill-layer">
-            {#each segments as segment, index}
-                {#if segment.visible}
-                    <path
-                        class={[
-                            "snowui-circular-chart-segment",
-                            "snowui-circular-chart-segment-fill",
-                            segment.active
-                                ? "snowui-circular-chart-segment-active"
-                                : "",
-                        ]
-                            .filter(Boolean)
-                            .join(" ")}
-                        d={segment.fillPath}
-                        fill={segmentPaints[index].fill}
-                        stroke={segment.seamStrokeWidth > 0
-                            ? segmentPaints[index].fill
-                            : "none"}
-                        stroke-width={segment.seamStrokeWidth}
-                        mask={`url(#${segmentPaints[index].opacityMaskId})`}
-                        pointer-events="none"
-                    />
-                    {#if segment.seamStrokeWidth > 0}
+                        {#if segment.seamStrokeWidth > 0}
+                            <path
+                                class="snowui-circular-chart-segment-seam-blur"
+                                d={segment.basePath}
+                                fill="none"
+                                stroke={segmentPaints[index].fill}
+                                stroke-width={segment.seamStrokeWidth}
+                                stroke-opacity="0.04"
+                                style="filter: blur(0.5px)"
+                                pointer-events="none"
+                            />
+                        {/if}
+                    {/each}
+                </g>
+            {/if}
+            <g class="snowui-circular-chart-fill-layer">
+                {#each segments as segment, index}
+                    {#if segment.visible}
                         <path
-                            class="snowui-circular-chart-segment-seam-blur"
+                            class={[
+                                "snowui-circular-chart-segment",
+                                "snowui-circular-chart-segment-fill",
+                                segment.active
+                                    ? "snowui-circular-chart-segment-active"
+                                    : "",
+                            ]
+                                .filter(Boolean)
+                                .join(" ")}
                             d={segment.fillPath}
-                            fill="none"
-                            stroke={segmentPaints[index].fill}
+                            fill={segmentPaints[index].fill}
+                            stroke={segment.seamStrokeWidth > 0
+                                ? segmentPaints[index].fill
+                                : "none"}
                             stroke-width={segment.seamStrokeWidth}
-                            style="filter: blur(0.5px)"
                             mask={`url(#${segmentPaints[index].opacityMaskId})`}
                             pointer-events="none"
                         />
+                        {#if segment.seamStrokeWidth > 0}
+                            <path
+                                class="snowui-circular-chart-segment-seam-blur"
+                                d={segment.fillPath}
+                                fill="none"
+                                stroke={segmentPaints[index].fill}
+                                stroke-width={segment.seamStrokeWidth}
+                                style="filter: blur(0.5px)"
+                                mask={`url(#${segmentPaints[index].opacityMaskId})`}
+                                pointer-events="none"
+                            />
+                        {/if}
+                    {/if}
+                {/each}
+            </g>
+            {#if hoverMode === "cell"}
+                <rect
+                    class="snowui-circular-chart-cell-hit-area"
+                    x="0"
+                    y="0"
+                    width={numericSize}
+                    height={numericSize}
+                    fill="transparent"
+                    pointer-events="all"
+                    role="presentation"
+                    onpointerenter={handleCellPointerMove}
+                    onpointermove={handleCellPointerMove}
+                    onpointerleave={() => setHoveredSegmentIndex(null)}
+                />
+            {/if}
+            {#each segments as segment, index}
+                <path
+                    class="snowui-circular-chart-segment-hit-area"
+                    d={segment.path}
+                    fill="transparent"
+                    pointer-events={hoverMode === "item" ? "all" : "none"}
+                    style="cursor: pointer;"
+                    tabindex="0"
+                    role="button"
+                    aria-label={effectiveShowHoverPanel
+                        ? describeSegmentHoverPanel(
+                              segment.item,
+                              segment.percent,
+                              index,
+                          )
+                        : `${segment.item.name}: ${formatPercentLabel(segment.item, segment.percent)}`}
+                    onpointerenter={(event) => {
+                        updateHoverPanelPointer(event);
+                        handleSegmentEnter(index);
+                    }}
+                    onpointermove={updateHoverPanelPointer}
+                    onpointerleave={() => handleSegmentLeave(index)}
+                    onfocus={() => handleSegmentFocus(index)}
+                    onblur={() => handleSegmentBlur(index)}
+                />
+            {/each}
+        </svg>
+
+        {#if showCenterLabel}
+            <Frame
+                bind:element={centerElement}
+                class="snowui-circular-chart-center"
+                data-visible={activeItem || hasStaticCenterLabel ? "true" : "false"}
+                currentState={activeItem || hasStaticCenterLabel
+                    ? "Appear"
+                    : "Disappear"}
+                whileAppear={CENTER_LABEL_APPEAR_MOTION}
+                whileDisappear={CENTER_LABEL_DISAPPEAR_MOTION}
+                enableResponsive={false}
+                enableContext={false}
+                enableScaleObserver={false}
+                enableDefaultMotion={false}
+                loading={false}
+                skeleton={false}
+                aria-live="polite"
+            >
+                {@render children?.()}
+                {#if !hasCustomCenterLabel && !hasStaticCenterLabel}
+                    {#if mountedCenterLabelLines.value || mountedCenterLabelLines.name}
+                        <span data-role="value">{mountedCenterLabelLines.value}</span>
+                        <span data-role="name">{mountedCenterLabelLines.name}</span>
                     {/if}
                 {/if}
-            {/each}
-        </g>
-        {#if hoverMode === "cell"}
-            <rect
-                class="snowui-circular-chart-cell-hit-area"
-                x="0"
-                y="0"
-                width={numericSize}
-                height={numericSize}
-                fill="transparent"
-                pointer-events="all"
-                role="presentation"
-                onpointerenter={handleCellPointerMove}
-                onpointermove={handleCellPointerMove}
-                onpointerleave={() => setHoveredSegmentIndex(null)}
-            />
+            </Frame>
         {/if}
-        {#each segments as segment, index}
-            <path
-                class="snowui-circular-chart-segment-hit-area"
-                d={segment.path}
-                fill="transparent"
-                pointer-events={hoverMode === "item" ? "all" : "none"}
-                style="cursor: pointer;"
-                tabindex="0"
-                role="button"
-                aria-label={effectiveShowHoverPanel
-                    ? describeSegmentHoverPanel(
-                          segment.item,
-                          segment.percent,
-                          index,
-                      )
-                    : `${segment.item.name}: ${formatPercentLabel(segment.item, segment.percent)}`}
-                onpointerenter={(event) => {
-                    updateHoverPanelPointer(event);
-                    handleSegmentEnter(index);
-                }}
-                onpointermove={updateHoverPanelPointer}
-                onpointerleave={() => handleSegmentLeave(index)}
-                onfocus={() => handleSegmentFocus(index)}
-                onblur={() => handleSegmentBlur(index)}
-            />
-        {/each}
-    </svg>
-
-    {#if showCenterLabel}
-        <Frame
-            bind:element={centerElement}
-            class="snowui-circular-chart-center"
-            data-visible={activeItem || hasStaticCenterLabel ? "true" : "false"}
-            currentState={activeItem || hasStaticCenterLabel
-                ? "Appear"
-                : "Disappear"}
-            whileAppear={CENTER_LABEL_APPEAR_MOTION}
-            whileDisappear={CENTER_LABEL_DISAPPEAR_MOTION}
-            enableResponsive={false}
-            enableContext={false}
-            enableScaleObserver={false}
-            enableDefaultMotion={false}
-            loading={false}
-            skeleton={false}
-            aria-live="polite"
-        >
-            {@render children?.()}
-            {#if !hasCustomCenterLabel && !hasStaticCenterLabel}
-                {#if mountedCenterLabelLines.value || mountedCenterLabelLines.name}
-                    <span data-role="value">{mountedCenterLabelLines.value}</span>
-                    <span data-role="name">{mountedCenterLabelLines.name}</span>
-                {/if}
-            {/if}
-        </Frame>
-    {/if}
+    </div>
 
     <ChartHoverPanel
         visible={Boolean(hoverPanelData)}
@@ -1266,22 +1283,38 @@
         display: inline-grid;
         flex: none;
         place-items: center;
-        width: var(
+        --snowui-circular-chart-body-width: var(
             --snowui-circular-chart-size-override,
             var(
                 --snowui-circular-chart-size,
                 var(--snowui-circular-chart-size-default)
             )
         );
-        height: var(
+        --snowui-circular-chart-body-height: var(
             --snowui-circular-chart-size-override,
             var(
                 --snowui-circular-chart-size,
                 var(--snowui-circular-chart-size-default)
             )
         );
+        width: var(--snowui-circular-chart-body-width);
+        height: calc(var(--snowui-circular-chart-body-height) * var(--snowui-circular-chart-responsive-scale, 1));
+        min-width: 0;
+        max-width: var(--snowui-circular-chart-max-width, 100%);
         color: var(--snowui-circular-chart-label-color);
         line-height: 1;
+    }
+
+    :global(:where(.snowui-circular-chart-body)) {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: grid;
+        place-items: center;
+        width: var(--snowui-circular-chart-body-width);
+        height: var(--snowui-circular-chart-body-height);
+        transform: scale(var(--snowui-circular-chart-responsive-scale, 1));
+        transform-origin: top left;
     }
 
     :global(:where(.snowui-circular-chart-svg)) {

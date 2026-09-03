@@ -28,3 +28,33 @@ export function resolveCartesianChartSize(
 ) {
     return measured > 0 ? measured : toNumber(declared, fallback);
 }
+
+export interface SectorChartSize extends CartesianChartSize {
+    scale: number;
+}
+
+/** 本体保留声明尺寸；根布局与浮层使用缩放后的尺寸。 */
+export function watchSectorChartSize(
+    root: HTMLElement,
+    body: HTMLElement,
+    onChange: (size: SectorChartSize) => void,
+) {
+    const update = () => {
+        // 不读取 transform 后的本体边界，避免缩放反馈和外层动效重复计入。
+        const rootStyle = getComputedStyle(root);
+        const bodyStyle = getComputedStyle(body);
+        const width = Math.max(0, parseFloat(rootStyle.width) || 0);
+        const bodyWidth = parseFloat(bodyStyle.width);
+        const bodyHeight = parseFloat(bodyStyle.height);
+        if (!(bodyWidth > 0) || !(bodyHeight > 0)) return;
+        const scale = width / bodyWidth;
+        onChange({ width, height: bodyHeight * scale, scale });
+    };
+    update();
+    const stopRoot = resizeManager.watch(root, update);
+    const stopBody = resizeManager.watch(body, update);
+    return () => {
+        stopRoot();
+        stopBody();
+    };
+}

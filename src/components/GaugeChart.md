@@ -1,10 +1,13 @@
 # GaugeChart (仪表图)
 
-> **版本**: v1.4.0
+> **版本**: v1.5.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、透明间隔、渐变颜色、4% 同色占位层与顺序出现动效的半圆仪表比例图。颜色、几何与出现时间轴能力与 CircularChart 保持同类心智。
 > **参考**: ECharts [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 官方示例，以及本地 ECharts `src/chart/pie/pieLayout.ts`、`src/chart/helper/sectorHelper.ts` 源码。
+
+
+默认启用响应式：容器变窄时，图表本体按可用宽度整体等比缩小，恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `pro/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
 
 ---
 
@@ -28,43 +31,52 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `data` | `GaugeChartItem[]` | 内置 5 项示例数据 | 图表数据 |
-| `width` | `number \| string` | `320` | 图表整体宽度；数字按 px 语义转为 rem |
-| `height` | `number \| string` | `160` | 图表整体高度；数字按 px 语义转为 rem |
-| `ringThickness` | `number \| string` | `32` | 半圆环粗细；等于外半径与内半径差 |
-| `cornerRadius` | `number \| string \| "auto"` | `"auto"` | 320px 基准下的扇区圆角；`auto` 等同基准 4px，实际值为 `base * width / 320` |
-| `separatorWidth` | `number \| string \| "auto"` | `"auto"` | 320px 基准下的透明间隔粗细；`auto` 等同基准 2px，实际值为 `base * width / 320` |
-| `colors` | `(GaugeChartColor \| undefined)[]` | - | 自定义调色板；空项回退当前 `colorMode`；支持普通颜色、CSS 变量、`linear-gradient(...)` 字符串和渐变对象 |
-| `colorMode` | `"sequence" \| "monochromeFade" \| "monochrome"` | `"sequence"` | Chart 通用颜色模式：默认色序、单色渐浅、单色 |
-| `color` | `GaugeChartColor` | - | 单色模式主色；传入后同时作为 `monochromeFade` 与 `monochrome` 的默认颜色 |
-| `monochromeColor` | `GaugeChartColor` | `"Primary"` | `monochromeFade` 的单色来源；第一个扇区为 100%，最后一个扇区为 20%，中间按扇区数量均匀递减 |
-| `mutedMonochromeColor` | `GaugeChartColor` | `"Black4"` | `monochrome` 的单色来源；默认所有未自定义扇区为 4% 黑色本体颜色，填充透明度保持 100% |
-| `hoverThicknessGrowth` | `number \| string` | `4` | hover 强调时扇区向外增厚的距离；内半径不变，扇区不位移 |
-| `startDirection` | `"left" \| "right"` | `"left"` | 出现动效起始方向；只影响填充顺序和扫描方向，不旋转数据排布 |
-| `showBaseLayer` | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。 |
-| `appearMotion` | `boolean` | `true` | 是否启用出现动效；关闭时直接显示完整填充层，占位层是否显示仍由 showBaseLayer 决定 |
-| `appearOnView` | `boolean` | `true` | 锚点进入视口默认位置时自动播放出现动效 |
-| `appearanceProgress` | `number` | - | 受控出现进度，范围 `0..1`；传入后组件只渲染外部进度 |
-| `defaultAppearanceProgress` | `number` | `0` | 非受控初始出现进度 |
-| `appearanceDuration` | `number` | - | 自动播放总时长覆盖；未设置时 GaugeChart 与 CircularChart 一致，固定为 `1000ms`，不随扇区数量变化 |
-| `appearAnchorId` | `string` | - | 动效触发锚点元素 ID；不传时使用图表根元素 |
-| `appearAnchorPoint` | `"top" \| "center" \| "bottom"` | `"top"` | 使用锚点的顶端、中间或底部作为触发点 |
-| `appearViewportPoint` | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发位置 |
-| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动条时间轴控制出现进度 |
-| `scrollAppearanceDistance` | `number \| string` | `320` | 滚动时间轴从 0 到 1 对应的滚动距离 |
-| `onAppearanceProgressChange` | `(progress: number) => void` | - | 非受控进度变化回调 |
-| `maxItems` | `number` | `10` | 最多显示项数，内部上限固定为 10 |
-| `showCenterLabel` | `boolean` | `true` | hover / focus 时是否显示中心标签 |
-| `hoverMode` | `"cell" \| "item"` | `"cell"` | hover 命中模式；`cell` 使用整图角度命中，扇区间隔处也保持当前扇区，`item` 仅命中可见扇区图形 |
-| `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前扇区自动生成；默认开启并保留中心 hover label；无静态 center-label 时可设为 false 关闭面板，有静态 center-label 时仍自动开启 |
-| `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
-| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；所有图表都可使用 `pointer` |
-| `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前扇区名称 |
-| `percentFormat` | `NumberFormatOptions` | NumberFormats 百分比默认 | 中心标签与扇区 `aria-label` 百分比数字格式；默认保留 1 位小数，可被单个数据项 `percentFormat` 覆盖 |
-| `labelFormatter` | `(item, percent) => string` | - | 中心标签格式化，支持用 `\n` 分两行；第一行是数值样式，第二行是名称样式 |
-| `loading` | `boolean` | - | Frame loading 协议 |
-| `skeleton` | `boolean` | - | Frame skeleton 协议 |
-| `renderHints` | `RenderHints` | - | 骨架屏渲染提示 |
+| `data` | `GaugeChartItem[]` | 内置 5 项示例数据 | 比例数据数组；每项必填 name（名称）与 value（有限正数），可选 color、percentFormat。按输入顺序过滤非正数和非法值，再取前 maxItems 项；百分比分母是实际显示项之和。空数组或全部无效时回退内置 5 项演示数据，不代表空态；业务无数据时应由调用方单独显示说明。 |
+| `width` | `number \| string` | `320` | 整体宽度，推荐正数（px 设计值转 rem）；字符串直接作为 CSS 长度，但 SVG 几何仅以 parseFloat 提取数值，不换算单位，不支持可靠的百分比、calc() 或 CSS 变量几何。 |
+| `height` | `number \| string` | `160` | 整体高度，推荐正数（px 设计值转 rem），通常为 width 的一半；改变高度会改变圆心与可用半径。字符串解析限制与 width 相同。 |
+| `ringThickness` | `number \| string` | `32` | 环厚，推荐非负数字（px 设计值）；内半径为 max(0, 外半径 − 环厚)。外半径为 max(1, min(width / 2, height) − hoverThicknessGrowth − 1)，环厚达到它时形成实心半饼图。字符串仅提取数值，不换算单位。 |
+| `cornerRadius` | `number \| string \| "auto"` | `"auto"` | 扇区端部圆角；非负数值或数字字符串表示 320px 宽基准的 px 设计值，按 width / 320 缩放；auto 使用基准值 4。最终受环厚和扇区角度限制；0 为直角。 |
+| `separatorWidth` | `number \| string \| "auto"` | `"auto"` | 扇区间透明隔断；非负数值或数字字符串表示 320px 宽基准的 px 设计值，按 width / 320 缩放；auto 使用基准值 2，0 关闭间隔。通过路径几何留空，透出真实背景。 |
+| `colors` | `(GaugeChartColor \| undefined)[]` | - | 按过滤后显示索引覆盖颜色；每项支持语义色、CSS 颜色/变量、linear-gradient 字符串或 { type?, angle?, stops } 渐变对象。undefined 空位回退当前 colorMode；数据项 color 优先于调色板。不支持背景 utility 类名。 |
+| `colorMode` | `"sequence" \| "monochromeFade" \| "monochrome"` | `"sequence"` | sequence 按 Primary 与 9 个 Secondary 色序循环；monochromeFade 使用同一主色从首项 100% 均匀降至末项 20%（单项为 100%）；monochrome 所有项使用同一颜色。三种模式均允许数据项和调色板逐项覆盖。 |
+| `color` | `GaugeChartColor` | - | 同时覆盖 monochromeFade 与 monochrome 的回退主色，优先于 monochromeColor / mutedMonochromeColor；sequence 不使用它。支持与数据项 color 相同的纯色、语义色和渐变。 |
+| `monochromeColor` | `GaugeChartColor` | `"Primary"` | 仅在 monochromeFade 且未传 color 时使用的回退主色；支持纯色和渐变。透明度从首项 100% 降到末项 20%，数据项 color 与 colors 仍优先。 |
+| `mutedMonochromeColor` | `GaugeChartColor` | `"Black4"` | 仅在 monochrome 且未传 color 时使用的回退色；默认 Black4 是主题自适应的低对比色，扇区填充自身不再降低透明度。数据项 color 与 colors 仍优先。 |
+| `hoverThicknessGrowth` | `number \| string` | `4` | hover / focus 时向外增厚的非负 px 设计值；内半径与圆心不变，0 关闭几何增厚但保留数据提示。字符串只提取数值，不按 width / 320 缩放；没有 hoverScaleSize 别名。 |
+| `startDirection` | `"left" \| "right"` | `"left"` | left 从左端开始向右揭示，right 从右端开始向左揭示；只改变出现顺序和扫描方向，不旋转数据排布。 |
+| `showBaseLayer` | `boolean` | `false` | 是否显示最终几何的同色 4% 透明度底层；默认不渲染。开启后底层不参与出现动效与命中，便于观察填充进度；不改变真实扇区和数据。 |
+| `appearMotion` | `boolean` | `true` | 是否启用图形出现动效；false 时直接显示完整填充，并使 replay / reverseAppearance 不播放。此开关不关闭独立的 hover 增厚反馈。 |
+| `appearOnView` | `boolean` | `true` | 非受控模式中，锚点到达指定视口位置时自动播放一次；false 可改用实例方法播放。appearanceProgress 优先；scrollAppearance 开启时由滚动驱动。 |
+| `appearanceProgress` | `number` | - | 受控填充进度，数值限制到 0..1；提供后显示由调用方决定，自动播放和实例播放方法不改变受控画面。appearMotion=false 仍直接完整显示；外部进度变化不会触发 onAppearanceProgressChange。 |
+| `defaultAppearanceProgress` | `number` | `0` | 非受控模式首次初始化的进度，限制到 0..1，只读取一次；后续改变此属性不重置动画。有 appearanceProgress 时不决定画面；默认 0 为描边态。 |
+| `appearanceDuration` | `number` | - | 实例播放与自动出现的总时长，单位 ms；未传时固定 1000，不随扇区数改变。非正数在下一动画帧直接到终点；不改变滚动或受控进度映射。 |
+| `appearAnchorId` | `string` | - | 页面内触发锚点元素的 id；未传时使用图表根元素，传入不存在的 id 不回退根元素。仅用于自动出现或滚动时间轴，不改变图表位置。 |
+| `appearAnchorPoint` | `"top" \| "center" \| "bottom"` | `"top"` | 选用锚点的 top（顶部）、center（垂直中心）或 bottom（底部）与视口触发线比较；不影响扇区绘制方向。 |
+| `appearViewportPoint` | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发线：数字限制到 0..1，或使用 top=0、center=0.5、bottom=1。默认 0.7 为视口高度 70%；配合 appearAnchorPoint 决定触发/滚动起点。 |
+| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | true 开启 window 滚动驱动的非受控时间轴；对象可用 distance 覆盖滚动距离。锚点越过触发线后进度由距离决定，向回滚动会逆向恢复。不监听嵌套 ScrollArea；appearanceProgress / appearMotion=false 优先。 |
+| `scrollAppearanceDistance` | `number \| string` | `320` | 滚动进度从 0 到 1 所需的 CSS px 距离；数字或数字字符串，最低按 1 处理。scrollAppearance.distance 优先；只在滚动时间轴开启时生效，不换算字符串单位。 |
+| `onAppearanceProgressChange` | `(progress: number) => void` | - | 内部进度写入时接收 progress（0..1），包括初始化中的直接完成、自动播放、实例方法与滚动更新；可同步外部进度读数。默认值初始化本身不通知；不用于监听外部 appearanceProgress，返回值被忽略，不能取消更新。 |
+| `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..10，0 / NaN 回退 10。百分比只基于保留项，超过 10 类的业务应先聚合小类以保留总量；全无效时仍回退完整内置演示数据。 |
+| `showCenterLabel` | `boolean` | `true` | 是否渲染中心内容区域；false 同时隐藏默认动态标签、segment-value / segment-name 模板与静态 center-label。隐藏中心不关闭显式启用的 HoverPanel。 |
+| `hoverMode` | `"cell" \| "item"` | `"cell"` | cell 按环带角度命中，跨过透明隔断仍保持所属扇区，排除中心空洞与图外；item 只响应扇区路径命中。两种模式均保留扇区键盘 focus 提示。 |
+| `showHoverPanel` | `boolean` | `true` | 默认根据当前 hover / focus 扇区显示结构化面板，同时保留动态中心标签。false 关闭面板；但存在可见静态 center-label 时组件自动启用面板承载扇区信息。 |
+| `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | 面板视觉：light 为默认浅色玻璃样式，dark 为深色样式，surface 为主题表面样式；仅改变面板外观，不改变数据和命中。 |
+| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | 面板位置：pointer 跟随指针；anchor-top / anchor-side 相对当前指针点定位（键盘焦点使用图心）；pin-top-left / pin-top / pin-top-right / pin-right / pin-bottom-right / pin-bottom / pin-bottom-left / pin-left / pin-center 固定在图表对应位置，边缘保留 8px 并参与视口碰撞处理。 |
+| `showHoverPanelLabel` | `boolean` | `false` | 是否在面板行数据上方额外显示当前扇区名称；false 只显示数据行。仅面板开启且存在当前项时有可见效果。 |
+| `percentFormat` | `NumberFormatOptions` | NumberFormats 百分比默认 | 中心百分比、面板百分比与扇区 aria-label 的数字格式；支持 fractionDigits、locale 等 NumberFormatOptions。优先级为数据项 percentFormat → 本属性 → NumberFormatContext → 默认一位小数；labelFormatter 只覆盖中心文本。 |
+| `labelFormatter` | `(item, percent) => string` | - | hover / focus 时接收 item（当前有效数据项）与 percent（0..100 百分数），返回中心文字；以换行拆成数值行与名称行，最多使用两行。静态 center-label 或 showCenterLabel=false 时不调用；不改变面板和扇区 aria-label 的百分比。 |
+| `loading` | `boolean` | - | 透传 Frame 加载状态；未传时使用 Frame 的上下文/默认解析。与 skeleton 配合显示内置占位，不代表数据请求或业务完成。 |
+| `skeleton` | `boolean` | - | 透传 Frame 骨架开关；与 loading 或上层加载上下文配合生效，默认由 Frame 解析。图表自注册矩形骨架，不需要调用方复制 SVG 占位。 |
+| `renderHints` | `RenderHints` | - | 骨架提示对象；读取 variant、width、height、radius，缺省分别为 rect、图表 width、图表 height、9999px。只改变加载占位，不改变真实图表几何。 |
+| `children` | `Snippet` | — | 无参数 Snippet，渲染在 showCenterLabel=true 的中心区域。直系 Text as="segment-value" / "segment-name" 是动态标签模板，由组件写入当前两行文字；直系 Frame as="center-label" 提供常驻内容并自动启用面板。静态内容不自动套用默认中心排版；只需默认文字时无需传 children。中心用于展示，不用于交互工具栏。 |
+| `class` | `string` | `""` | 追加到图表根 Frame 的 class 字符串；不传时为空。仅表达调用方公开根样式，不穿透内部 SVG 和标签结构。 |
+| `style` | `string` | `""` | 追加到根 Frame 的 inline style 字符串，在组件注入的变量之后合并。可表达外部布局；图表几何优先使用 width、height、ringThickness 等公开 Props。 |
+| `enableResponsive` | `boolean` | `true` | 默认随容器宽度等比缩小图表本体，HoverPanel 不缩放；false 保留声明尺寸。也透传至 Frame。 |
+| `enableContext` | `boolean` | `true` | 透传 Frame 的上下文能力开关；当前组件自己的 width、height、颜色与出现进度仍由对应 Props 决定。 |
+| `enableScaleObserver` | `boolean` | `false` | 透传 Frame 的旧版尺寸观察兼容能力，默认关闭；不等同于百分比图表尺寸，不建议新示例依赖此迁移期入口。 |
+| `enableDefaultMotion` | `boolean` | `true` | 透传 Frame 默认外层动效能力；不接管图表内部出现时间轴和扇区 hover 增厚，后者分别由 appearMotion / appearanceProgress 与 hoverThicknessGrowth 控制。 |
+
+其余未声明属性透传到根 Frame。根默认 role="img"；可聚焦扇区仍位于 aria-hidden SVG 内，这是 [ChartSpec §9.3](../../../specs/ChartSpec.md#93-已确认实现漂移) 已登记的读屏限制，键盘 focus 可用不等于完整读屏支持。
 
 ### 2.2 方法
 
@@ -145,7 +157,7 @@ interface GaugeChartItem {
 尺寸、环厚、圆角、隔断和 hover 外侧增厚优先通过 props 调整；props 会写入组件私有 CSS 变量。
 扇区 hover 提示不使用浏览器原生 SVG `title`，避免不可控灰底提示；结构化提示使用内置 Chart hover 面板。
 
-中心常驻内容可通过 `<Frame as="center-label">...</Frame>` 声明。`center-label` 不套用默认中心 hover label 的字号、颜色和缩放规则；未写样式时继承父级容器文字样式。出现 `center-label` 时，默认中心 hover 信息转由 hover 面板承载。
+中心常驻内容可通过 `<Frame as="center-label">...</Frame>` 声明。`center-label` 不套用默认中心 hover label 的字号和颜色；其自定义排版随图表本体响应式缩放；未写样式时继承父级容器文字样式。出现 `center-label` 时，默认中心 hover 信息转由 hover 面板承载。
 
 中心标签可传入直接子元素 `<Text as="segment-value" />` / `<Text as="segment-name" />` 自定义样式模板；组件会自动写入当前扇区的真实百分比和名称，出现任一角色子元素时不渲染默认中心标签。`showCenterLabel={false}` 会同时关闭默认标签和外部写入的中心标签角色内容。
 
@@ -155,7 +167,7 @@ interface GaugeChartItem {
 
 主布局模型:**内禀原子布局**。
 
-- 根层为 `Frame`，内部为单个 SVG 绘图区 + 中心标签层。
+- 根层为 `Frame`，内部本体层统一承载 SVG 绘图区与中心标签，负责等比缩放；HoverPanel 与本体层并列，保持原有尺寸。
 - 图表尺寸由 `width` / `height` 与 SVG 几何算法决定；作为外部布局子项时表现为 Hug。
 - 不接入三槽位协议，不承担通用子元素排列。
 - 根层显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`，并透传 `class`、`style` 与未声明属性。
@@ -221,7 +233,7 @@ interface GaugeChartItem {
 
 ```svelte
 <GaugeChart
-  colors={[undefined, "var(--secondary-blue)", "linear-gradient(135deg, #111 0%, #7DBBFF 100%)"]}
+  colors={[undefined, "var(--secondary-blue)", "linear-gradient(135deg, var(--black-100) 0%, var(--secondary-blue) 100%)"]}
   data={[
     { name: "Done", value: 62, color: "var(--secondary-mint)" },
     { name: "Doing", value: 24 },
@@ -232,12 +244,12 @@ interface GaugeChartItem {
 
 ```svelte
 <script lang="ts">
-  let chart: any;
+  let chart: { replay: () => void; reverseAppearance: () => void } | undefined;
 </script>
 
 <Button onclick={() => chart?.replay?.()}>重新填充</Button>
 <Button onclick={() => chart?.reverseAppearance?.()}>反向回退</Button>
-<GaugeChart bind:this={chart} startDirection="right" />
+<GaugeChart bind:this={chart} startDirection="right" appearOnView={false} defaultAppearanceProgress={1} />
 ```
 
 ```svelte
@@ -249,14 +261,25 @@ interface GaugeChartItem {
     { name: "Support", value: 18 }
   ]}
 >
-  <Text as="segment-value" class="text-24 font-bold text-black-100" />
-  <Text as="segment-name" class="text-18 text-black-40" />
+  <Text as="segment-value" />
+  <Text as="segment-name" />
 </GaugeChart>
 ```
 
 ---
 
 ## 7. 更新日志 (Changelog)
+
+### v1.5.0 (2026-09-03)
+
+- 默认随可用宽度等比缩小图表本体与全部中心内容，空间恢复后回到声明尺寸；`enableResponsive=false` 保留声明尺寸。
+- HoverPanel 保持大小，pointer / focus 定位与实际显示尺寸一致。
+
+### v1.4.1 (2026-09-03)
+
+- 审计全部公开属性，补齐 Frame 透传、数据空态、尺寸解析、格式优先级与受控动效边界。
+- Site 示例改为 12 个完整场景：文档准备度、半环/半饼、尺寸、配色、聚合、格式、提示、命中、播放、受控进度与报告状态。
+- 示例使用设计系统 Token 和组件默认中心文字；Code 与 Preview 从同一配方生成。
 
 ### v1.4.0 (2026-09-03)
 

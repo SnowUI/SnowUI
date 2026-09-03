@@ -542,4 +542,23 @@ CC-02
         },
         logic: ["HoverPanel", "Default", "LightVariant", "Keyboard"],
     },
+    {
+        name: "CC-17: 窄容器内图表本体等比缩小",
+        code: `CC-17
+<Frame column class="w-full gap-16">
+    <CircularChart size={320} ringThickness={48} cornerRadius={8} separatorWidth={6} />
+    <CircularChart size={320} ringThickness={48} cornerRadius={8} separatorWidth={6}>
+        <Frame as="center-label" column class="items-center gap-4">
+            <Text class="text-24">72%</Text>
+            <Text>Capacity</Text>
+        </Frame>
+    </CircularChart>
+</Frame>`,
+        expected: {
+            render: "显示默认中心标签与常驻中心内容两种用法；HoverPanel 使用默认大小",
+            responsive: "拖窄真实预览时，环厚、间隔、圆角、hover 增厚和中心内容同倍缩小；放宽恢复声明尺寸，不残留空白占位",
+            interaction: "缩小后 pointer 与键盘 focus 命中当前扇区，面板位置跟随实际显示尺寸",
+        },
+        logic: ["Responsive", "CenterLabel", "HoverPanel", "Keyboard"],
+    },
 ] as const;

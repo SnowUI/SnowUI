@@ -1,10 +1,13 @@
 # CircularChart (圆形图表)
 
-> **版本**: v1.2.3
+> **版本**: v1.3.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、隔断、整体尺寸的圆环/饼形比例图。Hover 动效参考 Apache ECharts `pie-borderRadius` 示例的强调反馈，并按 SnowUI 规范改为外侧增厚。
 > **参考**: ECharts [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 官方示例，以及本地 ECharts `src/chart/pie/pieLayout.ts`、`src/chart/helper/sectorHelper.ts` 源码。
+
+
+默认启用响应式：容器变窄时，图表本体按可用宽度整体等比缩小，恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `pro/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
 
 ---
 
@@ -117,7 +120,7 @@
 | `loading` | `boolean` | - | 透传 Frame 加载状态；未传时使用 Frame 的上下文/默认解析。与 skeleton 配合显示内置占位，不代表数据请求或业务完成。 |
 | `skeleton` | `boolean` | - | 透传 Frame 骨架开关；与 loading 或上层加载上下文配合生效，默认由 Frame 解析。图表自注册圆形骨架，不需要调用方复制 SVG 占位。 |
 | `renderHints` | `RenderHints` | - | 骨架提示对象；CircularChart 读取 variant、width、height、radius，缺省分别为 circle、size、size、全圆角。只改变加载占位，不改变真实图表几何。 |
-| `enableResponsive` | `boolean` | `true` | 透传 Frame 的容器响应式能力开关；不重新计算 CircularChart 的 SVG 几何，图表仍按 size 呈现固定尺寸。 |
+| `enableResponsive` | `boolean` | `true` | 默认随容器宽度等比缩小图表本体，HoverPanel 不缩放；false 保留声明尺寸。也透传至 Frame。 |
 | `enableContext` | `boolean` | `true` | 透传 Frame 的上下文能力开关；当前组件自己的 size、颜色与出现进度仍由对应 Props 决定。 |
 | `enableScaleObserver` | `boolean` | `false` | 透传 Frame 的旧版尺寸观察兼容能力，默认关闭；不等同于百分比图表尺寸，不建议新示例依赖此迁移期入口。 |
 | `enableDefaultMotion` | `boolean` | `true` | 透传 Frame 默认外层动效能力；不接管图表内部出现时间轴和扇区 hover 增厚，后者分别由 appearMotion / appearanceProgress 与 hoverThicknessGrowth 控制。 |
@@ -207,7 +210,7 @@ interface CircularChartGradient {
 尺寸、环厚、圆角、隔断和 hover 外侧增厚优先通过 props 调整；props 会写入组件私有 CSS 变量。
 扇区 hover 提示不使用浏览器原生 SVG `title`，避免不可控灰底提示；结构化提示使用内置 Chart hover 面板。
 
-中心常驻内容可通过 `<Frame as="center-label">...</Frame>` 声明。其直系 `Text as="segment-value"` / `Text as="segment-name"` 可显式复用图表默认的字号、颜色、行高、字重、居中与行间距；这些嵌套角色保留调用方文本，不写入悬停数据。`center-label` 的其它自定义内容不套用默认中心 hover label 的字号、颜色和缩放规则；未写样式时继承父级容器文字样式。出现 `center-label` 时，默认中心 hover 信息转由 hover 面板承载。
+中心常驻内容可通过 `<Frame as="center-label">...</Frame>` 声明。其直系 `Text as="segment-value"` / `Text as="segment-name"` 可显式复用图表默认的字号、颜色、行高、字重、居中与行间距；这些嵌套角色保留调用方文本，不写入悬停数据。`center-label` 的其它自定义内容不套用默认中心 hover label 的字号和颜色，但随图表本体响应式缩放；未写样式时继承父级容器文字样式。出现 `center-label` 时，默认中心 hover 信息转由 hover 面板承载。
 
 ### 4.3 圆环到实心饼图
 
@@ -219,7 +222,7 @@ interface CircularChartGradient {
 
 主布局模型:**内禀原子布局**。
 
-- 根层为 `Frame`，内部为单个 SVG 绘图区 + 中心标签层。
+- 根层为 `Frame`，内部本体层统一承载 SVG 绘图区与中心标签，负责等比缩放；HoverPanel 与本体层并列，保持原有尺寸。
 - 图表尺寸由 `size` 与 SVG 几何算法决定；作为外部布局子项时表现为 Hug。
 - 不接入三槽位协议，不承担通用子元素排列。
 
@@ -387,6 +390,11 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 ---
 
 ## 8. 更新日志 (Changelog)
+
+### v1.3.0 (2026-09-03)
+
+- 默认随可用宽度等比缩小图表本体与全部中心内容，空间恢复后回到声明尺寸；`enableResponsive=false` 保留声明尺寸。
+- HoverPanel 保持大小，pointer / focus 定位与实际显示尺寸一致。
 
 ### v1.2.3 (2026-09-03)
 
