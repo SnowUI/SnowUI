@@ -1,6 +1,6 @@
 <!--
   CircularChart 圆形图表组件 (PRO)
-  v1.1.0 (2026-05-28)
+  v1.2.3 (2026-09-03)
 
   职责:渲染可调圆角、环厚、隔断、尺寸的圆环/饼形比例图。
   Hover:当前扇区仅向外增厚,不位移;中心标签显示当前项。
@@ -202,6 +202,7 @@
     }: Props = $props();
 
     let rootElement = $state<HTMLElement>();
+    let centerElement = $state<HTMLElement>();
     let hoveredIndex = $state<number | null>(null);
     let focusedIndex = $state<number | null>(null);
     let animatedGrowths = $state<number[]>([]);
@@ -410,6 +411,8 @@
 
     $effect(() => {
         rootElement;
+        // Skeleton 会卸载中心节点；恢复时重新识别常驻内容和动态角色。
+        centerElement;
         children;
         showCenterLabel;
         mountedCenterLabelLines.value;
@@ -1191,6 +1194,7 @@
 
     {#if showCenterLabel}
         <Frame
+            bind:element={centerElement}
             class="snowui-circular-chart-center"
             data-visible={activeItem || hasStaticCenterLabel ? "true" : "false"}
             currentState={activeItem || hasStaticCenterLabel
@@ -1207,7 +1211,7 @@
             aria-live="polite"
         >
             {@render children?.()}
-            {#if !hasCustomCenterLabel}
+            {#if !hasCustomCenterLabel && !hasStaticCenterLabel}
                 {#if mountedCenterLabelLines.value || mountedCenterLabelLines.name}
                     <span data-role="value">{mountedCenterLabelLines.value}</span>
                     <span data-role="name">{mountedCenterLabelLines.name}</span>
@@ -1347,10 +1351,20 @@
         );
     }
 
+    :global(:where(.snowui-circular-chart-center > [data-as="center-label"]:has(> [data-as="segment-value"], > [data-as="segment-name"]))) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: inherit;
+        text-align: center;
+    }
+
     :global(
-        :where(.snowui-circular-chart-center > [data-as="segment-value"])
+        :where(.snowui-circular-chart-center > [data-as="segment-value"], .snowui-circular-chart-center > [data-as="center-label"] > [data-as="segment-value"])
     ) {
         order: 0;
+        align-self: center;
+        text-align: center;
         color: var(--snowui-circular-chart-label-color);
         font-size: var(
             --snowui-circular-chart-label-font-size-override,
@@ -1363,8 +1377,10 @@
         line-height: 1;
     }
 
-    :global(:where(.snowui-circular-chart-center > [data-as="segment-name"])) {
+    :global(:where(.snowui-circular-chart-center > [data-as="segment-name"], .snowui-circular-chart-center > [data-as="center-label"] > [data-as="segment-name"])) {
         order: 1;
+        align-self: center;
+        text-align: center;
         color: var(--snowui-circular-chart-label-muted-color);
         font-size: var(--snowui-circular-chart-label-name-font-size);
         font-weight: var(
