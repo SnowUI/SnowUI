@@ -1,6 +1,6 @@
 <!--
  Listbox 组件：浮层选项列表面板
- v1.3.0
+ v1.3.1
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -646,7 +646,7 @@
     :global(:where(.snowui-listbox-scrollbar)) {
         top: 0;
         bottom: 0;
-        right: -4px; /* thumb 右边缘距面板右边框 4px */
+        right: calc(4px - var(--snowui-listbox-padding-override, var(--padding-2))); /* 抵消面板内边距，缩放和公开 padding 覆写后仍距右边缘 4px。 */
         z-index: 10;
     }
 </style>

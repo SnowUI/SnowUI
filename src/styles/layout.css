@@ -643,16 +643,19 @@
  * 当前引用：Listbox.svelte、Popover.svelte（v3.0.0 起合并 QuickAction / SearchPopup）
  * 规范：specs/StyleSpec.md §2.6.3 第 4 类（跨组件共享视觉基类）
  */
-:where(.snowui-quick-action-panel) {
-    background-color: var(--snowui-background-quick-action);
-    backdrop-filter: var(--snowui-backdrop-quick-action);
-    -webkit-backdrop-filter: var(--snowui-backdrop-quick-action);
-    border-radius: var(--radius-4);
-    box-shadow: var(--snowui-shadow-quick-action);
-    border: var(--snowui-border-quick-action);
-    padding: var(--padding-3);
-    gap: 0;
-    box-sizing: border-box;
+/* 共享默认低于组件自有规则，不依赖动态样式注入顺序。 */
+@layer snowui-shared-visual {
+    :where(.snowui-quick-action-panel) {
+        background-color: var(--snowui-background-quick-action);
+        backdrop-filter: var(--snowui-backdrop-quick-action);
+        -webkit-backdrop-filter: var(--snowui-backdrop-quick-action);
+        border-radius: var(--radius-4);
+        box-shadow: var(--snowui-shadow-quick-action);
+        border: var(--snowui-border-quick-action);
+        padding: var(--padding-3);
+        gap: 0;
+        box-sizing: border-box;
+    }
 }
 
 /* Quick Action 浮层固定头部 + 滚动内容区结构

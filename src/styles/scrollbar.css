@@ -167,15 +167,18 @@
     height: 0;
 }
 
-:where(.snowui-overlay-scrollbar) {
-    position: absolute;
-    right: var(--snowui-scrollbar-edge-gap);
-    width: var(--snowui-overlay-scrollbar-size);
-    background: transparent;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
-        var(--snowui-frame-color-motion-easing, ease-out);
+/* 共享默认低于组件自有规则，不依赖动态样式注入顺序。 */
+@layer snowui-shared-behavior {
+    :where(.snowui-overlay-scrollbar) {
+        position: absolute;
+        right: var(--snowui-scrollbar-edge-gap);
+        width: var(--snowui-overlay-scrollbar-size);
+        background: transparent;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
+    }
 }
 
 /*
