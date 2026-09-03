@@ -14,7 +14,7 @@
 ## 1. 设计原则
 
 - **PRO 组件**:图表属于付费高级展示组件，放在 `pro/src/components/`。
-- **默认 10 项，最多 24 项**:默认 `maxItems=10`。显式提高 `maxItems` 时最多显示 24 项，颜色序列与 CircularChart 完全一致，10 项后仍按序循环。
+- **默认 10 项，最多 28 项**:默认 `maxItems=10`。显式提高 `maxItems` 时最多显示 28 项，颜色序列与 CircularChart 完全一致，10 项后仍按序循环。
 - **颜色优先级**:`data[i].color → colors[i] → colorMode 对应回退色`。单项颜色只影响当前扇区，不会传递给后续扇区。
 - **尺寸基准**:`cornerRadius` 与 `separatorWidth` 都表示 320px 宽仪表图下的设计基准值。组件内部统一按 `width / 320` 等比缩放，数字和字符串数字都按基准值理解。
 - **透明间隔**:扇区间隔在 path 几何阶段通过 `padAngle + padRadius` 生成，贯穿内外圆弧并透出真实背景；不绘制固定白色 stroke，也不使用后置 gap mask。
@@ -57,7 +57,7 @@
 | `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | true 开启 window 滚动驱动的非受控时间轴；对象可用 distance 覆盖滚动距离。锚点越过触发线后进度由距离决定，向回滚动会逆向恢复。不监听嵌套 ScrollArea；appearanceProgress / appearMotion=false 优先。 |
 | `scrollAppearanceDistance` | `number \| string` | `320` | 滚动进度从 0 到 1 所需的 CSS px 距离；数字或数字字符串，最低按 1 处理。scrollAppearance.distance 优先；只在滚动时间轴开启时生效，不换算字符串单位。 |
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 内部进度写入时接收 progress（0..1），包括初始化中的直接完成、自动播放、实例方法与滚动更新；可同步外部进度读数。默认值初始化本身不通知；不用于监听外部 appearanceProgress，返回值被忽略，不能取消更新。 |
-| `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..24，0 / NaN 回退 10。百分比只基于保留项，超过 24 类的业务应先聚合小类以保留总量；全无效时仍回退完整内置演示数据。 |
+| `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..28，0 / NaN 回退 10。百分比只基于保留项，超过 28 类的业务应先聚合小类以保留总量；全无效时仍回退完整内置演示数据。 |
 | `showCenterLabel` | `boolean` | `true` | 是否渲染中心内容区域；false 同时隐藏默认动态标签、segment-value / segment-name 模板与静态 center-label。隐藏中心不关闭显式启用的 HoverPanel。 |
 | `centerTitle` | `string` | `""` | 无 hover / focus 项时显示的中心标题，复用默认数值行排版；悬停或聚焦扇区时被百分比或 labelFormatter 第一行替换，离开后恢复。空字符串不占标题行；showCenterLabel=false 隐藏，静态 center-label 优先。 |
 | `centerSubtitle` | `string` | `""` | 无 hover / focus 项时显示的中心副标题，复用默认名称行排版；悬停或聚焦时被当前项名称或 labelFormatter 第二行替换，离开后恢复。可单独设置；不生成 HoverPanel 数据。 |
@@ -343,5 +343,5 @@ interface GaugeChartItem {
 
 - 初始实现 PRO 仪表图组件。
 - 支持整体宽高、环厚、圆角、隔断、hover 外侧增厚可调。
-- 支持中心 hover 标签、默认 10 项且可显式提高到 24 项、SnowUI `primary + secondary-*` 颜色序列。
+- 支持中心 hover 标签、默认 10 项且可显式提高到 28 项、SnowUI `primary + secondary-*` 颜色序列。
 - 接入 Frame 根层、Skeleton、Test 示例与规范登记。
