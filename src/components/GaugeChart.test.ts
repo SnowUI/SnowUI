@@ -314,4 +314,17 @@ GG-01
         },
         logic: ["Responsive", "MinWidth", "HoverPanel"],
     },
+    {
+        name: "GG-17: 空闲中心标题与悬停替换",
+        code: `GG-17
+<Frame column class="gap-16">
+    <GaugeChart centerTitle="Docs" centerSubtitle="This week" appearMotion={false}
+        data={[{ name: 'Ready', value: 72 }, { name: 'Review', value: 18 }, { name: 'Plan', value: 10 }]} />
+</Frame>`,
+        expected: {
+            render: "初始显示 Docs / This week，使用组件默认中心数值和名称两行排版",
+            interaction: "hover / focus 替换为当前项，离开后恢复标题；加载恢复、showCenterLabel 和动态角色模板遵循同一状态",
+        },
+        logic: ["CenterLabel", "Hover", "Keyboard"],
+    },
 ] as const;

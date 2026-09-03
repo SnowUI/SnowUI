@@ -1,6 +1,6 @@
 <!--
   GaugeChart 仪表图组件 (PRO)
-  v1.6.0 (2026-09-03)
+  v1.7.0 (2026-09-04)
 
   职责:渲染具备同色占位层、透明间隔、渐变填充与顺序出现动效的半圆仪表比例图。
   Hover:每个扇区独立完成向外增厚与复位动效;中心标签显示当前项。
@@ -93,6 +93,8 @@
         onAppearanceProgressChange?: (progress: number) => void;
         maxItems?: number;
         showCenterLabel?: boolean;
+        centerTitle?: string;
+        centerSubtitle?: string;
         hoverMode?: ChartHoverMode;
         showHoverPanel?: boolean;
         hoverPanelVariant?: ChartHoverPanelVariant;
@@ -172,6 +174,8 @@
         onAppearanceProgressChange,
         maxItems = 10,
         showCenterLabel = true,
+        centerTitle = "",
+        centerSubtitle = "",
         hoverMode = "cell",
         showHoverPanel = true,
         hoverPanelVariant = "light",
@@ -194,6 +198,7 @@
 
     let rootElement = $state<HTMLElement>();
     let bodyElement = $state<HTMLElement>();
+    let centerElement = $state<HTMLElement>();
     let displaySize = $state<SectorChartSize>({ width: 0, height: 0, scale: 1 });
     let hoveredIndex = $state<number | null>(null);
     let focusedIndex = $state<number | null>(null);
@@ -276,8 +281,11 @@
         activeItem && total > 0 ? (activeItem.value / total) * 100 : 0,
     );
     const centerLabelLines = $derived.by(() => {
-        if (!showCenterLabel || hasStaticCenterLabel || !activeItem) {
+        if (!showCenterLabel || hasStaticCenterLabel) {
             return { value: "", name: "" };
+        }
+        if (!activeItem) {
+            return { value: centerTitle, name: centerSubtitle };
         }
         if (labelFormatter) {
             const [value = "", name = ""] = labelFormatter(
@@ -291,6 +299,9 @@
             name: activeItem.name,
         };
     });
+    const hasCenterLabelContent = $derived(
+        Boolean(centerLabelLines.value || centerLabelLines.name),
+    );
     const segments = $derived(
         buildSegments(
             chartData,
@@ -395,9 +406,7 @@
     });
 
     $effect(() => {
-        const hasVisibleLabel =
-            Boolean(activeItem) &&
-            (Boolean(centerLabelLines.value) || Boolean(centerLabelLines.name));
+        const hasVisibleLabel = hasCenterLabelContent;
         if (centerLabelUnmountTimer !== null) {
             clearTimeout(centerLabelUnmountTimer);
             centerLabelUnmountTimer = null;
@@ -422,6 +431,7 @@
 
     $effect(() => {
         rootElement;
+        centerElement;
         children;
         showCenterLabel;
         mountedCenterLabelLines.value;
@@ -1174,9 +1184,10 @@
 
         {#if showCenterLabel}
             <Frame
+                bind:element={centerElement}
                 class="snowui-gauge-chart-center"
-                data-visible={activeItem || hasStaticCenterLabel ? "true" : "false"}
-                currentState={activeItem || hasStaticCenterLabel
+                data-visible={hasCenterLabelContent || hasStaticCenterLabel ? "true" : "false"}
+                currentState={hasCenterLabelContent || hasStaticCenterLabel
                     ? "Appear"
                     : "Disappear"}
                 whileAppear={CENTER_LABEL_APPEAR_MOTION}
@@ -1190,10 +1201,14 @@
                 aria-live="polite"
             >
                 {@render children?.()}
-                {#if !hasCustomCenterLabel}
+                {#if !hasCustomCenterLabel && !hasStaticCenterLabel}
                     {#if mountedCenterLabelLines.value || mountedCenterLabelLines.name}
-                        <span data-role="value">{mountedCenterLabelLines.value}</span>
-                        <span data-role="name">{mountedCenterLabelLines.name}</span>
+                        {#if mountedCenterLabelLines.value}
+                            <span data-role="value">{mountedCenterLabelLines.value}</span>
+                        {/if}
+                        {#if mountedCenterLabelLines.name}
+                            <span data-role="name">{mountedCenterLabelLines.name}</span>
+                        {/if}
                     {/if}
                 {/if}
             </Frame>

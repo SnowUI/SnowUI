@@ -1,6 +1,6 @@
 # GaugeChart (仪表图)
 
-> **版本**: v1.6.1
+> **版本**: v1.7.0
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、透明间隔、渐变颜色、4% 同色占位层与顺序出现动效的半圆仪表比例图。颜色、几何与出现时间轴能力与 CircularChart 保持同类心智。
@@ -59,6 +59,8 @@
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 内部进度写入时接收 progress（0..1），包括初始化中的直接完成、自动播放、实例方法与滚动更新；可同步外部进度读数。默认值初始化本身不通知；不用于监听外部 appearanceProgress，返回值被忽略，不能取消更新。 |
 | `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..10，0 / NaN 回退 10。百分比只基于保留项，超过 10 类的业务应先聚合小类以保留总量；全无效时仍回退完整内置演示数据。 |
 | `showCenterLabel` | `boolean` | `true` | 是否渲染中心内容区域；false 同时隐藏默认动态标签、segment-value / segment-name 模板与静态 center-label。隐藏中心不关闭显式启用的 HoverPanel。 |
+| `centerTitle` | `string` | `""` | 无 hover / focus 项时显示的中心标题，复用默认数值行排版；悬停或聚焦扇区时被百分比或 labelFormatter 第一行替换，离开后恢复。空字符串不占标题行；showCenterLabel=false 隐藏，静态 center-label 优先。 |
+| `centerSubtitle` | `string` | `""` | 无 hover / focus 项时显示的中心副标题，复用默认名称行排版；悬停或聚焦时被当前项名称或 labelFormatter 第二行替换，离开后恢复。可单独设置；不生成 HoverPanel 数据。 |
 | `hoverMode` | `"cell" \| "item"` | `"cell"` | cell 按环带角度命中，跨过透明隔断仍保持所属扇区，排除中心空洞与图外；item 只响应扇区路径命中。两种模式均保留扇区键盘 focus 提示。 |
 | `showHoverPanel` | `boolean` | `true` | 默认根据当前 hover / focus 扇区显示结构化面板，同时保留动态中心标签。false 关闭面板；但存在可见静态 center-label 时组件自动启用面板承载扇区信息。 |
 | `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | 面板视觉：light 为默认浅色玻璃样式，dark 为深色样式，surface 为主题表面样式；仅改变面板外观，不改变数据和命中。 |
@@ -158,6 +160,8 @@ interface GaugeChartItem {
 尺寸、环厚、圆角、隔断和 hover 外侧增厚优先通过 props 调整；props 会写入组件私有 CSS 变量。
 扇区 hover 提示不使用浏览器原生 SVG `title`，避免不可控灰底提示；结构化提示使用内置 Chart hover 面板。
 
+空闲中心内容使用 `centerTitle` / `centerSubtitle`，默认均为空。它们与 hover 文本使用同一个默认渲染器，字号、字重、颜色、行距和响应式缩放完全一致；hover 优先于 focus，所有交互结束后恢复空闲内容。标题变化会立即更新，无需重建组件；`labelFormatter` 只格式化活动数据项。动态角色模板同样接收空闲文字，静态 `center-label` 则优先保留调用方内容。
+
 中心常驻内容可通过 `<Frame as="center-label">...</Frame>` 声明。`center-label` 不套用默认中心 hover label 的字号和颜色；其自定义排版随图表本体响应式缩放；未写样式时继承父级容器文字样式。出现 `center-label` 时，默认中心 hover 信息转由 hover 面板承载。
 
 中心标签可传入直接子元素 `<Text as="segment-value" />` / `<Text as="segment-name" />` 自定义样式模板；组件会自动写入当前扇区的真实百分比和名称，出现任一角色子元素时不渲染默认中心标签。`showCenterLabel={false}` 会同时关闭默认标签和外部写入的中心标签角色内容。
@@ -221,6 +225,11 @@ interface GaugeChartItem {
 ## 6. 使用示例
 
 ```svelte
+<GaugeChart centerTitle="Docs" centerSubtitle="This week"
+  data={[{ name: "Ready", value: 72 }, { name: "Review", value: 18 }, { name: "Plan", value: 10 }]} />
+```
+
+```svelte
 <GaugeChart
   data={[
     { name: "Primary", value: 32 },
@@ -270,6 +279,11 @@ interface GaugeChartItem {
 ---
 
 ## 7. 更新日志 (Changelog)
+
+### v1.7.0 (2026-09-04)
+
+- 新增可选空闲中心标题与副标题，复用默认 hover 排版，hover / focus 临时替换、离开恢复。
+- 保留静态中心和动态角色模板的优先级，加载恢复及开关中心区域后同步角色内容。
 
 ### v1.6.1 (2026-09-04)
 
