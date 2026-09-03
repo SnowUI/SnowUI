@@ -1,6 +1,6 @@
 # CircularChart (圆形图表)
 
-> **版本**: v1.4.0
+> **版本**: v1.4.1
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、隔断、整体尺寸的圆环/饼形比例图。Hover 动效参考 Apache ECharts `pie-borderRadius` 示例的强调反馈，并按 SnowUI 规范改为外侧增厚。
@@ -272,7 +272,7 @@ SnowUI 的最终实现为：
 - **填充层**:fill layer 始终绘制与占位层相同的完整 padded path。出现动效只使用局部 `revealPath` mask 逐步揭示颜色，不使用局部圆角扇区替代填充几何。
 - **透明度层**:每个填充 path 套用独立 `linearGradient + mask`。启动瞬间尾部透明度为 `0%`、中段为 `62%`、扫描头为 `100%`；随后尾部和中段在 `0.75s` 内线性补齐到 `100%`。透明度时间轴与填充时间轴同时启动，但不决定下一个扇区何时启动。
 - **无可见分隔层**:扇区未填充时不绘制白色 outline、独立 separator path 或后置 gap mask。间隔直接存在于 path 几何中。
-- **零间隔 seam cover**:多扇区且 `separatorWidth=0` 时，相邻 SVG path 的独立抗锯齿可能让背景从共边处透出发丝缝。不透明色的 base layer 与 fill layer 增加 `0.5px` 同色描边覆盖该亚像素接缝，并叠加一层只画描边的 `blur(0.5px)` 同色 seam；base layer 两层描边都保持 `4%` 透明度。半透明颜色不启用 seam cover，避免填充与描边重复合成而形成深色毛边；显式透明间隔同样不启用该描边。
+- **零间隔 seam cover**:多扇区且 `separatorWidth=0` 时，相邻 SVG path 的独立抗锯齿可能让背景从共边处透出发丝缝。base layer 与 fill layer 分别用白色 alpha mask 合并完整 path、`0.5px` seam cover 和只画描边的 `blur(0.5px)` seam，再让颜色或渐变通过该 mask 只绘制一次；半透明色不会因 fill 与 stroke 重叠而形成深色毛边。base layer 在合并后统一使用 `4%` 透明度；显式透明间隔不启用该补偿。
 - **层级顺序**:从下到上依次为 4% 透明度占位层、动效填充层、透明命中层。占位层只表达完整结构；填充层负责扫描填充、透明度补齐、圆角和间隔；命中区域使用同一个完整扇区 path。
 - **可逆时间轴**:`appearanceProgress` 是总时间轴的直接渲染结果，`0..1` 可任意反推。滚动控制或外部受控进度反向变化时，填充宽度与透明度都会按同一确定性公式回退。
 
@@ -298,7 +298,7 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 | 径向短线 mask 的间隔没有贯穿扇区，且大圆角时分隔长度不一致 | 短线需要根据圆角手工缩进，圆角越大，短线越短 | 淘汰径向短线 mask；改用几何 padding，让间隔贯穿内外圆弧 |
 | `cornerRadius={80}` 时部分扇区圆角消失，或更大的圆角看不出变化 | 旧算法有额外 `innerRadius / 4` 限制，并在短弧下退化为无圆角 | 共享 path 改用 d3-shape `arc().cornerRadius()`；圆角仅受环厚一半和扇区真实角度容量限制 |
 | hover 外扩后局部被切掉 | 外扩 path 与视口或旧 mask 范围不一致 | hover 只增加外半径；完整 path、占位层、填充层、命中层和 SVG 视口统一按外扩范围生成 |
-| `separatorWidth={0}` 的实心饼图仍有约 1px 发丝缝 | SVG 会对相邻 path 分别做边缘抗锯齿；即使几何完全共边，背景仍可能从亚像素覆盖不足处透出。ECharts doughnut 官网示例默认使用 Canvas，不会呈现同样的 SVG 接缝 | 仅对不透明色的多扇区零间隔图形增加 `0.5px` 同色 seam cover，并叠加只画描边的 `blur(0.5px)` seam；半透明色跳过该补偿以避免深色毛边；显式间隔保持原有 padding 几何 |
+| `separatorWidth={0}` 的实心饼图仍有约 1px 发丝缝，半透明色直接叠加同色描边又会形成深色毛边 | SVG 会对相邻 path 分别做边缘抗锯齿；即使几何完全共边，背景仍可能从亚像素覆盖不足处透出。半透明 fill 与 stroke 分开绘制还会在重叠边缘重复合成 alpha | 用包含完整 path、`0.5px` seam cover 与 `blur(0.5px)` seam 的白色 alpha mask 合并覆盖范围，再让颜色或渐变通过该 mask 只绘制一次；显式间隔继续使用原有 padding 几何 |
 
 ---
 
@@ -392,6 +392,10 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 
 ## 8. 更新日志 (Changelog)
 
+### v1.4.1 (2026-09-04)
+
+- 零间隔扇区改为通过 alpha paint mask 单次绘制颜色，同时保留 seam cover，减少抗锯齿缝隙并消除半透明 fill / stroke 重叠造成的深色边缘。
+
 ### v1.4.0 (2026-09-03)
 
 - 新增 `minWidth`，默认 `"40px"`；与图表宽度相同即可阻止响应式收缩，数字尺寸使用相同单位规则。
@@ -444,7 +448,7 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 - fill layer 改为完整 padded path 加局部 `revealPath` mask，修复动效填充与占位扇区不重合。
 - 圆角统一使用 d3-shape，修复大圆角无效、短弧圆角消失与 hover 裁切问题。
 - 补充 ECharts 官网示例、本地源码参考以及本轮问题与解决方法。
-- 零间隔多扇区的不透明色增加 `0.5px` 同色 seam cover 与只画描边的 `blur(0.5px)` seam；半透明色跳过补偿，避免 alpha 重复合成产生深色毛边。
+- 零间隔多扇区的不透明色增加 `0.5px` 同色 seam cover 与只画描边的 `blur(0.5px)` seam。
 
 ### v1.0.1 (2026-05-28)
 
