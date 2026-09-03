@@ -616,7 +616,7 @@
     }
 
     function normalizeData(items: GaugeChartItem[], limit: number) {
-        const safeLimit = Math.min(Math.max(1, Math.floor(limit || 10)), 10);
+        const safeLimit = Math.min(Math.max(1, Math.floor(limit || 10)), 24);
         const validItems = items
             .filter((item) => Number.isFinite(item.value) && item.value > 0)
             .slice(0, safeLimit);

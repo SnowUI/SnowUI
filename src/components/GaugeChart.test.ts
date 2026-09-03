@@ -119,7 +119,7 @@ GG-01
         logic: ["TransparentSeparator", "GapMask", "ColoredBackground"],
     },
     {
-        name: "GG-06: 最多 10 项颜色序列",
+        name: "GG-06: 默认 10 项颜色序列",
         code: `GG-06
 <GaugeChart
     width={420}
