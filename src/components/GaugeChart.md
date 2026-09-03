@@ -207,7 +207,7 @@ interface GaugeChartItem {
 - base layer、fill layer 与 hit layer 复用同一套完整 padded path。
 - fill layer 始终绘制完整扇区；出现动效只使用局部 `revealPath` mask 揭示颜色，因此扫描过程中不会偏离 4% 占位层。
 - hover / focus 只增加外半径，内半径和圆心不变；外扩后的 path 不受后置 gap mask 裁切。
-- 多扇区且 `separatorWidth=0` 时，不透明色的 base layer 与 fill layer 使用 `0.5px` 同色 seam cover 覆盖相邻 SVG path 独立抗锯齿产生的亚像素接缝，并叠加一层只画描边的 `blur(0.5px)` 同色 seam；base layer 两层 seam 保持 `4%` 透明度。半透明颜色不启用 seam cover，避免填充与描边重复合成而形成深色毛边；显式透明间隔同样不启用该描边。
+- 多扇区且 `separatorWidth=0` 时，base layer 与 fill layer 使用 `0.5px` 同色 seam cover 覆盖相邻 SVG path 独立抗锯齿产生的亚像素接缝，并叠加一层只画描边的 `blur(0.5px)` 同色 seam；base layer 两层 seam 保持 `4%` 透明度。显式透明间隔不启用该描边。
 
 ### 5.2 本轮问题与解决方法
 
@@ -218,7 +218,7 @@ interface GaugeChartItem {
 | 间隔没有贯穿环厚，大圆角下短线分隔不稳定 | 径向短线 mask 需要根据圆角缩进，圆角越大越容易缩短 | 淘汰径向短线 mask；改用几何 padding |
 | 较大的圆角设置不生效，短扇区圆角消失 | 旧 path 有额外半径限制，并在短弧下退化 | 改用 d3-shape `arc().cornerRadius()`，只遵守真实几何上限 |
 | hover 扇区外扩后被裁切 | 旧 mask 或 SVG 范围没有覆盖外扩 path | 统一按外扩范围生成 path 与视口；不再让 gap mask 参与裁切 |
-| `separatorWidth={0}` 时仍出现约 1px 发丝缝 | SVG 相邻 path 分别做抗锯齿，共边处可能透出背景 | 仅对不透明色的多扇区零间隔图形增加 `0.5px` 同色 seam cover，并叠加只画描边的 `blur(0.5px)` seam；半透明色跳过该补偿以避免深色毛边 |
+| `separatorWidth={0}` 时仍出现约 1px 发丝缝 | SVG 相邻 path 分别做抗锯齿，共边处可能透出背景 | 仅在多扇区且零间隔时，为 base layer 与 fill layer 增加 `0.5px` 同色 seam cover，并叠加只画描边的 `blur(0.5px)` seam |
 
 ---
 
@@ -328,7 +328,7 @@ interface GaugeChartItem {
 - fill layer 改为完整 padded path 加局部 `revealPath` mask，修复动效填充与占位扇区不重合。
 - 圆角统一使用 d3-shape，修复大圆角无效、短弧圆角消失与 hover 裁切问题。
 - 补充 ECharts 官网示例、本地源码参考以及本轮问题与解决方法。
-- 零间隔多扇区的不透明色增加 `0.5px` 同色 seam cover 与只画描边的 `blur(0.5px)` seam；半透明色跳过补偿，避免 alpha 重复合成产生深色毛边。
+- 零间隔多扇区增加 `0.5px` 同色 seam cover 与只画描边的 `blur(0.5px)` seam，修复 SVG 抗锯齿产生的发丝缝。
 
 ### v1.1.0 (2026-05-28)
 

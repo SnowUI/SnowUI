@@ -23,7 +23,6 @@
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
     import { buildArcPath } from "../lib/chart/arc-path";
     import {
-        chartColorUsesTransparency,
         resolveChartColor,
         type ChartColor,
         type ChartColorMode,
@@ -839,9 +838,7 @@
                 active: isActive,
                 visible: localProgress > 0.001,
                 seamStrokeWidth:
-                    rawSegments.length > 1 &&
-                    segment.strokeWidth <= 0 &&
-                    !chartColorUsesTransparency(segment.color)
+                    rawSegments.length > 1 && segment.strokeWidth <= 0
                         ? 0.5
                         : 0,
                 rawStart: segment.rawStart,
