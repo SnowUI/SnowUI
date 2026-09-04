@@ -603,4 +603,17 @@ CC-02
         },
         logic: ["Loading", "NoSkeleton", "StableGeometry"],
     },
+    {
+        name: "CC-21: 实心饼图出现路径稳定完成",
+        code: `CC-21
+<Frame row class="gap-24">
+    <CircularChart size={220} ringThickness={140} separatorWidth={0} appearanceProgress={0.45} />
+    <CircularChart size={220} ringThickness={140} separatorWidth={0} appearanceProgress={1} />
+</Frame>`,
+        expected: {
+            render: "左图显示由起始边界增长的实心扇区中间帧；右图显示完整实心饼图，不停留为径向细线；零间隔接缝补偿仍生效",
+            interaction: "appearanceProgress 从 0 到 1 时直接更新实心 revealPath，完成态覆盖所有有效扇区",
+        },
+        logic: ["AppearMotion", "SolidPie", "RevealPath", "SeamCompensation"],
+    },
 ] as const;

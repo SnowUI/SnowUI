@@ -337,4 +337,17 @@ GG-01
         },
         logic: ["Loading", "NoSkeleton", "StableGeometry", "CenterLabel"],
     },
+    {
+        name: "GG-19: 实心半饼图出现路径稳定完成",
+        code: `GG-19
+<Frame row class="gap-24">
+    <GaugeChart width={320} height={160} ringThickness={160} separatorWidth={0} appearanceProgress={0.45} />
+    <GaugeChart width={320} height={160} ringThickness={160} separatorWidth={0} appearanceProgress={1} />
+</Frame>`,
+        expected: {
+            render: "左图显示由左端增长的实心半饼中间帧；右图显示完整实心半饼图，不停留为径向细线；零间隔接缝补偿仍生效",
+            interaction: "appearanceProgress 从 0 到 1 时直接更新实心 revealPath，完成态覆盖所有有效扇区",
+        },
+        logic: ["AppearMotion", "SolidHalfPie", "RevealPath", "SeamCompensation"],
+    },
 ] as const;

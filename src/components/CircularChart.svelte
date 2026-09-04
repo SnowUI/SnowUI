@@ -1147,22 +1147,39 @@
                             maskUnits="userSpaceOnUse"
                             style="mask-type: alpha"
                         >
-                            <g mask={`url(#${paint.opacityMaskId})`}>
+                            {#if innerRadius <= 0.001}
                                 <path
-                                    d={segments[index].fillPath}
+                                    d={segments[index].revealPath}
                                     fill="white"
                                     stroke="white"
                                     stroke-width={segments[index].seamStrokeWidth}
                                 />
                                 <path
                                     class="snowui-circular-chart-segment-seam-blur"
-                                    d={segments[index].fillPath}
+                                    d={segments[index].revealPath}
                                     fill="none"
                                     stroke="white"
                                     stroke-width={segments[index].seamStrokeWidth}
                                     style="filter: blur(0.5px)"
                                 />
-                            </g>
+                            {:else}
+                                <g mask={`url(#${paint.opacityMaskId})`}>
+                                    <path
+                                        d={segments[index].fillPath}
+                                        fill="white"
+                                        stroke="white"
+                                        stroke-width={segments[index].seamStrokeWidth}
+                                    />
+                                    <path
+                                        class="snowui-circular-chart-segment-seam-blur"
+                                        d={segments[index].fillPath}
+                                        fill="none"
+                                        stroke="white"
+                                        stroke-width={segments[index].seamStrokeWidth}
+                                        style="filter: blur(0.5px)"
+                                    />
+                                </g>
+                            {/if}
                         </mask>
                     {/if}
                 {/each}
@@ -1233,22 +1250,40 @@
                                 pointer-events="none"
                             />
                         {:else}
-                            <path
-                                class={[
-                                    "snowui-circular-chart-segment",
-                                    "snowui-circular-chart-segment-fill",
-                                    segment.active
-                                        ? "snowui-circular-chart-segment-active"
-                                        : "",
-                                ]
-                                    .filter(Boolean)
-                                    .join(" ")}
-                                d={segment.fillPath}
-                                fill={segmentPaints[index].fill}
-                                stroke="none"
-                                mask={`url(#${segmentPaints[index].opacityMaskId})`}
-                                pointer-events="none"
-                            />
+                            {#if innerRadius <= 0.001}
+                                <path
+                                    class={[
+                                        "snowui-circular-chart-segment",
+                                        "snowui-circular-chart-segment-fill",
+                                        segment.active
+                                            ? "snowui-circular-chart-segment-active"
+                                            : "",
+                                    ]
+                                        .filter(Boolean)
+                                        .join(" ")}
+                                    d={segment.revealPath}
+                                    fill={segmentPaints[index].fill}
+                                    stroke="none"
+                                    pointer-events="none"
+                                />
+                            {:else}
+                                <path
+                                    class={[
+                                        "snowui-circular-chart-segment",
+                                        "snowui-circular-chart-segment-fill",
+                                        segment.active
+                                            ? "snowui-circular-chart-segment-active"
+                                            : "",
+                                    ]
+                                        .filter(Boolean)
+                                        .join(" ")}
+                                    d={segment.fillPath}
+                                    fill={segmentPaints[index].fill}
+                                    stroke="none"
+                                    mask={`url(#${segmentPaints[index].opacityMaskId})`}
+                                    pointer-events="none"
+                                />
+                            {/if}
                         {/if}
                     {/if}
                 {/each}

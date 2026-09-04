@@ -203,7 +203,7 @@ interface GaugeChartItem {
 - `separatorWidth` 先按 GaugeChart 的 320px 宽基准缩放，再换算为 d3-shape 的 `padAngle`；`padRadius` 使内外圆弧共同收缩。
 - `cornerRadius` 在收缩后的扇区 path 上生效。间隔贯穿环厚后，端部圆角仍然保留。
 - base layer、fill layer 与 hit layer 复用同一套完整 padded path。
-- fill layer 始终绘制完整扇区；出现动效只使用局部 `revealPath` mask 揭示颜色，因此扫描过程中不会偏离 4% 占位层。
+- 圆环形态的 fill layer 绘制完整扇区并用局部 `revealPath` mask 揭示；内半径为 `0` 的实心半饼图直接绘制局部 `revealPath`，避免 Chromium 对动态嵌套 SVG mask 不重绘。两种形态共享相同时间轴。
 - hover / focus 只增加外半径，内半径和圆心不变；外扩后的 path 不受后置 gap mask 裁切。
 - 多扇区且 `separatorWidth=0` 时，base layer 与 fill layer 分别用白色 alpha mask 合并完整 path、`0.5px` seam cover 和只描边的 `blur(0.5px)` seam，再让颜色或渐变只绘制一次；半透明色不会因 fill 与 stroke 重叠而形成深色毛边。base layer 在 mask 合并后统一使用 `4%` 透明度；显式透明间隔不启用该补偿。
 
@@ -217,6 +217,7 @@ interface GaugeChartItem {
 | 较大的圆角设置不生效，短扇区圆角消失 | 旧 path 有额外半径限制，并在短弧下退化 | 改用 d3-shape `arc().cornerRadius()`，只遵守真实几何上限 |
 | hover 扇区外扩后被裁切 | 旧 mask 或 SVG 范围没有覆盖外扩 path | 统一按外扩范围生成 path 与视口；不再让 gap mask 参与裁切 |
 | `separatorWidth={0}` 时仍出现约 1px 发丝缝，半透明色直接叠加同色描边又会形成深色毛边 | SVG 相邻 path 分别做抗锯齿，共边处可能透出背景；半透明 fill 与 stroke 分开绘制会在重叠边缘重复合成 alpha | 用包含完整 path、`0.5px` seam cover 与 `blur(0.5px)` seam 的白色 alpha mask 合并覆盖范围，再让颜色或渐变通过该 mask 只绘制一次；同时覆盖缝隙并避免同一扇区边缘重复叠色 |
+| 实心半饼图出现后只剩径向细线，DOM 中的进度却已完成 | Chromium 没有稳定重绘随进度变化的实心 `revealPath` 嵌套 mask | 实心形态直接以 `revealPath` 作为填充或单层 seam mask；圆环形态继续使用透明尾迹 mask |
 
 ---
 
