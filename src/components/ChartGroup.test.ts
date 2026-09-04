@@ -307,4 +307,17 @@ CG-01
         },
         logic: ["HoverPanel", "Default", "LightVariant", "Keyboard"],
     },
+    {
+        name: "CG-08: loading 保留组合坐标与子图节点",
+        code: `CG-08
+<ChartGroup loading width={640} height={320} xLabels={["Jan", "Feb", "Mar", "Apr"]} yMin={0} yMax={100} showXAxis showYAxis showGrid>
+    <BarChart class="absolute top-0 left-0" width={640} height={320} data={[]} />
+    <LineChart class="absolute top-0 left-0" width={640} height={296} series={[]} showXAxis={false} showYAxis={false} />
+</ChartGroup>`,
+        expected: {
+            render: "加载时保留 640x320 组合画布、共享横纵坐标和两个子图节点；不出现 Skeleton",
+            interaction: "loading 上下文让所有子图停在各自出现动效起点；解除 loading 后子图按视口条件播放",
+        },
+        logic: ["Loading", "NoSkeleton", "StableGeometry", "ChartGroup"],
+    },
 ] as const;

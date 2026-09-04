@@ -91,9 +91,7 @@
 | `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动时间轴 |
 | `scrollAppearanceDistance` | `number \| string` | `320` | 滚动映射距离 |
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 出现进度变化回调 |
-| `loading` | `boolean` | - | Frame loading 协议 |
-| `skeleton` | `boolean` | - | Frame skeleton 协议 |
-| `renderHints` | `RenderHints` | - | 骨架屏渲染提示 |
+| `loading` | `boolean` | - | 数据等待状态。保持声明的画布尺寸、坐标轴和网格，将柱体固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文。 |
 | `enableResponsive` | `boolean` | `true` | 是否启用 Frame responsive |
 | `enableContext` | `boolean` | `true` | 是否启用 Frame context |
 | `enableScaleObserver` | `boolean` | `false` | 是否启用 Frame scale observer |
@@ -236,7 +234,7 @@ interface BarChartItem {
 - 根层使用 `role="img"` 和 `aria-label="柱状图"`。
 - 每根柱 / 每个分段有独立透明命中层，使用 `role="button"`、`tabindex="0"` 和包含名称与数值的 `aria-label`。
 - 独立使用或接入 `ChartGroup` 时均支持 `hoverMode="cell"`；cell 命中区按分类中心左右半格覆盖绘图区，同一分类单元的所有单柱、多段、相叠层或并排柱一起响应 hover。
-- 支持 `loading`、`skeleton`、`renderHints`。
+- `loading` 保留完整画布与坐标结构，只把柱体恢复到出现动效起点；根 Frame 明确关闭 Skeleton。显式空 `data={[]}` 不回退默认演示数据，可配合 `xLabels`、`yMin`、`yMax` 先建立最终坐标。
 - 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
 - `class`、`style` 与未声明属性透传到根层 Frame。
 

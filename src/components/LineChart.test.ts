@@ -651,4 +651,25 @@ LC-13
         },
         logic: ["HoverPanel", "Default", "LightVariant", "Keyboard"],
     },
+    {
+        name: "LC-18: loading 保留坐标与最终尺寸",
+        code: `LC-18
+<LineChart
+    loading
+    width={640}
+    height={320}
+    series={[]}
+    xLabels={["Jan", "Feb", "Mar", "Apr"]}
+    yMin={0}
+    yMax={100}
+    showXAxis
+    showYAxis
+    showGrid
+/>`,
+        expected: {
+            render: "加载时保留 640x320 画布、横纵坐标和网格；没有折线、面积或 marker；不出现 Skeleton",
+            interaction: "loading 期间图形停在出现动效起点且交互暂停；解除 loading 后按视口触发条件播放出现动效",
+        },
+        logic: ["Loading", "NoSkeleton", "StableGeometry", "Axis"],
+    },
 ] as const;

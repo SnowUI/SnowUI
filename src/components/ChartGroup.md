@@ -62,9 +62,7 @@
 | `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | 共享面板定位：anchor-side 跟随数据图形侧边，anchor-top 对齐最高数据锚点，pointer 跟随指针；pin-* 固定在绘图区对应方位。面板碰撞处理由共享 ChartHoverPanel 完成。 |
 | `showHoverPanelLabel` | `boolean` | `false` | 在共享面板顶部显示当前分类名称；优先读取 xLabels 中的激活项，没有对应标签时回退到首个子图面板 label。 |
 | `children` | `Snippet` | — | 显式组合子图的无参数 Snippet；不会自动生成 BarChart、LineChart、标题或图例。子图通过各自 width/height 和根定位样式共享同一画布。 |
-| `loading` | `boolean` | — | 透传根 Frame 的 loading 状态，只控制组合宿主的加载呈现，不负责数据请求或子图出现时间轴。 |
-| `skeleton` | `boolean` | — | 透传根 Frame 的骨架呈现开关；须配合 loading 才进入加载占位，单独设 true 不会隐藏图表。未传时沿用 Frame 的继承与默认值，骨架形状来自 renderHints。 |
-| `renderHints` | `RenderHints` | — | 配置根骨架的 variant、width、height、radius；未指定字段分别回退为 rect、画布宽高和 0.75rem。不能替代真实画布 width/height。 |
+| `loading` | `boolean` | — | 数据等待状态。保留组合画布的最终尺寸、共享坐标和所有子图节点；子图读取该 loading 上下文后停在各自出现动效起点，解除加载时按当前视口条件播放。组合图不渲染 Skeleton。 |
 | `enableResponsive` | `boolean` | `true` | 是否开启根 Frame 的响应能力；图表画布的实测尺寸监听独立存在，百分比 width/height 不依赖此开关。 |
 | `enableContext` | `boolean` | `true` | 是否开启根 Frame 通用 Context 能力；不关闭 ChartGroup 为子图提供的共享分类、轴和悬浮协议。 |
 | `enableScaleObserver` | `boolean` | `false` | 根 Frame scale observer 的兼容开关，默认关闭；不控制图表自身实测尺寸监听。 |
@@ -149,7 +147,7 @@ interface ChartGroupContext {
 
 - 根层使用 `role="group"` 和 `aria-label="组合图表"`。
 - 未开启共享面板且 `hoverMode="cell"`、`showHitLayer=true` 时，每个 cell hit rect 使用 `role="button"`、`tabindex="0"` 和分类 label 作为 `aria-label`。
-- 支持 `loading`、`skeleton`、`renderHints`。
+- `loading` 保留组合画布、共享坐标和子图节点；根 Frame 明确关闭 Skeleton，子图通过加载上下文同步恢复到出现动效起点。
 - 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
 - `class`、`style` 与未声明属性透传到根层 Frame。
 

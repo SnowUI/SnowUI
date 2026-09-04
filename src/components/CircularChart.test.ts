@@ -593,4 +593,14 @@ CC-02
         },
         logic: ["Responsive", "MinWidth", "HoverPanel"],
     },
+    {
+        name: "CC-20: loading 保留最终尺寸",
+        code: `CC-20
+<CircularChart loading size={320} data={[]} />`,
+        expected: {
+            render: "加载时保留 320x320 最终区域；空数据不回退默认扇区；不出现 Skeleton",
+            interaction: "loading 期间扇区停在出现动效起点且交互暂停；解除 loading 后按视口触发条件播放出现动效",
+        },
+        logic: ["Loading", "NoSkeleton", "StableGeometry"],
+    },
 ] as const;

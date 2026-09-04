@@ -27,7 +27,7 @@
 
 - 支持圆环图与实心饼图：`ringThickness` 小于外半径时为圆环，`ringThickness >= outerRadius` 时内半径归零并形成实心饼图。
 - 支持最多 10 个扇区：`maxItems` 默认 `10`，内部上限固定为 `10`，超出项会被截断。
-- 自动过滤无效数据：`value <= 0` 或非数字项不参与渲染；全部数据无效时回退内置示例数据。
+- 自动过滤无效数据：`value <= 0` 或非数字项不参与渲染；显式空数组或全部无效时渲染空图表，只有省略 `data` 时使用内置示例数据。
 - 支持尺寸、环厚、圆角、隔断和 hover 外侧增厚调整：数字值按 px 语义写入组件私有 CSS 变量。
 - 支持 160x160 基准几何缩放：`cornerRadius` 与 `separatorWidth` 的传入数值都是设计基准值，实际渲染按 `size / 160` 等比放大或缩小。
 
@@ -70,7 +70,7 @@
 
 ### 2.6 Frame 集成
 
-- 根层使用 `Frame`，支持 `loading`、`skeleton`、`renderHints` 骨架屏协议。
+- 根层使用 `Frame`；`loading` 保留声明尺寸和中心内容，将扇区固定在出现动效起点并暂停交互。图表根层明确关闭 Skeleton，也会读取上层 Frame 的 loading 上下文。
 - 支持 `enableResponsive`、`enableContext`、`enableScaleObserver`、`enableDefaultMotion` 透传到 Frame。
 - `class`、`style` 和其余未声明属性会透传给根层 Frame。
 - 图表尺寸由 SVG 几何算法决定，作为外部布局子项时表现为 Hug。
@@ -83,7 +83,7 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `data` | `CircularChartItem[]` | 内置 5 项示例数据 | 比例数据数组；每项必填 name（名称）与 value（有限正数），可选 color、percentFormat。按输入顺序过滤非正数和非法值，再取前 maxItems 项；百分比分母是实际显示项之和。空数组或全部无效时回退内置 5 项演示数据，不代表空态；业务无数据时应由调用方单独显示说明。 |
+| `data` | `CircularChartItem[]` | 内置 5 项示例数据 | 比例数据数组；每项必填 name（名称）与 value（有限正数），可选 color、percentFormat。按输入顺序过滤非正数和非法值，再取前 maxItems 项；百分比分母是实际显示项之和。省略 `data` 时使用内置示例数据；显式空数组或全部无效时保留最终尺寸并渲染空图表。 |
 | `size` | `number \| string` | `240` | 图表正方形尺寸；推荐传正数，数字按 px 设计值转为 rem。字符串直接作为 CSS 长度，但 SVG 几何仅通过 parseFloat 取数，不进行单位换算，因此不支持可靠的百分比、calc() 或 CSS 变量自适应几何。 |
 | `minWidth` | `number \| string` | `"40px"` | 响应式最小显示宽度；数字与 size 使用相同的 px 设计值转 rem 规则，字符串直接作为 CSS 长度。默认固定 40 CSS px；设为与 size 相同可阻止自动缩小，设为更小值允许缩到该下限。仅 enableResponsive=true 时生效。 |
 | `ringThickness` | `number \| string` | `32` | 环厚，推荐非负数字（px 设计值）；内半径为 max(0, 外半径 − 环厚)。外半径为 size / 2 − hoverThicknessGrowth − 1，环厚达到它时形成实心饼图。字符串仅提取数值，不换算 CSS 单位。 |
@@ -109,7 +109,7 @@
 | `scrollAppearanceDistance` | `number \| string` | `320` | 滚动进度从 0 到 1 所需的 CSS px 距离；数字或数字字符串，最低按 1 处理。scrollAppearance.distance 优先；只在滚动时间轴开启时生效，不换算字符串单位。 |
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 内部进度写入时接收 progress（0..1），包括初始化中的直接完成、自动播放、实例方法与滚动更新；可同步外部进度读数。默认值初始化本身不通知；不用于监听外部 appearanceProgress，返回值被忽略，不能取消更新。 |
 | `hoverScaleSize` | `number \| string` | - | 已废弃的增厚别名，单位和行为与 hoverThicknessGrowth 相同；仅后者未传时生效。新代码使用 hoverThicknessGrowth，不能把它理解为整体缩放比例。 |
-| `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..10，0 / NaN 回退 10。百分比只基于保留项，超过 10 类的业务应先聚合小类以保留总量；全无效时仍回退完整内置演示数据。 |
+| `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..10，0 / NaN 回退 10。百分比只基于保留项，超过 10 类的业务应先聚合小类以保留总量；全无效时渲染空图表。 |
 | `showCenterLabel` | `boolean` | `true` | 是否渲染中心内容区域；false 同时隐藏默认动态标签、segment-value / segment-name 模板与静态 center-label。隐藏中心不关闭显式启用的 HoverPanel。 |
 | `hoverMode` | `"cell" \| "item"` | `"cell"` | cell 按环带角度命中，跨过透明隔断仍保持所属扇区，排除中心空洞与图外；item 只响应扇区路径命中。两种模式均保留扇区键盘 focus 提示。 |
 | `showHoverPanel` | `boolean` | `true` | 默认根据当前 hover / focus 扇区显示结构化面板，同时保留动态中心标签。false 关闭面板；但存在可见静态 center-label 时组件自动启用面板承载扇区信息。 |
@@ -118,9 +118,7 @@
 | `showHoverPanelLabel` | `boolean` | `false` | 是否在面板行数据上方额外显示当前扇区名称；false 只显示数据行。仅面板开启且存在当前项时有可见效果。 |
 | `percentFormat` | `NumberFormatOptions` | NumberFormats 百分比默认 | 中心百分比、面板百分比与扇区 aria-label 的数字格式；支持 fractionDigits、locale 等 NumberFormatOptions。优先级为数据项 percentFormat → 本属性 → NumberFormatContext → 默认一位小数；labelFormatter 只覆盖中心文本。 |
 | `labelFormatter` | `(item, percent) => string` | - | hover / focus 时接收 item（当前有效数据项）与 percent（0..100 百分数），返回中心文字；以换行拆成数值行与名称行，最多使用两行。静态 center-label 或 showCenterLabel=false 时不调用；不改变面板和扇区 aria-label 的百分比。 |
-| `loading` | `boolean` | - | 透传 Frame 加载状态；未传时使用 Frame 的上下文/默认解析。与 skeleton 配合显示内置占位，不代表数据请求或业务完成。 |
-| `skeleton` | `boolean` | - | 透传 Frame 骨架开关；与 loading 或上层加载上下文配合生效，默认由 Frame 解析。图表自注册圆形骨架，不需要调用方复制 SVG 占位。 |
-| `renderHints` | `RenderHints` | - | 骨架提示对象；CircularChart 读取 variant、width、height、radius，缺省分别为 circle、size、size、全圆角。只改变加载占位，不改变真实图表几何。 |
+| `loading` | `boolean` | - | 数据等待状态。保留 `size` 对应的最终占位和中心内容，将扇区固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文；显式空 `data={[]}` 不回退默认演示数据。 |
 | `enableResponsive` | `boolean` | `true` | 默认在容器放不下时等比缩小图表本体，支持 flex 并排收缩，最小显示宽度由 minWidth 决定（默认 40px），与图表宽度相同时不收缩；HoverPanel 不缩放；false 保留声明尺寸。也透传至 Frame。 |
 | `enableContext` | `boolean` | `true` | 透传 Frame 的上下文能力开关；当前组件自己的 size、颜色与出现进度仍由对应 Props 决定。 |
 | `enableScaleObserver` | `boolean` | `false` | 透传 Frame 的旧版尺寸观察兼容能力，默认关闭；不等同于百分比图表尺寸，不建议新示例依赖此迁移期入口。 |
@@ -152,7 +150,7 @@ interface CircularChartItem {
 
 百分比数字格式优先级：`labelFormatter`（中心标签）→ `item.percentFormat` → 组件 `percentFormat` → `NumberFormatContext` → `NumberFormats` 默认值。扇区命中层 `aria-label` 不使用 `labelFormatter`，但会消费 `percentFormat`。
 
-`value <= 0` 或非数字项会被过滤；全部无效时回退到内置示例数据。
+`value <= 0` 或非数字项会被过滤；显式空数组或全部无效时渲染空图表，省略 `data` 才使用内置示例数据。
 
 ```ts
 type CircularChartColor = string | CircularChartGradient;

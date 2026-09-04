@@ -16,8 +16,8 @@
         getNumberFormat,
         mergeNumberFormatOptions,
         type NumberFormatOptions,
-        type RenderHints,
     } from "@snowui-design-system/components";
+    import { getSkeleton } from "@snowui-design-system/components/context";
     import type { MotionConfig } from "@snowui-design-system/components/logic/motion-config";
     import { SECTOR_CHART_MIN_WIDTH, watchSectorChartSize, type SectorChartSize } from "../lib/chart/size";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
@@ -103,8 +103,6 @@
         percentFormat?: NumberFormatOptions;
         labelFormatter?: (item: GaugeChartItem, percent: number) => string;
         loading?: boolean;
-        skeleton?: boolean;
-        renderHints?: RenderHints;
         children?: Snippet;
         class?: string;
         style?: string;
@@ -184,8 +182,6 @@
         percentFormat = undefined,
         labelFormatter,
         loading = undefined,
-        skeleton = undefined,
-        renderHints = undefined,
         children,
         class: userClass = "",
         style = "",
@@ -209,6 +205,8 @@
     let appearanceFrame = $state<number | null>(null);
     let scrollFrame = $state<number | null>(null);
     let hasAutoPlayed = $state(false);
+    let wasEffectivelyLoading = $state(false);
+    let prefersReducedAppearanceMotion = false;
     let hasCustomCenterLabel = $state(false);
     let hasStaticCenterLabel = $state(false);
     let hoverPanelPointer = $state({ x: 0, y: 0 });
@@ -256,11 +254,17 @@
     );
     const chartData = $derived(normalizeData(data, maxItems));
     const total = $derived(chartData.reduce((sum, item) => sum + item.value, 0));
+    const parentLoadingContext = getSkeleton();
+    const effectiveLoading = $derived(
+        Boolean(loading) || Boolean(parentLoadingContext?.loading),
+    );
     const controlledAppearanceProgress = $derived(
         typeof appearanceProgress === "number",
     );
     const effectiveAppearanceProgress = $derived(
-        appearMotion
+        effectiveLoading
+            ? 0
+            : appearMotion
             ? clamp(
                   controlledAppearanceProgress
                       ? (appearanceProgress as number)
@@ -370,12 +374,6 @@
             .filter(Boolean)
             .join(";"),
     );
-    const gaugeChartRenderHints = $derived({
-        variant: renderHints?.variant ?? "rect",
-        width: renderHints?.width ?? toCssLength(width),
-        height: renderHints?.height ?? toCssLength(height),
-        radius: renderHints?.radius ?? "9999px",
-    });
 
     function formatPercentLabel(item: GaugeChartItem, percent: number) {
         return formatSharedPercentLabel(
@@ -439,37 +437,57 @@
         scheduleCustomCenterLabelSync();
     });
 
-    onMount(() => {
-        const mediaQuery = window.matchMedia?.(
-            "(prefers-reduced-motion: reduce)",
-        );
-        if (!appearMotion || mediaQuery?.matches) {
-            setInternalAppearanceProgress(1);
+    function updateAppearanceFromViewport() {
+        if (effectiveLoading || scrollFrame !== null) return;
+        scrollFrame = requestAnimationFrame(() => {
+            scrollFrame = null;
+            if (effectiveLoading) return;
+            if (!appearMotion || prefersReducedAppearanceMotion) {
+                setInternalAppearanceProgress(1);
+                return;
+            }
+            if (scrollAppearance) {
+                setInternalAppearanceProgress(resolveScrollProgress());
+                return;
+            }
+            if (appearOnView && !hasAutoPlayed && isAnchorTriggered()) {
+                hasAutoPlayed = true;
+                playAppearance();
+            }
+        });
+    }
+
+    $effect(() => {
+        if (effectiveLoading) {
+            wasEffectivelyLoading = true;
+            hasAutoPlayed = false;
+            if (appearanceFrame !== null) {
+                cancelAnimationFrame(appearanceFrame);
+                appearanceFrame = null;
+            }
+            if (internalAppearanceProgress !== 0) {
+                setInternalAppearanceProgress(0);
+            }
             return;
         }
+        if (!wasEffectivelyLoading) return;
+        wasEffectivelyLoading = false;
+        void tick().then(updateAppearanceFromViewport);
+    });
 
-        const updateFromScroll = () => {
-            if (scrollFrame !== null) return;
-            scrollFrame = requestAnimationFrame(() => {
-                scrollFrame = null;
-                if (scrollAppearance) {
-                    setInternalAppearanceProgress(resolveScrollProgress());
-                    return;
-                }
-                if (appearOnView && !hasAutoPlayed && isAnchorTriggered()) {
-                    hasAutoPlayed = true;
-                    playAppearance();
-                }
-            });
-        };
-
-        updateFromScroll();
-        window.addEventListener("scroll", updateFromScroll, { passive: true });
-        window.addEventListener("resize", updateFromScroll);
+    onMount(() => {
+        prefersReducedAppearanceMotion = Boolean(
+            window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,
+        );
+        updateAppearanceFromViewport();
+        window.addEventListener("scroll", updateAppearanceFromViewport, {
+            passive: true,
+        });
+        window.addEventListener("resize", updateAppearanceFromViewport);
 
         return () => {
-            window.removeEventListener("scroll", updateFromScroll);
-            window.removeEventListener("resize", updateFromScroll);
+            window.removeEventListener("scroll", updateAppearanceFromViewport);
+            window.removeEventListener("resize", updateAppearanceFromViewport);
         };
     });
 
@@ -620,7 +638,7 @@
         const validItems = items
             .filter((item) => Number.isFinite(item.value) && item.value > 0)
             .slice(0, safeLimit);
-        return validItems.length > 0 ? validItems : DEFAULT_DATA;
+        return validItems;
     }
 
     function setSegmentGrowth(index: number, value: number) {
@@ -1022,14 +1040,13 @@
     {enableContext}
     {enableScaleObserver}
     {enableDefaultMotion}
+    {...rest}
     {loading}
-    {skeleton}
-    renderHints={gaugeChartRenderHints}
+    skeleton={false}
     class={["snowui-gauge-chart", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
     role="img"
     aria-label="仪表图"
-    {...rest}
 >
     <div bind:this={bodyElement} class="snowui-gauge-chart-body">
         <svg

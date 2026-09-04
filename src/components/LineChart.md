@@ -79,9 +79,7 @@
 | `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动条时间轴控制出现动效 |
 | `scrollAppearanceDistance` | `number \| string` | `320` | 滚动时间轴从 `0` 到 `1` 对应的滚动距离 |
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 出现进度变化回调 |
-| `loading` | `boolean` | - | Frame loading 协议 |
-| `skeleton` | `boolean` | - | Frame skeleton 协议 |
-| `renderHints` | `RenderHints` | - | 骨架屏渲染提示 |
+| `loading` | `boolean` | - | 数据等待状态。保持声明的画布尺寸、坐标轴和网格，将折线、面积和 marker 固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文。 |
 | `enableResponsive` | `boolean` | `true` | 是否启用 Frame responsive 能力 |
 | `enableContext` | `boolean` | `true` | 是否启用 Frame context 能力 |
 | `enableScaleObserver` | `boolean` | `false` | 是否启用 Frame scale observer |
@@ -231,7 +229,7 @@ Marker 说明：
 - marker 内部包含透明命中圆，保证键盘焦点与鼠标命中不只依赖可见圆点半径。
 - marker 可见层不接管 pointer events，白色中心、黑色外圈与透明命中圆统一由命中圆触发；默认命中区域不小于 `16x16`。
 - 独立使用或接入 `ChartGroup` 时均支持 `hoverMode="cell"`；cell 命中区按分类点位中心左右半格覆盖绘图区，对应分类点位的 marker 响应 hover，marker 自身命中区仍独立保留。
-- 支持 `loading`、`skeleton`、`renderHints`。
+- `loading` 保留完整画布与坐标结构，只把折线、面积和 marker 恢复到出现动效起点；根 Frame 明确关闭 Skeleton。空 `series={[]}` 可配合 `xLabels`、`yMin`、`yMax` 先建立最终坐标。
 - 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
 - `class`、`style` 与未声明属性透传到根层 Frame。
 

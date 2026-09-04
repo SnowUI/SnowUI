@@ -327,4 +327,14 @@ GG-01
         },
         logic: ["CenterLabel", "Hover", "Keyboard"],
     },
+    {
+        name: "GG-18: loading 保留最终尺寸",
+        code: `GG-18
+<GaugeChart loading width={480} height={240} data={[]} centerTitle="Docs" centerSubtitle="This week" />`,
+        expected: {
+            render: "加载时保留 480x240 最终区域和中心静态信息；空数据不回退默认扇区；不出现 Skeleton",
+            interaction: "loading 期间扇区停在出现动效起点且交互暂停；解除 loading 后按视口触发条件播放出现动效",
+        },
+        logic: ["Loading", "NoSkeleton", "StableGeometry", "CenterLabel"],
+    },
 ] as const;

@@ -31,7 +31,7 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `data` | `GaugeChartItem[]` | 内置 5 项示例数据 | 比例数据数组；每项必填 name（名称）与 value（有限正数），可选 color、percentFormat。按输入顺序过滤非正数和非法值，再取前 maxItems 项；百分比分母是实际显示项之和。空数组或全部无效时回退内置 5 项演示数据，不代表空态；业务无数据时应由调用方单独显示说明。 |
+| `data` | `GaugeChartItem[]` | 内置 5 项示例数据 | 比例数据数组；每项必填 name（名称）与 value（有限正数），可选 color、percentFormat。按输入顺序过滤非正数和非法值，再取前 maxItems 项；百分比分母是实际显示项之和。省略 `data` 时使用内置示例数据；显式空数组或全部无效时保留最终尺寸并渲染空图表。 |
 | `width` | `number \| string` | `320` | 整体宽度，推荐正数（px 设计值转 rem）；字符串直接作为 CSS 长度，但 SVG 几何仅以 parseFloat 提取数值，不换算单位，不支持可靠的百分比、calc() 或 CSS 变量几何。 |
 | `minWidth` | `number \| string` | `"40px"` | 响应式最小显示宽度；数字与 width 使用相同的 px 设计值转 rem 规则，字符串直接作为 CSS 长度。默认固定 40 CSS px；设为与 width 相同可阻止自动缩小，设为更小值允许缩到该下限。仅 enableResponsive=true 时生效。 |
 | `height` | `number \| string` | `160` | 整体高度，推荐正数（px 设计值转 rem），通常为 width 的一半；改变高度会改变圆心与可用半径。字符串解析限制与 width 相同。 |
@@ -57,7 +57,7 @@
 | `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | true 开启 window 滚动驱动的非受控时间轴；对象可用 distance 覆盖滚动距离。锚点越过触发线后进度由距离决定，向回滚动会逆向恢复。不监听嵌套 ScrollArea；appearanceProgress / appearMotion=false 优先。 |
 | `scrollAppearanceDistance` | `number \| string` | `320` | 滚动进度从 0 到 1 所需的 CSS px 距离；数字或数字字符串，最低按 1 处理。scrollAppearance.distance 优先；只在滚动时间轴开启时生效，不换算字符串单位。 |
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 内部进度写入时接收 progress（0..1），包括初始化中的直接完成、自动播放、实例方法与滚动更新；可同步外部进度读数。默认值初始化本身不通知；不用于监听外部 appearanceProgress，返回值被忽略，不能取消更新。 |
-| `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..28，0 / NaN 回退 10。百分比只基于保留项，超过 28 类的业务应先聚合小类以保留总量；全无效时仍回退完整内置演示数据。 |
+| `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..28，0 / NaN 回退 10。百分比只基于保留项，超过 28 类的业务应先聚合小类以保留总量；全无效时渲染空图表。 |
 | `showCenterLabel` | `boolean` | `true` | 是否渲染中心内容区域；false 同时隐藏默认动态标签、segment-value / segment-name 模板与静态 center-label。隐藏中心不关闭显式启用的 HoverPanel。 |
 | `centerTitle` | `string` | `""` | 无 hover / focus 项时显示的中心标题，复用默认数值行排版；悬停或聚焦扇区时被百分比或 labelFormatter 第一行替换，离开后恢复。空字符串不占标题行；showCenterLabel=false 隐藏，静态 center-label 优先。 |
 | `centerSubtitle` | `string` | `""` | 无 hover / focus 项时显示的中心副标题，复用默认名称行排版；悬停或聚焦时被当前项名称或 labelFormatter 第二行替换，离开后恢复。可单独设置；不生成 HoverPanel 数据。 |
@@ -68,9 +68,7 @@
 | `showHoverPanelLabel` | `boolean` | `false` | 是否在面板行数据上方额外显示当前扇区名称；false 只显示数据行。仅面板开启且存在当前项时有可见效果。 |
 | `percentFormat` | `NumberFormatOptions` | NumberFormats 百分比默认 | 中心百分比、面板百分比与扇区 aria-label 的数字格式；支持 fractionDigits、locale 等 NumberFormatOptions。优先级为数据项 percentFormat → 本属性 → NumberFormatContext → 默认一位小数；labelFormatter 只覆盖中心文本。 |
 | `labelFormatter` | `(item, percent) => string` | - | hover / focus 时接收 item（当前有效数据项）与 percent（0..100 百分数），返回中心文字；以换行拆成数值行与名称行，最多使用两行。静态 center-label 或 showCenterLabel=false 时不调用；不改变面板和扇区 aria-label 的百分比。 |
-| `loading` | `boolean` | - | 透传 Frame 加载状态；未传时使用 Frame 的上下文/默认解析。与 skeleton 配合显示内置占位，不代表数据请求或业务完成。 |
-| `skeleton` | `boolean` | - | 透传 Frame 骨架开关；与 loading 或上层加载上下文配合生效，默认由 Frame 解析。图表自注册矩形骨架，不需要调用方复制 SVG 占位。 |
-| `renderHints` | `RenderHints` | - | 骨架提示对象；读取 variant、width、height、radius，缺省分别为 rect、图表 width、图表 height、9999px。只改变加载占位，不改变真实图表几何。 |
+| `loading` | `boolean` | - | 数据等待状态。保留 `width` / `height` 对应的最终占位和中心内容，将扇区固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文；显式空 `data={[]}` 不回退默认演示数据。 |
 | `children` | `Snippet` | — | 无参数 Snippet，渲染在 showCenterLabel=true 的中心区域。直系 Text as="segment-value" / "segment-name" 是动态标签模板，由组件写入当前两行文字；直系 Frame as="center-label" 提供常驻内容并自动启用面板。静态内容不自动套用默认中心排版；只需默认文字时无需传 children。中心用于展示，不用于交互工具栏。 |
 | `class` | `string` | `""` | 追加到图表根 Frame 的 class 字符串；不传时为空。仅表达调用方公开根样式，不穿透内部 SVG 和标签结构。 |
 | `style` | `string` | `""` | 追加到根 Frame 的 inline style 字符串，在组件注入的变量之后合并。可表达外部布局；图表几何优先使用 width、height、ringThickness 等公开 Props。 |
@@ -110,7 +108,7 @@ interface GaugeChartItem {
 
 百分比数字格式优先级：`labelFormatter`（中心标签）→ `item.percentFormat` → 组件 `percentFormat` → `NumberFormatContext` → `NumberFormats` 默认值。扇区命中层 `aria-label` 不使用 `labelFormatter`，但会消费 `percentFormat`。
 
-`value <= 0` 或非数字项会被过滤；全部无效时回退到内置示例数据。不支持直接传入 `.bg-gradient-blue` 这类背景工具类名，因为 SVG path 消费的是 `fill`。
+`value <= 0` 或非数字项会被过滤；显式空数组或全部无效时渲染空图表，省略 `data` 才使用内置示例数据。不支持直接传入 `.bg-gradient-blue` 这类背景工具类名，因为 SVG path 消费的是 `fill`。
 
 ---
 

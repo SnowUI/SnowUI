@@ -8,7 +8,7 @@
 
 <script lang="ts">
     import { onDestroy, setContext, untrack, type Snippet } from "svelte";
-    import { Frame, type FrameProps, type RenderHints } from "@snowui-design-system/components";
+    import { Frame, type FrameProps } from "@snowui-design-system/components";
     import ChartHoverPanel from "../lib/chart/ChartHoverPanel.svelte";
     import {
         CHART_X_AXIS_RESERVED_HEIGHT,
@@ -38,7 +38,7 @@
         left?: number;
     }
 
-    interface Props extends Omit<FrameProps, "children"> {
+    interface Props extends Omit<FrameProps, "children" | "skeleton" | "renderHints"> {
         width?: number | string;
         height?: number | string;
         xLabels?: string[];
@@ -72,7 +72,6 @@
         children?: Snippet;
         class?: string;
         style?: string;
-        renderHints?: RenderHints;
         enableResponsive?: boolean;
         enableContext?: boolean;
         enableScaleObserver?: boolean;
@@ -121,8 +120,6 @@
         class: userClass = "",
         style = "",
         loading = undefined,
-        skeleton = undefined,
-        renderHints = undefined,
         enableResponsive = true,
         enableContext = true,
         enableScaleObserver = false,
@@ -210,12 +207,6 @@
             .filter(Boolean)
             .join("; "),
     );
-    const chartGroupRenderHints = $derived({
-        variant: renderHints?.variant ?? "rect",
-        width: renderHints?.width ?? toCssLength(width),
-        height: renderHints?.height ?? toCssLength(height),
-        radius: renderHints?.radius ?? "0.75rem",
-    });
     const plotAnchorBounds = $derived({
         left: resolvedBounds.left,
         top: resolvedBounds.top,
@@ -524,16 +515,15 @@
     style={rootStyle}
     role="group"
     aria-label="组合图表"
+    {...rest}
     {loading}
-    {skeleton}
-    renderHints={chartGroupRenderHints}
+    skeleton={false}
     {enableResponsive}
     {enableContext}
     {enableScaleObserver}
     {enableDefaultMotion}
     onpointermove={handleGroupPointerMove}
     onpointerleave={handleGroupPointerLeave}
-    {...rest}
 >
     {@render children?.()}
 

@@ -296,4 +296,25 @@ hoverPanelPlacement="anchor-side"
         },
         logic: ["HoverPanel", "Default", "LightVariant", "Keyboard"],
     },
+    {
+        name: "BC-10: loading 保留坐标与最终尺寸",
+        code: `BC-10
+<BarChart
+    loading
+    width={640}
+    height={320}
+    data={[]}
+    xLabels={["Jan", "Feb", "Mar", "Apr"]}
+    yMin={0}
+    yMax={100}
+    showXAxis
+    showYAxis
+    showGrid
+/>`,
+        expected: {
+            render: "加载时保留 640x320 画布、横纵坐标和网格；空数据不回退默认演示柱；不出现 Skeleton",
+            interaction: "loading 期间柱体停在出现动效起点且交互暂停；解除 loading 后按视口触发条件播放出现动效",
+        },
+        logic: ["Loading", "NoSkeleton", "StableGeometry", "Axis"],
+    },
 ];
