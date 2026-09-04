@@ -1,6 +1,6 @@
 # GaugeChart (仪表图)
 
-> **版本**: v1.7.1
+> **版本**: v1.7.2
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染可调圆角、环厚、透明间隔、渐变颜色、4% 同色占位层与顺序出现动效的半圆仪表比例图。颜色、几何与出现时间轴能力与 CircularChart 保持同类心智。
@@ -47,14 +47,14 @@
 | `startDirection` | `"left" \| "right"` | `"left"` | left 从左端开始向右揭示，right 从右端开始向左揭示；只改变出现顺序和扫描方向，不旋转数据排布。 |
 | `showBaseLayer` | `boolean` | `false` | 是否显示最终几何的同色 4% 透明度底层；默认不渲染。开启后底层不参与出现动效与命中，便于观察填充进度；不改变真实扇区和数据。 |
 | `appearMotion` | `boolean` | `true` | 是否启用图形出现动效；false 时直接显示完整填充，并使 replay / reverseAppearance 不播放。此开关不关闭独立的 hover 增厚反馈。 |
-| `appearOnView` | `boolean` | `true` | 非受控模式中，锚点到达指定视口位置时自动播放一次；false 可改用实例方法播放。appearanceProgress 优先；scrollAppearance 开启时由滚动驱动。 |
+| `appearOnView` | `boolean` | `true` | 非受控模式中，锚点到达指定视口位置时自动播放一次；同源 iframe 中按最外层同源页面的真实位置判断。false 可改用实例方法播放。appearanceProgress 优先；scrollAppearance 开启时由滚动驱动。 |
 | `appearanceProgress` | `number` | - | 受控填充进度，数值限制到 0..1；提供后显示由调用方决定，自动播放和实例播放方法不改变受控画面。appearMotion=false 仍直接完整显示；外部进度变化不会触发 onAppearanceProgressChange。 |
 | `defaultAppearanceProgress` | `number` | `0` | 非受控模式首次初始化的进度，限制到 0..1，只读取一次；后续改变此属性不重置动画。有 appearanceProgress 时不决定画面；默认 0 为描边态。 |
 | `appearanceDuration` | `number` | - | 实例播放与自动出现的总时长，单位 ms；未传时固定 1000，不随扇区数改变。非正数在下一动画帧直接到终点；不改变滚动或受控进度映射。 |
 | `appearAnchorId` | `string` | - | 页面内触发锚点元素的 id；未传时使用图表根元素，传入不存在的 id 不回退根元素。仅用于自动出现或滚动时间轴，不改变图表位置。 |
 | `appearAnchorPoint` | `"top" \| "center" \| "bottom"` | `"top"` | 选用锚点的 top（顶部）、center（垂直中心）或 bottom（底部）与视口触发线比较；不影响扇区绘制方向。 |
 | `appearViewportPoint` | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发线：数字限制到 0..1，或使用 top=0、center=0.5、bottom=1。默认 0.7 为视口高度 70%；配合 appearAnchorPoint 决定触发/滚动起点。 |
-| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | true 开启 window 滚动驱动的非受控时间轴；对象可用 distance 覆盖滚动距离。锚点越过触发线后进度由距离决定，向回滚动会逆向恢复。不监听嵌套 ScrollArea；appearanceProgress / appearMotion=false 优先。 |
+| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | true 开启 window 滚动驱动的非受控时间轴；同源 iframe 同时响应外层页面滚动。对象可用 distance 覆盖滚动距离。锚点越过触发线后进度由距离决定，向回滚动会逆向恢复。不监听嵌套 ScrollArea；appearanceProgress / appearMotion=false 优先。 |
 | `scrollAppearanceDistance` | `number \| string` | `320` | 滚动进度从 0 到 1 所需的 CSS px 距离；数字或数字字符串，最低按 1 处理。scrollAppearance.distance 优先；只在滚动时间轴开启时生效，不换算字符串单位。 |
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 内部进度写入时接收 progress（0..1），包括初始化中的直接完成、自动播放、实例方法与滚动更新；可同步外部进度读数。默认值初始化本身不通知；不用于监听外部 appearanceProgress，返回值被忽略，不能取消更新。 |
 | `maxItems` | `number` | `10` | 过滤后保留的前 N 项数量，不排序、不自动合并 Other；取整并限制到 1..28，0 / NaN 回退 10。百分比只基于保留项，超过 28 类的业务应先聚合小类以保留总量；全无效时渲染空图表。 |
@@ -278,6 +278,10 @@ interface GaugeChartItem {
 ---
 
 ## 7. 更新日志 (Changelog)
+
+### v1.7.2 (2026-09-05)
+
+- 扇区 appearance 每帧改为一次线性时间表计算；HoverPanel pointer 与 cell 命中坐标按绘制帧共用一次根层测量。公开 API、半圆 path、动效时长、视觉和交互语义不变。
 
 ### v1.7.1 (2026-09-04)
 

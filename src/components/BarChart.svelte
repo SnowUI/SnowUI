@@ -1,6 +1,6 @@
 <!--
   BarChart 柱状图组件 (PRO)
-  v1.3.0 (2026-09-03)
+  v1.4.1 (2026-09-05)
 
   职责:渲染支持纵向/横向、多段、相叠、多柱并排与坐标轴的柱状图。
   文档: ./BarChart.md
@@ -52,6 +52,10 @@
     } from "../lib/chart/axis";
     import { clamp, toCssLength, toNumber } from "../lib/chart/geometry";
     import {
+        resolveAppearanceViewportGeometry,
+        resolveAppearanceViewportWindows,
+    } from "../lib/chart/appearance-viewport";
+    import {
         resolveCartesianChartSize,
         watchCartesianChartSize,
     } from "../lib/chart/size";
@@ -82,6 +86,7 @@
         type ChartHoverPanelRow,
         type ChartHoverPanelVariant,
     } from "../lib/chart/hover-panel";
+    import { createChartPointerFrameScheduler } from "../lib/chart/pointer";
 
     export type BarChartColor = ChartColor;
     export type BarChartColorMode = ChartColorMode;
@@ -372,8 +377,12 @@
     let internalActiveCellIndex = $state<number | null>(null);
     let lastActiveCellIndex = $state<number | null>(null);
     let hoverPanelPointer = $state({ x: 0, y: 0 });
-    let hoverPanelPointerFrame: number | null = null;
-    let pendingHoverPanelPointer: { x: number; y: number } | null = null;
+    const hoverPanelPointerScheduler = createChartPointerFrameScheduler(
+        () => rootElement,
+        (position) => {
+            hoverPanelPointer = position;
+        },
+    );
     const hoverLabelUnmountTimers = new Map<
         string,
         ReturnType<typeof setTimeout>
@@ -860,14 +869,19 @@
             window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,
         );
         updateAppearanceFromViewport();
-        window.addEventListener("scroll", updateAppearanceFromViewport, {
-            passive: true,
+        const viewportWindows = resolveAppearanceViewportWindows();
+        viewportWindows.forEach((viewportWindow) => {
+            viewportWindow.addEventListener("scroll", updateAppearanceFromViewport, {
+                passive: true,
+            });
+            viewportWindow.addEventListener("resize", updateAppearanceFromViewport);
         });
-        window.addEventListener("resize", updateAppearanceFromViewport);
 
         return () => {
-            window.removeEventListener("scroll", updateAppearanceFromViewport);
-            window.removeEventListener("resize", updateAppearanceFromViewport);
+            viewportWindows.forEach((viewportWindow) => {
+                viewportWindow.removeEventListener("scroll", updateAppearanceFromViewport);
+                viewportWindow.removeEventListener("resize", updateAppearanceFromViewport);
+            });
         };
     });
 
@@ -949,7 +963,7 @@
         return clamp(appearViewportPoint, 0, 1);
     }
 
-    function getAnchorCoordinate(rect: DOMRect) {
+    function getAnchorCoordinate(rect: { top: number; bottom: number; height: number }) {
         if (appearAnchorPoint === "center") return rect.top + rect.height / 2;
         if (appearAnchorPoint === "bottom") return rect.bottom;
         return rect.top;
@@ -958,8 +972,9 @@
     function isAnchorTriggered() {
         const anchor = getAnchorElement();
         if (!anchor) return false;
-        const rect = anchor.getBoundingClientRect();
-        const triggerLine = window.innerHeight * getViewportPoint();
+        const rect = resolveAppearanceViewportGeometry(anchor);
+        if (rect.appearanceReleased) return true;
+        const triggerLine = rect.viewportHeight * getViewportPoint();
         return getAnchorCoordinate(rect) <= triggerLine && rect.bottom >= 0;
     }
 
@@ -974,8 +989,8 @@
     function resolveScrollProgress() {
         const anchor = getAnchorElement();
         if (!anchor) return internalAppearanceProgress;
-        const rect = anchor.getBoundingClientRect();
-        const triggerLine = window.innerHeight * getViewportPoint();
+        const rect = resolveAppearanceViewportGeometry(anchor);
+        const triggerLine = rect.viewportHeight * getViewportPoint();
         const distance = Math.max(1, getScrollDistance());
         return clamp(
             (triggerLine - getAnchorCoordinate(rect)) / distance,
@@ -1146,11 +1161,7 @@
     }
 
     function resolveBarChartStartOffset(order: number, count: number) {
-        let offset = 0;
-        for (let index = 0; index < order; index += 1) {
-            offset += resolveBarChartStaggerAfter(index, count);
-        }
-        return offset;
+        return resolveBarChartStaggerAfter(0, count) * order;
     }
 
     function resolveBarChartAppearanceDuration(count: number) {
@@ -1918,26 +1929,11 @@
     }
 
     function updateHoverPanelPointer(event: PointerEvent | MouseEvent) {
-        const rect = rootElement?.getBoundingClientRect();
-        if (!rect) return;
-        pendingHoverPanelPointer = {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top,
-        };
-        if (hoverPanelPointerFrame !== null) return;
-        hoverPanelPointerFrame = requestAnimationFrame(() => {
-            hoverPanelPointerFrame = null;
-            if (!pendingHoverPanelPointer) return;
-            hoverPanelPointer = pendingHoverPanelPointer;
-            pendingHoverPanelPointer = null;
-        });
+        hoverPanelPointerScheduler.schedule(event);
     }
 
     function clearHoverPanelPointerFrame() {
-        pendingHoverPanelPointer = null;
-        if (hoverPanelPointerFrame === null) return;
-        cancelAnimationFrame(hoverPanelPointerFrame);
-        hoverPanelPointerFrame = null;
+        hoverPanelPointerScheduler.clear();
     }
 
     $effect(() => {

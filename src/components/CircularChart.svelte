@@ -1,6 +1,6 @@
 <!--
   CircularChart 圆形图表组件 (PRO)
-  v1.4.1 (2026-09-04)
+  v1.4.2 (2026-09-05)
 
   职责:渲染可调圆角、环厚、隔断、尺寸的圆环/饼形比例图。
   Hover:当前扇区仅向外增厚,不位移;中心标签显示当前项。
@@ -33,6 +33,10 @@
         buildOpacityMaskColor,
         resolveSegmentAppearanceTimelines,
     } from "../lib/chart/appearance-timeline";
+    import {
+        resolveAppearanceViewportGeometry,
+        resolveAppearanceViewportWindows,
+    } from "../lib/chart/appearance-viewport";
     import { resolveColorGradient as resolveSharedColorGradient } from "../lib/chart/gradients";
     import {
         clamp,
@@ -49,6 +53,7 @@
         type ChartHoverPanelRow,
         type ChartHoverPanelVariant,
     } from "../lib/chart/hover-panel";
+    import { createChartPointerFrameScheduler } from "../lib/chart/pointer";
 
     export type CircularChartColor = ChartColor;
     export type CircularChartColorMode = ChartColorMode;
@@ -220,8 +225,15 @@
     let hoverPanelPointer = $state({ x: 0, y: 0 });
     let mountedCenterLabelLines = $state({ value: "", name: "" });
     let centerLabelUnmountTimer: ReturnType<typeof setTimeout> | null = null;
-    let hoverPanelPointerFrame: number | null = null;
-    let pendingHoverPanelPointer: { x: number; y: number } | null = null;
+    const hoverPanelPointerScheduler = createChartPointerFrameScheduler(
+        () => rootElement,
+        (position) => {
+            hoverPanelPointer = { x: position.x, y: position.y };
+            if (hoverMode === "cell") {
+                setHoveredSegmentIndex(resolvePointerSegmentIndex(position));
+            }
+        },
+    );
     const animationFrames = new Map<number, number>();
     const numberFormatContext = getNumberFormat();
 
@@ -480,14 +492,19 @@
             window.matchMedia?.("(prefers-reduced-motion: reduce)").matches,
         );
         updateAppearanceFromViewport();
-        window.addEventListener("scroll", updateAppearanceFromViewport, {
-            passive: true,
+        const viewportWindows = resolveAppearanceViewportWindows();
+        viewportWindows.forEach((viewportWindow) => {
+            viewportWindow.addEventListener("scroll", updateAppearanceFromViewport, {
+                passive: true,
+            });
+            viewportWindow.addEventListener("resize", updateAppearanceFromViewport);
         });
-        window.addEventListener("resize", updateAppearanceFromViewport);
 
         return () => {
-            window.removeEventListener("scroll", updateAppearanceFromViewport);
-            window.removeEventListener("resize", updateAppearanceFromViewport);
+            viewportWindows.forEach((viewportWindow) => {
+                viewportWindow.removeEventListener("scroll", updateAppearanceFromViewport);
+                viewportWindow.removeEventListener("resize", updateAppearanceFromViewport);
+            });
         };
     });
 
@@ -598,7 +615,7 @@
         return clamp(appearViewportPoint, 0, 1);
     }
 
-    function getAnchorCoordinate(rect: DOMRect) {
+    function getAnchorCoordinate(rect: { top: number; bottom: number; height: number }) {
         if (appearAnchorPoint === "center") return rect.top + rect.height / 2;
         if (appearAnchorPoint === "bottom") return rect.bottom;
         return rect.top;
@@ -607,8 +624,9 @@
     function isAnchorTriggered() {
         const anchor = getAnchorElement();
         if (!anchor) return false;
-        const rect = anchor.getBoundingClientRect();
-        const triggerLine = window.innerHeight * getViewportPoint();
+        const rect = resolveAppearanceViewportGeometry(anchor);
+        if (rect.appearanceReleased) return true;
+        const triggerLine = rect.viewportHeight * getViewportPoint();
         return getAnchorCoordinate(rect) <= triggerLine && rect.bottom >= 0;
     }
 
@@ -623,8 +641,8 @@
     function resolveScrollProgress() {
         const anchor = getAnchorElement();
         if (!anchor) return internalAppearanceProgress;
-        const rect = anchor.getBoundingClientRect();
-        const triggerLine = window.innerHeight * getViewportPoint();
+        const rect = resolveAppearanceViewportGeometry(anchor);
+        const triggerLine = rect.viewportHeight * getViewportPoint();
         const distance = Math.max(1, getScrollDistance());
         return clamp(
             (triggerLine - getAnchorCoordinate(rect)) / distance,
@@ -1000,28 +1018,19 @@
     }
 
     function updateHoverPanelPointer(event: PointerEvent | MouseEvent) {
-        const rect = rootElement?.getBoundingClientRect();
-        if (!rect) return;
-        pendingHoverPanelPointer = {
-            x: event.clientX - rect.left,
-            y: event.clientY - rect.top,
-        };
-        if (hoverPanelPointerFrame !== null) return;
-        hoverPanelPointerFrame = requestAnimationFrame(() => {
-            hoverPanelPointerFrame = null;
-            if (!pendingHoverPanelPointer) return;
-            hoverPanelPointer = pendingHoverPanelPointer;
-            pendingHoverPanelPointer = null;
-        });
+        hoverPanelPointerScheduler.schedule(event);
     }
 
-    function resolvePointerSegmentIndex(event: PointerEvent | MouseEvent) {
-        const rect = rootElement?.getBoundingClientRect();
-        if (!rect) return null;
-        const scaleX = numericSize / rect.width;
-        const scaleY = numericSize / rect.height;
-        const localX = (event.clientX - rect.left) * scaleX;
-        const localY = (event.clientY - rect.top) * scaleY;
+    function resolvePointerSegmentIndex(position: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }) {
+        const scaleX = numericSize / position.width;
+        const scaleY = numericSize / position.height;
+        const localX = position.x * scaleX;
+        const localY = position.y * scaleY;
         const dx = localX - center;
         const dy = localY - center;
         const radius = Math.hypot(dx, dy);
@@ -1036,7 +1045,6 @@
 
     function handleCellPointerMove(event: PointerEvent) {
         updateHoverPanelPointer(event);
-        setHoveredSegmentIndex(resolvePointerSegmentIndex(event));
     }
 
     onDestroy(() => {
@@ -1044,10 +1052,7 @@
     });
 
     function clearHoverPanelPointerFrame() {
-        pendingHoverPanelPointer = null;
-        if (hoverPanelPointerFrame === null) return;
-        cancelAnimationFrame(hoverPanelPointerFrame);
-        hoverPanelPointerFrame = null;
+        hoverPanelPointerScheduler.clear();
     }
 </script>
 

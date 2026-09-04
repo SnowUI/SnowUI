@@ -1,6 +1,6 @@
 # LineChart (折线图)
 
-> **版本**: v1.6.0
+> **版本**: v1.6.1
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
@@ -69,14 +69,14 @@
 | `mutedMonochromeColor` | `LineChartColor` | `"Black4"` | `monochrome` 的单色来源；默认所有未自定义序列为 4% 黑色本体颜色，描边透明度保持 100% |
 | `showBaseLayer` | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。同时控制完整折线及 Area 底层，不关闭真实 Area 渐变。 |
 | `appearMotion` | `boolean` | `true` | 是否启用出现动效 |
-| `appearOnView` | `boolean` | `true` | 是否在触发锚点进入视口默认位置时自动播放出现动效 |
+| `appearOnView` | `boolean` | `true` | 是否在触发锚点进入视口默认位置时自动播放出现动效；同源 iframe 中按最外层同源页面的真实位置判断 |
 | `appearanceProgress` | `number` | - | 受控出现进度，范围 `0..1`；传入后组件只根据该进度渲染，不自行播放 |
 | `defaultAppearanceProgress` | `number` | `0` | 非受控初始出现进度 |
 | `appearanceDuration` | `number` | - | 自动播放总时长覆盖；未设置时每条序列自身绘制时长固定为 `1000ms`，多序列总完成时间会随 `360ms` stagger 增加 |
 | `appearAnchorId` | `string` | - | 动效触发锚点元素 ID；不传时使用图表自身根元素 |
 | `appearAnchorPoint` | `"top" \| "center" \| "bottom"` | `"top"` | 使用锚点元素的顶端、中间或底部作为触发点 |
 | `appearViewportPoint` | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发位置；`0.7` 表示视口高度 70% |
-| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动条时间轴控制出现动效 |
+| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动条时间轴控制出现动效；同源 iframe 同时响应外层页面滚动 |
 | `scrollAppearanceDistance` | `number \| string` | `320` | 滚动时间轴从 `0` 到 `1` 对应的滚动距离 |
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 出现进度变化回调 |
 | `loading` | `boolean` | - | 数据等待状态。保持声明的画布尺寸、坐标轴和网格，将折线、面积和 marker 固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文。 |
@@ -272,7 +272,7 @@ SVG 图层从下到上为：
 | :--- | :--- | :--- |
 | LineChart | [./LineChart.svelte](./LineChart.svelte) | 主组件 |
 | LineChart 示例 | [./LineChart.test.ts](./LineChart.test.ts) | Test 示例 |
-| Chart 共享逻辑 | [../lib/chart/](../lib/chart/) | 颜色、渐变、基础几何 helper、Y 轴标签宽度测量、appearance timeline |
+| Chart 共享逻辑 | [../lib/chart/](../lib/chart/) | 颜色、渐变、基础几何 helper、Y 轴标签宽度测量、线性 appearance 时间表与逐帧 pointer 坐标合并 |
 
 ### 关键字映射
 
@@ -293,6 +293,10 @@ SVG 图层从下到上为：
 使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
 
 ## 更新日志 (Changelog)
+
+### v1.6.1 (2026-09-05)
+
+- 多序列 appearance 每帧改为一次线性时间表计算；HoverPanel pointer 原始事件不再同步读取布局，坐标换算按绘制帧合并。公开 API、路径、marker、时长、视觉和交互语义不变。
 
 ### v1.6.0 (2026-09-03)
 

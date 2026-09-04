@@ -1,6 +1,6 @@
 <!--
   ChartGroup 图表组合容器 (PRO)
-  v0.3.0 (2026-09-03)
+  v0.4.1 (2026-09-05)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。
   文档: ./ChartGroup.md
@@ -30,6 +30,7 @@
         ChartHoverPanelPlacement,
         ChartHoverPanelVariant,
     } from "../lib/chart/hover-panel";
+    import { createChartPointerFrameScheduler } from "../lib/chart/pointer";
 
     export interface ChartGroupPlotBounds {
         top?: number;
@@ -139,10 +140,12 @@
     let rootElement = $state<HTMLElement>();
     let measuredWidth = $state(0);
     let measuredHeight = $state(0);
-    let hoverPanelPointerFrame: number | null = null;
-    let pendingHoverPanelPointer: { x: number; y: number } | null = null;
     let plotTopInsetVersion = $state(0);
     const plotTopInsetResolvers = new Map<string, () => number>();
+    const hoverPanelPointerScheduler = createChartPointerFrameScheduler(
+        () => rootElement,
+        commitGroupPointerPosition,
+    );
 
     $effect(() => {
         const root = rootElement;
@@ -233,7 +236,6 @@
             showLabel: showHoverPanelLabel,
         };
     });
-
     function resolveGroupHoverPanelAnchor(entries: ChartHoverPanelData[]) {
         if (hoverPanelPlacement === "pointer") {
             return {
@@ -420,22 +422,18 @@
         };
     }
 
-    function scheduleHoverPanelPointer(x: number, y: number) {
-        pendingHoverPanelPointer = { x, y };
-        if (hoverPanelPointerFrame !== null) return;
-        hoverPanelPointerFrame = requestAnimationFrame(() => {
-            hoverPanelPointerFrame = null;
-            if (!pendingHoverPanelPointer) return;
-            hoverPanelPointer = pendingHoverPanelPointer;
-            pendingHoverPanelPointer = null;
-        });
+    function handleGroupPointerMove(event: PointerEvent) {
+        if (!showHoverPanel || hoverMode !== "cell") return;
+        hoverPanelPointerScheduler.schedule(event);
     }
 
-    function handleGroupPointerMove(event: PointerEvent) {
-        if (!showHoverPanel || hoverMode !== "cell" || !rootElement) return;
-        const rect = rootElement.getBoundingClientRect();
-        const localX = event.clientX - rect.left;
-        const localY = event.clientY - rect.top;
+    function commitGroupPointerPosition({
+        x: localX,
+        y: localY,
+    }: {
+        x: number;
+        y: number;
+    }) {
         const insidePlot =
             localX >= resolvedBounds.left &&
             localX <= resolvedBounds.left + plotWidth &&
@@ -445,7 +443,7 @@
             setActiveCellIndex(null);
             return;
         }
-        scheduleHoverPanelPointer(localX, localY);
+        hoverPanelPointer = { x: localX, y: localY };
         const nextIndex = Math.floor((localX - resolvedBounds.left) / cellWidth);
         setActiveCellIndex(nextIndex);
     }
@@ -462,17 +460,17 @@
     });
 
     function clearHoverPanelPointerFrame() {
-        pendingHoverPanelPointer = null;
-        if (hoverPanelPointerFrame === null) return;
-        cancelAnimationFrame(hoverPanelPointerFrame);
-        hoverPanelPointerFrame = null;
+        hoverPanelPointerScheduler.clear();
     }
 
     // 反白表面只传递绘制数据，不通过 Context 暴露子图 DOM。
     let contrastPaints = $state<Record<string, import("@snowui-design-system/components/lib/adaptive-contrast").AdaptiveContrastSurface[]>>({});
+    const groupContrastSurfaces = $derived(
+        Object.values(contrastPaints).flat(),
+    );
     const context: ChartGroupContext = {
         adaptiveContrast: () => adaptiveContrast,
-        contrastSurfaces: () => Object.values(contrastPaints).flat(),
+        contrastSurfaces: () => groupContrastSurfaces,
         setContrastSurfaces: (source, surfaces) => untrack(() => {
             const next = { ...contrastPaints };
             if (surfaces) next[source] = surfaces;

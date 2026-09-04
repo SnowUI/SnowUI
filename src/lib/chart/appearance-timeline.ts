@@ -85,13 +85,79 @@ function resolveTailOutFillDurations(
     );
 }
 
+interface SegmentAppearanceSchedule {
+    fillDurations: number[];
+    startOffsets: number[];
+    totalDuration: number;
+}
+
+/**
+ * 为一帧内的全部数据项一次性建立时间表。
+ *
+ * Chart 的出现进度会在动画期间逐帧更新。这里把每项时长和前缀偏移合并为
+ * 一次线性扫描，避免逐项解析时重复生成完整时长数组与重复累计前序偏移。
+ */
+function resolveSegmentAppearanceSchedule(
+    count: number,
+    options: SegmentAppearanceTimelineOptions = {},
+): SegmentAppearanceSchedule {
+    if (count <= 0) {
+        return {
+            fillDurations: [],
+            startOffsets: [],
+            totalDuration: SEGMENT_APPEARANCE_OPACITY_DURATION,
+        };
+    }
+
+    let fillDurations: number[];
+    if (options.durationMode === "fixed") {
+        const duration = Math.max(
+            0,
+            options.fillDuration ?? SEGMENT_APPEARANCE_FILL_DURATION,
+        );
+        fillDurations = Array.from({ length: count }, () => duration);
+    } else if (options.durationMode === "decay") {
+        fillDurations = Array.from({ length: count }, (_, order) =>
+            resolveSegmentAppearanceFillDuration(order),
+        );
+    } else {
+        fillDurations = resolveTailOutFillDurations(count, options);
+    }
+
+    const startOffsets = new Array<number>(count);
+    const startDelay =
+        typeof options.startDelay === "number"
+            ? Math.max(0, options.startDelay)
+            : undefined;
+    let prefixOffset = 0;
+    for (let order = 0; order < count; order += 1) {
+        startOffsets[order] =
+            startDelay === undefined ? prefixOffset : startDelay * order;
+        prefixOffset += fillDurations[order] ?? 0;
+    }
+
+    const lastOrder = count - 1;
+    const totalDuration =
+        typeof options.totalDuration === "number"
+            ? Math.max(0, options.totalDuration)
+            : (startOffsets[lastOrder] ?? 0) +
+              Math.max(
+                  fillDurations[lastOrder] ?? 0,
+                  SEGMENT_APPEARANCE_OPACITY_DURATION,
+              );
+    return { fillDurations, startOffsets, totalDuration };
+}
+
 export function resolveSegmentAppearanceFillDurationByOptions(
     order: number,
     count: number,
     options: SegmentAppearanceTimelineOptions = {},
 ) {
     if (options.durationMode === "fixed") {
-        return Math.max(0, options.fillDuration ?? SEGMENT_APPEARANCE_FILL_DURATION);
+        return Math.max(
+            0,
+            options.fillDuration ?? SEGMENT_APPEARANCE_FILL_DURATION,
+        );
     }
     if (options.durationMode === "decay") {
         return resolveSegmentAppearanceFillDuration(order);
@@ -130,22 +196,7 @@ export function resolveAppearanceTimelineDuration(
     count: number,
     options: SegmentAppearanceTimelineOptions = {},
 ) {
-    if (count <= 0) return SEGMENT_APPEARANCE_OPACITY_DURATION;
-    if (typeof options.totalDuration === "number") {
-        return Math.max(0, options.totalDuration);
-    }
-    const lastOrder = count - 1;
-    return (
-        resolveSegmentAppearanceStartOffsetByOptions(lastOrder, count, options) +
-        Math.max(
-            resolveSegmentAppearanceFillDurationByOptions(
-                lastOrder,
-                count,
-                options,
-            ),
-            SEGMENT_APPEARANCE_OPACITY_DURATION,
-        )
-    );
+    return resolveSegmentAppearanceSchedule(count, options).totalDuration;
 }
 
 export function resolveSegmentAppearanceTimelines(
@@ -155,28 +206,19 @@ export function resolveSegmentAppearanceTimelines(
     options: SegmentAppearanceTimelineOptions = {},
 ): SegmentAppearanceTimeline[] {
     if (count <= 0) return [];
-    const elapsed =
-        clamp(progress, 0, 1) * resolveAppearanceTimelineDuration(count, options);
+    const schedule = resolveSegmentAppearanceSchedule(count, options);
+    const elapsed = clamp(progress, 0, 1) * schedule.totalDuration;
     const timelines = Array.from({ length: count }, () => ({
         fillProgress: 0,
         opacityProgress: 0,
     }));
     for (let order = 0; order < count; order += 1) {
         const index = (startIndex + order) % count;
-        const startOffset = resolveSegmentAppearanceStartOffsetByOptions(
-            order,
-            count,
-            options,
-        );
+        const startOffset = schedule.startOffsets[order] ?? 0;
         const localElapsed = elapsed - startOffset;
         const localEasing = options.localEasing ?? "linear";
         const fillProgress = resolveLocalProgress(
-            localElapsed /
-                resolveSegmentAppearanceFillDurationByOptions(
-                    order,
-                    count,
-                    options,
-                ),
+            localElapsed / (schedule.fillDurations[order] ?? 0),
             localEasing,
             options.localEasingPower,
         );

@@ -1,6 +1,6 @@
 # BarChart (柱状图)
 
-> **版本**: v1.4.0
+> **版本**: v1.4.1
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。
@@ -81,14 +81,14 @@
 | `mutedMonochromeColor` | `BarChartColor` | `"Black4"` | 单色来源 |
 | `showBaseLayer` | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。与 overlay 的后层数据柱无关；横向柱按最终宽度绘制。 |
 | `appearMotion` | `boolean` | `true` | 是否启用出现动效 |
-| `appearOnView` | `boolean` | `true` | 是否进入视口后自动播放 |
+| `appearOnView` | `boolean` | `true` | 是否进入视口后自动播放；同源 iframe 中按最外层同源页面的真实位置判断 |
 | `appearanceProgress` | `number` | - | 受控出现进度 |
 | `defaultAppearanceProgress` | `number` | `0` | 非受控初始出现进度 |
 | `appearanceDuration` | `number` | - | 自动播放总时长覆盖 |
 | `appearAnchorId` | `string` | - | 动效触发锚点 ID |
 | `appearAnchorPoint` | `"top" \| "center" \| "bottom"` | `"top"` | 锚点触发位置 |
 | `appearViewportPoint` | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发位置 |
-| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动时间轴 |
+| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动时间轴；同源 iframe 同时响应外层页面滚动 |
 | `scrollAppearanceDistance` | `number \| string` | `320` | 滚动映射距离 |
 | `onAppearanceProgressChange` | `(progress: number) => void` | - | 出现进度变化回调 |
 | `loading` | `boolean` | - | 数据等待状态。保持声明的画布尺寸、坐标轴和网格，将柱体固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文。 |
@@ -264,6 +264,7 @@ SVG 图层从下到上为：
 - `geometry.ts`: 数值、CSS 长度与 clamp。
 - `axis.ts`: Y 轴可见标签实际渲染宽度测量。
 - Frame 默认 morph 时序: BarChart 出现动效的单柱升高基准时长来源。
+- `pointer.ts`: HoverPanel 指针坐标按绘制帧合并，每帧最多读取一次根层布局。
 
 保留在组件内：
 
@@ -281,6 +282,10 @@ SVG 图层从下到上为：
 ## 8. AI Zone
 
 ### Changelog
+
+### v1.4.1 (2026-09-05)
+
+- 出现时间轴的分类起始偏移改为常量时间计算；HoverPanel pointer 原始事件不再同步读取布局，坐标换算按绘制帧合并。公开 API、柱体几何、时长、视觉和交互语义不变。
 
 ### v1.4.0 (2026-09-03)
 

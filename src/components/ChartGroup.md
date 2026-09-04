@@ -1,6 +1,6 @@
 # ChartGroup 图表组合容器
 
-> **版本**: v0.4.0
+> **版本**: v0.4.1
 > **状态**: 已实现(PRO)
 > **包归属**: `@snowui/components-pro`
 > **职责**: 承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。
@@ -180,6 +180,7 @@ interface ChartGroupContext {
 
 - **实现**: [./ChartGroup.svelte](./ChartGroup.svelte)
 - **共享协议**: [../lib/chart/group-context.ts](../lib/chart/group-context.ts)
+- **指针合帧**: [../lib/chart/pointer.ts](../lib/chart/pointer.ts)
 - **参考组件**:
   - `Field`: 宿主组件通过 context 协调后代组件。
   - `BarChart`: Chart 原子组件、坐标轴和出现动效 API。
@@ -192,6 +193,10 @@ interface ChartGroupContext {
 使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
 
 ## 更新日志 (Changelog)
+
+### v0.4.1 (2026-09-05)
+
+- 共享 pointer 跟随与 cell 解析改为每帧提交最新坐标，原始事件不再同步读取布局；反白表面列表改为响应式缓存。公开 API、命中范围、面板位置、视觉和交互语义不变。
 
 ### v0.4.0 (2026-09-03)
 
