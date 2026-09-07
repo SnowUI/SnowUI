@@ -18,7 +18,7 @@
 - 展开正文默认使用主题自适应的 `Black/40%` 次要文字色；标题继续继承宿主前景色。
 - 默认使用唯一的 Continuous Hover Background 在 AccordionItem 之间连续移动；展开项的 hover 覆盖 title 与完整 content 区域。
 - 展开项的非交互内容区域均可点击收起；Link、Button、输入控件等交互后代保留自身行为，不触发收起。
-- 默认 trailing 图标为组件内部绘制的 `+ / -`，展开 / 收起时整颗图标使用 Frame motion bridge 时序旋转半圈；外部提供直系 `as="trailing"` 时会替换默认图标。
+- 默认 trailing 图标通过包内 `ComponentIcon` 解析 `plus / minus`，无外部 Provider 或 resolver 未命中时使用随包内置的 `+ / -`，展开 / 收起时整颗图标使用 Frame motion bridge 时序旋转半圈；外部提供直系 `as="trailing"` 时会替换默认图标。
 
 ---
 

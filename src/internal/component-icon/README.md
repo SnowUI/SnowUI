@@ -8,3 +8,5 @@
 
 `builtin-icon-data.ts` 是检查入库的发布快照，记录每个语义名的 `sourceCollection`、viewBox 与 weight 内容。工作区维护时执行 `node scripts/generate-builtin-icons.mjs` 从同级 `resource-svelte` 已生成组件同步；Components 构建、安装和运行都不执行该脚本。新增语义名必须先核对来源、许可与再分发边界，并把它加入脚本显式 allowlist，禁止把整个资源库复制进 Components。
 
+
+Accordion / AccordionItem 的 `plus`、`minus` 随包内置，来源为 `resource-svelte@1.0.29` 的 Phosphor regular 图标（MIT）；构建和运行不依赖该资源包。

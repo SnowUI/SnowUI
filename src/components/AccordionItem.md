@@ -26,7 +26,7 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 - 直系 `Frame as="title" row` 作为标题触发器，固定启用三槽位布局；直系 `as="leading"`、普通内容与直系 `as="trailing"` 分别落入三槽位。
 - 直系 `Frame as="content" row` 作为内容区，同样固定启用三槽位布局；折叠时保持宽度，使用向下高度收起与透明度渐隐。
 - title 继承父级 Accordion 或外层容器的 `color`；content 默认消费父 Accordion 的 `--snowui-accordion-content-color`，使用主题自适应 `Black/40%` 次要文字色。
-- title 默认渲染内置 `+ / -` trailing 图标；图标由两条线绘制，展开 / 收起时整颗图标容器旋转半圈，竖线淡入 / 淡出，动效时序消费 Frame motion bridge。外部在 title 内提供直系 `as="trailing"` 子项时，默认图标隐藏。
+- title 默认通过包内 `ComponentIcon` 解析 `plus / minus` trailing 图标；无外部 Provider 或 resolver 未命中时使用随包内置图形，不需要安装 `resource-svelte`。展开 / 收起时切换 `+ / -`，整颗图标容器旋转半圈，动效时序消费 Frame motion bridge。外部在 title 内提供直系 `as="trailing"` 子项时，默认图标隐藏。
 - hover 背景由父级 Accordion 的唯一 Continuous Hover Background 表达：收起时覆盖 title，展开时覆盖整个 item。`continuousHover=false` 时 title 恢复普通 hover overlay。
 - 展开 content 的非交互区域点击会收起当前项；Link、Button、表单控件、交互 role 与可编辑内容不触发父项收起。
 
