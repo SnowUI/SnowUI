@@ -269,19 +269,8 @@
             ),
             isNumericArithmetic ? "right-to-left" : "left-to-right",
         );
-        const sample =
-            slots.find((slot) => (slot.dataset.char ?? "") !== "") ?? slots[0];
         const styles = getComputedStyle(container);
-        const height =
-            Math.ceil(
-                sample?.getBoundingClientRect().height ||
-                    sample?.offsetHeight ||
-                    container.getBoundingClientRect().height ||
-                    Number.parseFloat(styles.lineHeight) ||
-                    0,
-            ) ||
-            Math.ceil(Number.parseFloat(styles.fontSize) * 1.3) ||
-            18;
+        const height = parseFloat(getComputedStyle(container).fontSize);
         const restingColor = options.motionColor ? styles.color : "";
 
         const timers: number[] = [];
@@ -762,10 +751,9 @@
         display: inline-flex;
         flex: none;
         justify-content: center;
-        overflow: hidden;
-        overflow-x: visible;
-        overflow-y: clip;
-        line-height: 1.3;
+        overflow: visible;
+        clip-path: inset(calc((100% - 1em) / 2 - 0.2em) -1em);
+        line-height: inherit;
         vertical-align: bottom;
     }
 
@@ -779,7 +767,10 @@
 
     :global(:where(.snowui-slot-text-face)) {
         position: absolute;
-        inset: 0;
+        inset-inline: 0;
+        top: 50%;
+        margin-top: -0.5em;
+        height: 1em;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -787,7 +778,7 @@
         font: inherit;
         color: inherit;
         font-variant-numeric: inherit;
-        line-height: inherit;
+        line-height: 1;
         will-change: transform, opacity;
     }
 

@@ -73,7 +73,6 @@
         "snowui-flow-text-character-source";
     const FLOW_TEXT_CHARACTER_VIEWPORT_CLASS =
         "snowui-flow-text-character-viewport";
-    const FLOW_TEXT_ROLL_OVERLAP_VAR = "--snowui-flow-text-roll-overlap";
     const FLOW_TEXT_Y_VAR = "--snowui-flow-text-y";
     const FLOW_TEXT_SCALE_Y_VAR = "--snowui-flow-text-scale-y";
     const FLOW_TEXT_WHEEL_VALUE_VAR = "--snowui-flow-text-wheel-v";
@@ -277,6 +276,28 @@
     let previousDisplayValue = "";
     let characterElement = $state<TextMotionCharacterElement | undefined>();
 
+    function fitCharacterMask(
+        element: HTMLElement,
+        source: HTMLElement,
+        viewport: HTMLElement,
+        glyph: HTMLElement,
+    ) {
+        // 隐藏的 inline 字符提供实际字体边界；不修改继承的字号、行高或占位。
+        // 将宿主缩放后的测量换回局部坐标，渐隐区只放在字形边界之外。
+        const box = element.getBoundingClientRect();
+        const text = source.getBoundingClientRect();
+        const scale = element.offsetHeight > 0 ? box.height / element.offsetHeight : 1;
+        const top = Math.max(0, (box.top - text.top) / (scale || 1));
+        const bottom = Math.max(0, (text.bottom - box.bottom) / (scale || 1));
+        const start = `calc(${top}px + var(--snowui-flow-text-mask-height))`;
+        const end = `calc(${bottom}px + var(--snowui-flow-text-mask-height))`;
+        viewport.style.insetBlockStart = `calc(-1 * ${start})`;
+        viewport.style.insetBlockEnd = `calc(-1 * ${end})`;
+        // 动效字形保持 1em 行盒，通过半行距抵消回到静态文字基线。
+        const leading = (box.height / (scale || 1) - parseFloat(getComputedStyle(element).fontSize)) / 2;
+        glyph.style.insetBlockStart = `calc(${start} + ${leading}px)`;
+    }
+
     function createFlowTextCharacterAnimator(
         opacityDuration: number,
         deformDuration: number,
@@ -309,7 +330,10 @@
                             FLOW_TEXT_CHARACTER_SOURCE_CLASS,
                         ),
                 );
-                if (existingSource) existingSource.textContent = label;
+                if (existingSource instanceof HTMLElement) {
+                    existingSource.textContent = label;
+                    fitCharacterMask(element, existingSource, existingViewport, existingGlyph);
+                }
                 return { viewport: existingViewport, glyph: existingGlyph };
             }
 
@@ -338,7 +362,7 @@
             glyph.className = FLOW_TEXT_CHARACTER_GLYPH_CLASS;
             glyph.setAttribute("aria-hidden", "true");
             glyph.textContent = label;
-            glyph.style.lineHeight = "inherit";
+            glyph.style.lineHeight = "1";
             glyph.style.position = "absolute";
             glyph.style.insetBlockStart = "var(--snowui-flow-text-mask-offset)";
             glyph.style.insetInlineStart = "var(--snowui-flow-text-mask-width)";
@@ -351,6 +375,7 @@
             element.style.overflow = "visible";
             viewport.appendChild(glyph);
             element.append(source, viewport);
+            fitCharacterMask(element, source, viewport, glyph);
             return { viewport, glyph };
         }
 
@@ -1036,6 +1061,7 @@
                 wheel.style.position = "relative";
                 wheel.style.width = "100%";
                 wheel.style.height = "1em";
+                wheel.style.clipPath = "inset(0)";
                 wheel.style.lineHeight = "1";
                 wheel.style.verticalAlign = "baseline";
                 wheel.style.fontVariantNumeric = "tabular-nums";
@@ -1085,7 +1111,7 @@
                 glyph.appendChild(wheel);
             }
 
-            glyph.style.lineHeight = "inherit";
+            glyph.style.lineHeight = "1";
             return {
                 wheel,
                 previousAxisValue: currentTrackValue,
@@ -1180,6 +1206,7 @@
             wheel.style.position = "relative";
             wheel.style.width = "100%";
             wheel.style.height = "1em";
+                wheel.style.clipPath = "inset(0)";
             wheel.style.lineHeight = "1";
             wheel.style.verticalAlign = "baseline";
             wheel.style.fontVariantNumeric = "tabular-nums";
@@ -1211,7 +1238,7 @@
             }
 
             glyph.textContent = "";
-            glyph.style.lineHeight = "inherit";
+            glyph.style.lineHeight = "1";
             glyph.appendChild(wheel);
             return {
                 wheel,
@@ -1262,7 +1289,7 @@
                 /^\d$/.test(label) &&
                 (previousLabel === undefined || /^\d$/.test(previousLabel));
             const direction = isOut ? -trend : trend;
-            const edgeY = `calc(${direction} * (100% - var(${FLOW_TEXT_ROLL_OVERLAP_VAR}, 0.22em)))`;
+            const edgeY = `calc(${direction} * 1em)`;
             const edgeExitY =
                 direction >= 0 ? "100%" : "-100%";
             const edgeEnterY = direction >= 0 ? "100%" : "-100%";
@@ -1280,9 +1307,8 @@
             }
 
             glyph.style.display = "inline-block";
-            glyph.style.lineHeight = "inherit";
+            glyph.style.lineHeight = "1";
             glyph.style.transform = `translateY(var(${FLOW_TEXT_Y_VAR}, 0%)) scaleY(var(${FLOW_TEXT_SCALE_Y_VAR}, 1))`;
-            glyph.style.setProperty(FLOW_TEXT_ROLL_OVERLAP_VAR, "0.22em");
             glyph.style.setProperty(FLOW_TEXT_Y_VAR, startY);
             glyph.style.setProperty(FLOW_TEXT_SCALE_Y_VAR, startScaleY);
             const wheelMotion = canUseWheel
@@ -1430,6 +1456,28 @@
             return flowAnimation;
         };
     }
+
+    $effect(() => {
+        const host = characterElement;
+        if (!host || typeof ResizeObserver === "undefined") return;
+        // 容器排版变化时，仅重新定位仍保留的临时滚轮与遮罩，不修改外层排版。
+        const observer = new ResizeObserver(() => {
+            host.shadowRoot?.querySelectorAll<HTMLElement>(
+                `.${FLOW_TEXT_CHARACTER_SOURCE_CLASS}`,
+            ).forEach((source) => {
+                const element = source.parentElement;
+                const viewport = element?.querySelector<HTMLElement>(
+                    `.${FLOW_TEXT_CHARACTER_VIEWPORT_CLASS}`,
+                );
+                const glyph = viewport?.firstElementChild;
+                if (element && viewport && glyph instanceof HTMLElement) {
+                    fitCharacterMask(element, source, viewport, glyph);
+                }
+            });
+        });
+        observer.observe(host);
+        return () => observer.disconnect();
+    });
 
     function getDigitsModulo() {
         if (!digits) return undefined;

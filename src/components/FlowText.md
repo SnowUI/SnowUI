@@ -40,7 +40,7 @@
 - 正数 / 负数切换规则：负号作为普通字符进入或退出；数字 wheel 的正负号只影响轴映射，不改变加 / 减趋势。非负数变负数时，动画结束后更新 `previousRawValue`、`axisDirection` 与 `axisOffset`，但不得跳动 `wheel-v` 改写当前显示数字。下一次 `+1` / `-1` 必须只滚一格。
 - 计时器 / 倒计时通过 `digits` 或完整时间解析得到 modulo：计时器增加沿同一方向跨 `59 -> 00`，倒计时减少沿同一方向跨 `00 -> 59`。边界处不得反向、卡停或半位停留。
 - 纵向字符流与布局 FLIP 均为 `900ms`，使用 `number-flow-main` 的 transform easing；opacity 为 `450ms ease-out`。
-- 纵向滚动距离使用继承行盒的 `100%`，但通过 `--snowui-flow-text-roll-overlap: 0.22em` 做负间距 overlap：实际位移为 `100% - overlap`，用来缩小相邻滚动字符的视觉间距。glyph 的 `line-height` 继续继承外部排版，避免动效期间和 restore 后使用不同的垂直参照系。
+- 纵向滚动步长为 `1em`，独立于外部行高；数字 wheel 使用 `line-height: 1`、高度 `1em`，通过继承行高的静态占位及半行距补偿保持基线。字符遮罩扩展到实际字体边界之外，不改变文字占位。
 - 字符变形时机必须与位移开始时机一致，共用同一个 character delay；变形速度由 `transition.deformDuration` 单独控制，默认 `100ms`；变形缓动由 `transition.deformEasing` 单独控制，默认 `linear`。
 - 动效字符使用扩展 viewport 作为字符级遮罩窗口：真实字符节点只保留原始占位宽度，不得写入 padding / margin；内部隐藏 source 保宽，viewport 以 `mask-height / mask-width` 向外扩展，glyph 通过同样的 offset 放回真实字符原点后滚动。遮罩的 `linear-gradient` / `radial-gradient` 层、`mask-size`、`mask-position` 与 `NumberFlow.svelte` 的 `.snowui-number-flow-mask` 保持一致；遮罩只在该字符的位移动效启动后显示，位移动画结束或取消后清理。
 - `transition` 仅覆盖内部固定时序，主要用于 TextMotion-Demo Slow Mode；默认参考值不得改变。Slow Mode 下 wheel 的 cleanup、mask 清理和 DOM settle 必须等待实际 wheel duration，不能按普通字符 duration 提前清理。

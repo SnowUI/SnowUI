@@ -76,6 +76,8 @@ import { NumberFlow } from "@snowui/components-pro";
 
 ### 输出协议
 
+- 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../specs/TextMotionSpec.md#2-统一排版与颜色)。
+
 - 根 class 为 `.snowui-number-flow`；内部 parts、digit 和 wheel class 是私有实现。
 - `value` 是单一数据源；格式化文本、趋势、滚轮目标和 Skeleton 宽度都从它派生。
 - `digits` 只定义数位循环长度，不改变最终 `Intl.NumberFormat` 文本。

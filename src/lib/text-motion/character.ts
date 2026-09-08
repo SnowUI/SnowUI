@@ -141,6 +141,10 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                 will-change: transform;
                 z-index: 1;
             }
+            /* 空区段没有文字基线，不能成为 inline-flex 的首个基线来源。 */
+            .section:empty {
+                display: none;
+            }
             .char {
                 display: inline-block;
                 white-space: pre;

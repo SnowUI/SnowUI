@@ -42,6 +42,8 @@
 
 ## 实现约束
 
+- 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../specs/TextMotionSpec.md#2-统一排版与颜色)。
+
 - 主布局模型为内禀原子布局，根层为 `FramePro`。
 - 根 `FramePro` 的 `enableDefaultMotion` 默认保持 `true`；扰动动画只更新内部输出层，显式 `while*` 与父级编排可继续控制组件整体。
 - 排版、语意色、变化色与减少动效判断复用 `../lib/text-motion/`。

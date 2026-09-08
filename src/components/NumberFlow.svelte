@@ -1310,14 +1310,14 @@
         --snowui-number-flow-mask-width: 0.5em;
         --snowui-number-flow-em-height: 1em;
         display: inline-flex;
-        align-items: center;
+        align-items: baseline;
         overflow: visible;
         font-variant-numeric: tabular-nums;
         position: relative;
         white-space: nowrap;
         isolation: isolate;
         line-height: var(--snowui-number-flow-line-height, inherit);
-        height: var(--snowui-number-flow-em-height);
+        vertical-align: baseline;
         font-family: var(--snowui-number-flow-font, inherit);
         font-size: var(--snowui-number-flow-size, inherit);
         font-weight: var(--snowui-number-flow-weight, inherit);
@@ -1327,11 +1327,12 @@
 
     :global(:where(.snowui-number-flow-mask)) {
         display: inline-flex;
-        align-items: center;
+        align-items: baseline;
         width: max-content;
         flex: 0 0 auto;
-        overflow: hidden;
-        margin: 0 calc(-1 * var(--snowui-number-flow-mask-width));
+        overflow: visible;
+        margin: calc(-1 * var(--snowui-number-flow-mask-height))
+            calc(-1 * var(--snowui-number-flow-mask-width));
         -webkit-mask-image: linear-gradient(
                 to right,
                 transparent 0,
@@ -1435,7 +1436,7 @@
         align-items: baseline;
         gap: 0;
         justify-content: flex-start;
-        padding: var(--snowui-number-flow-half-mask-height)
+        padding: var(--snowui-number-flow-mask-height)
             var(--snowui-number-flow-mask-width);
         width: max-content;
         flex: 0 0 auto;
@@ -1444,7 +1445,7 @@
 
     :global(:where(.snowui-number-flow-extra)) {
         display: inline-flex;
-        align-items: center;
+        align-items: baseline;
         height: var(--snowui-number-flow-em-height);
         flex: 0 0 auto;
     }
@@ -1464,7 +1465,8 @@
     :global(:where(.snowui-number-flow-wheel-viewport)) {
         display: inline-flex;
         align-items: flex-start;
-        overflow: hidden;
+        overflow: visible;
+        clip-path: inset(0);
         height: var(--snowui-number-flow-em-height);
         line-height: 1;
         padding-inline: 0;
@@ -1499,7 +1501,7 @@
     :global(:where(.snowui-number-flow-digit)) {
         /* CSS mod() + round() 圆环定位：每个 digit 根据 --snowui-number-flow-n 和 --snowui-number-flow-c 计算偏移 */
         display: inline-flex;
-        align-items: center;
+        align-items: baseline;
         justify-content: center;
         height: var(--snowui-number-flow-em-height);
         /* 计算偏移量（无限循环） */
@@ -1554,8 +1556,9 @@
 
     :global(:where(.snowui-number-flow-symbol)) {
         height: var(--snowui-number-flow-em-height);
+        line-height: 1;
         display: flex;
-        align-items: center;
+        align-items: baseline;
         mix-blend-mode: plus-lighter;
     }
 
