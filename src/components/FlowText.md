@@ -4,7 +4,7 @@
 > **组件路径**: `pro/src/components/FlowText.svelte`  
 > **包归属**: PRO
 
-`FlowText` 使用统一字符重组运行时显示文字、格式化数字、计时器与倒计时。文字和符号变化使用同一套字符出现 / 消失视觉：字符沿趋势纵向移动一整行，位移使用 `900ms` number-flow timing；字符变形从位移开始的同一刻触发，默认 `100ms linear` 到达边缘 scaleY；同时采用 AnimatePresence 的 `450ms ease-out` opacity。数字替换时，通用字符运行时仍负责 diff / 顺序 / 清理；同位置且相同的字符直接复用，例如保留的千分位逗号不会跟随数字滚动。新增或删除的千分位、小数点、百万分位等分隔符会作为普通字符纵向出现 / 消失。FlowText animator 内部临时渲染 NumberFlow 同款 0-9 连续 wheel，让同一位数字沿连续轨道滚到目标数字。
+`FlowText` 以流动动效展示文字和数字的变化，适用于动态文案、计数、计时与倒计时。
 
 ## 关键字
 
