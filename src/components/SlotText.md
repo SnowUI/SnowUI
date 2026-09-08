@@ -1,6 +1,6 @@
 # SlotText 槽位滚动文字
 
-> **版本**: v1.11.0  
+> **版本**: v1.11.1
 > **组件路径**: `pro/src/components/SlotText.svelte`  
 > **包归属**: PRO
 
@@ -15,7 +15,7 @@
 | `trend` | `-1 \| 0 \| 1` | `0` | 数字趋势；`0` 自动判断，增加向上、减少向下 |
 | `motionRole` | `"auto" \| "text" \| "number" \| "timer" \| "countdown"` | `"auto"` | 内容语义定性；`text` 显式关闭数字推断，其他值用于普通数值、计时器或倒计时 |
 | `skipUnchanged` | `boolean` | `true` | 跳过未变化字符 |
-| `interrupt` | `boolean` | `true` | 新内容是否中断当前播放；默认立即 settle 到当前目标并播放最新内容 |
+| `interrupt` | `boolean` | `true` | 新内容是否中断当前播放；`true` 从当前画面继续过渡到最新文字，`false` 等待当前播放结束后处理最新文字 |
 | `replayKey` | `string \| number` | `0` | 文字不变时值变化会从空槽位重播；文字变化时只执行正常 diff 动画 |
 | `playOnMount` | `boolean` | `false` | 挂载后是否从空槽位重播 |
 | `animated` | `boolean` | `true` | 是否启用文字动效 |
@@ -65,6 +65,8 @@
 
 ## 实现约束
 
+- 动画差值与逻辑终点由 `../lib/text-motion/animation.ts` 分离管理；连续更新保留未结束的位移，旧清理回调不能覆盖最新目标。
+
 - 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../specs/TextMotionSpec.md#2-统一排版与颜色)。
 
 - 主布局模型为内禀原子布局，根层为 `FramePro`。
@@ -86,6 +88,10 @@
 - 字符按 grapheme 拆分；动画字符对辅助技术隐藏，根节点提供最终 `aria-label`。
 
 ## 更新日志
+
+### v1.11.1 (2026-09-08)
+
+- 连续更新从当前槽位画面继续，保留已开始的位移；减少逐字符定时器和重复布局。`interrupt=false` 仍等待当前播放完成后处理最新目标。
 
 ### v1.11.0 (2026-06-16)
 

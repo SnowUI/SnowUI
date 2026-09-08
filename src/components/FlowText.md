@@ -1,6 +1,6 @@
 # FlowText 文本流动效
 
-> **版本**: v2.0.0  
+> **版本**: v2.0.1
 > **组件路径**: `pro/src/components/FlowText.svelte`  
 > **包归属**: PRO
 
@@ -27,6 +27,8 @@
 
 ## 实现约束
 
+- 动画差值与逻辑终点由 `../lib/text-motion/animation.ts` 分离管理；连续更新保留未结束的位移，旧清理回调不能覆盖最新目标。
+
 - 内容标准化使用 `text-motion/format.ts`；字符串直出，数字使用 `Intl.NumberFormat`。
 - 字符重组、LCP / LCS、自然宽度、区段 FLIP、顺序、清理与颜色生命周期全部使用 `text-motion/character.ts`。
 - 数字、文字、计时器、倒计时与 `digits` modulo 分类使用 `text-motion/numeric.ts`。
@@ -48,6 +50,10 @@
 - 根节点提供稳定的最终 `aria-label`，内部动画字符对辅助技术隐藏。
 
 ## 更新日志
+
+### v2.0.1 (2026-09-08)
+
+- 数字滚轮和文字进退场支持连续重定向；保留当前轨迹与方向，批量测量遮罩并取消逐位轮询。
 
 ### v2.0.0 (2026-06-16)
 

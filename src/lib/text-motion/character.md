@@ -15,6 +15,9 @@
 7. 变化字符在主要动效期间保持 `motionColor`，结束后以共享 `280ms linear` 回到最终颜色。
 8. NumericText 路径显式 `trend` 优先；否则复用 `numeric.ts` 判断数字增加 / 减少、负数、计时器与倒计时，无法解析的普通文字默认使用正向进入语义。
 
+- `onCleanup` 将组件临时动画资源交给宿主生命周期管理；静态更新、减少动效与卸载时释放。启动间隔按每批字符计算一次。
+- `accumulateLayout` 仅由 FlowText 开启；NumericText 的布局替换和字符关键帧保持原机制。
+
 ## 视觉边界
 
 `character.ts` 不得包含缩放、旋转、模糊、透明度或具体位移幅度等组件视觉。`NumericText` 与 `FlowText` 的非数字路径必须复用该运行时，但各自在组件文件中定义 animator。NumericText 的字符出现 / 消失视觉完整复刻 `numeric-text-main`，包含垂直位移、缩放、旋转、模糊与可见性淡入淡出。

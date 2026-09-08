@@ -1,6 +1,6 @@
 <!--
   NumericText 文字与数字过渡动效组件
-  v1.6.2
+  v1.7.1
 
   职责：提供 SwiftUI numericText 风格的单行动效文本。
   内容标准化、字符 diff、节点重组与区段 FLIP 复用 text-motion 公共能力。
@@ -25,7 +25,7 @@
         type TextMotionCharacterAnimationContext,
         type TextMotionCharacterElement,
     } from "../lib/text-motion/character";
-    import { formatTextMotionValue } from "../lib/text-motion/format";
+    import { createTextMotionFormatter } from "../lib/text-motion/format";
     import {
         TEXT_MOTION_LAYOUT_TRANSITION,
         type TextMotionTransition,
@@ -51,6 +51,8 @@
     const NUMERIC_TEXT_CHARACTER_ROTATE_DEG = 2;
     const NUMERIC_TEXT_MOTION_DURATION = 550;
 
+    const replacementCleanups = new WeakMap<HTMLElement, () => void>();
+
     function animateNumericTextCharacter({
         element,
         isOut,
@@ -60,12 +62,14 @@
         easing,
         label,
         previousLabel,
+        onCleanup,
     }: TextMotionCharacterAnimationContext) {
         const direction = isOut ? -1 : 1;
         const transform = `translateY(${direction * trend * NUMERIC_TEXT_CHARACTER_OFFSET_EM}em) scale(${NUMERIC_TEXT_CHARACTER_SCALE}) rotateZ(${NUMERIC_TEXT_CHARACTER_ROTATE_DEG}deg)`;
         const blur = `blur(${NUMERIC_TEXT_CHARACTER_BLUR_EM}em)`;
 
         if (!isOut && previousLabel !== undefined && previousLabel !== label) {
+            replacementCleanups.get(element)?.();
             const motionId = String(
                 Number(element.dataset.numericTextMotionId ?? "0") + 1,
             );
@@ -105,7 +109,7 @@
 
             const exitTransform = `translateY(${-trend * NUMERIC_TEXT_CHARACTER_OFFSET_EM}em) scale(${NUMERIC_TEXT_CHARACTER_SCALE}) rotateZ(${NUMERIC_TEXT_CHARACTER_ROTATE_DEG}deg)`;
             const enterTransform = `translateY(${trend * NUMERIC_TEXT_CHARACTER_OFFSET_EM}em) scale(${NUMERIC_TEXT_CHARACTER_SCALE}) rotateZ(${NUMERIC_TEXT_CHARACTER_ROTATE_DEG}deg)`;
-            oldFace.animate(
+            const oldAnimation = oldFace.animate(
                 {
                     opacity: [1, 0],
                     transform: ["", exitTransform],
@@ -121,16 +125,29 @@
                 },
                 { duration, easing, fill: "both", delay },
             );
+            let timer: number;
+            const dispose = () => {
+                window.clearTimeout(timer);
+                animation.removeEventListener("finish", cleanup);
+                animation.removeEventListener("cancel", cleanup);
+                oldAnimation.cancel();
+                animation.cancel();
+                release();
+                replacementCleanups.delete(element);
+            };
             const cleanup = () => {
+                dispose();
                 if (element.dataset.numericTextMotionId !== motionId) return;
                 delete element.dataset.numericTextMotionId;
                 element.textContent = label;
                 element.style.position = "";
                 element.style.display = "";
             };
+            const release = onCleanup(dispose);
+            replacementCleanups.set(element, dispose);
             animation.addEventListener("finish", cleanup, { once: true });
             animation.addEventListener("cancel", cleanup, { once: true });
-            window.setTimeout(cleanup, delay + duration + 50);
+            timer = window.setTimeout(cleanup, delay + duration + 50);
             return animation;
         }
 
@@ -195,9 +212,8 @@
     let previousDisplayValue = "";
     let numericElement = $state<TextMotionCharacterElement | undefined>();
 
-    const displayValue = $derived(
-        formatTextMotionValue(value, locales, format),
-    );
+    const formatValue = $derived(createTextMotionFormatter(locales, format));
+    const displayValue = $derived(formatValue(value));
     const numericVariant = $derived(
         motionRole === "number" ||
             motionRole === "timer" ||

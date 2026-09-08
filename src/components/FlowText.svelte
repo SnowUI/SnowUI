@@ -22,7 +22,8 @@
 </script>
 
 <script lang="ts">
-    import type { Snippet } from "svelte";
+    import { onDestroy, type Snippet } from "svelte";
+    import { animateTextMotionDelta, animateTextMotionOpacity } from "../lib/text-motion/animation";
     import { Skeleton } from "@snowui-design-system/components";
     import { getSkeleton } from "@snowui-design-system/components/context";
     import type { SnowUIColor } from "@snowui-design-system/components/lib/color";
@@ -36,7 +37,7 @@
         type TextMotionCharacterAnimationContext,
         type TextMotionCharacterElement,
     } from "../lib/text-motion/character";
-    import { formatTextMotionValue } from "../lib/text-motion/format";
+    import { createTextMotionFormatter } from "../lib/text-motion/format";
     import type { TextMotionTransition } from "../lib/text-motion/layout";
     import {
         extractTextMotionNumber,
@@ -98,22 +99,9 @@
         axisDirection: -1 | 1;
         axisOffset: number;
     }
-    interface FlowTextWheelRuntime {
-        cancel: () => void;
-    }
-    interface FlowTextGlyphRuntime {
-        cancel: () => void;
-    }
     const flowTextWheelStates = new WeakMap<HTMLElement, FlowTextWheelState>();
-    const flowTextWheelRuntimes = new WeakMap<
-        HTMLElement,
-        FlowTextWheelRuntime
-    >();
-    const flowTextGlyphRuntimes = new WeakMap<
-        HTMLElement,
-        FlowTextGlyphRuntime
-    >();
-
+    const flowTextMaskCleanups = new WeakMap<HTMLElement, () => void>();
+    const FLOW_TEXT_WHEEL_EASING = "linear(" + Array.from({ length: 101 }, (_, i) => 1 - (1 - i / 100) ** 4).join(",") + ")";
     function registerFlowTextMotionProperties() {
         if (
             flowTextMotionPropertiesRegistered ||
@@ -126,9 +114,9 @@
         try {
             CSS.registerProperty({
                 name: FLOW_TEXT_Y_VAR,
-                syntax: "<length-percentage>",
+                syntax: "<number>",
                 inherits: false,
-                initialValue: "0%",
+                initialValue: "0",
             });
         } catch {
             // The property may already be registered by another FlowText instance.
@@ -226,9 +214,8 @@
     const effectiveSkeleton = $derived(
         skeleton ?? skeletonContext?.skeleton ?? false,
     );
-    const displayValue = $derived(
-        formatTextMotionValue(value, locales, format),
-    );
+    const formatValue = $derived(createTextMotionFormatter(locales, format));
+    const displayValue = $derived(formatValue(value));
     const numericVariant = $derived(
         motionRole === "number" ||
             motionRole === "timer" ||
@@ -276,26 +263,36 @@
     let previousDisplayValue = "";
     let characterElement = $state<TextMotionCharacterElement | undefined>();
 
-    function fitCharacterMask(
-        element: HTMLElement,
-        source: HTMLElement,
-        viewport: HTMLElement,
-        glyph: HTMLElement,
-    ) {
-        // 隐藏的 inline 字符提供实际字体边界；不修改继承的字号、行高或占位。
-        // 将宿主缩放后的测量换回局部坐标，渐隐区只放在字形边界之外。
-        const box = element.getBoundingClientRect();
-        const text = source.getBoundingClientRect();
-        const scale = element.offsetHeight > 0 ? box.height / element.offsetHeight : 1;
-        const top = Math.max(0, (box.top - text.top) / (scale || 1));
-        const bottom = Math.max(0, (text.bottom - box.bottom) / (scale || 1));
-        const start = `calc(${top}px + var(--snowui-flow-text-mask-height))`;
-        const end = `calc(${bottom}px + var(--snowui-flow-text-mask-height))`;
-        viewport.style.insetBlockStart = `calc(-1 * ${start})`;
-        viewport.style.insetBlockEnd = `calc(-1 * ${end})`;
-        // 动效字形保持 1em 行盒，通过半行距抵消回到静态文字基线。
-        const leading = (box.height / (scale || 1) - parseFloat(getComputedStyle(element).fontSize)) / 2;
-        glyph.style.insetBlockStart = `calc(${start} + ${leading}px)`;
+    const pendingMasks = new Map<HTMLElement, { source: HTMLElement; viewport: HTMLElement; glyph: HTMLElement }>();
+    let maskFrame = 0;
+    onDestroy(() => {
+        if (maskFrame) cancelAnimationFrame(maskFrame);
+        pendingMasks.clear();
+    });
+
+    function fitCharacterMask(element: HTMLElement, source: HTMLElement, viewport: HTMLElement, glyph: HTMLElement) {
+        pendingMasks.set(element, { source, viewport, glyph });
+        if (maskFrame) return;
+        maskFrame = requestAnimationFrame(() => {
+            maskFrame = 0;
+            // 所有字形先测量，再写入遮罩，避免每个位数都触发布局刷新。
+            const measurements = [...pendingMasks].filter(([element]) => element.isConnected).map(([element, parts]) => {
+                const box = element.getBoundingClientRect();
+                const text = parts.source.getBoundingClientRect();
+                const height = element.offsetHeight;
+                const scale = (height > 0 ? box.height / height : 1) || 1;
+                return { ...parts, top: Math.max(0, (box.top - text.top) / scale),
+                    bottom: Math.max(0, (text.bottom - box.bottom) / scale),
+                    leading: (box.height / scale - parseFloat(getComputedStyle(element).fontSize)) / 2 };
+            });
+            pendingMasks.clear();
+            for (const { viewport, glyph, top, bottom, leading } of measurements) {
+                const start = `calc(${top}px + var(--snowui-flow-text-mask-height))`;
+                viewport.style.insetBlockStart = `calc(-1 * ${start})`;
+                viewport.style.insetBlockEnd = `calc(-1 * (${bottom}px + var(--snowui-flow-text-mask-height)))`;
+                glyph.style.insetBlockStart = `calc(${start} + ${leading}px)`;
+            }
+        });
     }
 
     function createFlowTextCharacterAnimator(
@@ -331,8 +328,7 @@
                         ),
                 );
                 if (existingSource instanceof HTMLElement) {
-                    existingSource.textContent = label;
-                    fitCharacterMask(element, existingSource, existingViewport, existingGlyph);
+                    if (existingSource.textContent !== label) existingSource.textContent = label;
                 }
                 return { viewport: existingViewport, glyph: existingGlyph };
             }
@@ -424,8 +420,6 @@
             const glyph = viewport.firstElementChild as HTMLElement | null;
             element.removeAttribute("data-flow-text-mask");
             if (glyph) {
-                flowTextGlyphRuntimes.get(glyph)?.cancel();
-                flowTextGlyphRuntimes.delete(glyph);
                 glyph.style.transition = "";
                 glyph.style.opacity = "";
                 glyph.style.transform = "translateY(0%) scaleY(1)";
@@ -578,18 +572,6 @@
             );
         }
 
-        function crossesNonNegativeToNegative(
-            previousNumber: number | null | undefined,
-            nextNumber: number | null | undefined,
-        ) {
-            return (
-                typeof previousNumber === "number" &&
-                typeof nextNumber === "number" &&
-                previousNumber >= 0 &&
-                nextNumber < 0
-            );
-        }
-
         function resolveTargetWheelValue(
             currentTrackValue: number,
             targetDigit: number,
@@ -626,19 +608,6 @@
             });
         }
 
-        function readFlowTextWheelTrackValue(glyph: HTMLElement) {
-            const wheel = glyph.querySelector(
-                `.${FLOW_TEXT_WHEEL_CLASS}`,
-            ) as HTMLElement | null;
-            if (!wheel) return null;
-
-            const raw = getComputedStyle(wheel).getPropertyValue(
-                FLOW_TEXT_WHEEL_VALUE_VAR,
-            );
-            const parsed = Number.parseFloat(raw);
-            return Number.isFinite(parsed) ? parsed : null;
-        }
-
         function startFlowTextWheelValueAnimation(
             wheel: HTMLElement,
             from: number,
@@ -648,109 +617,25 @@
                 delay: number;
             },
         ) {
-            flowTextWheelRuntimes.get(wheel)?.cancel();
-            jumpFlowTextWheelValue(wheel, from);
-
-            let frame: number | undefined;
-            let cancelled = false;
-            const startTime =
-                (typeof performance !== "undefined"
-                    ? performance.now()
-                    : Date.now()) + options.delay;
-            const distance = to - from;
-            const readNow = () =>
-                typeof performance !== "undefined"
-                    ? performance.now()
-                    : Date.now();
-            const tick = () => {
-                if (cancelled) return;
-                const now = readNow();
-                const elapsed = Math.max(0, now - startTime);
-                const progress =
-                    options.duration <= 0
-                        ? 1
-                        : Math.min(1, elapsed / options.duration);
-                const eased = easeFlowTextWheelProgress(progress);
-                wheel.style.setProperty(
-                    FLOW_TEXT_WHEEL_VALUE_VAR,
-                    String(from + distance * eased),
-                );
-                if (progress < 1) {
-                    frame = window.setTimeout(tick, 16);
-                    return;
-                }
-                wheel.style.setProperty(FLOW_TEXT_WHEEL_VALUE_VAR, String(to));
-            };
-
-            const cancel = () => {
-                cancelled = true;
-                if (frame !== undefined) window.clearTimeout(frame);
-            };
-            flowTextWheelRuntimes.set(wheel, { cancel });
-            frame = window.setTimeout(tick, 16);
-            return cancel;
+            return animateTextMotionDelta(wheel, FLOW_TEXT_WHEEL_VALUE_VAR, from, to, {
+                ...options, easing: FLOW_TEXT_WHEEL_EASING,
+            });
         }
 
-        function getFlowTextWheelDuration(duration: number) {
-            return duration;
-        }
+        function getFlowTextWheelDuration(duration: number) { return duration; }
 
         function jumpFlowTextWheelValue(wheel: HTMLElement, value: number) {
-            wheel.style.transition = "none";
             wheel.style.setProperty(FLOW_TEXT_WHEEL_VALUE_VAR, String(value));
-            wheel.offsetHeight;
         }
 
-        function easeFlowTextWheelProgress(progress: number) {
-            const t = Math.max(0, Math.min(1, progress));
-            return 1 - (1 - t) ** 4;
+        function startEdgeWheelExitTransition(glyph: HTMLElement, edge: number, duration: number, easing: string, delay: number) {
+            animateTextMotionDelta(glyph, FLOW_TEXT_Y_VAR, 0, edge, { duration, easing, delay });
+            animateTextMotionOpacity(glyph, 0.001, { duration, easing, delay });
         }
 
-        function startEdgeWheelExitTransition(
-            glyph: HTMLElement,
-            edgeY: string,
-            duration: number,
-            easing: string,
-            delay: number,
-        ) {
-            flowTextGlyphRuntimes.get(glyph)?.cancel();
-            glyph.style.transition = "none";
-            glyph.style.transform = "translateY(0%) scaleY(1)";
+        function startEdgeWheelEnterTransition(glyph: HTMLElement, edge: number, duration: number, easing: string, delay: number) {
+            animateTextMotionDelta(glyph, FLOW_TEXT_Y_VAR, edge, 0, { duration, easing, delay });
             glyph.style.opacity = "1";
-            glyph.offsetHeight;
-            const timer = window.setTimeout(() => {
-                glyph.style.transition = [
-                    `transform ${duration}ms ${easing}`,
-                    `opacity ${duration}ms ${easing}`,
-                ].join(", ");
-                glyph.style.transform = `translateY(${edgeY}) scaleY(1)`;
-                glyph.style.opacity = "0.001";
-            }, delay);
-            flowTextGlyphRuntimes.set(glyph, {
-                cancel: () => window.clearTimeout(timer),
-            });
-        }
-
-        function startEdgeWheelEnterTransition(
-            glyph: HTMLElement,
-            edgeY: string,
-            duration: number,
-            easing: string,
-            delay: number,
-        ) {
-            flowTextGlyphRuntimes.get(glyph)?.cancel();
-            glyph.style.transition = "none";
-            glyph.style.transform = `translateY(${edgeY}) scaleY(1)`;
-            glyph.style.opacity = "1";
-            glyph.offsetHeight;
-            const timer = window.setTimeout(() => {
-                glyph.style.transition = `transform ${duration}ms ${easing}`;
-                glyph.style.transform = "translateY(0%) scaleY(1)";
-                glyph.style.opacity = "1";
-            }, delay);
-            flowTextGlyphRuntimes.set(glyph, {
-                cancel: () => window.clearTimeout(timer),
-            });
         }
 
         function createWheelDigit(
@@ -821,6 +706,7 @@
             activeDigit: number,
         ) {
             const isActive = digit === activeDigit;
+            if (digitElement.getAttribute("aria-hidden") === String(!isActive)) return;
             digitElement.setAttribute("aria-hidden", String(!isActive));
             digitElement.style.position = isActive ? "" : "absolute";
             digitElement.style.top = isActive ? "" : "0";
@@ -972,84 +858,20 @@
             const nextNumber = nextValue
                 ? extractTextMotionNumber(nextValue)
                 : undefined;
-            const isNegativeSignExit = crossesNegativeToNonNegative(
-                previousNumber,
-                nextNumber,
-            );
-            const isNegativeSignEnter = crossesNonNegativeToNegative(
-                previousNumber,
-                nextNumber,
-            );
             const preferredSign = getPreferredWheelSign(currentTrend);
-            const axisDirection = resolveWheelAxisDirection(
-                previousValue,
-                nextValue,
-                preferredSign,
-            );
-            const storedState = isNegativeSignExit
-                ? undefined
-                : flowTextWheelStates.get(element);
-            const state =
-                storedState?.currentLength === length ? storedState : undefined;
-            const axisOffset = isNegativeSignEnter
-                ? 0
-                : (state?.axisOffset ?? 0);
-            const axisPreviousNumber = isNegativeSignExit
-                ? undefined
-                : previousNumber;
-            const axisNextNumber =
-                isNegativeSignExit || isNegativeSignEnter
-                    ? axisPreviousNumber
-                    : nextNumber;
-            const previousAxisValue = mapFlowTextDigitAxis(
-                previousDigit,
-                length,
-                axisPreviousNumber,
-                axisDirection,
-                axisOffset,
-            );
-            const targetAxisValue = mapFlowTextDigitAxis(
-                nextDigit,
-                length,
-                axisNextNumber,
-                axisDirection,
-                axisOffset,
-            );
-            const previousRawValue =
-                state?.previousRawValue ?? axisPreviousNumber ?? null;
-            const currentDigit = state?.currentDigit ?? previousDigit;
-            const currentAxisValue = mapFlowTextDigitAxis(
-                currentDigit,
-                length,
-                previousRawValue,
-                axisDirection,
-                axisOffset,
-            );
-            const canReuseTrack =
-                !isNegativeSignExit &&
-                state?.axisDirection === axisDirection &&
-                state?.axisOffset === axisOffset;
-            const currentTrackValue =
-                (canReuseTrack ? readFlowTextWheelTrackValue(glyph) : null) ??
-                (canReuseTrack ? state?.currentWheelValue : null) ??
-                currentAxisValue ??
-                previousAxisValue;
-            const preservesCurrentDigit = currentAxisValue === targetAxisValue;
-            const targetWheelValue = preservesCurrentDigit
-                ? state?.currentWheelValue ?? currentTrackValue
-                : resolveTargetWheelValue(
-                      currentTrackValue,
-                      targetAxisValue,
-                      length,
-                      preferredSign,
-                  );
+            const stored = flowTextWheelStates.get(element);
+            const state = stored?.currentLength === length ? stored : undefined;
+            const axisDirection = state?.axisDirection ?? resolveWheelAxisDirection(previousValue, nextValue, preferredSign);
+            const axisOffset = state?.axisOffset ?? 0;
+            const axisNextNumber = state?.previousRawValue ?? previousNumber;
+            const currentTrackValue = state?.currentWheelValue ?? mapFlowTextDigitAxis(previousDigit, length, axisNextNumber, axisDirection, axisOffset);
+            const targetAxisValue = mapFlowTextDigitAxis(nextDigit, length, axisNextNumber, axisDirection, axisOffset);
+            const preservesCurrentDigit = state?.currentDigit === nextDigit;
+            const targetWheelValue = preservesCurrentDigit ? currentTrackValue : resolveTargetWheelValue(currentTrackValue, targetAxisValue, length, preferredSign);
             flowTextWheelStates.set(element, {
-                currentDigit: nextDigit,
-                currentWheelValue: targetWheelValue,
-                currentLength: length,
-                previousRawValue: axisNextNumber ?? null,
-                axisDirection,
-                axisOffset,
+                currentDigit: nextDigit, currentWheelValue: targetWheelValue,
+                currentLength: length, previousRawValue: axisNextNumber ?? null,
+                axisDirection, axisOffset,
             });
             const reusableWheel = getReusableFlowTextWheel(glyph, length);
             const wheel = reusableWheel ?? document.createElement("span");
@@ -1076,7 +898,7 @@
                 FLOW_TEXT_WHEEL_C_VAR,
                 `var(${FLOW_TEXT_WHEEL_VALUE_VAR}, var(${FLOW_TEXT_WHEEL_CURRENT_VAR}, 0))`,
             );
-            jumpFlowTextWheelValue(wheel, currentTrackValue);
+            if (!reusableWheel) jumpFlowTextWheelValue(wheel, currentTrackValue);
 
             if (reusableWheel) {
                 if (hasCompleteWheelDigits(wheel, length)) {
@@ -1117,8 +939,7 @@
                 previousAxisValue: currentTrackValue,
                 targetWheelValue,
                 preserveWheelRuntime: preservesCurrentDigit,
-                finalizeWheel: isNegativeSignEnter
-                    ? () => {
+                finalizeWheel: () => {
                           const settledAxisValue = mapFlowTextDigitAxis(
                               nextDigit,
                               length,
@@ -1150,8 +971,7 @@
                               axisDirection,
                               axisOffset: settledAxisOffset,
                           });
-                      }
-                    : undefined,
+                      },
             };
         }
 
@@ -1198,6 +1018,11 @@
                 axisDirection,
                 axisOffset: 0,
             });
+            const existing = getReusableFlowTextWheel(glyph, length);
+            if (existing && isOut) {
+                const current = Number.parseFloat(existing.style.getPropertyValue(FLOW_TEXT_WHEEL_VALUE_VAR));
+                return { wheel: existing, previousAxisValue: current, targetWheelValue: current, preserveWheelRuntime: true, finalizeWheel: undefined };
+            }
             const wheel = document.createElement("span");
             wheel.className = FLOW_TEXT_WHEEL_CLASS;
             wheel.style.display = "inline-flex";
@@ -1262,6 +1087,7 @@
             nextValue,
             characterIndex,
             isNumericArithmetic,
+            onCleanup,
         }: TextMotionCharacterAnimationContext) {
             registerFlowTextMotionProperties();
             const previousNumber = previousValue
@@ -1289,27 +1115,25 @@
                 /^\d$/.test(label) &&
                 (previousLabel === undefined || /^\d$/.test(previousLabel));
             const direction = isOut ? -trend : trend;
-            const edgeY = `calc(${direction} * 1em)`;
-            const edgeExitY =
-                direction >= 0 ? "100%" : "-100%";
-            const edgeEnterY = direction >= 0 ? "100%" : "-100%";
-            const startY = isOut ? "0%" : edgeY;
-            const endY = isOut ? edgeY : "0%";
+            const edgeY = direction;
+            const edgeExitY = direction >= 0 ? 1 : -1;
+            const edgeEnterY = edgeExitY;
+            const startY = isOut ? 0 : edgeY;
+            const endY = isOut ? edgeY : 0;
             const startScaleY = isOut ? "1" : String(FLOW_TEXT_EDGE_SCALE_Y);
             const endScaleY = isOut ? String(FLOW_TEXT_EDGE_SCALE_Y) : "1";
+            const hadViewport = Boolean(element.querySelector(`.${FLOW_TEXT_CHARACTER_VIEWPORT_CLASS}`));
+            flowTextMaskCleanups.get(element)?.();
             const { viewport, glyph } = getCharacterViewport(element);
             const motionId = String(
                 Number(element.dataset.flowTextMotionId ?? "0") + 1,
             );
             element.dataset.flowTextMotionId = motionId;
-            for (const animation of glyph.getAnimations({ subtree: true })) {
-                animation.cancel();
-            }
 
             glyph.style.display = "inline-block";
             glyph.style.lineHeight = "1";
-            glyph.style.transform = `translateY(var(${FLOW_TEXT_Y_VAR}, 0%)) scaleY(var(${FLOW_TEXT_SCALE_Y_VAR}, 1))`;
-            glyph.style.setProperty(FLOW_TEXT_Y_VAR, startY);
+            glyph.style.transform = `translateY(calc(var(${FLOW_TEXT_Y_VAR}, 0) * 1em)) scaleY(var(${FLOW_TEXT_SCALE_Y_VAR}, 1))`;
+            if (!hadViewport) glyph.style.setProperty(FLOW_TEXT_Y_VAR, String(startY));
             glyph.style.setProperty(FLOW_TEXT_SCALE_Y_VAR, startScaleY);
             const wheelMotion = canUseWheel
                 ? previousLabel !== undefined
@@ -1339,8 +1163,8 @@
                 (isOut || element.parentElement?.hasAttribute("inert"));
             const isEdgeWheelEnter =
                 Boolean(wheelMotion) && !isOut && previousLabel === undefined;
-            if (wheelMotion) {
-                glyph.style.setProperty(FLOW_TEXT_Y_VAR, "0%");
+            if (wheelMotion && !hadViewport) {
+                glyph.style.setProperty(FLOW_TEXT_Y_VAR, isEdgeWheelEnter ? String(edgeEnterY) : "0");
                 glyph.style.setProperty(FLOW_TEXT_SCALE_Y_VAR, "1");
             }
             const maskTimer =
@@ -1358,8 +1182,9 @@
                       const wheelDuration = getFlowTextWheelDuration(
                           duration,
                       );
+                      let wheelAnimation: Animation | undefined;
                       if (!wheelMotion.preserveWheelRuntime) {
-                          startFlowTextWheelValueAnimation(
+                          wheelAnimation = startFlowTextWheelValueAnimation(
                               wheelMotion.wheel,
                               wheelMotion.previousAxisValue,
                               wheelMotion.targetWheelValue,
@@ -1386,55 +1211,37 @@
                               motionDelay,
                           );
                       }
-                      return wheelMotion.wheel.animate(
-                          { opacity: [1, 0.999999, 1] },
+                      return wheelAnimation ?? wheelMotion.wheel.animate(
+                          [],
                           {
                               duration: wheelDuration,
                               easing: "linear",
-                              fill: "both",
+                              fill: "none",
                               delay: motionDelay,
                           },
                       );
                   })()
-                : glyph.animate(
-                      { [FLOW_TEXT_Y_VAR]: [startY, endY] },
-                      {
-                          duration,
-                          easing,
-                          fill: "both",
-                          delay: motionDelay,
-                      },
-                  );
+                : animateTextMotionDelta(glyph, FLOW_TEXT_Y_VAR, startY, endY, {
+                      duration, easing, delay: motionDelay,
+                  });
             const cleanupDuration = wheelMotion
                 ? getFlowTextWheelDuration(duration)
                 : duration;
             if (!wheelMotion) {
-                glyph.animate(
+                if (startScaleY !== endScaleY) glyph.animate(
                     { [FLOW_TEXT_SCALE_Y_VAR]: [startScaleY, endScaleY] },
-                    {
-                        duration: deformDuration,
-                        easing: deformEasing,
-                        fill: "both",
-                        delay: motionDelay,
-                    },
+                    { duration: deformDuration, easing: deformEasing, fill: "backwards", delay: motionDelay },
                 );
-                glyph.animate(
-                    { opacity: isOut ? [1, 0.001] : [0.0001, 1] },
-                    {
-                        duration: opacityDuration,
-                        easing: "ease-out",
-                        fill: "both",
-                        delay: motionDelay,
-                    },
-                );
+                animateTextMotionOpacity(glyph, isOut ? 0.001 : 1,
+                    { duration: opacityDuration, easing: "ease-out", delay: motionDelay },
+                    hadViewport ? undefined : isOut ? 1 : 0.0001);
             }
             let maskCleaned = false;
             const cleanupMask = () => {
                 if (maskCleaned) return;
                 if (element.dataset.flowTextMotionId !== motionId) return;
                 maskCleaned = true;
-                if (maskTimer) window.clearTimeout(maskTimer);
-                window.clearTimeout(maskCleanupTimer);
+                dispose();
                 delete element.dataset.flowTextMotionId;
                 if (wheelMotion) {
                     wheelMotion.finalizeWheel?.();
@@ -1447,6 +1254,16 @@
                 cleanupMask,
                 motionDelay + cleanupDuration + 50,
             );
+            const dispose = () => {
+                if (maskTimer) window.clearTimeout(maskTimer);
+                window.clearTimeout(maskCleanupTimer);
+                flowAnimation.removeEventListener("finish", cleanupMask);
+                flowAnimation.removeEventListener("cancel", cleanupMask);
+                flowTextMaskCleanups.delete(element);
+                release();
+            };
+            const release = onCleanup(dispose);
+            flowTextMaskCleanups.set(element, dispose);
             flowAnimation.addEventListener("finish", cleanupMask, {
                 once: true,
             });
@@ -1534,6 +1351,7 @@
             stagger: flowTextStagger,
             numericStaggerDirection: "right-to-left",
             animatePreservedNumericSignChange: true,
+            accumulateLayout: true,
             respectMotionPreference,
             motionColor:
                 typeof motionColor === "function"

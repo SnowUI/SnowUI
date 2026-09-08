@@ -1,6 +1,6 @@
 <!--
   ScrambleText 代码文字扰动动效组件
-  v1.0.0
+  v1.3.1
 
   职责：提供 PRO 级字符扰动后归位的文本动效。
   文档：./ScrambleText.md
@@ -34,15 +34,7 @@
     const ServerSafeHTMLElement = BROWSER
         ? HTMLElement
         : (class {} as typeof HTMLElement);
-    const segmenter =
-        BROWSER && "Segmenter" in Intl
-            ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
-            : undefined;
-
-    function splitGraphemes(value: string) {
-        if (!segmenter) return Array.from(value);
-        return Array.from(segmenter.segment(value), (item) => item.segment);
-    }
+    import { splitTextMotionGraphemes as splitGraphemes } from "../lib/text-motion/layout";
 
     function createRng(seed: number) {
         let s = seed | 0;
@@ -68,255 +60,137 @@
         motionColor: string;
     }
 
+    interface ScrambleCharacter {
+        source: string;
+        target: string;
+        current: string;
+        start: number;
+        reveal: number;
+        end: number;
+        step: number;
+    }
+
     class SnowUIScrambleTextElement extends ServerSafeHTMLElement {
         private value = "";
         private display = "";
         private rafId = 0;
-        private runId = 0;
+        private characters: ScrambleCharacter[] = [];
+        private textNode: Text | undefined;
+        private sequence: string[] = [];
+        private rng = createRng(1);
         private options: ScrambleElementOptions = {
-            charset: "glyphs",
-            mode: "cascade",
+            charset: "glyphs", mode: "cascade",
             cascadeSpeed: DEFAULT_CASCADE_SPEED,
             cascadeDelay: DEFAULT_CASCADE_DELAY,
-            respectMotionPreference: false,
-            motionColor: "",
+            respectMotionPreference: false, motionColor: "",
         };
 
         connectedCallback() {
-            if (!this.textContent && this.value) this.textContent = this.value;
+            this.renderText(this.value);
         }
 
-        disconnectedCallback() {
-            this.cancel();
-        }
+        disconnectedCallback() { this.cancel(); }
 
-        setOptions(options: ScrambleElementOptions) {
-            const changed =
-                this.options.charset !== options.charset ||
-                this.options.customSequence !== options.customSequence ||
-                this.options.mode !== options.mode ||
-                this.options.cascadeSpeed !== options.cascadeSpeed ||
-                this.options.cascadeDelay !== options.cascadeDelay ||
-                this.options.respectMotionPreference !==
-                    options.respectMotionPreference ||
-                this.options.motionColor !== options.motionColor;
-            this.options = options;
+        setOptions(options: Partial<ScrambleElementOptions>) {
+            const next = { ...this.options, ...options };
+            const changed = (Object.keys(next) as (keyof ScrambleElementOptions)[])
+                .some(key => next[key] !== this.options[key]);
+            if (next.charset !== this.options.charset || next.customSequence !== this.options.customSequence) this.sequence = [];
+            this.options = next;
             return changed;
         }
 
-        update(nextValue: string, animate: boolean, force = false) {
+        update(nextValue: string | number, animate: boolean, force = false) {
             const next = String(nextValue ?? "");
-            if (!force && next === this.value && this.display === next) return;
-            const fromText = this.display || this.value || next;
-            this.value = next;
-
-            if (!animate || this.shouldReduceMotion()) {
-                this.cancel();
-                this.display = next;
-                this.textContent = next;
+            // Svelte 的初始文本也可能更新；立即恢复当前画面，不能短暂暴露最终值。
+            if (!force && next === this.value) {
+                this.renderText(this.display);
                 return;
             }
-
-            this.play(fromText, next);
+            const from = this.display || this.value || next;
+            this.value = next;
+            if (!animate || shouldReduceTextMotion(this.options.respectMotionPreference)) {
+                this.cancel(); this.display = next; this.renderText(next); return;
+            }
+            this.play(from, next, force);
         }
 
-        replay() {
-            this.play(this.value, this.value);
-        }
-
-        private shouldReduceMotion() {
-            return shouldReduceTextMotion(
-                this.options.respectMotionPreference,
-            );
-        }
+        replay() { this.play(this.value, this.value, true); }
 
         private cancel() {
             if (this.rafId) window.cancelAnimationFrame(this.rafId);
-            cancelTextMotionColor(this);
             this.rafId = 0;
-            this.runId += 1;
-        }
-
-        private resolveSequence() {
-            const raw =
-                this.options.customSequence ||
-                CHARSETS[this.options.charset] ||
-                CHARSETS.glyphs;
-            const chars = splitGraphemes(raw).slice(
-                0,
-                MAX_CUSTOM_SEQUENCE_LENGTH,
-            );
-            return chars.length ? chars : splitGraphemes(CHARSETS.glyphs);
+            this.characters = [];
+            cancelTextMotionColor(this);
         }
 
         private renderText(value: string) {
-            this.replaceChildren(document.createTextNode(value));
+            // 复用同一 Text 节点。cascade 两次换字之间不产生 DOM 写入。
+            if (this.textNode?.parentNode !== this) {
+                this.textNode = this.firstChild instanceof Text ? this.firstChild : document.createTextNode(value);
+                if (this.childNodes.length !== 1 || this.firstChild !== this.textNode) this.replaceChildren(this.textNode);
+            }
+            if (this.textNode.data !== value) this.textNode.data = value;
         }
 
-        private play(fromText: string, toText: string) {
-            if (this.options.mode === "cascade") {
-                this.playCascade(fromText, toText);
-                return;
+        private play(from: string, to: string, restart = false) {
+            if (shouldReduceTextMotion(this.options.respectMotionPreference)) {
+                this.cancel(); this.display = to; this.renderText(to); return;
             }
-
-            this.cancel();
-
-            const currentRun = this.runId;
-            const seed = Math.floor(Math.random() * 2147483647) + currentRun;
-            const rng = createRng(seed);
-            const fromChars = splitGraphemes(fromText);
-            const toChars = splitGraphemes(toText);
-            const maxLen = Math.max(fromChars.length, toChars.length);
-            const order = Array.from({ length: maxLen }, (_, index) => index);
-            const ranks: number[] = [];
-            order.forEach((index, rank) => {
-                ranks[index] = rank;
+            if (restart) this.cancel();
+            const running = Boolean(this.rafId);
+            const now = performance.now();
+            const old = this.characters;
+            const source = splitGraphemes(from);
+            const target = splitGraphemes(to);
+            const length = Math.max(source.length, target.length, running ? old.length : 0);
+            if (!this.sequence.length) this.sequence = splitGraphemes(this.options.customSequence || CHARSETS[this.options.charset]).slice(0, MAX_CUSTOM_SEQUENCE_LENGTH);
+            const cascade = this.options.mode === "cascade";
+            const speed = Math.max(1, Number.isFinite(this.options.cascadeSpeed) ? this.options.cascadeSpeed : DEFAULT_CASCADE_SPEED);
+            const delay = Math.max(0, Number.isFinite(this.options.cascadeDelay) ? this.options.cascadeDelay : DEFAULT_CASCADE_DELAY);
+            const interval = length <= 1 ? 0 : (DEFAULT_DURATION - DEFAULT_SETTLE_DURATION) / (length - 1);
+            this.characters = Array.from({length}, (_, index) => {
+                const previous = running ? old[index] : undefined;
+                if (previous && (now < previous.end || previous.target === (target[index] ?? ""))) {
+                    // 重定向只改终点，正在播放或等待的字符延续自己的时钟。
+                    previous.target = target[index] ?? "";
+                    return previous;
+                }
+                const start = now + (running && previous ? 0 : cascade ? index * delay : DEFAULT_DELAY);
+                return { source: previous?.current ?? source[index] ?? "", current: previous?.current ?? source[index] ?? "",
+                    target: target[index] ?? "", start,
+                    reveal: start + (cascade ? 0 : index * interval),
+                    end: start + (cascade ? this.sequence.length * speed : index * interval + DEFAULT_SETTLE_DURATION), step: -1 };
             });
-
-            const sequence = this.resolveSequence();
-            const duration = DEFAULT_DURATION;
-            const delay = DEFAULT_DELAY;
-            const settleDuration = DEFAULT_SETTLE_DURATION;
-            const settleRate = DEFAULT_SETTLE_RATE;
-            const revealSpan = Math.max(0, duration - settleDuration);
-            const revealInterval =
-                maxLen > 1 ? revealSpan / Math.max(1, maxLen - 1) : 0;
-            const startedAt = window.performance.now();
-            animateTextMotionColor(
-                this,
-                this.options.motionColor,
-                duration,
-            );
-
-            const tick = (now: number) => {
-                if (currentRun !== this.runId) return;
-
-                const elapsed = now - startedAt - delay;
-                if (elapsed < 0) {
-                    this.rafId = window.requestAnimationFrame(tick);
-                    return;
-                }
-
-                const progress =
-                    duration > 0
-                        ? Math.min(Math.max(elapsed / duration, 0), 1)
-                        : 1;
-                const activeMs = progress * duration;
-
-                if (progress >= 1) {
-                    this.display = toText;
-                    this.renderText(toText);
-                    this.rafId = 0;
-                    return;
-                }
-
-                const chars: string[] = [];
-                for (let i = 0; i < maxLen; i += 1) {
-                    const rank = ranks[i] ?? i;
-                    const revealAt = revealInterval * rank;
-                    const settleProgress = activeMs - revealAt;
-
-                    if (settleProgress >= settleDuration) {
-                        chars.push(toChars[i] ?? "");
-                    } else if (settleProgress >= 0) {
-                        const settleStep = Math.floor(
-                            settleProgress / settleRate,
-                        );
-                        if (settleStep > 0) {
-                            chars.push(randomChar(sequence, rng));
-                        } else {
-                            chars.push(
-                                fromChars[i] ?? randomChar(sequence, rng),
-                            );
-                        }
-                    } else if (progress === 0 && fromText) {
-                        chars.push(fromChars[i] ?? "");
-                    } else {
-                        chars.push(randomChar(sequence, rng));
-                    }
-                }
-
-                this.display = chars.join("");
-                this.renderText(this.display);
-                this.rafId = window.requestAnimationFrame(tick);
-            };
-
-            this.rafId = window.requestAnimationFrame(tick);
-        }
-
-        private playCascade(fromText: string, toText: string) {
-            this.cancel();
-
-            const currentRun = this.runId;
-            const fromChars = splitGraphemes(fromText);
-            const toChars = splitGraphemes(toText);
-            const maxLen = Math.max(fromChars.length, toChars.length);
-            const sequence = this.resolveSequence();
-            const speedValue = Number(this.options.cascadeSpeed);
-            const delayValue = Number(this.options.cascadeDelay);
-            const speed = Math.max(
-                1,
-                Number.isFinite(speedValue)
-                    ? speedValue
-                    : DEFAULT_CASCADE_SPEED,
-            );
-            const delay = Math.max(
-                0,
-                Number.isFinite(delayValue)
-                    ? delayValue
-                    : DEFAULT_CASCADE_DELAY,
-            );
-
-            if (maxLen === 0) {
-                this.display = "";
-                this.renderText("");
-                return;
+            this.display = from;
+            this.renderText(from);
+            if (!running) {
+                this.rng = createRng(Math.floor(Math.random() * 0x7fffffff));
+                const end = Math.max(now, ...this.characters.map(char => char.end));
+                animateTextMotionColor(this, this.options.motionColor, end - now);
+                this.rafId = window.requestAnimationFrame(this.tick);
             }
-
-            const sequenceLength = sequence.length;
-            const duration =
-                sequenceLength * speed + Math.max(0, maxLen - 1) * delay;
-            const startedAt = window.performance.now();
-            animateTextMotionColor(
-                this,
-                this.options.motionColor,
-                duration,
-            );
-
-            const tick = (now: number) => {
-                if (currentRun !== this.runId) return;
-
-                const elapsed = now - startedAt;
-                if (elapsed >= duration) {
-                    this.display = toText;
-                    this.renderText(toText);
-                    this.rafId = 0;
-                    return;
-                }
-
-                const chars: string[] = [];
-                for (let index = 0; index < maxLen; index += 1) {
-                    const localElapsed = elapsed - index * delay;
-                    if (localElapsed < 0) {
-                        chars.push(fromChars[index] ?? "");
-                        continue;
-                    }
-
-                    const sequenceIndex = Math.floor(localElapsed / speed);
-                    if (sequenceIndex >= sequenceLength) {
-                        chars.push(toChars[index] ?? "");
-                    } else {
-                        chars.push(sequence[sequenceIndex] ?? "");
-                    }
-                }
-
-                this.display = chars.join("");
-                this.renderText(this.display);
-                this.rafId = window.requestAnimationFrame(tick);
-            };
-
-            this.rafId = window.requestAnimationFrame(tick);
         }
+
+        private tick = (now: number) => {
+            let active = false;
+            const cascade = this.options.mode === "cascade";
+            const speed = Math.max(1, Number.isFinite(this.options.cascadeSpeed) ? this.options.cascadeSpeed : DEFAULT_CASCADE_SPEED);
+            for (const char of this.characters) {
+                if (now >= char.end) { char.current = char.target; continue; }
+                active = true;
+                if (now < char.start) continue;
+                const step = Math.floor((now - char.start) / (cascade ? speed : DEFAULT_SETTLE_RATE));
+                if (step === char.step) continue;
+                char.step = step;
+                char.current = cascade ? this.sequence[step] ?? char.target :
+                    now >= char.reveal && now < char.reveal + DEFAULT_SETTLE_RATE ? char.source : randomChar(this.sequence, this.rng);
+            }
+            this.display = active ? this.characters.map(char => char.current).join("") : this.value;
+            this.renderText(this.display);
+            this.rafId = active ? window.requestAnimationFrame(this.tick) : 0;
+            if (!active) this.characters = [];
+        };
     }
 
     if (BROWSER && !customElements.get("snowui-scramble-text")) {

@@ -1,11 +1,12 @@
 <!--
   SlotText 槽位滚动文字动效组件
-  v1.9.0
+  v1.11.1
 
   职责：提供逐字符纵向 slot roll 文本切换动效，并统一数字趋势与数位顺序。
 -->
 
 <script module lang="ts">
+    import { animateTextMotionFace, animateTextMotionOpacity } from "../lib/text-motion/animation";
     import {
         TEXT_MOTION_COLOR_FADE_MS,
     } from "../lib/text-motion/color";
@@ -130,7 +131,9 @@
     }
 
     interface SlotState {
-        timers: number[];
+        timer?: number;
+        end: number;
+        exiting: Set<HTMLElement>;
         target: string;
         pending?: { text: string; options: ResolvedSlotTextOptions };
     }
@@ -169,8 +172,9 @@
     function settle(container: HTMLElement) {
         const state = states.get(container);
         if (!state) return;
-        for (const timer of state.timers) window.clearTimeout(timer);
+        window.clearTimeout(state.timer);
         states.delete(container);
+        for (const animation of container.getAnimations({ subtree: true })) animation.cancel();
         buildSlotText(container, state.target);
     }
 
@@ -194,7 +198,8 @@
             return;
         }
 
-        settle(container);
+        // 保留旧画面和旧动画，新的差值叠加到当前轨迹。
+        if (running) window.clearTimeout(running.timer);
 
         if (!container.querySelector(".snowui-slot-text-slot")) {
             buildSlotText(container, toText);
@@ -202,7 +207,7 @@
         }
 
         const slots = Array.from(
-            container.querySelectorAll<HTMLElement>(".snowui-slot-text-slot"),
+            container.querySelectorAll<HTMLElement>(".snowui-slot-text-slot:not([data-exiting])"),
         );
         const fromText = slots.map((slot) => slot.dataset.char ?? "").join("");
         if (!options.interrupt && fromText === toText) return;
@@ -241,7 +246,14 @@
             nextNodes: nextSlots,
             preservedNodes: preservedSlots,
         } = timeline;
-        const exitingSlots = [...recompositionExitingSlots, ...tailSlots];
+        const exitCandidates = [...recompositionExitingSlots, ...tailSlots];
+        const exitOpacities = new Map(exitCandidates.map(slot => {
+            const face = slot.querySelector<HTMLElement>(".snowui-slot-text-face");
+            return [slot, face ? Number.parseFloat(getComputedStyle(face).opacity) : 0];
+        }));
+        // 尚未显现的旧目标无需再做退场，避免快速更新积累不可见动画。
+        const exitingSlots = exitCandidates.filter(slot => (exitOpacities.get(slot) ?? 0) > 0.001);
+        const discardedSlots = exitCandidates.filter(slot => !exitingSlots.includes(slot));
         const numericExitPairing = isNumericArithmetic
             ? createNumericSlotPairing(recompositionExitingSlots, newMiddleSlots)
             : new Map<number, number>();
@@ -270,27 +282,30 @@
             isNumericArithmetic ? "right-to-left" : "left-to-right",
         );
         const styles = getComputedStyle(container);
-        const height = parseFloat(getComputedStyle(container).fontSize);
         const restingColor = options.motionColor ? styles.color : "";
 
-        const timers: number[] = [];
-        const state: SlotState = { timers, target: toText };
+        const previousExits = [...(running?.exiting ?? [])];
+        const state: SlotState = running ?? { end: 0, exiting: new Set(), target: toText };
+        state.target = toText;
+        state.pending = undefined;
+        const now = performance.now();
         states.set(container, state);
 
-        const outY = effectiveDirection === "down" ? height : -height;
-        const inStart = effectiveDirection === "down" ? -height : height;
+        const outY = effectiveDirection === "down" ? 1 : -1;
+        const inStart = -outY;
         const layoutTransition = getSlotTextTransition(options);
         const wobble = (index: number, salt: number) => {
             const n = Math.sin((index + 1) * 12.9898 + salt * 78.233) * 43758.5453;
             return (n - Math.floor(n)) * 2 - 1;
         };
 
-        let maxEnd = 0;
+        let maxEnd = Math.max(0, state.end - now);
         const enterPlans = new Map<
             HTMLElement,
             {
                 base: number;
-                transition: string;
+                duration: number;
+                tilt: number;
             }
         >();
         for (let index = 0; index < newMiddleSlots.length; index += 1) {
@@ -315,20 +330,12 @@
                     (1 + bounce * 0.25 * wobble(charIndex, 2)),
             );
             const tilt = (bounce * 5 * wobble(charIndex, 3)).toFixed(2);
-            const rollTransition = `transform ${duration}ms ${options.easing}, opacity ${duration}ms ${options.easing}`;
-            const transition = options.motionColor
-                ? `${rollTransition}, color ${options.colorFade}ms linear ${duration}ms`
-                : rollTransition;
-            const tint =
-                typeof options.motionColor === "function"
-                    ? options.motionColor(charIndex, toChars.length)
-                    : options.motionColor;
-
-            face.style.transformOrigin = "50% 50%";
-            face.style.transform = `translateY(${inStart}px) rotate(${tilt}deg)`;
+            const tint = typeof options.motionColor === "function"
+                ? options.motionColor(charIndex, toChars.length) : options.motionColor;
+            face.style.transform = `translateY(${inStart}em) rotate(${tilt}deg)`;
             face.style.opacity = "0";
             if (tint) face.style.color = tint;
-            enterPlans.set(face, { base, transition });
+            enterPlans.set(face, { base, duration, tilt: Number(tilt) });
 
             maxEnd = Math.max(
                 maxEnd,
@@ -345,34 +352,39 @@
                 containerRect: container.getBoundingClientRect(),
                 exitingRects: captureTextMotionRects(exitingSlots),
                 preservedRects: captureTextMotionRects(preservedSlots),
+                exitPositions: new Map([...previousExits, ...exitingSlots].map(slot => [slot, slot.offsetLeft])),
             }),
             commit: (_, snapshot) => {
+                for (const slot of discardedSlots) {
+                    for (const animation of slot.getAnimations({ subtree: true })) animation.cancel();
+                    slot.remove();
+                }
                 for (const slot of exitingSlots) {
                     const rect = snapshot.exitingRects.get(slot);
                     if (!rect) continue;
+                    slot.dataset.exiting = "";
+                    state.exiting.add(slot);
                     slot.style.position = "absolute";
-                    slot.style.left = `${rect.left - snapshot.containerRect.left}px`;
-                    slot.style.top = `${rect.top - snapshot.containerRect.top}px`;
+                    slot.style.left = `${snapshot.exitPositions.get(slot)}px`;
+                    slot.style.top = "0px";
                     slot.style.width = `${rect.width}px`;
                     slot.style.height = `${rect.height}px`;
                     slot.style.zIndex = "2";
                     slot.style.pointerEvents = "none";
                 }
-                container.replaceChildren(...nextSlots, ...exitingSlots);
+                container.replaceChildren(...nextSlots, ...previousExits, ...exitingSlots);
             },
             playLayout: (_, snapshot) => {
                 const nextContainerRect = container.getBoundingClientRect();
-                for (const slot of exitingSlots) {
-                    const rect = snapshot.exitingRects.get(slot);
-                    if (!rect) continue;
-                    slot.style.left = `${rect.left - nextContainerRect.left}px`;
-                    slot.style.top = `${rect.top - nextContainerRect.top}px`;
+                const targetRects = captureTextMotionRects(newMiddleSlots);
+                for (const slot of [...previousExits, ...exitingSlots]) {
+                    slot.style.left = `${(snapshot.exitPositions.get(slot) ?? 0) + snapshot.containerRect.left - nextContainerRect.left}px`;
                 }
-                void container.offsetWidth;
                 playTextMotionLayout(
                     preservedSlots,
                     snapshot.preservedRects,
                     layoutTransition,
+                    true,
                 );
                 if (isNumericArithmetic) {
                     for (const [oldIndex, newIndex] of numericExitPairing) {
@@ -380,15 +392,16 @@
                         const targetSlot = newMiddleSlots[newIndex];
                         const previousRect = snapshot.exitingRects.get(slot);
                         if (!slot || !targetSlot || !previousRect) continue;
-                        const targetRect = targetSlot.getBoundingClientRect();
+                        const targetRect = targetRects.get(targetSlot)!;
                         const nextLeft = targetRect.left - nextContainerRect.left;
                         const nextTop = targetRect.top - nextContainerRect.top;
                         slot.style.left = `${nextLeft}px`;
                         slot.style.top = `${nextTop}px`;
                         flipTextMotionElement(
                             slot,
-                            previousRect.left - targetRect.left,
+                            (snapshot.exitPositions.get(slot) ?? 0) + snapshot.containerRect.left - targetRect.left,
                             layoutTransition,
+                            true,
                         );
                     }
                 }
@@ -400,14 +413,14 @@
         );
 
         for (const [face, plan] of enterPlans) {
-            timers.push(
-                window.setTimeout(() => {
-                    face.style.transition = plan.transition;
-                    face.style.transform = "translateY(0) rotate(0deg)";
-                    face.style.opacity = "1";
-                    if (options.motionColor) face.style.color = restingColor;
-                }, plan.base + options.exitOffset),
-            );
+            const timing = { duration: plan.duration, easing: options.easing, delay: plan.base + options.exitOffset };
+            animateTextMotionFace(face, inStart, 0, plan.tilt, 0, timing);
+            animateTextMotionOpacity(face, 1, timing, 0);
+            if (options.motionColor) {
+                const tint = face.style.color;
+                face.style.color = restingColor;
+                face.animate({ color: [tint, restingColor] }, { duration: options.colorFade, delay: timing.delay + plan.duration, easing: "linear", fill: "backwards" });
+            }
         }
 
         const exitingPlans = exitingSlots.map((slot) => {
@@ -452,36 +465,25 @@
                     (1 + bounce * 0.25 * wobble(charIndex, 2)),
             );
             const tilt = (bounce * 5 * wobble(charIndex, 3)).toFixed(2);
-            const rollTransition = `transform ${duration}ms ${options.easing}, opacity ${duration}ms ${options.easing}`;
-            maxEnd = Math.max(
-                maxEnd,
-                base + duration,
-            );
-
-            timers.push(
-                window.setTimeout(() => {
-                    oldFace.style.transition = rollTransition;
-                    oldFace.style.transform = `translateY(${outY}px) rotate(${-Number(tilt)}deg)`;
-                    oldFace.style.opacity = "0";
-
-                    const done = (event: TransitionEvent) => {
-                        if (event.propertyName !== "transform") return;
-                        oldFace.removeEventListener("transitionend", done);
-                        slot.remove();
-                    };
-                    oldFace.addEventListener("transitionend", done);
-                }, base),
-            );
+            maxEnd = Math.max(maxEnd, base + duration);
+            const timing = { duration, easing: options.easing, delay: base };
+            const motion = animateTextMotionFace(oldFace, 0, outY, 0, -Number(tilt), timing);
+            animateTextMotionOpacity(oldFace, 0, timing, exitOpacities.get(slot));
+            motion.onfinish = () => {
+                for (const animation of slot.getAnimations({ subtree: true })) animation.cancel();
+                state.exiting.delete(slot);
+                slot.remove();
+            };
         }
 
-        timers.push(
-            window.setTimeout(() => {
-                const pending = state.pending;
-                states.delete(container);
-                buildSlotText(container, toText);
-                if (pending) animateSlotText(container, pending.text, pending.options);
-            }, maxEnd + 80),
-        );
+        state.end = now + maxEnd;
+        state.timer = window.setTimeout(() => {
+            if (states.get(container) !== state) return;
+            const pending = state.pending;
+            for (const slot of state.exiting) slot.remove();
+            states.delete(container);
+            if (pending) animateSlotText(container, pending.text, pending.options);
+        }, maxEnd + 80);
     }
 
     class SnowUISlotTextElement extends ServerSafeHTMLElement {

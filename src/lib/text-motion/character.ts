@@ -40,6 +40,7 @@ export interface TextMotionCharacterOptions {
     stagger?: number;
     numericStaggerDirection?: "left-to-right" | "right-to-left";
     animatePreservedNumericSignChange?: boolean;
+    accumulateLayout?: boolean;
 }
 
 export interface TextMotionCharacterAnimationContext {
@@ -57,6 +58,7 @@ export interface TextMotionCharacterAnimationContext {
     characterIndex?: number;
     characterTotal?: number;
     isNumericArithmetic?: boolean;
+    onCleanup: (cleanup: () => void) => () => void;
 }
 
 export type TextMotionCharacterAnimator = (
@@ -87,6 +89,34 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
     private isRTL = false;
     private value = "";
     private previousValue = "";
+    private cleanups = new Set<() => void>();
+    private delayCache = new WeakMap<HTMLElement[], number>();
+    public accumulateLayout = false;
+
+    private registerCleanup = (cleanup: () => void) => {
+        this.cleanups.add(cleanup);
+        return () => this.cleanups.delete(cleanup);
+    };
+
+    disconnectedCallback() {
+        this.clearMotion();
+    }
+
+    private clearMotion() {
+        for (const cleanup of this.cleanups) cleanup();
+        this.cleanups.clear();
+        for (const node of this.shadowRoot?.querySelectorAll('*') ?? []) {
+            for (const animation of node.getAnimations()) animation.cancel();
+        }
+        for (const [group] of this.exitingChars) group.remove();
+        this.exitingChars = [];
+    }
+
+    private scheduleCleanup(callback: () => void, delay: number) {
+        const timer = window.setTimeout(() => { release(); callback(); }, delay);
+        const release = this.registerCleanup(() => window.clearTimeout(timer));
+        return () => { window.clearTimeout(timer); release(); };
+    }
 
     public transition: TextMotionTransition = TEXT_MOTION_LAYOUT_TRANSITION;
     public trend: TextMotionTrend = 0;
@@ -191,6 +221,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
         if (typeof options.respectMotionPreference === "boolean") {
             this.respectMotionPreference = options.respectMotionPreference;
         }
+        this.accumulateLayout = options.accumulateLayout ?? false;
         this.motionColor = options.motionColor ?? "";
         this.animator = options.animator;
         this.motionDuration = options.motionDuration;
@@ -221,12 +252,12 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
         } = plan;
 
         if (!animate) {
+            this.clearMotion();
             for (const char of this.chars) cancelTextMotionColor(char);
-            for (const char of oldMiddleNodes) char.remove();
-            this.prefixSection.replaceChildren(...prefixNodes);
-            this.middleSection.replaceChildren(...newMiddleNodes);
-            this.suffixSection.replaceChildren(...suffixNodes);
-            this.chars = nextNodes;
+            this.chars = splitTextMotionGraphemes(this.value, true).map(label => createPart("char", label));
+            this.prefixSection.replaceChildren();
+            this.middleSection.replaceChildren(...this.chars);
+            this.suffixSection.replaceChildren();
             return;
         }
 
@@ -240,8 +271,9 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
         const numericPairing = resolvedTrend.isNumericArithmetic
             ? this.createNumericPairing(oldMiddleNodes, newMiddleNodes)
             : undefined;
+        this.delayCache = new WeakMap();
         const oldMiddleRects = new Map(
-            oldMiddleNodes.map((node) => [node, node.getBoundingClientRect()]),
+            (numericPairing ? oldMiddleNodes : []).map((node) => [node, node.getBoundingClientRect()]),
         );
         if (numericPairing) {
             for (
@@ -307,8 +339,10 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                 this.chars = nextNodes;
             },
             playLayout: (_, snapshot) => {
-                cancelTextMotionLayout(this.prefixSection);
-                cancelTextMotionLayout(this.suffixSection);
+                if (!this.accumulateLayout) {
+                    cancelTextMotionLayout(this.prefixSection);
+                    cancelTextMotionLayout(this.suffixSection);
+                }
                 const newPrefixRect = this.prefixSection.getBoundingClientRect();
                 const newSuffixRect = this.suffixSection.getBoundingClientRect();
                 const exitingEdge = this.isRTL
@@ -317,16 +351,20 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                 for (const [element, x] of this.exitingChars) {
                     element.style.transform = `translateX(${x - exitingEdge}px)`;
                 }
+                const pairedRects = new Map(newMiddleNodes
+                    .filter((_, index) => numericPairing?.pairedNewNodes[index])
+                    .map(node => [node, node.getBoundingClientRect()]));
                 for (let index = 0; index < newMiddleNodes.length; index += 1) {
                     if (!numericPairing?.pairedNewNodes[index]) continue;
                     const node = newMiddleNodes[index];
                     const oldRect = oldMiddleRects.get(node);
                     if (!oldRect) continue;
-                    const newRect = node.getBoundingClientRect();
+                    const newRect = pairedRects.get(node)!;
                     flipTextMotionElement(
                         node,
                         oldRect.left - newRect.left,
                         this.transition,
+                        this.accumulateLayout,
                     );
                 }
                 for (let index = 0; index < newMiddleNodes.length; index += 1) {
@@ -400,6 +438,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                         true,
                     ),
                     this.transition,
+                    this.accumulateLayout,
                 );
                 flipTextMotionElement(
                     this.suffixSection,
@@ -410,6 +449,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                         false,
                     ),
                     this.transition,
+                    this.accumulateLayout,
                 );
             },
         });
@@ -571,11 +611,11 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
 
     private getDelay(index: number, nodes: HTMLElement[], reverse: boolean) {
         const order = reverse ? nodes.length - index - 1 : index;
-        const stagger = this.stagger ??
-            getTextMotionStagger(
-                this.transition.duration,
-                nodes.map((node) => node.textContent),
-            );
+        let stagger = this.stagger ?? this.delayCache.get(nodes);
+        if (stagger === undefined) {
+            stagger = getTextMotionStagger(this.transition.duration, nodes.map(node => this.getCharacterLabel(node)));
+            this.delayCache.set(nodes, stagger);
+        }
         return Math.max(0, order) * stagger;
     }
 
@@ -611,7 +651,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
         const label = this.getCharacterLabel(element);
         if (label === TEXT_MOTION_SPACE) {
             if (isOut && onFinish) {
-                window.setTimeout(onFinish, motionDuration + delay);
+                this.scheduleCleanup(onFinish, motionDuration + delay);
             }
             return;
         }
@@ -630,6 +670,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
             characterIndex,
             characterTotal,
             isNumericArithmetic,
+            onCleanup: this.registerCleanup,
         });
         if (!isOut) {
             animateSettledTextMotionColor(
@@ -643,18 +684,20 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
         }
         if (!onFinish) return;
         if (!animation) {
-            window.setTimeout(onFinish, motionDuration + delay);
+            this.scheduleCleanup(onFinish, motionDuration + delay);
             return;
         }
         let finished = false;
-        let fallbackTimer: number;
+        let cancelFallback: () => void;
         const finish = () => {
             if (finished) return;
             finished = true;
-            window.clearTimeout(fallbackTimer);
+            cancelFallback();
+            animation.removeEventListener("finish", finish);
+            animation.removeEventListener("cancel", finish);
             onFinish();
         };
-        fallbackTimer = window.setTimeout(
+        cancelFallback = this.scheduleCleanup(
             finish,
             motionDuration + delay + 50,
         );

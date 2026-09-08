@@ -68,15 +68,17 @@ export function flipTextMotionElement(
     element: HTMLElement,
     deltaX: number,
     transition: TextMotionTransition,
+    accumulate = false,
 ) {
     if (!deltaX) return undefined;
-    cancelTextMotionLayout(element);
+    if (!accumulate) cancelTextMotionLayout(element);
     return element.animate(
-        { transform: [`translateX(${deltaX}px)`, ""] },
+        { transform: [`translateX(${deltaX}px)`, accumulate ? "translateX(0px)" : ""] },
         {
             duration: transition.layoutDuration ?? transition.duration,
             easing: transition.easing,
-            fill: "both",
+            fill: accumulate ? "backwards" : "both",
+            composite: accumulate ? "accumulate" : "replace",
         },
     );
 }
@@ -89,11 +91,14 @@ export function playTextMotionLayout(
     elements: HTMLElement[],
     previousRects: Map<HTMLElement, DOMRect>,
     transition: TextMotionTransition,
+    accumulate = false,
 ) {
+    // 同一批先读完，再启动动画，避免每个字符都强制布局。
+    const currentRects = captureTextMotionRects(elements);
     for (const element of elements) {
         const previous = previousRects.get(element);
         if (!previous) continue;
-        const current = element.getBoundingClientRect();
-        flipTextMotionElement(element, previous.left - current.left, transition);
+        const current = currentRects.get(element)!;
+        flipTextMotionElement(element, previous.left - current.left, transition, accumulate);
     }
 }
