@@ -234,6 +234,18 @@
     );
     const highlightedLines = $derived(lines.map(highlightLine));
     const highlightedSingleLine = $derived(highlightLine(resolvedCode));
+    // 全屏层是独立宿主：只同步背景和外置变量，不带入普通态尺寸。
+    const fullscreenBackgroundStyle = $derived.by(() => {
+        if (typeof document === "undefined") return "";
+        const declarations = document.createElement("div").style;
+        declarations.cssText = userStyle;
+        for (const property of Array.from(declarations)) {
+            if (property !== "background" && !property.startsWith("background-") && !property.startsWith("--")) {
+                declarations.removeProperty(property);
+            }
+        }
+        return declarations.cssText;
+    });
     const rootStyle = $derived(
         [
             `--snowui-code-block-visible-lines: ${autoVisibleLines};`,
@@ -810,6 +822,7 @@
         enableContext={false}
         enableScaleObserver={false}
         class="snowui-code-block-fullscreen snowui-overlay-scrollbar-host"
+        style={fullscreenBackgroundStyle}
         tabindex={-1}
     >
         <!-- 全屏工具栏 -->

@@ -15,7 +15,7 @@
 
 平铺 Button 兼容 Props。`text` 提供静态内容，`getText` 提供同步或异步动态内容；复制成功触发 `onCopy`，失败触发 `onCopyError`。从复制开始到成功反馈结束的整个非 idle 阶段禁止重复触发；此时不设置 disabled，不改变按钮视觉，只关闭 Button 点击反馈并忽略后续点击。成功反馈在 `feedbackDuration` 后复位。不提供 parts。
 
-`showText={false}` 启用无文字模式，只显示 Copy / Check 图标，并自动提供复制状态的 `aria-label`。图标变化复用 CodeBlock 的 Frame `stateContent` 协议：内部 Icon Frame 在 Idle 渲染 Copy、Active 渲染 Check；Button 本身不进入 Active/toggle 视觉。带文字模式下文字始终保持“复制”，只有图标执行内容替换动效。
+`showText={false}` 启用无文字模式，只显示 Copy / Check 图标，并自动提供复制状态的 `aria-label`。图标变化使用内部 Frame 的 150ms replacement appear：复制成功显示 Check，反馈结束恢复 Copy；Button 本身不进入 Active/toggle 视觉。带文字模式下文字始终保持“复制”，只有图标执行内容替换动效。
 
 ## API
 
@@ -71,3 +71,7 @@
 ### v1.0.0 (2026-07-03)
 
 - 首次实现异步复制、成功/失败事件和反馈复位。
+
+### 状态按钮动效时长
+
+默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。复制成功的停留时间由 `feedbackDuration` 单独控制，不等于动效时长。

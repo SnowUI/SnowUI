@@ -3,8 +3,8 @@
     import type { ComponentProps, Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Button from "./Button.svelte";
+    import { CONTROL_BUTTON_REPLACEMENT_MOTION, CONTROL_BUTTON_MOTION_DURATION_MS, controlButtonMotionStyle } from "../motion/presets/replacement";
     import Frame from "./Frame.svelte";
-    import { REPLACEMENT_APPEAR_MOTION } from "../motion/presets/replacement";
     import {
         mergeComponentPartProps,
         useComponentPart,
@@ -36,6 +36,7 @@
         disabled = false,
         onExpandedChange,
         onclick,
+        style: userStyle = "",
         ...rest
     }: Props = $derived(
         mergeComponentPartProps(
@@ -64,6 +65,7 @@
 
 <Button
     {...rest}
+    style={`${controlButtonMotionStyle(`var(--snowui-expand-button-motion-duration-override, ${CONTROL_BUTTON_MOTION_DURATION_MS}ms)`)} ${userStyle}`}
     iconOnly={!children}
     {disabled}
     aria-expanded={resolvedExpanded}
@@ -77,7 +79,7 @@
             enableResponsive={false}
             enableContext={false}
             enableScaleObserver={false}
-            whileAppear={REPLACEMENT_APPEAR_MOTION}
+            currentState="Appear" whileAppear={CONTROL_BUTTON_REPLACEMENT_MOTION}
         >
             {#if collapseIcon}
                 {@render collapseIcon()}
@@ -91,7 +93,7 @@
             enableResponsive={false}
             enableContext={false}
             enableScaleObserver={false}
-            whileAppear={REPLACEMENT_APPEAR_MOTION}
+            currentState="Appear" whileAppear={CONTROL_BUTTON_REPLACEMENT_MOTION}
         >
             {#if icon}
                 {@render icon()}

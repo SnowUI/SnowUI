@@ -18,7 +18,7 @@
 - `onExpandedChange`：值切换回调。
 - `icon` / `collapseIcon`：替换默认的放大、收起图标。
 - `ariaLabel` / `collapseAriaLabel`：两种状态的辅助文本。
-- 默认图标为 `arrows-out-simple` / `arrows-in-simple`，内容替换使用统一 replacement appear 动效。
+- 默认图标为 `arrows-out-simple` / `arrows-in-simple`，内容替换使用轻量状态按钮的 150ms replacement appear 动效。
 
 ## API
 
@@ -68,3 +68,7 @@
 ### v1.0.0 (2026-07-03)
 
 - 首次实现 Button 宿主特化、展开语义与图标替换动效。
+
+### 状态按钮动效时长
+
+默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。

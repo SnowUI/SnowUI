@@ -11,8 +11,9 @@
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | variant | `"default"` \| `"background"` | `"default"` | 视觉变体。`default` 默认显示内置 Dot；`background` 增加色块背景与 0.5px 边框，默认不显示 Dot |
-| size | `"sm"` \| `"lg"` | `"sm"` | 尺寸档位。`sm` 文字 12/16；`lg` 文字 14/20 |
-| showDot | `boolean` | `variant === "default"` | 是否显示内置 Dot；`background` 可通过 `showDot` 开启 |
+| size | `"sm"` \| `"lg"` | `undefined` | 显式值优先；未传时在组件创建时读取父级数值尺寸 Context 快照，≤12 使用 `sm`，>12 使用 `lg`；无数值 Context 时回退 `sm`。不跟随后续父级尺寸变化；动态切换请显式传入 size。`sm` 文字 12/16，`lg` 文字 14/20 |
+| showDot | `boolean` | `undefined` | 未传时随 variant 解析：`default` 显示、`background` 隐藏。显式 true / false 开启或关闭内置 Dot；存在外置 leading 时始终隐藏内置 Dot |
+| children | `Snippet` | `undefined` | 无参数内容片段，渲染标签正文和可选 leading / trailing 子项。SnowUI 组件通过 `as="leading"` / `as="trailing"` 声明角色；外置 leading 替换内置 Dot |
 
 ## 关键字 (Keyword)
 
@@ -169,6 +170,10 @@
 ---
 
 ## 更新日志 (Changelog)
+
+### 文档补全 (2026-09-07)
+
+- 补齐 `children` 的公开说明，澄清 size Context 回退和 showDot 的解析与替换优先级；运行时行为不变。
 
 ### v1.1.0 (2026-06-21)
 

@@ -3,6 +3,7 @@
     import { onDestroy, type ComponentProps, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Button from "./Button.svelte";
+    import { CONTROL_BUTTON_REPLACEMENT_MOTION, CONTROL_BUTTON_MOTION_DURATION_MS, controlButtonMotionStyle } from "../motion/presets/replacement";
     import Frame from "./Frame.svelte";
     import { writeClipboardText } from "../lib/clipboard";
     import {
@@ -55,6 +56,7 @@
         onCopyError,
         onclick,
         whileClick: userWhileClick = undefined,
+        style: userStyle = "",
         ...rest
     }: Props = $derived(
         mergeComponentPartProps(
@@ -112,6 +114,7 @@
 
 <Button
     {...rest}
+    style={`${controlButtonMotionStyle(`var(--snowui-copy-button-motion-duration-override, ${CONTROL_BUTTON_MOTION_DURATION_MS}ms)`)} ${userStyle}`}
     iconOnly={!showText}
     {disabled}
     data-copy-button
@@ -123,19 +126,22 @@
     whileClick={status === "idle" ? userWhileClick : false}
     onclick={handleClick}
 >
-    <Frame
-        {...iconFrameProps}
-        tag="span"
-        enableResponsive={false}
-        enableContext={false}
-        enableScaleObserver={false}
-        currentState={status === "success" ? "Active" : "Idle"}
-        whileActive={{ duration: feedbackDuration, opacity: [1, 1] }}
-        stateContent={{
-            Idle: idleIcon,
-            Active: copiedIcon,
-        }}
-    />
+    {#key status === "success"}
+        <Frame
+            {...iconFrameProps}
+            tag="span"
+            enableResponsive={false}
+            enableContext={false}
+            enableScaleObserver={false}
+            currentState="Appear" whileAppear={CONTROL_BUTTON_REPLACEMENT_MOTION}
+        >
+            {#if status === "success"}
+                {@render copiedIcon()}
+            {:else}
+                {@render idleIcon()}
+            {/if}
+        </Frame>
+    {/key}
     {#if showText}
         {#if children}
             {@render children()}

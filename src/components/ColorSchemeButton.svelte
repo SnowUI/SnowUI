@@ -2,7 +2,9 @@
 <script lang="ts">
     import { onMount, type ComponentProps, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
+    import Frame from "./Frame.svelte";
     import Button from "./Button.svelte";
+    import { CONTROL_BUTTON_REPLACEMENT_MOTION, CONTROL_BUTTON_MOTION_DURATION_MS, controlButtonMotionStyle } from "../motion/presets/replacement";
     import { useLocale } from "../i18n/locale.svelte";
     import {
         mergeComponentPartProps,
@@ -42,10 +44,13 @@
         disabled = false,
         onSchemeChange,
         onclick,
+        style: userStyle = "",
         ...rest
     }: Props = $derived(
         mergeComponentPartProps(inheritedPart.current, explicitProps),
     );
+
+    const iconFrameProps = { tag: "span" as const, enableResponsive: false, enableContext: false, enableScaleObserver: false, "aria-hidden": "true" as const };
 
     let internalScheme = $state<ColorScheme>("light");
     let mounted = $state(false);
@@ -119,6 +124,7 @@
 
 <Button
     {...rest}
+    style={`${controlButtonMotionStyle(`var(--snowui-color-scheme-button-motion-duration-override, ${CONTROL_BUTTON_MOTION_DURATION_MS}ms)`)} ${userStyle}`}
     iconOnly={!children}
     {disabled}
     data-color-scheme-button
@@ -127,6 +133,8 @@
     aria-pressed={resolvedScheme === "dark"}
     onclick={handleClick}
 >
+    {#key resolvedScheme}
+        <Frame {...iconFrameProps} enableResponsive={false} enableContext={false} enableScaleObserver={false} currentState="Appear" whileAppear={CONTROL_BUTTON_REPLACEMENT_MOTION}>
     {#if resolvedScheme === "dark"}
         {#if darkIcon}
             {@render darkIcon()}
@@ -140,5 +148,7 @@
             <ComponentIcon name="sun" aria-hidden="true" />
         {/if}
     {/if}
+        </Frame>
+    {/key}
     {@render children?.()}
 </Button>

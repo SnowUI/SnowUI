@@ -17,7 +17,7 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 
 旧名称 `ThemeButton` 仅作为弃用兼容别名保留；新代码统一使用 ColorSchemeButton。
 
-点击后立即切换，不写入 storage，也不增加图标替换、主题切换动效。`applyToDocument={false}` 时组件只维护受控状态，适合由 Test、iframe 等宿主管理实际主题目标。
+点击后立即更新方案，不写入 storage；图标替换使用 150ms 动效，不对整页主题增加过渡。`applyToDocument={false}` 时组件只维护受控状态，适合由 Test、iframe 等宿主管理实际主题目标。
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
@@ -59,3 +59,7 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 ### v1.0.0 (2026-08-11)
 
 - 从 ThemeButton 收敛命名为 ColorSchemeButton；修正内置图标按 Button 尺寸显示。
+
+### 状态按钮动效时长
+
+默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。

@@ -852,4 +852,7 @@
     /* --snowui-table-toolbar-radius-override: ; */ /* default: --radius-3 */
     /* --snowui-table-toolbar-background-override: ; */ /* default: --black-4 */
 
+    /* --snowui-color-scheme-button-motion-duration-override: ; */ /* default: 150ms; Button hover / click */
+    /* --snowui-copy-button-motion-duration-override: ; */ /* default: 150ms; Button hover / click */
+    /* --snowui-expand-button-motion-duration-override: ; */ /* default: 150ms; Button hover / click */
 }
