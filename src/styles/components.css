@@ -856,3 +856,10 @@
     /* --snowui-copy-button-motion-duration-override: ; */ /* default: 150ms; Button hover / click */
     /* --snowui-expand-button-motion-duration-override: ; */ /* default: 150ms; Button hover / click */
 }
+
+/* Dialog：面板、正文、操作区 gap 与标题/正文水平 inset。
+ --snowui-dialog-gap-override
+ --snowui-dialog-content-gap-override
+ --snowui-dialog-footer-gap-override
+ --snowui-dialog-text-padding-override
+*/

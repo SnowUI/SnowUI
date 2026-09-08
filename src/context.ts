@@ -302,6 +302,8 @@ export type ButtonSizeContextValue = "sm" | "md" | "lg";
 export interface ButtonSizeContext {
     present: true;
     readonly size: ButtonSizeContextValue;
+    /** 可按已注册的直系角色限定尺寸默认值；返回 undefined 时保留 Button 自身默认。 */
+    readonly resolveSize?: (element: HTMLElement | undefined) => ButtonSizeContextValue | undefined;
     /** 复合控件可同时提供 Button item 的内置 hover scale 默认值。 */
     readonly scaleOnHover?: boolean;
 }

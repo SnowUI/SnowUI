@@ -1,6 +1,6 @@
 <!--
  Dialog 通用模态对话框
- v1.0.0
+ v1.1.0
 
  职责:
  - 面板模式: <Dialog bind:open>
@@ -9,7 +9,15 @@
 -->
 
 <script lang="ts">
-    import { tick, onMount, onDestroy, type Snippet } from "svelte";
+    import { tick, onMount, onDestroy, setContext, type Snippet } from "svelte";
+    import Button from "./Button.svelte";
+    import Text from "./Text.svelte";
+    import Separator from "./Separator.svelte";
+    import { getButtonSize } from "../context";
+    import { BUTTON_SIZE_CONTEXT_KEY } from "../keys";
+    import { ComponentIcon } from "../internal/component-icon/index";
+    import { useLocale } from "../i18n/locale.svelte";
+    import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import {
         dialogStore,
@@ -42,7 +50,7 @@
         };
     }
 
-    interface Props extends Omit<FrameProps, "children" | "as"> {
+    interface Props extends Omit<FrameProps, "children" | "as" | "title"> {
         id?: string;
         template?: boolean;
         as?: "dialog" | undefined;
@@ -56,6 +64,11 @@
         pinOffsetX?: number;
         pinOffsetY?: number;
         role?: "dialog" | string;
+        title?: string;
+        separator?: boolean;
+        showCloseButton?: boolean;
+        closeLabel?: string;
+        parts?: ComponentPartsOf<{ Button: typeof Button; Text: typeof Text; Separator: typeof Separator }>;
         children?: Snippet;
         [key: string]: any;
     }
@@ -68,12 +81,17 @@
         onOpenChange = undefined,
         backdrop = "opaque",
         size = "md",
-        closeOnOutside = false,
+        closeOnOutside = true,
         closeOnEscape = true,
-        pinOffset = 12,
+        pinOffset = undefined,
         pinOffsetX = undefined,
         pinOffsetY = undefined,
         role = "dialog",
+        title,
+        separator = undefined,
+        showCloseButton = true,
+        closeLabel,
+        parts,
         children,
         class: userClass = "",
         style: userStyle = "",
@@ -82,6 +100,10 @@
         enableScaleObserver = false,
         ...rest
     }: Props = $props();
+
+    const locale = useLocale();
+    const componentId = $props.id();
+    const titleId = `${componentId}-title`;
 
     type DialogMode = "panel" | "inline" | "template";
     const mode = $derived<DialogMode>(
@@ -127,6 +149,78 @@
     let placeholderRef = $state<HTMLElement | undefined>(undefined);
     let backdropEl = $state<HTMLElement | undefined>(undefined);
     let panelEl = $state<HTMLElement | undefined>(undefined);
+    let contentEl = $state<HTMLDivElement>();
+    let externalClose = $state<HTMLElement>();
+    let externalFooter = $state<HTMLElement>();
+    let externalTitle = $state<HTMLElement>();
+    let externalSeparator = $state<HTMLElement>();
+    let externalContent = $state<HTMLElement>();
+    let externalTitleId = $state<string>();
+    const hasTitle = $derived(!!title || !!externalTitle);
+    const structuredChildren = $derived(!!externalTitle || !!externalContent || !!externalSeparator);
+    $effect(() => {
+        const node = externalTitle;
+        if (!node) { externalTitleId = undefined; return; }
+        const originalId = node.getAttribute("id");
+        if (!originalId) node.id = titleId;
+        externalTitleId = node.id;
+        const observer = new MutationObserver(() => {
+            if (!node.id) node.id = titleId;
+            externalTitleId = node.id;
+        });
+        observer.observe(node, { attributes: true, attributeFilter: ["id"] });
+        return () => {
+            observer.disconnect();
+            if (originalId !== titleId && node.id === titleId) node.removeAttribute("id");
+        };
+    });
+    const parentButtonSize = getButtonSize();
+    setContext(BUTTON_SIZE_CONTEXT_KEY, {
+        present: true,
+        get scaleOnHover() { return parentButtonSize?.scaleOnHover; },
+        get size() { return resolvedSize === "sm" ? "sm" : "md"; },
+        resolveSize(element: HTMLElement | undefined) {
+            if (externalFooter && element?.parentElement === externalFooter) return resolvedSize === "sm" ? "sm" : "md";
+            return parentButtonSize?.resolveSize ? parentButtonSize.resolveSize(element) : parentButtonSize?.size;
+        },
+    });
+    const hasClose = $derived(showCloseButton || !!externalClose);
+
+    // 只识别调用方 children 的直系角色，正文包装不改变角色所有权。
+    $effect(() => {
+        const host = contentEl ?? panelEl;
+        if (!host || !children) {
+            externalClose = undefined;
+            externalFooter = undefined;
+            externalTitle = undefined;
+            externalSeparator = undefined;
+            externalContent = undefined;
+            return;
+        }
+        const reportedDuplicates = new Set<string>();
+        const update = () => {
+            for (const role of ["close", "footer", "title", "separator", "content"]) {
+                const candidates = Array.from(host.querySelectorAll<HTMLElement>(
+                    `:scope > [data-as="${role}"]:not([data-dialog-builtin-close]):not([data-dialog-builtin])`,
+                ));
+                if (role === "close") externalClose = candidates[0];
+                else if (role === "footer") externalFooter = candidates[0];
+                else if (role === "title") externalTitle = candidates[0];
+                else if (role === "separator") externalSeparator = candidates[0];
+                else externalContent = candidates[0];
+                if (candidates.length > 1) {
+                    if (!reportedDuplicates.has(role) && import.meta.env.DEV) {
+                        console.error(`[SnowUI Dialog] ${role} ${role === "close" ? "关闭角色" : role === "footer" ? "底部角色" : "角色"}只能有一个；仅使用第一个。`);
+                    }
+                    reportedDuplicates.add(role);
+                } else reportedDuplicates.delete(role);
+            }
+        };
+        update();
+        const observer = new MutationObserver(update);
+        observer.observe(host, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-as'] });
+        return () => observer.disconnect();
+    });
     let inlineTrigger: HTMLElement | null = null;
     let originalCursor = "";
     let restoreFocusEl: HTMLElement | null = null;
@@ -226,6 +320,13 @@
     function handlePanelClick(event: MouseEvent) {
         const target = event.target;
         if (!(target instanceof Element)) return;
+        if (event.defaultPrevented) return;
+        const closeRole = target.closest<HTMLElement>('[data-as="close"]');
+        if (closeRole && closeRole === externalClose) {
+            if (closeRole.matches(':disabled, [aria-disabled="true"]')) return;
+            requestClose();
+            return;
+        }
         if (target.closest("[data-" + "dialog-close]")) {
             requestClose();
         }
@@ -295,12 +396,14 @@
                 tabindex="-1"
                 {role}
                 aria-modal="true"
+                aria-labelledby={rest["aria-label"] ? undefined : externalTitle ? externalTitleId : title ? titleId : undefined}
+                data-has-close={hasClose ? "true" : undefined}
                 data-size={resolvedSize}
                 data-open={presence.closing ? undefined : "true"}
                 data-closing={presence.closing ? "true" : undefined}
                 class={panelClass}
                 style={userStyle || undefined}
-                {pinOffset}
+                pinOffset={pinOffset ?? "var(--snowui-dialog-close-offset)"}
                 {pinOffsetX}
                 {pinOffsetY}
                 onclick={handlePanelClick}
@@ -316,7 +419,29 @@
                     rows: rest.renderHints?.rows,
                 }}
             >
-                {@render children?.()}
+                {#if title && !externalTitle}
+                    <Text {...parts?.Text} as="title" data-dialog-builtin="true" tag="h2" id={titleId}
+                        class={["snowui-dialog-title", hasClose ? "snowui-dialog-title-with-close" : "", parts?.Text?.class].filter(Boolean).join(" ")}>
+                        {title}
+                    </Text>
+                {/if}
+                {#if hasTitle && !externalSeparator && (separator ?? resolvedSize !== "sm")}
+                    <Separator thickness="var(--border-2)" {...parts?.Separator} as="separator" data-dialog-builtin="true" class={["snowui-dialog-separator", parts?.Separator?.class].filter(Boolean).join(" ")} />
+                {/if}
+                {#if children}
+                    {#if !title && !showCloseButton}
+                        {@render children()}
+                    {:else}
+                        <div bind:this={contentEl} class="snowui-dialog-content" data-structured={structuredChildren ? "true" : undefined} data-has-footer={externalFooter ? "true" : undefined} data-close-space={!hasTitle && hasClose ? "true" : undefined}>{@render children()}</div>
+                    {/if}
+                {/if}
+                {#if showCloseButton && !externalClose}
+                    <Button variant="borderless" iconOnly size={resolvedSize === "sm" ? "sm" : "md"} {...parts?.Button} type="button" as="close" data-dialog-builtin-close="true"
+                        class={["snowui-dialog-close", parts?.Button?.class].filter(Boolean).join(" ")}
+                        aria-label={closeLabel ?? locale.t("dialog.close")} onclick={requestClose}>
+                        <ComponentIcon name="close" size="var(--snowui-dialog-close-icon-size)" aria-hidden="true" />
+                    </Button>
+                {/if}
             </Frame>
         </div>
     </div>
@@ -371,6 +496,15 @@
         pointer-events: auto;
         position: relative;
         box-sizing: border-box;
+        align-items: stretch;
+        gap: var(--snowui-dialog-gap-override, var(--snowui-dialog-gap));
+        --snowui-dialog-gap: var(--gap-4);
+        --snowui-dialog-title-font-size: var(--text-18);
+        --snowui-dialog-title-line-height: var(--leading-18);
+        --snowui-dialog-close-size: calc(var(--size-6) + var(--size-3));
+        --snowui-dialog-close-icon-size: var(--size-5);
+        --snowui-dialog-close-offset: var(--padding-4);
+        --snowui-dialog-footer-gap: var(--gap-3);
         transform-origin: center;
         will-change: transform, opacity;
         font-size: var(--snowui-dialog-font-size-override, var(--text-14));
@@ -382,8 +516,8 @@
             --snowui-dialog-max-width-override,
             28rem
         );
-        --snowui-dialog-padding: var(--padding-6);
-        --snowui-dialog-radius: calc(var(--radius-4) * 2);
+        --snowui-dialog-padding: var(--padding-5);
+        --snowui-dialog-radius: var(--radius-6);
         padding: var(
             --snowui-dialog-padding-override,
             var(--snowui-dialog-padding)
@@ -410,7 +544,13 @@
             20rem
         );
         --snowui-dialog-padding: var(--padding-4);
-        --snowui-dialog-radius: var(--radius-6);
+        --snowui-dialog-radius: var(--radius-5);
+        --snowui-dialog-gap: var(--gap-3);
+        --snowui-dialog-title-font-size: var(--text-16);
+        --snowui-dialog-title-line-height: var(--leading-16);
+        --snowui-dialog-close-size: var(--size-6);
+        --snowui-dialog-close-icon-size: var(--size-4);
+        --snowui-dialog-footer-gap: var(--gap-2);
     }
 
     :global(:where(.snowui-dialog[data-size="lg"])) {
@@ -419,6 +559,101 @@
             40rem
         );
         --snowui-dialog-padding: var(--padding-6);
-        --snowui-dialog-radius: calc(var(--radius-4) * 2);
+        --snowui-dialog-radius: var(--radius-7);
+        --snowui-dialog-gap: var(--gap-5);
+        --snowui-dialog-close-offset: var(--padding-5);
+    }
+    :global(:where(.snowui-dialog-title, .snowui-dialog > [data-as="title"], .snowui-dialog > .snowui-dialog-content > [data-as="title"])) {
+        order: -3;
+        margin: 0;
+        min-width: 0;
+        padding-inline: var(--snowui-dialog-text-padding-override, var(--padding-1));
+        font-size: var(--snowui-dialog-title-font-size);
+        line-height: var(--snowui-dialog-title-line-height);
+        font-weight: 600;
+        color: var(--black-100, #000);
+        overflow-wrap: anywhere;
+    }
+
+    :global(:where(.snowui-dialog-title-with-close, .snowui-dialog[data-has-close="true"] > [data-as="title"], .snowui-dialog[data-has-close="true"] > .snowui-dialog-content > [data-as="title"])) {
+        padding-right: calc(var(--snowui-dialog-close-size) + var(--padding-1));
+    }
+
+    :global(:where(.snowui-dialog-content)) {
+        position: static;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        flex: 0 0 auto;
+        gap: var(--snowui-dialog-content-gap-override, var(--gap-2));
+        padding-inline: var(--snowui-dialog-text-padding-override, var(--padding-1));
+        font-size: inherit;
+        line-height: inherit;
+        overflow-wrap: anywhere;
+    }
+
+    :global(:where(.snowui-dialog-content[data-close-space="true"])) {
+        padding-top: calc(var(--snowui-dialog-close-size) + var(--padding-2));
+    }
+
+    :global(:where(.snowui-dialog > [data-as="close"], .snowui-dialog > .snowui-dialog-content > [data-as="close"])) {
+        position: absolute;
+        z-index: 1;
+        top: var(--pin-offset-y, var(--pin-offset, var(--snowui-dialog-close-offset)));
+        right: var(--pin-offset-x, var(--pin-offset, var(--snowui-dialog-close-offset)));
+    }
+
+    :global(:where(.snowui-dialog-content[data-has-footer="true"])) {
+        gap: var(--snowui-dialog-gap-override, var(--snowui-dialog-gap));
+    }
+
+    :global(:where(.snowui-dialog > [data-as="footer"], .snowui-dialog > .snowui-dialog-content > [data-as="footer"])) {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        align-items: center;
+        gap: var(--snowui-dialog-footer-gap-override, var(--snowui-dialog-footer-gap));
+        min-width: 0;
+        order: 1;
+    }
+
+    :global(:where(.snowui-dialog > [data-as="footer"] ~ [data-as="footer"], .snowui-dialog > .snowui-dialog-content > [data-as="footer"] ~ [data-as="footer"])) {
+        display: none;
+    }
+
+    :global(:where(.snowui-dialog-content[data-structured="true"])) {
+        display: contents;
+    }
+
+    :global(:where(.snowui-dialog-separator, .snowui-dialog > [data-as="separator"], .snowui-dialog > .snowui-dialog-content > [data-as="separator"])) {
+        order: -2;
+    }
+
+    :global(:where(.snowui-dialog > [data-as="content"], .snowui-dialog > .snowui-dialog-content > [data-as="content"])) {
+        display: flex;
+        flex-direction: column;
+        gap: var(--snowui-dialog-content-gap-override, var(--gap-2));
+        padding-inline: var(--snowui-dialog-text-padding-override, var(--padding-1));
+        font-size: inherit;
+        line-height: inherit;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    :global(:where(.snowui-dialog > [data-as="title"] ~ [data-as="title"], .snowui-dialog > .snowui-dialog-content > [data-as="title"] ~ [data-as="title"],
+        .snowui-dialog > [data-as="separator"] ~ [data-as="separator"], .snowui-dialog > .snowui-dialog-content > [data-as="separator"] ~ [data-as="separator"],
+        .snowui-dialog > [data-as="content"] ~ [data-as="content"], .snowui-dialog > .snowui-dialog-content > [data-as="content"] ~ [data-as="content"])) {
+        display: none;
+    }
+
+    :global(:where(.snowui-dialog-close)) {
+        --snowui-button-opacity-override: 0.4;
+    }
+    :global(:where(.snowui-dialog-close:hover, .snowui-dialog-close:focus-visible)) {
+        --snowui-button-opacity-override: 1;
+    }
+    :global(:where(.snowui-dialog-content > [data-as="close"] ~ [data-as="close"], .snowui-dialog > [data-as="close"]:not([data-dialog-builtin-close]) ~ [data-as="close"]:not([data-dialog-builtin-close]))) {
+        display: none;
     }
 </style>

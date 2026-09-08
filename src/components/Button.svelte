@@ -168,7 +168,10 @@
   const resolvedSize = $derived.by(() => {
     if (size) return size;
     if (isButtonGroupEmbedded && buttonGroupCtx?.size) return buttonGroupCtx.size;
-    if (as === "item" && buttonSizeCtx?.present) return buttonSizeCtx.size;
+    if (as === "item" && buttonSizeCtx?.present) {
+      const inheritedSize = buttonSizeCtx.resolveSize ? buttonSizeCtx.resolveSize(buttonElement) : buttonSizeCtx.size;
+      if (inheritedSize) return inheritedSize;
+    }
     if (contextSize === undefined) return "sm";
     if (typeof contextSize === "number") {
       if (contextSize <= 16) return "sm";

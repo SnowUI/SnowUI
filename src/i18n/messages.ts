@@ -15,7 +15,8 @@ export type SnowUIMessageKey =
     | "sidePanel.delete"
     | "sidePanel.cancel"
     | "sidePanel.save"
-    | "sidePanel.close";
+    | "sidePanel.close"
+    | "dialog.close";
 
 export type SnowUIMessageValues = Record<string, string | number>;
 export type SnowUIMessageOverrides = Partial<Record<SnowUIMessageKey, string>>;
@@ -38,6 +39,7 @@ export const SNOWUI_MESSAGES: Record<
         "sidePanel.cancel": "取消",
         "sidePanel.save": "保存",
         "sidePanel.close": "关闭",
+        "dialog.close": "关闭",
     },
     "en-US": {
         "colorSchemeButton.toLight": "Switch to light color scheme",
@@ -53,5 +55,6 @@ export const SNOWUI_MESSAGES: Record<
         "sidePanel.cancel": "Cancel",
         "sidePanel.save": "Save",
         "sidePanel.close": "Close",
+        "dialog.close": "Close",
     },
 };
