@@ -60,14 +60,14 @@
     registerTextMotionCharacterElement();
 
     const FLOW_TEXT_LAYOUT_TRANSITION: TextMotionTransition = {
-        duration: 900,
+        duration: 550,
         easing: "linear(0,.005,.019,.039,.066,.096,.129,.165,.202,.24,.278,.316,.354,.39,.426,.461,.494,.526,.557,.586,.614,.64,.665,.689,.711,.731,.751,.769,.786,.802,.817,.831,.844,.856,.867,.877,.887,.896,.904,.912,.919,.925,.931,.937,.942,.947,.951,.955,.959,.962,.965,.968,.971,.973,.976,.978,.98,.981,.983,.984,.986,.987,.988,.989,.99,.991,.992,.992,.993,.994,.994,.995,.995,.996,.996,.9963,.9967,.9969,.9972,.9975,.9977,.9979,.9981,.9982,.9984,.9985,.9987,.9988,.9989,1)",
     };
-    const FLOW_TEXT_MOTION_DURATION = 900;
-    const FLOW_TEXT_OPACITY_DURATION = 450;
+    const FLOW_TEXT_MOTION_DURATION = 550;
+    const FLOW_TEXT_OPACITY_DURATION = 275;
     const FLOW_TEXT_DEFORM_DURATION = 100;
     const FLOW_TEXT_DEFORM_EASING = "linear";
-    const FLOW_TEXT_STAGGER = 25;
+    const FLOW_TEXT_SIGN_EXIT_DELAY = 25;
     const FLOW_TEXT_EDGE_SCALE_Y = 1;
     const FLOW_TEXT_CHARACTER_GLYPH_CLASS = "snowui-flow-text-character-glyph";
     const FLOW_TEXT_CHARACTER_SOURCE_CLASS =
@@ -257,7 +257,8 @@
     const flowTextDeformEasing = $derived(
         transition?.deformEasing ?? FLOW_TEXT_DEFORM_EASING,
     );
-    const flowTextStagger = $derived(transition?.stagger ?? FLOW_TEXT_STAGGER);
+    // 未覆盖时由共享字符运行时按 NumericText 的比例计算逐位延迟。
+    const flowTextStagger = $derived(transition?.stagger);
 
     let hasMounted = false;
     let previousDisplayValue = "";
@@ -649,10 +650,8 @@
             const digitElement = document.createElement("span");
             digitElement.className = FLOW_TEXT_WHEEL_DIGIT_CLASS;
             digitElement.textContent = String(digit);
-            digitElement.setAttribute(
-                "aria-hidden",
-                String(digit !== activeDigit),
-            );
+            // 首次由 updateWheelDigitActiveState 同时初始化语义与定位，
+            // 不能预设 aria-hidden 而误触发“状态未变”的快速返回。
             digitElement.style.display = "inline-flex";
             digitElement.style.alignItems = "center";
             digitElement.style.justifyContent = "center";
@@ -861,10 +860,22 @@
             const preferredSign = getPreferredWheelSign(currentTrend);
             const stored = flowTextWheelStates.get(element);
             const state = stored?.currentLength === length ? stored : undefined;
-            const axisDirection = state?.axisDirection ?? resolveWheelAxisDirection(previousValue, nextValue, preferredSign);
-            const axisOffset = state?.axisOffset ?? 0;
-            const axisNextNumber = state?.previousRawValue ?? previousNumber;
+            const reusableWheel = getReusableFlowTextWheel(glyph, length);
+            const requestedAxisDirection = resolveWheelAxisDirection(previousValue, nextValue, preferredSign);
+            let axisDirection = state?.axisDirection ?? requestedAxisDirection;
+            let axisOffset = state?.axisOffset ?? 0;
+            // 零在正负轴上是同一个锚点；首次从零减小也应直接进入负轴。
+            let axisNextNumber = state?.previousRawValue ?? (previousDigit === 0 ? nextNumber : previousNumber);
             const currentTrackValue = state?.currentWheelValue ?? mapFlowTextDigitAxis(previousDigit, length, axisNextNumber, axisDirection, axisOffset);
+            const switchesZeroAxis = previousDigit === 0 && ((axisNextNumber ?? 0) < 0) !== ((nextNumber ?? 0) < 0);
+            const switchesDirection = axisDirection !== requestedAxisDirection;
+            if (state && reusableWheel && (switchesZeroAxis || switchesDirection) &&
+                !reusableWheel.getAnimations().some(animation => animation.playState === "running" || animation.playState === "paused")) {
+                // 静止时只重排不可见数字，并保留中心字符的位置。播放中的轨道继续重定向。
+                axisDirection = requestedAxisDirection;
+                axisNextNumber = nextNumber;
+                axisOffset = modBy(currentTrackValue - mapFlowTextDigitAxis(previousDigit, length, axisNextNumber, axisDirection), length);
+            }
             const targetAxisValue = mapFlowTextDigitAxis(nextDigit, length, axisNextNumber, axisDirection, axisOffset);
             const preservesCurrentDigit = state?.currentDigit === nextDigit;
             const targetWheelValue = preservesCurrentDigit ? currentTrackValue : resolveTargetWheelValue(currentTrackValue, targetAxisValue, length, preferredSign);
@@ -873,7 +884,6 @@
                 currentLength: length, previousRawValue: axisNextNumber ?? null,
                 axisDirection, axisOffset,
             });
-            const reusableWheel = getReusableFlowTextWheel(glyph, length);
             const wheel = reusableWheel ?? document.createElement("span");
             if (!reusableWheel) {
                 wheel.className = FLOW_TEXT_WHEEL_CLASS;
@@ -1101,7 +1111,7 @@
                 /^\d$/.test(label) &&
                 crossesNegativeToNonNegative(previousNumber, nextNumber);
             const motionDelay = waitsForNegativeSignExit
-                ? delay + FLOW_TEXT_STAGGER
+                ? delay + FLOW_TEXT_SIGN_EXIT_DELAY
                 : delay;
             const allowsNumericWheel =
                 motionRole === "number" ||
