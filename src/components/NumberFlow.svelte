@@ -8,7 +8,7 @@
     - 位移平滑: 位数字增减时仅做平移动画，避免 scale 导致字形变宽。
     - 格式化支持: 完整支持 Intl.NumberFormat 格式化。
     - 属性透传: 支持自定义样式、字体大小与权重。
-    - 方向约束: 新位数字统一从左下方进场，退场反向退出到左下方。
+    - 进退场: 新数位从零滚入、旧数位滚回零并渐隐；负号沿滚动方向位移进退场。
     - 依次编排: 位数增减时按位依次滚动进场 / 依次退场。
     - 滚动方向可配: 支持通过 rollDirection 配置 normal / reverse 语义方向。
     - 常规组件模式: 通过 numberPosition 控制数字在内容左侧或右侧，无需 layout snippet。
@@ -16,10 +16,9 @@
  -->
 
 <script lang="ts">
-    import { fly } from "svelte/transition";
-    import type { AnimationConfig } from "svelte/animate";
+    import type { TransitionConfig } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
-    import type { Snippet } from "svelte";
+    import { untrack, type Snippet } from "svelte";
     import type {
         FrameProps,
         RenderHints,
@@ -50,6 +49,7 @@
         createTextMotionTypographyStyle,
         resolveTextMotionColor,
     } from "../lib/text-motion/typography";
+    import { getTextMotionStagger } from "../lib/text-motion/sequence";
     import FramePro from "./FramePro.svelte";
 
     type TrendResolver = TextMotionTrend;
@@ -143,10 +143,12 @@
         order?: number;
         enterOrder?: number;
         exitOrder?: number;
+        staggerValues?: string[];
         pos?: number;
     }
 
-    let currentParts = $derived(formatToParts(value, locales, format));
+    const numberFormatter = $derived(new Intl.NumberFormat(locales, format));
+    let currentParts = $derived(formatToParts(value, numberFormatter));
     const displayText = $derived(
         currentParts.map((part) => part.value).join(""),
     );
@@ -166,8 +168,6 @@
     let measuredContentWidth = $state<number | null>(null);
     let trackWidth = $state<number | null>(null);
     let previousNumericValue = $state<number | null>(null);
-    let fromNumericValue = $state<number | null>(null);
-    let toNumericValue = $state<number | null>(null);
     let numericDiff = $state(0);
     let trendSign = $state<-1 | 0 | 1>(0);
     const widthMotionDuration = $derived(
@@ -181,18 +181,13 @@
     let widthTransitionDurationMs = $state(
         resolveInitialWidthMotionDuration(),
     );
-    let isRapidCalculation = $state(false);
-    let lastNumericChangeAt = 0;
-    let rapidCalculationTimer: ReturnType<typeof setTimeout> | null = null;
 
     // 格式化数字并生成带 Key 的部分
     function formatToParts(
         val: number | string,
-        loc: string,
-        opt: Intl.NumberFormatOptions,
+        formatter: Intl.NumberFormat,
     ): KeyedPart[] {
         const num = extractTextMotionNumber(String(val)) ?? 0;
-        const formatter = new Intl.NumberFormat(loc, opt);
         const parts = formatter.formatToParts(num);
 
         let integerParts: KeyedPart[] = [];
@@ -263,32 +258,21 @@
 
         const merged = [...integerParts, ...fractionParts];
         const total = merged.length;
+        const staggerValues = merged.map((part) => part.value);
         return merged.map((part, index) => ({
             ...part,
             order: index,
             enterOrder: total - 1 - index, // 进场：右侧优先
-            exitOrder: index, // 退场：左侧优先
+            exitOrder: total - 1 - index, // 退场同样从低位到高位
+            staggerValues,
         }));
     }
 
-    const DIGIT_ENTER_X = -12;
-    const DIGIT_ENTER_Y = $derived(
-        getFlyOffsetYForTrend(
-            getEnterExitTrendSign(trendSign, numericDiff),
-            rollDirection,
-        ),
-    );
-    const DIGIT_STAGGER_MS = 55;
-    const RAPID_DIGIT_TRANSITION_MS = 220;
-    const DIGIT_EXIT_STAGGER_MS = $derived(
-        Math.max(120, Math.round(duration * 0.2)),
-    );
-    const digitTransitionDuration = $derived(getDigitTransitionDuration());
     const digitsModulo = $derived.by(() => getDigitsModulo());
     type RollDirection = "normal" | "reverse";
-    const WHEEL_OUTRO_DURATION_MS = 140;
     const WHEEL_DEFAULT_MAX = 9;
     const WHEEL_VALUE_VAR = "--snowui-number-flow-wheel-v";
+    const WIDTH_DELTA_VAR = "--snowui-number-flow-width-delta";
     const WHEEL_DURATION_VAR = "--snowui-number-flow-wheel-duration";
     const WHEEL_DELAY_VAR = "--snowui-number-flow-wheel-delay";
     const WHEEL_EASING_VAR = "--snowui-number-flow-wheel-easing";
@@ -296,69 +280,223 @@
         "linear(0,.005,.019,.039,.066,.096,.129,.165,.202,.24,.278,.316,.354,.39,.426,.461,.494,.526,.557,.586,.614,.64,.665,.689,.711,.731,.751,.769,.786,.802,.817,.831,.844,.856,.867,.877,.887,.896,.904,.912,.919,.925,.931,.937,.942,.947,.951,.955,.959,.962,.965,.968,.971,.973,.976,.978,.98,.981,.983,.984,.986,.987,.988,.989,.99,.991,.992,.992,.993,.994,.994,.995,.995,.996,.996,.9963,.9967,.9969,.9972,.9975,.9977,.9979,.9981,.9982,.9984,.9985,.9987,.9988,.9989,1)";
     let wheelTransitionSupport: boolean | null = null;
 
-    // 只做位移，不做缩放，避免位数变化时字形拉伸
-    function translateOnly(
-        _node: Element,
-        {
-            from,
-            to,
-        }: {
-            from: DOMRect;
-            to: DOMRect;
-        },
-        params: { duration?: number } = {},
-    ): AnimationConfig {
-        const dx = from.left - to.left;
-        const dy = from.top - to.top;
+    const partPositions = new WeakMap<HTMLElement, { layoutLeft: number; layoutTop: number }>();
+    let layoutSnapshotPending = false;
 
-        if (dx === 0 && dy === 0) {
-            return { duration: 0 };
+    $effect.pre(() => {
+        currentParts;
+        if (!motionElement || layoutSnapshotPending) return;
+        layoutSnapshotPending = true;
+        // 一帧内只记录最初的布局；后续输入不能用尚未补偿的中间布局覆盖它。
+        for (const track of managedTracks) {
+            partPositions.set(track, {
+                layoutLeft: track.offsetLeft,
+                layoutTop: track.offsetTop,
+            });
         }
+    });
 
+    const exitingTracks = new Set<HTMLElement>();
+    const managedTracks = new Set<HTMLElement>();
+    const layoutAnimations = new WeakMap<HTMLElement, Set<Animation>>();
+    const layoutEasing = `linear(${Array.from({ length: 61 }, (_, i) => cubicOut(i / 60).toFixed(6)).join(",")})`;
+    let layoutFrame: number | null = null;
+
+    function schedulePartLayout() {
+        if (layoutFrame !== null) return;
+        layoutFrame = requestAnimationFrame(() => {
+            layoutFrame = null;
+            if (!motionElement) return;
+            updateContentWidth();
+            if (!layoutSnapshotPending) return;
+            layoutSnapshotPending = false;
+            // 先批量读取，再写退出位置和启动动画，避免逐位交错读写导致重复布局。
+            const positions = new Map<HTMLElement, { layoutLeft: number; layoutTop: number }>();
+            let anchor: HTMLElement | undefined;
+            for (const track of managedTracks) {
+                positions.set(track, { layoutLeft: track.offsetLeft, layoutTop: track.offsetTop });
+                if (track.dataset.type === "integer" && !exitingTracks.has(track)) {
+                    if (!anchor || positions.get(track)!.layoutLeft > positions.get(anchor)!.layoutLeft) anchor = track;
+                }
+            }
+            const anchorBefore = anchor && partPositions.get(anchor);
+            const anchorDelta = anchor && anchorBefore
+                ? positions.get(anchor)!.layoutLeft - anchorBefore.layoutLeft
+                : 0;
+            for (const [track, next] of positions) {
+                const previous = partPositions.get(track);
+                partPositions.delete(track);
+                if (!previous) continue;
+                if (exitingTracks.has(track)) {
+                    next.layoutLeft = previous.layoutLeft + anchorDelta;
+                    track.style.left = `${next.layoutLeft}px`;
+                }
+                const dx = previous.layoutLeft - next.layoutLeft;
+                const dy = previous.layoutTop - next.layoutTop;
+                if ((dx === 0 && dy === 0) || duration === 0) continue;
+                // FLIP 仅处理组件内部排列，外层宽度有独立轨道；保留旧位移并叠加本次差值。
+                const animation = track.animate(
+                    { transform: [`translate(${dx}px, ${dy}px)`, "translate(0px, 0px)"] },
+                    { duration, easing: layoutEasing, composite: "accumulate", fill: "both" },
+                );
+                let animations = layoutAnimations.get(track);
+                if (!animations) {
+                    animations = new Set();
+                    layoutAnimations.set(track, animations);
+                }
+                animations.add(animation);
+                animation.finished.then(() => {
+                    if (layoutAnimations.get(track) !== animations) return;
+                    animations.delete(animation);
+                    animation.cancel();
+                    if (animations.size === 0) layoutAnimations.delete(track);
+                }).catch(() => {});
+            }
+        });
+    }
+
+    $effect(() => {
+        currentParts;
+        if (motionElement) schedulePartLayout();
+    });
+
+    function clearPartLayout(track: HTMLElement) {
+        exitingTracks.delete(track);
+        managedTracks.delete(track);
+        partPositions.delete(track);
+        layoutAnimations.get(track)?.forEach(animation => animation.cancel());
+        layoutAnimations.delete(track);
+        if (managedTracks.size === 0 && layoutFrame !== null) {
+            cancelAnimationFrame(layoutFrame);
+            layoutFrame = null;
+        }
+        if (managedTracks.size === 0) layoutSnapshotPending = false;
+    }
+
+    const wheelPresence = new WeakMap<HTMLElement, {
+        exit: () => void;
+        resume: () => void;
+    }>();
+
+    interface PartPresenceOptions {
+        delay: number;
+        duration: number;
+    }
+
+    const presenceAnimations = new WeakMap<HTMLElement, Animation>();
+    const signMotions = new WeakMap<HTMLElement, {
+        target: number;
+        animations: Set<Animation>;
+    }>();
+
+    function animateSignPresence(node: HTMLElement, options: PartPresenceOptions, entering: boolean) {
+        if (node.parentElement?.dataset.type !== "minusSign") return;
+        const sign = getPreferredWheelSign(rollDirection, getEnterExitTrendSign(trendSign, numericDiff));
+        const target = entering ? 0 : -sign;
+        let motion = signMotions.get(node);
+        if (!motion) {
+            motion = { target: entering ? sign : 0, animations: new Set() };
+            signMotions.set(node, motion);
+        }
+        const delta = motion.target - target;
+        motion.target = target;
+        node.style.transform = `translateY(${target}em)`;
+        if (options.duration === 0) {
+            motion.animations.forEach(animation => animation.cancel());
+            motion.animations.clear();
+            return;
+        }
+        if (delta === 0) return;
+        // 与数字滚轮共用 1em 步长和缓动；旧位移继续收敛，反向进退场只追加目标差值。
+        const animation = node.animate(
+            { transform: [`translateY(${delta}em)`, "translateY(0em)"] },
+            { duration: options.duration, easing: WHEEL_SPIN_EASING, composite: "accumulate", fill: "both" },
+        );
+        motion.animations.add(animation);
+        animation.finished.then(() => {
+            motion.animations.delete(animation);
+            animation.cancel();
+        }).catch(() => {});
+    }
+
+    function managePartPresence(node: HTMLElement) {
+        const track = node.parentElement;
+        if (track) managedTracks.add(track);
         return {
-            duration: params.duration ?? getDigitTransitionDuration(),
-            easing: cubicOut,
-            css: (_t, u) => `transform: translate(${u * dx}px, ${u * dy}px);`,
+            destroy() {
+                if (track) clearPartLayout(track);
+                presenceAnimations.get(node)?.cancel();
+                presenceAnimations.delete(node);
+                signMotions.get(node)?.animations.forEach(animation => animation.cancel());
+                signMotions.delete(node);
+            },
         };
     }
 
-    function getEnterDelay(order?: number) {
-        if (reduceMotion) return 0;
-        if (isRapidCalculation) return 0;
-        return Math.max(0, order ?? 0) * DIGIT_STAGGER_MS;
-    }
-
-    function getExitDelay(order?: number) {
-        if (reduceMotion) return 0;
-        if (isRapidCalculation) return 0;
-        return Math.max(0, order ?? 0) * DIGIT_EXIT_STAGGER_MS;
-    }
-
-    function getDigitTransitionDuration() {
-        return isRapidCalculation
-            ? Math.min(RAPID_DIGIT_TRANSITION_MS, duration)
-            : duration;
-    }
-
-    function markNumericChange() {
-        const now =
-            typeof performance !== "undefined" ? performance.now() : Date.now();
-        const rapidWindow = Math.max(160, duration);
-        isRapidCalculation =
-            lastNumericChangeAt > 0 && now - lastNumericChangeAt < rapidWindow;
-        lastNumericChangeAt = now;
-
-        if (rapidCalculationTimer !== null) {
-            clearTimeout(rapidCalculationTimer);
-            rapidCalculationTimer = null;
+    function partPresence(
+        node: HTMLElement,
+        options: PartPresenceOptions,
+        entering: boolean,
+    ): TransitionConfig {
+        animateSignPresence(node, options, entering);
+        // 数位滚动与 opacity 独立；重新出现时从当前透明度接管，避免先闪回 0 或 1。
+        const previous = presenceAnimations.get(node);
+        const opacity = previous || !entering
+            ? Number(getComputedStyle(node).opacity)
+            : 0;
+        previous?.cancel();
+        presenceAnimations.delete(node);
+        node.style.opacity = entering ? "1" : "0";
+        if (options.duration > 0) {
+            const animation = node.animate(
+                { opacity: [opacity, entering ? 1 : 0] },
+                { duration: options.duration / 2, delay: options.delay, easing: "ease-out", fill: "both" },
+            );
+            presenceAnimations.set(node, animation);
+            animation.finished.then(() => {
+                if (presenceAnimations.get(node) !== animation) return;
+                presenceAnimations.delete(node);
+                animation.cancel();
+            }).catch(() => {});
         }
+        // Svelte 只负责完整滚轮时长内的节点保留与清理，不再叠加斜向飞入 / 飞出。
+        return options;
+    }
 
-        if (isRapidCalculation) {
-            rapidCalculationTimer = setTimeout(() => {
-                isRapidCalculation = false;
-                rapidCalculationTimer = null;
-            }, Math.min(duration, RAPID_DIGIT_TRANSITION_MS) + 80);
+    function enterPart(node: HTMLElement, options: PartPresenceOptions) {
+        const track = node.parentElement;
+        if (track) {
+            exitingTracks.delete(track);
+            track.style.position = "";
+            track.style.left = "";
+            track.style.top = "";
+            track.removeAttribute("inert");
         }
+        const wheel = node.querySelector<HTMLElement>(".snowui-number-flow-wheel");
+        if (wheel) wheelPresence.get(wheel)?.resume();
+        return partPresence(node, options, true);
+    }
+
+    function exitPart(node: HTMLElement, options: PartPresenceOptions) {
+        const track = node.parentElement;
+        const position = track && (partPositions.get(track) ?? {
+            layoutLeft: track.offsetLeft, layoutTop: track.offsetTop,
+        });
+        if (track && position) {
+            track.style.position = "absolute";
+            track.style.left = `${position.layoutLeft}px`;
+            track.style.top = `${position.layoutTop}px`;
+            track.setAttribute("inert", "");
+            exitingTracks.add(track);
+            schedulePartLayout();
+        }
+        return partPresence(node, options, false);
+    }
+
+    function getPartDelay(order?: number, values: string[] = []) {
+        if (reduceMotion) return 0;
+        // 与 NumericText 共用错峰比例；快速更新仍保留数位启动顺序。
+        return Math.max(0, order ?? 0) * getTextMotionStagger(duration, values);
     }
 
     function toCssEasing(easing: string | undefined) {
@@ -375,16 +513,15 @@
 
     function updateContentWidth() {
         if (!contentMeasureElement) return;
-        const nextWidth = Math.ceil(contentMeasureElement.scrollWidth);
+        // 保留小数像素，不把根 Frame 的外层缩放算进排版宽度。
+        const nextWidth = Number.parseFloat(getComputedStyle(contentMeasureElement).width);
         if (!Number.isFinite(nextWidth) || nextWidth <= 0) return;
         if (nextWidth === measuredContentWidth) return;
         measuredContentWidth = nextWidth;
     }
 
     function scheduleWidthSync() {
-        requestAnimationFrame(() => {
-            updateContentWidth();
-        });
+        schedulePartLayout();
     }
 
     function normalizeWheelLength(length: number | undefined) {
@@ -473,16 +610,6 @@
         return 0 as const;
     }
 
-    function getVisualRollDirection(
-        sign: -1 | 0 | 1,
-        direction: RollDirection,
-    ): "up" | "down" {
-        if (sign < 0) {
-            return direction === "normal" ? "down" : "up";
-        }
-        return direction === "normal" ? "up" : "down";
-    }
-
     function getWheelCssDirection(
         _sign: -1 | 0 | 1,
         _direction: RollDirection,
@@ -490,10 +617,6 @@
         // 滚轮方向由连续轨道值的增减决定；数字轴本身保持正向，
         // 避免“轨道反向 + CSS 反向”互相抵消。
         return "1";
-    }
-
-    function getFlyOffsetYForTrend(sign: -1 | 0 | 1, direction: RollDirection) {
-        return getVisualRollDirection(sign, direction) === "down" ? -12 : 12;
     }
 
     function getEnterExitTrendSign(sign: -1 | 0 | 1, diff: number) {
@@ -540,6 +663,9 @@
         length: number,
         preferredSign: -1 | 0 | 1,
     ) {
+        // 新指令可能撤销尚未启动的错峰任务；已经位于目标时不能强制绕一整圈。
+        const distance = modBy(currentTrackValue - targetDigit, length);
+        if (Math.min(distance, length - distance) < 0.0001) return currentTrackValue;
         const baseCycle = Math.round((currentTrackValue - targetDigit) / length);
         const candidates = [
             targetDigit + (baseCycle - 2) * length,
@@ -580,15 +706,12 @@
             return wheelTransitionSupport;
         }
 
-        try {
-            CSS.registerProperty({
-                name: WHEEL_VALUE_VAR,
-                syntax: "<number>",
-                inherits: true,
-                initialValue: "0",
-            });
-        } catch {
-            // 已注册或当前环境不支持时忽略
+        for (const name of [WHEEL_VALUE_VAR, WIDTH_DELTA_VAR]) {
+            try {
+                CSS.registerProperty({ name, syntax: "<number>", inherits: name === WHEEL_VALUE_VAR, initialValue: "0" });
+            } catch {
+                // 同一属性只需注册一次，其他 NumberFlow 实例继续复用。
+            }
         }
 
         try {
@@ -616,85 +739,71 @@
         node.style.setProperty(WHEEL_EASING_VAR, WHEEL_SPIN_EASING);
     }
 
+    const wheelAnimations = new WeakMap<HTMLElement, Set<Animation>>();
+    const wheelSettled = new WeakMap<HTMLElement, () => void>();
+
+    function cancelWheelAnimations(node: HTMLElement) {
+        const animations = wheelAnimations.get(node);
+        wheelAnimations.delete(node);
+        animations?.forEach(animation => animation.cancel());
+    }
+
     function jumpWheelValue(node: HTMLElement, value: number) {
-        node.classList.add("snowui-number-flow-wheel-no-transition");
+        cancelWheelAnimations(node);
         node.style.setProperty(WHEEL_VALUE_VAR, String(value));
-        node.offsetHeight;
     }
 
     function animateWheelValue(
         node: HTMLElement,
         value: number,
-        options: {
-            duration: number;
-            delay?: number;
-        },
+        options: { duration: number; delay?: number },
     ) {
-        if (!supportsWheelTransitionAnimation()) {
+        if (options.duration === 0 || !supportsWheelTransitionAnimation()) {
             jumpWheelValue(node, value);
             return;
         }
-
+        const previousTarget = Number(node.style.getPropertyValue(WHEEL_VALUE_VAR));
         setWheelMotionVars(node, options);
-        if (
-            node.classList.contains(
-                "snowui-number-flow-wheel-no-transition",
-            )
-        ) {
-            node.classList.remove("snowui-number-flow-wheel-no-transition");
-            node.offsetHeight;
-        }
         node.style.setProperty(WHEEL_VALUE_VAR, String(value));
+        const delta = previousTarget - value;
+        if (delta === 0) return;
+
+        // 保留旧动画的残余位移，新动画只补上本次目标差值。
+        // delay 期间旧轨道仍继续运动，不因连续点击重新等待或从零速度起步。
+        const animation = node.animate(
+            { [WHEEL_VALUE_VAR]: [delta, 0] },
+            {
+                ...options,
+                easing: WHEEL_SPIN_EASING,
+                composite: "accumulate",
+                fill: "both",
+            },
+        );
+        let animations = wheelAnimations.get(node);
+        if (!animations) {
+            animations = new Set();
+            wheelAnimations.set(node, animations);
+        }
+        animations.add(animation);
+        animation.finished.then(() => {
+            if (wheelAnimations.get(node) !== animations) return;
+            animations.delete(animation);
+            animation.cancel();
+            if (animations.size === 0) {
+                wheelAnimations.delete(node);
+                wheelSettled.get(node)?.();
+            }
+        }).catch(() => {});
     }
 
-    // 退场时给一个微小的 delta 动画让数字滚出视口
-    function handlePartOutroStart(event: Event, part: KeyedPart) {
-        scheduleWidthSync();
-
-        if (part.type !== "integer" && part.type !== "fraction") return;
-
-        const node = event.currentTarget as HTMLElement | null;
-        const wheel = node?.querySelector(
-            ".snowui-number-flow-wheel",
-        ) as HTMLElement | null;
-        if (!wheel) return;
-
-        const partLength = getPartDigitLength(part);
-        const digit = parseWheelDigit(part.value, partLength);
-        if (digit === null) return;
-
-        const axisDirection = getRollAxisDirection(rollDirection);
-        const axisValue = mapNumberFlowDigitAxis(
-            digit,
-            partLength,
-            fromNumericValue,
-            axisDirection,
-        );
-        const effectiveSign = getEnterExitTrendSign(trendSign, numericDiff);
-        const preferredSign = getPreferredWheelSign(rollDirection, effectiveSign);
-        if (preferredSign === 0) return;
-
-        // 退出时向最终视觉方向滚动一小步。
-        const delta = preferredSign > 0 ? 1 : -1;
-
-        jumpWheelValue(wheel, axisValue);
-        wheel.style.setProperty(
-            "--snowui-number-flow-dir",
-            getWheelCssDirection(effectiveSign || 1, rollDirection),
-        );
-        requestAnimationFrame(() => {
-            animateWheelValue(wheel, axisValue + delta, {
-                duration: reduceMotion ? 0 : WHEEL_OUTRO_DURATION_MS,
-            });
-        });
-    }
-
-    function handlePartOutroEnd(_event: Event) {
-        scheduleWidthSync();
+    function handlePartOutroStart(event: Event) {
+        const node = event.currentTarget as HTMLElement;
+        const wheel = node.querySelector<HTMLElement>(".snowui-number-flow-wheel");
+        if (wheel) wheelPresence.get(wheel)?.exit();
     }
 
     // 无限序列轨道 rollWheel action
-    // 通过连续的 --wheel-v 轨道值驱动 CSS mod() 圆环滚动。
+    // 通过增量叠加的 --wheel-v 轨道值驱动 CSS mod() 圆环滚动。
     function rollWheel(
         node: HTMLElement,
         params: {
@@ -705,20 +814,44 @@
             trendSign: -1 | 0 | 1;
             length: number;
             pos?: number;
-            fromValue: number | null;
-            toValue: number | null;
             numericDiff: number;
             rawValue: number | string; // 组件的原始 value prop，用于内部追踪趋势
         },
     ) {
+        let latest = params;
+        let exiting = false;
         let currentDigit: number | null = null;
         let currentWheelValue: number | null = null;
         let currentLength = normalizeWheelLength(params.length);
         let currentDirection: RollDirection = params.direction;
-        let scheduledFrame: number | null = null;
         let previousRawValue: number | null = parseNumericValue(
             params.rawValue,
         );
+
+        // 轨道方向属于当前画面，不能随新数值的正负号提前翻转。
+        let axisRawValue = previousRawValue;
+        const syncDigitAxis = () => {
+            for (const digit of node.querySelectorAll<HTMLElement>(".snowui-number-flow-digit")) {
+                digit.style.setProperty("--snowui-number-flow-n", String(mapNumberFlowDigitAxis(
+                    Number(digit.textContent), currentLength, axisRawValue,
+                    getRollAxisDirection(currentDirection),
+                )));
+            }
+        };
+        const settleDigitAxis = () => {
+            if (exiting || currentDigit === null || axisRawValue === previousRawValue) return;
+            const axisChanged = (axisRawValue !== null && axisRawValue < 0) !==
+                (previousRawValue !== null && previousRawValue < 0);
+            axisRawValue = previousRawValue;
+            if (axisChanged) syncDigitAxis();
+            currentWheelValue = mapNumberFlowDigitAxis(
+                currentDigit, currentLength, axisRawValue,
+                getRollAxisDirection(currentDirection),
+            );
+            jumpWheelValue(node, currentWheelValue);
+        };
+        wheelSettled.set(node, settleDigitAxis);
+        syncDigitAxis();
 
         // 初始化 --length 和 --dir（视觉上滚=1, 下滚=-1）
         node.style.setProperty(
@@ -733,26 +866,6 @@
             duration: getWheelSpinDurationMs(1, currentLength),
         });
 
-        const cancelScheduledFrame = () => {
-            if (scheduledFrame === null) return;
-            cancelAnimationFrame(scheduledFrame);
-            scheduledFrame = null;
-        };
-
-        const scheduleWheelValue = (
-            value: number,
-            options: {
-                duration: number;
-                delay?: number;
-            },
-        ) => {
-            cancelScheduledFrame();
-            scheduledFrame = requestAnimationFrame(() => {
-                scheduledFrame = null;
-                animateWheelValue(node, value, options);
-            });
-        };
-
         const apply = (
             next: {
                 value: string;
@@ -762,8 +875,6 @@
                 trendSign: -1 | 0 | 1;
                 length: number;
                 pos?: number;
-                fromValue: number | null;
-                toValue: number | null;
                 numericDiff: number;
                 rawValue: number | string;
             },
@@ -777,7 +888,7 @@
             const targetAxisValue = parseWheelAxisValue(
                 next.value,
                 nextLength,
-                currentRawValue,
+                axisRawValue,
                 axisDirection,
             );
             if (targetAxisValue === null) return;
@@ -789,6 +900,7 @@
             ) {
                 currentLength = nextLength;
                 currentDirection = next.direction;
+                syncDigitAxis();
                 node.style.setProperty(
                     "--snowui-number-flow-length",
                     String(currentLength),
@@ -797,7 +909,6 @@
                     "--snowui-number-flow-dir",
                     getWheelCssDirection(next.trendSign || 1, currentDirection),
                 );
-                cancelScheduledFrame();
                 currentWheelValue = targetAxisValue;
                 jumpWheelValue(node, currentWheelValue);
             }
@@ -809,22 +920,15 @@
             );
 
             if (isMount && next.animateOnMount) {
-                // 首次挂载动画：从前一个 digit 滚到目标
+                // 新数位从零开始，仍由 SnowUI 的正负轴和 normal / reverse 决定上滚或下滚。
                 const mountTrend = next.trendSign === 0 ? 1 : next.trendSign;
-                const mountPreferredSign = getPreferredWheelSign(
-                    next.direction,
-                    mountTrend,
+                currentWheelValue = resolveTargetWheelValue(
+                    0, targetAxisValue, nextLength,
+                    getPreferredWheelSign(next.direction, mountTrend),
                 );
-                const mountDelta = mountPreferredSign > 0 ? 1 : -1;
-                node.style.setProperty(
-                    "--snowui-number-flow-dir",
-                    getWheelCssDirection(mountTrend, next.direction),
-                );
-
-                currentWheelValue = targetAxisValue;
-                jumpWheelValue(node, targetAxisValue - mountDelta);
-                scheduleWheelValue(currentWheelValue, {
-                    duration: getWheelSpinDurationMs(1, nextLength),
+                jumpWheelValue(node, 0);
+                animateWheelValue(node, currentWheelValue, {
+                    duration: getWheelSpinDurationMs(Math.abs(currentWheelValue), nextLength),
                     delay: next.delay,
                 });
                 currentDigit = targetDigit;
@@ -844,13 +948,14 @@
             const currentAxisValue = mapNumberFlowDigitAxis(
                 currentDigit,
                 currentLength,
-                previousRawValue,
+                axisRawValue,
                 axisDirection,
             );
 
             if (currentAxisValue === targetAxisValue) {
                 currentDigit = targetDigit;
                 previousRawValue = currentRawValue;
+                if (!wheelAnimations.get(node)?.size) settleDigitAxis();
                 return;
             }
 
@@ -891,12 +996,8 @@
                 return;
             }
 
-            // 连续轨道值允许 CSS transition 在快速连续更新时从当前插值位置重定向。
-            // 读取当前插值后的轨道值，避免尚未结束的动画在反向更新时绕完整长圈。
-            const currentTrackValue =
-                readWheelTrackValue(node) ??
-                currentWheelValue ??
-                currentAxisValue;
+            // 目标沿逻辑轨道累积；当前画面还包含未完成动画的残余位移。
+            const currentTrackValue = currentWheelValue ?? currentAxisValue;
             currentWheelValue = resolveTargetWheelValue(
                 currentTrackValue,
                 targetAxisValue,
@@ -905,11 +1006,33 @@
             );
             animateWheelValue(node, currentWheelValue, {
                 duration: getWheelSpinDurationMs(Math.abs(delta), nextLength),
+                delay: next.delay,
             });
 
             currentDigit = targetDigit;
+            if (reduceMotion || duration === 0 || !supportsWheelTransitionAnimation()) settleDigitAxis();
         };
 
+        wheelPresence.set(node, {
+            exit() {
+                exiting = true;
+                const current = currentWheelValue ?? readWheelTrackValue(node) ?? 0;
+                const exitTrend = getEnterExitTrendSign(trendSign, numericDiff);
+                currentWheelValue = resolveTargetWheelValue(
+                    current, 0, currentLength,
+                    getPreferredWheelSign(currentDirection, exitTrend),
+                );
+                currentDigit = 0;
+                animateWheelValue(node, currentWheelValue, {
+                    duration: getWheelSpinDurationMs(Math.abs(currentWheelValue - current), currentLength),
+                });
+            },
+            resume() {
+                if (!exiting) return;
+                exiting = false;
+                apply(latest, false);
+            },
+        });
         apply(params, true);
 
         return {
@@ -921,15 +1044,17 @@
                 trendSign: -1 | 0 | 1;
                 length: number;
                 pos?: number;
-                fromValue: number | null;
-                toValue: number | null;
                 numericDiff: number;
                 rawValue: number | string;
             }) {
+                latest = next;
+                exiting = false;
                 apply(next, false);
             },
             destroy() {
-                cancelScheduledFrame();
+                wheelPresence.delete(node);
+                wheelSettled.delete(node);
+                cancelWheelAnimations(node);
             },
         };
     }
@@ -958,20 +1083,16 @@
     });
 
     $effect.pre(() => {
-        const currentNumeric = parseNumericValue(value);
+        const currentNumeric = displayNumericValue;
         if (currentNumeric === null) return;
 
         if (previousNumericValue === null) {
-            fromNumericValue = currentNumeric;
-            toNumericValue = currentNumeric;
             numericDiff = 0;
             trendSign = 0;
             previousNumericValue = currentNumeric;
             return;
         }
 
-        fromNumericValue = previousNumericValue;
-        toNumericValue = currentNumeric;
         numericDiff = currentNumeric - previousNumericValue;
 
         const resolvedTrend = resolveTextMotionTrend(
@@ -989,34 +1110,18 @@
                 motionRole,
             ) ||
             resolvedTrend;
-        markNumericChange();
 
         previousNumericValue = currentNumeric;
     });
 
     $effect(() => {
-        return () => {
-            if (rapidCalculationTimer !== null) {
-                clearTimeout(rapidCalculationTimer);
-                rapidCalculationTimer = null;
-            }
-        };
-    });
-
-    $effect(() => {
         if (!contentMeasureElement) return;
-        updateContentWidth();
-
-        const unwatch = resizeManager.watch(contentMeasureElement, () => {
-            updateContentWidth();
+        untrack(scheduleWidthSync);
+        const unwatch = resizeManager.watch(contentMeasureElement, (entry) => {
+            if (entry.contentRect.width !== measuredContentWidth) scheduleWidthSync();
         });
 
         return () => unwatch();
-    });
-
-    $effect(() => {
-        currentParts;
-        scheduleWidthSync();
     });
 
     // 宽度策略：
@@ -1034,11 +1139,9 @@
         }
 
         const isShrinking = measured < current;
-        widthTransitionDurationMs = isRapidCalculation
-            ? widthMotionDuration
-            : isShrinking
-            ? duration + widthSlowOffset
-            : widthMotionDuration;
+        widthTransitionDurationMs = reduceMotion || duration === 0
+            ? 0
+            : isShrinking ? duration + widthSlowOffset : widthMotionDuration;
 
         if (measured !== current) {
             trackWidth = measured;
@@ -1046,9 +1149,44 @@
         }
     });
 
+    function animateTrackWidth(content: HTMLElement, options: { width: number | null; duration: number }) {
+        const node = content.parentElement!;
+        const animations = new Set<Animation>();
+        let previousWidth: number | null = null;
+        const cancel = () => {
+            animations.forEach(animation => animation.cancel());
+            animations.clear();
+        };
+        const update = (next: typeof options) => {
+            if (next.width === null) return;
+            const previous = previousWidth;
+            previousWidth = next.width;
+            if (previous === null || next.duration === 0 || !supportsWheelTransitionAnimation()) {
+                cancel();
+                return;
+            }
+            const delta = previous - next.width;
+            if (delta === 0) return;
+            // 用宽度差补偿新的基础宽度，旧补偿继续收敛；快速增减不会重置已有轨迹。
+            const animation = node.animate(
+                { [WIDTH_DELTA_VAR]: [delta, 0] },
+                { duration: next.duration, easing: widthMotionEasing, composite: "accumulate", fill: "both" },
+            );
+            animations.add(animation);
+            animation.finished.then(() => {
+                animations.delete(animation);
+                animation.cancel();
+            }).catch(() => {});
+        };
+        update(options);
+        return { update, destroy: cancel };
+    }
+
     const widthMotionEasing = toCssEasing(MORPH_MOTION.easing);
     const widthTrackStyle = $derived.by(() => {
-        const width = trackWidth !== null ? `width: ${trackWidth}px;` : "";
+        const width = trackWidth !== null
+            ? `width: calc(${trackWidth}px + var(${WIDTH_DELTA_VAR}, 0) * 1px);`
+            : "";
         return [
             "display: inline-flex;",
             "align-items: baseline;",
@@ -1056,7 +1194,6 @@
             "font-size: inherit;",
             "line-height: inherit;",
             "will-change: width;",
-            `transition: width ${widthTransitionDurationMs}ms ${widthMotionEasing};`,
             width,
         ]
             .filter(Boolean)
@@ -1103,34 +1240,23 @@
                         class="snowui-number-flow-width-track"
                         style={widthTrackStyle}
                     >
-                        <span class="snowui-number-flow-content">
+                        <span class="snowui-number-flow-content" use:animateTrackWidth={{ width: trackWidth, duration: widthTransitionDurationMs }}>
                             {#each currentParts as part (part.key)}
                                 <span
                                     class="snowui-number-flow-part-track"
                                     data-type={part.type}
-                                    animate:translateOnly={{
-                                        duration: digitTransitionDuration,
-                                    }}
                                 >
                                     <span
                                         class="snowui-number-flow-part"
-                                        onintroend={scheduleWidthSync}
-                                        onoutrostart={(event) =>
-                                            handlePartOutroStart(event, part)}
-                                        onoutroend={handlePartOutroEnd}
-                                        in:fly={{
-                                            x: DIGIT_ENTER_X,
-                                            y: DIGIT_ENTER_Y,
-                                            duration: digitTransitionDuration,
-                                            opacity: 0,
-                                            delay: getEnterDelay(part.enterOrder),
+                                        use:managePartPresence
+                                        onoutrostart={handlePartOutroStart}
+                                        in:enterPart={{
+                                            duration,
+                                            delay: part.type === "minusSign" ? 0 : getPartDelay(part.enterOrder, part.staggerValues),
                                         }}
-                                        out:fly={{
-                                            x: DIGIT_ENTER_X,
-                                            y: DIGIT_ENTER_Y,
-                                            duration: digitTransitionDuration,
-                                            opacity: 0,
-                                            delay: getExitDelay(part.exitOrder),
+                                        out:exitPart={{
+                                            duration,
+                                            delay: part.type === "minusSign" ? 0 : getPartDelay(part.exitOrder, part.staggerValues),
                                         }}
                                     >
                                         {#if part.type === "integer" || part.type === "fraction"}
@@ -1143,16 +1269,15 @@
                                                     class="snowui-number-flow-wheel"
                                                     use:rollWheel={{
                                                         value: part.value,
-                                                        delay: getEnterDelay(
+                                                        delay: getPartDelay(
                                                             part.enterOrder,
+                                                            part.staggerValues,
                                                         ),
                                                         animateOnMount: hasMounted,
                                                         direction: rollDirection,
                                                         trendSign,
                                                         length: partLength,
                                                         pos: part.pos,
-                                                        fromValue: fromNumericValue,
-                                                        toValue: toNumericValue,
                                                         numericDiff,
                                                         rawValue: value,
                                                     }}
@@ -1160,13 +1285,7 @@
                                                     {#each Array.from({ length: partLength }, (_, i) => i) as digitNum (digitNum)}
                                                         <span
                                                             class="snowui-number-flow-digit"
-                                                            style="--snowui-number-flow-n: {mapNumberFlowDigitAxis(
-                                                                digitNum,
-                                                                partLength,
-                                                                toNumericValue ??
-                                                                    displayNumericValue,
-                                                                getRollAxisDirection(rollDirection),
-                                                            )}"
+                                                            style="--snowui-number-flow-n: {digitNum}"
                                                             aria-hidden={digitNum !==
                                                                 parseWheelDigit(
                                                                     part.value,
@@ -1210,34 +1329,23 @@
                         class="snowui-number-flow-width-track"
                         style={widthTrackStyle}
                     >
-                        <span class="snowui-number-flow-content">
+                        <span class="snowui-number-flow-content" use:animateTrackWidth={{ width: trackWidth, duration: widthTransitionDurationMs }}>
                             {#each currentParts as part (part.key)}
                                 <span
                                     class="snowui-number-flow-part-track"
                                     data-type={part.type}
-                                    animate:translateOnly={{
-                                        duration: digitTransitionDuration,
-                                    }}
                                 >
                                     <span
                                         class="snowui-number-flow-part"
-                                        onintroend={scheduleWidthSync}
-                                        onoutrostart={(event) =>
-                                            handlePartOutroStart(event, part)}
-                                        onoutroend={handlePartOutroEnd}
-                                        in:fly={{
-                                            x: DIGIT_ENTER_X,
-                                            y: DIGIT_ENTER_Y,
-                                            duration: digitTransitionDuration,
-                                            opacity: 0,
-                                            delay: getEnterDelay(part.enterOrder),
+                                        use:managePartPresence
+                                        onoutrostart={handlePartOutroStart}
+                                        in:enterPart={{
+                                            duration,
+                                            delay: part.type === "minusSign" ? 0 : getPartDelay(part.enterOrder, part.staggerValues),
                                         }}
-                                        out:fly={{
-                                            x: DIGIT_ENTER_X,
-                                            y: DIGIT_ENTER_Y,
-                                            duration: digitTransitionDuration,
-                                            opacity: 0,
-                                            delay: getExitDelay(part.exitOrder),
+                                        out:exitPart={{
+                                            duration,
+                                            delay: part.type === "minusSign" ? 0 : getPartDelay(part.exitOrder, part.staggerValues),
                                         }}
                                     >
                                         {#if part.type === "integer" || part.type === "fraction"}
@@ -1250,16 +1358,15 @@
                                                     class="snowui-number-flow-wheel"
                                                     use:rollWheel={{
                                                         value: part.value,
-                                                        delay: getEnterDelay(
+                                                        delay: getPartDelay(
                                                             part.enterOrder,
+                                                            part.staggerValues,
                                                         ),
                                                         animateOnMount: hasMounted,
                                                         direction: rollDirection,
                                                         trendSign,
                                                         length: partLength,
                                                         pos: part.pos,
-                                                        fromValue: fromNumericValue,
-                                                        toValue: toNumericValue,
                                                         numericDiff,
                                                         rawValue: value,
                                                     }}
@@ -1267,13 +1374,7 @@
                                                     {#each Array.from({ length: partLength }, (_, i) => i) as digitNum (digitNum)}
                                                         <span
                                                             class="snowui-number-flow-digit"
-                                                            style="--snowui-number-flow-n: {mapNumberFlowDigitAxis(
-                                                                digitNum,
-                                                                partLength,
-                                                                toNumericValue ??
-                                                                    displayNumericValue,
-                                                                getRollAxisDirection(rollDirection),
-                                                            )}"
+                                                            style="--snowui-number-flow-n: {digitNum}"
                                                             aria-hidden={digitNum !==
                                                                 parseWheelDigit(
                                                                     part.value,
@@ -1425,6 +1526,7 @@
     }
 
     :global(:where(.snowui-number-flow-content)) {
+        position: relative;
         display: inline-flex;
         align-items: baseline;
         width: max-content;
@@ -1482,20 +1584,6 @@
             --snowui-number-flow-wheel-v,
             var(--snowui-number-flow-current, 0)
         );
-        transition: --snowui-number-flow-wheel-v
-            var(
-                --snowui-number-flow-wheel-duration,
-                var(--snowui-number-flow-duration)
-            )
-            var(--snowui-number-flow-wheel-easing) var(--snowui-number-flow-wheel-delay, 0ms);
-    }
-
-    :global(
-            :where(
-                    .snowui-number-flow-wheel.snowui-number-flow-wheel-no-transition
-                )
-        ) {
-        transition: none;
     }
 
     :global(:where(.snowui-number-flow-digit)) {
