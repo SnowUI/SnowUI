@@ -2218,17 +2218,6 @@
 
     :global(
             :where(
-                    .snowui-field:has(
-                            .snowui-input.snowui-field-host[data-readonly="true"]
-                        )
-                )
-        ) {
-        background-color: var(--surface-2, #00000008);
-        box-shadow: none;
-    }
-
-    :global(
-            :where(
                     .snowui-input[data-invalid="true"]:not(
                             [data-embedded="true"]
                         )

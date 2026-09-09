@@ -101,6 +101,8 @@
 - 独立模式：`.snowui-field-bordered`，兼容历史用法，自己带默认字段外壳
 - 容器模式：检测到 `Field` 上下文后，切到 host 模式，只保留输入宿主，不再重复渲染边框、背景和 focus ring
 
+嵌入态的根及原生输入控件保持透明。Field 与独立 Input 的默认背景均为 `surface-1`；只读输入通过 `data-field-control="input"` 与 `data-readonly` 暴露状态，由 Field 自己绘制 `surface-2` 背景，Input 不再反向定义父容器样式。
+
 容器模式下：
 
 - 根节点会带上 `.snowui-field-host`
