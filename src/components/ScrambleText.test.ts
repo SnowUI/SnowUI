@@ -1,3 +1,4 @@
+// motionColor 的全文索引、回落顺序及快速更新由 Playground text-motion-color-sequence 浏览器回归验证。
 export const examples = [
     {
         name: "A1: 基础字符集",

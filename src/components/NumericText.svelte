@@ -258,6 +258,7 @@
             motionRole,
             transition: numericTextLayoutTransition,
             motionDuration: numericTextMotionDuration,
+            colorAllCharacters: true,
             respectMotionPreference,
             motionColor:
                 typeof motionColor === "function"

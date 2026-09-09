@@ -4,6 +4,7 @@
  *
  * 覆盖文字变化、数字格式化、方向控制、统一排版与 SnowUI 样式继承。
  */
+// motionColor 的全文索引、回落顺序及快速更新由 Playground text-motion-color-sequence 浏览器回归验证。
 export const examples = [
     {
         name: "A1: 基础文字与数字",

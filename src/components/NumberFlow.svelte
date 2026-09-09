@@ -18,18 +18,19 @@
 <script lang="ts">
     import type { TransitionConfig } from "svelte/transition";
     import { cubicOut } from "svelte/easing";
-    import { untrack, type Snippet } from "svelte";
+    import { untrack, onDestroy, type Snippet } from "svelte";
     import type {
         FrameProps,
         RenderHints,
     } from "@snowui-design-system/components/logic/frame-types";
+    import { splitTextMotionGraphemes } from "../lib/text-motion/layout";
     import type { SnowUIColor } from "@snowui-design-system/components/lib/color";
     import { Skeleton } from "@snowui-design-system/components";
     import { MORPH_MOTION } from "@snowui-design-system/components/motion/morph";
     import { resizeManager } from "@snowui-design-system/components/logic/observer.svelte";
     import { getSkeleton } from "@snowui-design-system/components/context";
     import {
-        animateTextMotionColor,
+        animateTextMotionColorSequence,
         cancelTextMotionColor,
     } from "../lib/text-motion/color";
     import {
@@ -425,6 +426,7 @@
         return {
             destroy() {
                 if (track) clearPartLayout(track);
+                node.querySelectorAll<HTMLElement>("[data-number-flow-color-label]").forEach(cancelTextMotionColor);
                 presenceAnimations.get(node)?.cancel();
                 presenceAnimations.delete(node);
                 signMotions.get(node)?.animations.forEach(animation => animation.cancel());
@@ -1059,6 +1061,10 @@
         };
     }
 
+    onDestroy(() => {
+        motionElement?.querySelectorAll<HTMLElement>("[data-number-flow-color-label]").forEach(cancelTextMotionColor);
+    });
+
     $effect(() => {
         hasMounted = true;
     });
@@ -1067,7 +1073,8 @@
         if (!motionElement) return;
         const next = displayText;
         const reduced = reduceMotion;
-        if (reduced) cancelTextMotionColor(motionElement);
+        const characters = Array.from(motionElement.querySelectorAll<HTMLElement>("[data-number-flow-color-label]")).filter(node => node.closest(".snowui-number-flow-mask") === motionElement && !node.closest("[inert]"));
+        if (reduced) characters.forEach(cancelTextMotionColor);
         if (previousMotionText === undefined) {
             previousMotionText = next;
             return;
@@ -1075,10 +1082,11 @@
         if (next === previousMotionText) return;
         previousMotionText = next;
         if (reduced) return;
-        animateTextMotionColor(
-            motionElement,
+        animateTextMotionColorSequence(
+            characters,
             resolveTextMotionColor(motionColor),
-            duration,
+            characters.map(node => node.dataset.numberFlowColorLabel ?? ""),
+            { duration, reverse: true },
         );
     });
 
@@ -1264,6 +1272,7 @@
                                                 getPartDigitLength(part)}
                                             <span
                                                 class="snowui-number-flow-wheel-viewport"
+                                                data-number-flow-color-label={part.value}
                                             >
                                                 <span
                                                     class="snowui-number-flow-wheel"
@@ -1298,9 +1307,11 @@
                                                 </span>
                                             </span>
                                         {:else}
-                                            <span class="snowui-number-flow-symbol"
-                                                >{part.value}</span
-                                            >
+                                            <span class="snowui-number-flow-symbol">
+                                                {#each splitTextMotionGraphemes(part.value) as character, index (index)}
+                                                    <span data-number-flow-color-label={character}>{character}</span>
+                                                {/each}
+                                            </span>
                                         {/if}
                                     </span>
                                 </span>
@@ -1353,6 +1364,7 @@
                                                 getPartDigitLength(part)}
                                             <span
                                                 class="snowui-number-flow-wheel-viewport"
+                                                data-number-flow-color-label={part.value}
                                             >
                                                 <span
                                                     class="snowui-number-flow-wheel"
@@ -1387,9 +1399,11 @@
                                                 </span>
                                             </span>
                                         {:else}
-                                            <span class="snowui-number-flow-symbol"
-                                                >{part.value}</span
-                                            >
+                                            <span class="snowui-number-flow-symbol">
+                                                {#each splitTextMotionGraphemes(part.value) as character, index (index)}
+                                                    <span data-number-flow-color-label={character}>{character}</span>
+                                                {/each}
+                                            </span>
                                         {/if}
                                     </span>
                                 </span>

@@ -9,6 +9,7 @@
     import { animateTextMotionFace, animateTextMotionOpacity } from "../lib/text-motion/animation";
     import {
         TEXT_MOTION_COLOR_FADE_MS,
+        animateTextMotionColorSequence,
     } from "../lib/text-motion/color";
     import {
         captureTextMotionRects,
@@ -281,8 +282,6 @@
             ),
             isNumericArithmetic ? "right-to-left" : "left-to-right",
         );
-        const styles = getComputedStyle(container);
-        const restingColor = options.motionColor ? styles.color : "";
 
         const previousExits = [...(running?.exiting ?? [])];
         const state: SlotState = running ?? { end: 0, exiting: new Set(), target: toText };
@@ -416,12 +415,16 @@
             const timing = { duration: plan.duration, easing: options.easing, delay: plan.base + options.exitOffset };
             animateTextMotionFace(face, inStart, 0, plan.tilt, 0, timing);
             animateTextMotionOpacity(face, 1, timing, 0);
-            if (options.motionColor) {
-                const tint = face.style.color;
-                face.style.color = restingColor;
-                face.animate({ color: [tint, restingColor] }, { duration: options.colorFade, delay: timing.delay + plan.duration, easing: "linear", fill: "backwards" });
-            }
+            face.style.color = "";
         }
+
+        const colorFaces = nextSlots.map(slot => slot.querySelector<HTMLElement>(".snowui-slot-text-face")!);
+        maxEnd = Math.max(maxEnd, animateTextMotionColorSequence(colorFaces, options.motionColor, toChars, {
+            duration: options.duration + options.exitOffset,
+            stagger: options.stagger,
+            reverse: isNumericArithmetic,
+            fadeDuration: options.colorFade,
+        }));
 
         const exitingPlans = exitingSlots.map((slot) => {
             const recompositionIndex = recompositionExitingSlots.indexOf(slot);

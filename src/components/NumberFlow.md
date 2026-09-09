@@ -1,6 +1,6 @@
 # NumberFlow
 
-> **版本**: v2.0.0
+> **版本**: v2.0.1
 > **职责**: 展示持续变化的格式化数字，并以逐位滚轮、位数重排和容器宽度过渡表达数值变化。
 > **包归属**: `@snowui/components-pro`
 
@@ -32,7 +32,8 @@ import { NumberFlow } from "@snowui/components-pro";
 | `renderHints` | `RenderHints` | — | 覆盖 Skeleton 形状与尺寸提示 |
 | `respectMotionPreference` | `boolean` | `false` | 为 `true` 时遵守 reduced-motion 并立即提交最终数值 |
 | `font` / `size` / `weight` / `lineHeight` | `string \| number` | — | 数字排版输入 |
-| `color` / `motionColor` | `SnowUIColor \| string` | 默认文字色 / text-motion 默认变化色 | 静态颜色和变化期间颜色 |
+| `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色，未设置时继承容器 |
+| `motionColor` | `SnowUIColor \| string` | `undefined` | 全部目标字符从低位到高位依次回落的临时颜色，包含保留数位、分隔符及格式化货币符号，不影响 children 附加内容 |
 | `align` | `TextMotionAlign` | — | 数字内部对齐 |
 | `children` | `Snippet` | — | 数字左侧或右侧的附加内容 |
 | FramePro Props | `FrameProps` | 见 FramePro | 支持 `tag`、`as`、class/style、状态与外层动效 |
@@ -102,6 +103,12 @@ import { NumberFlow } from "@snowui/components-pro";
 - 与 NumericText、SlotText、FlowText 共用 text-motion 数值与排版能力，但保留自己的滚轮视觉时间线。
 
 ## 更新日志
+
+### v2.0.1 (2026-09-09)
+
+- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../specs/TextMotionSpec.md#21-motioncolor)。
+- 字符变化效果保持原有规则；未设置颜色、关闭动画（适用时）或减少动效生效时显示最终原色。连续更新重新编排颜色序列，卸载清理颜色动画。
+
 
 ### v2.0.0
 

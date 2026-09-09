@@ -6,6 +6,7 @@
  * - 移除示例中的 script 标签与导入语句，符合 ComponentGuidelines §13.3 规范。
  * - 示例仅包含纯模板代码，依赖由测试环境自动注入。
  */
+// motionColor 的全文索引、回落顺序及快速更新由 Playground text-motion-color-sequence 浏览器回归验证。
 export const examples = [
     {
         name: "1: 基础数字显示",

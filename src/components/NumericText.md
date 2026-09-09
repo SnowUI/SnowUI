@@ -1,6 +1,6 @@
 # NumericText 文字与数字过渡
 
-> **版本**: v1.7.1
+> **版本**: v1.7.2
 > **组件路径**: `pro/src/components/NumericText.svelte`  
 > **包归属**: PRO
 
@@ -25,7 +25,7 @@
 | `lineHeight` | `string \| number` | `undefined` | 行高 |
 | `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色 |
 | `align` | `"left" \| "center" \| "right" \| "justify"` | `undefined` | 对齐；默认继承父级 |
-| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 新进入字符的临时颜色；默认不改变颜色，支持 `chromatic()` 逐字符渐变 |
+| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符按全文顺序回落的临时颜色；默认不改变颜色，支持 `chromatic()` 逐字符渐变 |
 | `...rest` | `FrameProps` | - | 透传到根 `FramePro`，包括 `as="label"` |
 
 六项排版默认全部继承父级，支持 SnowUI Token 与 `color="Primary"` 等 PascalCase 语意色。
@@ -70,6 +70,12 @@
 - 内部 shadow DOM 必须继承字体、颜色、行高和字距。
 
 ## 更新日志
+
+### v1.7.2 (2026-09-09)
+
+- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../specs/TextMotionSpec.md#21-motioncolor)。
+- 字符变化效果保持原有规则；未设置颜色、关闭动画（适用时）或减少动效生效时显示最终原色。连续更新重新编排颜色序列，卸载清理颜色动画。
+
 
 ### v1.7.1 (2026-09-08)
 

@@ -8,7 +8,7 @@
 
 <script module lang="ts">
     import {
-        animateTextMotionColor,
+        animateTextMotionColorSequence,
         cancelTextMotionColor,
     } from "../lib/text-motion/color";
     import { shouldReduceTextMotion } from "../lib/text-motion/preference";
@@ -76,6 +76,7 @@
         private rafId = 0;
         private characters: ScrambleCharacter[] = [];
         private textNode: Text | undefined;
+        private colorNodes: HTMLElement[] = [];
         private sequence: string[] = [];
         private rng = createRng(1);
         private options: ScrambleElementOptions = {
@@ -121,10 +122,31 @@
             if (this.rafId) window.cancelAnimationFrame(this.rafId);
             this.rafId = 0;
             this.characters = [];
-            cancelTextMotionColor(this);
+            this.colorNodes.forEach(cancelTextMotionColor);
         }
 
         private renderText(value: string) {
+            if (this.options.motionColor) {
+                const labels = this.characters.length ? this.characters.map(char => char.current) : splitGraphemes(value);
+                while (this.colorNodes.length > labels.length) {
+                    const node = this.colorNodes.pop()!;
+                    cancelTextMotionColor(node);
+                    node.remove();
+                }
+                while (this.colorNodes.length < labels.length) {
+                    const node = document.createElement("span");
+                    node.className = "snowui-scramble-text-character";
+                    node.setAttribute("aria-hidden", "true");
+                    this.colorNodes.push(node);
+                }
+                if (this.firstChild !== this.colorNodes[0] || this.childNodes.length !== this.colorNodes.length) this.replaceChildren(...this.colorNodes);
+                labels.forEach((label, index) => {
+                    if (this.colorNodes[index].textContent !== label) this.colorNodes[index].textContent = label;
+                });
+                return;
+            }
+            this.colorNodes.forEach(cancelTextMotionColor);
+            this.colorNodes = [];
             // 复用同一 Text 节点。cascade 两次换字之间不产生 DOM 写入。
             if (this.textNode?.parentNode !== this) {
                 this.textNode = this.firstChild instanceof Text ? this.firstChild : document.createTextNode(value);
@@ -164,10 +186,12 @@
             });
             this.display = from;
             this.renderText(from);
+            const end = Math.max(now, ...this.characters.map(char => char.end));
+            animateTextMotionColorSequence(this.colorNodes.slice(0, target.length), this.options.motionColor, target, {
+                duration: end - now,
+            });
             if (!running) {
                 this.rng = createRng(Math.floor(Math.random() * 0x7fffffff));
-                const end = Math.max(now, ...this.characters.map(char => char.end));
-                animateTextMotionColor(this, this.options.motionColor, end - now);
                 this.rafId = window.requestAnimationFrame(this.tick);
             }
         }
@@ -187,9 +211,9 @@
                     now >= char.reveal && now < char.reveal + DEFAULT_SETTLE_RATE ? char.source : randomChar(this.sequence, this.rng);
             }
             this.display = active ? this.characters.map(char => char.current).join("") : this.value;
+            if (!active) this.characters = [];
             this.renderText(this.display);
             this.rafId = active ? window.requestAnimationFrame(this.tick) : 0;
-            if (!active) this.characters = [];
         };
     }
 

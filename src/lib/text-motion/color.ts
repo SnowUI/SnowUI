@@ -1,3 +1,4 @@
+import { getTextMotionStagger } from "./sequence";
 import { resolveTextMotionColor } from "./typography";
 import type {
     TextMotionColor,
@@ -41,28 +42,6 @@ export function cancelTextMotionColor(element: HTMLElement) {
     colorAnimations.delete(element);
 }
 
-export function animateTextMotionColor(
-    element: HTMLElement,
-    motionColor: TextMotionColor,
-    duration: number,
-    delay = 0,
-    index = 0,
-    total = 1,
-) {
-    cancelTextMotionColor(element);
-    const resolvedColor = resolveTextMotionColorAt(motionColor, index, total);
-    if (!resolvedColor || duration <= 0) return undefined;
-    const restingColor = getComputedStyle(element).color;
-    const animation = element.animate(
-        { color: [resolvedColor, restingColor] },
-        { duration, delay, easing: "linear", fill: "none" },
-    );
-    colorAnimations.set(element, animation);
-    animation.onfinish = () => colorAnimations.delete(element);
-    animation.oncancel = () => colorAnimations.delete(element);
-    return animation;
-}
-
 export function animateSettledTextMotionColor(
     element: HTMLElement,
     motionColor: TextMotionColor,
@@ -70,6 +49,7 @@ export function animateSettledTextMotionColor(
     startDelay = 0,
     index = 0,
     total = 1,
+    fadeDuration = TEXT_MOTION_COLOR_FADE_MS,
 ) {
     cancelTextMotionColor(element);
     const resolvedColor = resolveTextMotionColorAt(motionColor, index, total);
@@ -78,7 +58,7 @@ export function animateSettledTextMotionColor(
     const animation = element.animate(
         { color: [resolvedColor, restingColor] },
         {
-            duration: TEXT_MOTION_COLOR_FADE_MS,
+            duration: fadeDuration,
             delay: startDelay + motionDuration,
             easing: "linear",
             fill: "backwards",
@@ -92,4 +72,29 @@ export function animateSettledTextMotionColor(
     animation.onfinish = release;
     animation.oncancel = release;
     return animation;
+}
+
+/** 目标全文共享一个颜色序列，字符是否位移不影响其颜色顺序。 */
+export function animateTextMotionColorSequence(
+    elements: HTMLElement[],
+    motionColor: TextMotionColor,
+    labels: string[],
+    options: {
+        duration: number;
+        layoutDuration?: number;
+        stagger?: number;
+        reverse?: boolean;
+        fadeDuration?: number;
+    },
+) {
+    const stagger = options.stagger ?? getTextMotionStagger(options.layoutDuration ?? options.duration, labels);
+    const fade = options.fadeDuration ?? TEXT_MOTION_COLOR_FADE_MS;
+    let end = 0;
+    elements.forEach((element, index) => {
+        const order = options.reverse ? elements.length - index - 1 : index;
+        const delay = order * stagger;
+        const animation = animateSettledTextMotionColor(element, motionColor, options.duration, delay, index, labels.length, fade);
+        if (animation) end = Math.max(end, options.duration + delay + fade);
+    });
+    return end;
 }

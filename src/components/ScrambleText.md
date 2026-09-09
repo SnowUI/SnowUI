@@ -1,6 +1,6 @@
 # ScrambleText 代码文字动效
 
-> **版本**: v1.3.1
+> **版本**: v1.3.2
 > **组件路径**: `pro/src/components/ScrambleText.svelte`  
 > **包归属**: PRO
 
@@ -21,7 +21,7 @@
 | `lineHeight` | `string \| number` | `undefined` | 行高 |
 | `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色 |
 | `align` | `"left" \| "center" \| "right" \| "justify"` | `undefined` | 对齐；默认继承父级 |
-| `motionColor` | `SnowUIColor \| string` | `undefined` | 扰动阶段的临时颜色；默认不改变颜色 |
+| `motionColor` | `SnowUIColor \| string` | `undefined` | 全部目标字符从左到右依次回落的临时颜色；默认不改变颜色 |
 | `...rest` | `FrameProps` | - | 透传到根 `FramePro`，包括 `as="label"` |
 
 ```svelte
@@ -54,9 +54,15 @@
 
 ## 更新日志
 
+### v1.3.2 (2026-09-09)
+
+- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../specs/TextMotionSpec.md#21-motioncolor)。
+- 字符变化效果保持原有规则；未设置颜色、关闭动画（适用时）或减少动效生效时显示最终原色。连续更新重新编排颜色序列，卸载清理颜色动画。
+
+
 ### v1.3.1 (2026-09-08)
 
-- 连续更新延续正在运行的字符进度；复用文本节点，仅在实际换字时更新画面。
+- 连续更新延续正在运行的字符进度；无颜色时复用文本节点；有颜色时复用逐字符节点，仅在实际换字时更新画面。
 
 ### v1.3.0 (2026-06-15)
 

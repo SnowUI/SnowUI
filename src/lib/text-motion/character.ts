@@ -1,5 +1,6 @@
 import {
     animateSettledTextMotionColor,
+    animateTextMotionColorSequence,
     cancelTextMotionColor,
 } from "./color";
 import {
@@ -434,21 +435,17 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                 }
                 // 颜色按目标全文统一编排，与只处理变化中段的位移时间线分离。
                 if (this.colorAllCharacters) {
-                    nextNodes.forEach((node, index) => {
-                        animateSettledTextMotionColor(
-                            node,
-                            this.motionColor,
-                            this.motionDuration ?? this.transition.duration,
-                            this.getDelay(
-                                index,
-                                nextNodes,
-                                resolvedTrend.isNumericArithmetic &&
-                                    this.numericStaggerDirection !== "left-to-right",
-                            ),
-                            index,
-                            nextNodes.length,
-                        );
-                    });
+                    animateTextMotionColorSequence(
+                        nextNodes,
+                        this.motionColor,
+                        nextNodes.map(node => this.getCharacterLabel(node)),
+                        {
+                            duration: this.motionDuration ?? this.transition.duration,
+                            layoutDuration: this.transition.duration,
+                            stagger: this.stagger,
+                            reverse: resolvedTrend.isNumericArithmetic && this.numericStaggerDirection !== "left-to-right",
+                        },
+                    );
                 }
                 flipTextMotionElement(
                     this.prefixSection,
