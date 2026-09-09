@@ -65,7 +65,7 @@
 - 同一数位替换使用隐藏 sizer + old face + new face：sizer 继承最终字符宽度，old/new face 绝对定位并继承 `font`、`line-height`、`font-variant-numeric`、`letter-spacing`，避免动效期间宽度抖动。
 - 数字运算中未变化的数字和格式符号保持静止；新增或删除的格式符号由公共字符运行时当作普通字符处理，不进入任何数字 wheel。
 - WAAPI keyframe 结构与参考项目一致：退出使用目标单值，进入使用 `[起始值, ""]` 回到当前计算样式。
-- `motionColor` 在字符主动画期间保持，落地后以 `280ms linear` 回到最终颜色。
+- `motionColor` 在字符主动画期间保持，落地后以 `280ms linear` 回到最终颜色。共享颜色生命周期在快速连续更新时仅清理对应动画，旧结束事件不会覆盖最新颜色回落。
 - `transition` 保留为 NumericText 对齐参考项目的公开能力；`stagger`、`scale`、`rotate`、`blur` 不单独公开。
 - 内部 shadow DOM 必须继承字体、颜色、行高和字距。
 

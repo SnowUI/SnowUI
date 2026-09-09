@@ -34,6 +34,7 @@ export interface TextMotionCharacterOptions {
     motionRole?: TextMotionRole;
     respectMotionPreference?: boolean;
     motionColor?: TextMotionColor;
+    colorAllCharacters?: boolean;
     animator?: TextMotionCharacterAnimator;
     transition?: Partial<TextMotionTransition>;
     motionDuration?: number;
@@ -123,6 +124,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
     public motionRole: TextMotionRole = "auto";
     public respectMotionPreference = true;
     public motionColor: TextMotionColor = "";
+    public colorAllCharacters = false;
     public animator: TextMotionCharacterAnimator | undefined;
     public motionDuration: number | undefined;
     public stagger: number | undefined;
@@ -223,6 +225,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
         }
         this.accumulateLayout = options.accumulateLayout ?? false;
         this.motionColor = options.motionColor ?? "";
+        this.colorAllCharacters = options.colorAllCharacters ?? false;
         this.animator = options.animator;
         this.motionDuration = options.motionDuration;
         this.stagger = options.stagger;
@@ -428,6 +431,24 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                             nextNodes.length,
                         );
                     }
+                }
+                // 颜色按目标全文统一编排，与只处理变化中段的位移时间线分离。
+                if (this.colorAllCharacters) {
+                    nextNodes.forEach((node, index) => {
+                        animateSettledTextMotionColor(
+                            node,
+                            this.motionColor,
+                            this.motionDuration ?? this.transition.duration,
+                            this.getDelay(
+                                index,
+                                nextNodes,
+                                resolvedTrend.isNumericArithmetic &&
+                                    this.numericStaggerDirection !== "left-to-right",
+                            ),
+                            index,
+                            nextNodes.length,
+                        );
+                    });
                 }
                 flipTextMotionElement(
                     this.prefixSection,
@@ -673,7 +694,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
             isNumericArithmetic,
             onCleanup: this.registerCleanup,
         });
-        if (!isOut) {
+        if (!isOut && !this.colorAllCharacters) {
             animateSettledTextMotionColor(
                 element,
                 this.motionColor,

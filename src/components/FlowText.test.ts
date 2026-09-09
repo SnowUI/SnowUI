@@ -73,7 +73,7 @@ export const examples = [
         expected: {
             render: "从 SnowUl Motion 变化为 SnowUI 时显示最终文字 SnowUI",
             interaction:
-                "变化字符使用 number-flow 的纵向数位流与 AnimatePresence opacity，剩余不变文字通过公共区段 FLIP 平移到最终位置",
+                "变化字符使用 number-flow 的纵向数位流与 AnimatePresence opacity，剩余不变文字通过公共区段 FLIP 平移到最终位置；motionColor 同时作用于全部目标字符（ab → ac 时 a、c 都着色），按全文顺序依次回落（Code editor 的保留后缀 tor 接续左侧字母）",
         },
         logic: ["Motion", "TextDiff", "CharacterTransition", "FLIP"],
     },

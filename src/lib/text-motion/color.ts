@@ -85,7 +85,11 @@ export function animateSettledTextMotionColor(
         },
     );
     colorAnimations.set(element, animation);
-    animation.onfinish = () => colorAnimations.delete(element);
-    animation.oncancel = () => colorAnimations.delete(element);
+    // 旧动画的异步结束事件不能清除连续更新后登记的新动画。
+    const release = () => {
+        if (colorAnimations.get(element) === animation) colorAnimations.delete(element);
+    };
+    animation.onfinish = release;
+    animation.oncancel = release;
     return animation;
 }

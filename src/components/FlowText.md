@@ -1,6 +1,6 @@
 # FlowText 文本流动效
 
-> **版本**: v2.0.3
+> **版本**: v2.0.4
 > **组件路径**: `pro/src/components/FlowText.svelte`  
 > **包归属**: PRO
 
@@ -26,7 +26,7 @@
 | `lineHeight` | `string \| number` | `undefined` | 行高；未设置时继承容器 |
 | `color` | `SnowUIColor \| string` | `undefined` | 文字最终颜色；未设置时继承容器 |
 | `align` | `TextMotionAlign` | `undefined` | 文字对齐方式 |
-| `motionColor` | `TextMotionColor` | `undefined` | 变化字符的临时颜色，动效结束后回到文字颜色 |
+| `motionColor` | `TextMotionColor` | `undefined` | 内容变化时全部目标字符的临时颜色，包括保留字符；resolver 的 index / total 对应目标全文的 grapheme 索引与总数，动效结束后回到文字颜色 |
 | `loading` | `boolean` | `undefined` | 加载状态；与 skeleton 同时开启时显示骨架，未设置时遵循容器状态 |
 | `skeleton` | `boolean` | `undefined` | 控制骨架显示，未设置时遵循容器骨架状态 |
 | `renderHints` | `RenderHints` | `undefined` | 骨架形状与尺寸提示 |
@@ -55,10 +55,14 @@
 - 字符变形时机必须与位移开始时机一致，共用同一个 character delay；变形速度由 `transition.deformDuration` 单独控制，默认 `100ms`；变形缓动由 `transition.deformEasing` 单独控制，默认 `linear`。
 - 动效字符使用扩展 viewport 作为字符级遮罩窗口：真实字符节点只保留原始占位宽度，不得写入 padding / margin；内部隐藏 source 保宽，viewport 以 `mask-height / mask-width` 向外扩展，glyph 通过同样的 offset 放回真实字符原点后滚动。遮罩的 `linear-gradient` / `radial-gradient` 层、`mask-size`、`mask-position` 与 `NumberFlow.svelte` 的 `.snowui-number-flow-mask` 保持一致；遮罩只在该字符的位移动效启动后显示，位移动画结束或取消后清理。
 - `transition` 仅覆盖内部固定时序，主要用于 TextMotion-Demo Slow Mode；默认主动画和逐位时序与 NumericText 对齐。Slow Mode 下 wheel 的 cleanup、mask 清理和 DOM settle 必须等待实际 wheel duration，不能按普通字符 duration 提前清理。
-- `motionColor` 与 `550ms` 字符流生命周期一致，之后用公共 `280ms linear` 回落。
+- `motionColor` 在内容变化时覆盖全部目标字符：如 `ab → ac`，`a` 保持静止但与 `c` 一样着色。全部目标字符按全文索引参与同一颜色回落序列：普通文字从左到右，数字按低位到高位；保留前后缀与数字分隔符也占有对应顺序。颜色使用目标全文计算默认 stagger，显式 `transition.stagger` 优先；维持主动画时长与各自 delay 后，用公共 `280ms linear` 回落。位移继续只按变化字符编排。未传颜色、内容未变或启用的减少动效偏好生效时不播放颜色动效。
 - 根节点提供稳定的最终 `aria-label`，内部动画字符对辅助技术隐藏。
 
 ## 更新日志
+
+### v2.0.4 (2026-09-09)
+
+- 内容变化时保留字符也播放颜色动效；逐字符颜色与回落时序均按目标全文分布，保留前后缀不再提前一起褪色，不改变字符位移规则。
 
 ### v2.0.3 (2026-09-09)
 

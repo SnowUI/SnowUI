@@ -1361,6 +1361,7 @@
             stagger: flowTextStagger,
             numericStaggerDirection: "right-to-left",
             animatePreservedNumericSignChange: true,
+            colorAllCharacters: true,
             accumulateLayout: true,
             respectMotionPreference,
             motionColor:
