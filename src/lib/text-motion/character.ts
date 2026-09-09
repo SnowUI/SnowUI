@@ -345,9 +345,9 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                 }
                 const newPrefixRect = this.prefixSection.getBoundingClientRect();
                 const newSuffixRect = this.suffixSection.getBoundingClientRect();
-                const exitingEdge = this.isRTL
-                    ? newPrefixRect.right
-                    : newPrefixRect.left;
+                // 退出层相对宿主定位；空前缀没有布局矩形，不能作为坐标原点。
+                const hostRect = this.getBoundingClientRect();
+                const exitingEdge = this.isRTL ? hostRect.right : hostRect.left;
                 for (const [element, x] of this.exitingChars) {
                     element.style.transform = `translateX(${x - exitingEdge}px)`;
                 }
@@ -561,6 +561,7 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
         if (!nodes.length || !this.shadowRoot) return;
         const group = createPart();
         group.toggleAttribute("inert", true);
+        group.style[this.isRTL ? "right" : "left"] = "0";
         for (let index = 0; index < nodes.length; index += 1) {
             if (preservedNodes?.[index]) continue;
             if (replacementLabels?.[index]) continue;
