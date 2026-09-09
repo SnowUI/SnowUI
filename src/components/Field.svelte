@@ -498,6 +498,8 @@
         flex-direction: row;
         gap: 0;
         align-items: center;
+        /* Frame 间距压缩后仍将整条内容行居中，避免 wrap 行贴向段落顶部。 */
+        align-content: center;
         justify-content: center;
         box-sizing: border-box;
     }

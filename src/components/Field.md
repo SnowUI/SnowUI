@@ -151,6 +151,7 @@ Field 是字段表面的槽位宿主特化：
 - `label / description / error` 只是内容元素，不负责处理 padding、gap 或分割线
 - `FM-01` 这类地址复合字段属于“纵向多段连续字段表面”：每一段自己持有边线与必要圆角，相邻两段之间只保留一条共用分割线，不能上下两段各画一条
 - `FM-02` 这类信用卡字段属于“横向显式 segment 连续字段表面”：外层 `Field` 持有整张表面，`segment` 之间用内部分割线切段
+- 横向 `Frame as="segment" row` 的内容行与行内元素均垂直居中；Frame 响应式压缩 padding 后，MM / YY 仍与相邻 Input 段保持同一水平中心线。
 - `FM-03` 这类通知方式属于“label 下并排内容行”：外层 `Field` 持有外壳，内部只用示例里显式声明的 `Frame gap` 排布选项，不加分割线
 
 `Field` 不限制 `leading / trailing` 必须是 `Icon`。任何基于 `Frame` 的组件，只要声明了对应 `as`，都可以参与字段表面。
