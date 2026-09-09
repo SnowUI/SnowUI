@@ -27,7 +27,7 @@ const observedElements = new Set<Element>();
 
 ## 2. 适配顺序
 
-1. 测量 Frame 当前可用宽度与普通直系子项的首选宽度。
+1. 测量 Frame 当前可用宽度与普通直系子项的首选宽度。测量可伸缩子项时仅临时取消 flex 扩张，保留声明的 width 与 max-width，避免将紧凑输入框按原生固有宽度误判为溢出。
 2. 内容放不下时，把大于下限的 gap / padding 按需向下压缩。
 3. gap / padding 默认下限为 4px；首选值低于 4px 时保持首选值，不放大也不继续压缩。
 4. 压缩后仍放不下，且消费方传入 `responsive` 时，启用回退方向、对齐和子项宽度策略。

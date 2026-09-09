@@ -88,19 +88,15 @@ function measurePreferredChildWidth(child: HTMLElement, style: CSSStyleDeclarati
         return Math.max(child.getBoundingClientRect().width, child.scrollWidth);
     }
 
-    const snapshots = {
-        flex: snapshotStyle(child, "flex"),
-        width: snapshotStyle(child, "width"),
-        maxWidth: snapshotStyle(child, "max-width"),
-    };
+    // Remove flex growth while preserving authored width and max-width constraints.
+    // Forcing max-content here expands compact native inputs to their intrinsic width.
+    const flex = snapshotStyle(child, "flex");
     child.style.setProperty("flex", "0 0 auto", "important");
-    child.style.setProperty("width", "max-content", "important");
-    child.style.setProperty("max-width", "none", "important");
-    const width = Math.max(child.getBoundingClientRect().width, child.scrollWidth);
-    restoreStyle(child, "flex", snapshots.flex);
-    restoreStyle(child, "width", snapshots.width);
-    restoreStyle(child, "max-width", snapshots.maxWidth);
-    return width;
+    try {
+        return Math.max(child.getBoundingClientRect().width, child.scrollWidth);
+    } finally {
+        restoreStyle(child, "flex", flex);
+    }
 }
 
 export class FrameResponsive {
