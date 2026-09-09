@@ -8,15 +8,14 @@
 
 ## 关键字
 
-## 关键字
-
-| Keyword | Type | Default | Description | Category |
+| Property | Type | Default | Description | Category |
 |:---|:---|:---|:---|:---|
 | `checked` | `boolean` | `false` | 选中状态（双向绑定） | **State** |
 | `indeterminate` | `boolean` | `false` | 不确定状态（双向绑定） | **State** |
 | `onCheckedChange` | `(checked: boolean) => void` | - | 原生复选状态变化后的回调 | Event |
 | `ariaLabel` | `string` | - | 无可见 label 时的无障碍名称 | Accessibility |
 | `disabled` | `boolean` | `false` | 禁用状态 | **State** |
+| `group` | `any[]` | `undefined` | 多选值数组，配合 value 双向绑定 | Data |
 | `value` | `any` | - | 表单值 | Data |
 | `size` | `number` | `16` | 组件尺寸（像素，梯度与 Icon 一致：12/16/20/24/28/32/40/48/80） | Style |
 | `children` | `Snippet` | - | 标签内容 | Content |
