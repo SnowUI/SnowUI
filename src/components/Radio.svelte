@@ -172,24 +172,26 @@
     renderHints={radioRenderHints}
     {...rest}
 >
-    <input
-        bind:this={inputRef}
-        type="radio"
-        class="snowui-radio-sr-only"
-        {checked}
-        {value}
-        {disabled}
-        onclick={handleClick}
-        onkeydown={handleKeyDown}
-        tabindex={disabled ? -1 : 0}
-    />
-    <div class="snowui-radio-visual">
-        <div class="snowui-radio-active-ring"></div>
-        <div class="snowui-radio-hover-layer"></div>
-        {#if variant === "outline"}
-            <div class="snowui-radio-dot"></div>
-        {/if}
-    </div>
+    <span class="snowui-control-inset">
+        <input
+            bind:this={inputRef}
+            type="radio"
+            class="snowui-radio-sr-only"
+            {checked}
+            {value}
+            {disabled}
+            onclick={handleClick}
+            onkeydown={handleKeyDown}
+            tabindex={disabled ? -1 : 0}
+        />
+        <span class="snowui-radio-visual">
+            <span class="snowui-radio-active-ring"></span>
+            <span class="snowui-radio-hover-layer"></span>
+            {#if variant === "outline"}
+                <span class="snowui-radio-dot"></span>
+            {/if}
+        </span>
+    </span>
     {#if children}
         <span class="snowui-radio-label">
             {@render children()}
@@ -226,18 +228,20 @@
             --snowui-radio-border-width-override,
             var(--snowui-radio-border-width)
         );
-        --snowui-radio-dot-size: calc(var(--snowui-radio-size-resolved) * 0.5);
+        --snowui-radio-dot-size: calc(var(--snowui-radio-visual-size) * 0.5);
         --snowui-radio-dot-size-resolved: var(
             --snowui-radio-dot-size-override,
             var(--snowui-radio-dot-size)
         );
         --snowui-radio-filled-border: calc(
-            var(--snowui-radio-size-resolved) * 0.3
+            var(--snowui-radio-visual-size) * 0.3
         );
         --snowui-radio-filled-border-resolved: var(
             --snowui-radio-filled-border-override,
             var(--snowui-radio-filled-border)
         );
+        --snowui-control-inset: calc(var(--snowui-radio-size-resolved) / 16);
+        --snowui-radio-visual-size: calc(var(--snowui-radio-size-resolved) * 0.875);
         --snowui-radio-color: var(--primary, var(--black-100, #000));
         --snowui-radio-color-resolved: var(
             --snowui-radio-color-override,
@@ -312,8 +316,8 @@
 
     :global(:where(.snowui-radio-visual)) {
         box-sizing: border-box;
-        width: var(--snowui-radio-size-resolved);
-        height: var(--snowui-radio-size-resolved);
+        width: var(--snowui-radio-visual-size);
+        height: var(--snowui-radio-visual-size);
         border-radius: var(--snowui-radio-radius-resolved);
         box-shadow: inset 0 0 0 var(--snowui-radio-border-width-resolved)
             var(--snowui-radio-base-border-color-current);

@@ -32,8 +32,9 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 - `.snowui-radio-visual` 是固定 Hug 的控件视觉体。
 - `.snowui-radio-label` 是可选 label，默认 Hug，不承担 Fill。
 - visual 与 label 的距离由 `--snowui-radio-gap` 管理，可通过 `--snowui-radio-gap-override` 覆盖。
-- `size` 只影响视觉体尺寸，不改变 label 的布局策略。
-- `size` 包含 inset 边框；例如 `size={32}` 的视觉体外框始终为 32×32px，边框不增加布局宽高。
+- `size` 表示包含透明留白的控件占位尺寸，不改变 label 的布局策略。
+- 四周留白为 `size / 16`，可见图形宽高为 `size × 0.875`；例如 `size={32}` 占位 32×32px、图形 28×28px、四边各 2px。留白与图形随 size、根字号和尺寸 Token 等比缩放，留白仍可点击。
+- 留白由共享控件壳持有，label 位于壳外；内边框继续按名义 size 的 `0.0625` 计算，圆角、Dot 与选中环按可见图形尺寸计算。
 - `as="badge"` 只表示 Radio 作为 Image 的角标挂件，不改变 Radio 内部布局模型。
 
 ---
@@ -310,8 +311,8 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 ```css
 --snowui-radio-size: var(--size-4); /* 基准 16px */
 --snowui-radio-border-width: calc(var(--snowui-radio-size) * 0.0625); /* 1px */
---snowui-radio-dot-size: calc(var(--snowui-radio-size) * 0.5); /* 8px */
---snowui-radio-filled-border: calc(var(--snowui-radio-size) * 0.3); /* 4px */
+--snowui-radio-dot-size: calc(var(--snowui-radio-visual-size) * 0.5); /* 可见尺寸的 50% */
+--snowui-radio-filled-border: calc(var(--snowui-radio-visual-size) * 0.3); /* 可见尺寸的 30% */
 --snowui-radio-primary: var(--primary, var(--black-100, #000000)); /* 使用全局 Primary Token */
 ```
 

@@ -54,7 +54,7 @@ import { AdaptiveContrastMask } from '@snowui-design-system/components/lib/adapt
 
 ## 生命周期、SSR 与成本
 
-颜色模块是无顶层副作用的纯函数。渲染辅助仅在实际挂载后读取祖先纯色背景，创建一个 MutationObserver 和系统色彩模式监听，并监听祖先背景颜色过渡的结束/取消；卸载时释放。监听 API 缺失时保留首次背景快照；SSR 不读 DOM，初始按 background-1 与白色基底绘制，挂载后校正。
+颜色模块是无顶层副作用的纯函数。渲染辅助仅在实际挂载后读取祖先纯色背景，创建一个 MutationObserver（包含 theme / mode 及 class / style 属性）和系统色彩模式监听，并监听祖先背景颜色过渡的结束/取消；卸载时释放。监听 API 缺失时保留首次背景快照；SSR 不读 DOM，初始按 background-1 与白色基底绘制，挂载后校正。
 
 组件必须在开启时才渲染遮罩、登记表面；关闭时不启动该能力专属 Observer、监听或持续测量。渲染层不创建 Portal、ResizeObserver、timer 或 rAF。背景 transition 结束后刷新最终色，不承诺逐帧采样过渡色。
 

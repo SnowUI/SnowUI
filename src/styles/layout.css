@@ -775,3 +775,13 @@
         transition: none;
     }
 }
+
+/* 原子表单控件的透明留白壳；原生 input 仍以外层 label 为定位和点击区域。 */
+:where(.snowui-control-inset) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    padding: var(--snowui-control-inset);
+    box-sizing: border-box;
+}

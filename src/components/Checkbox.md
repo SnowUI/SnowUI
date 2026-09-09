@@ -32,8 +32,9 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 - `.snowui-checkbox-visual` 是固定 Hug 的控件视觉体。
 - `.snowui-checkbox-label` 是可选 label，默认 Hug，不承担 Fill。
 - visual 与 label 的距离由 `--snowui-checkbox-gap` 管理，可通过 `--snowui-checkbox-gap-override` 覆盖。
-- `size` 只影响视觉体尺寸，不改变 label 的布局策略。
-- `size` 包含 inset 边框；例如 `size={32}` 的视觉体外框始终为 32×32px，边框不增加布局宽高。
+- `size` 表示包含透明留白的控件占位尺寸，不改变 label 的布局策略。
+- 四周留白为 `size / 16`，可见图形宽高为 `size × 0.875`；例如 `size={32}` 占位 32×32px、图形 28×28px、四边各 2px。留白与图形随 size、根字号和尺寸 Token 等比缩放，留白仍可点击。
+- 留白由共享控件壳持有，label 位于壳外；内边框继续按名义 size 的 `0.0625` 计算，圆角、Dot 与选中环按可见图形尺寸计算。
 
 ---
 
@@ -325,7 +326,7 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 ```css
 --snowui-checkbox-size: var(--size-4); /* 基准 16px */
 --snowui-checkbox-size-resolved: var(--snowui-checkbox-size-override, var(--snowui-checkbox-size));
---snowui-checkbox-radius: calc(var(--snowui-checkbox-size-resolved) * 0.3125); /* 16px 时为 5px */
+--snowui-checkbox-radius: calc(var(--snowui-checkbox-visual-size) * 0.3125); /* 可见尺寸的 31.25% */
 --snowui-checkbox-radius-resolved: var(--snowui-checkbox-radius-override, var(--snowui-checkbox-radius));
 --snowui-checkbox-border-width: calc(var(--snowui-checkbox-size-resolved) * 0.0625); /* 16px 时 1px，32px 时 2px */
 --snowui-checkbox-border-width-resolved: var(--snowui-checkbox-border-width-override, var(--snowui-checkbox-border-width));

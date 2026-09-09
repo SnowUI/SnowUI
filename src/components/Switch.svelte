@@ -77,8 +77,8 @@
     );
     const toggleRenderHints = $derived({
         variant: userRenderHints?.variant ?? "line",
-        width: userRenderHints?.width ?? `calc(${resolvedSizeToken} * 1.8)`,
-        height: userRenderHints?.height ?? resolvedSizeToken,
+        width: userRenderHints?.width ?? `calc(${resolvedSizeToken} * (1.8 + 1 / 7))`,
+        height: userRenderHints?.height ?? `calc(${resolvedSizeToken} * 8 / 7)`,
         radius: userRenderHints?.radius ?? "var(--radius-full, 9999px)",
     });
 
@@ -108,21 +108,23 @@
     renderHints={toggleRenderHints}
     {...rest}
 >
-    <input
-        bind:this={inputRef}
-        type="checkbox"
-        role="switch"
-        aria-checked={checked}
-        class="snowui-switch-sr-only"
-        {checked}
-        {value}
-        {disabled}
-        onclick={handleClick}
-        tabindex={disabled ? -1 : 0}
-    />
-    <div class="snowui-switch-track">
-        <div class="snowui-switch-thumb"></div>
-    </div>
+    <span class="snowui-control-inset">
+        <input
+            bind:this={inputRef}
+            type="checkbox"
+            role="switch"
+            aria-checked={checked}
+            class="snowui-switch-sr-only"
+            {checked}
+            {value}
+            {disabled}
+            onclick={handleClick}
+            tabindex={disabled ? -1 : 0}
+        />
+        <span class="snowui-switch-track">
+            <span class="snowui-switch-thumb"></span>
+        </span>
+    </span>
     {#if children}
         <span class="snowui-switch-label">
             {@render children()}
@@ -177,6 +179,7 @@
             --snowui-switch-width-override,
             var(--snowui-switch-width)
         );
+        --snowui-control-inset: calc(var(--snowui-switch-height-resolved) / 14);
         --snowui-switch-radius: var(--radius-full);
         --snowui-switch-radius-resolved: var(
             --snowui-switch-radius-override,

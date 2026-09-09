@@ -33,7 +33,7 @@ export const examples = [
     <Checkbox size={80} checked>80</Checkbox>
 </div>`,
         expected: {
-            render: "Checkbox in all ResourceSize steps; size includes the inset border, so 32 stays 32×32px while the border scales to 2px",
+            render: "Checkbox in all ResourceSize steps; 32px 占位包含四边各 2px 的可点击透明留白，可见图形为 28×28px；留白和图形等比缩放",
             layout: "Flex row",
             interaction: "None",
             responsive: "None"

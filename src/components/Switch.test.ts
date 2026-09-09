@@ -32,7 +32,7 @@ export const examples = [
     <Switch size={80} checked>80</Switch>
 </div>`,
         expected: {
-            render: "Switch in 8 standard gradient sizes",
+            render: "Switch 的 size 表示轨道高度，四边留白均为高度 / 14；28px 轨道加留白占用 32px 高，整体等比缩放",
             layout: "Flex row",
             interaction: "None",
             performance: "All sizes use the same bounded state-transition duration",

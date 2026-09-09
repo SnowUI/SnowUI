@@ -15,7 +15,7 @@
         };
         refresh();
         const observer = typeof MutationObserver === 'undefined' ? undefined : new MutationObserver(refresh);
-        ancestors.forEach(element => observer?.observe(element, { attributes: true, attributeFilter: ['class', 'style', 'data-theme', 'data-color-scheme'] }));
+        ancestors.forEach(element => observer?.observe(element, { attributes: true, attributeFilter: ['class', 'style', 'theme', 'mode', 'data-theme', 'data-color-scheme'] }));
         // 背景色带过渡时，属性变更时读到的是起始色；结束后按最终色重新计算。
         const afterTransition = (event: Event) => {
             if ((event as TransitionEvent).propertyName === 'background-color') refresh();

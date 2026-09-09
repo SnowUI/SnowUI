@@ -156,37 +156,39 @@
     renderHints={checkboxRenderHints}
     {...rest}
 >
-    <input
-        type="checkbox"
-        class="snowui-checkbox-sr-only"
-        bind:checked
-        bind:indeterminate
-        {value}
-        {disabled}
-        onchange={handleChange}
-        tabindex={disabled ? -1 : 0}
-        aria-label={ariaLabel}
-    />
-    <div class="snowui-checkbox-visual snowui-rounded-rectangle">
-        <div class="snowui-checkbox-hover-layer"></div>
-        <svg
-            class="snowui-checkbox-icon"
-            viewBox="0 0 28 28"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-        >
-            <path
-                class="snowui-checkbox-check-path"
-                d="M8 13.7333L11.4697 17.6106C11.6596 17.8228 11.9882 17.8338 12.1918 17.6346L20 10"
-                pathLength="1"
-            />
-            <path
-                class="snowui-checkbox-indeterminate-path"
-                d="M8 14H20"
-                pathLength="1"
-            />
-        </svg>
-    </div>
+    <span class="snowui-control-inset">
+        <input
+            type="checkbox"
+            class="snowui-checkbox-sr-only"
+            bind:checked
+            bind:indeterminate
+            {value}
+            {disabled}
+            onchange={handleChange}
+            tabindex={disabled ? -1 : 0}
+            aria-label={ariaLabel}
+        />
+        <span class="snowui-checkbox-visual snowui-rounded-rectangle">
+            <span class="snowui-checkbox-hover-layer"></span>
+            <svg
+                class="snowui-checkbox-icon"
+                viewBox="0 0 28 28"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    class="snowui-checkbox-check-path"
+                    d="M8 13.7333L11.4697 17.6106C11.6596 17.8228 11.9882 17.8338 12.1918 17.6346L20 10"
+                    pathLength="1"
+                />
+                <path
+                    class="snowui-checkbox-indeterminate-path"
+                    d="M8 14H20"
+                    pathLength="1"
+                />
+            </svg>
+        </span>
+    </span>
     {#if children}
         <span class="snowui-checkbox-label">
             {@render children()}
@@ -229,7 +231,7 @@
             var(--snowui-checkbox-size)
         );
         --snowui-checkbox-radius: calc(
-            var(--snowui-checkbox-size-resolved) * 0.3125
+            var(--snowui-checkbox-visual-size) * 0.3125
         ); /* 5px at 16px */
         --snowui-checkbox-radius-resolved: var(
             --snowui-checkbox-radius-override,
@@ -242,6 +244,8 @@
             --snowui-checkbox-border-width-override,
             var(--snowui-checkbox-border-width)
         );
+        --snowui-control-inset: calc(var(--snowui-checkbox-size-resolved) / 16);
+        --snowui-checkbox-visual-size: calc(var(--snowui-checkbox-size-resolved) * 0.875);
         --snowui-checkbox-color: var(--primary, var(--black-100, #000));
         --snowui-checkbox-color-resolved: var(
             --snowui-checkbox-color-override,
@@ -283,8 +287,8 @@
 
     :global(:where(.snowui-checkbox-visual)) {
         box-sizing: border-box;
-        width: var(--snowui-checkbox-size-resolved);
-        height: var(--snowui-checkbox-size-resolved);
+        width: var(--snowui-checkbox-visual-size);
+        height: var(--snowui-checkbox-visual-size);
         border-radius: var(--snowui-checkbox-radius-resolved);
         /* 内边框: 使用 box-shadow: inset 替代 border */
         box-shadow: inset 0 0 0 var(--snowui-checkbox-border-width-resolved)

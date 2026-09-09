@@ -12,7 +12,7 @@
 |:---|:---|:---|:---|
 | `checked` | `boolean` | `false` | 选中状态（双向绑定） |
 | `value` | `any` | - | 表单值 |
-| `size` | `ResourceSize \| number` | `16` | 组件高度（标准梯度: 12/16/20/24/28/32/40/48/80） |
+| `size` | `ResourceSize \| number` | `16` | 可见轨道高度，不含外侧留白（标准梯度: 12/16/20/24/28/32/40/48/80） |
 | `disabled` | `boolean` | `false` | 禁用状态 |
 | `children` | `Snippet` | - | 标签内容 |
 | `enableResponsive` | `boolean` | `false` | 启用响应式 |
@@ -28,7 +28,8 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 - `.snowui-switch-track` 是固定 Hug 的控件视觉体。
 - `.snowui-switch-label` 是可选 label，默认 Hug，不承担 Fill。
 - track 与 label 的距离由 `--snowui-switch-gap` 管理，可通过 `--snowui-switch-gap-override` 覆盖。
-- `size` 只影响 track / thumb 尺寸，不改变 label 的布局策略。
+- `size` 表示可见轨道高度；四边透明留白各为 `size / 14`，控件占位高为 `size × 8 / 7`、宽为 `size × (1.8 + 1 / 7)`。例如 `size={28}` 轨道为 50.4×28px，四边各留 2px，占位为 54.4×32px。
+- 留白与 track / thumb 随 size、根字号和尺寸 Token 等比缩放，留白仍可点击；label 位于留白壳外。
 
 ---
 
