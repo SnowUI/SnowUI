@@ -20,8 +20,16 @@
 | `textPosition` | `"left" \| "right"` | `"right"` | FlowText 内容相对 `children` 的位置 |
 | `rollDirection` | `"normal" \| "reverse"` | `"normal"` | 控制统一字符纵向流动语义；`normal` 使用公共趋势方向，`reverse` 完整取反 |
 | `respectMotionPreference` | `boolean` | `false` | 显式开启后遵循系统减少动效设置 |
-| `font` / `size` / `weight` / `lineHeight` | - | `undefined` | 统一排版接口 |
-| `color` / `align` / `motionColor` | - | `undefined` | 最终颜色、对齐与变化色 |
+| `font` | `string` | `undefined` | 字体；未设置时继承容器 |
+| `size` | `string \| number` | `undefined` | 字号；未设置时继承容器 |
+| `weight` | `string \| number` | `undefined` | 字重；未设置时继承容器 |
+| `lineHeight` | `string \| number` | `undefined` | 行高；未设置时继承容器 |
+| `color` | `SnowUIColor \| string` | `undefined` | 文字最终颜色；未设置时继承容器 |
+| `align` | `TextMotionAlign` | `undefined` | 文字对齐方式 |
+| `motionColor` | `TextMotionColor` | `undefined` | 变化字符的临时颜色，动效结束后回到文字颜色 |
+| `loading` | `boolean` | `undefined` | 加载状态；与 skeleton 同时开启时显示骨架，未设置时遵循容器状态 |
+| `skeleton` | `boolean` | `undefined` | 控制骨架显示，未设置时遵循容器骨架状态 |
+| `renderHints` | `RenderHints` | `undefined` | 骨架形状与尺寸提示 |
 | `children` | `Snippet` | `undefined` | 文本前后缀内容 |
 | `...rest` | `FrameProps` | - | 透传到根 `FramePro` |
 
