@@ -36,7 +36,7 @@ export const examples = [
     {
         name: "FM-01b：地址复合字段错误态",
         code: `FM-01b
-<Field invalid column style="width: 360px; gap: 0;">
+<Field invalid error="请补全地址信息。" column style="width: 360px; gap: 0;">
     <Select as="segment" invalid placeholder="Country" name="addressCountryError">
         <Listbox>
             <MenuItem as="item" value="us">United States</MenuItem>
@@ -56,7 +56,6 @@ export const examples = [
         <Input as="segment" invalid name="cityError" placeholder="City" />
         <Input as="segment" invalid name="zipError" placeholder="ZIP" />
     </Frame>
-    <Text as="error">请补全地址信息。</Text>
 </Field>`,
         logic: ["Composition", "Validation"],
     },
@@ -72,12 +71,12 @@ export const examples = [
     >
         <Icon as="leading"><CreditCard /></Icon>
     </Input>
-    <Frame as="segment" row style="flex: 0 0 97px; padding: var(--padding-3) var(--padding-4); gap: 0;">
+    <Frame as="segment" row gap={1} class="px-16 py-12" style="flex: 0 0 97px;">
         <Input
             name="cardMonth"
             type="tel"
             placeholder="MM"
-            style="width: 1.5rem; min-height: 20px; padding: 0; background: transparent; box-shadow: none; border-radius: 0;"
+            style="width: 1.5rem; padding: 0; background: transparent; box-shadow: none; border-radius: 0;"
         />
         <Text
             class="text-14"
@@ -87,7 +86,7 @@ export const examples = [
             name="cardYear"
             type="tel"
             placeholder="YY"
-            style="width: 1.5rem; min-height: 20px; padding: 0; background: transparent; box-shadow: none; border-radius: 0;"
+            style="width: 1.5rem; padding: 0; background: transparent; box-shadow: none; border-radius: 0;"
         />
     </Frame>
     <Input as="segment" name="cardCvc" type="tel" placeholder="CVC" style="flex: 0 0 62px;" />
@@ -230,7 +229,7 @@ export const examples = [
         Ask a question or request, or type '/' for suggestions
     </Text>
     <Frame as="row" row style="align-items: center; justify-content: space-between;">
-        <Frame as="row" row style="gap: var(--gap-1);">
+        <Frame as="row" row gap={2}>
             <Button type="button" variant="borderless" bare iconOnly emphasis="muted" aria-label="添加附件">
                 <Paperclip size={16} />
             </Button>

@@ -322,7 +322,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 | 默认 | `Background/3` + `Black/20%` 的 `0.5px` 内边框 |
 | Hover | 通过 `field-bordered 工具类` 的 hover 链路生效，默认维持 `Black/20%` 内边框 |
 | Focus Within | 通过 `field-bordered 工具类` 的 focus-within 链路生效，切到 `Black/40%` 内边框，并显示 `Black/4%` 的 `4px` focus ring |
-| Invalid | 组件层改写为 `--secondary-red` 链路 |
+| Invalid | 组件层改写为 `--secondary-red` 链路；共享 field-bordered 错误外壳的聚焦环使用同色 4% 透明度，Field 汇总子宿主错误时同样生效 |
 | Disabled | 统一使用 Frame 的禁用态表现 |
 | Readonly | 保留聚焦与文本选择能力，但改为 `Background/2` 且移除边框 |
 

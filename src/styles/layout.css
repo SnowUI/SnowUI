@@ -223,6 +223,17 @@
         0 0 0 var(--snowui-field-focus-ring-width, 0.25rem) var(--snowui-field-focus-ring-color, var(--black-4, #0000000a));
 }
 
+/* 汇总容器与内部 host 的错误态；细边框始终为红色，聚焦环仍仅由 focus-within 绘制。 */
+:where(
+    .snowui-field-bordered[data-invalid="true"],
+    .snowui-field-bordered:has(.snowui-field-host[data-invalid="true"])
+) {
+    --snowui-field-border-color: var(--secondary-red, #ff4747ff);
+    --snowui-field-hover-border-color: var(--secondary-red, #ff4747ff);
+    --snowui-field-focus-border-color: var(--secondary-red, #ff4747ff);
+    --snowui-field-focus-ring-color: color-mix(in srgb, var(--secondary-red, #ff4747ff) 4%, transparent);
+}
+
 /* === Feedback Error Shake ===
    语义:一次性错误反馈动效。错误视觉仍由 invalid / data-invalid 管理。
    默认接入:Field、独立 Input、独立 Textarea、独立 Select。

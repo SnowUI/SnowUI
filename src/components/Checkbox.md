@@ -8,7 +8,7 @@
 
 ## 关键字
 
-| Property | Type | Default | Description | Category |
+| 关键字 | Type | Default | Description | Category |
 |:---|:---|:---|:---|:---|
 | `checked` | `boolean` | `false` | 选中状态（双向绑定） | **State** |
 | `indeterminate` | `boolean` | `false` | 不确定状态（双向绑定） | **State** |
