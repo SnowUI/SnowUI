@@ -169,8 +169,15 @@
         flex-wrap: nowrap;
     }
 
-    :global(:where(.snowui-field[data-readonly="true"])) {
+    :global(:where(
+        .snowui-field[data-readonly="true"],
+        .snowui-field:has([data-field-control="input"][data-readonly="true"])
+    )) {
         background-color: var(--surface-2, #00000008);
+    }
+
+    :global(:where(.snowui-field:has([data-field-control="input"][data-readonly="true"]))) {
+        box-shadow: none;
     }
 
     :global(:where(.snowui-field[data-invalid="true"])) {
@@ -490,7 +497,6 @@
         gap: 0;
         padding: 0;
         overflow: hidden;
-        background-color: transparent;
     }
 
     :global(:where(.snowui-field.snowui-direction-row > [data-as="segment"].snowui-direction-row)) {

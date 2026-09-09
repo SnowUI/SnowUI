@@ -261,6 +261,8 @@ Field 是字段表面的槽位宿主特化：
 | Focus | 由 `field-bordered 工具类` 提供：`Black/40%` + `Black/4%` 的 `4px` ring |
 | Label 字重 | `var(--font-weight-regular, 400)` |
 
+Field 与独立 Input 使用相同的默认背景 `surface-1`。普通、横向分段与纵向分段均由 Field 统一绘制背景；嵌入的 Input 根及原生输入控件保持透明，避免重复叠加半透明背景。只读态继续由 Field 统一承接 `surface-2`。
+
 ### 2. 组合规则
 
 | 区域 | 规则 |
@@ -281,7 +283,7 @@ Field 是字段表面的槽位宿主特化：
 
 | 示例 | 结构类型 | padding 归属 | 分割线规则 |
 | :--- | :--- | :--- | :--- |
-| `FM-01` 地址复合字段 | `Field column > Select as="segment" + Input as="segment" + Select as="segment" + Frame as="segment" row > Input as="segment" + Input as="segment"` | 每一段 `segment` 宿主自己持有 `12 / 16` 内容 inset；外层 `Field` 透明，不再统一包一层 padding | 顶部三段和底部双列属于同一张连续表面；段与段之间只允许一条横线，底部双列之间只允许一条竖线 |
+| `FM-01` 地址复合字段 | `Field column > Select as="segment" + Input as="segment" + Select as="segment" + Frame as="segment" row > Input as="segment" + Input as="segment"` | 每一段 `segment` 宿主自己持有 `12 / 16` 内容 inset；外层 `Field` 统一绘制背景，不再统一包一层 padding | 顶部三段和底部双列属于同一张连续表面；段与段之间只允许一条横线，底部双列之间只允许一条竖线 |
 | `FM-02` 信用卡三段 | `Field row > segment + segment + segment` | 每个 `segment` 段容器持有 `12 / 16` padding，内部 `gap = 0`；外层 `Field` 负责整张表面的外壳与分割线组织 | 三段共用同一张外壳，段与段之间使用纵向分割线 |
 | `FM-03` 通知方式 | `Field > label + row(Checkbox + Checkbox)` | 外层 `Field` 持有 `12 / 16` padding；checkbox 行自己的间距要在 `Frame` 上显式声明 | 内部是并排选项，不是连续输入表面，因此不加任何内部分割线 |
 
