@@ -641,7 +641,7 @@
  * Log (2026-04-16): 提取 Quick Action 阴影与背景变量，作为 Listbox / 浮层类组件通用规范。
  */
 :where(html) {
-    --snowui-shadow-quick-action: 0 0.5rem 1.75rem 0 rgba(0, 0, 0, 0.10);
+    --snowui-shadow-quick-action: inset 0 0 0 var(--border-1) var(--surface-1), 0 0.5rem 1.75rem 0 rgba(0, 0, 0, 0.10);
     --snowui-backdrop-quick-action: blur(var(--size-10));
     --snowui-border-quick-action: none;
     --snowui-background-quick-action: var(--background-3, rgba(255, 255, 255, 0.9));

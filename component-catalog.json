@@ -471,7 +471,7 @@
       "kind": "component",
       "source": "src/components/Input.svelte",
       "documentation": "src/components/Input.md",
-      "description": "基础单行输入宿主；text 使用原生可见 <input，date / color 使用自定义可见展示层，其余类型继续承接原生 <input 能力与 Frame 通用能力。",
+      "description": "单行输入，支持文本、搜索、密码、数字、日期时间与颜色；可组合字段标签、图标、校验反馈和表单。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,

@@ -1,5 +1,7 @@
 # Listbox.svelte 文档
 
+> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-1)`（16px 根字号下 0.5px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+
 ## 默认内置模式 / 显式组合模式
 
 - 默认内置模式（推荐）：`items` 自动生成固定搜索框与 `<MenuItem as="item">`。未设置 `maxHeight` 时，面板高度按实际可见 MenuItem 的高度计算：默认最多完整显示 10 项，超过后显示浮层滚动条；通过 `parts.Input` / `parts.MenuItem` 配置内置组件。

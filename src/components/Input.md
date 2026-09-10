@@ -1,7 +1,7 @@
 # Input.svelte 文档
 
 > **版本**: v1.1.3
-> **职责**: 基础单行输入宿主；`text` 使用原生可见 `<input>`，`date` / `color` 使用自定义可见展示层，其余类型继续承接原生 `<input>` 能力与 Frame 通用能力。
+> **职责**: 单行输入，支持文本、搜索、密码、数字、日期时间与颜色；可组合字段标签、图标、校验反馈和表单。
 
 **2026-04-27 补充**: 内建清除 X 恢复为焦点态交互：只有输入内容非空且 `Input` 处于 `focus-within` 时显示；失焦后隐藏且不为隐藏 X 预留额外 gap。
 
@@ -79,20 +79,55 @@
 
 ## 组件特有属性 (Component-Specific Props)
 
+下表逐项对应具名 Props；未重新声明的通用能力见 [Frame](./Frame.md)。
+
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| type | `string` | `"text"` | 原生输入类型，如 `text` / `email` / `password` / `number`；`range` / `file` 不再支持，会回退为 `text` |
-| value | `string \| number` | - | 当前值，支持 `bind:value` |
-| element | `HTMLElement` | - | 外层真实 Frame 根元素引用，支持 `bind:element`；用于宿主特化组件复用根尺寸与焦点能力 |
-| defaultValue | `string \| number` | - | 初始值；未绑定 `value` 时作为初始展示值 |
-| disabled | `boolean` | `false` | 禁用输入 |
-| readonly | `boolean` | `false` | 只读输入；保留聚焦与选中文本能力，但不可直接编辑 |
-| required | `boolean` | `false` | 必填输入 |
-| invalid | `boolean` | `false` | 组件级无效态，等价于为内部 input 补 `aria-invalid="true"` 的视觉表现 |
-| error | `string \| Snippet` | `undefined` | `invalid=true` 时生成位于输入框下方的内置错误 Text；默认不生成。 |
-| parts | `{ Text? }` | `undefined` | 配置内置错误 Text。 |
-| placeholder | `string` | - | 占位提示 |
-| name | `string` | - | 表单提交字段名 |
+| element | `HTMLElement` | `—` | 外层 Frame 根元素引用，支持 bind:element；不是原生 input 引用。 |
+| type | `HTMLInputAttributes["type"]` | `"text"` | 选择单行输入类型；支持 text、search、email、password、url、tel、number、date、time、datetime-local、month、week、color。日期时间和颜色具有组件展示层及原生值宿主；file / range 会回退为 text，不提供上传或滑杆。 |
+| value | `string \| number \| undefined` | `—` | 当前值，支持 bind:value 双向同步；显式 value 优先于 defaultValue。原生编辑和内置清除事件同步 input.value 字符串；number 可使用数字初值，业务计算需自行转换。 |
+| defaultValue | `string \| number \| undefined` | `—` | 未传 value 时的初始值；输入后的值由组件同步管理；表单重置若需恢复业务初值，应在 onreset 中显式恢复绑定值。 |
+| placeholder | `string` | `—` | 空输入的提示文字，不替代可访问标签；日期时间输入保留分段占位。 |
+| name | `string` | `—` | 原生表单字段名；FormData 使用该名称收集字段。 |
+| disabled | `boolean` | `false` | 禁止用户输入与交互，原生禁用字段不参与表单提交。 |
+| readonly | `boolean` | `false` | 保留聚焦、选择与提交，禁止编辑并隐藏清除入口；使用只读视觉。 |
+| required | `boolean` | `false` | 参与浏览器原生必填校验；不自动产生业务错误文案。 |
+| autocomplete | `HTMLInputAttributes["autocomplete"]` | `—` | 透传浏览器自动填充字段语义，如 username、email、new-password；候选来自浏览器已有数据。 |
+| minlength | `number` | `—` | 适用文本输入的最小字符长度，由浏览器在适用的用户编辑和表单校验路径执行。 |
+| maxlength | `number` | `—` | 适用文本输入的最大字符长度；浮层 as="search" 未显式设置时回退为 100。 |
+| pattern | `string` | `—` | 适用文本输入的原生校验正则，不包含斜杠；需要整体匹配，空值是否有效由 required 决定。 |
+| min | `number \| string` | `—` | 数字或日期时间输入的最小值；数字按输入数值，日期时间按对应原生格式表达。 |
+| max | `number \| string` | `—` | 数字或日期时间输入的最大值；数字按输入数值，日期时间按对应原生格式表达。 |
+| step | `number \| string` | `—` | 原生步进约束；number 以数值单位步进，日期时间使用浏览器对应类型的步进单位。 |
+| inputmode | `HTMLInputAttributes["inputmode"]` | `—` | 向设备提示软键盘类型，如 numeric、decimal、tel；不执行输入过滤或校验。 |
+| enterkeyhint | `HTMLInputAttributes["enterkeyhint"]` | `—` | 向软键盘提示回车动作，如 next、search、done；不自动执行导航或提交。 |
+| spellcheck | `boolean` | `—` | 透传拼写检查开关；未指定时遵循浏览器与继承环境。 |
+| list | `string` | `—` | 关联原生 datalist 的 id，候选与浏览器呈现由调用方和浏览器提供。 |
+| accept | `string` | `—` | 保留的原生属性透传入口；Input 不支持 file，不能通过此属性获得文件类型限制或上传能力。 |
+| multiple | `boolean` | `—` | 原生多值提示，适用于 email 多邮箱等浏览器支持的输入；Input 不支持多文件上传。 |
+| capture | `boolean \| "user" \| "environment"` | `—` | 保留的原生采集属性；由于 file 会回退为 text，在 Input 中不提供相机或文件采集能力。 |
+| form | `string` | `—` | 按 id 关联外部 form；原生提交与重置包含该字段，不要求字段位于 form 内。 |
+| autofocus | `boolean` | `—` | 普通输入透传原生自动聚焦提示，浏览器可能保留已有焦点；日期时间展示层在首次挂载主动聚焦首段。避免页面加载抢焦点。 |
+| tabindex | `number` | `—` | 透传原生焦点顺序；0 使用自然顺序，-1 退出顺序导航，正数定义显式顺序。常规表单推荐自然顺序。 |
+| title | `string` | `—` | 原生提示文字；日期时间与颜色输入同时为展示层提供相应提示，不替代 label。 |
+| id | `string` | `—` | 原生输入标识，可供 label 的 for 与原生关联属性引用。 |
+| invalid | `boolean` | `false` | 与 aria-invalid 汇总无效态，显示错误视觉；独立输入自动错误反馈，Field 内由 Field 汇总。 |
+| error | `string \| Snippet` | `—` | invalid 时生成下方内置错误 Text；字符串为文案，Snippet 无参数并提供错误内容，默认不生成。 |
+| parts | `ComponentPartsOf<{ Text: typeof Text }>` | `—` | 通过 Text 键配置内置错误 Text 的公开 Props，仅对组件生成的 Text 生效；显式子项自行声明 Props。 |
+| children | `Snippet` | `—` | 无参数显式子内容，用 as="leading" / as="trailing" 组合图标或附件；清除可见时接管 trailing 位置。 |
+| allowCustomValue | `boolean` | `false` | 仅 as="search" 位于 Listbox 时生效；无匹配时 Enter 将输入添加为自定义项并选中，支持删除自定义项。 |
+| onclick | `(event: MouseEvent) => void` | `—` | 单击原生输入或相应展示层时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| ondblclick | `(event: MouseEvent) => void` | `—` | 双击时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| oninput | `(event: Event) => void` | `—` | 用户输入以及组件清除、步进等输入同步时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onchange | `(event: Event) => void` | `—` | 原生提交值变化或组件发出 change 同步时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onfocus | `(event: FocusEvent) => void` | `—` | 输入获得焦点时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onblur | `(event: FocusEvent) => void` | `—` | 输入失去焦点时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onkeydown | `(event: KeyboardEvent) => void` | `—` | 按下键盘按键时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onkeyup | `(event: KeyboardEvent) => void` | `—` | 释放键盘按键时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onkeypress | `(event: KeyboardEvent) => void` | `—` | 浏览器触发已弃用的 keypress 时；新代码推荐 onkeydown回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onpaste | `(event: ClipboardEvent) => void` | `—` | 粘贴时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| oncopy | `(event: ClipboardEvent) => void` | `—` | 复制时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| oncut | `(event: ClipboardEvent) => void` | `—` | 剪切时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
 
 ## 宿主协议
 
@@ -150,9 +185,9 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 | enterkeyhint | `string` | - | 移动端回车键文案提示 |
 | spellcheck | `boolean` | - | 拼写检查 |
 | list | `string` | - | datalist 关联 |
-| accept | `string` | - | 文件类型约束 |
-| multiple | `boolean` | `false` | 多文件选择 |
-| capture | `boolean \| "user" \| "environment"` | - | 文件采集偏好 |
+| accept | `string` | - | 保留透传；Input 不支持 file，无法提供上传类型约束 |
+| multiple | `boolean` | - | 原生多值语义，如 email 多邮箱；不支持多文件上传 |
+| capture | `boolean \| "user" \| "environment"` | - | 保留透传；Input 不提供文件采集能力 |
 | form | `string` | - | 指定表单归属 |
 | autofocus | `boolean` | `false` | 首次渲染自动聚焦 |
 | tabindex | `number` | - | Tab 顺序 |
@@ -226,7 +261,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 
 `Input` 不负责：
 
-- label / description / error 的排版
+- label / description 的完整字段排版（可组合 Field）；error 可由公开 error 属性生成内置反馈
 - 自动补全数据源生成
 - 表单规则中心
 - 业务级错误文案
@@ -531,6 +566,8 @@ invalid=true + !hasCustomTrailing
 - **Input 组件**: [./Input.svelte](./Input.svelte)
 
 ## Changelog
+
+- **Input-Docs.2026-09-10** 补齐全部具名属性、事件与 Snippet 说明，明确原生多值与已移除文件类型的边界；同步 Site 拟真示例，不改变组件行为。
 
 - **Input-Motion.2026-06-18** 新增默认错误反馈 shake：独立 `Input invalid / aria-invalid` 自动播放，嵌入 `Field` 时由 `Field` 汇总播放，消费方无需手动传类名或状态。
 - **Input-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。

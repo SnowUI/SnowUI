@@ -1,5 +1,7 @@
 # Dialog.svelte 文档
 
+> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-1)`（16px 根字号下 0.5px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+
 > **版本**: v1.1.0
 > **职责**: 提供通用模态对话框,包含 backdrop、居中面板、焦点陷阱、滚动锁定与三种激活模式。
 

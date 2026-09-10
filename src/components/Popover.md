@@ -1,5 +1,7 @@
 # Popover.svelte 文档
 
+> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-1)`（16px 根字号下 0.5px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+
 > **版本**: v3.1.1
 > **变更记录 (2026-05-15)**: 旧 Popover 定义全部废弃,合并 QuickAction(小尺寸)、取代 SearchPopup(中尺寸)。
 > **新增 (2026-05-15) v3.1.0**: 内嵌模式 `as="popover"`(Tooltip 风格):放入宿主子节点即自动绑定。
