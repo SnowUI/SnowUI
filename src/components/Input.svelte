@@ -381,7 +381,7 @@
     const inputRenderHints = $derived({
         variant: userRenderHints?.variant ?? "line",
         width: userRenderHints?.width ?? "100%",
-        height: userRenderHints?.height,
+        height: userRenderHints?.height ?? "calc(var(--snowui-input-line-height) + var(--snowui-input-padding-y) * 2)",
         radius: userRenderHints?.radius ?? "var(--radius-4)",
     });
     const colorDisplayValue = $derived(
@@ -943,6 +943,8 @@
         if (nextSegment) focusDateSegment(nextSegment);
     }
 
+    let committingDateDraft = false;
+
     function commitDateDraft(nextDraft: DateDraft, emitChange = false) {
         dateDraft = nextDraft;
         const formatted = formatDateDraft(nextDraft);
@@ -950,7 +952,8 @@
         if (formatted !== getResolvedStringValue(nativeInputElement?.value)) {
             if (nativeInputElement) nativeInputElement.value = formatted;
         }
-        emitSyntheticInput();
+        committingDateDraft = true;
+        try { emitSyntheticInput(); } finally { committingDateDraft = false; }
         if (emitChange && formatted !== lastDateChangeValue) {
             lastDateChangeValue = formatted;
             emitSyntheticChange();
@@ -1165,6 +1168,8 @@
     }
 
     function handleNativeDateInput(event: Event) {
+        // 分段编辑自己的 input 通知不能把未完成草稿按原生空值重新解析。
+        if (committingDateDraft) { userOnInput?.(event); return; }
         syncValueFromTarget(event.currentTarget);
         const nextValue =
             event.currentTarget instanceof HTMLInputElement
@@ -1788,6 +1793,12 @@
 {/if}
 
 <style>
+    /* 骨架替换整个输入表面，不重复叠加输入内容的 padding。 */
+    :global(:where(.snowui-input.snowui-loading):has(> .snowui-skeleton-layout)) {
+        padding: 0;
+        display: block;
+    }
+
     :global(:where(.snowui-input)) {
         display: flex;
         flex-direction: row;

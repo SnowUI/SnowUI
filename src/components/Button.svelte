@@ -42,8 +42,9 @@
   interface Props extends Omit<FrameProps, "size"> {
     variant?: "gray" | "filled" | "outline" | "borderless";
     size?: "sm" | "md" | "lg";
-    /** 明确启用单视觉内容布局；默认 false，不根据 children 自动推断。 */
+    /** 有 padding 的纯图标按钮，控制对称 padding 与图标大小；不根据 children 自动推断。 */
     iconOnly?: boolean;
+    /** 无外壳按钮，以图标操作为主，也支持文字；无需叠加 iconOnly。 */
     bare?: boolean;
     /** bare 模式的视觉强调级别；normal 默认始终 100%，muted 为 40% 并在 hover 时提升到 100%。 */
     emphasis?: "normal" | "muted";
@@ -184,16 +185,9 @@
   let buttonElement = $state<HTMLElement | undefined>(undefined);
   let hasWarnedMissingIconOnlyName = false;
 
-  const defaultButtonIconSize = $derived.by(() => {
-    if (resolvedSize === "lg") return 20;
-    if (resolvedSize === "md") return 16;
-    return 12;
-  });
-
   // 传递给 Frame Context 的尺寸（供 Icon/Avatar 等子组件继承）
   const contextPixelSize = $derived.by(() => {
-    if (bare && iconOnly) return defaultButtonIconSize;
-    if (iconOnly) {
+    if (bare || iconOnly) {
       if (resolvedSize === "lg") return 24;
       if (resolvedSize === "md") return 20;
       return 16;
@@ -207,8 +201,8 @@
     if (bare && iconOnly) {
       return {
         variant: userRenderHints?.variant ?? "circle",
-        width: userRenderHints?.width ?? `${defaultButtonIconSize}px`,
-        height: userRenderHints?.height ?? `${defaultButtonIconSize}px`,
+        width: userRenderHints?.width ?? `${contextPixelSize}px`,
+        height: userRenderHints?.height ?? `${contextPixelSize}px`,
         radius: userRenderHints?.radius ?? "0",
       };
     }

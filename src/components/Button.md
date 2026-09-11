@@ -27,14 +27,14 @@
 
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `children` | `Snippet` | — | 按钮内的文字、图标或其他内容；纯图标用法须显式设置 iconOnly 并提供可访问名称，组件不通过内容自动推断。 |
+| `children` | `Snippet` | — | 按钮内的文字、图标或其他内容；有外壳纯图标用法设置 iconOnly，无外壳用 bare；两者的纯图标用法均须提供可访问名称，组件不通过内容自动推断。 |
 | `holdRepeatInterval` | `number` | `80` | 按住期间相邻周期 click 的间隔，单位 ms，最小按 1 处理；仅 holdRepeat=true 生效。 |
 | `holdRepeatDelay` | `number` | `260` | 开始周期连发前的等待时间，单位 ms，负值按 0 处理；仅 holdRepeat=true 生效，第一次周期点击还需等待 holdRepeatInterval。 |
 | `holdRepeat` | `boolean` | `false` | 开启指针按住连发；仅对未禁用的 button 宿主主按钮按压生效。按下立即触发一次 click，等待后周期触发，松开或取消停止；不为链接或键盘增加连发。 |
 | variant | 'gray'\|'filled'\|'outline'\|'borderless' | 'gray' | 按钮变体样式 |
 | `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "sm"） | 控制按钮字号、内边距、圆角及子图标尺寸；显式值优先，其次 ButtonGroup/集合及父级尺寸上下文，无上下文时为 sm。 |
-| iconOnly | `boolean` | `false` | 明确启用单视觉内容布局。使用对称 icon-only padding 与放大一级的尺寸上下文；不检查 children 类型。缺少 `aria-label`、`aria-labelledby` 或 `title` 时开发环境警告。 |
-| bare | `boolean` | `false` | 开启无外壳按钮模式，内容可包含文字、Icon 或其他元素。忽略 `variant`，移除 padding / radius / 背景 / 边框与 hover overlay，保留普通 Button 的内容 gap；前景色继承 `currentColor`，默认保持 100% 不透明。因为没有背景层，`scaleOnHover` 不产生视觉放大，文字与 Icon 保持原尺寸。与 `iconOnly` 同时使用时采用当前 `size` 档位的 12/16/20px 视觉尺寸上下文，并提供至少 16×16px 的透明点击热区。精确尺寸由子视觉自己声明。放入 Tab 时由 Tab 的 Button opacity override 接管透明度，不发生叠乘。 |
+| iconOnly | `boolean` | `false` | 有 padding 的纯图标按钮模式，专门控制只有图标时的对称 padding 和图标大小；sm/md/lg 图标为 16/20/24px。无外壳图标按钮直接使用 bare。缺少 aria-label、aria-labelledby 或 title 时开发环境警告。 |
+| bare | `boolean` | `false` | 无外壳按钮，以图标操作为主，也可包含文字或其他内容。忽略 variant，移除 padding、radius、背景、边框和 hover overlay，保留内容 gap。无需叠加 iconOnly；同 size 的图标与 iconOnly 一致，为 16/20/24px，子图标显式 size 优先。默认 100% 不透明，emphasis="muted" 启用 40% → hover 100%。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
 | backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
 | scaleOnHover | `boolean` | `true` | 是否同时启用 Button 内置背景层 hover 放大及配套点击缩回 / 恢复动效。独立动作默认开启；文字、Icon、Spinner 与命中区不缩放。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
@@ -49,8 +49,8 @@
 | :--- | :--- | :--- | :--- |
 | variant | `'gray' \| 'filled' \| 'outline' \| 'borderless'` | `'gray'` | 按钮变体 |
 | `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "sm"） | 控制按钮字号、内边距、圆角及子图标尺寸；显式值优先，其次 ButtonGroup/集合及父级尺寸上下文，无上下文时为 sm。 |
-| iconOnly | `boolean` | `false` | 显式选择单视觉内容布局；未声明时始终按普通内容按钮处理。 |
-| bare | `boolean` | `false` | 无外壳按钮模式，不限制内容类型。忽略 `variant`，外壳 padding / radius 为 0，保留内容 gap；与 `iconOnly` 同时使用时获得对应尺寸上下文与最小透明点击热区。默认使用 `currentColor × opacity: 1`。 |
+| iconOnly | `boolean` | `false` | 有 padding 的纯图标按钮模式，专门控制只有图标时的对称 padding 和图标大小；sm/md/lg 图标为 16/20/24px。无外壳图标按钮直接使用 bare。缺少 aria-label、aria-labelledby 或 title 时开发环境警告。 |
+| bare | `boolean` | `false` | 无外壳按钮，以图标操作为主，也可包含文字或其他内容。忽略 variant，移除 padding、radius、背景、边框和 hover overlay，保留内容 gap。无需叠加 iconOnly；同 size 的图标与 iconOnly 一致，为 16/20/24px，子图标显式 size 优先。默认 100% 不透明，emphasis="muted" 启用 40% → hover 100%。 |
 | emphasis | `'normal'\|'muted'` | `'normal'` | bare 的强调级别；`muted` 使用 `currentColor × opacity: 0.4 -> 1`。 |
 | backgroundBlur | `boolean` | `false` | 开启按钮背景模糊，默认强度为 `1.25rem`。 |
 | scaleOnHover | `boolean` | `true` | 统一控制背景层内置 hover 放大与配套点击缩回 / 恢复；内容不缩放。复合控件项从 owner 继承 `false`，实例显式值优先。 |
@@ -75,7 +75,7 @@ Button 的内部布局不接入三槽位模型：
 - `as="current"` / `as="page"` / `as="prev"` / `as="next"` 放入 Pagination 时表示角色样式模板；真实页码、可点击性与边界状态由 Pagination 生成和管理。
 - `bare` 是不限制内容类型的无外壳特化：保持当前字号 / 行高与普通内容 gap，固定清零 padding / radius，并默认使用 `currentColor × opacity: 1`；仅 `emphasis="muted"` 使用 `0.4 -> 1` 表达次级操作。
 - `as="pageSize"` 可作为 Pagination 的每页条数视觉模板；Pagination 会注入当前数值和 `ArrowLineDown`，并用内置 Listbox 接管交互。Icon 作为 Button 普通内容，不使用 `as="trailing"`，间距由 Button 内容 gap 控制。
-- `bare iconOnly` 显式注入当前档位的 12/16/20px 尺寸上下文，并通过透明伪元素保证至少 16×16px 的点击热区；精确尺寸直接写在子视觉上。
+- `bare` 自动注入与 iconOnly 一致的 16/20/24px 图标上下文，无需 iconOnly；子图标显式 size 优先。兼容的 bare iconOnly 组合仍保留透明热区。
 - 当 Button 作为 `ButtonGroup` 的直系子项时，自动进入嵌入态：保留独立点击、链接、状态与内容 gap，退掉自身背景、边框和圆角，并接收 ButtonGroup 分配的单元格 padding。
 
 布局变量链：
@@ -107,14 +107,14 @@ Button 的内部布局不接入三槽位模型：
 <Button bare>Random</Button>
 <Button bare><Icon><Shuffle /></Icon>Random</Button>
 <Button iconOnly aria-label="展开"><ArrowLineDown /></Button>
-<Button bare iconOnly aria-label="展开"><ArrowLineDown size={16} /></Button>
-<Button bare iconOnly emphasis="muted" aria-label="次级操作"><ArrowLineDown size={16} /></Button>
+<Button bare aria-label="展开"><ArrowLineDown size={16} /></Button>
+<Button bare emphasis="muted" aria-label="次级操作"><ArrowLineDown size={16} /></Button>
 <Button backgroundBlur>背景模糊按钮</Button>
 
 <!-- 日期选择触发器 -->
 <Field>
   <Input type="date" />
-  <Button bare iconOnly as="trailing" aria-label="打开日期选择">
+  <Button bare as="trailing" aria-label="打开日期选择">
     <ArrowLineDown size={16} />
   </Button>
 </Field>
@@ -265,7 +265,7 @@ OSS Button **自动输出 `aria-pressed`**:
 <!-- 简单场景：自动推断 -->
 <Field>
   <Input type="date" />
-  <Button bare iconOnly as="trailing" aria-label="打开日期选择">
+  <Button bare as="trailing" aria-label="打开日期选择">
     <ArrowLineDown size={16} />
   </Button>
 </Field>
@@ -274,7 +274,7 @@ OSS Button **自动输出 `aria-pressed`**:
 <Field>
   <Frame as="row" row>
     <Input type="date" />
-    <Button bare iconOnly as="trailing" aria-label="打开日期选择">
+    <Button bare as="trailing" aria-label="打开日期选择">
       <ArrowLineDown size={16} />
     </Button>
   </Frame>
@@ -314,6 +314,13 @@ Button 放入 Pagination 时使用角色模板：
 - `as="prev"` / `as="next"` 可定义上一页 / 下一页模板；缺失时 Pagination 使用内置默认箭头。
 - Pagination 会替换模板文本、生成真实页码并接管点击。
 
+## Bare 与 IconOnly 的选择
+
+- `bare`：无外壳按钮，以图标操作为主，适合轻量工具与行内动作；也允许文字。
+- `iconOnly`：有 padding 的特殊图标按钮，用于只有图标时控制对称 padding 和图标大小；外壳样式由 variant 决定。
+- 两者同 size 的图标大小一致；文字按钮配图标仍使用 12/16/20px。精确尺寸见下表。
+- 历史记录中的 bare 12/16/20px 及纯图标统一叠加 iconOnly 的要求，已由 2026-09-11 用户定义取代。
+
 ## 样式规范 (Style Spec)
 
 ### 1. Dimensions (尺寸规范)
@@ -327,7 +334,7 @@ Button 放入 Pagination 时使用角色模板：
 > **备注**: 
 > 1. 常规按钮包含文字时，挂载的 `Icon` 等资源尺寸会优先等比缩小一号（`sm: 12`, `md: 16`, `lg: 20`）以匹配文本字号。
 > 2. 当按钮显式声明 `iconOnly=true` 时，内部挂载的视觉资源使用放大一级的上下文：`sm: 16`, `md: 20`, `lg: 24`。
-> 3. `bare iconOnly` 使用当前 `size` 档位的常规视觉尺寸（`sm -> 12`，`md -> 16`，`lg -> 20`）；子视觉显式声明尺寸时优先使用自身尺寸。
+> 3. `bare` 与 `iconOnly` 的图标尺寸一致：sm/md/lg 为 16/20/24px；子图标显式 size 优先。bare 不依赖 iconOnly。兼容已有 bare iconOnly 写法时仍由 bare 去掉外壳与 padding，不作为推荐组合。
 
 ### 1.1 Bare 模式
 
@@ -343,7 +350,7 @@ Button 放入 Pagination 时使用角色模板：
 | 默认透明度 | `1`；`emphasis="muted"` 时为 `0.4` |
 | Hover 透明度 | 默认保持 `1`；`emphasis="muted"` 时提升到 `1` |
 | Hover 背景图层 | 关闭 `Surface` 默认 hover 叠加 |
-| icon-only 视觉尺寸 | 子视觉显式尺寸 > 当前 Button 档位尺寸（`sm/md/lg -> 12/16/20`） |
+| 图标尺寸 | 子图标显式 size > 与 iconOnly 共享的 sm/md/lg 16/20/24px |
 
 ### 2. Colors & Interaction (颜色与交互)
 
