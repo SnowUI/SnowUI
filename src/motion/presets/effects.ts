@@ -25,6 +25,7 @@ import {
     MOTION_SCALE_BUTTON_HOVER_TO,
     MOTION_SCALE_BUTTON_BORDERLESS_FROM,
     MOTION_BUTTON_REFERENCE_HEIGHT_PX,
+    MOTION_BUTTON_HOVER_MAX_WIDTH_GROWTH_REM,
     MOTION_SCALE_ICON_SWAP_FROM,
 } from "../tokens";
 
@@ -42,7 +43,7 @@ export const BUTTON_HOVER_SCALE_UP_MOTION: MotionConfig = {
     easing: MOTION_EASING_BUTTON_HOVER,
 };
 
-/** 按标准高度反比补偿整段背景运动，保留默认 / sm 的视觉与等比圆角。 */
+/** 按标准高度反比补偿整段背景运动，保留纵向默认 / sm 的视觉。 */
 export function getButtonBackgroundScale(size: keyof typeof MOTION_BUTTON_REFERENCE_HEIGHT_PX) {
     const factor = MOTION_BUTTON_REFERENCE_HEIGHT_PX.sm / MOTION_BUTTON_REFERENCE_HEIGHT_PX[size];
     const hoverTo = MOTION_SCALE_HOVER_FROM
@@ -53,6 +54,14 @@ export function getButtonBackgroundScale(size: keyof typeof MOTION_BUTTON_REFERE
             + (MOTION_SCALE_BUTTON_BORDERLESS_FROM - MOTION_SCALE_HOVER_FROM) * factor,
         clickTo: (MOTION_SCALE_HOVER_FROM + hoverTo) / 2,
     };
+}
+
+/** 横向行程与宽度反比补偿；隐藏起点、hover 与点击共用同一系数。 */
+export function getButtonBackgroundWidthFactor(hoverTo: number, width: number, rootFontSize: number) {
+    const growth = width * (hoverTo - 1);
+    return growth > 0 && rootFontSize > 0
+        ? Math.min(1, MOTION_BUTTON_HOVER_MAX_WIDTH_GROWTH_REM * rootFontSize / growth)
+        : 1;
 }
 
 export const HOVER_LIFT_MOTION: MotionConfig = {

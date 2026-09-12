@@ -30,6 +30,21 @@
  */
 export const examples = [
     {
+        name: "BTN-Width：长按钮 hover 横向扩张上限",
+        code: `BTN-Width
+<Frame column class="gap-16" style="width: 100%; max-width: 600px;">
+    <Button size="lg" variant="filled" style="width: max-content;">Log in</Button>
+    <Button size="lg" variant="filled" style="width: 100%;">Log in</Button>
+    <Button size="lg" variant="borderless" style="width: 100%;">Continue with email</Button>
+</Frame>`,
+        expected: {
+            render: "普通 hug 按钮与满宽按钮对比。",
+            interaction: "hover 横向总外扩不超过 0.25rem，纵向保持原效果；点击缩回一半后恢复，Borderless 展开同步补偿。",
+            responsive: "容器变窄与根字号变化后仍按实际宽度限制横向外扩。",
+        },
+        logic: ["BTN-Width"],
+    },
+    {
         name: "BTN-Click: hover 配套点击缩回与恢复",
         code: `BTN-Click
 <Frame row class="gap-16">
@@ -42,7 +57,7 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "内置 hover 放大与点击缩回 / 恢复共用 scaleOnHover 开关；文字、图标与布局不缩放。",
-            interaction: "点击从背景当前尺寸缩回统一的 1.03 倍，再恢复 1.06 倍 hover 大小，两段各用 hover 一半时长；重复点击重新接管，键盘与 Toggle 正常生效；减少动效不播放点击缩放。",
+            interaction: "点击从背景当前尺寸缩回纵向 1.03 倍，再恢复纵向 1.06 倍 hover 大小；横向按外扩上限同比补偿，两段各用 hover 一半时长；重复点击重新接管，键盘与 Toggle 正常生效；减少动效不播放点击缩放。",
         },
         logic: ["HoverScale", "ClickMotion", "ScaleOnHover", "Keyboard", "ReducedMotion"],
     },

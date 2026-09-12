@@ -19,7 +19,7 @@
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
 | `CONTINUOUS_HOVER_MOTION` | Sidebar、Listbox、Popover、TableBody、Accordion、Tab / Segmented 的共享 hover 背景移动 | 单项独立 hover、生命周期进入 | Fluid Functionalism proximity hover |
 | `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
-| `BUTTON_HOVER_SCALE_UP_MOTION` / `getButtonBackgroundScale(size)` | 独立动作 Button 背景使用 `200ms ease`；标准高度 `H=24/36/48`，系数 `k=24/H`，hover 终点 `1+0.06k` 为 sm `1.06`、md `1.04`、lg `1.03`；Borderless 隐藏起点 `1-0.16k` 为 `0.84/0.893333…/0.92`；点击中点 `1+0.03k` 为 `1.03/1.02/1.015`，两段各 100ms。颜色、内容、命中区与布局不变；按 size 校准，不测量自定义高度，左右外扩仍取决于宽高比 | bare、默认关闭的复合控件项、非 Button hover、生命周期出现 | 保留 2026-08-27 恢复的默认 / sm 基线；2026-09-04 用户要求直接实现 md / lg 感知幅度补偿，等待视觉验收 |
+| `BUTTON_HOVER_SCALE_UP_MOTION` / `getButtonBackgroundScale(size)` | 独立动作 Button 背景使用 `200ms ease`；标准高度 `H=24/36/48`，系数 `k=24/H`，hover 终点 `1+0.06k` 为 sm `1.06`、md `1.04`、lg `1.03`；Borderless 隐藏起点 `1-0.16k` 为 `0.84/0.893333…/0.92`；点击中点 `1+0.03k` 为 `1.03/1.02/1.015`，两段各 100ms。颜色、内容、命中区与布局不变；按 size 校准，不测量自定义高度，横向总外扩由 `getButtonBackgroundWidthFactor` 限制为 `MOTION_BUTTON_HOVER_MAX_WIDTH_GROWTH_REM=0.25rem`；横向系数 q=min(1, 0.25rem / (实际宽度 × (hoverTo-1)))，hover、Borderless 起点与点击相对 1 的差值均乘 q，纵向不变 | bare、默认关闭的复合控件项、非 Button hover、生命周期出现 | 保留 2026-08-27 恢复的默认 / sm 基线；2026-09-04 用户要求直接实现 md / lg 感知幅度补偿，等待视觉验收 |
 | `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
 | `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
 | `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |

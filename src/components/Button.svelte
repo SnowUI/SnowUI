@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.18.0
+  v2.18.1
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -19,10 +19,12 @@
 <script lang="ts">
   import { onDestroy, setContext, type Snippet } from "svelte";
   import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
+  import { resizeManager } from "../logic/observer.svelte";
   import Frame, { type FrameProps } from "./Frame.svelte";
   import {
     BUTTON_HOVER_SCALE_UP_MOTION,
     getButtonBackgroundScale,
+    getButtonBackgroundWidthFactor,
   } from "../motion/presets/effects";
   import {
     mergeComponentPartProps,
@@ -184,6 +186,40 @@
 
   let buttonElement = $state<HTMLElement | undefined>(undefined);
   let hasWarnedMissingIconOnlyName = false;
+  let backgroundWidthFactor = $state(1);
+
+  $effect(() => {
+    const node = buttonElement;
+    const { hoverTo } = getButtonBackgroundScale(resolvedSize);
+    if (!node || !hasDefaultBackgroundMotion) {
+      backgroundWidthFactor = 1;
+      return;
+    }
+    const refresh = () => {
+      // computed width 不受祖先 transform 影响，并保留亚像素精度。
+      const view = node.ownerDocument.defaultView;
+      if (!view) return;
+      const style = view.getComputedStyle(node);
+      const width = parseFloat(style.width);
+      const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+      const borderWidth = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+      const backgroundWidth = style.boxSizing === "border-box" ? width - borderWidth : width + padding;
+      const rootFontSize = parseFloat(view.getComputedStyle(node.ownerDocument.documentElement).fontSize);
+      backgroundWidthFactor = getButtonBackgroundWidthFactor(hoverTo, backgroundWidth, rootFontSize);
+    };
+    refresh();
+    const stop = resizeManager.watch(node, refresh);
+    // 能力缺失时仍在交互开始刷新，也覆盖固定尺寸按钮的根字号变化。
+    node.addEventListener("pointerenter", refresh);
+    node.addEventListener("focus", refresh);
+    node.addEventListener("click", refresh, true);
+    return () => {
+      stop();
+      node.removeEventListener("pointerenter", refresh);
+      node.removeEventListener("focus", refresh);
+      node.removeEventListener("click", refresh, true);
+    };
+  });
 
   // 传递给 Frame Context 的尺寸（供 Icon/Avatar 等子组件继承）
   const contextPixelSize = $derived.by(() => {
@@ -292,6 +328,9 @@
     const easing = BUTTON_HOVER_SCALE_UP_MOTION.easing ?? "ease";
     const defaultHoverMotionStyle = [
       `--snowui-button-hover-scale-to: ${scale}`,
+      `--snowui-button-hover-scale-x-to: ${1 + (scale - 1) * backgroundWidthFactor}`,
+      `--snowui-button-borderless-scale-x-from: ${1 + (borderlessFrom - 1) * backgroundWidthFactor}`,
+      `--snowui-button-click-scale-x-to: ${1 + (clickTo - 1) * backgroundWidthFactor}`,
       `--snowui-button-borderless-scale-from: ${borderlessFrom}`,
       // 点击统一缩回标准 hover 区间中点，不使用 Borderless 的隐藏起点。
       `--snowui-button-click-scale-to: ${clickTo}`,
@@ -677,6 +716,7 @@
     text-decoration: none;
     white-space: nowrap;
     --snowui-button-hover-scale: 1;
+    --snowui-button-hover-scale-x: 1;
     --snowui-frame-component-transform: translate(var(--snowui-drag-x, 0), var(--snowui-drag-y, 0));
     opacity: var(--snowui-button-opacity-override, var(--snowui-button-opacity));
 
@@ -884,7 +924,7 @@
     border-radius: inherit;
     corner-shape: inherit;
     pointer-events: none;
-    transform: scale(var(--snowui-button-hover-scale));
+    transform: scale(var(--snowui-button-hover-scale-x), var(--snowui-button-hover-scale));
     transform-origin: center;
   }
 
@@ -946,6 +986,7 @@
       :where(.snowui-button).snowui-button-background-scale-surface[data-variant="borderless"]
     ) {
     --snowui-button-hover-scale: var(--snowui-button-borderless-scale-from);
+    --snowui-button-hover-scale-x: var(--snowui-button-borderless-scale-x-from);
     --snowui-button-background-layer-opacity: 0;
   }
 
@@ -960,6 +1001,7 @@
       :where(.snowui-button)[data-default-hover-scale="true"]:is(:hover, [data-click-scale]):not(.snowui-disabled):not(:disabled)
     ) {
     --snowui-button-hover-scale: var(--snowui-button-hover-scale-to);
+    --snowui-button-hover-scale-x: var(--snowui-button-hover-scale-x-to);
   }
 
   :global(:where(.snowui-button)[data-click-scale="a"]) {
@@ -982,14 +1024,14 @@
   /* 两个同形名称交替触发，使快速重复点击无需强制重排即可重新播放。 */
   @keyframes -global-snowui-button-click-a {
     from { transform: var(--snowui-button-click-transform-from); }
-    50% { transform: scale(var(--snowui-button-click-scale-to)); }
-    to { transform: scale(var(--snowui-button-hover-scale-to)); }
+    50% { transform: scale(var(--snowui-button-click-scale-x-to), var(--snowui-button-click-scale-to)); }
+    to { transform: scale(var(--snowui-button-hover-scale-x-to), var(--snowui-button-hover-scale-to)); }
   }
 
   @keyframes -global-snowui-button-click-b {
     from { transform: var(--snowui-button-click-transform-from); }
-    50% { transform: scale(var(--snowui-button-click-scale-to)); }
-    to { transform: scale(var(--snowui-button-hover-scale-to)); }
+    50% { transform: scale(var(--snowui-button-click-scale-x-to), var(--snowui-button-click-scale-to)); }
+    to { transform: scale(var(--snowui-button-hover-scale-x-to), var(--snowui-button-hover-scale-to)); }
   }
 
   /* Toggle / 瞬时反馈：Active 状态由 Frame 自动暴露的 data-state="Active" 触发，
@@ -1108,7 +1150,7 @@
       )
     );
     pointer-events: auto;
-    transform: scale(var(--snowui-button-hover-scale));
+    transform: scale(var(--snowui-button-hover-scale-x), var(--snowui-button-hover-scale));
     transform-origin: center;
     transition: transform
       var(

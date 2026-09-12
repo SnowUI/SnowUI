@@ -3,7 +3,7 @@
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 
-> **版本**: v2.18.0
+> **版本**: v2.18.1
 > **变更记录 (2026-09-04)**: hover 改为标准高度反比补偿；默认 / sm 保持原效果，md / lg 的背景放大与 Borderless 隐藏起点同步减弱，点击继续缩回当前尺寸放大量的一半。计算规则见下文，具体数值以 preset catalog 为准。
 > **变更记录 (2026-08-27)**: 恢复 Owner 在 2026-08-19 确认的背景层比例放大方案：gray / filled / outline 从 `1` 放大到 `1.06`，Borderless 从隐藏的 `0.84` 背景显示并放大到 `1.06`，最终颜色保持 Light 4% / Dark 10%；文字、Icon、Spinner、命中区和布局不变。背景缩放使用 `BUTTON_HOVER_SCALE_UP_MOTION` 的 `200ms ease`，颜色使用通用 `150ms ease-out`。
 > **变更记录 (2026-08-19)**: Button hover 的背景颜色与背景外扩统一使用 `150ms ease-in-out`，进入和退出时同时开始、同时结束；固定 `1px` 外扩、radius 同步、内容与布局尺寸均不变。
@@ -126,17 +126,19 @@ Button 的内部布局不接入三槽位模型：
 <Button loading>Loading...</Button>
 ```
 
+> **变更记录 (2026-09-12)**：横向外扩增加 rem 上限，纵向比例不变；Borderless 起点与点击缩回同步分轴补偿。
+
 ## Hover 尺寸补偿
 
-内置背景动效由 `getButtonBackgroundScale(resolvedSize)` 解析，保留 `BUTTON_HOVER_SCALE_UP_MOTION` 的时序及默认 / sm 基线。以标准高度 `Hsm / Hsize` 为补偿系数 `k`：hover 终点为 `1 + (sm 终点 - 1) × k`；Borderless 隐藏起点为 `1 + (sm 隐藏起点 - 1) × k`；点击中点为 `1 + (当前 hover 终点 - 1) / 2`。
+内置背景动效由 `getButtonBackgroundScale(resolvedSize)` 解析，保留 `BUTTON_HOVER_SCALE_UP_MOTION` 的时序及纵向默认 / sm 基线。以标准高度 `Hsm / Hsize` 为补偿系数 `k`：hover 终点为 `1 + (sm 终点 - 1) × k`；Borderless 隐藏起点为 `1 + (sm 隐藏起点 - 1) × k`；点击中点为 `1 + (当前 hover 终点 - 1) / 2`。
 
 当前 sm / md / lg 标准高度为 24 / 36 / 48（16px 根字号名义值），对应 hover 终点 1.06 / 1.04 / 1.03，Borderless 起点 0.84 / 约 0.893333 / 0.92。标准高度按钮的上下边缘各外扩约 0.72px，Borderless 完整展开行程也保持一致；数值以 [preset catalog](../motion/presets/README.md) 为准。
 
-采用最终解析的 size（显式 Prop 优先于 Context），不新增 DOM、Observer 或逐帧测量；根字号变化时外扩量随 rem 体系协调缩放。背景仍等比缩放以保留圆角形状，因此不同宽高比的按钮左右外扩量不保证相同；自定义高度 / padding 不重新测量补偿。内容、命中区、布局、颜色和时序不变。
+采用最终解析的 size（显式 Prop 优先于 Context）。横向总扩张量由 preset 限制为最多 0.25rem（16px 根字号下左右各 2px），纵向保持原比例；Borderless 隐藏起点与点击缩回同步使用横向补偿。仅启用默认背景动效时复用共享 resizeManager，初始化、尺寸变化和交互开始时刷新几何，不逐帧测量、不新增 DOM。根字号变化时上限随 rem 缩放；圆角随背景分轴缩放。自定义高度 / padding 不重新做纵向补偿。内容、命中区、布局、颜色和时序不变。
 
 ## Hover 配套点击动效
 
-启用内置 hover 放大时，每次 click（包括键盘激活）从背景当前显示大小缩回当前尺寸标准 hover 区间的中点，再恢复到 hover 放大大小。所有变体（包括 Borderless）共享同一规则：sm 为 `1.06 → 1.03 → 1.06`，md 为 `1.04 → 1.02 → 1.04`，lg 为 `1.03 → 1.015 → 1.03`；具体值以 preset catalog 为准。Borderless 隐藏背景的起点仅用于 hover，不参与点击缩回。缩回与恢复两段各使用 `BUTTON_HOVER_SCALE_UP_MOTION` 一半的时长，保持相同 easing；当前 hover 为 200ms，点击为 100ms 缩回 + 100ms 恢复。文字、Icon、Spinner、命中区与布局保持原尺寸，点击回调、链接和 Toggle 状态立即生效，不等待动效。
+启用内置 hover 放大时，每次 click（包括键盘激活）从背景当前显示大小缩回当前尺寸标准 hover 区间的中点，再恢复到 hover 放大大小。所有变体（包括 Borderless）的纵向共享同一规则，横向同步按上述上限补偿：sm 为 `1.06 → 1.03 → 1.06`，md 为 `1.04 → 1.02 → 1.04`，lg 为 `1.03 → 1.015 → 1.03`；具体值以 preset catalog 为准。Borderless 隐藏背景的起点仅用于 hover，不参与点击缩回。缩回与恢复两段各使用 `BUTTON_HOVER_SCALE_UP_MOTION` 一半的时长，保持相同 easing；当前 hover 为 200ms，点击为 100ms 缩回 + 100ms 恢复。文字、Icon、Spinner、命中区与布局保持原尺寸，点击回调、链接和 Toggle 状态立即生效，不等待动效。
 
 `scaleOnHover={false}`、复合控件的默认关闭值、bare、disabled 或显式 `whileHover` 接管时，都不运行这份配套动效。作为其他组件的子 Button 时，同样遵循宿主传递的开关；关闭 hover 放大就同时关闭点击缩放。显式重新开启复合控件子 Button 的 hover 放大时，点击效果也随之开启。连续点击从当前背景尺寸重新播放，不排队；点击结束后按实际 hover 状态恢复背景。减少动效模式直接保留当前 hover / idle 视觉，不播放点击缩放。
 
@@ -400,6 +402,10 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.18.1 (2026-09-12)
+
+- 背景横向总外扩限制为 0.25rem，纵向保持原比例；Borderless 隐藏起点与点击缩回同步补偿，长按钮不再随宽度无限增加外扩量。复用共享尺寸监听，内容、布局和时序保持不变。
 
 ### v2.18.0 (2026-09-04)
 

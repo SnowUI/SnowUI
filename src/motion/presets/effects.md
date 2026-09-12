@@ -23,7 +23,8 @@
 - 本文件收录单个 Frame 可表达的 opacity、scale、x/y、blur 与 timing 组合，以及由组件背景伪元素消费、但仍需共享 token 管理的 Button 背景缩放。
 - Badge 双层动画、Avatar hover-out 强回弹、Success check 路径绘制、error shake 分段、shimmer 循环等专项动画继续由共享专项能力或组件内部实现负责。
 - 组件命中这里的语义时直接引用 preset，不复制具体数值。
-- `getButtonBackgroundScale(size)` 只返回 `hoverTo / borderlessFrom / clickTo`；使用最终解析的 `sm / md / lg`，不读取 DOM，不改变布局或背景等比缩放方式。标准高度比例不随根字号变化。
+- `getButtonBackgroundScale(size)` 只返回 `hoverTo / borderlessFrom / clickTo`；使用最终解析的 `sm / md / lg`，不读取 DOM，不改变布局，返回纵向基线。标准高度比例不随根字号变化。
+- `getButtonBackgroundWidthFactor(hoverTo, width, rootFontSize)` 返回横向补偿系数；输入为未受 transform 影响的背景宽度与根字号，具体上限以 catalog 为准。Button 负责通过共享尺寸观察刷新输入，算法自身不读取 DOM。
 
 ```svelte
 <script lang="ts">
