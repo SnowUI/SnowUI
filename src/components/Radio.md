@@ -9,18 +9,20 @@
 
 ## 关键字
 
-| Keyword | Type | Default | Description |
+| Property | Type | Default | Description |
 |:---|:---|:---|:---|
-| `checked` | `boolean` | `false` | 选中状态（双向绑定），支持再次点击取消 |
-| `group` | `any` | - | 分组值（双向绑定），当前项再次点击会清空分组值 |
-| `value` | `any` | - | 单选按钮的值 |
-| `size` | `ResourceSize \| number` | `16` | 组件尺寸（标准梯度: 12/16/20/24/28/32/40/48/80） |
-| `disabled` | `boolean` | `false` | 禁用状态 |
-| `variant` | `"outline" \| "filled"` | `"filled"` | 视觉变体 |
-| `children` | `Snippet` | - | 标签内容 |
-| `enableResponsive` | `boolean` | `false` | 启用响应式 |
-| `enableContext` | `boolean` | `false` | 启用上下文 |
+| `checked` | `boolean` | `false` | 独立使用时以 bind:checked 双向绑定选中状态；点击或按 Space 切换，再次操作会取消。分组时选中状态由 group 与 value 是否相等决定。 |
+| `group` | `any` | - | 同组 Radio 绑定同一状态并提供不同 value。初始值应为已选项值；无初始选择可设为 null。取消当前项后写入 undefined，后续组联动仍有效。 |
+| `value` | `any` | - | 当前选项对应的值，以严格相等与 group 比较；同组应使用唯一且稳定的值。 |
+| `size` | `ResourceSize \| number` | `16` | 控件占位尺寸，支持 12/16/20/24/28/32/40/48/80 及自定义数值；未传时优先继承尺寸上下文，否则为 16。图形占尺寸的 87.5%，不改变标签字号。 |
+| `disabled` | `boolean` | `false` | 禁止点击与键盘切换，并移出 Tab 顺序；保留当前选中状态。 |
+| `variant` | `"outline" \| "filled"` | `"filled"` | filled 使用粗选中环，outline 使用细外框与中心点；两者具有相同的选择行为。 |
+| `children` | `Snippet` | - | 显示在圆形控件旁的标签，可组合标题和说明；建议始终提供可读标签。 |
+| `enableResponsive` | `boolean` | `false` | 传递给 Frame 的响应式能力开关；按 Frame 的响应式配置处理布局。 |
+| `enableContext` | `boolean` | `false` | 传递给 Frame 的通用上下文能力开关；不控制 Radio 自身读取的尺寸与 Image 角标上下文。 |
 | `as` | `'badge'` | - | 角色化：作为 `Image` 角标挂件 |
+
+分组建议在外层提供带名称的 `role="radiogroup"`。使用 Tab 聚焦、Space 切换；当前组件通过绑定管理组值，不提供组内方向键导航。`name`、`required` 等剩余属性传递到外层 Frame，不等同于内层原生 input 的表单属性。
 
 ## 布局模型
 
