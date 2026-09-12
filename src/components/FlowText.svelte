@@ -26,6 +26,7 @@
     import { animateTextMotionDelta, animateTextMotionOpacity } from "../lib/text-motion/animation";
     import { Skeleton } from "@snowui-design-system/components";
     import { getSkeleton } from "@snowui-design-system/components/context";
+    import { resizeManager } from "@snowui-design-system/components/logic/observer.svelte";
     import type { SnowUIColor } from "@snowui-design-system/components/lib/color";
     import type {
         FrameProps,
@@ -1286,9 +1287,9 @@
 
     $effect(() => {
         const host = characterElement;
-        if (!host || typeof ResizeObserver === "undefined") return;
+        if (!host) return;
         // 容器排版变化时，仅重新定位仍保留的临时滚轮与遮罩，不修改外层排版。
-        const observer = new ResizeObserver(() => {
+        return resizeManager.watch(host, () => {
             host.shadowRoot?.querySelectorAll<HTMLElement>(
                 `.${FLOW_TEXT_CHARACTER_SOURCE_CLASS}`,
             ).forEach((source) => {
@@ -1302,8 +1303,6 @@
                 }
             });
         });
-        observer.observe(host);
-        return () => observer.disconnect();
     });
 
     function getDigitsModulo() {
