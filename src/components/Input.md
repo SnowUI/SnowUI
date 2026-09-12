@@ -1,11 +1,13 @@
 # Input.svelte 文档
 
+> **2026-09-12 v1.1.4**：输入表面显式使用 `align-content: center`。带 leading / trailing 的单行 Grid 在指定 height / min-height 时整体垂直居中，避免通用自动布局的 flex-start 将剩余空间堆到下方；SearchInput 同步继承此修复，默认自适应高度不变。
+
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
 
 
 > **2026-09-11 修复**：分段键盘输入保留未完成草稿，组件自产的 input 通知不重新解析为空值；默认 loading 骨架使用输入表面的完整高度，不重复叠加内容 padding。
 
-> **版本**: v1.1.3
+> **版本**: v1.1.4
 > **职责**: 单行输入，支持文本、搜索、密码、数字、日期时间与颜色；可组合字段标签、图标、校验反馈和表单。
 
 **2026-04-27 补充**: 内建清除 X 恢复为焦点态交互：只有输入内容非空且 `Input` 处于 `focus-within` 时显示；失焦后隐藏且不为隐藏 X 预留额外 gap。
@@ -579,6 +581,10 @@ invalid=true + !hasCustomTrailing
 
 - **Input-Motion.2026-06-18** 新增默认错误反馈 shake：独立 `Input invalid / aria-invalid` 自动播放，嵌入 `Field` 时由 `Field` 汇总播放，消费方无需手动传类名或状态。
 - **Input-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+
+### v1.1.4 (2026-09-12)
+
+- 修复带附件的 Input 在固定高度下内容偏上：单行 Grid 使用 `align-content: center`，SearchInput 同步继承；默认自适应高度不变。
 
 ### v1.1.3 (2026-08-12)
 

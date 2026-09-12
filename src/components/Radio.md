@@ -9,7 +9,7 @@
 
 ## 关键字
 
-| Property | Type | Default | Description |
+| 关键字 | Type | Default | Description |
 |:---|:---|:---|:---|
 | `checked` | `boolean` | `false` | 独立使用时以 bind:checked 双向绑定选中状态；点击或按 Space 切换，再次操作会取消。分组时选中状态由 group 与 value 是否相等决定。 |
 | `group` | `any` | - | 同组 Radio 绑定同一状态并提供不同 value。初始值应为已选项值；无初始选择可设为 null。取消当前项后写入 undefined，后续组联动仍有效。 |

@@ -1,6 +1,6 @@
 <!--
  Listbox 组件：浮层选项列表面板
- v1.3.3
+ v1.3.4
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -405,6 +405,34 @@
         owner.customOptions.length;
         owner.filterText;
         tick().then(updatePosition);
+    });
+
+    // 触发器的状态动效会改变视觉尺寸，浮层需跟随到动效最终帧。
+    $effect(() => {
+        if (!owner?.open || !listboxEl) return;
+        const anchor = owner.anchorEl;
+        if (!anchor) return;
+        let frame = 0;
+        let disposed = false;
+        const sync = () => {
+            frame = 0;
+            if (disposed) return;
+            updatePosition();
+            if (anchor.getAnimations().some(animation => animation.playState === "running")) {
+                frame = requestAnimationFrame(sync);
+            }
+        };
+        const schedule = () => {
+            if (!disposed && !frame) frame = requestAnimationFrame(sync);
+        };
+        const events = ["animationstart", "animationend", "animationcancel", "transitionrun", "transitionend", "transitioncancel"];
+        for (const event of events) anchor.addEventListener(event, schedule);
+        schedule();
+        return () => {
+            disposed = true;
+            cancelAnimationFrame(frame);
+            for (const event of events) anchor.removeEventListener(event, schedule);
+        };
     });
 
     // 滚动活跃选项到可视区域

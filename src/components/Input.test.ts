@@ -537,4 +537,13 @@ export const examples = [
 />`,
         logic: ["Validation", "Frame", "Motion"],
     },
+    {
+        name: "I-Center：固定高度附件居中",
+        code: `I-Center
+<Input placeholder="Search" style="width: 20rem; height: var(--size-12);">
+    <Icon as="leading" size={16}>S</Icon>
+</Input>`,
+        expected: { render: "输入文字与 leading 在 48px 输入表面内垂直居中，上下剩余空间对称。" },
+        logic: ["Layout", "Leading", "Height"],
+    },
 ] as const;

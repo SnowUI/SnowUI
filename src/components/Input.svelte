@@ -1,6 +1,6 @@
 <!--
  Input 组件：基础单行输入框
- v1.1.3
+ v1.1.4
 
  文档: ./Input.md
 -->
@@ -1807,6 +1807,8 @@
         flex-direction: row;
         flex-wrap: nowrap;
         align-items: center;
+        /* 带附件时切换为单行 Grid；固定高度的剩余空间须上下均分。 */
+        align-content: center;
         position: relative;
         cursor: var(--snowui-field-cursor, text);
         --snowui-input-width: 100%;
