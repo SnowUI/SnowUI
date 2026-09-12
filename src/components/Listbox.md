@@ -13,7 +13,7 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 
 未设置 `maxHeight` 时，可用视口空间只改变完整可见的 Item 数量，不产生半项高度：面板在 2～10 项之间选择能够容纳的完整项数；即使触发器下方空间不足，也至少为现有选项中的前 2 项保留完整高度。少于 2 项时按实际项数 Hug。显式 `maxHeight` 继续按调用方给定的长度与视口可用高度取较小值。
 
-> **版本**: v1.3.2
+> **版本**: v1.3.3
 > **状态**: 已实现
 > **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局；补充关键字表格、用户定义区与更新日志，以满足组件开发链路检查。
 > **职责**: 浮层选项列表面板，作为 Select 的下拉面板。Portal 到 body，position:fixed 定位，选中项中心对齐 Trigger，遵循 Quick Action 视觉规范。支持内嵌 `<Input as="search">` 搜索/过滤。
@@ -81,11 +81,13 @@ Portal anchor div (position:fixed; width/max-height only)
 | `maxHeight` | `number \| string` | 未设置 | 面板最大高度，数字为 px，字符串为 CSS 长度；受可用视口约束。未设置时最多完整显示 10 项，空间不足时至少保留实际选项中的前 2 项。 |
 | `minWidth` | `number \| string` | 未设置 | 面板最小宽度，数字为 px，字符串为 CSS 长度；未设置时搜索开启取 160px，否则取 0。内容与视口约束仍参与最终宽度计算。 |
 | `scrollbar` | `boolean` | `true` | 溢出时显示浮层滚动条；false 仅隐藏轨道，仍可通过滚轮和键盘滚动。 |
-| `matchTriggerWidth` | `boolean` | `true` | true 时至少与锚点等宽，内容需要更宽时允许扩展；false 时按选项内容 Hug，仍受 minWidth 与视口约束。 |
+| `matchTriggerWidth` | `boolean` | `true` | true 时以锚点实测宽度加固定 2px 为宽度基准，左右各覆盖 1px，内容需要更宽时允许扩展；false 时按选项内容 Hug，不添加补偿，仍受 minWidth 与视口约束。 |
 | `placementMode` | `'selected' \| 'bottom'` | `'selected'` | selected 将选中项中心对齐触发器；bottom 从触发器下方展开。最终定位与高度受可用视口约束。 |
 | `align` | `'start' \| 'end'` | `'start'` | 面板相对锚点左边缘或右边缘对齐；Hug 面板与锚点宽度不同时差异明显，最终位置受视口约束。 |
 | `showCheck` | `boolean` | `false` | 为选中项预留并显示 trailing 勾选；Select 默认提供 true。显式 MenuItem 可用自身 showCheck 覆盖，自定义 trailing 替换默认勾选。 |
 | `continuousHover` | `boolean` | `true` | 在直接 MenuItem 之间移动同一个高亮背景，键盘 active 共用该背景；false 恢复逐项即时背景，禁用和过滤项不作为目标。 |
+
+等宽模式使用锚点实测宽度加固定 2px，左右各外扩 1px，覆盖下层字段边框；保留小数定位精度。该固定 CSS px 补偿不随根字号缩放，适用于所有 Listbox 宿主；Hug 模式不增加补偿，更大的 minWidth / 内容扩展继续生效。规范例外见 [StyleSpec §2.1](../../../specs/StyleSpec.md#21-token-使用规范) 的 USER-LISTBOX-WIDTH-001。
 
 ## 宿主协议
 
@@ -266,6 +268,10 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 - **关联规范**: [../../../specs/HTMLSpec.md](../../../specs/HTMLSpec.md)
 
 ## 更新日志 (Changelog)
+
+### v1.3.3（2026-09-12）
+
+- 按用户要求移除横向取整，等宽 Listbox 总宽度增加固定 2px、左右各覆盖 1px；保留背景、模糊与内边框，固定 px 已登记规范例外。
 
 ### v1.3.2 (2026-09-12)
 

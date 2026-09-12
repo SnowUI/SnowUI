@@ -1,6 +1,6 @@
 <!--
  Listbox 组件：浮层选项列表面板
- v1.3.2
+ v1.3.3
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -281,15 +281,22 @@
 
         const anchorRect = anchorEl.getBoundingClientRect();
         const triggerRect = triggerEl.getBoundingClientRect();
-        if (matchTriggerWidth && listboxWidth !== anchorRect.width) {
-            listboxWidth = anchorRect.width;
+        // USER-LISTBOX-WIDTH-001：等宽面板左右各覆盖 1 CSS px，固定补偿不随根字号缩放。
+        const coverInset = matchTriggerWidth ? 1 : 0;
+        const anchorLeft = anchorRect.left - coverInset;
+        const anchorRight = anchorRect.right + coverInset;
+        const anchorWidth = anchorRect.width + coverInset * 2;
+        if (matchTriggerWidth && listboxWidth !== anchorWidth) {
+            listboxWidth = anchorWidth;
             tick().then(updatePosition);
             return;
         } else if (listboxWidth === 0) {
             listboxWidth = listboxEl.offsetWidth;
         }
-        const resolvedWidth = listboxEl.offsetWidth;
-        listboxLeft = align === "end" ? anchorRect.right - resolvedWidth : anchorRect.left;
+        const resolvedWidth = matchTriggerWidth
+            ? listboxEl.getBoundingClientRect().width
+            : listboxEl.offsetWidth;
+        listboxLeft = align === "end" ? anchorRight - resolvedWidth : anchorLeft;
 
         if (placementMode === "bottom") {
             listboxPlacement = "bottom";
