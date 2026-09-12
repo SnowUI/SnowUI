@@ -96,6 +96,7 @@
 | name | `string` | `—` | 原生表单字段名；FormData 使用该名称收集字段。 |
 | disabled | `boolean` | `false` | 禁止用户输入与交互，原生禁用字段不参与表单提交。 |
 | readonly | `boolean` | `false` | 保留聚焦、选择与提交，禁止编辑并隐藏清除入口；使用只读视觉。 |
+| clearable | `boolean` | `true` | 是否允许显示内置清除 X；false 时不渲染 X，不改变编辑、校验或自定义 trailing。适用于普通及 Field 内嵌 Input。 |
 | required | `boolean` | `false` | 参与浏览器原生必填校验；不自动产生业务错误文案。 |
 | autocomplete | `HTMLInputAttributes["autocomplete"]` | `—` | 透传浏览器自动填充字段语义，如 username、email、new-password；候选来自浏览器已有数据。 |
 | minlength | `number` | `—` | 适用文本输入的最小字符长度，由浏览器在适用的用户编辑和表单校验路径执行。 |
@@ -495,15 +496,17 @@ Input 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 或复杂槽位�
 
 ### 9. 内置清除按钮（Clear / X）规范
 
-适用于所有**文字系**输入类型（`text`、`search`、`email`、`password`、`url`、`tel` 等）；以下类型**不渲染** X：`number`、`color`、日期/时间族（`date`、`time`、`month`、`week`、`datetime-local`）。`disabled` 或 `readonly` 时同样不渲染。
+紧凑组合字段可使用 `<Input type="tel" maxlength={2} clearable={false} />`。maxlength 复用浏览器文本输入长度限制；具体长度由消费场景设置，不适用于 number 的位数限制，也不会截断调用方程序赋值。
+
+适用于所有**文字系**输入类型（`text`、`search`、`email`、`password`、`url`、`tel` 等）；以下类型**不渲染** X：`number`、`color`、日期/时间族（`date`、`time`、`month`、`week`、`datetime-local`）。`disabled`、`readonly` 或 `clearable={false}` 时同样不渲染。
 
 | 项目 | 规则 |
 | :--- | :--- |
-| 图标 | `XCircle2` 的 **fill weight**（内置 inline SVG，无需外部 Icon 组件） |
+| 图标 | `ComponentIcon name="x-circle" weight="fill"`，通过内置 Button bare 渲染 |
 | 默认颜色 | `var(--black-40, #00000066)` |
 | Hover 颜色 | `var(--black-100, #000000ff)` |
 | 过渡 | `color`，时长/缓动与 Select 下拉箭头保持一致（`var(--snowui-frame-color-motion-duration) var(--snowui-frame-color-motion-easing)`） |
-| 触发条件 | 输入内容非空**且**Input 处于焦点态 |
+| 触发条件 | clearable=true、输入内容非空且 Input 处于焦点态 |
 | 独立 Input 焦点检测 | `.snowui-input:not([data-embedded]):focus-within` |
 | 嵌入 Field 时焦点检测 | `.snowui-input[data-embedded="true"]:focus-within` |
 | 优先级规则 | X （内置）> 外置 trailing Icon；X 可见时，**同位置**的外置 trailing Icon 和内置 Warning 图标全部隐藏 |

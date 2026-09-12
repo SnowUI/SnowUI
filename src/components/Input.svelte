@@ -64,6 +64,7 @@
         name?: string;
         disabled?: boolean;
         readonly?: boolean;
+        clearable?: boolean;
         required?: boolean;
         autocomplete?: HTMLInputAttributes["autocomplete"];
         minlength?: number;
@@ -122,6 +123,7 @@
         name = undefined,
         disabled = false,
         readonly = false,
+        clearable = true,
         required = false,
         autocomplete = undefined,
         minlength = undefined,
@@ -232,7 +234,7 @@
             !isCustomTemporalType,
     );
     const hasClearableValue = $derived(
-        isClearableType &&
+        clearable && isClearableType &&
             resolvedValue !== undefined &&
             String(resolvedValue) !== "",
     );
@@ -1450,7 +1452,7 @@
             oncut={userOnCut}
         />
         {@render children?.()}
-        {#if isClearableType && !disabled && !readonly}
+        {#if clearable && isClearableType && !disabled && !readonly}
             <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
                 class={`snowui-clear-icon-btn snowui-input-clear-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
@@ -1745,7 +1747,7 @@
         </div>
     {:else}
         {@render children?.()}
-        {#if isClearableType && !disabled && !readonly}
+        {#if clearable && isClearableType && !disabled && !readonly}
             <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
                 class={`snowui-clear-icon-btn snowui-input-clear-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
