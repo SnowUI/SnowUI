@@ -7,6 +7,7 @@
 </script>
 
 <script lang="ts">
+    import ComponentIcon from "../internal/component-icon/ComponentIcon.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { resizable, type ResizableOptions } from "../lib/resizable";
     import { untrack } from "svelte";
@@ -440,9 +441,7 @@
 >
     <span class="snowui-indicator-visual" aria-hidden="true">
         {#if resolvedAppearance === "corner"}
-            <svg viewBox="0 0 32 32" aria-hidden="true">
-                <path d="M9 23h4c5.523 0 10-4.477 10-10V9" />
-            </svg>
+            <ComponentIcon name="rounded-corner" size="var(--size-4)" />
         {/if}
     </span>
 </Frame>
@@ -598,23 +597,6 @@
         display: block;
         width: 100%;
         height: 100%;
-    }
-
-    :global(:where(.snowui-indicator-corner) > .snowui-indicator-visual path) {
-        fill: none;
-        stroke: currentColor;
-        stroke-width: 2;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        shape-rendering: geometricPrecision;
-        transition: stroke-width var(--snowui-frame-color-motion-duration, 0.15s)
-            var(--snowui-frame-color-motion-easing, ease-out);
-    }
-
-    :global(:where(.snowui-indicator-corner:hover) > .snowui-indicator-visual path),
-    :global(:where(.snowui-indicator-corner:focus-visible) > .snowui-indicator-visual path),
-    :global(:where(.snowui-indicator-corner[data-dragging="true"]) > .snowui-indicator-visual path) {
-        stroke-width: 4;
     }
 
     :global(:where(.snowui-indicator[data-disabled="true"])) {

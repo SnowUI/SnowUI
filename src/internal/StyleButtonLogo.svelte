@@ -13,7 +13,8 @@
         size?: number | string;
     } | undefined>(OPTIONAL_RESOURCE_ICON_CONTEXT_KEY);
     const logoSize = $derived.by(() => {
-        const numericSize = Number(resourceIconContext?.size ?? 16);
+        const rawSize = resourceIconContext?.size ?? 16;
+        const numericSize = typeof rawSize === "string" && rawSize.endsWith("rem") ? parseFloat(rawSize) * 16 : Number(rawSize);
         return Number.isFinite(numericSize) && numericSize > 0 ? numericSize : 16;
     });
     const snowuiLogoScale = $derived(logoSize / 28);
@@ -22,8 +23,8 @@
 {#if mode === "apple"}
     <svg
         class="snowui-style-button-logo snowui-style-button-apple-logo"
-        width={logoSize}
-        height={logoSize}
+        width={`${logoSize / 16}rem`}
+        height={`${logoSize / 16}rem`}
         viewBox="0 0 32 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
@@ -36,7 +37,7 @@
         class="snowui-style-button-logo"
         variant="icon"
         scale={snowuiLogoScale}
-        style={`--snowui-snow-ui-logo-icon-size-override: ${logoSize}px`}
+        style={`--snowui-snow-ui-logo-icon-size-override: ${logoSize / 16}rem`}
         decorative
     />
 {/if}

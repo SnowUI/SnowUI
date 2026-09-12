@@ -1,5 +1,8 @@
 # Input.svelte 文档
 
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+
+
 > **2026-09-11 修复**：分段键盘输入保留未完成草稿，组件自产的 input 通知不重新解析为空值；默认 loading 骨架使用输入表面的完整高度，不重复叠加内容 padding。
 
 > **版本**: v1.1.3
@@ -115,7 +118,7 @@
 | id | `string` | `—` | 原生输入标识，可供 label 的 for 与原生关联属性引用。 |
 | invalid | `boolean` | `false` | 与 aria-invalid 汇总无效态，显示错误视觉；独立输入自动错误反馈，Field 内由 Field 汇总。 |
 | error | `string \| Snippet` | `—` | invalid 时生成下方内置错误 Text；字符串为文案，Snippet 无参数并提供错误内容，默认不生成。 |
-| parts | `ComponentPartsOf<{ Text: typeof Text }>` | `—` | 通过 Text 键配置内置错误 Text 的公开 Props，仅对组件生成的 Text 生效；显式子项自行声明 Props。 |
+| parts | `ComponentPartsOf<{ Text: typeof Text; Button: typeof Button }>` | `—` | 通过 Text / Button 键配置内置错误文案或操作按钮的公开 Props，仅对组件生成的 Text 生效；显式子项自行声明 Props。 |
 | children | `Snippet` | `—` | 无参数显式子内容，用 as="leading" / as="trailing" 组合图标或附件；清除可见时接管 trailing 位置。 |
 | allowCustomValue | `boolean` | `false` | 仅 as="search" 位于 Listbox 时生效；无匹配时 Enter 将输入添加为自定义项并选中，支持删除自定义项。 |
 | onclick | `(event: MouseEvent) => void` | `—` | 单击原生输入或相应展示层时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
@@ -174,7 +177,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 | required | `boolean` | `false` | 必填态 |
 | invalid | `boolean` | `false` | 组件级无效态 |
 | error | `string \| Snippet` | `undefined` | invalid 时显示内置错误文字；与输入框间距默认 8px。校验逻辑由外部决定，可动态传入不同提示。 |
-| parts | `{ Text? }` | `undefined` | 内置错误 Text 的部件配置。 |
+| parts | `{ Text?, Button? }` | `undefined` | 内置错误 Text 和操作 Button 的部件配置。 |
 | name | `string` | - | 表单字段名 |
 | autocomplete | `string` | - | 浏览器自动填充提示 |
 | minlength | `number` | - | 最小长度 |
@@ -286,7 +289,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 <!-- 日期输入 + 自定义 trailing 触发器（简单场景自动推断） -->
 <Field>
   <Input type="date" />
-  <Button bare iconOnly as="trailing" aria-label="打开日期选择">
+  <Button bare as="trailing" aria-label="打开日期选择">
     <ArrowLineDown size={16} />
   </Button>
 </Field>
@@ -295,7 +298,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 <Field>
   <Frame as="row" row>
     <Input type="date" />
-    <Button bare iconOnly as="trailing" aria-label="打开日期选择">
+    <Button bare as="trailing" aria-label="打开日期选择">
       <ArrowLineDown size={16} />
     </Button>
   </Frame>

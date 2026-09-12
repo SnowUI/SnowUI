@@ -563,7 +563,6 @@
             name="copy"
             class="snowui-code-block-icon-builtin"
             as="copy-icon"
-            size={16}
             aria-hidden="true"
         />
     {/if}
@@ -580,7 +579,6 @@
             name="check"
             class="snowui-code-block-icon-builtin"
             as="copied-icon"
-            size={16}
             aria-hidden="true"
         />
     {/if}
@@ -814,6 +812,7 @@
 {#if !isSingleLine && (isFullscreen || isExitingFullscreen)}
     <Frame
         bind:element={fullscreenElement}
+        componentParts={parts}
         tag="div"
         role="dialog"
         aria-modal="true"

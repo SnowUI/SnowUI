@@ -104,7 +104,7 @@
         const instance = mount(ComponentIcon, {
             target: indicator,
             context: iconContexts,
-            props: { name: iconName, size: 16, "aria-hidden": "true" },
+            props: { name: iconName, size: "var(--snowui-accordion-icon-size-override, var(--snowui-accordion-icon-size))", "aria-hidden": "true" },
         });
         indicatorIcons.set(indicator, instance);
     }

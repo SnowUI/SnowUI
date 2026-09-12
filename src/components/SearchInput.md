@@ -1,5 +1,8 @@
 # SearchInput (简单搜索输入框)
 
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
 ## 宿主组件特化模式
 
 - `SearchInput` 以真实 `Input` 为主要视觉与交互宿主，直接平铺 `Input` 的兼容 Props，不提供 `parts.Input`。

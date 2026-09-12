@@ -283,7 +283,7 @@
             data-as="trailing"
             aria-hidden="true"
         >
-            <ComponentIcon name="arrow-up-right" class="snowui-link-default-icon" size={12} aria-hidden="true" />
+            <ComponentIcon name="arrow-up-right" class="snowui-link-default-icon" size="var(--snowui-link-icon-size-override, var(--snowui-link-icon-size))" aria-hidden="true" />
         </span>
     {:else if variant === "external" && !hasCustomTrailing}
         <span
@@ -291,7 +291,7 @@
             data-as="trailing"
             aria-hidden="true"
         >
-            <ComponentIcon name="arrow-square-out" class="snowui-link-default-icon" size={12} aria-hidden="true" />
+            <ComponentIcon name="arrow-square-out" class="snowui-link-default-icon" size="var(--snowui-link-icon-size-override, var(--snowui-link-icon-size))" aria-hidden="true" />
         </span>
     {/if}
 </Frame>

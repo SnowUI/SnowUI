@@ -18,6 +18,7 @@
   3. 日期/时间激活: 优化交互，使得日期编辑器空白区域点击能激活首个有效选区。
 -->
 <script lang="ts">
+    import Button from "./Button.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Text from "./Text.svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
@@ -86,7 +87,7 @@
         invalid?: boolean;
         /** invalid 时显示的内置错误文字；默认不生成。 */
         error?: string | Snippet;
-        parts?: ComponentPartsOf<{ Text: typeof Text }>;
+        parts?: ComponentPartsOf<{ Text: typeof Text; Button: typeof Button }>;
         onclick?: (event: MouseEvent) => void;
         ondblclick?: (event: MouseEvent) => void;
         oninput?: (event: Event) => void;
@@ -1450,24 +1451,24 @@
         />
         {@render children?.()}
         {#if isClearableType && !disabled && !readonly}
-            <button
+            <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
-                class="snowui-clear-icon-btn snowui-input-clear-btn"
-                data-as="trailing"
+                class={`snowui-clear-icon-btn snowui-input-clear-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
+                as="trailing"
                 aria-label="清除输入"
                 onclick={handleClear}
-                onmousedown={(e) => e.preventDefault()}
+                onmousedown={(e: MouseEvent) => e.preventDefault()}
                 tabindex={-1}
             >
-                <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
-            </button>
+                <ComponentIcon name="x-circle" weight="fill" aria-hidden="true" />
+            </Button>
         {/if}
         {#if resolvedInvalid && !hasCustomTrailing}
             <span
                 class="snowui-input-warning-icon snowui-role-trailing text-secondary-red"
                 aria-hidden="true"
             >
-                <ComponentIcon name="warning" size={16} aria-hidden="true" />
+                <ComponentIcon name="warning" size="var(--size-4)" aria-hidden="true" />
             </span>
         {/if}
     </div>
@@ -1589,7 +1590,7 @@
                     data-active={activeDateSegment === segment
                         ? "true"
                         : undefined}
-                    onmousedown={(event) =>
+                    onmousedown={(event: MouseEvent) =>
                         handleDateSegmentMouseDown(segment, event)}
                 >
                     <span
@@ -1605,7 +1606,7 @@
                             ? "true"
                             : undefined}
                         tabindex={disabled ? undefined : (tabindex ?? 0)}
-                        onmousedown={(event) =>
+                        onmousedown={(event: MouseEvent) =>
                             handleDateSegmentMouseDown(segment, event)}
                         onclick={(event) =>
                             handleDateSegmentClick(segment, event)}
@@ -1635,17 +1636,17 @@
                 {/if}
             {/each}
             {#if !hasTemporalTrigger}
-                <button
+                <Button bare emphasis="muted" size="sm" {...parts?.Button}
                     type="button"
-                    class="snowui-input-date-trigger"
+                    class={`snowui-input-date-trigger${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
                     aria-label={getTemporalTriggerLabel(temporalInputType)}
-                    onmousedown={(event) => event.preventDefault()}
+                    onmousedown={(event: MouseEvent) => event.preventDefault()}
                     onclick={tryOpenNativeTemporalPicker}
                     {disabled}
                     tabindex={disabled ? undefined : -1}
                 >
-                    <ComponentIcon name={temporalDefaultIconName} size={16} aria-hidden="true" />
-                </button>
+                    <ComponentIcon name={temporalDefaultIconName} aria-hidden="true" />
+                </Button>
             {/if}
         </div>
     {:else}
@@ -1707,30 +1708,30 @@
                 : undefined}
         >
             {#if !hasCustomStepperUp}
-                <button
+                <Button bare emphasis="muted" size="sm" {...parts?.Button}
                     type="button"
-                    class="snowui-input-stepper-btn"
-                    data-as="up"
+                    class={`snowui-input-stepper-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
+                    as="up"
                     aria-label="增加数值"
                     disabled={stepUpDisabled}
                     onclick={handleStepUp}
-                    onmousedown={(e) => e.preventDefault()}
+                    onmousedown={(e: MouseEvent) => e.preventDefault()}
                 >
-                    <ComponentIcon name="arrow-line-up" size={16} aria-hidden="true" />
-                </button>
+                    <ComponentIcon name="arrow-line-up" aria-hidden="true" />
+                </Button>
             {/if}
             {#if !hasCustomStepperDown}
-                <button
+                <Button bare emphasis="muted" size="sm" {...parts?.Button}
                     type="button"
-                    class="snowui-input-stepper-btn"
-                    data-as="down"
+                    class={`snowui-input-stepper-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
+                    as="down"
                     aria-label="减少数值"
                     disabled={stepDownDisabled}
                     onclick={handleStepDown}
-                    onmousedown={(e) => e.preventDefault()}
+                    onmousedown={(e: MouseEvent) => e.preventDefault()}
                 >
-                    <ComponentIcon name="arrow-line-down" size={16} aria-hidden="true" />
-                </button>
+                    <ComponentIcon name="arrow-line-down" aria-hidden="true" />
+                </Button>
             {/if}
             {@render children?.()}
             {#if resolvedInvalid && !hasCustomTrailing}
@@ -1738,31 +1739,31 @@
                     class="snowui-input-warning-icon snowui-role-trailing text-secondary-red"
                     aria-hidden="true"
                 >
-                    <ComponentIcon name="warning" size={16} aria-hidden="true" />
+                    <ComponentIcon name="warning" size="var(--size-4)" aria-hidden="true" />
                 </span>
             {/if}
         </div>
     {:else}
         {@render children?.()}
         {#if isClearableType && !disabled && !readonly}
-            <button
+            <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
-                class="snowui-clear-icon-btn snowui-input-clear-btn"
-                data-as="trailing"
+                class={`snowui-clear-icon-btn snowui-input-clear-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
+                as="trailing"
                 aria-label="清除输入"
                 onclick={handleClear}
-                onmousedown={(e) => e.preventDefault()}
+                onmousedown={(e: MouseEvent) => e.preventDefault()}
                 tabindex={-1}
             >
-                <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
-            </button>
+                <ComponentIcon name="x-circle" weight="fill" aria-hidden="true" />
+            </Button>
         {/if}
         {#if resolvedInvalid && !hasCustomTrailing}
             <span
                 class="snowui-input-warning-icon snowui-role-trailing text-secondary-red"
                 aria-hidden="true"
             >
-                <ComponentIcon name="warning" size={16} aria-hidden="true" />
+                <ComponentIcon name="warning" size="var(--size-4)" aria-hidden="true" />
             </span>
         {/if}
     {/if}
@@ -1819,8 +1820,6 @@
         --snowui-input-warning-icon-color: var(--secondary-red, #ff4747ff);
         --snowui-input-warning-icon-size: var(--size-4);
         --snowui-input-warning-icon-line-height: 1;
-        --snowui-input-stepper-button-size: var(--size-4); /* 16px */
-        --snowui-input-stepper-icon-size: var(--size-4);
         width: var(--snowui-input-width-override, var(--snowui-input-width));
         height: var(
             --snowui-input-height-override,
@@ -1930,38 +1929,7 @@
         z-index: 2;
     }
 
-    :global(:where(.snowui-input-stepper-btn)) {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: var(--snowui-input-stepper-button-size);
-        height: var(--snowui-input-stepper-button-size);
-        min-width: var(--snowui-input-stepper-button-size);
-        min-height: var(--snowui-input-stepper-button-size);
-        padding: 0;
-        border: none;
-        border-radius: var(--radius-full);
-        background: transparent;
-        color: var(--black-100, #000000ff);
-        opacity: var(--snowui-state-opacity, 0.4);
-        cursor: pointer;
-        transition:
-            color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
-            opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
-    }
 
-    :global(:where(.snowui-input-stepper-btn:hover:not(:disabled))) {
-        opacity: var(--snowui-state-opacity, 1);
-    }
-
-    :global(:where(.snowui-input-stepper-btn:disabled)) {
-        opacity: 0.4;
-    }
-
-    :global(:where(.snowui-input-stepper-btn svg)) {
-        width: var(--snowui-input-stepper-icon-size);
-        height: var(--snowui-input-stepper-icon-size);
-    }
 
     :global(
             :where(
@@ -2446,37 +2414,10 @@
     }
 
     :global(:where(.snowui-input-date-trigger)) {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex: 0 0 auto;
         position: absolute;
         top: 50%;
         right: 0;
         transform: translateY(-50%);
-        padding: 0;
-        border: 0;
-        background: transparent;
-        color: var(--black-100, #000000ff);
-        opacity: var(--snowui-state-opacity, 0.4);
-        cursor: pointer;
-        transition:
-            color var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out),
-            opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
-    }
-
-    :global(:where(.snowui-input-date-trigger:hover:not(:disabled))) {
-        opacity: var(--snowui-state-opacity, 1);
-    }
-
-    :global(:where(.snowui-input-date-trigger:disabled)) {
-        cursor: default;
-        opacity: 0.48;
-    }
-
-    :global(:where(.snowui-input-date-trigger svg)) {
-        width: var(--size-4);
-        height: var(--size-4);
     }
 
     :global(:where(.snowui-input-warning-icon)) {
@@ -2705,7 +2646,7 @@
     }
 
     /* ─── Clear (X) 按钮 ─────────────────────────────────────────
-     * 视觉/交互复用共享基类 .snowui-clear-icon-btn（layout.css）。
+     * 视觉/交互复用 Button bare。
      * 此处仅保留 Input 专属的 grid 落列与默认隐藏；显示时机由下方
      * focus-within 规则接管。 */
 

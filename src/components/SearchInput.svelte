@@ -113,7 +113,7 @@
         <ComponentIcon
             name="search"
             as="leading"
-            size={16}
+            size="var(--size-4)"
             class="snowui-search-input-default-icon"
             aria-hidden="true"
         />

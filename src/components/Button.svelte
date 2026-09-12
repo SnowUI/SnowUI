@@ -238,7 +238,7 @@
   // 资源图标直接放在 Button 内时，注入默认尺寸上下文（与 <Icon> 包裹一致）
   setContext(OPTIONAL_RESOURCE_ICON_CONTEXT_KEY, {
     get size() {
-      return contextPixelSize;
+      return `${contextPixelSize / 16}rem`;
     },
   });
 
@@ -301,7 +301,7 @@
     const clickMotionStyle = clickMotion
       ? `--snowui-button-click-transform-from: ${clickMotion.from}`
       : "";
-    const styles = [defaultHoverMotionStyle, clickMotionStyle, hostStyle, userStyle]
+    const styles = [`--snowui-button-icon-size: ${contextPixelSize / 16}rem`, defaultHoverMotionStyle, clickMotionStyle, hostStyle, userStyle]
       .filter(Boolean)
       .join("; ");
     return styles || undefined;

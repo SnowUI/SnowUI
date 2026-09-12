@@ -1,5 +1,8 @@
 # OverflowActions
 
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
 > **版本**: v1.0.2
 > **职责**: 在有限宽度内保留一组操作，并把容纳不下的操作转移到 More 菜单。
 

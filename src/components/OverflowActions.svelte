@@ -386,7 +386,7 @@
 
 {#snippet renderMenuIcon(icon: OverflowActionIcon | undefined)}
     {#if typeof icon === "string"}
-        <ComponentIcon name={icon} size={16} aria-hidden="true" />
+        <ComponentIcon name={icon} aria-hidden="true" />
     {:else if icon}
         {@render icon()}
     {/if}

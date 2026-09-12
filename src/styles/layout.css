@@ -690,47 +690,7 @@
     min-height: 0;
 }
 
-/* X 关闭/清除图标共享视觉基类
- * 共享给 Input.snowui-input-clear-btn / Tag.snowui-tag-close /
- * MenuItem.snowui-menu-item-delete / SearchBox.snowui-search-box-clear-btn /
- * Toast.snowui-toast-close-btn 等所有"灰→黑 X"按钮。
- * 仅含视觉规则（尺寸、颜色、opacity、圆角、过渡、button 重置、内部 svg 100% 填充）；
- * 显示/隐藏时机（display none / focus-within 显示 / hover 容器才显示）由各组件自行声明。
- * 内部图标统一使用 Components 自有 ComponentIcon 语义资源：
- * <XCircle weight="fill" />（圆形清除）或 <Close />（Tag 紧凑关闭 X）。
- * Tag 的 Close regular 形状来自 close-regular.svg，对齐 Workshop node-id=11898-37771 的 12×12 plain X。
- * 规范：specs/StyleSpec.md §2.6.3 第 5 类（共享 X 图标按钮基类）
- */
-:where(.snowui-clear-icon-btn) {
-    box-sizing: border-box;
-    width: var(--snowui-clear-icon-size-override, var(--size-4));
-    height: var(--snowui-clear-icon-size-override, var(--size-4));
-    flex: 0 0 var(--snowui-clear-icon-size-override, var(--size-4));
-    padding: 0;
-    margin: 0;
-    border: none;
-    border-radius: var(--radius-full);
-    background: transparent;
-    color: var(--snowui-clear-icon-color-override, var(--black-100, #000));
-    opacity: var(--snowui-clear-icon-opacity-override, 0.4);
-    cursor: pointer;
-    line-height: 0;
-    transition:
-        color var(--snowui-frame-color-motion-duration, 0.15s)
-            var(--snowui-frame-color-motion-easing, ease-out),
-        opacity var(--snowui-frame-color-motion-duration, 0.15s)
-            var(--snowui-frame-color-motion-easing, ease-out);
-}
-
-:where(.snowui-clear-icon-btn:hover) {
-    opacity: var(--snowui-clear-icon-hover-opacity-override, 1);
-}
-
-:where(.snowui-clear-icon-btn > svg) {
-    display: block;
-    width: 100%;
-    height: 100%;
-}
+/* 清除操作由 Button bare 拥有视觉；组件保留自己的定位与显隐标记。 */
 .snowui-continuous-hover-layer {
     position: absolute;
     top: 0;

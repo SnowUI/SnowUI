@@ -2,6 +2,7 @@
     import { getContext } from "svelte";
     import {
         COMPONENT_ICON_CONTEXT_KEY,
+        OPTIONAL_RESOURCE_ICON_CONTEXT_KEY,
         type ComponentIconContext,
         type ComponentIconWeight,
     } from "../../logic/component-icon";
@@ -20,7 +21,7 @@
 
     let {
         name,
-        size = 16,
+        size = undefined,
         color = "currentColor",
         weight = "regular",
         collection,
@@ -32,6 +33,8 @@
     const context = getContext<ComponentIconContext | undefined>(
         COMPONENT_ICON_CONTEXT_KEY,
     );
+    const sizeContext = getContext<{ readonly size?: number | string } | undefined>(OPTIONAL_RESOURCE_ICON_CONTEXT_KEY);
+    const iconSize = $derived(size ?? sizeContext?.size ?? 16);
     const request = $derived({ name, weight, collection });
     const ExternalIcon = $derived(context?.resolve(request));
     const builtin = $derived(BUILTIN_ICON_DATA[name]);
@@ -39,13 +42,13 @@
         builtin?.weights[weight] ?? builtin?.weights.regular ?? "",
     );
     const resolvedSize = $derived(
-        typeof size === "number" ? `${size}px` : size,
+        typeof iconSize === "number" ? `${iconSize}px` : iconSize,
     );
 </script>
 
 {#if ExternalIcon}
     <ExternalIcon
-        {size}
+        size={iconSize}
         {color}
         {weight}
         class={className}
@@ -54,8 +57,8 @@
     />
 {:else if builtin && content}
     <svg
-        width={size}
-        height={size}
+        width={iconSize}
+        height={iconSize}
         viewBox={builtin.viewBox}
         fill={color}
         xmlns="http://www.w3.org/2000/svg"

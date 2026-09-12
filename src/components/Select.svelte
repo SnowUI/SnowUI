@@ -469,7 +469,7 @@
 
     <!-- 指示器图标（箭头） -->
     {#if !buttonTrigger && !hasCustomTrailing}
-        <ComponentIcon name="arrow-line-up-down" as="trailing" class="snowui-select-indicator" size={16} aria-hidden="true" onclick={handleTriggerClick} />
+        <ComponentIcon name="arrow-line-up-down" as="trailing" class="snowui-select-indicator" size="var(--size-4)" aria-hidden="true" onclick={handleTriggerClick} />
     {/if}
 
     <!-- 默认内置模式生成 Listbox + MenuItem；显式 children 存在时切换为显式组合模式。 -->

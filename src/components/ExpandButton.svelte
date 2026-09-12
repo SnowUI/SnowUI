@@ -66,7 +66,7 @@
 <Button
     {...rest}
     style={`${controlButtonMotionStyle(`var(--snowui-expand-button-motion-duration-override, ${CONTROL_BUTTON_MOTION_DURATION_MS}ms)`)} ${userStyle}`}
-    iconOnly={!children}
+    iconOnly={!rest.bare && !children}
     {disabled}
     aria-expanded={resolvedExpanded}
     aria-label={resolvedExpanded ? collapseAriaLabel : ariaLabel}
@@ -84,7 +84,7 @@
             {#if collapseIcon}
                 {@render collapseIcon()}
             {:else}
-                <ComponentIcon name="arrows-in-simple" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-in-simple" aria-hidden="true" />
             {/if}
         </Frame>
     {:else}
@@ -98,7 +98,7 @@
             {#if icon}
                 {@render icon()}
             {:else}
-                <ComponentIcon name="arrows-out-simple" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-out-simple" aria-hidden="true" />
             {/if}
         </Frame>
     {/if}

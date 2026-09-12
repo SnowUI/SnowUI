@@ -139,7 +139,7 @@
                 disabled: context.disabled,
             })}
         {:else}
-            <ComponentIcon name="arrow-line-down" size={16} aria-hidden="true" />
+            <ComponentIcon name="arrow-line-down" aria-hidden="true" />
         {/if}
     {/if}
 {/snippet}

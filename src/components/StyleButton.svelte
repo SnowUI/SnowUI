@@ -119,7 +119,7 @@
 
 <Button
     {...rest}
-    iconOnly={!children}
+    iconOnly={!rest.bare && !children}
     {disabled}
     data-style-button
     data-mode={resolvedMode}

@@ -1,5 +1,8 @@
 # MenuItem.svelte 文档
 
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+
+
 > **版本**: v1.2.3
 > **状态**: 已实现
 > **职责**: 浮层面板操作项，统一支持 Listbox 选项与 QuickAction 操作项两种场景。有 `ListboxOwnerContext` 时自动注册并从 context 派生状态；无 context 时通过 Props 直接控制。padding 在两种场景中统一为 8px。

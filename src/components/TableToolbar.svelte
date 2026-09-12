@@ -194,8 +194,8 @@
                     {#if pendingAction === "copy"}
                         <Spinner size={12} aria-label={`${copyLabel}中`} />
                     {:else}
-                        <Button bare iconOnly emphasis={builtInBareEmphasis} aria-label={copyLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("copy")}>
-                            <ComponentIcon name="copy" size={16} aria-hidden="true" />
+                        <Button bare emphasis={builtInBareEmphasis} aria-label={copyLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("copy")}>
+                            <ComponentIcon name="copy" aria-hidden="true" />
                             <Tooltip as="tooltip">{copyLabel}</Tooltip>
                         </Button>
                     {/if}
@@ -206,8 +206,8 @@
                     {#if pendingAction === "delete"}
                         <Spinner size={12} aria-label={`${deleteLabel}中`} />
                     {:else}
-                        <Button bare iconOnly emphasis={builtInBareEmphasis} aria-label={deleteLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("delete")}>
-                            <ComponentIcon name="trash" size={16} aria-hidden="true" />
+                        <Button bare emphasis={builtInBareEmphasis} aria-label={deleteLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("delete")}>
+                            <ComponentIcon name="trash" aria-hidden="true" />
                             <Tooltip as="tooltip">{deleteLabel}</Tooltip>
                         </Button>
                     {/if}
@@ -222,7 +222,7 @@
         <Select class="snowui-table-toolbar-built-in snowui-table-toolbar-picker" as="sort"
             bind:value={sortValue} buttonTrigger buttonBare ariaLabel={sortLabel} parts={pickerParts}>
             {#snippet triggerContent()}
-                <ComponentIcon name="arrows-down-up" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-down-up" aria-hidden="true" />
                 <Tooltip as="tooltip">{sortLabel}</Tooltip>
             {/snippet}
             <Listbox matchTriggerWidth={false} placementMode="bottom" align="end">
@@ -240,7 +240,7 @@
             bind:value={filterValue} buttonTrigger buttonBare ariaLabel={filterLabel} parts={pickerParts}
             data-placeholder-visible={filterValue === "default" ? "true" : undefined}>
             {#snippet triggerContent()}
-                <ComponentIcon name="funnel-simple" size={16} aria-hidden="true" />
+                <ComponentIcon name="funnel-simple" aria-hidden="true" />
                 <Tooltip as="tooltip">{filterLabel}</Tooltip>
             {/snippet}
             <Listbox matchTriggerWidth={false} placementMode="bottom" align="end">

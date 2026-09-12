@@ -673,23 +673,23 @@
             <Button as="current" variant="gray" />
             <Button as="page" variant="outline" />
             <Button as="prev" variant="outline" iconOnly aria-label="上一页">
-                <ComponentIcon name="arrow-line-left" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrow-line-left" size="var(--size-4)" aria-hidden="true" />
             </Button>
             <Button as="next" variant="outline" iconOnly aria-label="下一页">
-                <ComponentIcon name="arrow-line-right" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrow-line-right" size="var(--size-4)" aria-hidden="true" />
             </Button>
         {/if}
         <span bind:this={previousIconTemplateEl}>
-            <ComponentIcon name="arrow-line-left" class="snowui-pagination-default-icon" size={16} aria-hidden="true" />
+            <ComponentIcon name="arrow-line-left" class="snowui-pagination-default-icon" size="var(--size-4)" aria-hidden="true" />
         </span>
         <span bind:this={nextIconTemplateEl}>
-            <ComponentIcon name="arrow-line-right" class="snowui-pagination-default-icon" size={16} aria-hidden="true" />
+            <ComponentIcon name="arrow-line-right" class="snowui-pagination-default-icon" size="var(--size-4)" aria-hidden="true" />
         </span>
         <span
             class="snowui-pagination-page-size-icon-template"
             bind:this={pageSizeIconTemplateEl}
         >
-            <ComponentIcon name="arrow-line-down" size={16} aria-hidden="true" />
+            <ComponentIcon name="arrow-line-down" size="var(--size-4)" aria-hidden="true" />
         </span>
     </div>
     <div class="snowui-pagination-items" bind:this={itemsEl}></div>

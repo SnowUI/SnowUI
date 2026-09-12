@@ -547,6 +547,11 @@
                             </MenuItem>
                         {/each}
                     {/if}
+                    {#each owner?.customOptions ?? [] as item (item.value)}
+                        <MenuItem as="item" value={item.value} disabled={item.disabled}>
+                            {item.label}
+                        </MenuItem>
+                    {/each}
                 </Frame>
 
                 <!-- 自定义浮层滚动条：只覆盖实际滚动的列表 body，不进入搜索 Input 区域 -->

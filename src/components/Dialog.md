@@ -1,5 +1,7 @@
 # Dialog.svelte 文档
 
+> **内置关闭图标（2026-09-11）**：由Button的size上下文控制，parts.Button.size可覆盖默认档位，图形比例遵循ComponentGuidelines §2.7。
+
 > **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
 
 > **版本**: v1.1.0

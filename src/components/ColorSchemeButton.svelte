@@ -125,7 +125,7 @@
 <Button
     {...rest}
     style={`${controlButtonMotionStyle(`var(--snowui-color-scheme-button-motion-duration-override, ${CONTROL_BUTTON_MOTION_DURATION_MS}ms)`)} ${userStyle}`}
-    iconOnly={!children}
+    iconOnly={!rest.bare && !children}
     {disabled}
     data-color-scheme-button
     data-scheme={resolvedScheme}

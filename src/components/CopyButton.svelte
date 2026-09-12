@@ -98,7 +98,7 @@
     {#if icon}
         {@render icon()}
     {:else}
-        <ComponentIcon name="copy" size={16} aria-hidden="true" />
+        <ComponentIcon name="copy" aria-hidden="true" />
     {/if}
 {/snippet}
 
@@ -108,14 +108,14 @@
     {:else if successContent}
         {@render successContent()}
     {:else}
-        <ComponentIcon name="check" size={16} aria-hidden="true" />
+        <ComponentIcon name="check" aria-hidden="true" />
     {/if}
 {/snippet}
 
 <Button
     {...rest}
     style={`${controlButtonMotionStyle(`var(--snowui-copy-button-motion-duration-override, ${CONTROL_BUTTON_MOTION_DURATION_MS}ms)`)} ${userStyle}`}
-    iconOnly={!showText}
+    iconOnly={!rest.bare && !showText}
     {disabled}
     data-copy-button
     data-copy-status={status}

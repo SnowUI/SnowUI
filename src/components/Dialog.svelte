@@ -439,7 +439,7 @@
                     <Button variant="borderless" iconOnly size={resolvedSize === "sm" ? "sm" : "md"} {...parts?.Button} type="button" as="close" data-dialog-builtin-close="true"
                         class={["snowui-dialog-close", parts?.Button?.class].filter(Boolean).join(" ")}
                         aria-label={closeLabel ?? locale.t("dialog.close")} onclick={requestClose}>
-                        <ComponentIcon name="close" size="var(--snowui-dialog-close-icon-size)" aria-hidden="true" />
+                        <ComponentIcon name="close" aria-hidden="true" />
                     </Button>
                 {/if}
             </Frame>
@@ -502,7 +502,6 @@
         --snowui-dialog-title-font-size: var(--text-18);
         --snowui-dialog-title-line-height: var(--leading-18);
         --snowui-dialog-close-size: calc(var(--size-6) + var(--size-3));
-        --snowui-dialog-close-icon-size: var(--size-5);
         --snowui-dialog-close-offset: var(--padding-4);
         --snowui-dialog-footer-gap: var(--gap-3);
         transform-origin: center;
@@ -549,7 +548,6 @@
         --snowui-dialog-title-font-size: var(--text-16);
         --snowui-dialog-title-line-height: var(--leading-16);
         --snowui-dialog-close-size: var(--size-6);
-        --snowui-dialog-close-icon-size: var(--size-4);
         --snowui-dialog-footer-gap: var(--gap-2);
     }
 

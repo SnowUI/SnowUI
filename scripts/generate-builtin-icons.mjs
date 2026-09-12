@@ -35,6 +35,7 @@ const names = [
     "moon",
     "plus",
     "rightbar",
+    "rounded-corner",
     "search",
     "sun",
     "three-dots",
@@ -88,6 +89,8 @@ for (const name of names) {
     if (!weightsMatch || !viewBoxMatch || !collectionMatch) {
         throw new Error(`Unable to read icon data for ${name}`);
     }
+    const usageNameMatch = componentSource.match(/usageName: '([^']+)'/);
+    const resourceAssets = path.resolve(componentsRoot, "../resource-base/assets/icons");
     const sourceWeights = Function(`"use strict"; return (${weightsMatch[1]});`)();
     const requiredWeights = ["regular", ...(extraWeights.get(name) ?? [])];
     const weights = Object.fromEntries(
@@ -95,6 +98,16 @@ for (const name of names) {
             .filter((weight) => sourceWeights[weight])
             .map((weight) => [weight, sourceWeights[weight]]),
     );
+    // assets 是生成消费源；不接受组件快照私自改变图形与 viewBox。
+    for (const [weight, body] of Object.entries(weights)) {
+        const assetPath = path.join(resourceAssets, collectionMatch[1], weight, `${usageNameMatch?.[1]}.svg`);
+        const asset = fs.readFileSync(assetPath, "utf8");
+        const assetViewBox = asset.match(/viewBox=["']([^"']+)["']/)?.[1];
+        const assetBody = asset.replace(/^[\s\S]*?<svg\b[^>]*>/, "").replace(/<\/svg>\s*$/, "").trim();
+        if (assetViewBox !== viewBoxMatch[1] || assetBody.replace(/(?:#000000|#000|black)/g, "currentColor") !== body.trim()) {
+            throw new Error(`Icon geometry drift: ${name}/${weight} differs from ${assetPath}`);
+        }
+    }
     data[name] = {
         sourceCollection: collectionMatch[1],
         viewBox: viewBoxMatch[1],

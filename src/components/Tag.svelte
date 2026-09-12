@@ -20,12 +20,16 @@
 -->
 
 <script lang="ts">
+    import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import Button from "./Button.svelte";
     import type { Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import { resizeManager } from "../logic/observer.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
 
     interface Props extends Omit<FrameProps, "size"> {
+        /** 内置图标按钮配置；事件与角色由所属组件控制。 */
+        parts?: ComponentPartsOf<{ Button: typeof Button }>;
         variant?: "default" | "active";
         toggle?: boolean;
         closable?: boolean;
@@ -43,6 +47,7 @@
         onClose,
         class: className = "",
         currentState: userCurrentState,
+        parts = undefined,
         children,
         ...rest
     }: Props = $props();
@@ -272,14 +277,14 @@
     {/if}
     {@render children?.()}
     {#if closable}
-        <button
+        <Button bare emphasis="muted" size="sm" {...parts?.Button}
             type="button"
-            class="snowui-clear-icon-btn snowui-tag-close"
+            class={`snowui-clear-icon-btn snowui-tag-close${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
             aria-label="Close tag"
             onclick={handleCloseClick}
         >
-            <ComponentIcon name="close" size={16} aria-hidden="true" />
-        </button>
+            <ComponentIcon name="close" aria-hidden="true" />
+        </Button>
     {/if}
 </Frame>
 
@@ -292,13 +297,10 @@
         --snowui-tag-radius: var(--radius-3, 8px);
         --snowui-tag-font-size: var(--text-12, 12px);
         --snowui-tag-line-height: var(--leading-12, 16px);
-        --snowui-tag-icon-size: calc(var(--size-4, 16px) * 3 / 4); /* 12px */
         /* 箭头可见宽度；箭头形状由内部 SVG path 按当前尺寸重算 */
         --snowui-tag-arrow-width: 8px;
         --snowui-tag-bg: var(--black-4, rgba(0, 0, 0, 0.04));
         --snowui-tag-color: inherit;
-        --snowui-tag-close-opacity: 0.4;
-        --snowui-tag-close-opacity-hover: 1;
 
         display: inline-flex;
         align-items: center;
@@ -363,7 +365,7 @@
             transparent
         );
         --snowui-tag-color: var(--secondary-indigo, #adadfb);
-        --snowui-clear-icon-color-override: var(--secondary-indigo, #adadfb);
+        --snowui-tag-close-color: var(--secondary-indigo, #adadfb);
     }
 
     /* Level 4: 箭头形状（SVG 圆角箭头）
@@ -444,13 +446,12 @@
         opacity: var(--snowui-hover-opacity, var(--snowui-frame-hover-opacity, 4%));
     }
 
-    /* 内置删除 X：视觉/hover 复用 .snowui-clear-icon-btn；
+    /* 内置删除 X：视觉/hover 复用 Button bare；
        Tag 只补充自身显示时机：默认 width=0 + overflow:hidden 不占位，
        hover Tag 时 width 展开到 icon-size，由 Frame 桥接动效平滑过渡撑出 Tag 宽度。 */
     :global(:where(.snowui-tag) > .snowui-tag-close) {
-        --snowui-clear-icon-size-override: var(--snowui-tag-icon-size);
-        --snowui-clear-icon-opacity-override: 0;
-        --snowui-clear-icon-hover-opacity-override: var(--snowui-tag-close-opacity-hover);
+        --snowui-button-color-override: var(--snowui-tag-close-color, var(--snowui-tag-color));
+        --snowui-button-opacity-override: 0;
 
         width: 0;
         flex: 0 0 0;
@@ -466,9 +467,9 @@
 
     /* Hover Tag 时 X 显形并撑出宽度 */
     :global(:where(.snowui-tag):hover > .snowui-tag-close) {
-        --snowui-clear-icon-opacity-override: var(--snowui-tag-close-opacity);
+        --snowui-button-opacity-override: var(--snowui-button-opacity);
 
-        width: var(--snowui-tag-icon-size);
-        flex: 0 0 var(--snowui-tag-icon-size);
+        width: var(--snowui-button-icon-size, var(--size-4));
+        flex: 0 0 var(--snowui-button-icon-size, var(--size-4));
     }
 </style>

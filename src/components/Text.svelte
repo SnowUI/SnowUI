@@ -598,7 +598,7 @@
                     >
                         <ComponentIcon
                             name="arrow-line-down"
-                            size={16}
+
                             aria-hidden="true"
                         />
                     </Button>

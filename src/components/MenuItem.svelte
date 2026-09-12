@@ -12,6 +12,8 @@
 -->
 
 <script lang="ts">
+    import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import Button from "./Button.svelte";
     import type { Snippet } from "svelte";
     import { onMount } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
@@ -24,6 +26,8 @@
     } from "../logic/component-parts.svelte";
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
+        /** 内置图标按钮配置；事件与角色由所属组件控制。 */
+        parts?: ComponentPartsOf<{ Button: typeof Button }>;
         /** 选项值（在 Listbox 内使用时必填，同一 Listbox 内必须唯一） */
         value?: string;
         /** 是否选中（独立使用时有效；Listbox 内由 context 覆盖） */
@@ -51,6 +55,7 @@
         showCheck = undefined,
         closeOnSelect = undefined,
         as = undefined,
+        parts = undefined,
         children,
         enableAutoLayout = true,
         enableResponsive = false,
@@ -80,7 +85,7 @@
 
     // ── Listbox 内注册 ─────────────────────────────────────────────────────
     onMount(() => {
-        if (owner && value !== undefined) {
+        if (owner && value !== undefined && !isCustom) {
             const label = getRegistrationLabel() ?? value;
             owner.registerOption({ value, label, disabled });
             return () => {
@@ -92,7 +97,7 @@
     // ── 派生状态（有 context 时从 context 读取，否则用 Props）────────────────
     const itemIndex = $derived(
         owner && value !== undefined
-            ? (owner.options.findIndex(o => o.value === value) ?? -1)
+            ? ([...owner.options, ...owner.customOptions].findIndex(o => o.value === value) ?? -1)
             : -1,
     );
     const isCustom = $derived(
@@ -225,23 +230,23 @@
 
     {#if resolvedShowCheck && isCustom && isHovered}
         <!-- 自定义项 hover 时显示删除按钮（替换 ✔ 位置） -->
-        <button
+        <Button bare emphasis="muted" size="sm" {...parts?.Button}
             type="button"
-            class="snowui-clear-icon-btn snowui-menu-item-delete snowui-menu-item-check"
-            data-as="trailing"
+            class={`snowui-clear-icon-btn snowui-menu-item-delete snowui-menu-item-check${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
+            as="trailing"
             aria-label="删除自定义选项"
             onclick={handleDelete}
             onmousedown={handleMousedown}
             tabindex={-1}
         >
-            <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
-        </button>
+            <ComponentIcon name="x-circle" weight="fill" aria-hidden="true" />
+        </Button>
     {:else if resolvedShowCheck}
         <ComponentIcon
             name="check"
             class="snowui-menu-item-check"
             as="trailing"
-            size={16}
+            size="var(--size-4)"
             aria-hidden="true"
         />
     {/if}

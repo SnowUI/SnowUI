@@ -179,9 +179,9 @@
         <button class="snowui-table-sort" type="button" data-active={isSortActive ? "true" : undefined} onclick={toggleSort}>
             <span class="snowui-table-head-content">{#if children}{@render children()}{/if}</span>
             {#if isSortActive && direction === "ascending"}
-                <ComponentIcon name="arrows-up" class="snowui-table-sort-icon" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-up" class="snowui-table-sort-icon" size="var(--size-4)" aria-hidden="true" />
             {:else if isSortActive && direction === "descending"}
-                <ComponentIcon name="arrows-down" class="snowui-table-sort-icon" size={16} aria-hidden="true" />
+                <ComponentIcon name="arrows-down" class="snowui-table-sort-icon" size="var(--size-4)" aria-hidden="true" />
             {/if}
         </button>
     {:else}

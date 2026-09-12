@@ -1,5 +1,8 @@
 # Button.svelte 文档
 
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
 > **版本**: v2.18.0
 > **变更记录 (2026-09-04)**: hover 改为标准高度反比补偿；默认 / sm 保持原效果，md / lg 的背景放大与 Borderless 隐藏起点同步减弱，点击继续缩回当前尺寸放大量的一半。计算规则见下文，具体数值以 preset catalog 为准。
 > **变更记录 (2026-08-27)**: 恢复 Owner 在 2026-08-19 确认的背景层比例放大方案：gray / filled / outline 从 `1` 放大到 `1.06`，Borderless 从隐藏的 `0.84` 背景显示并放大到 `1.06`，最终颜色保持 Light 4% / Dark 10%；文字、Icon、Spinner、命中区和布局不变。背景缩放使用 `BUTTON_HOVER_SCALE_UP_MOTION` 的 `200ms ease`，颜色使用通用 `150ms ease-out`。
@@ -75,7 +78,7 @@ Button 的内部布局不接入三槽位模型：
 - `as="current"` / `as="page"` / `as="prev"` / `as="next"` 放入 Pagination 时表示角色样式模板；真实页码、可点击性与边界状态由 Pagination 生成和管理。
 - `bare` 是不限制内容类型的无外壳特化：保持当前字号 / 行高与普通内容 gap，固定清零 padding / radius，并默认使用 `currentColor × opacity: 1`；仅 `emphasis="muted"` 使用 `0.4 -> 1` 表达次级操作。
 - `as="pageSize"` 可作为 Pagination 的每页条数视觉模板；Pagination 会注入当前数值和 `ArrowLineDown`，并用内置 Listbox 接管交互。Icon 作为 Button 普通内容，不使用 `as="trailing"`，间距由 Button 内容 gap 控制。
-- `bare` 自动注入与 iconOnly 一致的 16/20/24px 图标上下文，无需 iconOnly；子图标显式 size 优先。兼容的 bare iconOnly 组合仍保留透明热区。
+- `bare` 自动注入与 iconOnly 一致的 1/1.25/1.5rem 图标上下文（标准根字号下16/20/24px），无需 iconOnly；子图标显式 size 优先。兼容的 bare iconOnly 组合仍保留透明热区。
 - 当 Button 作为 `ButtonGroup` 的直系子项时，自动进入嵌入态：保留独立点击、链接、状态与内容 gap，退掉自身背景、边框和圆角，并接收 ButtonGroup 分配的单元格 padding。
 
 布局变量链：
@@ -331,7 +334,7 @@ Button 放入 Pagination 时使用角色模板：
 | **md** | `36px` | `var(--padding-2) var(--padding-4)` | `var(--padding-2)` | `calc((var(--gap-1) + var(--gap-2)) / 2)` | `var(--radius-4)` | `var(--text-14)` | `var(--leading-14)` | `var(--size-4)` (16) |
 | **lg** | `48px` | `var(--padding-3) var(--padding-5)` | `var(--padding-3)` | `var(--gap-2)` | `var(--radius-5)` | `var(--text-16)` | `var(--leading-16)` | `var(--size-5)` (20) |
 
-> **备注**: 
+> **备注**:
 > 1. 常规按钮包含文字时，挂载的 `Icon` 等资源尺寸会优先等比缩小一号（`sm: 12`, `md: 16`, `lg: 20`）以匹配文本字号。
 > 2. 当按钮显式声明 `iconOnly=true` 时，内部挂载的视觉资源使用放大一级的上下文：`sm: 16`, `md: 20`, `lg: 24`。
 > 3. `bare` 与 `iconOnly` 的图标尺寸一致：sm/md/lg 为 16/20/24px；子图标显式 size 优先。bare 不依赖 iconOnly。兼容已有 bare iconOnly 写法时仍由 bare 去掉外壳与 padding，不作为推荐组合。
