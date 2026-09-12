@@ -515,13 +515,12 @@
         <span class="snowui-sidebar-collapse-button-host">
             <Button
                 bare
-                iconOnly
                 size="sm"
                 class="snowui-sidebar-collapse-button"
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
                 onclick={toggleCollapsed}
             >
-                <ComponentIcon name="rightbar" size={16} aria-hidden="true" />
+                <ComponentIcon name="rightbar" aria-hidden="true" />
             </Button>
         </span>
     </header>

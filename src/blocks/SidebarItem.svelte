@@ -95,7 +95,7 @@
                 {:else if iconSnippet}
                     {@render iconSnippet()}
                 {:else if iconName}
-                    <ComponentIcon name={iconName} collection={iconCollection} size={20} />
+                    <ComponentIcon name={iconName} collection={iconCollection} size="var(--size-5)" />
                 {/if}
                 {#if updated && collapsed}
                     <Badge
@@ -176,14 +176,13 @@
                     <Button
                         {...parts?.Button}
                         bare
-                        iconOnly
                         emphasis={parts?.Button?.emphasis ?? "muted"}
                         size="sm"
                         disabled={action.disabled}
                         aria-label={action.label}
                         onclick={(event: MouseEvent) => runAction(event, action)}
                     >
-                        <ComponentIcon name={action.icon} collection={action.iconCollection} size={16} aria-hidden="true" />
+                        <ComponentIcon name={action.icon} collection={action.iconCollection} aria-hidden="true" />
                         <Tooltip as="tooltip" position="right">{action.label}</Tooltip>
                     </Button>
                 {/each}

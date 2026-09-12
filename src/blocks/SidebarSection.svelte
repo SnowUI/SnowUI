@@ -93,7 +93,7 @@
                 >
                     <Text class="snowui-sidebar-section-title">{title}</Text>
                     <span class="snowui-sidebar-section-toggle-icon">
-                        <ComponentIcon name="arrow-line-down" size={12} aria-hidden="true" />
+                        <ComponentIcon name="arrow-line-down" aria-hidden="true" />
                     </span>
                 </Button>
             {:else}
@@ -110,14 +110,13 @@
                             <Button
                                 {...parts?.Button}
                                 bare
-                                iconOnly
                                 emphasis={parts?.Button?.emphasis ?? "muted"}
                                 size="sm"
                                 disabled={action.disabled}
                                 aria-label={action.label}
                                 onclick={() => action.onSelect?.(id)}
                             >
-                                <ComponentIcon name={action.icon} collection={action.iconCollection} size={12} aria-hidden="true" />
+                                <ComponentIcon name={action.icon} collection={action.iconCollection} aria-hidden="true" />
                                 <Tooltip as="tooltip" position="right">{action.label}</Tooltip>
                             </Button>
                         {/each}

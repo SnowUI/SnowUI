@@ -22,6 +22,8 @@
 -->
 
 <script lang="ts">
+    import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
+    import { Button } from "@snowui-design-system/components";
     import { onMount, onDestroy, type Snippet } from "svelte";
     import { Frame, type FrameProps } from "@snowui-design-system/components";
     import { GENERIC_SCALE_APPEAR_MOTION } from "@snowui-design-system/components/motion/presets/generic";
@@ -40,6 +42,8 @@
     } from "@snowui-design-system/components/logic/component-parts.svelte";
 
     interface Props extends Omit<FrameProps, "children"> {
+        /** 内置图标按钮配置；事件与角色由所属组件控制。 */
+        parts?: ComponentPartsOf<{ Button: typeof Button }>;
         /** 模版模式 id;配合 template=true 后可通过 showToast(id) 触发;Inline 模式自动生成 */
         id?: string;
         /** 模版模式:只注册为命令式 Toast 模板,不直接渲染 */
@@ -72,6 +76,7 @@
         size = "md",
         position = "top",
         onDismiss = undefined,
+        parts = undefined,
         children,
         enableResponsive = false,
         enableContext = true,
@@ -192,9 +197,9 @@
                 aria-hidden="true"
             >
                 {#if positive}
-                    <ComponentIcon name="check-circle" weight="fill" size={20} aria-hidden="true" />
+                    <ComponentIcon name="check-circle" weight="fill" size="var(--snowui-toast-icon-size, var(--size-5))" aria-hidden="true" />
                 {:else}
-                    <ComponentIcon name="warning" weight="fill" size={20} aria-hidden="true" />
+                    <ComponentIcon name="warning" weight="fill" size="var(--snowui-toast-icon-size, var(--size-5))" aria-hidden="true" />
                 {/if}
             </span>
         {/if}
@@ -202,16 +207,16 @@
         {@render children?.()}
 
         {#if isRich}
-            <button
+            <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
-                class="snowui-clear-icon-btn snowui-toast-close-btn"
+                class={`snowui-clear-icon-btn snowui-toast-close-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
                 aria-label="关闭通知"
                 onclick={() => onDismiss?.()}
-                onmousedown={(e) => e.preventDefault()}
+                onmousedown={(e: MouseEvent) => e.preventDefault()}
                 tabindex={-1}
             >
-                <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
-            </button>
+                <ComponentIcon name="x-circle" weight="fill" aria-hidden="true" />
+            </Button>
         {/if}
     </Frame>
 {/if}
@@ -304,21 +309,18 @@
         position: absolute;
         top: -0.25rem;          /* -4px, 与 Figma 一致 */
         right: -0.25rem;
-        --snowui-clear-icon-opacity-override: 0;
-        --snowui-clear-icon-hover-opacity-override: 0;
+        --snowui-button-opacity-override: 0;
         pointer-events: none;
     }
 
     :global(:where(.snowui-toast-rich:hover .snowui-toast-close-btn)) {
-        --snowui-clear-icon-opacity-override: 0.4;
-        --snowui-clear-icon-hover-opacity-override: 1;
+        --snowui-button-opacity-override: var(--snowui-button-opacity);
         pointer-events: auto;
     }
 
     /* Toaster 只声明根状态；Toast 自己控制内部关闭按钮。 */
     :global(:where(.snowui-toast[data-frontmost="false"] .snowui-toast-close-btn)) {
-        --snowui-clear-icon-opacity-override: 0;
-        --snowui-clear-icon-hover-opacity-override: 0;
+        --snowui-button-opacity-override: 0;
         pointer-events: none;
     }
 </style>

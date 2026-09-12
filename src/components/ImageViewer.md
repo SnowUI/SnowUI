@@ -1,5 +1,8 @@
 # ImageViewer.svelte 文档
 
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
 > **版本**: v1.4.1
 > **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局，明确 overlay / media / controls 的区域关系。
 > **职责**: 页面级媒体预览组件，负责显示当前图片/视频与组合式控制按钮。

@@ -12,6 +12,8 @@
 -->
 
 <script lang="ts">
+    import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
+    import { Button } from "@snowui-design-system/components";
     import type { Snippet } from "svelte";
     import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
     import {
@@ -21,6 +23,8 @@
     } from "@snowui-design-system/components";
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
+        /** 内置图标按钮配置；事件与角色由所属组件控制。 */
+        parts?: ComponentPartsOf<{ Button: typeof Button }>;
         variant?: "gray" | "outline";
         value?: string | number;
         placeholder?: string;
@@ -48,6 +52,7 @@
         showSearchIcon = true,
         collapseBelow = undefined,
         clearable = true,
+        parts = undefined,
         children,
         onOpenChange = undefined,
         onClear = undefined,
@@ -175,7 +180,7 @@
             name="search"
             as="leading"
             class="snowui-search-box-default-icon"
-            size={16}
+            size="var(--size-4)"
             aria-hidden="true"
         />
     {/if}
@@ -189,17 +194,17 @@
     {@render children?.()}
 
     {#if clearable && hasValue && !disabled && !readonly}
-        <button
+        <Button bare emphasis="muted" size="sm" {...parts?.Button}
             type="button"
-            class="snowui-clear-icon-btn snowui-search-box-clear-btn"
-            data-as="trailing"
+            class={`snowui-clear-icon-btn snowui-search-box-clear-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
+            as="trailing"
             aria-label="清除搜索内容"
             onclick={handleClear}
-            onmousedown={(event) => event.preventDefault()}
+            onmousedown={(event: MouseEvent) => event.preventDefault()}
             tabindex={-1}
         >
-            <ComponentIcon name="x-circle" weight="fill" size={16} aria-hidden="true" />
-        </button>
+            <ComponentIcon name="x-circle" weight="fill" aria-hidden="true" />
+        </Button>
     {/if}
 </Frame>
 
@@ -430,7 +435,7 @@
     }
 
     /* ─── Clear (X) 按钮 ─────────────────────────────────────────
-     * 视觉/交互复用共享基类 .snowui-clear-icon-btn（layout.css）。
+     * 视觉/交互复用 Button bare。
      * 此处仅保留 SearchBox 专属的默认隐藏；focus-within 显示规则在下方。
      * grid 落列由 auto-layout.css 通过 [data-as="trailing"] 接管。 */
 

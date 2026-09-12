@@ -317,7 +317,7 @@
     {#if !action.hidden}
         <Button
             bare={action.bare ?? !action.label}
-            iconOnly={!!action.icon && !action.label}
+            iconOnly={!(action.bare ?? !action.label) && !!action.icon && !action.label}
             emphasis={parts?.Button?.emphasis ?? "muted"}
             size="sm"
             variant={action.variant ?? "gray"}
@@ -327,7 +327,7 @@
             onclick={(event: MouseEvent) => handleAction(action, event)}
         >
             {#if action.icon}
-                <ComponentIcon name={action.icon} size={16} aria-hidden="true" />
+                <ComponentIcon name={action.icon} aria-hidden="true" />
             {/if}
             {#if action.label}<span>{action.label}</span>{/if}
             {#if action.icon && !action.label && (action.ariaLabel ?? action.label)}
@@ -389,14 +389,13 @@
                         <span class="snowui-side-panel-title">{title}</span>
                         <Button
                             bare
-                            iconOnly
                             emphasis={parts?.Button?.emphasis ?? "muted"}
                             size="sm"
                             aria-label={locale.t("sidePanel.close")}
                             class="snowui-side-panel-toolbar-button snowui-side-panel-close"
                             onclick={() => void closePanel()}
                         >
-                            <ComponentIcon name="close" size={16} aria-hidden="true" />
+                            <ComponentIcon name="close" aria-hidden="true" />
                             <Tooltip as="tooltip">{locale.t("sidePanel.close")}</Tooltip>
                         </Button>
                     </div>

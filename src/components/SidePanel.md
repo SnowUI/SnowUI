@@ -1,9 +1,12 @@
 # SidePanel
 
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
 > **2026-09-10 浮层内边框**：floating 模式复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
 
 > **版本**: v1.4.0
-> **包归属**: PRO  
+> **包归属**: PRO
 > **职责**: 右侧详情弹出窗，支持浮层与页面右侧内嵌两种预览形态。
 
 ## AI Zone

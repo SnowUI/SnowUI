@@ -459,7 +459,7 @@
                 >
                     <ComponentIcon
                         name="arrow-line-left"
-                        size={16}
+
                         aria-hidden="true"
                     />
                 </Button>
@@ -471,7 +471,7 @@
                 >
                     <ComponentIcon
                         name="arrow-line-right"
-                        size={16}
+
                         aria-hidden="true"
                     />
                 </Button>
@@ -482,7 +482,7 @@
                         iconOnly
                         aria-label="关闭图片预览"
                     >
-                        <ComponentIcon name="close" size={16} aria-hidden="true" />
+                        <ComponentIcon name="close" aria-hidden="true" />
                     </Button>
                 {/if}
             </div>
