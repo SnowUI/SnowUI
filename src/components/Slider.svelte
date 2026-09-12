@@ -1,6 +1,6 @@
 <!--
   Slider 滑动输入组件
-  v1.4.1
+  v1.4.2
 
   文档: ./Slider.md
 -->
@@ -148,6 +148,7 @@
             : 100,
     );
     const isBarVariant = $derived(variant === "solid" || variant === "soft");
+    const combinedRangeLabel = $derived(isBarVariant && orientation === "horizontal" && isRange && !children);
     const resolvedColor = $derived(
         color ?? (variant === "soft" ? "Black10" : "Primary"),
     );
@@ -216,8 +217,9 @@
             label.dataset.snowuiSliderAutoLabel = "true";
             const resolvedValue =
                 resolvedValues[index] ?? resolvedValues[0] ?? minValue;
-            label.textContent =
-                isBarVariant
+            label.textContent = combinedRangeLabel
+                ? resolvedValues.map(item => `${Math.round(toPercent(item))}%`).join("–")
+                : isBarVariant
                     ? `${Math.round(toPercent(resolvedValue))}%`
                     : String(resolvedValue);
         });
@@ -341,7 +343,7 @@
                 {#if children}
                     {@render children()}
                 {:else}
-                    {#each resolvedValues as _, index (`label-${index}`)}
+                    {#each (combinedRangeLabel ? [resolvedValues[0]] : resolvedValues) as _, index (`label-${index}`)}
                         <Text {...parts?.Text} as="label" />
                     {/each}
                 {/if}
@@ -629,6 +631,16 @@
                     --snowui-slider-indicator-disappear-easing,
                     cubic-bezier(0.22, 1, 0.36, 1)
                 );
+    }
+
+    /* 区间标识向填充内部偏移，并始终保留轨道两端的标准留白。 */
+    :global(:where(.snowui-slider-bar[data-orientation="horizontal"][data-range="true"] .snowui-slider-thumb)) {
+        --snowui-slider-range-inset: min(var(--padding-1), calc((var(--snowui-slider-end) - var(--snowui-slider-start)) / 2));
+        inset-inline-start: clamp(var(--padding-1), calc(var(--snowui-slider-thumb-position) - var(--snowui-slider-range-inset)), calc(100% - var(--padding-1)));
+    }
+
+    :global(:where(.snowui-slider-bar[data-orientation="horizontal"][data-range="true"] .snowui-slider-thumb[data-index="0"])) {
+        inset-inline-start: clamp(var(--padding-1), calc(var(--snowui-slider-thumb-position) + var(--snowui-slider-range-inset)), calc(100% - var(--padding-1)));
     }
 
     :global(:where(.snowui-slider-solid[data-orientation="horizontal"] .snowui-slider-thumb[data-at-start="true"])) {

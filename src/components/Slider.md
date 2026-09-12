@@ -1,6 +1,6 @@
 # Slider 滑动输入组件
 
-> **版本**: v1.4.1
+> **版本**: v1.4.2
 > **职责**: 提供单值、区间、水平、纵向、可切割 steps 与填充式视觉变体的滑动输入。
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -13,7 +13,7 @@
 - 轨道、填充条与拖动块规则复用 Progress：默认粗细 4px、轨道 `Black4`、填充 `Primary`、全圆角。
 - 拖动块固定为 `20px × 14px`，默认背景为 `Static White/80%`，含 `0.5px` 白色 Inside Stroke（inset shadow）与 `blur(2px)` 背景模糊；drop shadow 保持 `0 1px 2px rgba(0, 0, 0, 0.4)` 不变。
 - 鼠标常态隐藏拖动块；hover、`focus-visible`、拖动中显示；触控设备常驻显示。
-- label 采用默认内置模式，默认不显示；`showLabel=true` 时自动生成 Text，并显示对应拖动块的实时值。Range 自动生成两个 Text。
+- label 采用默认内置模式，默认不显示；`showLabel=true` 时自动生成 Text，并显示对应拖动块的实时值。普通及纵向 Range 自动生成两个 Text；水平 `solid` / `soft` Range 生成一个完整百分比范围（如 `85%–100%`）。
 - 内置 label 默认排版为 12px / 16px，可通过 `parts.Text` 配置。显式 `<Text as="label">` 内容保持原样并替换内置 label。
 - 水平 label 位于拖动块上方，纵向 label 位于拖动块左侧，默认间距均为 2px；label 只在 hover 时显示。
 - Range Slider 使用两个直系 `as="label"` 内容时，按顺序分别跟随起点和终点拖动块。
@@ -38,7 +38,7 @@
 | `variant` | `"default" \| "solid" \| "soft"` | `"default"` | `solid` 为高对比条形样式；`soft` 为使用 Black token 的主题自适应低对比条形样式 |
 | `title` | `string` | `"Text"` | `solid` / `soft` 左侧内置标题；空字符串可隐藏；不是 label |
 | `showSteps` | `boolean` | `false` | 使用 1px 透明缝隙按照 step 切割轨道与填充条 |
-| `showLabel` | `boolean` | `false` | 是否生成跟随拖动块的内置 Text label；Range 自动生成两个 |
+| `showLabel` | `boolean` | `false` | 是否生成跟随拖动块的内置 Text label；水平条形 Range 合并为一个范围标签，其他 Range 生成两个 |
 | `thickness` | `number \| string` | `4`；`solid` / `soft` 为 `32` | 轨道粗细；在条形变体中控制整体高度 |
 | `background` | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
 | `color` | `SnowUIColor \| string` | `"Primary"`；`soft` 为 `"Black10"` | 填充条颜色；显式传值可覆盖变体默认值 |
@@ -95,6 +95,11 @@
 - steps 只在固定尺寸的 track 上使用 CSS mask 生成 1px 透明缝隙；父级 mask 同时裁切内部 fill，切割线不会随填充宽度移动，也不假设页面背景色。
 
 ## 更新日志 (Changelog)
+
+### v1.4.2 (2026-09-12)
+
+- 水平 `solid` / `soft` 区间默认 label 合并为一个百分比范围，避免右侧重叠；显式 label 内容仍由调用方控制。
+- 区间两端竖线向填充内部偏移，窄区间限制偏移为区间的一半，并始终保留与单值相同的轨道边缘留白，包括 `0%–0%` 和 `100%–100%`；单值模式保持原定位。
 
 ### v1.4.1 (2026-08-06)
 
