@@ -41,7 +41,7 @@ export const examples = [
 </Select>`,
         expected: {
             render: "浮层顶部显示搜索输入框，输入文字后实时过滤选项",
-            interaction: "匹配的选项保留，不匹配的隐藏；关闭后搜索框自动清空",
+            interaction: "匹配的选项保留，不匹配的隐藏；选中项被过滤、无匹配及清空时搜索框与面板顶部保持打开时的位置；关闭后搜索框自动清空，再次打开重新对齐",
         },
         logic: ["Filter", "Search"],
     },

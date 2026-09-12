@@ -5,7 +5,7 @@
 
 > **版本**: v1.2.3
 > **状态**: 已实现
-> **职责**: 浮层面板操作项，统一支持 Listbox 选项与 QuickAction 操作项两种场景。有 `ListboxOwnerContext` 时自动注册并从 context 派生状态；无 context 时通过 Props 直接控制。padding 在两种场景中统一为 8px。
+> **职责**: 浮层面板操作项，统一支持 Listbox 选项与 QuickAction 操作项两种场景。以 `as="item"` 接入 `ListboxOwnerContext` 时自动注册并从 context 派生状态；未接入时通过 Props 直接控制。padding 在两种场景中统一为 8px。
 
 ---
 
@@ -15,14 +15,15 @@
 
 | 关键字 | 类型 | 默认值 | 说明 |
 | :--- | :--- | :--- | :--- |
-| `value` | `string` | — | 选项值（Listbox 内使用时必填，同一 Listbox 内唯一） |
-| `selected` | `boolean` | `false` | 是否选中（独立使用时有效；Listbox 内由 context 覆盖） |
-| `active` | `boolean` | `false` | 是否高亮（独立使用时有效；Listbox 内由 context 覆盖） |
+| `parts` | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置默认内置删除按钮的公开 Props（如 size、class、style）；删除事件、可访问名称和角色仍由组件控制，不影响外置子项。 |
+| `value` | `string` | — | 选项值（通过 as="item" 接入 Listbox 时必填且同一列表内唯一；独立使用时作为选择意图事件的业务标识） |
+| `selected` | `boolean` | `false` | 是否选中（独立使用时有效；使用 as="item" 接入 Listbox 后由宿主覆盖） |
+| `active` | `boolean` | `false` | 是否高亮（独立使用时有效；使用 as="item" 接入 Listbox 后由宿主覆盖） |
 | `disabled` | `boolean` | `false` | 是否禁用（opacity 0.2，阻止点击） |
 | `showCheck` | `boolean` | — | 是否渲染 trailing 勾选槽位；未设置时仅独立 `selected` 项默认开启，Listbox 默认关闭，Select 默认开启 |
 | `closeOnSelect` | `boolean` | — | 点击后是否请求父级浮层关闭；未设置时由父级浮层决定默认策略 |
-| `onclick` | `function` | — | 点击回调（独立使用时有效；Listbox 内由 context 接管） |
-| `children` | `Snippet` | — | 操作项内容；直系 `as="leading"` / `as="trailing"` 子项会参与根级三槽位布局 |
+| `onclick` | `function` | — | 接收 MouseEvent；未禁用且未以 as="item" 接入 Listbox 时触发，返回值忽略。调用 preventDefault 或 stopPropagation 可阻止后续选择意图派发；Listbox 内选择由宿主接管 |
+| `children` | `Snippet` | — | 无参数的操作项内容；直系 `as="leading"` / `as="trailing"` 子项会参与根级三槽位布局 |
 | `class` | `string` | `""` | 自定义 CSS 类名 |
 | `enableAutoLayout` | `boolean` | `true` | 内部自动布局协议固定启用；外部传入 `false` 不关闭 MenuItem 的三槽位布局 |
 | `enableResponsive` | `boolean` | `false` | 是否开启响应式监听 |
@@ -38,7 +39,7 @@
 | **Listbox 内**（有 `ListboxOwnerContext`） | 8px | context 派生 | 挂载时注册，卸载时注销 |
 | **QuickAction 内 / 独立使用** | 8px | `selected` / `active` Props | 无 |
 
-点击未禁用的 `MenuItem` 后会派发 `snowui-menu-item-select` 选择意图事件，事件携带 `value` 与可选 `closeOnSelect`。`MenuItem` 本身不决定父级浮层是否关闭；`QuickAction` / `SearchPopup` 等浮层容器按自身默认策略处理，单个 `MenuItem closeOnSelect={...}` 可覆盖容器默认值。`Listbox` 仍由自身选择协议管理关闭行为。
+点击未禁用的 `MenuItem` 后会派发 `snowui-menu-item-select` 选择意图事件，事件携带 `value` 与可选 `closeOnSelect`。`MenuItem` 本身不决定父级浮层是否关闭；`Popover` 等浮层容器按自身默认策略处理，单个 `MenuItem closeOnSelect={...}` 可覆盖容器默认值。`Listbox` 仍由自身选择协议管理关闭行为。
 
 ---
 

@@ -1,6 +1,6 @@
 <!--
  Listbox 组件：浮层选项列表面板
- v1.3.1
+ v1.3.2
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -193,6 +193,11 @@
     let listboxWidth = $state(0);
     let listboxMaxHeight = $state(100000);
     const hasLockedWidth = $derived(listboxWidth !== 0);
+    // 每次打开只做一次选中项对齐；过滤隐藏选项后不能用零尺寸矩形重新定位。
+    let selectedTopOffset: number | undefined;
+    $effect(() => {
+        if (!owner?.open) selectedTopOffset = undefined;
+    });
 
     // content 模式在每次打开时测量一次最长项宽度并锁定。
     // 搜索框 focus、输入和过滤都不应让浮层横向跳动。
@@ -312,10 +317,10 @@
         }
 
         // 选中项对齐模式
-        const selectedItemEl = listboxEl.querySelector(
-            '[aria-selected="true"]',
-        ) as HTMLElement | null;
-        const allOptionEls = listboxEl.querySelectorAll('[role="option"]');
+        const allOptionEls = getVisibleOptionElements();
+        const selectedItemEl = allOptionEls.find(
+            (element) => element.getAttribute("aria-selected") === "true",
+        );
         const midIndex =
             allOptionEls.length > 0
                 ? Math.floor((allOptionEls.length - 1) / 2)
@@ -326,7 +331,7 @@
 
         // 如果没找到要对齐的元素，使用简单定位（Trigger 下方）
         // 规范：无选中值时应与中间项对齐，但如果找不到任何选项，则使用下方定位作为后备
-        if (!alignItemEl) {
+        if (!alignItemEl && selectedTopOffset === undefined) {
             listboxPlacement = "bottom";
             listboxTop = triggerRect.bottom + LISTBOX_TRIGGER_GAP;
             const availableHeight = Math.max(
@@ -342,16 +347,16 @@
             return;
         }
 
-        // 先 scrollIntoView 使 alignItem 滚入可视区域，再读取它相对 portal 的视觉位置。
-        // header/body 拆分后不能再用 offsetTop 手算，否则有无 Input 时参考坐标会不同。
-        alignItemEl.scrollIntoView({ block: "nearest" });
-
         const triggerCenterY = triggerRect.top + triggerRect.height / 2;
-        const portalRect = listboxEl.getBoundingClientRect();
-        const itemRect = alignItemEl.getBoundingClientRect();
-        const itemCenterOffset =
-            itemRect.top - portalRect.top + itemRect.height / 2;
-        const idealTop = triggerCenterY - itemCenterOffset;
+        let idealTop = triggerCenterY + (selectedTopOffset ?? 0);
+        if (selectedTopOffset === undefined && alignItemEl) {
+            // 首次对齐读取 header / body 拆分后的真实视觉位置。
+            alignItemEl.scrollIntoView({ block: "nearest" });
+            const portalRect = listboxEl.getBoundingClientRect();
+            const itemRect = alignItemEl.getBoundingClientRect();
+            idealTop = triggerCenterY -
+                (itemRect.top - portalRect.top + itemRect.height / 2);
+        }
 
         // 用 offsetHeight（实际渲染高度，已受 max-height 约束）替代 scrollHeight
         // scrollHeight 在 overflow:clip 下可能超过 max-height，导致 clampedTop 计算偏大
@@ -366,6 +371,7 @@
 
         listboxPlacement = "bottom";
         listboxTop = clampedTop;
+        selectedTopOffset ??= clampedTop - triggerCenterY;
         if (hasExplicitMaxHeight) {
             listboxMaxHeight = Math.max(
                 0,
@@ -398,7 +404,7 @@
     $effect(() => {
         if (!owner?.open || !listboxEl) return;
         const idx = owner.activeIndex;
-        const optEls = listboxEl.querySelectorAll('[role="option"]');
+        const optEls = getVisibleOptionElements();
         (optEls[idx] as HTMLElement | undefined)?.scrollIntoView({
             block: "nearest",
         });

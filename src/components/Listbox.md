@@ -6,14 +6,14 @@
 
 ## 默认内置模式 / 显式组合模式
 
-- 默认内置模式（推荐）：`items` 自动生成固定搜索框与 `<MenuItem as="item">`。未设置 `maxHeight` 时，面板高度按实际可见 MenuItem 的高度计算：默认最多完整显示 10 项，超过后显示浮层滚动条；通过 `parts.Input` / `parts.MenuItem` 配置内置组件。
+- 默认内置模式（推荐）：`items` 自动生成 `<MenuItem as="item">`；设置 `search` 可生成固定搜索框。未设置 `maxHeight` 时，面板高度按实际可见 MenuItem 的高度计算：默认最多完整显示 10 项，超过后显示浮层滚动条；通过 `parts.Input` / `parts.MenuItem` 配置内置组件。
 - 显式组合模式：显式书写 MenuItem，用于复杂内容或逐项 Props 差异；存在 children 时不再生成 items。
 
-默认内置模式可用 `search={false}` 隐藏搜索框、`maxHeight` 显式修改最大高度、`scrollbar={false}` 隐藏浮层滚动条。搜索框默认 placeholder 为“搜索”，有搜索框时面板默认最小宽度为 160px。显式组合模式使用 `search` 时同样自动插入 Input；不设置时也可手动书写 `<Input as="search">`。`maxHeight` 与 `scrollbar` 始终作为 Listbox 面板能力生效。
+Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、`search={false}` 隐藏搜索框、`maxHeight` 显式修改最大高度、`scrollbar={false}` 隐藏浮层滚动条。搜索框默认 placeholder 为“搜索”，有搜索框时面板默认最小宽度为 160px。显式组合模式使用 `search` 时同样自动插入 Input；不设置时也可设置 `search={false}` 并手动书写 `<Input as="search">`。`maxHeight` 与 `scrollbar` 始终作为 Listbox 面板能力生效。
 
 未设置 `maxHeight` 时，可用视口空间只改变完整可见的 Item 数量，不产生半项高度：面板在 2～10 项之间选择能够容纳的完整项数；即使触发器下方空间不足，也至少为现有选项中的前 2 项保留完整高度。少于 2 项时按实际项数 Hug。显式 `maxHeight` 继续按调用方给定的长度与视口可用高度取较小值。
 
-> **版本**: v1.3.1
+> **版本**: v1.3.2
 > **状态**: 已实现
 > **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局；补充关键字表格、用户定义区与更新日志，以满足组件开发链路检查。
 > **职责**: 浮层选项列表面板，作为 Select 的下拉面板。Portal 到 body，position:fixed 定位，选中项中心对齐 Trigger，遵循 Quick Action 视觉规范。支持内嵌 `<Input as="search">` 搜索/过滤。
@@ -54,11 +54,11 @@ Portal anchor div (position:fixed; width/max-height only)
 ### 定位逻辑
 
 - Portal 到 `document.body`，`position: fixed` 逃出 overflow:hidden
-- 宽度：与锚点（Field 或 Select 容器）等宽
+- 宽度：至少与锚点（Field 或 Select 容器）等宽，必要时按内容扩展
 - `matchTriggerWidth={false}` 时不继承锚点宽度，浮层按最长选项 Hug；所有选项在确定的面板宽度内 fill
 - 垂直：选中项中心与 Trigger 中心对齐（无选中值时取中间项）；计算基于 `getBoundingClientRect()` 的真实视觉位置，兼容有无搜索 Input
 - 最大高度：未设置 `maxHeight` 时按实际 Item 高度完整显示最多 10 项，并在视口收窄时至少保留 2 个完整项；通过 `maxHeight` 配置，并继续兼容 inline `style="max-height: ..."` 覆盖
-- 每次打开前重新计算位置
+- 每次打开前重新计算位置；本次展开中保留初始选中项对齐位置，搜索、清空与自定义项变化只更新列表高度，不再按过滤后的选项重新对齐。视口高度限制继续生效。
 
 ### 与宿主的关系
 
@@ -68,37 +68,28 @@ Portal anchor div (position:fixed; width/max-height only)
 
 ---
 
-## 组件 Props（草案）
+## 组件 Props
 
-| 属性 | 类型 | 默认值 | 描述 |
+继承 [FrameProps](./Frame.md)，排除 `children` / `tag`。Listbox 必须置于 Select 等提供选择上下文的宿主内；展开、当前值和选择事件由宿主拥有，不支持独立 `open`、`value`、`options`、`multiple` 或 `placement` 属性。
+
+| 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `open` | `boolean` | `false` | 控制浮层显示，可 `bind:open` |
-| `options` | `ListboxOption[]` | `[]` | 选项数据（与 children 二选一）|
-| `value` | `string \| string[]` | — | 当前选中值 |
-| `multiple` | `boolean` | `false` | 多选模式 |
-| `placement` | `'top' \| 'bottom'` | `'bottom'` | 浮层方向 |
-| `children` | `Snippet` | — | 自定义选项内容（传入 `<ListboxOption>` 子项）|
-| `items` | `ListboxItem[]` | `[]` | 默认内置模式的稳定选项数据 |
-| `search` | `boolean` | `true` | 默认内置模式是否生成固定搜索框 |
-| `maxHeight` | `number \| string` | 未设置 | 面板最大高度；数字按 px 处理。未设置时按实际 Item 高度完整显示最多 10 项，视口不足时至少显示 2 项 |
-| `scrollbar` | `boolean` | `true` | 溢出时是否显示浮层滚动条 |
-| `parts` | `{ Input?, MenuItem? }` | — | 配置默认内置的搜索 Input 与 MenuItem |
-| `matchTriggerWidth` | `boolean` | `true` | 是否与触发锚点等宽；`false` 时浮层及选项按内容 Hug |
-| `minWidth` | `number \| string` | 有搜索框时 `160`，否则 `0` | 面板最小宽度；数字按 px 处理 |
-| `showCheck` | `boolean` | `false` | 是否为选中项显示 trailing check；Select 会默认开启 |
+| `children` | `Snippet` | — | 无参数的显式选项内容；传入后不生成 `items`。选项使用 `MenuItem as="item"` 并提供唯一 `value`；外置搜索使用 `Input as="search"`，同时设置 `search={false}` 避免重复内置搜索框。 |
+| `items` | `ListboxItem[]` | `[]` | 默认内置选项数组；每项包含必填且唯一的字符串 `value`、显示及搜索使用的 `label`、可选 `disabled`。有 children 时忽略；运行时自定义项由宿主另行管理。 |
+| `parts` | `ComponentPartsOf<{ Input: typeof Input; MenuItem: typeof MenuItem }>` | — | 配置默认内置 Input 和 MenuItem 的公开 Props，例如搜索 placeholder、allowCustomValue 或选项 showCheck；显式子项需自行配置。parts.MenuItem.showCheck 优先于 Listbox 的 showCheck。 |
+| `search` | `boolean` | 未设置 | 是否生成固定在面板顶部的 Input；依次读取显式值、宿主配置并回退 true。Select 默认向 Listbox 提供 false；需要搜索时显式开启。 |
+| `maxHeight` | `number \| string` | 未设置 | 面板最大高度，数字为 px，字符串为 CSS 长度；受可用视口约束。未设置时最多完整显示 10 项，空间不足时至少保留实际选项中的前 2 项。 |
+| `minWidth` | `number \| string` | 未设置 | 面板最小宽度，数字为 px，字符串为 CSS 长度；未设置时搜索开启取 160px，否则取 0。内容与视口约束仍参与最终宽度计算。 |
+| `scrollbar` | `boolean` | `true` | 溢出时显示浮层滚动条；false 仅隐藏轨道，仍可通过滚轮和键盘滚动。 |
+| `matchTriggerWidth` | `boolean` | `true` | true 时至少与锚点等宽，内容需要更宽时允许扩展；false 时按选项内容 Hug，仍受 minWidth 与视口约束。 |
+| `placementMode` | `'selected' \| 'bottom'` | `'selected'` | selected 将选中项中心对齐触发器；bottom 从触发器下方展开。最终定位与高度受可用视口约束。 |
+| `align` | `'start' \| 'end'` | `'start'` | 面板相对锚点左边缘或右边缘对齐；Hug 面板与锚点宽度不同时差异明显，最终位置受视口约束。 |
+| `showCheck` | `boolean` | `false` | 为选中项预留并显示 trailing 勾选；Select 默认提供 true。显式 MenuItem 可用自身 showCheck 覆盖，自定义 trailing 替换默认勾选。 |
+| `continuousHover` | `boolean` | `true` | 在直接 MenuItem 之间移动同一个高亮背景，键盘 active 共用该背景；false 恢复逐项即时背景，禁用和过滤项不作为目标。 |
 
----
+## 宿主协议
 
-## 关键字 (Keyword)
-
-Listbox 自身不接受外部 props — 所有状态通过 `ListboxOwnerContext` 从宿主获取。
-
-| 关键字 | 类型 | 默认值 | 说明 |
-| :--- | :--- | :--- | :--- |
-| `children` | `Snippet` | - | 选项内容，通常为 `MenuItem` |
-| `class` | `string` | `""` | 面板 class 透传 |
-| `style` | `string` | `""` | 面板尺寸与定位补充样式 |
-| `enableAutoLayout` | `boolean` | `true` | 内部 `Frame column` 是否启用自动布局 |
+下表为组件内部通信说明，不是 Listbox 的公开 Props。
 
 ### ListboxOwnerContext 字段
 
@@ -194,6 +185,7 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 ```svelte
 <Select placeholder="请选择框架">
   <Listbox
+    search
     items={[
       { value: "svelte", label: "Svelte" },
       { value: "react", label: "React" },
@@ -209,9 +201,9 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 ```svelte
 <Select bind:value={country} name="country">
   <Listbox>
-    <MenuItem value="us">United States</MenuItem>
-    <MenuItem value="cn">China</MenuItem>
-    <MenuItem value="jp">Japan</MenuItem>
+    <MenuItem as="item" value="us">United States</MenuItem>
+    <MenuItem as="item" value="cn">China</MenuItem>
+    <MenuItem as="item" value="jp">Japan</MenuItem>
   </Listbox>
 </Select>
 ```
@@ -220,11 +212,11 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 
 ```svelte
 <Select placeholder="请选择城市">
-  <Listbox>
+  <Listbox search={false}>
     <Input as="search" placeholder="搜索..." />
-    <MenuItem value="beijing">北京</MenuItem>
-    <MenuItem value="shanghai">上海</MenuItem>
-    <MenuItem value="hangzhou">杭州</MenuItem>
+    <MenuItem as="item" value="beijing">北京</MenuItem>
+    <MenuItem as="item" value="shanghai">上海</MenuItem>
+    <MenuItem as="item" value="hangzhou">杭州</MenuItem>
   </Listbox>
 </Select>
 ```
@@ -233,10 +225,10 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 
 ```svelte
 <Select placeholder="请选择或输入">
-  <Listbox>
+  <Listbox search={false}>
     <Input as="search" allowCustomValue placeholder="搜索或输入新选项..." />
-    <MenuItem value="tag-a">Tag A</MenuItem>
-    <MenuItem value="tag-b">Tag B</MenuItem>
+    <MenuItem as="item" value="tag-a">Tag A</MenuItem>
+    <MenuItem as="item" value="tag-b">Tag B</MenuItem>
   </Listbox>
 </Select>
 ```
@@ -274,6 +266,12 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 - **关联规范**: [../../../specs/HTMLSpec.md](../../../specs/HTMLSpec.md)
 
 ## 更新日志 (Changelog)
+
+### v1.3.2 (2026-09-12)
+
+- 每次打开时记录选中项对齐位置；搜索、无匹配、清空与自定义项变化不再依据隐藏选项的零尺寸矩形重定位。
+- 初始对齐与 active 项滚动只读取当前可见选项，保留完整项高度与视口约束。
+
 
 ### v1.3.1 (2026-09-03)
 
