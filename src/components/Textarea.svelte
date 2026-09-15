@@ -124,7 +124,7 @@
     const effectiveRows = $derived(readonly ? undefined : rows);
     const currentLength = $derived((resolvedValue ?? '').length);
     const isExceeded = $derived(maxCount !== undefined && currentLength > maxCount);
-    const showCounter = $derived(maxCount !== undefined && currentLength >= Math.floor(maxCount * 0.8));
+    const showCounter = $derived(maxCount !== undefined);
     $effect(() => { exceeded = isExceeded; });
 
     const textareaRenderHints = $derived({
@@ -595,11 +595,17 @@
     }
 
     :global(:where(.snowui-textarea-counter)) {
+        visibility: hidden;
         color: var(--black-20, #00000033);
         font-size: var(--text-12);
         line-height: var(--leading-12);
         text-align: right;
         white-space: nowrap;
+    }
+
+    :global(:where(.snowui-textarea:hover .snowui-textarea-counter)),
+    :global(:where(.snowui-textarea-counter[data-exceeded="true"])) {
+        visibility: visible;
     }
 
     :global(:where(.snowui-textarea-counter[data-exceeded="true"])) {

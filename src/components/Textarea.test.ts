@@ -55,6 +55,18 @@ export const examples = [
         logic: ["NativeProps", "Validation", "MaxCount"],
     },
     {
+        name: "TA-05c：计数 hover 显示与超限常显",
+        code: `TA-05c
+<Textarea
+    maxCount={20}
+    defaultValue="SnowUI"
+    aria-label="计数显示规则"
+    placeholder="移入显示计数，超过 20 字后移出仍显示"
+    style="width: 22.5rem;"
+/>`,
+        logic: ["State", "Validation", "MaxCount"],
+    },
+    {
         name: "TA-06：autocomplete / enterkeyhint / wrap / spellcheck",
         code: `TA-06
 <Textarea

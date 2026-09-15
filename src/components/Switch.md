@@ -8,15 +8,15 @@
 
 ## 关键字
 
-| Keyword | Type | Default | Description |
+| 关键字 | Type | Default | Description |
 |:---|:---|:---|:---|
-| `checked` | `boolean` | `false` | 选中状态（双向绑定） |
-| `value` | `any` | - | 表单值 |
-| `size` | `ResourceSize \| number` | `16` | 可见轨道高度，不含外侧留白（标准梯度: 12/16/20/24/28/32/40/48/80） |
-| `disabled` | `boolean` | `false` | 禁用状态 |
-| `children` | `Snippet` | - | 标签内容 |
-| `enableResponsive` | `boolean` | `false` | 启用响应式 |
-| `enableContext` | `boolean` | `false` | 启用上下文 |
+| `checked` | `boolean` | `false` | 开关状态，支持 `bind:checked`。点击标签或聚焦后按 Space 切换；绑定变量、可见轨道与原生输入状态同步。禁用时用户操作不改变状态。 |
+| `value` | `any` | — | 传给内部原生 checkbox 的值，不决定开关状态，也不建立选择组。当前 `name` / `form` 等其余属性传给外层标签，不转发至内部 input，因此仅设置 `value` 不会产生具名表单提交项。 |
+| `size` | `ResourceSize \| number` | — | 可见轨道高度，数字按根字号为 16px 时的名义 px 解析，外侧留白另计。支持 12 / 16 / 20 / 24 / 28 / 32 / 40 / 48 / 80 及其它有限正数；未传时依次读取父级尺寸 Context 的 `iconSize`、`size`，最后回退到 16。非法数字回退到默认尺寸 Token。显式值优先，随根字号缩放。 |
+| `disabled` | `boolean` | `false` | 禁用原生输入及用户切换，保留当前开关值和标签，退出 Tab 顺序。外部仍可更新 `checked`。 |
+| `children` | `Snippet` | — | 无参数标签内容，显示在轨道后；省略时不显示标签。标签文字同时为内部开关提供可访问名称，可通过内容 Snippet 组合文本。 |
+| `enableResponsive` | `boolean` | `false` | 传给根 Frame，启用其容器内容适配监听；不改变 Switch 的标准尺寸值域。通用行为见 [Frame 能力开关](./Frame.md)。 |
+| `enableContext` | `boolean` | `false` | 传给根 Frame，控制向子组件提供状态、加载与动效等 Context；不控制 Switch 读取父级尺寸 Context。通用行为见 [Frame 能力开关](./Frame.md)。 |
 
 ## 布局模型
 
