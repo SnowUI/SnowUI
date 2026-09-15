@@ -121,6 +121,7 @@
 - 未标 `segment` 时，`Textarea` 去掉自身 padding（由外层 `Field` 统一负责 `12 / 16` padding 与 `8` gap），但保留自身 gap
 - 标了 `segment` 时，保留 `Textarea` 自身的 padding 与 gap，作为连续字段表面的一段
 - 多行输入的值同步、placeholder、readonly、resize 规则仍由宿主自身负责
+- 手柄与滚动条重叠时 Resize 优先，重叠区可拖动缩放且保留键盘操作；滚动条剩余区域仍可拖动。优先级契约见 [Indicator](./Indicator.md)。
 - `Indicator appearance="corner"` 是统一尺寸手柄，随 footer 通过 `pin-bottom-right` 固定在右下角；Textarea 不再私有维护 pointer capture、方向键或 clamp 算法
 - 右下角保留区（含缩放图标与计数器）固定在右下角，默认右侧留白为 `16px`
 - 字符计数器属于 `Textarea` 组件自身逻辑，不属于通用表单样式规则；传入 `maxCount` 后自动驱动

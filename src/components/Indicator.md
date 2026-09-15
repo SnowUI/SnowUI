@@ -1,7 +1,7 @@
 # Indicator（尺寸指示手柄）
 
-> **版本**: v1.2.1
-> **更新**: 2026-08-16
+> **版本**: v1.3.0
+> **更新**: 2026-09-15
 > **职责**: 提供宿主 hover 显示、Pointer / 键盘拖动与统一视觉反馈的通用尺寸手柄
 > **布局模型**: Pin 布局
 > **文档**: ./Indicator.md
@@ -10,7 +10,7 @@ Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一�
 
 **命中带（line）**：视觉条与命中区分层。默认情况下 line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条中心落在 `pinOffset`（SidePanel 为 4px），默认 2×16 / 16×2。消费方可传 `hitAreaPadding`，将沿边命中范围收窄为“视觉长度 + 两端 padding”；例如 Sidebar 传 4px 后，16px 视觉条只有上下各 4px、合计 24px 的纵向激活范围。corner 仍用 `pin-bottom-right` + 局部命中。
 
-Indicator 会在准备显示时检查同一 resize target 内可见的 SnowUI overlay scrollbar。宿主 hover 仍是 Indicator 的默认显示条件；若 Indicator 命中区与实际 scrollbar Thumb 发生矩形重叠，则滚动条优先，Indicator 整体隐藏并关闭 Pointer、hover、拖拽与键盘命中。检测只在宿主 hover、Indicator focus 或 dragging 期间启用，并响应 ScrollArea pointer enter / leave、viewport scroll、Thumb 拖动 / 位移和 scrollbar opacity transition；结束后清理全部监听与观察器。
+Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize 命中区优先：手柄继续显示并接收 Pointer 与键盘操作，滚动条在未被手柄覆盖的区域继续响应拖动。组合宿主须保证手柄所在层高于滚动条，不以隐藏手柄或移除焦点来避让。
 
 ## API 参考
 
@@ -45,7 +45,7 @@ Indicator 会在准备显示时检查同一 resize target 内可见的 SnowUI ov
 - corner 固定在右下角；默认 `axis="height"`，使用 `ns-resize` 上下双箭头并只调整高度。
 - corner 显式 `axis="both"` 时使用 `nwse-resize` 对角双箭头，同时调整宽度和高度。
 - 定位：line 自管 absolute 贴边（不用 pin 居中）；corner 默认 `as="pin-bottom-right"` + `pinOffset="var(--padding-1)"` + `z-index: 4`。
-- 默认隐藏；宿主 hover、focus-visible 或 dragging 时显示；与同一 target 内可见 overlay scrollbar Thumb 重叠时继续隐藏，并禁用 Pointer、hover、拖拽与键盘命中。
+- 默认隐藏；宿主 hover、focus-visible 或 dragging 时显示；与同一 target 内 overlay scrollbar Thumb 重叠时保持显示及 Pointer、键盘命中。
 - 视觉与命中区分层；line 命中带铺满所在边缘全高/全宽。
 - 动效消费与 overlay scrollbar 相同的 Frame color motion bridge。
 
@@ -84,6 +84,10 @@ Indicator 会在准备显示时检查同一 resize target 内可见的 SnowUI ov
 - 不接入 Skeleton：手柄没有加载占位意义。
 
 ## 更新日志 (Changelog)
+
+### v1.3.0 (2026-09-15)
+
+- 按用户要求改为 Resize 优先，移除滚动条重叠检测及其观察器；以下旧版本的滚动条优先规则已被取代。
 
 ### v1.2.1 (2026-08-16)
 

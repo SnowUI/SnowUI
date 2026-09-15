@@ -580,7 +580,8 @@
         gap: 0;
         min-width: 0;
         pointer-events: none;
-        z-index: 3;
+        /* Resize 命中区高于 scrollbar；footer 空白区仍可穿透。 */
+        z-index: 4;
         color: var(--black-20, #00000033);
     }
 

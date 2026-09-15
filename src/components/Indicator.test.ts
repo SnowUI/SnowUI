@@ -55,13 +55,13 @@ export const examples = [
         logic: ["Corner", "BothAxes", "Pointer", "Keyboard"],
     },
     {
-        name: "IN-04: 局部命中与滚动条避让",
+        name: "IN-04: 局部命中与 Resize 优先",
         code: `IN-04
 <Frame style="position: relative; width: 10rem; height: 6rem;">
     <ScrollArea style="height: 100%;">
         <Frame column class="gap-8" style="height: 12rem;">
             <Text>滚动内容</Text>
-            <Text>Indicator 与滚动条重叠时只显示滚动条</Text>
+            <Text>重叠区域优先调整尺寸</Text>
         </Frame>
     </ScrollArea>
     <Indicator
@@ -71,11 +71,11 @@ export const examples = [
     />
 </Frame>`,
         expected: {
-            render: "鼠标进入宿主任意区域后显示 Indicator；存在纵向 overlay scrollbar 且 Indicator 与实际 Thumb 重叠时不显示 Indicator。",
+            render: "鼠标进入宿主任意区域后显示 Indicator；与实际 Thumb 重叠时仍显示 Indicator。",
             layout: "16px 视觉条的纵向命中范围为上下各 4px，合计 24px。",
-            interaction: "重叠时 Indicator 关闭 Pointer、hover、拖拽和键盘命中，只允许操作滚动条；Thumb 移出后恢复 Indicator。",
-            performance: "重叠检测只在宿主 hover、Indicator focus 或 dragging 期间启用，响应 ScrollArea hover、scroll、Thumb 位移与 opacity transition，并在结束后清理监听和观察器。",
-            responsive: "移除滚动溢出或使二者不再相交后，Indicator 恢复普通显隐与拖动。",
+            interaction: "重叠区域可拖动 Indicator 并使用键盘调整尺寸，Thumb 其余区域可滚动。",
+            performance: "无需观察滚动条几何；拖动复用共享 resizable 的 rAF 合并。",
+            responsive: "有无滚动溢出均遵守相同显隐和尺寸边界。",
         },
         logic: ["LocalHitArea", "ScrollbarOverlap", "PointerPriority"],
     },
