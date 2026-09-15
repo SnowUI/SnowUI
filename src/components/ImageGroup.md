@@ -32,7 +32,9 @@
 | `size` | `12\|16\|20\|24\|28\|32\|40\|48\|56\|64\|72\|80` | `undefined` | 统一控制组内图片尺寸 |
 | `layout` | `"row" \| "column" \| "grid"` | `"row"` | 布局模式 |
 | `previewMode` | `"viewer" \| "window" \| "none"` | `undefined` | 作为组内 Image 的显式预览模式；省略时由页面共享 Viewer 是否存在自动决定 |
-| `enableContext` | `boolean` | `true` | 是否为子组件提供尺寸上下文 |
+| `enableContext` | `boolean` | `true` | 是否向 Frame 子组件提供通用上下文；Image 的组尺寸和预览策略仍通过专属组上下文提供。 |
+| `enableResponsive` | `boolean` | `true` | 启用 Frame 响应式能力，按公开响应式配置调整集合布局。 |
+| `children` | `Snippet` | `undefined` | 组内图片内容；Image 自动注册媒体并继承组尺寸与预览策略，显式子项设置优先。 |
 
 ### 2. 视觉规则
 

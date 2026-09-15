@@ -28,8 +28,9 @@
 | `size` | `12\|16\|20\|24\|28\|32\|40\|48\|56\|64\|72\|80` | `16` | 图片尺寸。未显式设置时自动继承 `ImageGroup` 提供的尺寸上下文。 |
 | `alt` | `string` | `undefined` | 图片替代文本 |
 | `previewMode` | `"viewer" \| "window" \| "none"` | 自动 | 显式控制预览方式；未声明时，页面存在共享 ImageViewer 则接入 Viewer，否则字符串媒体回退为新窗口 |
-| `badgePosition` | `'top' \| 'bottom'` | `'top'` | 角标位置。默认顶部；当前需求主路径使用顶部。 |
-| `children` | `Snippet` | `undefined` | 组合子内容 |
+| `badgePosition` | `'top' \| 'bottom'` | `'top'` | 角标位置：top 为右上，bottom 为右下。 |
+| `children` | `Snippet` | `undefined` | 媒体挂件；子组件通过 as="icon" 居中或 as="badge" 定位，不替换媒体内容。 |
+| `onOpen` | `(event?: MouseEvent \| KeyboardEvent) => void` | `undefined` | 点击或键盘触发打开时调用；提供后接管默认 Viewer / 新窗口动作，调用方负责处理打开行为。 |
 
 ## 关键字 (Keyword)
 
