@@ -30,9 +30,10 @@
 | stateIcon | `Partial<Record<CoreState, Component \| null>>` | undefined | 根据最近父级 Frame 的 `currentState` 解析图标。未命中当前状态时回退 `Idle`，再回退 `icon` / `src` / children；状态值为 `null` 时隐藏 Icon。 |
 | size | 12\|16\|20\|24\|28\|32\|40\|48\|80 | 16 | 图标尺寸。未显式设置时，自动继承父级 `Frame` 提供尺寸上下文。 |
 | background | boolean | false | 是否显示背景 |
-| weight | string | undefined | 图标字重（font-weight） |
+| weight | string | undefined | 透传给图标资源的视觉权重；资源支持时可用 thin、light、regular、bold、fill、duotone。未设置时由资源或上下文决定，不会凭空生成资源缺少的变体。 |
 | as | 'badge'\|'icon'\|'prev'\|'next'\|'close' | 'icon' | 角色：作为独立图标、徽标、图片中央图标或 Viewer 控制图标 |
-| badgePosition | 'top'\|'bottom' | 'top' | 徽标位置 (当作为宿主时) |
+| children | `Snippet` | undefined | 图标内容与角标组合；仅当 src 和解析后的 icon 均未命中时渲染；可同时放入资源图标与 Badge as="badge"，角标由宿主定位。 |
+| badgePosition | 'top'\|'bottom' | 'top' | 作为角标宿主时的位置：top 为右上，bottom 为右下。 |
 
 ## 关键字 (Keyword)
 
