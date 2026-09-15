@@ -357,6 +357,7 @@
             `--snowui-gradient-width: ${resolvedWidth}`,
             `--snowui-gradient-height: ${resolvedHeight}`,
             `--snowui-gradient-radius: ${resolvedRadius}`,
+            `--snowui-gradient-clip: ${resolvedRadius === "inherit" ? "border-box" : resolvedRadius === "50%" ? "ellipse(50% 50% at 50% 50%)" : "inset(0 round var(--snowui-gradient-radius-override, var(--snowui-gradient-radius)))"}`,
             userStyle,
         ]
             .filter(Boolean)
@@ -582,16 +583,14 @@
                 calc(var(--size-4) * 45 / 2)
             )
         );
-        overflow: hidden;
+
         border-radius: var(
             --snowui-gradient-radius-override,
             var(--snowui-gradient-radius, var(--radius-0))
         );
-        /*
-         * 带 SVG filter 的子树可能被浏览器单独合成，直接使用
-         * border-radius + overflow 会在最外圈露出一条底色采样线。
-         * 纯 alpha mask 强制圆角与滤镜在同一合成层完成裁切。
-         */
+        /* 按实际 border-radius 统一裁切合成结果，包含 Avatar 继承的圆角。
+         * alpha mask 保持图层整体合成，再由明确轮廓裁切。 */
+        clip-path: var(--snowui-gradient-clip);
         -webkit-mask-image: linear-gradient(black, black);
         mask-image: linear-gradient(black, black);
         box-sizing: border-box;

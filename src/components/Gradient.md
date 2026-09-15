@@ -130,7 +130,7 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 - 颜色顺序仅在组件求值时由 seed 与实例 ID 稳定打乱；每次 hover 只用一次随机数选择与上次不同的六组运动相位 / 方向配置，所有逐帧运动仍由 CSS 完成。JavaScript 只在 hover 边界使用一次 `requestAnimationFrame` 分离挂载与淡入，并以退出计时器在0.5秒淡出后回收 DOM；不使用 JavaScript 动画循环、Canvas 或 ResizeObserver。
 - `0%` 与 `100%` 使用完全相同的 transform，保证持续循环时不跳帧。
 - 一个模块级 `IntersectionObserver` 服务全部实例；离开视口预热范围后暂停 CSS 动画并移除图层提升，重新进入时从暂停位置继续。能力缺失时保持运行，不引入功能退化。
-- 图层预栅格画布大于可见画布；动效幅度限制在 overscan 安全范围内并由根 alpha mask 裁切。
+- 图层预栅格画布大于可见画布；动效幅度限制在 overscan 安全范围内并由根 clip-path 统一裁切。
 
 ---
 
@@ -162,6 +162,10 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 ---
 
 ## 更新日志 (Changelog)
+
+### 圆角边缘修复（2026-09-15）
+
+- `radius="50%"` 使用椭圆路径，正方形时为精确圆形；其他显式圆角使用 `inset(0 round …)` 跟随公开圆角值裁切完整合成结果；继承圆角时使用 `border-box`，替换 `overflow: hidden` 的圆角裁切，保留 alpha mask 的整体合成，减少圆形轮廓的采样毛边；支持 `radius` 与 Avatar 继承圆角。
 
 ### v2.13.2 (2026-09-15)
 
