@@ -49,7 +49,7 @@ Backdrop(Portal 到 body)
 | `as` | `"dialog" \| undefined` | — | 内嵌模式标记 |
 | `open` | `boolean` | `false` | 面板模式显隐,支持 `bind:open` |
 | `onOpenChange` | `(open: boolean) => void` | — | 面板模式状态变化回调 |
-| `backdrop` | `"opaque" \| "blur" \| "transparent"` | `"opaque"` | 遮罩层变体 |
+| `backdrop` | `"opaque" \| "blur" \| "transparent"` | `"opaque"` | 遮罩层变体；与 ImageViewer 复用共享 backdrop 视觉，关闭与动效仍由 Dialog 管理。 |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` | 面板尺寸 |
 | `closeOnOutside` | `boolean` | `true` | 默认点击面板外的遮罩关闭；false 禁止。面板内部空白处不关闭。未保存表单或必须明确选择的场景建议显式设为 false |
 | `closeOnEscape` | `boolean` | `true` | Escape 是否关闭 |

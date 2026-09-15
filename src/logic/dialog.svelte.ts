@@ -7,7 +7,7 @@
  */
 
 export type DialogSize = "sm" | "md" | "lg";
-export type DialogBackdrop = "opaque" | "blur" | "transparent";
+export type DialogBackdrop = import("../lib/backdrop").BackdropVariant;
 
 export interface DialogTemplateConfig {
     size: DialogSize;

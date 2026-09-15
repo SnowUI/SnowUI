@@ -671,6 +671,7 @@
 
     /* PRO ImageViewer */
     /* --snowui-image-viewer-z-index-override: ; */     /* z-index（默认值见组件源码） */
+    /* --snowui-backdrop-background-override: ; */  /* 共享遮罩背景；默认取 backdrop 变体 */
     /* --snowui-image-viewer-background-override: ; */  /* 背景（默认值见组件源码） */
 
     /* PRO CircularChart */

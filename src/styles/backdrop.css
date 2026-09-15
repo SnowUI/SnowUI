@@ -1,0 +1,16 @@
+/* 共享遮罩视觉；打开、关闭、布局和动效由消费组件拥有。 */
+:where(.snowui-backdrop) {
+    --snowui-backdrop-background: rgb(0 0 0 / 10%);
+    --snowui-backdrop-filter: none;
+    background: var(--snowui-backdrop-background-override, var(--snowui-backdrop-background));
+    backdrop-filter: var(--snowui-backdrop-filter);
+    -webkit-backdrop-filter: var(--snowui-backdrop-filter);
+}
+
+:where(.snowui-backdrop[data-backdrop="blur"]) {
+    --snowui-backdrop-filter: blur(var(--size-5));
+}
+
+:where(.snowui-backdrop[data-backdrop="transparent"]) {
+    --snowui-backdrop-background: transparent;
+}

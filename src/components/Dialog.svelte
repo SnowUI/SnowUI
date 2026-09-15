@@ -377,7 +377,7 @@
         bind:this={backdropEl}
         use:portal
         role="presentation"
-        class="snowui-dialog-backdrop"
+        class="snowui-dialog-backdrop snowui-backdrop"
         data-backdrop={backdrop}
         data-open={presence.closing ? undefined : "true"}
         data-closing={presence.closing ? "true" : undefined}
@@ -457,7 +457,6 @@
         justify-content: center;
         box-sizing: border-box;
         padding: var(--padding-4);
-        background: rgb(0 0 0 / 10%);
         opacity: 1;
         transition: opacity var(--snowui-dialog-backdrop-appear-duration)
             var(--snowui-dialog-backdrop-appear-easing);
@@ -468,16 +467,6 @@
         pointer-events: none;
         transition: opacity var(--snowui-dialog-backdrop-disappear-duration)
             var(--snowui-dialog-backdrop-disappear-easing);
-    }
-
-    :global(:where(.snowui-dialog-backdrop[data-backdrop="blur"])) {
-        background: rgb(0 0 0 / 10%);
-        backdrop-filter: blur(var(--size-5));
-        -webkit-backdrop-filter: blur(var(--size-5));
-    }
-
-    :global(:where(.snowui-dialog-backdrop[data-backdrop="transparent"])) {
-        background: transparent;
     }
 
     :global(:where(.snowui-dialog-container)) {
