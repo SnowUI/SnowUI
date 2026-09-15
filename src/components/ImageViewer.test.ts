@@ -5,6 +5,10 @@
  * 变更记录 (2026-07-05): 默认示例改用 ImageViewer 内置纯图标 Button 控制键。
  */
 export const examples = [
+    ...["opaque", "blur", "transparent"].map((backdrop) => ({
+        name: `Backdrop: ${backdrop}`,
+        code: `<ImageViewer open backdrop="${backdrop}" dismissMode="button" items={[{ src: Gradient01, alt: "SnowUI cover" }]} />`,
+    })),
     {
         name: "1: 页面级自动预览",
         code: `1

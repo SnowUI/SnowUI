@@ -29,6 +29,10 @@
       "@snowui-design-system/components/lib/adaptive-contrast-renderer": [
         "../components/src/lib/adaptive-contrast-renderer.ts",
         "./node_modules/@snowui-design-system/components/src/lib/adaptive-contrast-renderer.ts"
+      ],
+      "@snowui-design-system/components/lib/backdrop": [
+        "../components/src/lib/backdrop.ts",
+        "./node_modules/@snowui-design-system/components/src/lib/backdrop.ts"
       ]
     }
   },

@@ -33,6 +33,7 @@
 | `open` | `boolean` | `undefined` | 手动模式下控制 Viewer 显示；与 `items/index` 一起省略时进入页面级自动模式 |
 | `items` | `Array<{ src?: string \| Component; alt?: string }>` | `undefined` | 手动模式下提供预览项列表；省略时自动消费页面级预览状态 |
 | `index` | `number` | `undefined` | 手动模式下提供当前显示项索引；省略时自动消费页面级预览状态 |
+| `backdrop` | `"opaque" \| "blur" \| "transparent"` | `"opaque"` | 与 Dialog 共用遮罩视觉：opaque 为 10% 黑色遮罩，blur 在其上模糊背景，transparent 透明；不改变关闭策略。 |
 | `dismissMode` | `"button" \| "backdrop"` | `"backdrop"` | 关闭策略：backdrop 隐藏关闭按钮并允许点击媒体外空白关闭；button 显示关闭按钮且禁用空白关闭 |
 | `children` | `Snippet` | `undefined` | 显式组合控制按钮；提供后替换全部默认内置按钮 |
 | `parts` | `{ Button? }` | `undefined` | 批量配置默认内置的 prev / next / close Button |
@@ -727,3 +728,7 @@
 - **IV-Feat.1** 新增独立的 ImageViewer 组件，承载图片预览态。
 - **IV-Feat.2** 提供 `prev / next / close` 的宿主组合协议。
 - **IV-Feat.3** 保持无动效切换，满足图片打开、切换、关闭的即时反馈要求。
+
+### 共享遮罩
+
+通过 `backdrop` 选择视觉，通过 `dismissMode` 选择点击关闭策略，两者独立。默认从旧的主题背景 92% 覆盖改为与 Dialog 相同的 opaque；背景覆盖变量仍兼容。实现边界见 [backdrop](../../../components/src/lib/backdrop.md)。

@@ -25,6 +25,8 @@
     } from "@snowui-design-system/components/logic/image-preview";
     import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
 
+    import type { BackdropVariant } from "@snowui-design-system/components/lib/backdrop";
+
     interface ImageViewerItem {
         src?: string | Component;
         alt?: string;
@@ -35,6 +37,7 @@
         items?: ImageViewerItem[];
         index?: number;
         dismissMode?: "button" | "backdrop";
+        backdrop?: BackdropVariant;
         children?: Snippet;
         parts?: ComponentPartsOf<{ Button: typeof Button }>;
         [key: string]: any;
@@ -45,6 +48,7 @@
         items = undefined,
         index = undefined,
         dismissMode = "backdrop",
+        backdrop = "opaque",
         class: className = "",
         style: userStyle = "",
         renderHints: userRenderHints = undefined,
@@ -377,7 +381,8 @@
         bind:element={viewerHostEl}
         role="dialog"
         aria-modal="true"
-        class={["snowui-image-viewer", className].filter(Boolean).join(" ")}
+        data-backdrop={backdrop}
+        class={["snowui-image-viewer", "snowui-backdrop", className].filter(Boolean).join(" ")}
         style={userStyle || undefined}
         onclick={handleRootClick}
         {...rest}
@@ -503,16 +508,9 @@
         /* 架构级变量声明 (符合 2.10 规范) */
         --snowui-image-viewer-viewport-padding: 10vh 10vw;
         --snowui-image-viewer-control-margin: 3%;
-        --snowui-image-viewer-background: color-mix(
-            in srgb,
-            var(--background-1, #ffffff) 92%,
-            transparent
-        );
+        --snowui-image-viewer-background: var(--snowui-backdrop-background);
+        --snowui-backdrop-background-override: var(--snowui-image-viewer-background-override);
 
-        background-color: var(
-            --snowui-image-viewer-background-override,
-            var(--snowui-image-viewer-background)
-        );
     }
 
     :global(:where(.snowui-image-viewer-viewport)) {
