@@ -102,7 +102,7 @@
         return undefined;
     });
     const resolvedPinOffset = $derived(
-        pinOffset ?? (resolvedAppearance === "corner" ? "var(--padding-1)" : 0),
+        pinOffset ?? "var(--padding-1)",
     );
     const resolvedTarget = $derived(target ?? element?.parentElement ?? undefined);
     const resolvedRevealTarget = $derived(revealTarget ?? resolvedTarget);
@@ -134,7 +134,7 @@
 
     /**
      * line 命中带：从物理边缘 0 起算，覆盖边框；宽度/高度 = pinOffset + 抓取厚度。
-     * 视觉条中心落在 pinOffset（默认 4px）处，不随命中带居中。
+     * 视觉条外缘距宿主边缘 pinOffset（默认 4px），加粗时向内生长。
      */
     const lineEdgeStyle = $derived.by(() => {
         if (resolvedAppearance !== "line" || resolvedAxis === "both") return "";
@@ -389,7 +389,7 @@
         left: var(--snowui-indicator-visual-inset, 0);
         width: calc(var(--size-3) / 6);
         height: var(--snowui-indicator-visual-length, var(--size-4));
-        transform: translate(-50%, -50%);
+        transform: translateY(-50%);
     }
 
     :global(:where(.snowui-indicator-line.snowui-indicator-width.snowui-indicator-edge-end) > .snowui-indicator-visual) {
@@ -398,7 +398,7 @@
         left: auto;
         width: calc(var(--size-3) / 6);
         height: var(--snowui-indicator-visual-length, var(--size-4));
-        transform: translate(50%, -50%);
+        transform: translateY(-50%);
     }
 
     :global(:where(.snowui-indicator-line.snowui-indicator-height.snowui-indicator-edge-top) > .snowui-indicator-visual) {
@@ -406,7 +406,7 @@
         left: 50%;
         width: var(--snowui-indicator-visual-length, var(--size-4));
         height: calc(var(--size-3) / 6);
-        transform: translate(-50%, -50%);
+        transform: translateX(-50%);
     }
 
     :global(:where(.snowui-indicator-line.snowui-indicator-height.snowui-indicator-edge-bottom) > .snowui-indicator-visual) {
@@ -415,7 +415,7 @@
         left: 50%;
         width: var(--snowui-indicator-visual-length, var(--size-4));
         height: calc(var(--size-3) / 6);
-        transform: translate(-50%, 50%);
+        transform: translateX(-50%);
     }
 
     :global(:where(.snowui-indicator[data-visible="true"]) > .snowui-indicator-visual) {

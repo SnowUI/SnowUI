@@ -8,7 +8,7 @@
 
 Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一个可交互组件。它默认调整直接父元素，也可以通过 `target` 显式关联任意祖先宿主。鼠标位于 reveal host 的任意普通后代上时，Indicator 都会显示；只有进入 Indicator **命中带**时才会加深、变粗并开始拖动。
 
-**命中带（line）**：视觉条与命中区分层。默认情况下 line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条中心落在 `pinOffset`（SidePanel 为 4px），默认 2×16 / 16×2。消费方可传 `hitAreaPadding`，将沿边命中范围收窄为“视觉长度 + 两端 padding”；例如 Sidebar 传 4px 后，16px 视觉条只有上下各 4px、合计 24px 的纵向激活范围。corner 仍用 `pin-bottom-right` + 局部命中。
+**命中带（line）**：视觉条与命中区分层。默认情况下 line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条外缘距宿主边缘 `pinOffset`（默认 `var(--padding-1)`，基准 4px），默认 2×16 / 16×2。消费方可传 `hitAreaPadding`，将沿边命中范围收窄为“视觉长度 + 两端 padding”；例如 Sidebar 传 4px 后，16px 视觉条只有上下各 4px、合计 24px 的纵向激活范围。corner 仍用 `pin-bottom-right` + 局部命中。
 
 Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize 命中区优先：手柄继续显示并接收 Pointer 与键盘操作，滚动条在未被手柄覆盖的区域继续响应拖动。组合宿主须保证手柄所在层高于滚动条，不以隐藏手柄或移除焦点来避让。
 
@@ -19,27 +19,36 @@ Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize �
 | `axis` | `"width" \| "height" \| "both"` | line 为 `"width"`；corner 为 `"height"` | 调整宿主宽度、高度或同时调整；`both` 只用于 corner |
 | `edge` | `"start" \| "end" \| "top" \| "bottom"` | 根据 axis 推导 | 拖动方向与默认定位边缘 |
 | `appearance` | `"line" \| "corner"` | `"line"` | 线形或右下角图标视觉 |
+| `pinOffset` | `number \| string` | `var(--padding-1)` | line 可见短条外缘到宿主物理边缘的距离；hover / focus / dragging 加粗向内生长，间距不变。corner 保持 Pin 角点偏移语义。 |
 | `hitAreaPadding` | `number \| string` | — | line 沿边命中范围两端相对视觉条增加的 padding；未传时继续铺满整条边 |
 | `target` | `HTMLElement` | 直接父元素 | resize target；可显式关联页面中的任意元素，不要求 Indicator 是其 DOM 后代 |
 | `revealTarget` | `HTMLElement` | target | 控制显隐的 hover 宿主 |
 | `value` | `number` | 实测 target 尺寸 | 当前受控尺寸基线，并同步为 ARIA 当前值 |
-| `minSize` / `maxSize` | `number` | `0 / Infinity` | 尺寸边界 |
-| `minWidth` / `maxWidth` | `number` | - | width / both 模式的独立宽度边界，优先于 minSize / maxSize |
-| `minHeight` / `maxHeight` | `number` | - | height / both 模式的独立高度边界，优先于 minSize / maxSize |
-| `step` / `largeStep` | `number` | `8 / 32` | 键盘普通步长与 Shift 步长 |
+| `minSize` | `number` | `0` | 当前调整轴允许的最小尺寸，单位 px。 |
+| `maxSize` | `number` | `Infinity` | 当前调整轴允许的最大尺寸，单位 px。 |
+| `minWidth` | `number` | — | width / both 的宽度下限，优先于 minSize。 |
+| `maxWidth` | `number` | — | width / both 的宽度上限，优先于 maxSize。 |
+| `minHeight` | `number` | — | height / both 的高度下限，优先于 minSize。 |
+| `maxHeight` | `number` | — | height / both 的高度上限，优先于 maxSize。 |
+| `step` | `number` | `8` | 方向键每次调整的像素数。 |
+| `largeStep` | `number` | `32` | 按住 Shift 时方向键每次调整的像素数。 |
 | `applySize` | `boolean` | `true` | 是否直接写入 target 的 width / height |
 | `disabled` | `boolean` | `false` | 禁止 Pointer 和键盘调整 |
 | `ariaLabel` | `string` | `"调整宽度" / "调整高度"` | 无障碍名称 |
-| `onResizeStart` | `(size: number) => void` | - | 开始调整回调 |
-| `onSizeChange` | `(size: number) => void` | - | 尺寸变化回调 |
-| `onResizeEnd` | `(size: number) => void` | - | 结束调整回调 |
+| `onResizeStart` | `(size: number, axis: "width" \| "height") => void` | - | 开始调整回调 |
+| `onSizeChange` | `(size: number, axis: "width" \| "height") => void` | - | 尺寸变化回调 |
+| `onResizeEnd` | `(size: number, axis: "width" \| "height") => void` | - | 结束调整回调 |
+| `enableResponsive` | `boolean` | `false` | 启用根 Frame 响应式能力；默认关闭以保持手柄几何。 |
+| `enableContext` | `boolean` | `false` | 是否向子内容提供 Frame 通用上下文。 |
+| `enableScaleObserver` | `boolean` | `false` | 是否启用根 Frame 尺寸观察；默认不新增观察。 |
+| `enableDefaultMotion` | `boolean` | `true` | 启用 Frame 默认交互动效；手柄颜色仍复用共享颜色动效。 |
 | `...rest` | `FrameProps` | - | 透传到根 Frame |
 
 ## 视觉状态
 
 - 颜色与 overlay 滚动条 thumb 一致：默认 `Black/10`，hover / focus / dragging 为 `Black/20`。
-- line + width：命中带 = 父级全高 × 8px（`top/bottom:0`）；视觉默认 2px × **16px**，hover / focus / dragging 时视觉宽变为 4px；沿边长度可用 `--snowui-indicator-visual-length` 覆盖。
-- line + height：命中带 = 父级全宽 × 8px（`left/right:0`）；视觉默认 **16px** × 2px，hover / focus / dragging 时视觉高变为 4px；沿边长度同上变量。
+- line + width：命中带 = 父级全高 × (pinOffset + 8px)（`top/bottom:0`）；视觉默认 2px × **16px**，hover / focus / dragging 时视觉宽变为 4px；沿边长度可用 `--snowui-indicator-visual-length` 覆盖。
+- line + height：命中带 = 父级全宽 × (pinOffset + 8px)（`left/right:0`）；视觉默认 **16px** × 2px，hover / focus / dragging 时视觉高变为 4px；沿边长度同上变量。
 - line 与 Scrollbar 一致通过实际 width / height 变化而非 transform 缩放，使用 `var(--radius-full, 9999px)`，端点始终为完整胶囊圆角。
 - corner：使用 1rem 视觉盒，通过 ComponentIcon 复用 rounded-corner；图形与外框比例以 raw-assets/icons/snowui/RoundedCorner.svg 为准。显示时为 Black/10，自身 hover / focus-visible / dragging 时为 Black/20；各状态保持原图比例，不额外加粗或缩放。
 - corner 固定在右下角；默认 `axis="height"`，使用 `ns-resize` 上下双箭头并只调整高度。
@@ -113,3 +122,7 @@ Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize �
 
 - 合并 WidthIndicator、HeightIndicator 与 ResizeHandle。
 - 新增宿主 hover 显隐、line / corner 视觉、Pointer / 键盘 / ARIA 完整协议。
+
+### 2026-09-15 边缘间距修正
+
+line 的默认 pinOffset 从 0 修正为 padding-1，并从短条中心定位改为外缘定位；显式 pinOffset 也按外缘计算。普通、hover、focus 和拖动均保持基准 4px 可见间距；命中带仍从物理边缘 0 开始。显式偏移的 line 消费方会比旧中心定位向内移动半个条宽；corner 不变。

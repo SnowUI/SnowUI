@@ -1,6 +1,15 @@
 /** Indicator.test.ts - 通用尺寸指示手柄示例。 */
 export const examples = [
     {
+        name: "IN-Insets: 默认边缘间距",
+        code: `IN-Insets
+<Frame style="position: relative; width: 280px; height: 160px; background: var(--background-1);">
+    <Text>悬停或聚焦：可见短条距边缘 4px，加粗时向内生长。</Text>
+    <Indicator axis="width" edge="end" minSize={200} maxSize={480} />
+    <Indicator axis="height" edge="bottom" minSize={100} maxSize={280} />
+</Frame>`,
+    },
+    {
         name: "IN-01: 宽度与高度拖动",
         code: `IN-01
 <Frame row class="gap-16">
