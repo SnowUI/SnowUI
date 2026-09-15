@@ -1,6 +1,6 @@
 # Gradient 矢量渐变
 
-> **版本**: v2.13.1
+> **版本**: v2.13.2
 > **职责**: 以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并以预栅格图层保持四层柔和形变。
 > **包归属**: OSS
 
@@ -16,7 +16,7 @@ Gradient 使用六种 SVG 矢量渐变。六种配色共用同一套 `360 × 360
 - 组件不接受 children，不使用 Leading / Content / Trailing，不提供 `parts`。
 - 默认画布为 `360 × 360`，默认无圆角；`size` 或 `width` / `height` 可改变外部几何。
 - 可见几何沿用 `0 0 360 360` 坐标系；静态 SVG 使用该 `viewBox`，活动图层则在同一坐标系外扩 overscan，并以 `preserveAspectRatio="none"` 填满画布。
-- 四张活动图层图片保留 `filterUnits="userSpaceOnUse"` 的 `feGaussianBlur`；普通 Gradient 的 Subtract 2 使用 `720 × 720` overscan，其他三层使用 `600 × 600`，Avatar 的增强幅度分支全部使用 `720 × 720`。图形随图片 viewport 缩放时，模糊标准差与几何一起按比例缩放，不使用固定屏幕像素模糊，也不需要尺寸观察器。
+- 四张活动图层图片保留 `filterUnits="userSpaceOnUse"` 的 `feGaussianBlur`；普通 Gradient 的 Subtract 2 使用 `800 × 800` overscan，其他三层使用 `600 × 600`，Avatar 的增强幅度分支全部使用 `720 × 720`。图形随图片 viewport 缩放时，模糊标准差与几何一起按比例缩放，不使用固定屏幕像素模糊，也不需要尺寸观察器。
 - 根层使用纯 alpha mask 统一裁切预栅格图层，避免圆角最外圈露出渐变底色毛边。
 - 普通 Gradient 默认开启四层 `15s` 闭环动效；Avatar fallback 常态关闭基础形变，可通过 `motion` / `gradientMotion` 显式常驻开启，或在 hover 期间按需运行水波形变。
 - 作为 `Avatar fallback` 渲染时，Gradient 根据 Avatar 传入的 `seed` 稳定选择六种配色；若 seed 本身是 `blue / cyan / green / red / orange / purple`，则直接命中对应配色。
@@ -114,10 +114,10 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 - 路径模糊：`stdDeviation=40 / 50`。
 - 模块按 `variant + 画布档位` 缓存四张透明 SVG data source；相同 variant 的实例复用同一字符串、图片解码与栅格缓存，不创建实例级 filter ID / filter DOM。
 - Avatar 常态基础形变关闭时复用六份短 URL 的包内完整 SVG 资源；hover 只为当前头像按需创建四张活动图层图片，离开淡出后释放。
-- 静态 Avatar 与活动图层使用同一套 palette、路径和 blur 参数；普通 Gradient 仅将位于最上方、会旋转并暴露裁切边界的 Subtract 2 扩到 `720 × 720`，其余三层保留 `600 × 600`；Avatar 的 `720 × 720` overscan 覆盖增强幅度。
+- 静态 Avatar 与活动图层使用同一套 palette、路径和 blur 参数；普通 Gradient 仅将位于最上方、会旋转并暴露裁切边界的 Subtract 2 扩到 `800 × 800`，其余三层保留 `600 × 600`；Avatar 的 `720 × 720` overscan 覆盖增强幅度。
 - Avatar 模式继续使用浏览器原生 `content-visibility: auto` 与布局 / 绘制 containment，跳过长列表视口外子树绘制，不创建逐实例观察器。
 - SVG 图片 viewport 负责统一缩放全部几何与 blur；组件不读取实际像素尺寸，也不重新计算 blur。
-- 非正方形宽高按 Figma Fill 行为分别缩放 X / Y 轴。
+- 非正方形宽高按 Figma Fill 行为分别缩放 X / Y 轴。四个 HTML 图层先在 SVG foreignObject 的 360 × 360 设计坐标内运动，再由外层 viewBox 整体 Fill；禁止先拉成长方形再旋转，以免露出预栅格图片的硬裁切边界。
 
 ## 动效与性能
 
@@ -162,6 +162,10 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 ---
 
 ## 更新日志 (Changelog)
+
+### v2.13.2 (2026-09-15)
+
+- 动态图层在原始设计坐标中运动后整体适配宽高，修复横向画布左上角露底；保留配色、路径及动画参数；普通 Subtract 2 安全区扩到 800 × 800 以覆盖最小缩放时的四角，其余图层与 Avatar 缓存尺寸不变，不引入尺寸观察器。
 
 ### v2.13.1 (2026-08-16)
 

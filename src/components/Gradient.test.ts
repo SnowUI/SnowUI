@@ -30,7 +30,7 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "三项使用同一套 viewBox 矢量；尺寸按 0.25×、0.5×、1× 缩放时，图形边界与四层 Gaussian Blur 同比缩放。",
-            performance: "不使用 ResizeObserver、Canvas 或运行时 blur 重算；活动图层复用模块级预栅格 SVG 图源，最上方的 Subtract 2 使用独立 720 × 720 安全区，避免旋转 / 缩放时暴露裁切边界。",
+            performance: "不使用 ResizeObserver、Canvas 或运行时 blur 重算；活动图层复用模块级预栅格 SVG 图源，最上方的 Subtract 2 使用独立 800 × 800 安全区，避免旋转 / 缩放时暴露裁切边界。",
         },
         logic: ["VectorScaling", "BlurScaling"],
     },
@@ -39,7 +39,7 @@ export const examples = [
         code: `GD-03
 <Gradient variant="orange" width={360} height={180} />`,
         expected: {
-            render: "SVG 以 preserveAspectRatio=none 填满 360 × 180 画布，X/Y 几何与模糊分别跟随画布缩放。",
+            render: "SVG 以 preserveAspectRatio=none 填满 360 × 180 画布，图层先在 360 × 360 坐标内运动，X/Y 几何与模糊再分别跟随画布缩放；完整周期内不暴露硬裁切边界。",
             layout: "外部宽高决定内禀画布，不产生留白。",
         },
         logic: ["NonSquare", "FigmaFill", "BlurScaling"],

@@ -1,6 +1,6 @@
 <!--
   Gradient 矢量渐变组件
-  v2.13.1
+  v2.13.2
 
   职责：以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并以预栅格图层保持四层柔和形变。
   文档：./Gradient.md
@@ -147,7 +147,7 @@
     function createGradientMotionLayerSource(
         name: GradientMotionLayer,
         palette: GradientPalette,
-        canvasSize: 600 | 720,
+        canvasSize: 600 | 720 | 800,
     ) {
         const definitions: Record<
             GradientMotionLayer,
@@ -198,7 +198,7 @@
             source: createGradientMotionLayerSource(
                 name,
                 palette,
-                avatar || name === "subtract-2" ? 720 : 600,
+                avatar ? 720 : name === "subtract-2" ? 800 : 600,
             ),
         }));
         GRADIENT_MOTION_LAYER_SOURCE_CACHE.set(cacheKey, sources);
@@ -521,20 +521,25 @@
             aria-hidden="true"
             style={`--snowui-gradient-background-internal: ${palette.background}`}
         >
-            {#each motionLayerSources as layer}
-                <div
-                    class={`snowui-gradient-layer snowui-gradient-layer-${layer.name}`}
-                >
-                    <img
-                        class="snowui-gradient-layer-image"
-                        src={layer.source}
-                        alt=""
-                        decoding="sync"
-                        draggable="false"
-                        aria-hidden="true"
-                    />
-                </div>
-            {/each}
+            <!-- 先在设计画布中运动，再整体 Fill，避免长宽比放大旋转后的裁切缺口。 -->
+            <svg class="snowui-gradient-motion-plane" viewBox="0 0 360 360" preserveAspectRatio="none" aria-hidden="true">
+                <foreignObject width="360" height="360" overflow="visible">
+                    {#each motionLayerSources as layer}
+                        <div
+                            class={`snowui-gradient-layer snowui-gradient-layer-${layer.name}`}
+                        >
+                            <img
+                                class="snowui-gradient-layer-image"
+                                src={layer.source}
+                                alt=""
+                                decoding="sync"
+                                draggable="false"
+                                aria-hidden="true"
+                            />
+                        </div>
+                    {/each}
+                </foreignObject>
+            </svg>
         </div>
     {/if}
     {#if isAvatarVariant && avatarOverlayMounted}
@@ -637,6 +642,15 @@
             var(--snowui-gradient-height);
     }
 
+    :global(:where(.snowui-gradient-motion-plane)) {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        pointer-events: none;
+    }
+
     :global(:where(.snowui-gradient-layer)) {
         position: absolute;
         inset: 0;
@@ -659,10 +673,10 @@
             :where(.snowui-gradient-layer-subtract-2)
                 :where(.snowui-gradient-layer-image)
         ) {
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
+        top: -61.111111%;
+        left: -61.111111%;
+        width: 222.222222%;
+        height: 222.222222%;
     }
 
     :global(
