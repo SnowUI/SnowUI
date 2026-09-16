@@ -1,6 +1,10 @@
 <!-- 
  NumberFlow 动效数字组件
-  v2.0.0
+  v2.1.0
+
+  Original implementation reference: number-flow v0.6.2
+  Copyright (c) 2024 Maxwell Barvian, MIT License.
+  SnowUI keeps its own Svelte/FramePro implementation and public contract.
 
  1. 核心能力 (Features):
     - 滚轮动效: 模拟物理滚轮的数字滚动效果。
@@ -32,6 +36,8 @@
     import {
         animateTextMotionColorSequence,
         cancelTextMotionColor,
+        resolveChromaticTextMotionColors,
+        TEXT_MOTION_COLOR_FADE_MS,
         TEXT_MOTION_COLOR_DURATION_MS,
     } from "../lib/text-motion/color";
     import {
@@ -428,7 +434,7 @@
         return {
             destroy() {
                 if (track) clearPartLayout(track);
-                node.querySelectorAll<HTMLElement>("[data-number-flow-color-label]").forEach(cancelTextMotionColor);
+                node.querySelectorAll<HTMLElement>("[data-number-flow-color-label]").forEach(cancelNumberFlowColor);
                 presenceAnimations.get(node)?.cancel();
                 presenceAnimations.delete(node);
                 signMotions.get(node)?.animations.forEach(animation => animation.cancel());
@@ -745,6 +751,115 @@
 
     const wheelAnimations = new WeakMap<HTMLElement, Set<Animation>>();
     const wheelSettled = new WeakMap<HTMLElement, () => void>();
+    const colorOverlayAnimations = new WeakMap<HTMLElement, Animation>();
+    const COLOR_OVERLAY_PAINT_VAR =
+        "--snowui-number-flow-color-overlay-paint";
+    const COLOR_OVERLAY_STOP_VARS = Array.from(
+        { length: 5 },
+        (_, index) => `--snowui-number-flow-color-stop-${index}`,
+    );
+    let colorOverlayPropertyRegistered = false;
+
+    function ensureColorOverlayProperty() {
+        if (
+            colorOverlayPropertyRegistered ||
+            typeof CSS === "undefined" ||
+            typeof CSS.registerProperty !== "function"
+        ) return;
+        try {
+            COLOR_OVERLAY_STOP_VARS.forEach(name => {
+                CSS.registerProperty({
+                    name,
+                    syntax: "<color>",
+                    inherits: true,
+                    initialValue: "transparent",
+                });
+            });
+        } catch {
+            // Shared by all NumberFlow instances; another instance may own registration.
+        }
+        colorOverlayPropertyRegistered = true;
+    }
+
+    function cancelNumberFlowColor(node: HTMLElement) {
+        const overlay = colorOverlayAnimations.get(node);
+        colorOverlayAnimations.delete(node);
+        overlay?.cancel();
+        node.removeAttribute("data-number-flow-color-active");
+        node.style.removeProperty(COLOR_OVERLAY_PAINT_VAR);
+        COLOR_OVERLAY_STOP_VARS.forEach(name => node.style.removeProperty(name));
+        cancelTextMotionColor(node);
+    }
+
+    function animateNumberFlowColorSequence(
+        elements: HTMLElement[],
+        labels: string[],
+    ) {
+        const colorStops = elements.map((_, index) =>
+            resolveChromaticTextMotionColors(
+                motionColor,
+                index,
+                elements.length,
+            ),
+        );
+        if (!colorStops.some(Boolean)) {
+            elements.forEach(cancelNumberFlowColor);
+            animateTextMotionColorSequence(
+                elements,
+                typeof motionColor === "function"
+                    ? motionColor
+                    : resolveTextMotionColor(motionColor),
+                labels,
+                { duration: TEXT_MOTION_COLOR_DURATION_MS },
+            );
+            return;
+        }
+
+        ensureColorOverlayProperty();
+        const stagger = getTextMotionStagger(
+            TEXT_MOTION_COLOR_DURATION_MS,
+            labels,
+        );
+        elements.forEach((node, index) => {
+            cancelNumberFlowColor(node);
+            const stops = colorStops[index];
+            if (!stops) return;
+            const restingColor = getComputedStyle(node).color;
+            const paint = `linear-gradient(90deg, ${COLOR_OVERLAY_STOP_VARS.map((name, stopIndex) => `var(${name}) ${(stopIndex / (COLOR_OVERLAY_STOP_VARS.length - 1)) * 100}%`).join(", ")})`;
+            const initialFrame = Object.fromEntries(
+                COLOR_OVERLAY_STOP_VARS.map((name, stopIndex) => [name, stops[stopIndex]]),
+            );
+            const finalFrame = Object.fromEntries(
+                COLOR_OVERLAY_STOP_VARS.map(name => [name, restingColor]),
+            );
+            node.setAttribute("data-number-flow-color-active", "");
+            node.style.setProperty(COLOR_OVERLAY_PAINT_VAR, paint);
+            COLOR_OVERLAY_STOP_VARS.forEach(name =>
+                node.style.setProperty(name, restingColor),
+            );
+            const animation = node.animate(
+                [initialFrame, finalFrame],
+                {
+                    duration: TEXT_MOTION_COLOR_FADE_MS,
+                    delay:
+                        TEXT_MOTION_COLOR_DURATION_MS + index * stagger,
+                    easing: "linear",
+                    fill: "backwards",
+                },
+            );
+            colorOverlayAnimations.set(node, animation);
+            const release = () => {
+                if (colorOverlayAnimations.get(node) !== animation) return;
+                colorOverlayAnimations.delete(node);
+                node.removeAttribute("data-number-flow-color-active");
+                node.style.removeProperty(COLOR_OVERLAY_PAINT_VAR);
+                COLOR_OVERLAY_STOP_VARS.forEach(name => node.style.removeProperty(name));
+                animation.cancel();
+            };
+            animation.onfinish = release;
+            animation.oncancel = release;
+        });
+    }
 
     function cancelWheelAnimations(node: HTMLElement) {
         const animations = wheelAnimations.get(node);
@@ -1064,7 +1179,7 @@
     }
 
     onDestroy(() => {
-        motionElement?.querySelectorAll<HTMLElement>("[data-number-flow-color-label]").forEach(cancelTextMotionColor);
+        motionElement?.querySelectorAll<HTMLElement>("[data-number-flow-color-label]").forEach(cancelNumberFlowColor);
     });
 
     $effect(() => {
@@ -1076,7 +1191,7 @@
         const next = displayText;
         const reduced = reduceMotion;
         const characters = Array.from(motionElement.querySelectorAll<HTMLElement>("[data-number-flow-color-label]")).filter(node => node.closest(".snowui-number-flow-mask") === motionElement && !node.closest("[inert]"));
-        if (reduced) characters.forEach(cancelTextMotionColor);
+        if (reduced) characters.forEach(cancelNumberFlowColor);
         if (previousMotionText === undefined) {
             previousMotionText = next;
             return;
@@ -1084,13 +1199,9 @@
         if (next === previousMotionText) return;
         previousMotionText = next;
         if (reduced) return;
-        animateTextMotionColorSequence(
+        animateNumberFlowColorSequence(
             characters,
-            typeof motionColor === "function"
-                ? motionColor
-                : resolveTextMotionColor(motionColor),
             characters.map(node => node.dataset.numberFlowColorLabel ?? ""),
-            { duration: TEXT_MOTION_COLOR_DURATION_MS },
         );
     });
 
@@ -1298,6 +1409,7 @@
                                                     {#each Array.from({ length: partLength }, (_, i) => i) as digitNum (digitNum)}
                                                         <span
                                                             class="snowui-number-flow-digit"
+                                                            data-number-flow-motion-glyph={digitNum}
                                                             style="--snowui-number-flow-n: {digitNum}"
                                                             aria-hidden={digitNum !==
                                                                 parseWheelDigit(
@@ -1313,7 +1425,11 @@
                                         {:else}
                                             <span class="snowui-number-flow-symbol">
                                                 {#each splitTextMotionGraphemes(part.value) as character, index (index)}
-                                                    <span data-number-flow-color-label={character}>{character}</span>
+                                                    <span
+                                                        class="snowui-number-flow-color-glyph"
+                                                        data-number-flow-color-label={character}
+                                                        data-number-flow-motion-glyph={character}
+                                                    >{character}</span>
                                                 {/each}
                                             </span>
                                         {/if}
@@ -1390,6 +1506,7 @@
                                                     {#each Array.from({ length: partLength }, (_, i) => i) as digitNum (digitNum)}
                                                         <span
                                                             class="snowui-number-flow-digit"
+                                                            data-number-flow-motion-glyph={digitNum}
                                                             style="--snowui-number-flow-n: {digitNum}"
                                                             aria-hidden={digitNum !==
                                                                 parseWheelDigit(
@@ -1405,7 +1522,11 @@
                                         {:else}
                                             <span class="snowui-number-flow-symbol">
                                                 {#each splitTextMotionGraphemes(part.value) as character, index (index)}
-                                                    <span data-number-flow-color-label={character}>{character}</span>
+                                                    <span
+                                                        class="snowui-number-flow-color-glyph"
+                                                        data-number-flow-color-label={character}
+                                                        data-number-flow-motion-glyph={character}
+                                                    >{character}</span>
                                                 {/each}
                                             </span>
                                         {/if}
@@ -1607,6 +1728,7 @@
     :global(:where(.snowui-number-flow-digit)) {
         /* CSS mod() + round() 圆环定位：每个 digit 根据 --snowui-number-flow-n 和 --snowui-number-flow-c 计算偏移 */
         display: inline-flex;
+        position: relative;
         align-items: baseline;
         justify-content: center;
         height: var(--snowui-number-flow-em-height);
@@ -1652,6 +1774,35 @@
         will-change: transform, opacity;
     }
 
+    :global(:where(.snowui-number-flow-digit)::after),
+    :global(:where(.snowui-number-flow-color-glyph)::after) {
+        content: attr(data-number-flow-motion-glyph);
+        position: absolute;
+        inset: 0;
+        display: inline-flex;
+        align-items: baseline;
+        justify-content: center;
+        color: transparent;
+        background-image: var(--snowui-number-flow-color-overlay-paint, none);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    :global(:where(.snowui-number-flow-wheel-viewport[data-number-flow-color-active]) :where(.snowui-number-flow-digit)),
+    :global(:where(.snowui-number-flow-color-glyph[data-number-flow-color-active])) {
+        -webkit-text-fill-color: transparent;
+    }
+
+    :global(:where(.snowui-number-flow-wheel-viewport[data-number-flow-color-active]) :where(.snowui-number-flow-digit)::after),
+    :global(:where(.snowui-number-flow-color-glyph[data-number-flow-color-active])::after) {
+        opacity: 1;
+    }
+
     /* 非当前 digit 使用 absolute 定位叠加 */
     :global(:where(.snowui-number-flow-digit)[aria-hidden="true"]) {
         position: absolute;
@@ -1666,6 +1817,12 @@
         display: flex;
         align-items: baseline;
         mix-blend-mode: plus-lighter;
+    }
+
+    :global(:where(.snowui-number-flow-color-glyph)) {
+        position: relative;
+        display: inline-block;
+        white-space: pre;
     }
 
     :global(:where(.snowui-disabled) :where(.snowui-number-flow-mask)),

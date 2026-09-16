@@ -6,6 +6,10 @@ import type {
 } from "./types";
 
 const colorAnimations = new WeakMap<HTMLElement, Animation>();
+const chromaticOptions = new WeakMap<
+    TextMotionColorResolver,
+    Required<ChromaticOptions>
+>();
 
 export const TEXT_MOTION_COLOR_FADE_MS = 280;
 export const TEXT_MOTION_COLOR_DURATION_MS = 550;
@@ -23,10 +27,33 @@ export function chromatic({
     saturation = 92,
     lightness = 60,
 }: ChromaticOptions = {}): TextMotionColorResolver {
-    return (index, total) => {
+    const resolver: TextMotionColorResolver = (index, total) => {
         const progress = total <= 1 ? 0 : index / (total - 1);
         return `hsl(${(from + progress * spread) % 360} ${saturation}% ${lightness}%)`;
     };
+    chromaticOptions.set(resolver, { from, spread, saturation, lightness });
+    return resolver;
+}
+
+/** Returns the five stops for one continuous slice of a chromatic resolver. */
+export function resolveChromaticTextMotionColors(
+    color: TextMotionColor | undefined,
+    index: number,
+    total: number,
+) {
+    if (typeof color !== "function") return undefined;
+    const options = chromaticOptions.get(color);
+    if (!options) return undefined;
+
+    const count = Math.max(1, total);
+    const start = index / count;
+    const end = (index + 1) / count;
+    return Array.from({ length: 5 }, (_, stopIndex) => {
+        const localProgress = stopIndex / 4;
+        const progress = start + (end - start) * localProgress;
+        const hue = (options.from + progress * options.spread) % 360;
+        return `hsl(${hue} ${options.saturation}% ${options.lightness}%)`;
+    });
 }
 
 export function resolveTextMotionColorAt(

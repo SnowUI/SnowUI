@@ -1,6 +1,6 @@
 # Text Motion 共享能力
 
-> **版本**: v1.5.0  
+> **版本**: v1.6.0
 > **职责**: 为 PRO 文字动效组件提供统一内容标准化、排版、字符重组、自然字宽布局、启动序列、颜色动效和减少动效判断。
 
 ## 模块
@@ -11,7 +11,7 @@
 | `format.ts` | 字符串 / 数字内容标准化，数字统一使用 `Intl.NumberFormat` |
 | `typography.ts` | SnowUI Token、PascalCase 语意色和组件 CSS 变量样式生成 |
 | `preference.ts` | opt-in 的 `prefers-reduced-motion` 判断 |
-| `color.ts` | 五个组件共享的全文颜色编排、单色 / `chromatic()` 解析与主动画后颜色回落 |
+| `color.ts` | 五个组件共享的全文颜色编排、单色 / `chromatic()` 解析、连续 chromatic 片段查询与主动画后颜色回落 |
 | `numeric.ts` | 数字提取、增加 / 减少趋势解析与低位到高位顺序 |
 | `animation.ts` | 内部动画差值叠加与透明度交接；具体方向、位移和时序由组件传入 |
 | `layout.ts` | grapheme 拆分、LCP/LCS diff、自然字宽测量与区段 FLIP |
@@ -30,3 +30,5 @@
 颜色回落的旧 finish / cancel 事件只释放自身登记，不能清除快速更新后的新动画。
 
 `color.ts` 的 `animateTextMotionColorSequence` 统一五个组件的全文索引、从左到右逐字延迟与颜色回落；颜色顺序独立于文字位移、数字滚轮、计时器或倒计时的运动方向。`TEXT_MOTION_COLOR_DURATION_MS=550` 是 FlowText 与 NumberFlow 的默认颜色主时长，公共回落为 `280ms linear`；数字滚轮仍使用自身时长。各组件只提供目标字符宿主、主时长及既有 timing 覆盖。ScrambleText 有颜色时使用稳定的逐字符 span，无颜色时继续复用单个文本节点。
+
+NumberFlow 的滚轮同时渲染多个 digit layer，不能把 wheel viewport 或滚轮轨道设为透明。它通过 `resolveChromaticTextMotionColors` 取得每个目标字符的连续彩谱片段，再由组件私有覆盖层作为唯一可见字形，把五个色标直接过渡到最终文字色后交回真实字形；共享层不拥有滚轮 DOM、伪元素或 presence。

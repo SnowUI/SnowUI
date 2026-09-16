@@ -1,12 +1,25 @@
 # NumberFlow
 
-> **版本**: v2.0.1
+> **版本**: v2.1.0
 > **职责**: 展示持续变化的格式化数字，并以逐位滚轮、位数重排和容器宽度过渡表达数值变化。
 > **包归属**: `@snowui/components-pro`
 
 ## 概览与选择边界
 
 NumberFlow 适合计数器、金额、指标和时钟等连续数值。它以 `Intl.NumberFormat` 拆分数字，保留符号、分组符和小数，并按数位执行滚轮变化。只需要静态数字时使用 Text；需要字符级重组或非滚轮文字动效时使用 NumericText、SlotText 或 FlowText。
+
+## 原始实现与 SnowUI 扩展
+
+SnowUI NumberFlow 以 Maxwell Barvian 的 MIT 开源项目 Number Flow 为原始实现参考：工作区源代码见 [`number-flow-main`](../../../../repos/number-flow-main/README.md)，原始 API、示例和使用限制见 [Number Flow 官方文档](https://number-flow.barvian.me/)。当前对照版本为 core `number-flow@0.6.2` 与 Svelte wrapper `@number-flow/svelte@0.4.2`。
+
+SnowUI 在原始逐位滚轮、`Intl.NumberFormat` parts、趋势方向和进退场架构上增加：
+
+- FramePro 根宿主、SnowUI 排版 / 语义颜色、Skeleton 与 RenderHints；
+- `motionRole`、`rollDirection`、低位到高位交错，以及时间 / 倒计时的循环数位；
+- `motionColor` 全文颜色序列；`chromatic()` 把完整彩谱连续铺满一位、三位或更多数位，并用独立覆盖层保证颜色不改变原始滚轮；
+- `children` 与 `numberPosition`，以及同帧更新、连续中断时的布局和宽度重定向。
+
+SnowUI 没有原样公开上游的 `plugins`、`NumberFlowGroup`、CSS parts / Shadow DOM、`prefix` / `suffix`、`willChange`、`animated`、事件和分离的 spin / transform / opacity timing。需要这些原始接口时直接使用上游包；SnowUI 只承诺本文 API。
 
 ## Import
 
@@ -31,9 +44,12 @@ import { NumberFlow } from "@snowui/components-pro";
 | `skeleton` | `boolean` | `false` | 接入 Skeleton Context |
 | `renderHints` | `RenderHints` | — | 覆盖 Skeleton 形状与尺寸提示 |
 | `respectMotionPreference` | `boolean` | `false` | 为 `true` 时遵守 reduced-motion 并立即提交最终数值 |
-| `font` / `size` / `weight` / `lineHeight` | `string \| number` | — | 数字排版输入 |
+| `font` | `string` | `undefined` | 数字字体；未传时继承容器字体 |
+| `size` | `string \| number` | `undefined` | 数字字号；数字转换为 `px`，字符串可使用 SnowUI token 或 CSS 值 |
+| `weight` | `string \| number` | `undefined` | 数字字重；未传时继承容器字重 |
+| `lineHeight` | `string \| number` | `undefined` | 根排版行高；内部滚轮仍使用独立 `1em` 裁切窗口 |
 | `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色，未设置时继承容器 |
-| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符从左到右依次回落的临时颜色，支持 `chromatic()`；包含保留数位、分隔符及格式化货币符号，不影响 children 附加内容 |
+| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符从左到右依次回落的临时颜色；`chromatic()` 将完整彩谱连续铺满全部数位，包含保留数位、分隔符及格式化货币符号，不影响 children 附加内容 |
 | `align` | `TextMotionAlign` | — | 数字内部对齐 |
 | `children` | `Snippet` | — | 数字左侧或右侧的附加内容 |
 | FramePro Props | `FrameProps` | 见 FramePro | 支持 `tag`、`as`、class/style、状态与外层动效 |
@@ -80,6 +96,8 @@ import { NumberFlow } from "@snowui/components-pro";
 - 负号的进场和退场与本次数值更新同时启动，delay 为 `0`；不参加数位的低位到高位错峰。负号沿数字滚动方向垂直进退场，步长为 `1em`，时长和缓动与数字滚轮一致；垂直位移同样采用增量叠加，中断后从当前轨迹接续。
 - 连续输入使用可中断动画重定向（interruptible / retargetable animation）：滚轮、数位的 FLIP 横移与宽度采用增量叠加（additive animation），保留正在运行的残余位移，新指令仅叠加目标差值；不能重复冻结已有轨道、重置缓动起点或用快速模式突然缩短布局时长。已完成的增量及时释放；销毁与减少动效时取消全部残余，直接落到最新值。
 
+- `chromatic()` 不把 wheel viewport、滚轮轨道或布局节点设为透明。每个数字 / 符号拥有一个不参与布局的伪元素覆盖层，完整色相按全文字符切片后绘制到覆盖层；彩色阶段暂时抑制真实字形的填充，由这一层直接把五个色标过渡到最终文字色，再无缝交回真实字形。整个过程只有一个可见字形绘制层，避免彩色边缘与底层黑字的抗锯齿像素叠加成黑边。
+
 - 同一帧内的多次更新共用第一次更新前的布局快照，按最后一次 DOM 布局执行一次补偿；快照消费后立即清除，不能重复补偿或把未补偿的中间位置当成起点。
 - 宽度与数位布局共用一个可取消的帧任务，先集中测量，再写入位置和启动动效。宽度保留小数像素且不包含根 Frame 的外层缩放；ResizeObserver 保持稳定订阅，进退场事件不重复测量最终文本。
 - 宽度补偿变量不向后代继承，避免每帧让全部数字重算无关样式。格式器只随 locale / format 更新；数字轴仅在正负轴实际变化时重排。
@@ -103,6 +121,12 @@ import { NumberFlow } from "@snowui/components-pro";
 - 与 NumericText、SlotText、FlowText 共用 text-motion 数值与排版能力，但保留自己的滚轮视觉时间线。
 
 ## 更新日志
+
+### v2.1.0 (2026-09-17)
+
+- 重新对照 `number-flow@0.6.2` 的旧布局测量、节点更新和动画启动顺序，保留 SnowUI 的连续更新与交错能力。
+- `chromatic()` 改为单一可见覆盖层：一位、三位或十位数字都覆盖完整彩谱，并直接过渡到最终文字色；不再通过透明 wheel viewport 绘制，也不会让黑色底字在彩色边缘形成黑边。
+- 文档补充原始代码仓库、官方文档、MIT 归属、SnowUI 扩展能力和未公开的上游接口边界。
 
 ### v2.0.1 (2026-09-09)
 
