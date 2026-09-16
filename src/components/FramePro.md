@@ -1570,3 +1570,167 @@ fontSize: "12 + Math.floor($self.width / 100)"
 #### 功能增强
 - **Size Context**: Frame 新增 `size` 属性。在 `enableContext` 开启时，自动通过 `SIZE_CONTEXT_KEY` 向下传递尺寸信息。
 - **组件适配**: Avatar, Icon, Badge 完成对尺寸上下文的适配，支持自动继承父级容器（如 AvatarGroup 或 Frame）的尺寸。
+
+## Site guide: frame
+
+<!-- site-guide:frame -->
+Compose layout, state, and motion with the shared foundation of SnowUI components.
+
+### When to use Frame {#when-to-use}
+
+Use Frame when a container needs SnowUI layout, shared state, loading, or motion. For a simple document section, ordinary semantic HTML is often enough. Choose an existing component first when it already provides the interaction you need.
+
+Frame owns behavior within its own boundary. Coordinating the timing, actions, or styles of other Frames is the role of FramePro.
+
+### Import {#import}
+
+Install the open-source Components package and load its stylesheet as described in Quick Start. Import Frame from the public package root.
+
+```ts
+import { Frame } from '@snowui-design-system/components';
+```
+
+### Compose a layout {#layout}
+
+Use column for stacked content and row for horizontal content. Padding, gap, and radius use SnowUI token steps. contentFill lets ordinary content children fill the available width.
+
+Keep the container flexible with a maximum reading width. Use tag to choose the semantic HTML element; as declares a composition role.
+
+```svelte
+<Frame tag="section" column contentFill padding={4} gap={3}
+  style="width: min(100%, 30rem);">
+  <h2>Build with SnowUI</h2>
+  <p>Install the components and start your first page.</p>
+  <Frame row gap={3}>
+    <a href="/components/quick-start">Quick Start</a>
+    <a href="/components/button">Explore components</a>
+  </Frame>
+</Frame>
+```
+
+### Adapt to available space {#responsive}
+
+Frame responds to the space its content needs. It first compresses eligible spacing toward its lower limits. An explicit responsive configuration can then provide a fallback direction, alignment, and child sizing strategy.
+
+Start with a flexible width and readable content. A narrow container can need adaptation even on a large screen. enableResponsive={false} disables the content-fit observer when that behavior is unnecessary.
+
+### Share loading state {#loading}
+
+A parent Frame can share loading state with its children. Components register their own skeleton shapes; skeleton controls whether the loading state renders those placeholders.
+
+Keep loading tied to the actual request lifecycle. Set it back to false when the content is available.
+
+```svelte
+<script lang="ts">
+  import { Frame, Text } from "@snowui-design-system/components";
+  let { loading = false } = $props<{ loading?: boolean }>();
+</script>
+
+<Frame column gap={3} {loading}>
+  <Text size={18} weight={600}>Documentation</Text>
+  <Text>Components, guides, and release notes.</Text>
+</Frame>
+```
+
+### Animate the container {#motion}
+
+Self-contained motion is part of the open-source Frame. Use whileAppear, whileHover, or other public motion properties when the movement belongs to this container.
+
+Use stateClass, stateStyle, and stateContent when appearance or content follows a state. Keep interactive semantics and keyboard behavior with the actual control.
+
+```svelte
+<Frame column gap={3} whileAppear={{ opacity: [0, 1], y: [8, 0] }}>
+  <h2>What’s new</h2>
+  <p>Read the latest updates to the SnowUI documentation.</p>
+</Frame>
+```
+
+### Next steps {#next-steps}
+
+- [Quick Start](/components/quick-start)
+- [Coordinate Frames with FramePro](/components/frame-pro)
+- [Add a scrollable region](/components/scroll-area)
+
+<!-- /site-guide:frame -->
+
+## Site guide: frame-pro
+
+<!-- site-guide:frame-pro -->
+Coordinate multiple Frames while keeping layout, state, and local motion in the shared Frame foundation.
+
+### When to use FramePro {#when-to-use}
+
+FramePro extends Frame with three coordination capabilities: scheduling child motion, triggering another Frame by ID, and applying styles to identified targets.
+
+Use the open-source Frame for layout, loading, local state, and self-contained motion. Add FramePro where the interface needs one Frame to coordinate others.
+
+### Import {#import}
+
+FramePro is part of the PRO package and requires package access. Keep using the open-source package for Frame and other foundational components.
+
+```ts
+import { Frame } from '@snowui-design-system/components';
+import { FramePro } from '@snowui/components-pro';
+```
+
+### Sequence child motion {#orchestration}
+
+Give the coordinating container a stable ID and enable orchestrate. Children define their own motion; the parent controls when they start.
+
+This sequence introduces three documentation steps in DOM order, with 100 milliseconds between starts. parallel and random are available when another ordering suits the content.
+
+```svelte
+<FramePro id="guide-steps" column gap={4}
+  orchestrate orchestrateMode="sequential"
+  orchestrateDelay={100} orchestrateOrder="dom"
+  orchestrateTrigger="appear">
+  <Frame whileAppear={{ opacity: [0, 1], y: [8, 0] }}>Install SnowUI</Frame>
+  <Frame whileAppear={{ opacity: [0, 1], y: [8, 0] }}>Load the styles</Frame>
+  <Frame whileAppear={{ opacity: [0, 1], y: [8, 0] }}>Build your first page</Frame>
+</FramePro>
+```
+
+### Link actions by ID {#linked-actions}
+
+A FramePro event can address another registered Frame by its ID. The action can play, pause, or reset the target motion.
+
+Use a semantic button for a clickable trigger. Give targets unique, stable IDs, especially when several copies of a feature can appear on one page.
+
+```svelte
+<FramePro tag="button" type="button"
+  Click={{ target: "guide-preview", action: "play" }}>
+  Replay introduction
+</FramePro>
+
+<FramePro id="guide-preview" whileAppear={{ opacity: [0, 1] }}>
+  Build your first page with SnowUI.
+</FramePro>
+```
+
+### Coordinate target styles {#coordinated-styles}
+
+Use styles when a coordinating Frame needs to address a descendant by ID. For ordinary local styling, set the target’s own public properties instead.
+
+Keep this relationship scoped to a feature. Stable IDs make the connection explicit and prevent repeated instances from addressing the same target.
+
+```svelte
+<FramePro id="guide-layout" column
+  styles={{ "#guide-summary": { padding: 4, radius: 3 } }}>
+  <Frame id="guide-summary">
+    A short introduction to the SnowUI component library.
+  </Frame>
+</FramePro>
+```
+
+### Keep responsibilities clear {#responsibilities}
+
+Frame continues to own layout, state, skeletons, and local motion. FramePro adds coordination on top of that foundation, so children keep their own visual definitions.
+
+Prefer a small coordinating boundary around the feature. Verify keyboard access, reduced-motion behavior, and what happens when targets mount or unmount.
+
+### Next steps {#next-steps}
+
+- [Read the Frame foundation](/components/frame)
+- [Quick Start](/components/quick-start)
+
+<!-- /site-guide:frame-pro -->
