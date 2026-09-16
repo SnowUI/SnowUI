@@ -27,10 +27,10 @@
 | `lineHeight` | `string \| number` | `undefined` | 行高；支持 SnowUI Token |
 | `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色；支持 PascalCase 语意色 |
 | `align` | `"left" \| "center" \| "right" \| "justify"` | `undefined` | 对齐；默认继承父级 |
-| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符按全文顺序回落的临时颜色；默认不改变颜色，支持 `chromatic()` 逐字符渐变 |
+| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符从左到右回落的临时颜色；默认不改变颜色，支持 `chromatic()` 逐字符渐变 |
 | `...rest` | `FrameProps` | - | 透传到根 `FramePro`，包括 `as="label"` |
 
-六项排版默认全部继承父级。`motionColor` 在更新时覆盖目标全文，并按全文顺序在主时长与逐字 delay 后回到 `color` 或父级继承色；颜色主时长保留 `duration + exitOffset`，回落时长保留 `colorFade`。
+六项排版默认全部继承父级。`motionColor` 在更新时覆盖目标全文，并从左到右在主时长与逐字 delay 后回到 `color` 或父级继承色；颜色主时长保留 `duration + exitOffset`，回落时长保留 `colorFade`。数字位移仍按低位到高位启动，两条时间线互不改变对方的方向。
 
 ```svelte
 <script lang="ts">

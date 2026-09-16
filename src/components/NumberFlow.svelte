@@ -32,6 +32,7 @@
     import {
         animateTextMotionColorSequence,
         cancelTextMotionColor,
+        TEXT_MOTION_COLOR_DURATION_MS,
     } from "../lib/text-motion/color";
     import {
         extractTextMotionNumber,
@@ -43,6 +44,7 @@
     import {
         DEFAULT_TEXT_MOTION_COLOR,
         type TextMotionAlign,
+        type TextMotionColor,
         type TextMotionRole,
         type TextMotionTrend,
     } from "../lib/text-motion/types";
@@ -78,7 +80,7 @@
         lineHeight?: string | number;
         color?: SnowUIColor | string;
         align?: TextMotionAlign;
-        motionColor?: SnowUIColor | string;
+        motionColor?: TextMotionColor;
         children?: Snippet;
         [key: string]: any;
     }
@@ -1084,9 +1086,11 @@
         if (reduced) return;
         animateTextMotionColorSequence(
             characters,
-            resolveTextMotionColor(motionColor),
+            typeof motionColor === "function"
+                ? motionColor
+                : resolveTextMotionColor(motionColor),
             characters.map(node => node.dataset.numberFlowColorLabel ?? ""),
-            { duration, reverse: true },
+            { duration: TEXT_MOTION_COLOR_DURATION_MS },
         );
     });
 

@@ -29,4 +29,4 @@
 
 颜色回落的旧 finish / cancel 事件只释放自身登记，不能清除快速更新后的新动画。
 
-`color.ts` 的 `animateTextMotionColorSequence` 统一五个组件的全文索引、逐字延迟与颜色回落；各组件只提供目标字符宿主和其主时长、方向及既有 timing 覆盖。ScrambleText 有颜色时使用稳定的逐字符 span，无颜色时继续复用单个文本节点。
+`color.ts` 的 `animateTextMotionColorSequence` 统一五个组件的全文索引、从左到右逐字延迟与颜色回落；颜色顺序独立于文字位移、数字滚轮、计时器或倒计时的运动方向。`TEXT_MOTION_COLOR_DURATION_MS=550` 是 FlowText 与 NumberFlow 的默认颜色主时长，公共回落为 `280ms linear`；数字滚轮仍使用自身时长。各组件只提供目标字符宿主、主时长及既有 timing 覆盖。ScrambleText 有颜色时使用稳定的逐字符 span，无颜色时继续复用单个文本节点。

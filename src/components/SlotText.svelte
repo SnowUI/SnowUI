@@ -422,7 +422,6 @@
         maxEnd = Math.max(maxEnd, animateTextMotionColorSequence(colorFaces, options.motionColor, toChars, {
             duration: options.duration + options.exitOffset,
             stagger: options.stagger,
-            reverse: isNumericArithmetic,
             fadeDuration: options.colorFade,
         }));
 

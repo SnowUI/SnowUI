@@ -443,7 +443,6 @@ export class TextMotionCharacterElement extends ServerSafeHTMLElement {
                             duration: this.motionDuration ?? this.transition.duration,
                             layoutDuration: this.transition.duration,
                             stagger: this.stagger,
-                            reverse: resolvedTrend.isNumericArithmetic && this.numericStaggerDirection !== "left-to-right",
                         },
                     );
                 }

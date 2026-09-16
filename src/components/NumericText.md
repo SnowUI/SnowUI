@@ -25,7 +25,7 @@
 | `lineHeight` | `string \| number` | `undefined` | 行高 |
 | `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色 |
 | `align` | `"left" \| "center" \| "right" \| "justify"` | `undefined` | 对齐；默认继承父级 |
-| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符按全文顺序回落的临时颜色；默认不改变颜色，支持 `chromatic()` 逐字符渐变 |
+| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符从左到右回落的临时颜色；默认不改变颜色，支持 `chromatic()` 逐字符渐变 |
 | `...rest` | `FrameProps` | - | 透传到根 `FramePro`，包括 `as="label"` |
 
 六项排版默认全部继承父级，支持 SnowUI Token 与 `color="Primary"` 等 PascalCase 语意色。

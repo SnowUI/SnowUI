@@ -8,6 +8,7 @@ import type {
 const colorAnimations = new WeakMap<HTMLElement, Animation>();
 
 export const TEXT_MOTION_COLOR_FADE_MS = 280;
+export const TEXT_MOTION_COLOR_DURATION_MS = 550;
 
 export interface ChromaticOptions {
     from?: number;
@@ -83,7 +84,6 @@ export function animateTextMotionColorSequence(
         duration: number;
         layoutDuration?: number;
         stagger?: number;
-        reverse?: boolean;
         fadeDuration?: number;
     },
 ) {
@@ -91,8 +91,7 @@ export function animateTextMotionColorSequence(
     const fade = options.fadeDuration ?? TEXT_MOTION_COLOR_FADE_MS;
     let end = 0;
     elements.forEach((element, index) => {
-        const order = options.reverse ? elements.length - index - 1 : index;
-        const delay = order * stagger;
+        const delay = index * stagger;
         const animation = animateSettledTextMotionColor(element, motionColor, options.duration, delay, index, labels.length, fade);
         if (animation) end = Math.max(end, options.duration + delay + fade);
     });

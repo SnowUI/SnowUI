@@ -1,6 +1,6 @@
 <!--
   ScrambleText 代码文字扰动动效组件
-  v1.3.1
+  v1.4.0
 
   职责：提供 PRO 级字符扰动后归位的文本动效。
   文档：./ScrambleText.md
@@ -12,6 +12,7 @@
         cancelTextMotionColor,
     } from "../lib/text-motion/color";
     import { shouldReduceTextMotion } from "../lib/text-motion/preference";
+    import type { TextMotionColor } from "../lib/text-motion/types";
 
     export type ScrambleTextCharset = "glyphs" | "symbols" | "numbers";
     export type ScrambleTextMode = "scramble" | "cascade";
@@ -57,7 +58,7 @@
         cascadeSpeed: number;
         cascadeDelay: number;
         respectMotionPreference: boolean;
-        motionColor: string;
+        motionColor?: TextMotionColor;
     }
 
     interface ScrambleCharacter {
@@ -83,7 +84,7 @@
             charset: "glyphs", mode: "cascade",
             cascadeSpeed: DEFAULT_CASCADE_SPEED,
             cascadeDelay: DEFAULT_CASCADE_DELAY,
-            respectMotionPreference: false, motionColor: "",
+            respectMotionPreference: false, motionColor: undefined,
         };
 
         connectedCallback() {
@@ -187,9 +188,12 @@
             this.display = from;
             this.renderText(from);
             const end = Math.max(now, ...this.characters.map(char => char.end));
-            animateTextMotionColorSequence(this.colorNodes.slice(0, target.length), this.options.motionColor, target, {
-                duration: end - now,
-            });
+            const motionColor = this.options.motionColor;
+            if (motionColor) {
+                animateTextMotionColorSequence(this.colorNodes.slice(0, target.length), motionColor, target, {
+                    duration: end - now,
+                });
+            }
             if (!running) {
                 this.rng = createRng(Math.floor(Math.random() * 0x7fffffff));
                 this.rafId = window.requestAnimationFrame(this.tick);
@@ -253,7 +257,7 @@
         color?: SnowUIColor | string;
         lineHeight?: string | number;
         align?: TextMotionAlign;
-        motionColor?: SnowUIColor | string;
+        motionColor?: TextMotionColor;
         [key: string]: any;
     }
 
@@ -306,7 +310,9 @@
             cascadeSpeed: DEFAULT_CASCADE_SPEED,
             cascadeDelay: DEFAULT_CASCADE_DELAY,
             respectMotionPreference,
-            motionColor: resolveTextMotionColor(motionColor),
+            motionColor: typeof motionColor === "function"
+                ? motionColor
+                : resolveTextMotionColor(motionColor),
         });
         scrambleElement.update(displayText, hasMounted, optionsChanged);
     });

@@ -1,6 +1,6 @@
 # ScrambleText 代码文字动效
 
-> **版本**: v1.3.2
+> **版本**: v1.4.0
 > **组件路径**: `pro/src/components/ScrambleText.svelte`  
 > **包归属**: PRO
 
@@ -21,10 +21,14 @@
 | `lineHeight` | `string \| number` | `undefined` | 行高 |
 | `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色 |
 | `align` | `"left" \| "center" \| "right" \| "justify"` | `undefined` | 对齐；默认继承父级 |
-| `motionColor` | `SnowUIColor \| string` | `undefined` | 全部目标字符从左到右依次回落的临时颜色；默认不改变颜色 |
+| `motionColor` | `TextMotionColor` | `undefined` | 全部目标字符从左到右依次回落的临时颜色；支持语义色、CSS 色与逐字 resolver，默认不改变颜色 |
 | `...rest` | `FrameProps` | - | 透传到根 `FramePro`，包括 `as="label"` |
 
 ```svelte
+<script lang="ts">
+    import { ScrambleText, chromatic } from "@snowui/components-pro";
+</script>
+
 <ScrambleText
     text="DEPLOY READY"
     charset="glyphs"
@@ -32,7 +36,7 @@
     size="--text-24"
     weight={600}
     color="Primary"
-    motionColor="Indigo"
+    motionColor={chromatic()}
 />
 ```
 
@@ -53,6 +57,10 @@
 - `customSequence` 是内容语义，不是动效速度调参，可以保留。
 
 ## 更新日志
+
+### v1.4.0 (2026-09-17)
+
+- `motionColor` 使用共享 `TextMotionColor`，新增逐字 resolver 支持，可通过 `chromatic()` 生成彩色渐变序列。
 
 ### v1.3.2 (2026-09-09)
 

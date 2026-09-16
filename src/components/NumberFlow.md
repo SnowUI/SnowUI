@@ -33,7 +33,7 @@ import { NumberFlow } from "@snowui/components-pro";
 | `respectMotionPreference` | `boolean` | `false` | 为 `true` 时遵守 reduced-motion 并立即提交最终数值 |
 | `font` / `size` / `weight` / `lineHeight` | `string \| number` | — | 数字排版输入 |
 | `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色，未设置时继承容器 |
-| `motionColor` | `SnowUIColor \| string` | `undefined` | 全部目标字符从低位到高位依次回落的临时颜色，包含保留数位、分隔符及格式化货币符号，不影响 children 附加内容 |
+| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符从左到右依次回落的临时颜色，支持 `chromatic()`；包含保留数位、分隔符及格式化货币符号，不影响 children 附加内容 |
 | `align` | `TextMotionAlign` | — | 数字内部对齐 |
 | `children` | `Snippet` | — | 数字左侧或右侧的附加内容 |
 | FramePro Props | `FrameProps` | 见 FramePro | 支持 `tag`、`as`、class/style、状态与外层动效 |
@@ -106,7 +106,7 @@ import { NumberFlow } from "@snowui/components-pro";
 
 ### v2.0.1 (2026-09-09)
 
-- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../specs/TextMotionSpec.md#21-motioncolor)。
+- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列，并支持 `chromatic()`。颜色主时长固定为与 FlowText 默认值一致的 `550ms`，再以公共 `280ms linear` 回落；数字滚轮仍保留自身 `transition.duration`。完整时序遵循 [TextMotionSpec §2.1](../../../specs/TextMotionSpec.md#21-motioncolor)。
 - 字符变化效果保持原有规则；未设置颜色、关闭动画（适用时）或减少动效生效时显示最终原色。连续更新重新编排颜色序列，卸载清理颜色动画。
 
 
