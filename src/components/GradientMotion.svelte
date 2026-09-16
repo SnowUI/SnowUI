@@ -224,9 +224,7 @@ void main() {
     float trail = clamp(0.5 - d * 1.3, 0.0, 1.0);
     trail = pow(trail, 2.5) * 0.30;
     float intensity = max(band * 0.95, trail);
-    float edgeFade = smoothstep(0.0, 0.015, cross)
-        * smoothstep(1.0, 0.985, cross);
-    float vfade = mix(edgeFade, 1.0, avatarMix);
+    float vfade = 1.0;
 
     float colorSway =
         sin(tw * 0.53 + 0.8) * 0.035
@@ -475,6 +473,7 @@ void main() {
             `--snowui-gradient-motion-width: ${resolvedWidth}`,
             `--snowui-gradient-motion-height: ${resolvedHeight}`,
             `--snowui-gradient-motion-radius: ${resolvedRadius}`,
+            `--snowui-gradient-motion-clip: ${resolvedRadius === "inherit" ? "border-box" : resolvedRadius === "50%" ? "ellipse(50% 50% at 50% 50%)" : "inset(0 round var(--snowui-gradient-motion-radius-override, var(--snowui-gradient-motion-radius)))"}`,
             style,
         ]
             .filter(Boolean)
@@ -690,12 +689,14 @@ void main() {
         min-width: 0;
         min-height: 0;
         gap: 0;
-        overflow: hidden;
         isolation: isolate;
         border-radius: var(
             --snowui-gradient-motion-radius-override,
             var(--snowui-gradient-motion-radius, inherit)
         );
+        clip-path: var(--snowui-gradient-motion-clip);
+        -webkit-mask-image: linear-gradient(black, black);
+        mask-image: linear-gradient(black, black);
         background: transparent;
         box-sizing: border-box;
         transform: translateZ(0);
@@ -707,8 +708,6 @@ void main() {
         display: block;
         width: 100%;
         height: 100%;
-        border-radius: inherit;
-        corner-shape: inherit;
     }
 
     :global(:where(.snowui-gradient-motion-fallback)) {

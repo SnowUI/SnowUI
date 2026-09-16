@@ -28,7 +28,7 @@ GradientMotion 是一个 PRO 动效组件。它输出 glimm.dev 同款 WebGL 扫
 - GradientMotion 的根节点只输出一个由尺寸、圆角与 shader 算法决定的视觉面。
 - 组件不管理子内容排列，不接入 Leading / Content / Trailing 三槽位。
 - 作为其他组件的子项时表现为 Hug；作为背景时通常配合 `class="w-full h-full"` 或外部 `style` 固定尺寸。
-- `as` 只作为外层宿主的角色声明透传，不影响组件内部布局。
+- `as` 透传宿主角色；`as="avatar-image"` 还会启用连续填充头像模式，不改变组件的内禀布局。
 
 ## API 参考
 
@@ -51,6 +51,7 @@ GradientMotion 是一个 PRO 动效组件。它输出 glimm.dev 同款 WebGL 扫
 | colorSpeed | `number` | `1` | 自定义颜色的时间相位速度倍率，范围 `0–20`；`0` 时颜色停止流动 |
 | highlightIntensity | `number` | `1` | Fresnel 与镜面高光强度倍率，范围 `0–20`；`0` 时关闭高光 |
 | colors | `readonly [string, string, string, string]` | - | 周期上的四个 HEX 采样色；组件提取均值、正弦项与余弦项生成 glimm 风格连续 palette，并沿时间相位流动 |
+| loopMotion | `LoopMotionConfig` | 基于 duration 的线性无限循环 | 覆盖 Frame loop bridge 配置；paused=true 始终优先暂停。shader 的时序仍由 speed、duration 和 paused 控制。 |
 | paused | `boolean` | `false` | 是否暂停动效 |
 | decorative | `boolean` | `true` | 是否作为装饰图；为 `true` 时输出 `aria-hidden="true"` |
 | as | `string` | - | Frame 角色声明；Avatar 场景推荐 `as="avatar-image"` |
@@ -148,6 +149,10 @@ GradientMotion 的内置 glimm cosine palette、WebGL 不可用时的 CSS fallba
 ---
 
 ## 更新日志 (Changelog)
+
+### 圆角边缘修复（2026-09-16）
+
+- 根层按最终 `radius` 使用单一 `clip-path` 与 alpha mask 裁切完整 WebGL 合成结果，canvas 不再重复应用圆角；同时移除 shader 横切轴两端额外的透明渐隐，避免浅色底层在轮廓内侧形成白色细边。扫光带自身的透明合成、palette 与运动算法保持不变。
 
 ### v4.0.1 (2026-08-15)
 
