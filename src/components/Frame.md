@@ -253,3 +253,7 @@ Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级�
 - v1.1.0 (2026-06-30): 所有显式 `while*` 对象统一为完整视觉通道声明，仅继承默认时序 / 动力学参数；generic `whileAppear` 默认仅渐显。
 
 - v1.0.0 (2026-05-06): OSS / PRO 切割线重构，OSS Frame 接入自包含状态机、动效执行、FLIP、Scale Observer、Perception 与 stateContent。
+
+## Site 文档同步
+
+官网 Frame 与 FramePro 指南正文均维护于共享 API 权威 [FramePro.md](../../../pro/src/components/FramePro.md) 的 Site guide 标记区。修改本文件的 OSS / PRO 边界时，同任务核对两个指南；同步流程见 [DocGuidelines §1.3](../../../specs/DocGuidelines.md#13-严格同步)。
