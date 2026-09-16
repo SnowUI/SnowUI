@@ -31,6 +31,7 @@
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
         variant?: LinkVariant;
+        color?: SnowUIColor | string;
         href?: string;
         target?: string;
         rel?: string;
@@ -47,6 +48,7 @@
 
     let {
         variant = "default",
+        color = "Black40",
         href = undefined,
         target = undefined,
         rel = undefined,
@@ -182,11 +184,14 @@
     });
 
     const internalStyle = $derived.by(() => {
-        if (hoverColor === undefined) return "";
-        if (hoverColor === false) {
-            return "--snowui-link-hover-color: var(--snowui-link-color);";
-        }
-        return `--snowui-link-hover-color: ${resolveSnowUIColor(hoverColor)};`;
+        const baseColor = resolveSnowUIColor(color);
+        // Black / Black100 与标准 Token 写法共享反向悬停规则。
+        const isBlack100 = baseColor.replace(/\s/g, "") === "var(--black-100)";
+        const automaticHover = isBlack100 ? "var(--black-40)" : "var(--black-100)";
+        const resolvedHover = hoverColor === false
+            ? "var(--snowui-link-color-override, var(--snowui-link-color))"
+            : hoverColor === undefined ? automaticHover : resolveSnowUIColor(hoverColor);
+        return `--snowui-link-color: ${baseColor}; --snowui-link-hover-color: ${resolvedHover};`;
     });
 
     const linkStyle = $derived(
@@ -302,12 +307,8 @@
         --snowui-link-line-height: var(--leading-14);
         --snowui-link-gap: calc(var(--gap-1) / 2);
         --snowui-link-icon-size: var(--size-3);
-        --snowui-link-color: var(--secondary-indigo, #adadfbff);
-        --snowui-link-hover-color: color-mix(
-            in srgb,
-            var(--secondary-indigo, #adadfbff),
-            var(--black-80, #000000cc)
-        );
+        --snowui-link-color: var(--black-40, #00000066);
+        --snowui-link-hover-color: var(--black-100, #000000ff);
         --snowui-link-decoration-opacity: var(--snowui-state-opacity, 0.4);
         --snowui-link-decoration-hover-opacity: var(--snowui-state-opacity, 1);
 
@@ -332,12 +333,6 @@
 
     :global(:where(.snowui-link)[data-auto-layout]) {
         gap: var(--snowui-link-gap-override, var(--snowui-link-gap));
-    }
-
-    :global(:where(.snowui-link).snowui-link-arrow),
-    :global(:where(.snowui-link).snowui-link-external) {
-        --snowui-link-color: var(--black-100, #000000ff);
-        --snowui-link-hover-color: var(--secondary-indigo, #adadfbff);
     }
 
     :global(:where(.snowui-link):hover:not(.snowui-disabled)),

@@ -8,7 +8,7 @@
 - `parts.Tooltip`：配置单行截断时的内置 Tooltip。
 - 自定义提示结构时使用外置 Tooltip 组合；显式 Props 高于 part。
 
-> **版本**: v1.2.3
+> **版本**: v1.3.0
 > **变更记录 (2026-08-15)**: Link 根节点显式移除原生下划线，不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；`underline` 仍由组件公开 Prop 控制。
 > **职责**: 提供正文、说明与导航中的文字链接样式。
 > **设计稿**: [Workshop / Link](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12417-11133&t=GYb3gHf9U5Ff6hcQ-4)
@@ -17,9 +17,9 @@ Link 是独立的 OSS 文字链接组件。按钮外观但点击后跳转的场�
 
 ## 功能概览
 
-- `default`：沿用原 Button Link 的 Indigo 默认色与 hover 混色。
-- `arrow`：Figma 样式 2。黑色文字 + 内置 `ArrowUpRight` trailing Icon；文字 hover 进入 Indigo，装饰箭头使用 `currentColor × opacity: 0.4 -> 1`。
-- `external`：Figma 样式 3。黑色文字 + 内置 `ArrowSquareOut` trailing Icon；文字 hover 进入 Indigo，Icon 使用 `currentColor × opacity: 0.4 -> 1`。
+- 所有变体默认 `color="Black40"`，hover 变为 Black100；`color="Black100"` / `"Black"` 反向变为 Black40；Indigo 等其他颜色 hover 变为 Black100。
+- `arrow`：Figma 样式 2。默认颜色文字 + 内置 `ArrowUpRight` trailing Icon；文字 hover 遵守统一颜色规则，装饰箭头使用 `currentColor × opacity: 0.4 -> 1`。
+- `external`：Figma 样式 3。默认颜色文字 + 内置 `ArrowSquareOut` trailing Icon；文字 hover 遵守统一颜色规则，Icon 使用 `currentColor × opacity: 0.4 -> 1`。
 - `hoverColor`：可传入任意 CSS 颜色；传 `false` 时 hover 不变色。
 - `underline`：支持常态下划线、仅 hover 下划线与不显示下划线。默认不显示。
 - `lines={1}`：启用单行截断；仅在真实溢出时自动显示 Tooltip，完整链接文字来自共享 `TruncationController`。
@@ -32,11 +32,12 @@ Link 是独立的 OSS 文字链接组件。按钮外观但点击后跳转的场�
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | variant | `"default" \| "arrow" \| "external"` | `"default"` | 链接视觉变体 |
+| color | `SnowUIColor \| string` | `"Black40"` | 常态颜色；Black100 / Black（或 `var(--black-100)`）自动 hover 为 Black40，其他颜色自动 hover 为 Black100。 |
 | href | `string` | - | 链接地址 |
 | target | `string` | - | 链接打开方式 |
 | rel | `string` | - | 链接关系 |
 | disabled | `boolean` | `false` | 禁用状态；禁用后不响应 hover |
-| hoverColor | `string \| false` | - | hover 文字颜色。未传时使用各 variant 默认 hover 色；`false` 表示 hover 不变色。trailing 装饰仍按规范执行 `opacity: 0.4 -> 1` |
+| hoverColor | `string \| false` | - | hover 文字颜色。未传时使用 color 对应的自动 hover 色；`false` 表示 hover 不变色。trailing 装饰仍按规范执行 `opacity: 0.4 -> 1` |
 | underline | `"none" \| "always" \| "hover"` | `"none"` | 下划线显示策略。下划线只覆盖 Link 文字，不覆盖 trailing 装饰或 Icon |
 | lines | `false \| 1` | `false` | 单行截断开关；启用后文字超出 Link 可用宽度时显示省略号 |
 | tooltip | `boolean \| string \| Snippet \| Record<string, any>` | - | 截断 Tooltip。默认仅在真实截断时显示完整文字；`false` 关闭；字符串 / Snippet 自定义内容；对象透传 Tooltip 配置 |
@@ -97,13 +98,13 @@ Link 复用 OSS 通用 `TruncationController` 与 `fitTextToElement()`，不自�
 <Link href="/docs" hoverColor={false}>hover 不变色</Link>
 ```
 
-未传 `hoverColor` 时：
+未传 `hoverColor` 时，颜色由 `color` 决定，与 variant 无关。主题切换时 Black40 / Black100 跟随主题。原有 CSS 颜色 override 仍作为直接样式逃生口；需要自动 hover 规则时使用 `color`，显式 `hoverColor` 高于自动结果：
 
-| variant | 默认颜色 | 默认 hover 颜色 |
+| 配置 | 常态颜色 | 默认 hover 颜色 |
 | :--- | :--- | :--- |
-| `default` | `var(--secondary-indigo)` | `color-mix(in srgb, var(--secondary-indigo), var(--black-80))` |
-| `arrow` | `var(--black-100)` | `var(--secondary-indigo)` |
-| `external` | `var(--black-100)` | `var(--secondary-indigo)` |
+| 任意 variant，默认 color | `var(--black-40)` | `var(--black-100)` |
+| 任意 variant，color="Black100" / "Black" | `var(--black-100)` | `var(--black-40)` |
+| 任意 variant，color="Indigo" 等其他颜色 | 对应 Token / CSS 颜色 | `var(--black-100)` |
 
 `arrow` 的默认 Icon、`external` 的默认 Icon 与外置 trailing Icon 均继承文字颜色，不单独切换颜色源。它们按照无底色轻量 Icon 规范使用 `opacity: 0.4 -> 1` 表达 hover 活跃度。
 
@@ -114,8 +115,8 @@ Link 复用 OSS 通用 `TruncationController` 与 `fitTextToElement()`，不自�
 | `--snowui-link-font-size` | `var(--text-14)` | 文字字号 |
 | `--snowui-link-line-height` | `var(--leading-14)` | 文字行高 |
 | `--snowui-link-gap` | `calc(var(--gap-1) / 2)` | 内部内容与 leading / trailing 的间距，默认 2px |
-| `--snowui-link-color` | variant | 默认文字颜色 |
-| `--snowui-link-hover-color` | variant / `hoverColor` | hover 文字颜色；trailing 箭头 / Icon 继承该颜色 |
+| `--snowui-link-color` | color（默认 Black40） | 默认文字颜色 |
+| `--snowui-link-hover-color` | color 自动规则 / `hoverColor` | hover 文字颜色；trailing 箭头 / Icon 继承该颜色 |
 | `--snowui-link-icon-size` | `var(--size-3)` | 内置 `ArrowUpRight` / `ArrowSquareOut` 尺寸，默认 12px；不覆盖外置 Icon |
 | `--snowui-link-decoration-opacity` | `var(--snowui-state-opacity, 0.4)` | trailing 箭头 / Icon 常态透明度 |
 | `--snowui-link-decoration-hover-opacity` | `var(--snowui-state-opacity, 1)` | trailing 箭头 / Icon hover 透明度 |
@@ -143,6 +144,11 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 - **迁移**：原 `<Button variant="link">` 已移除；按钮式跳转继续使用 `<Button href>`。
 
 ## 更新日志 (Changelog)
+
+### v1.3.0 (2026-09-16)
+
+- 新增 color；所有变体默认 Black40 → Black100，Black100 → Black40，其余常态颜色 → Black100。保留 hoverColor 的显式覆盖与 false，以及其他现有 Props。
+- hoverColor=false 保留通过颜色 override 设置的常态颜色。
 
 ### v1.2.3 (2026-08-15)
 

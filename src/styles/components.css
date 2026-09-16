@@ -80,7 +80,7 @@
     /* --snowui-link-font-size-override: ; */   /* font-size（默认 var(--text-14) = 14px） */
     /* --snowui-link-line-height-override: ; */ /* line-height（默认 var(--leading-14) = 20px） */
     /* --snowui-link-gap-override: ; */         /* 内部内容与 leading / trailing 间距（默认 calc(var(--gap-1) / 2) = 2px） */
-    /* --snowui-link-color-override: ; */       /* 常态颜色（默认由 variant 决定） */
+    /* --snowui-link-color-override: ; */       /* 常态颜色（默认 Black40；自动 hover 规则使用 Link color Prop） */
     /* --snowui-link-icon-size-override: ; */   /* 内置 ArrowUpRight / ArrowSquareOut 尺寸（默认 var(--size-3) = 12px；不覆盖外置 Icon） */
     /* --snowui-link-decoration-opacity-override: ; */       /* trailing 箭头 / Icon 常态透明度（默认 0.4） */
     /* --snowui-link-decoration-hover-opacity-override: ; */ /* trailing 箭头 / Icon hover 透明度（默认 1） */

@@ -7,6 +7,19 @@
  */
 export const examples = [
     {
+        name: "L-Colors: 常态与悬停颜色",
+        code: `L-Colors
+<div style="display:flex;gap:16px;flex-wrap:wrap;">
+<Link href="#">Default</Link>
+<Link href="#" color="Black100">Black100</Link>
+<Link href="#" color="Indigo">Indigo</Link>
+<Link href="#" color="Orange">Orange</Link>
+<Link href="#" color="Indigo" hoverColor={false}>Unchanged</Link>
+<Link href="#" color="Black100" hoverColor="Orange">Explicit hover</Link>
+</div>`,
+        expected: { interaction: "默认 Black40 → Black100；Black100 → Black40；其他颜色 → Black100；显式 hoverColor 或 false 优先。" },
+    },
+    {
         name: "L-01: 默认样式与 Figma 变体",
         code: `L-01
 <div class="flex-col gap-8">
@@ -15,7 +28,7 @@ export const examples = [
     <Link href="#" variant="external">样式 3</Link>
 </div>`,
         expected: {
-            render: "默认样式沿用 Indigo Link；arrow 显示 12px ArrowUpRight；external 显示 12px ArrowSquareOut",
+            render: "所有变体默认 Black40，hover Black100；arrow 显示 12px ArrowUpRight；external 显示 12px ArrowSquareOut",
             interaction: "hover 时默认 Link 进入深色混色，arrow / external 文字进入 Indigo；trailing 箭头 / Icon 继承文字颜色并由 opacity 0.4 提升到 1",
         },
         logic: ["LINK-Init.1", "LINK-Variant.1"],
