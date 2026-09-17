@@ -10,7 +10,7 @@
 - `parts.MenuItem`：统一配置 pageSize 选项。
 - 具体结构差异继续通过现有 `as` 模板/外置选择器协议完成；外置显式 Props 高于 part。
 
-> **版本**: v1.5.0
+> **版本**: v1.6.0
 > **职责**: 提供页码导航容器。
 > **设计稿**: [Workshop / Pagination](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12078-21567&t=nY2VC3oisn12OH01-4)
 
@@ -22,13 +22,14 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 
 - 默认内置模式：当前页使用 gray Button，普通页、上一页、下一页使用 outline Button。
 - pageSize 默认位于左侧并保持 Hug；分页按钮组位于右侧，默认与 pageSize 间隔 16px。
-- current、page、prev、next 默认等宽 Fill；省略符与 pageSize 保持 Hug。
+- 完整页码可容纳时，current、page、prev、next 默认等宽 Fill；进入省略模式后全部按钮保持 Hug。
 - 显式组合模式：子级 Button 定义角色样式，不代表每一页数据。
-- 根据 `page` / `total` 自动生成页码和 `...`。
+- 根据 `page` / `total` 与实际容器宽度自动决定展示完整页码或 `...`；省略策略没有手动窗口参数。
 - 缺少 `prev` / `next` 模板时使用内置默认箭头。
 - 当前页、边界 prev / next、整体 disabled、单页 disabled 都由 Pagination 管理可点击性。
 - Pagination 不控制使用方 Button 模板的 variant / size / hover 颜色 / border / background；作为复合导航控件，只将 item 的 Button hover 放大默认关闭，模板可用 `scaleOnHover={true}` 覆盖。
 - Pagination 支持 `auto`、`hug`、`fill` 三种明确宽度模式。
+- 默认 `responsive="auto"`：优先展示完整页码；空间不足时自动生成 `...`，再依次隐藏 pageSize、`...` 和当前页；上一页与下一页始终保留。
 - 传入 `pageSizeOptions` 并声明 `Button as="pageSize"` 时，显示每页条数选择器。
 - `pageSize` 模板在 children 中的声明顺序决定选择器位于页码左侧或右侧。
 - Pagination 只提供成组的 `variant` 搭配；单个角色的 size、color、hover、border 等视觉仍通过 Button 模板配置。
@@ -44,13 +45,12 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 | :--- | :--- | :--- | :--- |
 | page | `number` | `1` | 当前页，从 1 开始 |
 | total | `number` | `1` | 总页数 |
-| siblingCount | `number` | `1` | 当前页两侧保留页码数量 |
-| boundaryCount | `number` | `1` | 首尾边界保留页码数量 |
 | disabled | `boolean` | `false` | 禁用整个 Pagination |
 | disabledPages | `number[]` | `[]` | 禁用指定页码 |
 | ariaLabel | `string` | `"Pagination"` | 根导航区域的无障碍标签 |
 | variant | `"outline" \| "gray" \| "borderless"` | `"outline"` | 普通页与前后页的按钮样式；当前页使用对应的强调搭配 |
-| widthMode | `"auto" \| "hug" \| "fill"` | `"fill"` | `auto` 按容器空间判断；`hug` 保持内容宽度；`fill` 让所有按钮等宽填充，省略符保持 Hug |
+| responsive | `"auto" \| "none"` | `"auto"` | `auto` 根据容器宽度自动选择完整页码、省略页码与最小前后页；`none` 保持静态页码窗口与原有换行行为 |
+| widthMode | `"auto" \| "hug" \| "fill"` | `"fill"` | 完整页码可容纳时，`auto` 按剩余空间判断、`hug` 保持内容宽度、`fill` 等宽填充；省略状态统一保持 Hug |
 | gap | `string \| number` | `4px` | 页码、prev、next 之间的间距；数字按 px 处理 |
 | pageSize | `number`（bindable） | `20` | 当前每页条数；选择后组件自行更新绑定值，仅在 `pageSizeOptions` 非空时显示选择器 |
 | pageSizeOptions | `number[]` | `[]` | 可选的每页条数；非正数会被忽略，重复项会被去重 |
@@ -113,6 +113,24 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 ```
 
 显式提供的 `current`、`page`、`prev` 或 `next` Button 模板仍以模板自己的 `variant` 为准，适合需要脱离内置搭配的场景。
+
+### 响应式收缩
+
+`responsive="auto"` 默认启用类似 OverflowActions 的内容测量策略。Fill 模式读取 Pagination 自身宽度；Auto / Hug 模式读取父容器的真实可用宽度，多列 Grid 只采用 Pagination 所在轨道的宽度，横向 Flex 则扣除同级内容与 Gap。因此收缩后仍能随外层连续扩宽逐级恢复，且不会借用相邻标题或控件的空间。该策略不依赖视口断点，并按以下顺序逐级收缩：
+
+1. **完整页码**：先尝试展示从 `1` 到 `total` 的所有页码。页数少且空间充足时，`fill` / `auto` 可让按钮等宽占满；按钮先收缩到自身内容宽度下限，不改变 size、padding、字号或点击高度。
+2. **前后页内容**：若 `prev` / `next` 模板同时包含 Icon 与普通文字或 Text，空间不足时先隐藏文字并切换到 icon-only padding；`aria-label` 保持“上一页”或“下一页”。
+3. **自动省略**：完整页码仍放不下时，组件自动显示首尾、当前页附近页码与不可交互的 `...`，并让所有按钮保持 Hug。页码窗口不是公开配置项。
+4. **上下文省略**：继续变窄时缩为“左侧 `...` + 当前页 + 右侧 `...`”；当前页在首尾时只保留存在方向的 `...`。
+5. **隐藏 pageSize**：若有每页条数选择器，下一阶段先隐藏它，把可用宽度交给分页导航。
+6. **隐藏省略符**：再窄时移除两侧 `...`，只保留当前页与前后页。
+7. **最小导航**：最后隐藏当前页，只留下上一页和下一页。两者在所有阶段都存在；容器窄于其物理最小宽度时允许自然溢出。
+
+pageSize Listbox 打开期间冻结当前响应阶段，避免浮层锚点在操作中被重建；浮层关闭后再按最新宽度刷新。宽度恢复时，以上阶段按相反顺序恢复。尺寸监听统一复用共享 `resizeManager`；`responsive="none"` 可关闭动态压缩，并保留静态窗口和传统换行。
+
+```svelte
+<Pagination page={11} total={24} responsive="auto" widthMode="fill" />
+```
 
 ### 每页条数选择
 
@@ -298,14 +316,16 @@ Pagination 只复制模板的外观属性并替换页码文本；点击和可用
 ## 行为规则
 
 1. `total <= 可完整展示数量` 时展示全部页码，不插入 `...`。
-2. 长页数自动保留首尾 `boundaryCount` 个页码、当前页附近 `siblingCount` 个页码，并在断点处插入 `...`。
+2. 完整页码不适合容器时，组件自动保留首尾页、当前页附近页码，并在断点处插入 `...`。
 3. 当前页输出 `aria-current="page"`、`data-current="page"`、`aria-disabled="true"`，不可点击。
 4. `page <= 1` 时 prev 不可点击。
 5. `page >= total` 时 next 不可点击。
 6. `disabledPages` 中的页码不可点击，指向禁用页的 prev / next 也不可点击。
 7. `disabled={true}` 时所有生成项不可点击。
 8. 省略符不可点击，不进入焦点序列。
-9. `widthMode="fill"` 只拉伸 `.snowui-pagination-item`；省略符始终保持 Hug。
+9. `widthMode="fill"` 只在完整页码可容纳时拉伸 `.snowui-pagination-item`；省略模式全部内容保持 Hug。
+10. `responsive="auto"` 时分页控件行不换行，并按容器实测宽度选择页码窗口；`prev`、`next` 永不隐藏。
+11. pageSize 在窄宽度下先于省略符和当前页隐藏；Listbox 打开时冻结当前阶段。
 
 页码窗口补偿规则：
 
@@ -364,11 +384,12 @@ Figma 对照：
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
 - 根容器是 `nav`。
-- 根使用 `inline-flex`，允许换行。
+- 根使用 `inline-flex` 与 `min-width: 0`，因此可在 Grid/Flex 子项中按父容器真实宽度收缩；自动响应模式中 pageSize 与分页控件保持同一行，并在空间不足时由组件隐藏 pageSize。
+- `responsive="auto"` 时分页控件内部保持单行，页码通过省略策略适配宽度；`none` 恢复传统内部换行。
 - 默认 gap 为 `4px`。
 - `widthMode="auto"`：Pagination 自身为 Hug 宽度时内部按钮 Hug；被固定宽度或拉伸时按钮自动等宽 Fill。
 - `widthMode="hug"`：根宽度为 fit-content，按钮和省略符均保持 Hug。
-- `widthMode="fill"`：根宽度为 100%，所有按钮等宽均分剩余空间，省略符保持 Hug。
+- `widthMode="fill"`：根宽度为 100%；完整页码可容纳时按钮等宽均分剩余空间，省略状态回到 Hug。
 - 无法稳定判断 auto 模式时，优先回退 Hug，避免在内容宽度容器里意外拉伸。
 
 结构模型：
@@ -456,6 +477,7 @@ Root Frame(nav)
 | A9 | 设计稿样式还原 |
 | A10 | 完全默认样式 |
 | A10-1 | 三种内置按钮样式搭配与显式模板优先级 |
+| A10-2 | 容器变窄时的按钮收缩、前后页文字隐藏、页码省略与最小导航集合 |
 | A11 | 显式 Fill，省略符 Hug |
 | A12 | 显式 Hug |
 | A13 | pageSize 模板置于最右侧、Listbox 选择与 Fill 剩余宽度布局 |
@@ -477,6 +499,13 @@ Root Frame(nav)
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.6.0 (2026-09-17)
+
+- 新增默认 `responsive="auto"` 容器宽度策略：优先展示全部页码；空间不足时压缩前后页文字并自动生成省略窗口，不提供手动页码窗口参数。
+- 省略状态按钮保持 Hug；继续变窄时依次隐藏 pageSize、省略符和当前页，上一页与下一页始终存在。
+- pageSize Listbox 打开时冻结当前响应阶段，关闭后再按最新容器宽度刷新，避免操作中的浮层锚点重建。
+- 新增 `responsive="none"` 静态回退；尺寸测量复用共享 `resizeManager`。
 
 ### v1.5.0 (2026-09-17)
 

@@ -1,6 +1,6 @@
 <!--
   Pagination 组件：页码导航容器
-  v1.5.0
+  v1.6.0
 
   职责：
   - 读取直系 Button 作为 current / page / prev / next 角色样式模板。
@@ -11,16 +11,13 @@
 -->
 
 <script lang="ts">
-    import { setContext, tick, type Snippet } from "svelte";
+    import { onDestroy, setContext, tick, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
     import Listbox from "./Listbox.svelte";
     import MenuItem from "./MenuItem.svelte";
-    import {
-        type ListboxOptionRegistration,
-        type ListboxOwnerContext,
-    } from "../context";
+    import { type ListboxOptionRegistration, type ListboxOwnerContext } from "../context";
     import { BUTTON_COLLECTION_CONTEXT_KEY, LISTBOX_OWNER_CONTEXT_KEY } from "../keys";
     import { resizeManager } from "../logic/observer.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
@@ -30,17 +27,18 @@
     type PaginationLayoutToken = "pages" | "prev" | "next" | "pageSize";
     export type PaginationWidthMode = "auto" | "hug" | "fill";
     export type PaginationVariant = "outline" | "gray" | "borderless";
+    export type PaginationResponsive = "auto" | "none";
 
     interface Props extends Omit<FrameProps, "children" | "gap"> {
         page?: number;
         total?: number;
-        siblingCount?: number;
-        boundaryCount?: number;
         disabled?: boolean;
         disabledPages?: number[];
         ariaLabel?: string;
         /** 普通页按钮样式；当前页自动映射为 outline→gray、gray→filled、borderless→gray。 */
         variant?: PaginationVariant;
+        /** 根据容器宽度自动在完整页码、省略页码与最小前后页之间切换。 */
+        responsive?: PaginationResponsive;
         widthMode?: PaginationWidthMode;
         gap?: string | number;
         pageSize?: number;
@@ -61,12 +59,11 @@
     let {
         page = 1,
         total = 1,
-        siblingCount = 1,
-        boundaryCount = 1,
         disabled = false,
         disabledPages = [],
         ariaLabel = "Pagination",
         variant = "outline",
+        responsive = "auto",
         widthMode = "fill",
         gap = undefined,
         pageSize = $bindable(20),
@@ -94,10 +91,14 @@
     let pageSizeIconTemplateEl = $state<HTMLElement | undefined>(undefined);
     let previousIconTemplateEl = $state<HTMLElement | undefined>(undefined);
     let nextIconTemplateEl = $state<HTMLElement | undefined>(undefined);
+    let controlsEl: HTMLElement | undefined;
     let pageSizeTriggerEl = $state<HTMLElement | undefined>(undefined);
     let pageSizeOpen = $state(false);
+    let previousPageSizeOpen = false;
     let pageSizeActiveIndex = $state(-1);
     let registeredPageSizeOptions = $state<ListboxOptionRegistration[]>([]);
+    let layoutFrame = 0;
+    let observedRootWidth: number | undefined;
     const pageSizeUid = Math.random().toString(36).slice(2, 9);
     const pageSizeListboxId = `snowui-pagination-page-size-listbox-${pageSizeUid}`;
     const pageSizeTriggerId = `snowui-pagination-page-size-trigger-${pageSizeUid}`;
@@ -105,12 +106,6 @@
     const resolvedTotal = $derived(Math.max(1, Math.floor(Number(total) || 1)));
     const resolvedPage = $derived(
         Math.min(Math.max(1, Math.floor(Number(page) || 1)), resolvedTotal),
-    );
-    const resolvedSiblingCount = $derived(
-        Math.max(0, Math.floor(Number(siblingCount) || 0)),
-    );
-    const resolvedBoundaryCount = $derived(
-        Math.max(1, Math.floor(Number(boundaryCount) || 1)),
     );
     const disabledPageSet = $derived.by(
         () =>
@@ -129,32 +124,40 @@
                     .filter((option) => option > 0),
             ),
         );
-        return options.includes(resolvedPageSize)
-            ? options
-            : [resolvedPageSize, ...options];
+        return options.includes(resolvedPageSize) ? options : [resolvedPageSize, ...options];
     });
-    const showPageSize = $derived(
-        Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0,
-    );
+    const showPageSize = $derived(Array.isArray(pageSizeOptions) && pageSizeOptions.length > 0);
     const resolvedGap = $derived(resolveGapValue(gap));
-    const resolvedPageSizeGap = $derived(
-        resolveGapValue(pageSizeGap),
-    );
-    const resolvedCurrentVariant = $derived(
-        variant === "gray" ? "filled" : "gray",
-    );
+    const resolvedPageSizeGap = $derived(resolveGapValue(pageSizeGap));
+    const resolvedCurrentVariant = $derived(variant === "gray" ? "filled" : "gray");
 
     const pageSizeOwnerContext: ListboxOwnerContext = {
-        get open() { return pageSizeOpen; },
-        get selectedValue() { return String(resolvedPageSize); },
-        get activeIndex() { return pageSizeActiveIndex; },
-        get triggerEl() { return pageSizeTriggerEl ?? null; },
-        get anchorEl() { return pageSizeEl ?? pageSizeTriggerEl ?? null; },
+        get open() {
+            return pageSizeOpen;
+        },
+        get selectedValue() {
+            return String(resolvedPageSize);
+        },
+        get activeIndex() {
+            return pageSizeActiveIndex;
+        },
+        get triggerEl() {
+            return pageSizeTriggerEl ?? null;
+        },
+        get anchorEl() {
+            return pageSizeEl ?? pageSizeTriggerEl ?? null;
+        },
         listboxId: pageSizeListboxId,
         triggerId: pageSizeTriggerId,
-        get options() { return registeredPageSizeOptions; },
-        get filterText() { return ""; },
-        get customOptions() { return []; },
+        get options() {
+            return registeredPageSizeOptions;
+        },
+        get filterText() {
+            return "";
+        },
+        get customOptions() {
+            return [];
+        },
         registerOption(option) {
             if (registeredPageSizeOptions.some((item) => item.value === option.value)) return;
             registeredPageSizeOptions = [...registeredPageSizeOptions, option];
@@ -206,25 +209,17 @@
         return Array.from({ length: end - start + 1 }, (_, index) => start + index);
     }
 
-    function getPageTokens(): PageToken[] {
+    function getPageTokens(sibling = 1, boundary = 1): PageToken[] {
         const totalPages = resolvedTotal;
         const currentPage = resolvedPage;
-        const sibling = resolvedSiblingCount;
-        const boundary = resolvedBoundaryCount;
         const fullCount = boundary * 2 + sibling * 2 + 3;
 
         if (totalPages <= fullCount) {
             return range(1, totalPages);
         }
 
-        const startWindowEnd = Math.min(
-            totalPages,
-            boundary + sibling * 2 + 1,
-        );
-        const endWindowStart = Math.max(
-            1,
-            totalPages - boundary - sibling * 2,
-        );
+        const startWindowEnd = Math.min(totalPages, boundary + sibling * 2 + 1);
+        const endWindowStart = Math.max(1, totalPages - boundary - sibling * 2);
 
         if (currentPage <= boundary + sibling + 1) {
             return [...range(1, startWindowEnd), "ellipsis", totalPages];
@@ -241,6 +236,27 @@
             "ellipsis",
             ...range(totalPages - boundary + 1, totalPages),
         ];
+    }
+
+    function getCollapsedPageTokenCandidates(): PageToken[][] {
+        const candidates: PageToken[][] = [];
+        const seen = new Set<string>();
+        const add = (tokens: PageToken[]) => {
+            const key = tokens.join(",");
+            if (seen.has(key)) return;
+            seen.add(key);
+            candidates.push(tokens);
+        };
+
+        add(getPageTokens(1, 1));
+        add(getPageTokens(0, 1));
+
+        const contextual: PageToken[] = [];
+        if (resolvedPage > 1) contextual.push("ellipsis");
+        contextual.push(resolvedPage);
+        if (resolvedPage < resolvedTotal) contextual.push("ellipsis");
+        add(contextual);
+        return candidates;
     }
 
     function getTemplate(role: PaginationRole) {
@@ -269,9 +285,10 @@
 
     function appendDefaultControlIcon(node: HTMLElement, role: "prev" | "next") {
         if (hasTemplateContent(node)) return;
-        const iconTemplate = role === "prev"
-            ? previousIconTemplateEl?.firstElementChild
-            : nextIconTemplateEl?.firstElementChild;
+        const iconTemplate =
+            role === "prev"
+                ? previousIconTemplateEl?.firstElementChild
+                : nextIconTemplateEl?.firstElementChild;
         if (iconTemplate) node.append(iconTemplate.cloneNode(true));
         else node.textContent = "▧";
     }
@@ -288,9 +305,10 @@
 
         if (role === "prev" || role === "next") {
             button.setAttribute("aria-label", role === "prev" ? "上一页" : "下一页");
-            const iconTemplate = role === "prev"
-                ? previousIconTemplateEl?.firstElementChild
-                : nextIconTemplateEl?.firstElementChild;
+            const iconTemplate =
+                role === "prev"
+                    ? previousIconTemplateEl?.firstElementChild
+                    : nextIconTemplateEl?.firstElementChild;
             if (iconTemplate) button.append(iconTemplate.cloneNode(true));
             else button.textContent = "▧";
         } else {
@@ -313,8 +331,7 @@
         const isCurrent = token === resolvedPage;
         const role: PaginationRole = isCurrent ? "current" : "page";
         const button =
-            cloneTemplate(role, String(token)) ??
-            createDefaultButton(role, String(token));
+            cloneTemplate(role, String(token)) ?? createDefaultButton(role, String(token));
         button.dataset.page = String(token);
         button.dataset.as = role;
         button.classList.add("snowui-pagination-item", "snowui-rounded-rectangle");
@@ -342,8 +359,7 @@
             (role === "next" && resolvedPage >= resolvedTotal) ||
             disabledPageSet.has(target);
         const control =
-            cloneTemplate(role) ??
-            createDefaultButton(role, role === "prev" ? "上一页" : "下一页");
+            cloneTemplate(role) ?? createDefaultButton(role, role === "prev" ? "上一页" : "下一页");
 
         control.dataset.as = role;
         control.classList.add("snowui-pagination-item", "snowui-rounded-rectangle");
@@ -357,6 +373,40 @@
             bindClick(control, target);
         }
         return control;
+    }
+
+    function compactControl(control: HTMLElement) {
+        const graphicSelector = "svg, img, .snowui-icon, .snowui-icon-wrapper";
+        const hasGraphic = !!control.querySelector(graphicSelector);
+        const directTextNodes = Array.from(control.childNodes).filter(
+            (node): node is Text => node.nodeType === Node.TEXT_NODE && !!node.textContent?.trim(),
+        );
+        const fallbackTextElements = Array.from(control.children).filter(
+            (element): element is HTMLElement =>
+                element instanceof HTMLElement &&
+                !element.matches(".snowui-text") &&
+                !element.matches(graphicSelector) &&
+                !element.querySelector(graphicSelector) &&
+                !!element.textContent?.trim(),
+        );
+        const hasText =
+            !!control.querySelector(".snowui-text")?.textContent?.trim() ||
+            directTextNodes.length > 0 ||
+            fallbackTextElements.length > 0;
+        if (!hasGraphic || !hasText) return;
+        for (const textNode of directTextNodes) {
+            const text = document.createElement("span");
+            text.className = "snowui-pagination-responsive-text";
+            text.textContent = textNode.textContent;
+            textNode.replaceWith(text);
+        }
+        for (const element of fallbackTextElements) {
+            element.classList.add("snowui-pagination-responsive-text");
+        }
+        control.setAttribute("data-composition-content", "hidden");
+        control.setAttribute("data-responsive-compact", "true");
+        control.setAttribute("data-icon-only", "true");
+        control.classList.add("snowui-button-icon-only");
     }
 
     function createPageSizeSelector() {
@@ -457,10 +507,7 @@
         let hasPages = false;
         for (const child of Array.from(templatesEl.children)) {
             if (!(child instanceof HTMLElement)) continue;
-            if (
-                children &&
-                child.dataset.paginationVariantFallback === "true"
-            ) continue;
+            if (children && child.dataset.paginationVariantFallback === "true") continue;
             const role = child.dataset.as as PaginationRole | undefined;
             if (role === "current" || role === "page") {
                 if (!hasPages) {
@@ -529,7 +576,12 @@
         });
     }
 
-    function renderPaginationItems() {
+    function renderPaginationItems(
+        pageTokens = getPageTokens(),
+        compactControls = false,
+        scheduleLayout = true,
+        includePageSize = showPageSize,
+    ) {
         if (!itemsEl) return;
         itemsEl.replaceChildren();
         const root = itemsEl.closest(".snowui-pagination");
@@ -537,27 +589,17 @@
             root instanceof HTMLElement
                 ? root.style.columnGap || root.style.gap || undefined
                 : undefined;
-        const controlsGap =
-            (!showPageSize ? inlineGap : undefined) ??
-            resolvedGap;
+        const controlsGap = (!includePageSize ? inlineGap : undefined) ?? resolvedGap;
         const effectivePageSizeGap =
-            (showPageSize ? inlineGap : undefined) ??
-            resolvedPageSizeGap ??
-            resolvedGap;
+            (includePageSize ? inlineGap : undefined) ?? resolvedPageSizeGap ?? resolvedGap;
 
         if (controlsGap) {
-            itemsEl.style.setProperty(
-                "--snowui-pagination-controls-gap",
-                controlsGap,
-            );
+            itemsEl.style.setProperty("--snowui-pagination-controls-gap", controlsGap);
         } else {
             itemsEl.style.removeProperty("--snowui-pagination-controls-gap");
         }
         if (effectivePageSizeGap) {
-            itemsEl.style.setProperty(
-                "--snowui-pagination-page-size-gap",
-                effectivePageSizeGap,
-            );
+            itemsEl.style.setProperty("--snowui-pagination-page-size-gap", effectivePageSizeGap);
         } else {
             itemsEl.style.removeProperty("--snowui-pagination-page-size-gap");
         }
@@ -568,16 +610,15 @@
         const layoutTokens = getLayoutTokens();
         const controls = document.createElement("div");
         controls.className = "snowui-pagination-controls";
+        controlsEl = controls;
         const pageSizeBeforeControls =
             layoutTokens.indexOf("pageSize") < layoutTokens.indexOf("pages");
 
         for (const layoutToken of layoutTokens) {
             if (layoutToken === "pages") {
-                for (const token of getPageTokens()) {
+                for (const token of pageTokens) {
                     controls.append(
-                        token === "ellipsis"
-                            ? createEllipsis()
-                            : createPageButton(token),
+                        token === "ellipsis" ? createEllipsis() : createPageButton(token),
                     );
                 }
                 continue;
@@ -585,15 +626,230 @@
             if (layoutToken === "pageSize") {
                 continue;
             }
-            controls.append(createControl(layoutToken));
+            const control = createControl(layoutToken);
+            if (compactControls) compactControl(control);
+            controls.append(control);
         }
 
-        const selector = createPageSizeSelector();
+        const selector = includePageSize ? createPageSizeSelector() : undefined;
         if (selector && pageSizeBeforeControls) fragment.append(selector);
         fragment.append(controls);
         if (selector && !pageSizeBeforeControls) fragment.append(selector);
         itemsEl.append(fragment);
-        requestAnimationFrame(syncWidthMode);
+        if (scheduleLayout) requestLayout();
+    }
+
+    function requestLayout() {
+        if (layoutFrame) return;
+        layoutFrame = requestAnimationFrame(() => {
+            layoutFrame = 0;
+            updateResponsiveLayout();
+        });
+    }
+
+    function gridTrackTokens(template: string) {
+        let depth = 0;
+        const tokens: string[] = [];
+        let token = "";
+        let inTrack = false;
+        for (const character of template.trim()) {
+            if (character === "(") depth += 1;
+            if (character === ")") depth = Math.max(0, depth - 1);
+            if (/\s/.test(character) && depth === 0) {
+                if (inTrack) tokens.push(token);
+                token = "";
+                inTrack = false;
+            } else {
+                token += character;
+                inTrack = true;
+            }
+        }
+        if (inTrack) tokens.push(token);
+        return tokens;
+    }
+
+    function getResponsiveMeasureElement(root: HTMLElement) {
+        if (widthMode === "fill") return root;
+        const parent = root.parentElement;
+        if (!parent) return root;
+        const parentStyle = getComputedStyle(parent);
+        if (parentStyle.display.includes("grid")) {
+            return parent;
+        }
+        if (parentStyle.display.includes("flex")) {
+            return parent;
+        }
+        return parent;
+    }
+
+    function getGridAreaWidth(root: HTMLElement, parent: HTMLElement, style: CSSStyleDeclaration) {
+        const tracks = gridTrackTokens(style.gridTemplateColumns);
+        if (tracks.length <= 1) return getElementContentWidth(parent);
+        const widths = tracks.map((track) => Number.parseFloat(track));
+        if (widths.some((width) => !Number.isFinite(width))) return root.getBoundingClientRect().width;
+
+        const explicitColumn = Number.parseInt(getComputedStyle(root).gridColumnStart, 10);
+        const childIndex = Array.from(parent.children).indexOf(root);
+        const columnIndex = Number.isFinite(explicitColumn)
+            ? Math.min(tracks.length - 1, Math.max(0, explicitColumn - 1))
+            : Math.max(0, childIndex) % tracks.length;
+        return widths[columnIndex] ?? root.getBoundingClientRect().width;
+    }
+
+    function getFlexAreaWidth(root: HTMLElement, parent: HTMLElement, style: CSSStyleDeclaration) {
+        if (style.flexDirection.startsWith("column")) return getElementContentWidth(parent);
+        const siblings = Array.from(parent.children).filter(
+            (child): child is HTMLElement =>
+                child instanceof HTMLElement && child !== root && getComputedStyle(child).display !== "none",
+        );
+        const siblingsWidth = siblings.reduce(
+            (width, sibling) => width + sibling.getBoundingClientRect().width,
+            0,
+        );
+        const visibleItemCount = siblings.length + 1;
+        const gap = Number.parseFloat(style.columnGap) || 0;
+        return Math.max(
+            0,
+            getElementContentWidth(parent) - siblingsWidth - Math.max(0, visibleItemCount - 1) * gap,
+        );
+    }
+
+    function getElementContentWidth(element: HTMLElement) {
+        const style = getComputedStyle(element);
+        return Math.max(
+            0,
+            element.clientWidth -
+                (Number.parseFloat(style.paddingLeft) || 0) -
+                (Number.parseFloat(style.paddingRight) || 0),
+        );
+    }
+
+    function availableControlsWidth(controlsWidth: number) {
+        if (!itemsEl) return 0;
+        const root = itemsEl.closest(".snowui-pagination");
+        if (!(root instanceof HTMLElement)) return 0;
+        const measureElement = getResponsiveMeasureElement(root);
+        const measureStyle = getComputedStyle(measureElement);
+        const rootWidth =
+            measureElement === root
+                ? root.getBoundingClientRect().width
+                : measureElement === root.parentElement && measureStyle.display.includes("grid")
+                  ? getGridAreaWidth(root, measureElement, measureStyle)
+                  : measureElement === root.parentElement && measureStyle.display.includes("flex")
+                    ? getFlexAreaWidth(root, measureElement, measureStyle)
+                  : getElementContentWidth(measureElement);
+        const pageSizeWidth = pageSizeEl?.getBoundingClientRect().width ?? 0;
+        const gap =
+            pageSizeWidth > 0 ? Number.parseFloat(getComputedStyle(itemsEl).columnGap) || 0 : 0;
+        if (responsive === "auto" && pageSizeWidth > 0) {
+            return Math.max(0, rootWidth - pageSizeWidth - gap);
+        }
+        return pageSizeWidth > 0 && pageSizeWidth + gap + controlsWidth <= rootWidth + 0.5
+            ? Math.max(0, rootWidth - pageSizeWidth - gap)
+            : rootWidth;
+    }
+
+    function controlsFit() {
+        if (!controlsEl) return true;
+        const controlsWidth = controlsEl.scrollWidth;
+        return controlsWidth <= availableControlsWidth(controlsWidth) + 0.5;
+    }
+
+    function getAllPageTokensIfPotentiallyFits() {
+        if (!controlsEl) return undefined;
+        if (resolvedTotal === 1) return [1];
+
+        const children = Array.from(controlsEl.children).filter(
+            (child): child is HTMLElement => child instanceof HTMLElement,
+        );
+        const pageItems = children.filter((child) => child.dataset.page !== undefined);
+        const minimumPageWidth = Math.min(
+            ...pageItems.map((child) => child.getBoundingClientRect().width),
+        );
+        if (!Number.isFinite(minimumPageWidth) || minimumPageWidth <= 0) return undefined;
+
+        const controls = children.filter(
+            (child) => child.dataset.page === undefined && child.dataset.as !== "ellipsis",
+        );
+        const controlWidth = controls.reduce(
+            (sum, child) => sum + child.getBoundingClientRect().width,
+            0,
+        );
+        const gap = Number.parseFloat(getComputedStyle(controlsEl).columnGap) || 0;
+        const estimatedWidth =
+            resolvedTotal * minimumPageWidth +
+            controlWidth +
+            Math.max(0, resolvedTotal + controls.length - 1) * gap;
+        if (estimatedWidth > availableControlsWidth(estimatedWidth) + 0.5) return undefined;
+        return range(1, resolvedTotal);
+    }
+
+    function layoutName(tokens: PageToken[]) {
+        if (tokens.length === 0) return "controls";
+        if (tokens.some((token) => token === "ellipsis")) return "ellipsis";
+        if (tokens.length === resolvedTotal) return "all";
+        return "current";
+    }
+
+    function updateResponsiveLayout() {
+        if (!itemsEl) return;
+        const root = itemsEl.closest(".snowui-pagination");
+        if (!(root instanceof HTMLElement)) return;
+        if (pageSizeOpen) {
+            syncWidthMode();
+            return;
+        }
+
+        root.classList.remove("snowui-pagination-fill");
+        itemsEl.classList.remove("snowui-pagination-items-fill");
+
+        const candidates = getCollapsedPageTokenCandidates();
+        let selectedTokens = candidates[0] ?? [resolvedPage];
+        let compactControls = false;
+        let includePageSize = showPageSize;
+
+        renderPaginationItems(selectedTokens, false, false, includePageSize);
+        const allPageTokens = getAllPageTokensIfPotentiallyFits();
+        if (allPageTokens) {
+            selectedTokens = allPageTokens;
+            renderPaginationItems(selectedTokens, false, false, includePageSize);
+        }
+
+        if (responsive === "auto" && !controlsFit()) {
+            renderPaginationItems(selectedTokens, true, false, includePageSize);
+            compactControls = true;
+            if (!controlsFit()) {
+                for (const candidate of candidates) {
+                    selectedTokens = candidate;
+                    renderPaginationItems(selectedTokens, true, false, includePageSize);
+                    if (controlsFit()) break;
+                }
+            }
+            if (!controlsFit() && includePageSize) {
+                includePageSize = false;
+                for (const candidate of candidates) {
+                    selectedTokens = candidate;
+                    renderPaginationItems(selectedTokens, true, false, false);
+                    if (controlsFit()) break;
+                }
+            }
+            if (!controlsFit()) {
+                selectedTokens = [resolvedPage];
+                renderPaginationItems(selectedTokens, true, false, includePageSize);
+            }
+            if (!controlsFit()) {
+                selectedTokens = [];
+                renderPaginationItems(selectedTokens, true, false, includePageSize);
+            }
+        }
+
+        root.dataset.responsiveControls = compactControls ? "compact" : "full";
+        root.dataset.responsiveLayout = layoutName(selectedTokens);
+        root.dataset.responsivePages = String(
+            selectedTokens.filter((token) => typeof token === "number").length,
+        );
+        root.dataset.responsivePageSize = includePageSize ? "visible" : "hidden";
+        syncWidthMode();
     }
 
     function syncWidthMode() {
@@ -603,15 +859,17 @@
 
         root.classList.remove("snowui-pagination-fill");
         itemsEl.classList.remove("snowui-pagination-items-fill");
-        const pageSizeWidth = pageSizeEl?.getBoundingClientRect().width ?? 0;
-        const rootGap = pageSizeWidth > 0
-            ? Number.parseFloat(getComputedStyle(root).columnGap) || 0
-            : 0;
-        const shouldFill = widthMode === "fill"
-            ? true
-            : widthMode === "hug"
-              ? false
-              : root.getBoundingClientRect().width - pageSizeWidth - rootGap - itemsEl.scrollWidth > 1;
+        const controlsWidth = controlsEl?.scrollWidth ?? itemsEl.scrollWidth;
+        const availableWidth = availableControlsWidth(controlsWidth);
+        const showsAllPages =
+            controlsEl?.querySelectorAll(".snowui-pagination-current, .snowui-pagination-page")
+                .length === resolvedTotal && !controlsEl?.querySelector('[data-as="ellipsis"]');
+        const shouldFill =
+            widthMode === "fill"
+                ? showsAllPages
+                : widthMode === "hug"
+                  ? false
+                  : showsAllPages && availableWidth - controlsWidth > 1;
         root.classList.toggle("snowui-pagination-fill", shouldFill);
         itemsEl.classList.toggle("snowui-pagination-items-fill", shouldFill);
     }
@@ -619,8 +877,6 @@
     $effect(() => {
         resolvedPage;
         resolvedTotal;
-        resolvedSiblingCount;
-        resolvedBoundaryCount;
         disabled;
         disabledPageSet;
         onPageChange;
@@ -631,11 +887,29 @@
         showPageSize;
         resolvedGap;
         resolvedPageSizeGap;
+        responsive;
         userStyle;
+        if (!itemsEl || !templatesEl) return;
+        tick().then(() => renderPaginationItems());
+    });
+
+    $effect(() => {
         pageSizeOpen;
         pageSizeActiveIndex;
-        if (!itemsEl || !templatesEl) return;
-        tick().then(renderPaginationItems);
+        const shouldRefreshLayout = previousPageSizeOpen && !pageSizeOpen;
+        previousPageSizeOpen = pageSizeOpen;
+        if (!pageSizeTriggerEl) return;
+        pageSizeTriggerEl.setAttribute("aria-expanded", String(pageSizeOpen));
+        const activeOption = registeredPageSizeOptions[pageSizeActiveIndex];
+        if (pageSizeOpen && activeOption) {
+            pageSizeTriggerEl.setAttribute(
+                "aria-activedescendant",
+                `${pageSizeListboxId}-opt-${pageSizeActiveIndex}`,
+            );
+        } else {
+            pageSizeTriggerEl.removeAttribute("aria-activedescendant");
+        }
+        if (shouldRefreshLayout) requestLayout();
     });
 
     $effect(() => {
@@ -643,17 +917,30 @@
         showPageSize;
         resolvedPageSize;
         resolvedPageSizeOptions;
+        responsive;
         if (!itemsEl) return;
-        tick().then(syncWidthMode);
+        tick().then(requestLayout);
     });
 
     $effect(() => {
-        if (widthMode !== "auto") return;
+        if (responsive !== "auto" && widthMode !== "auto") return;
         if (!itemsEl) return;
         const root = itemsEl.closest(".snowui-pagination");
         if (!(root instanceof HTMLElement)) return;
-        const unwatch = resizeManager.watch(root, () => syncWidthMode());
+        const measureElement = getResponsiveMeasureElement(root);
+        observedRootWidth = getElementContentWidth(measureElement);
+        const unwatch = resizeManager.watch(measureElement, (entry) => {
+            const width = entry.contentRect.width;
+            if (observedRootWidth !== undefined && Math.abs(width - observedRootWidth) < 0.5)
+                return;
+            observedRootWidth = width;
+            requestLayout();
+        });
         return () => unwatch();
+    });
+
+    onDestroy(() => {
+        if (layoutFrame) cancelAnimationFrame(layoutFrame);
     });
 </script>
 
@@ -665,41 +952,68 @@
     enableAutoLayout={false}
     aria-label={ariaLabel}
     data-disabled={disabled ? "true" : undefined}
+    data-responsive={responsive}
     data-width-mode={widthMode}
-    class={["snowui-pagination", `snowui-pagination-width-${widthMode}`, showPageSize ? "snowui-pagination-has-page-size" : "", userClass].filter(Boolean).join(" ")}
+    class={[
+        "snowui-pagination",
+        `snowui-pagination-width-${widthMode}`,
+        showPageSize ? "snowui-pagination-has-page-size" : "",
+        userClass,
+    ]
+        .filter(Boolean)
+        .join(" ")}
     style={userStyle || undefined}
     renderHints={paginationRenderHints}
     componentParts={parts}
     {...rest}
 >
-    <div
-        class="snowui-pagination-templates"
-        bind:this={templatesEl}
-        aria-hidden="true"
-    >
+    <div class="snowui-pagination-templates" bind:this={templatesEl} aria-hidden="true">
         {#if children}
             {@render children()}
         {:else}
             <Button as="pageSize" variant="borderless" />
         {/if}
-        <Button as="current" variant={resolvedCurrentVariant} data-pagination-variant-fallback="true" />
-        <Button as="page" variant={variant} data-pagination-variant-fallback="true" />
-        <Button as="prev" variant={variant} iconOnly aria-label="上一页" data-pagination-variant-fallback="true">
+        <Button
+            as="current"
+            variant={resolvedCurrentVariant}
+            data-pagination-variant-fallback="true"
+        />
+        <Button as="page" {variant} data-pagination-variant-fallback="true" />
+        <Button
+            as="prev"
+            {variant}
+            iconOnly
+            aria-label="上一页"
+            data-pagination-variant-fallback="true"
+        >
             <ComponentIcon name="arrow-line-left" size="var(--size-4)" aria-hidden="true" />
         </Button>
-        <Button as="next" variant={variant} iconOnly aria-label="下一页" data-pagination-variant-fallback="true">
+        <Button
+            as="next"
+            {variant}
+            iconOnly
+            aria-label="下一页"
+            data-pagination-variant-fallback="true"
+        >
             <ComponentIcon name="arrow-line-right" size="var(--size-4)" aria-hidden="true" />
         </Button>
         <span bind:this={previousIconTemplateEl}>
-            <ComponentIcon name="arrow-line-left" class="snowui-pagination-default-icon" size="var(--size-4)" aria-hidden="true" />
+            <ComponentIcon
+                name="arrow-line-left"
+                class="snowui-pagination-default-icon"
+                size="var(--size-4)"
+                aria-hidden="true"
+            />
         </span>
         <span bind:this={nextIconTemplateEl}>
-            <ComponentIcon name="arrow-line-right" class="snowui-pagination-default-icon" size="var(--size-4)" aria-hidden="true" />
+            <ComponentIcon
+                name="arrow-line-right"
+                class="snowui-pagination-default-icon"
+                size="var(--size-4)"
+                aria-hidden="true"
+            />
         </span>
-        <span
-            class="snowui-pagination-page-size-icon-template"
-            bind:this={pageSizeIconTemplateEl}
-        >
+        <span class="snowui-pagination-page-size-icon-template" bind:this={pageSizeIconTemplateEl}>
             <ComponentIcon name="arrow-line-down" size="var(--size-4)" aria-hidden="true" />
         </span>
     </div>
@@ -707,11 +1021,7 @@
     {#if showPageSize}
         <Listbox matchTriggerWidth={false}>
             {#each resolvedPageSizeOptions as option (option)}
-                <MenuItem
-                    as="item"
-                    value={String(option)}
-                    showCheck={false}
-                />
+                <MenuItem as="item" value={String(option)} showCheck={false} />
             {/each}
         </Listbox>
     {/if}
@@ -722,6 +1032,7 @@
         display: inline-flex;
         flex-wrap: wrap;
         align-items: center;
+        min-width: 0;
         max-width: 100%;
         box-sizing: border-box;
         row-gap: var(
@@ -760,6 +1071,11 @@
         max-width: 100%;
     }
 
+    :global(:where(.snowui-pagination[data-responsive="auto"] .snowui-pagination-items)) {
+        flex-wrap: nowrap;
+        width: 100%;
+    }
+
     :global(:where(.snowui-pagination-controls)) {
         display: inline-flex;
         flex-wrap: wrap;
@@ -772,6 +1088,16 @@
             )
         );
         min-width: 0;
+    }
+
+    :global(:where(.snowui-pagination[data-responsive="auto"] .snowui-pagination-controls)) {
+        flex-wrap: nowrap;
+        max-width: 100%;
+        white-space: nowrap;
+    }
+
+    :global(:where(.snowui-pagination-responsive-text)) {
+        display: none;
     }
 
     :global(:where(.snowui-pagination-items-fill)) {
@@ -818,18 +1144,18 @@
             --snowui-pagination-icon-size-override,
             var(--snowui-pagination-icon-size, var(--size-4))
         );
-        flex: 0 0 var(
-            --snowui-pagination-icon-size-override,
-            var(--snowui-pagination-icon-size, var(--size-4))
-        );
+        flex: 0 0
+            var(
+                --snowui-pagination-icon-size-override,
+                var(--snowui-pagination-icon-size, var(--size-4))
+            );
         pointer-events: none;
         opacity: var(
             --snowui-pagination-idle-opacity-override,
             var(--snowui-pagination-idle-opacity, 0.4)
         );
-        transition:
-            opacity var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out);
+        transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
     }
 
     :global(:where(.snowui-pagination-page-size-icon > .snowui-icon)) {
@@ -844,18 +1170,33 @@
         height: 100%;
     }
 
-    :global(:where(.snowui-pagination-page-size-template:hover:not(:disabled):not([aria-disabled="true"]) .snowui-pagination-page-size-icon)) {
+    :global(
+        :where(
+            .snowui-pagination-page-size-template:hover:not(:disabled):not([aria-disabled="true"])
+                .snowui-pagination-page-size-icon
+        )
+    ) {
         opacity: var(
             --snowui-pagination-hover-opacity-override,
             var(--snowui-pagination-hover-opacity, 1)
         );
     }
 
-    :global(:where(.snowui-pagination-items-fill > .snowui-pagination-controls > .snowui-pagination-item)) {
+    :global(
+        :where(
+            .snowui-pagination-items-fill > .snowui-pagination-controls > .snowui-pagination-item
+        )
+    ) {
         flex: 1 1 0;
     }
 
-    :global(:where(.snowui-pagination-items-fill > .snowui-pagination-controls > .snowui-pagination-ellipsis)) {
+    :global(
+        :where(
+            .snowui-pagination-items-fill
+                > .snowui-pagination-controls
+                > .snowui-pagination-ellipsis
+        )
+    ) {
         flex: 0 0 auto;
     }
 
@@ -887,9 +1228,9 @@
             var(--snowui-pagination-radius, var(--radius-3))
         );
         padding: var(
-            --snowui-pagination-padding-y-override,
-            var(--snowui-pagination-padding-y, var(--padding-1))
-        )
+                --snowui-pagination-padding-y-override,
+                var(--snowui-pagination-padding-y, var(--padding-1))
+            )
             var(
                 --snowui-pagination-padding-x-override,
                 var(--snowui-pagination-padding-x, var(--padding-2))
@@ -898,23 +1239,34 @@
         background-image: none;
         text-decoration: none;
         user-select: none;
-        transition:
-            opacity var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out);
+        transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
     }
 
     :global(:where(.snowui-pagination-default)) {
         cursor: var(--snowui-state-cursor, pointer);
     }
 
-    :global(:where(.snowui-pagination-default-page, .snowui-pagination-default-prev, .snowui-pagination-default-next)) {
+    :global(
+        :where(
+            .snowui-pagination-default-page,
+            .snowui-pagination-default-prev,
+            .snowui-pagination-default-next
+        )
+    ) {
         opacity: var(
             --snowui-pagination-idle-opacity-override,
             var(--snowui-pagination-idle-opacity, 0.4)
         );
     }
 
-    :global(:where(.snowui-pagination-default-page:hover:not(:disabled):not([aria-disabled="true"]), .snowui-pagination-default-prev:hover:not(:disabled):not([aria-disabled="true"]), .snowui-pagination-default-next:hover:not(:disabled):not([aria-disabled="true"]))) {
+    :global(
+        :where(
+            .snowui-pagination-default-page:hover:not(:disabled):not([aria-disabled="true"]),
+            .snowui-pagination-default-prev:hover:not(:disabled):not([aria-disabled="true"]),
+            .snowui-pagination-default-next:hover:not(:disabled):not([aria-disabled="true"])
+        )
+    ) {
         opacity: var(
             --snowui-pagination-hover-opacity-override,
             var(--snowui-pagination-hover-opacity, 1)
@@ -963,10 +1315,11 @@
             --snowui-pagination-icon-size-override,
             var(--snowui-pagination-icon-size, var(--size-4))
         );
-        flex: 0 0 var(
-            --snowui-pagination-icon-size-override,
-            var(--snowui-pagination-icon-size, var(--size-4))
-        );
+        flex: 0 0
+            var(
+                --snowui-pagination-icon-size-override,
+                var(--snowui-pagination-icon-size, var(--size-4))
+            );
         display: block;
     }
 </style>

@@ -1,6 +1,6 @@
 /**
  * Pagination.test.ts
- * v1.3.0
+ * v1.6.0
  * 变更记录 (2026-05-26): 新增 Pagination 角色模板式示例。
  */
 export const examples = [
@@ -16,7 +16,7 @@ export const examples = [
             layout: "Pagination 为 Hug 宽度时，所有元素保持 Hug。",
             interaction: "当前页和上一页不可点击，其余页码和下一页可点击。",
             performance: "只使用 current / page 两个模板生成全部页码。",
-            responsive: "内容过长时允许换行。",
+            responsive: "内容过长时先收缩按钮，再减少页码窗口；分页控件不换行。",
         },
         logic: ["Template", "Short", "DefaultControls"],
     },
@@ -28,10 +28,10 @@ export const examples = [
     <Button as="page" />
 </Pagination>`,
         expected: {
-            render: "渲染 1 2 3 ... 22 和内置箭头。",
-            layout: "省略符与页码共享 4px 间距。",
+            render: "宽度足够时渲染 1 到 22 的全部页码和内置箭头，空间不足时自动出现省略符。",
+            layout: "完整页码可容纳时按钮可 Fill；省略状态全部按钮保持 Hug。",
             interaction: "上一页不可点击，下一页可跳转到第 2 页。",
-            performance: "隐藏中间页码，只生成可见窗口。",
+            performance: "先估算完整页码下限；明显放不下时只生成可见窗口。",
             responsive: "省略符不参与焦点。",
         },
         logic: ["Ellipsis", "Start"],
@@ -44,11 +44,11 @@ export const examples = [
     <Button as="page" />
 </Pagination>`,
         expected: {
-            render: "渲染 1 ... 10 11 12 ... 22。",
+            render: "宽度不足时自动渲染 1 ... 10 11 12 ... 22。",
             layout: "双省略符分别位于当前页窗口两侧。",
             interaction: "当前页不可点击，左右页码可触发页码变化。",
-            performance: "页码窗口由 page / total 计算。",
-            responsive: "长分页允许换行。",
+            performance: "页码窗口由 page、total 与容器宽度共同计算。",
+            responsive: "长分页先展示全部页码，窄容器中再自动生成和缩减省略窗口。",
         },
         logic: ["Ellipsis", "Middle"],
     },
@@ -82,7 +82,7 @@ export const examples = [
             layout: "自定义 Button 保持 Button 自己的 padding、边框和 hover。",
             interaction: "Pagination 接管点击目标页。",
             performance: "不新增 PageButton 组件。",
-            responsive: "自定义模板仍参与自动换行。",
+            responsive: "Icon + Text 前后页在窄容器中先隐藏文字，按钮本身始终保留。",
         },
         logic: ["CustomTemplate", "Controls"],
     },
@@ -114,7 +114,7 @@ export const examples = [
             layout: "禁用状态不改变页码窗口。",
             interaction: "不触发 onPageChange。",
             performance: "统一由 Pagination disabled 管理。",
-            responsive: "禁用状态不影响换行。",
+            responsive: "禁用状态不影响响应式页码窗口计算。",
         },
         logic: ["Disabled"],
     },
@@ -183,9 +183,29 @@ export const examples = [
             layout: "三组分页使用相同布局，只改变 Button variant。",
             interaction: "variant 不改变当前页语义、页码点击或边界禁用行为；显式 current 模板优先于内置搭配。",
             performance: "搭配由 Pagination 内置模板解析，不新增运行时测量。",
-            responsive: "全部搭配继续遵守 Pagination 宽度与换行策略。",
+            responsive: "全部搭配继续遵守 Pagination 宽度与页码省略策略。",
         },
         logic: ["Variant", "DefaultStyle", "BuiltInMode"],
+    },
+    {
+        name: "A10-2: 容器宽度响应",
+        code: `A10-2
+	<div style="width: 12rem;">
+	    <Pagination page={11} total={24} responsive="auto" widthMode="fill">
+	        <Button as="prev"><Icon><ArrowLineLeft /></Icon><Text>Previous</Text></Button>
+	        <Button as="current" />
+	        <Button as="page" />
+	        <Button as="next"><Text>Next</Text><Icon><ArrowLineRight /></Icon></Button>
+	    </Pagination>
+	</div>`,
+        expected: {
+            render: "窄容器中前后页保留图标，文字隐藏；远端页码逐级合并为省略符。",
+            layout: "完整页码先从 Fill 收缩到内容下限；进入省略状态后按钮保持 Hug，分页控件保持单行。",
+            interaction: "响应式阶段不改变页码、禁用状态、aria-label 或 onPageChange。",
+            performance: "复用 resizeManager，并在一帧内批量完成测量与布局提交。",
+            responsive: "宽度继续变窄时依次隐藏 pageSize、省略符和当前页；上一页与下一页始终保留，恢复宽度时反向恢复。",
+        },
+        logic: ["Responsive", "CompactControls", "AdaptiveWindow", "PersistentControls"],
     },
     {
         name: "A11: 显式 Fill，省略符 Hug",
@@ -198,10 +218,10 @@ export const examples = [
 </Pagination>`,
         expected: {
             render: "渲染双省略符、全部当前窗口按钮，以及空 prev / next 模板自动注入的默认箭头。",
-            layout: "current/page/prev/next 等宽填充；两个省略符保持 Hug。",
+            layout: "完整页码可容纳时 current/page/prev/next 等宽填充；出现省略符时全部控件保持 Hug。",
             interaction: "宽度模式不改变页码行为。",
-            performance: "显式 Fill 不启动 ResizeObserver 测量。",
-            responsive: "按钮遵守最小点击尺寸，空间不足时允许换行。",
+            performance: "默认响应式模式复用共享 resizeManager；不创建组件私有 ResizeObserver。",
+            responsive: "按钮遵守最小点击尺寸，空间不足时缩减页码且保留前后页。",
         },
         logic: ["WidthMode", "Fill", "EllipsisHug"],
     },
@@ -216,8 +236,8 @@ export const examples = [
             render: "渲染短分页。",
             layout: "根与全部生成项保持内容宽度。",
             interaction: "宽度模式不改变页码行为。",
-            performance: "显式 Hug 不启动 ResizeObserver 测量。",
-            responsive: "外部容器变宽时不拉伸。",
+            performance: "默认响应式模式复用共享 resizeManager；不创建组件私有 ResizeObserver。",
+            responsive: "外部容器变宽时不拉伸，变窄时仍按响应式页码窗口收缩。",
         },
         logic: ["WidthMode", "Hug"],
     },
@@ -243,7 +263,7 @@ export const examples = [
             layout: "每页条数选择器保持 Hug，与分页按钮组间距 16px；组内按钮仍使用 Pagination 默认 gap。",
             interaction: "点击后通过 Listbox 选择 10、20 或 50，并触发 onPageSizeChange。",
             performance: "未传 pageSizeOptions 时不渲染选择器。",
-            responsive: "空间不足时选择器与页码区域可以换行。",
+            responsive: "空间不足时先自动生成省略窗口，随后隐藏 pageSize，再隐藏省略符和当前页。",
         },
         logic: ["PageSize", "Listbox", "Fill", "Right"],
     },
@@ -266,7 +286,7 @@ export const examples = [
             layout: "pageSize 模板的声明顺序决定选择器位于左侧。",
             interaction: "Button 触发内置 Listbox，键盘、鼠标与触屏均可选择。",
             performance: "只复用一个 pageSize Button 模板。",
-            responsive: "整体仍遵守 Pagination 的换行与 Fill 策略。",
+            responsive: "pageSize 保持声明位置；窄宽度阶段可由组件隐藏，分页控件内部保持单行。",
         },
         logic: ["PageSize", "TemplateOrder", "Left"],
     },
