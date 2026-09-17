@@ -8,7 +8,7 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.7.0
+> **版本**: v1.8.0
 > **更新**: 2026-09-08
 > **职责**: 展示代码、基础语法着色与行号，并提供复制、全屏和可选尺寸调整能力。
 > **布局模型**: 默认态为复合管理布局；`singleLine` 为槽位宿主布局
@@ -47,6 +47,7 @@
 | `showLineNumbers` | `boolean` | `false` | 是否显示代码行号；普通态与全屏态保持一致，避免切换末帧发生代码横向跳变 |
 | `showCopyButton` | `boolean` | `true` | 是否显示复制按钮 |
 | `showExpandButton` | `boolean` | `true` | 是否显示全屏放大按钮 |
+| `horizontalScrollbarVisibility` | `"always" \| "hover"` | `"always"` | 横向滚动条在内容溢出时常显，或仅在鼠标移入代码块时显示 |
 | `visibleLines` | `number` | `5` | 默认状态最多显示几行代码；内容不足时自适应高度，超出后滚动；全屏模式不受此限制 |
 | `copyTimeout` | `number` | `2000` | 复制成功图标（Check）的停留时长（ms），超时后恢复 Copy 图标 |
 | `children` | `Snippet` | — | 代码内容或附件源；纯文本会作为代码，`as="trailing"` 会替换右侧动作区 |
@@ -67,7 +68,7 @@
 | Content | Fill / `min-width: 0` | 单行高亮代码；超宽时仅横向滚动 |
 | Trailing | Hug | 外置 `as="trailing"`，否则为默认内置 CopyButton |
 
-单行态固定隐藏语言、行号和全屏按钮；`visibleLines`、`showLanguage`、`showLineNumbers`、`showExpandButton` 在该变体中不产生对应结构。根层不生成 Indicator，不接受拖拽高度，也不创建纵向 scrollbar / fade；内容横向溢出时仍使用常显的 Overlay 横向滚动条。默认 padding 与 Input 标准态一致：上下 `--padding-3`（12px）、左右 `--padding-4`（16px）；gap 为 `--gap-2`（8px），圆角为 `--radius-4`（16px）。
+单行态固定隐藏语言、行号和全屏按钮；`visibleLines`、`showLanguage`、`showLineNumbers`、`showExpandButton` 在该变体中不产生对应结构。根层不生成 Indicator，不接受拖拽高度，也不创建纵向 scrollbar / fade；内容横向溢出时默认常显 Overlay 横向滚动条，也可通过 `horizontalScrollbarVisibility="hover"` 改为仅在鼠标移入代码块时显示。默认 padding 与 Input 标准态一致：上下 `--padding-3`（12px）、左右 `--padding-4`（16px）；gap 为 `--gap-2`（8px），圆角为 `--radius-4`（16px）。
 
 ```svelte
 <CodeBlock
@@ -191,12 +192,12 @@
 | 结构 | 说明 |
 |:---|:---|
 | `.snowui-overlay-scrollbar-viewport` | 可滚动 viewport，隐藏原生滚动条 |
-| `.snowui-overlay-scrollbar` | 自定义纵向 / 横向轨道，不占布局尺寸；横向溢出时常显 |
+| `.snowui-overlay-scrollbar` | 自定义纵向 / 横向轨道，不占布局尺寸；横向溢出时默认常显，可按宿主 hover 显隐 |
 | `.snowui-overlay-scrollbar-thumb` | Thumb 视觉与拖拽逻辑由通用样式 / hook 统一管理 |
 | `.snowui-scroll-mask` + `data-scroll-mask` | 顶部 / 尾部滚动透明渐隐 |
 | `.snowui-indicator-corner` | 右下角通用 Indicator 高度手柄；位置由 Indicator 默认规则统一管理 |
 
-CodeBlock 的默认态、全屏态和 `singleLine` 都由 `useOverlayScrollbar` 管理横向溢出；默认态和全屏态同时管理纵向溢出。组件只声明轨道定位，滚动条尺寸、显隐、hover 形态与鼠标拖拽由共享样式承接。纵向条随宿主 hover 显隐，横向条在内容溢出时始终显示。
+CodeBlock 的默认态、全屏态和 `singleLine` 都由 `useOverlayScrollbar` 管理横向溢出；默认态和全屏态同时管理纵向溢出。组件只声明轨道定位，滚动条尺寸、显隐、hover 形态与鼠标拖拽由共享样式承接。纵向条随宿主 hover 显隐；横向条默认在内容溢出时始终显示，`horizontalScrollbarVisibility="hover"` 时随宿主 hover 显隐。
 
 ---
 
@@ -290,6 +291,7 @@ pnpm build`}
 
 | 日期 | 版本 | 说明 |
 |:---|:---|:---|
+| 2026-09-18 | v1.8.0 | 新增 `horizontalScrollbarVisibility`，允许横向滚动条仅在代码块 hover 时显示；默认仍为溢出时常显。 |
 | 2026-09-03 | v1.7.0 | 新增默认开启的 format，按语言格式化展示及复制内容；支持显式关闭、异步竞态保护、原文回退与单行变体保留。 |
 | 2026-08-17 | v1.6.3 | 默认态、全屏态与 `singleLine` 接入共享 Overlay 横向滚动条；代码横向溢出时常显并支持拖拽，不再隐藏原生条后缺少可见滚动反馈 |
 | 2026-08-15 | v1.6.2 | 内部 `pre` / `code` 显式使用 `border-box`，与既有 padding、margin、font reset 一起隔离可选 `snowui-base.css` 的元素级影响 |

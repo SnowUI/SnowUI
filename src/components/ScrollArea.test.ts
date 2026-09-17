@@ -4,8 +4,26 @@
  * 变更记录 (2026-06-21): 新增纵向、横向、双轴与组合示例。
  * 变更记录 (2026-07-22): 明确纵向 Thumb 常态 8px hover 命中宽度。
  * 变更记录 (2026-09-01): 新增横向轨道贴近视口底部的长内容场景。
+ * 变更记录 (2026-09-18): 新增横向滚动条随 ScrollArea hover 显隐场景。
  */
 export const examples = [
+    {
+        name: "SA-06: 横向滚动条仅在 Hover 时显示",
+        code: `SA-06
+<ScrollArea axis="horizontal" horizontalScrollbarVisibility="hover" ariaLabel="Hover 横向内容" style="width: 18rem; height: 6rem;">
+    <Frame row style="width: 48rem;" class="gap-16">
+        <Text>Alpha</Text><Text>Beta</Text><Text>Gamma</Text><Text>Delta</Text>
+    </Frame>
+</ScrollArea>`,
+        expected: {
+            render: "横向溢出时，轨道默认透明，鼠标移入 ScrollArea 后显示。",
+            layout: "显隐不改变 viewport 或内容布局尺寸。",
+            interaction: "鼠标移出后轨道渐隐；拖动 Thumb 期间保持可见。",
+            performance: "复用共享 overlay scrollbar CSS，不增加监听器。",
+            responsive: "容器或内容宽度变化时继续自动重算 Thumb。",
+        },
+        logic: ["Horizontal", "HoverVisibility", "Drag"],
+    },
     {
         name: "SA-01: 默认纵向滚动",
         code: `SA-01

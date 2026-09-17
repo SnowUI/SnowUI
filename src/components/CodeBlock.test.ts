@@ -3,8 +3,20 @@
  * v1.4.0
  * 变更记录 (2026-09-03): 增加默认代码格式化与保留原文对照。
  * 变更记录 (2026-08-17): 补充默认态与 singleLine 横向溢出回归，验证共享横向滚动条常显与拖拽。
+ * 变更记录 (2026-09-18): 补充横向滚动条随代码块 hover 显隐的公开配置。
  */
 export const examples = [
+    {
+        name: "CB-09：横向滚动条仅在 Hover 时显示",
+        code: `CB-09
+<CodeBlock
+    variant="singleLine"
+    horizontalScrollbarVisibility="hover"
+    code="import { Pagination, ScrollArea, CodeBlock } from '@snowui-design-system/components';"
+    style="width: 16rem;"
+/>`,
+        logic: ["horizontalScrollbarVisibility", "singleLine", "horizontalScrollbar"],
+    },
     {
         name: "CB-08：默认格式化与保留原文",
         code: `CB-08

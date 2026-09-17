@@ -1,11 +1,12 @@
 /* Scrollbar Styles */
-/* v1.4.0 */
+/* v1.5.0 */
 /* Log (2026-04-17): 从 Textarea 组件提炼为通用共享样式，任何可滚动元素挂 .snowui-scrollbar 即生效。 */
 /* Log (2026-04-24): 新增 .snowui-scrollbar--edge 修饰类，落地「不占宽度·紧贴边缘」规范。 */
 /* Log (2026-04-24): 从 Textarea / Listbox 提炼 .snowui-overlay-scrollbar 浮层滚动条通用样式。 */
 /* Log (2026-06-21): 纵向 overlay scrollbar 改为宿主区域 hover 时以 Frame 默认动效渐显/渐隐；横向溢出时保持常显。 */
 /* Log (2026-07-22): 纵向 overlay Thumb 常态视觉维持 4px，透明 hover 命中区扩大为 8px。 */
 /* Log (2026-09-01): viewport 贴底横向轨道提炼为共享宿主布局，供 ScrollArea / Table 复用。 */
+/* Log (2026-09-18): 横向 overlay scrollbar 支持按宿主 hover 显示；默认仍保持常显。 */
 
 /*
  * ⚠️ ::-webkit-scrollbar 不可嵌套于 :where()，必须使用直接选择器。
@@ -203,7 +204,14 @@
     width: calc(100% - (var(--snowui-scrollbar-edge-gap) * 2));
 }
 
-.snowui-overlay-scrollbar[data-axis="horizontal"][data-visible="true"],
+.snowui-overlay-scrollbar[data-axis="horizontal"][data-visible="true"]:not(
+        [data-visibility="hover"]
+    ),
+.snowui-overlay-scrollbar-host:hover
+    > .snowui-overlay-scrollbar[data-axis="horizontal"][data-visibility="hover"][data-visible="true"],
+.snowui-overlay-scrollbar[data-axis="horizontal"][data-visibility="hover"]:has(
+        > .snowui-overlay-scrollbar-thumb[data-dragging="true"]
+    ),
 .snowui-overlay-scrollbar-host:hover
     > .snowui-overlay-scrollbar:not([data-axis="horizontal"])[data-visible="true"] {
     opacity: 1;

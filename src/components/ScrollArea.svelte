@@ -18,6 +18,8 @@
         extends Omit<FrameProps, "children" | "enableAutoLayout"> {
         axis?: ScrollAreaAxis;
         horizontalTrackPosition?: ScrollAreaHorizontalTrackPosition;
+        /** 横向滚动条常显，或仅在鼠标移入区域时显示 */
+        horizontalScrollbarVisibility?: "always" | "hover";
         ariaLabel?: string;
         viewport?: HTMLElement;
         onscroll?: (event: Event) => void;
@@ -28,6 +30,7 @@
     let {
         axis = "vertical",
         horizontalTrackPosition = "container",
+        horizontalScrollbarVisibility = "always",
         ariaLabel = "Scrollable content",
         viewport = $bindable(),
         onscroll,
@@ -126,6 +129,7 @@
             bind:this={horizontalTrack}
             class="snowui-scroll-area-scrollbar snowui-overlay-scrollbar"
             data-axis="horizontal"
+            data-visibility={horizontalScrollbarVisibility}
             data-visible={horizontalScrollbar.hasOverflow ? "true" : undefined}
             aria-hidden="true"
         >

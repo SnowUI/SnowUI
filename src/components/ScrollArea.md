@@ -1,7 +1,7 @@
 # ScrollArea（可滚动区域）
 
-> **版本**: v1.3.0
-> **更新**: 2026-09-01
+> **版本**: v1.4.0
+> **更新**: 2026-09-18
 > **职责**: 提供隐藏原生滚动条、使用 SnowUI 自建滚动条的通用可滚动容器
 > **布局模型**: 复合管理布局
 > **文档**: ./ScrollArea.md
@@ -12,7 +12,7 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 
 - 支持纵向、横向和双轴滚动
 - 隐藏浏览器原生滚动条
-- 内容溢出时启用对应 SnowUI overlay scrollbar；纵向条在鼠标移入区域时使用 Frame 默认动效渐显、移出时渐隐，横向条常显
+- 内容溢出时启用对应 SnowUI overlay scrollbar；纵向条在鼠标移入区域时使用 Frame 默认动效渐显、移出时渐隐，横向条默认常显并可配置为随区域 hover 显隐
 - Thumb 支持拖动并与原生滚动位置同步
 - 横向 Thumb 始终为 8px；纵向 Thumb 默认视觉宽 4px、hover 视觉宽 8px，常态 hover 命中宽度保持 8px
 - 长内容可把横向轨道贴近当前视口底部，容器离开视口后轨道仍收回到自身底边
@@ -28,6 +28,7 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 | :--- | :--- | :--- | :--- |
 | `axis` | `"vertical" \| "horizontal" \| "both"` | `"vertical"` | 允许滚动的方向 |
 | `horizontalTrackPosition` | `"container" \| "viewport"` | `"container"` | 横向轨道停靠在容器底边，或在长容器经过页面视口时贴近视口底部 |
+| `horizontalScrollbarVisibility` | `"always" \| "hover"` | `"always"` | 横向滚动条在内容溢出时常显，或仅在鼠标移入区域时显示 |
 | `ariaLabel` | `string` | `"Scrollable content"` | viewport 的无障碍标签；viewport 使用 `role="region"` |
 | `viewport` | `HTMLElement`（可绑定） | - | 暴露内部可滚动 viewport，供读取或设置原生滚动位置 |
 | `onscroll` | `(event: Event) => void` | - | viewport 原生 scroll 事件 |
@@ -97,6 +98,7 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 | :--- | :--- | :--- |
 | `axis` | `data-scroll-axis` + 条件轨道 | 控制 viewport overflow 与渲染的轨道 |
 | `horizontalTrackPosition` | `data-horizontal-track-position` | `viewport` 使用 sticky 轨道保持长内容中的横向控制可达 |
+| `horizontalScrollbarVisibility` | 横向轨道 `data-visibility` | `hover` 由共享宿主 hover 规则控制显隐 |
 | `ariaLabel` | viewport ARIA | 输出 `role="region"` 与 `aria-label` |
 | `viewport` | `$bindable` | 绑定内部滚动元素 |
 | `onscroll` | viewport 事件 | 不挂到根 Frame |
@@ -117,6 +119,10 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.4.0 (2026-09-18)
+
+- 新增 `horizontalScrollbarVisibility`；横向滚动条可选择仅在 ScrollArea hover 时显示，默认仍为溢出时常显。
 
 ### v1.3.0 (2026-09-01)
 

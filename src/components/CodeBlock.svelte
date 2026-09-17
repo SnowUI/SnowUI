@@ -1,6 +1,6 @@
 <!--
   CodeBlock 组件：代码块显示，支持行号、复制、全屏放大
-  v1.7.0
+  v1.8.0
 
   布局模型：默认态为复合管理布局；singleLine 变体为槽位宿主布局
 
@@ -135,6 +135,8 @@
         showCopyButton?: boolean;
         /** 是否显示全屏放大按钮 */
         showExpandButton?: boolean;
+        /** 横向滚动条常显，或仅在鼠标移入代码块时显示 */
+        horizontalScrollbarVisibility?: "always" | "hover";
         /** 默认状态最多显示几行代码，内容不足时自适应高度 */
         visibleLines?: number;
         /** 复制成功图标的停留时长（ms） */
@@ -163,6 +165,7 @@
         showLineNumbers = false,
         showCopyButton = true,
         showExpandButton = true,
+        horizontalScrollbarVisibility = "always",
         visibleLines = 5,
         copyTimeout = 2000,
         class: className = "",
@@ -793,6 +796,7 @@
         bind:this={codeHorizontalScrollbarElement}
         class="snowui-code-block-scrollbar snowui-overlay-scrollbar"
         data-axis="horizontal"
+        data-visibility={horizontalScrollbarVisibility}
         data-visible={codeHorizontalScrollbar.hasOverflow ? "true" : undefined}
         aria-hidden="true"
     >
@@ -926,6 +930,7 @@
             bind:this={fullscreenHorizontalScrollbarElement}
             class="snowui-code-block-scrollbar snowui-overlay-scrollbar"
             data-axis="horizontal"
+            data-visibility={horizontalScrollbarVisibility}
             data-visible={fullscreenHorizontalScrollbar.hasOverflow
                 ? "true"
                 : undefined}
