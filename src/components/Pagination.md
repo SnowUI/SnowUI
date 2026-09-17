@@ -58,6 +58,7 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 | onPageChange | `(page: number) => void` | - | 可点击页码变化时触发 |
 | onPageSizeChange | `(pageSize: number) => void` | - | 每页条数变化时触发 |
 | children | `Snippet` | - | 角色样式模板 |
+| parts | `{ Button?, Listbox?, MenuItem? }` | - | 统一配置内置页码按钮、每页条数 Listbox 与选项；显式角色模板 Props 优先 |
 
 `total` 会被归一化为至少 `1`。`page` 会被归一化到 `[1, total]`，避免渲染越界页码。
 

@@ -124,6 +124,7 @@ Popover 与 Listbox 共用同一套 `header + scroll-body` 结构,所有浮层�
 | `closeOn` | `'outside' \| 'manual'` | `'outside'` | 关闭方式:`outside` 点击空白关闭,`manual` 仅由 Popover 内按钮关闭 |
 | `closeOnEscape` | `boolean` | `true` | Escape 是否关闭;两种 closeOn 模式都默认支持 |
 | `closeOnSelect` | `boolean` | `true` (sm) / `false` (md/lg) | 点击内部 `MenuItem` 是否关闭;单个 `MenuItem closeOnSelect` 可覆盖 |
+| `continuousHover` | `boolean` | `true` | 直接 `MenuItem` 之间是否使用容器级连续 hover 背景 |
 | `open` | `boolean` | `false` | 静态模式手动控制显示,支持 `bind:open` |
 | `onOpenChange` | `(open: boolean) => void` | — | 打开状态变化回调 |
 | `children` | `Snippet` | — | 面板内容 |

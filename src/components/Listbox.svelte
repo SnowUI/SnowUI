@@ -1,6 +1,6 @@
 <!--
  Listbox 组件：浮层选项列表面板
- v1.3.4
+ v1.3.5
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -39,6 +39,7 @@
     import { splitFrameHostProps } from "../logic/frame-prop-filter";
     import { useOverlayPresence } from "../logic/overlay-presence.svelte";
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
+    import { clampFloatingPosition } from "../lib/floating-position";
     import {
         DROPDOWN_OVERLAY_APPEAR_MOTION,
         DROPDOWN_OVERLAY_DISAPPEAR_MOTION,
@@ -296,7 +297,18 @@
         const resolvedWidth = matchTriggerWidth
             ? listboxEl.getBoundingClientRect().width
             : listboxEl.offsetWidth;
-        listboxLeft = align === "end" ? anchorRight - resolvedWidth : anchorLeft;
+        const idealLeft = align === "end" ? anchorRight - resolvedWidth : anchorLeft;
+        listboxLeft = clampFloatingPosition(
+            { left: idealLeft, top: 0 },
+            { width: resolvedWidth, height: 0 },
+            {
+                left: 0,
+                top: 0,
+                width: window.innerWidth,
+                height: window.innerHeight,
+            },
+            LISTBOX_VIEWPORT_GAP,
+        ).left;
 
         if (placementMode === "bottom") {
             listboxPlacement = "bottom";
@@ -516,7 +528,7 @@
         use:portal
         bind:this={listboxEl}
         class="snowui-listbox-portal-anchor"
-        style="top: {listboxTop}px; left: {listboxLeft}px; width: max-content; min-width: {matchTriggerWidth && hasLockedWidth
+        style="top: {listboxTop}px; left: {listboxLeft}px; width: max-content; max-width: calc(100vw - {LISTBOX_VIEWPORT_GAP * 2}px); min-width: {matchTriggerWidth && hasLockedWidth
             ? `max(${configuredMinWidth}, ${listboxWidth}px)`
             : configuredMinWidth}; --snowui-listbox-available-height: {listboxMaxHeight}px;{hasExplicitMaxHeight
             ? ` --snowui-listbox-max-height: ${configuredMaxHeight}; max-height: min(var(--snowui-listbox-max-height), var(--snowui-listbox-available-height));`
