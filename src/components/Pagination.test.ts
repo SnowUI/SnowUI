@@ -1,6 +1,6 @@
 /**
  * Pagination.test.ts
- * v1.6.0
+ * v1.6.1
  * 变更记录 (2026-05-26): 新增 Pagination 角色模板式示例。
  */
 export const examples = [
@@ -121,14 +121,14 @@ export const examples = [
     {
         name: "A8: 某一页禁用",
         code: `A8
-<Pagination page={1} total={5} disabledPages={[3]}>
+<Pagination page={3} total={7} disabledPages={[2, 5]}>
     <Button as="current" />
     <Button as="page" />
 </Pagination>`,
         expected: {
-            render: "渲染 1 2 3 4 5，其中第 3 页处于不可点击状态。",
+            render: "渲染 1–7，其中第 2、5 页处于不可点击状态。",
             layout: "单页禁用不改变页码窗口和 4px 间距。",
-            interaction: "点击第 3 页不触发 onPageChange，其他可用页仍可点击。",
+            interaction: "第 3 页的上一页跳到 1；第 4 页的下一页跳到 6；禁用页本身不触发 onPageChange。",
             performance: "禁用页由 Pagination 统一管理。",
             responsive: "禁用页在换行时保持原有尺寸策略。",
         },

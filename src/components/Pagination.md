@@ -10,7 +10,7 @@
 - `parts.MenuItem`：统一配置 pageSize 选项。
 - 具体结构差异继续通过现有 `as` 模板/外置选择器协议完成；外置显式 Props 高于 part。
 
-> **版本**: v1.6.0
+> **版本**: v1.6.1
 > **职责**: 提供页码导航容器。
 > **设计稿**: [Workshop / Pagination](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12078-21567&t=nY2VC3oisn12OH01-4)
 
@@ -46,7 +46,7 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 | page | `number` | `1` | 当前页，从 1 开始 |
 | total | `number` | `1` | 总页数 |
 | disabled | `boolean` | `false` | 禁用整个 Pagination |
-| disabledPages | `number[]` | `[]` | 禁用指定页码 |
+| disabledPages | `number[]` | `[]` | 禁用指定页码；上一页 / 下一页会跳过连续禁用页，指向该方向最近的可用页 |
 | ariaLabel | `string` | `"Pagination"` | 根导航区域的无障碍标签 |
 | variant | `"outline" \| "gray" \| "borderless"` | `"outline"` | 普通页与前后页的按钮样式；当前页使用对应的强调搭配 |
 | responsive | `"auto" \| "none"` | `"auto"` | `auto` 根据容器宽度自动选择完整页码、省略页码与最小前后页；`none` 保持静态页码窗口与原有换行行为 |
@@ -319,7 +319,7 @@ Pagination 只复制模板的外观属性并替换页码文本；点击和可用
 3. 当前页输出 `aria-current="page"`、`data-current="page"`、`aria-disabled="true"`，不可点击。
 4. `page <= 1` 时 prev 不可点击。
 5. `page >= total` 时 next 不可点击。
-6. `disabledPages` 中的页码不可点击，指向禁用页的 prev / next 也不可点击。
+6. `disabledPages` 中的页码不可点击；prev / next 会跳过连续禁用页，指向该方向最近的可用页；该方向没有可用页时才不可点击。
 7. `disabled={true}` 时所有生成项不可点击。
 8. 省略符不可点击，不进入焦点序列。
 9. `widthMode="fill"` 只在完整页码可容纳时拉伸 `.snowui-pagination-item`；省略模式全部内容保持 Hug。
@@ -338,12 +338,12 @@ Pagination 只复制模板的外观属性并替换页码文本；点击和可用
 | :--- | :--- |
 | page | 目标页在 `[1, total]`、不是当前页、未被禁用时可点击 |
 | current | 不触发 `onPageChange`，不触发用户点击逻辑 |
-| prev | 目标页为 `page - 1`，第一页或目标页禁用时不可点击 |
-| next | 目标页为 `page + 1`，末页或目标页禁用时不可点击 |
+| prev | 跳过连续禁用页，指向当前页之前最近的可用页；没有可用页时不可点击 |
+| next | 跳过连续禁用页，指向当前页之后最近的可用页；没有可用页时不可点击 |
 | disabledPages | 命中的页码不可点击 |
 | disabled | 所有生成项不可点击 |
 
-禁用优先级：`disabled` > 页码越界 > prev / next 边界 > `disabledPages` > 当前页。
+禁用优先级：`disabled` > prev / next 方向内无可用页 > `disabledPages` > 当前页。
 
 无障碍规则：
 
@@ -498,6 +498,10 @@ Root Frame(nav)
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.6.1 (2026-09-18)
+
+- prev / next 会跳过连续禁用页并导航到该方向最近的可用页；只有该方向不存在可用页时才禁用。
 
 ### v1.6.0 (2026-09-17)
 

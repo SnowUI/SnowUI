@@ -1,11 +1,11 @@
 <!--
   Pagination 组件：页码导航容器
-  v1.6.0
+  v1.6.1
 
   职责：
   - 读取直系 Button 作为 current / page / prev / next 角色样式模板。
   - 根据 page / total 生成真实页码、ellipsis 与默认 prev / next。
-  - 管理当前页、边界页与整体 disabled 的可点击状态。
+  - 管理当前页、边界页、禁用页与整体 disabled 的可点击状态。
 
   文档: ./Pagination.md
 -->
@@ -362,13 +362,18 @@
         return button;
     }
 
+    function findAvailableControlTarget(role: "prev" | "next") {
+        const step = role === "prev" ? -1 : 1;
+        let target = resolvedPage + step;
+        while (target >= 1 && target <= resolvedTotal && disabledPageSet.has(target)) {
+            target += step;
+        }
+        return target >= 1 && target <= resolvedTotal ? target : undefined;
+    }
+
     function createControl(role: "prev" | "next") {
-        const target = role === "prev" ? resolvedPage - 1 : resolvedPage + 1;
-        const isUnavailable =
-            disabled ||
-            (role === "prev" && resolvedPage <= 1) ||
-            (role === "next" && resolvedPage >= resolvedTotal) ||
-            disabledPageSet.has(target);
+        const target = findAvailableControlTarget(role);
+        const isUnavailable = disabled || target === undefined;
         const control =
             cloneTemplate(role) ?? createDefaultButton(role, role === "prev" ? "上一页" : "下一页");
 
