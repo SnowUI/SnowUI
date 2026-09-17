@@ -1,6 +1,6 @@
 <!--
   Pagination 组件：页码导航容器
-  v1.4.0
+  v1.5.0
 
   职责：
   - 读取直系 Button 作为 current / page / prev / next 角色样式模板。
@@ -29,6 +29,7 @@
     type PaginationRole = "current" | "page" | "prev" | "next" | "pageSize";
     type PaginationLayoutToken = "pages" | "prev" | "next" | "pageSize";
     export type PaginationWidthMode = "auto" | "hug" | "fill";
+    export type PaginationVariant = "outline" | "gray" | "borderless";
 
     interface Props extends Omit<FrameProps, "children" | "gap"> {
         page?: number;
@@ -38,6 +39,8 @@
         disabled?: boolean;
         disabledPages?: number[];
         ariaLabel?: string;
+        /** 普通页按钮样式；当前页自动映射为 outline→gray、gray→filled、borderless→gray。 */
+        variant?: PaginationVariant;
         widthMode?: PaginationWidthMode;
         gap?: string | number;
         pageSize?: number;
@@ -63,6 +66,7 @@
         disabled = false,
         disabledPages = [],
         ariaLabel = "Pagination",
+        variant = "outline",
         widthMode = "fill",
         gap = undefined,
         pageSize = $bindable(20),
@@ -135,6 +139,9 @@
     const resolvedGap = $derived(resolveGapValue(gap));
     const resolvedPageSizeGap = $derived(
         resolveGapValue(pageSizeGap),
+    );
+    const resolvedCurrentVariant = $derived(
+        variant === "gray" ? "filled" : "gray",
     );
 
     const pageSizeOwnerContext: ListboxOwnerContext = {
@@ -450,6 +457,10 @@
         let hasPages = false;
         for (const child of Array.from(templatesEl.children)) {
             if (!(child instanceof HTMLElement)) continue;
+            if (
+                children &&
+                child.dataset.paginationVariantFallback === "true"
+            ) continue;
             const role = child.dataset.as as PaginationRole | undefined;
             if (role === "current" || role === "page") {
                 if (!hasPages) {
@@ -670,15 +681,15 @@
             {@render children()}
         {:else}
             <Button as="pageSize" variant="borderless" />
-            <Button as="current" variant="gray" />
-            <Button as="page" variant="outline" />
-            <Button as="prev" variant="outline" iconOnly aria-label="上一页">
-                <ComponentIcon name="arrow-line-left" size="var(--size-4)" aria-hidden="true" />
-            </Button>
-            <Button as="next" variant="outline" iconOnly aria-label="下一页">
-                <ComponentIcon name="arrow-line-right" size="var(--size-4)" aria-hidden="true" />
-            </Button>
         {/if}
+        <Button as="current" variant={resolvedCurrentVariant} data-pagination-variant-fallback="true" />
+        <Button as="page" variant={variant} data-pagination-variant-fallback="true" />
+        <Button as="prev" variant={variant} iconOnly aria-label="上一页" data-pagination-variant-fallback="true">
+            <ComponentIcon name="arrow-line-left" size="var(--size-4)" aria-hidden="true" />
+        </Button>
+        <Button as="next" variant={variant} iconOnly aria-label="下一页" data-pagination-variant-fallback="true">
+            <ComponentIcon name="arrow-line-right" size="var(--size-4)" aria-hidden="true" />
+        </Button>
         <span bind:this={previousIconTemplateEl}>
             <ComponentIcon name="arrow-line-left" class="snowui-pagination-default-icon" size="var(--size-4)" aria-hidden="true" />
         </span>

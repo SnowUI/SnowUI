@@ -170,6 +170,24 @@ export const examples = [
         logic: ["DefaultStyle", "BuiltInMode", "PageSize", "Fill"],
     },
     {
+        name: "A10-1: 内置按钮样式搭配",
+        code: `A10-1
+<Pagination page={1} total={5} variant="outline" />
+<Pagination page={1} total={5} variant="gray" />
+<Pagination page={1} total={5} variant="borderless" />
+<Pagination page={1} total={5} variant="gray">
+    <Button as="current" variant="outline" />
+</Pagination>`,
+        expected: {
+            render: "outline 常态搭配 gray 当前页；gray 常态搭配 filled 当前页；borderless 常态搭配 gray 当前页。",
+            layout: "三组分页使用相同布局，只改变 Button variant。",
+            interaction: "variant 不改变当前页语义、页码点击或边界禁用行为；显式 current 模板优先于内置搭配。",
+            performance: "搭配由 Pagination 内置模板解析，不新增运行时测量。",
+            responsive: "全部搭配继续遵守 Pagination 宽度与换行策略。",
+        },
+        logic: ["Variant", "DefaultStyle", "BuiltInMode"],
+    },
+    {
         name: "A11: 显式 Fill，省略符 Hug",
         code: `A11
 <Pagination widthMode="fill" page={11} total={22}>

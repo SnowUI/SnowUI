@@ -10,7 +10,7 @@
 - `parts.MenuItem`：统一配置 pageSize 选项。
 - 具体结构差异继续通过现有 `as` 模板/外置选择器协议完成；外置显式 Props 高于 part。
 
-> **版本**: v1.4.0
+> **版本**: v1.5.0
 > **职责**: 提供页码导航容器。
 > **设计稿**: [Workshop / Pagination](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12078-21567&t=nY2VC3oisn12OH01-4)
 
@@ -31,8 +31,8 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 - Pagination 支持 `auto`、`hug`、`fill` 三种明确宽度模式。
 - 传入 `pageSizeOptions` 并声明 `Button as="pageSize"` 时，显示每页条数选择器。
 - `pageSize` 模板在 children 中的声明顺序决定选择器位于页码左侧或右侧。
-- Pagination 不提供 `buttonWidth`、`variant`、`size`、`color` 等视觉快捷 prop。
-- Pagination 的默认样式只使用内部文字和内置 SVG，不渲染 SnowUI Button / Text / Icon 子组件。
+- Pagination 只提供成组的 `variant` 搭配；单个角色的 size、color、hover、border 等视觉仍通过 Button 模板配置。
+- Pagination 的默认页码与前后页使用内置 Button 模板；省略符使用内部文字，箭头使用内置 ComponentIcon。
 
 ---
 
@@ -49,6 +49,7 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 | disabled | `boolean` | `false` | 禁用整个 Pagination |
 | disabledPages | `number[]` | `[]` | 禁用指定页码 |
 | ariaLabel | `string` | `"Pagination"` | 根导航区域的无障碍标签 |
+| variant | `"outline" \| "gray" \| "borderless"` | `"outline"` | 普通页与前后页的按钮样式；当前页使用对应的强调搭配 |
 | widthMode | `"auto" \| "hug" \| "fill"` | `"fill"` | `auto` 按容器空间判断；`hug` 保持内容宽度；`fill` 让所有按钮等宽填充，省略符保持 Hug |
 | gap | `string \| number` | `4px` | 页码、prev、next 之间的间距；数字按 px 处理 |
 | pageSize | `number`（bindable） | `20` | 当前每页条数；选择后组件自行更新绑定值，仅在 `pageSizeOptions` 非空时显示选择器 |
@@ -78,9 +79,9 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 
 - Pagination 内写什么，就相当于给该角色定义一种样式。
 - 同一角色出现多个直系模板时，只使用第一个。
-- 缺失 `current` 模板时，使用内置默认当前页文字。
-- 缺失 `page` 模板时，使用内置默认普通页文字。
-- 缺失 `prev` / `next` 模板时，使用内置默认 `ArrowLineLeft/Right` SVG。
+- 缺失 `current` 模板时，使用与 `variant` 搭配的内置当前页 Button。
+- 缺失 `page` 模板时，使用 `variant` 指定的内置普通页 Button。
+- 缺失 `prev` / `next` 模板时，使用 `variant` 指定的内置 Button 与默认 `ArrowLineLeft/Right` 图标。
 - 自定义 Button 模板保留自己的 variant、size、padding、radius、hover、focus、border 和背景。
 - Pagination 生成的 Button 默认 `scaleOnHover=false`；模板显式传 `scaleOnHover={true}` 时保留放大反馈。
 - Pagination 只接管生成后的宽度模式、页码文本、可点击性和无障碍状态。
@@ -94,6 +95,24 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 ```
 
 默认样式即为左侧 Hug pageSize（提供 `pageSizeOptions` 时显示）与右侧 Fill 分页组；当前页 gray，其余按钮 outline。
+
+### 按钮样式搭配
+
+`variant` 描述普通页、上一页和下一页按钮的常态样式。Pagination 会为当前页自动选择具有足够区分度的强调样式：
+
+| variant | 普通页 / 前后页 | 当前页 |
+| :--- | :--- | :--- |
+| `outline`（默认） | outline | gray |
+| `gray` | gray | filled |
+| `borderless` | borderless | gray |
+
+```svelte
+<Pagination page={2} total={6} variant="outline" />
+<Pagination page={2} total={6} variant="gray" />
+<Pagination page={2} total={6} variant="borderless" />
+```
+
+显式提供的 `current`、`page`、`prev` 或 `next` Button 模板仍以模板自己的 `variant` 为准，适合需要脱离内置搭配的场景。
 
 ### 每页条数选择
 
@@ -257,9 +276,7 @@ Pagination 只复制模板的外观属性并替换页码文本；点击和可用
 <Pagination page={1} total={22} />
 ```
 
-完全不传子级模板时，Pagination 会使用内置文字和内置箭头样式生成全部可见项。
-
-这个写法不会使用 Button / Text / Icon 等其他组件。
+完全不传子级模板时，Pagination 会使用内置 Button 与箭头图标生成全部可见项。
 
 ### 受控页码
 
@@ -318,7 +335,7 @@ Pagination 只复制模板的外观属性并替换页码文本；点击和可用
 
 ## 默认样式
 
-角色模板缺失时，Pagination 使用内置默认样式，不渲染 SnowUI Button / Text / Icon 子组件。
+角色模板缺失时，Pagination 优先使用所选 `variant` 的内置 Button 模板。以下 `snowui-pagination-default-*` 规则只作为模板节点不可用时的防御性回退：
 
 | 默认项 | 样式 |
 | :--- | :--- |
@@ -338,8 +355,8 @@ Figma 对照：
 | :--- | :--- |
 | 根 gap `4px` | `--snowui-pagination-row-gap` / `--snowui-pagination-column-gap` |
 | 文本 `12px / 16px` | `--snowui-pagination-font-size` / `--snowui-pagination-line-height` |
-| 当前页灰底 | 通过 `Button as="current"` 模板还原；默认样式为纯文字 |
-| 非当前页描边 | 通过 `Button as="page"` 模板还原；默认样式为透明文字 |
+| 当前页灰底 | 由默认搭配或显式 `Button as="current"` 模板提供 |
+| 非当前页描边 | 由默认搭配或显式 `Button as="page"` 模板提供 |
 | `ArrowLineLeft/Right` | 内置 SVG 路径来自 `resource-base` 同名图标 |
 
 ## 布局模型
@@ -438,6 +455,7 @@ Root Frame(nav)
 | A8 | 指定页禁用 |
 | A9 | 设计稿样式还原 |
 | A10 | 完全默认样式 |
+| A10-1 | 三种内置按钮样式搭配与显式模板优先级 |
 | A11 | 显式 Fill，省略符 Hug |
 | A12 | 显式 Hug |
 | A13 | pageSize 模板置于最右侧、Listbox 选择与 Fill 剩余宽度布局 |
@@ -459,6 +477,11 @@ Root Frame(nav)
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.5.0 (2026-09-17)
+
+- 新增 `variant="outline" | "gray" | "borderless"`，分别内置 gray、filled、gray 当前页搭配；默认保持 outline 常态与 gray 当前页。
+- 显式角色 Button 模板继续优先，缺失角色由所选 variant 的内置模板补齐。
 
 ### v1.4.0 (2026-08-19)
 
