@@ -209,6 +209,25 @@
         return Array.from({ length: end - start + 1 }, (_, index) => start + index);
     }
 
+    function collapsePageNumbers(pages: number[]): PageToken[] {
+        const orderedPages = [...new Set(pages)]
+            .filter((pageNumber) => pageNumber >= 1 && pageNumber <= resolvedTotal)
+            .sort((left, right) => left - right);
+        const tokens: PageToken[] = [];
+
+        for (const pageNumber of orderedPages) {
+            const previousPage = tokens.at(-1);
+            if (typeof previousPage === "number") {
+                const hiddenPageCount = pageNumber - previousPage - 1;
+                if (hiddenPageCount === 1) tokens.push(previousPage + 1);
+                if (hiddenPageCount >= 2) tokens.push("ellipsis");
+            }
+            tokens.push(pageNumber);
+        }
+
+        return tokens;
+    }
+
     function getPageTokens(sibling = 1, boundary = 1): PageToken[] {
         const totalPages = resolvedTotal;
         const currentPage = resolvedPage;
@@ -222,20 +241,18 @@
         const endWindowStart = Math.max(1, totalPages - boundary - sibling * 2);
 
         if (currentPage <= boundary + sibling + 1) {
-            return [...range(1, startWindowEnd), "ellipsis", totalPages];
+            return collapsePageNumbers([...range(1, startWindowEnd), totalPages]);
         }
 
         if (currentPage >= totalPages - boundary - sibling) {
-            return [1, "ellipsis", ...range(endWindowStart, totalPages)];
+            return collapsePageNumbers([1, ...range(endWindowStart, totalPages)]);
         }
 
-        return [
+        return collapsePageNumbers([
             ...range(1, boundary),
-            "ellipsis",
             ...range(currentPage - sibling, currentPage + sibling),
-            "ellipsis",
             ...range(totalPages - boundary + 1, totalPages),
-        ];
+        ]);
     }
 
     function getCollapsedPageTokenCandidates(): PageToken[][] {
@@ -250,12 +267,6 @@
 
         add(getPageTokens(1, 1));
         add(getPageTokens(0, 1));
-
-        const contextual: PageToken[] = [];
-        if (resolvedPage > 1) contextual.push("ellipsis");
-        contextual.push(resolvedPage);
-        if (resolvedPage < resolvedTotal) contextual.push("ellipsis");
-        add(contextual);
         return candidates;
     }
 
