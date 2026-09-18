@@ -656,7 +656,7 @@
     }
     :global(:where(.snowui-sidebar-floating-toggle)) {
         position: fixed;
-        inset: var(--padding-4) var(--padding-3) auto auto;
+        inset: var(--padding-4) auto auto var(--padding-3);
         width: var(--size-6);
         height: var(--size-6);
         margin: 0;
