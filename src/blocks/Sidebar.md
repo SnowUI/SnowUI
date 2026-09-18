@@ -3,7 +3,7 @@
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 
-> **版本**: v1.8.0
+> **版本**: v1.9.0
 > **职责**: 提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。
 > **归属**: PRO Blocks / Template Block
 
@@ -13,22 +13,24 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 | 关键字 | 类型 | 默认值 | 描述 |
 |:---|:---|:---|:---|
-| `sections` | `SidebarSectionData[]` | `[]` | 默认数据模式的分类与导航项 |
-| `navigationVariant` | `"icon" \| "text"` | `"icon"` | 导航结构变体；`text` 折叠后只保留始终可见的展开按钮 |
-| `collapsed` | `boolean` | — | 受控折叠状态 |
+| `sections` | `SidebarSectionData[]` | `[]` | 分类数组，每项必填唯一 id，可选 title、collapsible、defaultCollapsed、actions、items、content；content 优先于 items。items 使用 SidebarItemData 的 id、label、icon、href 等字段。 |
+| `navigationVariant` | `"icon" \| "text"` | `"icon"` | 导航结构变体；`text` 表示无图标导航，折叠后根宽度与 padding 为零，只保留位于当前页面可视区域右上方的展开按钮；不自动扫描内容推断图标 |
+| `collapsed` | `boolean` | — | 受控折叠状态，支持 bind:collapsed；未传时从 defaultCollapsed 初始化内部状态。 |
 | `defaultCollapsed` | `boolean` | `false` | 非受控初始折叠状态 |
 | `width` | `number` | `220` | 展开宽度，支持 `bind:width`；拖拽右侧边框时实时更新 |
 | `minWidth` | `number` | `160` | 可拖拽展开宽度下限 |
 | `maxWidth` | `number` | `480` | 可拖拽展开宽度上限 |
 | `resizable` | `boolean` | `true` | 是否启用右侧边框调宽命中层 |
-| `activeItemId` | `string` | — | 唯一 active item 来源 |
+| `activeItemId` | `string` | — | 外部控制的选中项 id；未传时使用内部选择或恢复的持久化值。仅选择状态，不自动替宿主进行路由。 |
 | `persistence` | `boolean` | `true` | 是否记忆 active item 与各 Section 折叠状态 |
 | `persistenceKey` | `string` | `"default"` | localStorage 实例命名空间；同一页面存在多个 Sidebar 时必须分别设置 |
-| `onCollapsedChange` | `(collapsed: boolean) => void` | — | 折叠状态变化回调 |
-| `onWidthChange` | `(width: number) => void` | — | 展开宽度变化回调 |
-| `onActiveItemChange` | `(itemId: string) => void` | — | 导航选择回调 |
-| `children` | `Snippet` | — | 显式组合内容；可与 `sections` 同时使用 |
+| `onCollapsedChange` | `(collapsed: boolean) => void` | — | 用户点击内置按钮切换后调用，参数为新折叠状态，不可取消。 |
+| `onWidthChange` | `(width: number) => void` | — | 用户调宽时调用，参数为夹取到 minWidth/maxWidth 的整数像素宽度。 |
+| `onActiveItemChange` | `(itemId: string) => void` | — | 导航选择或恢复合法持久化选中项时调用，参数为选中项 id；宿主处理内容与路由。 |
+| `children` | `Snippet` | — | 无参数显式内容，与 sections 同时渲染；直属 as="logo" 替换 Header Logo，as="footer" 放入固定 Footer，其余内容进入导航区。 |
 | `parts` | `ComponentPartsOf` | — | 配置调宽交互层使用的 Indicator，以及默认生成的 SnowUILogo / SidebarSection / SidebarItem；组件固定隐藏 Indicator 视觉 |
+| `ariaLabel` | `string` | `"Primary navigation"` | 导航及其滚动区域的可访问名称，多实例应提供可区分的名称。 |
+| `continuousHover` | `boolean` | `true` | 是否在可用导航项之间移动共享 hover 背景；关闭后恢复逐项 hover，选中状态不受影响。 |
 
 默认 Logo 的 host 为 `as="logo"`，内部以 `SnowUILogo as="logo-icon" variant="icon"` 与 `SnowUILogo as="logo-wordmark" variant="text"` 明确区分图形和字标。直接子节点 `as="logo"` 会被安置到 Header 并完整替换默认 Logo；自定义 Logo 同样必须用它的直接子节点 `as="logo-icon"` 标记折叠后保留的图形，其余直接子节点视为展开态文字或字标并在折叠时隐藏。直接子节点 `as="footer"` 会被安置到底部覆盖 Footer。它们不抑制 `sections` 生成的 Body 内容，其余显式子节点会与 `sections` 依次渲染在 Body。第三方内容不支持 `as` 时，用对应角色的 `Frame` 包裹。Sidebar 根输出 `data-collapsed`，并提供 Sidebar Context。
 
@@ -49,8 +51,8 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 ## 布局与行为
 
-- 展开默认宽度 `220px`，折叠宽度 `60px`，高度 `100%`。`resizable={true}` 时，右侧边框全高均可在默认 `160px`～`480px` 范围内拖拽调整展开宽度，并通过 `width` / `bind:width` 与 `onWidthChange` 对外同步；边缘不显示宽度调整指示器。设为 `false` 时不渲染透明调宽命中层。
-- 折叠与展开以 Sidebar 根宽度为主时间轴：展开宽度 → 60px 使用 `SIDE_PANEL_DISAPPEAR_MOTION` 的临界阻尼 spring timing，60px → 上次展开宽度使用 `SIDE_PANEL_APPEAR_MOTION` 的同系 timing；该 timing 复用 Frame 默认 move spring。拖拽期间临时关闭宽度 transition，使边缘与指针同步；`enableDefaultMotion={false}` 与系统 reduced motion 均关闭该过渡。
+- 展开默认宽度 `220px`，有图标模式折叠宽度 `60px`，text 模式折叠宽度 `0px`，高度 `100%`。`resizable={true}` 时，右侧边框全高均可在默认 `160px`～`480px` 范围内拖拽调整展开宽度，并通过 `width` / `bind:width` 与 `onWidthChange` 对外同步；边缘不显示宽度调整指示器。设为 `false` 时不渲染透明调宽命中层。
+- 折叠与展开以 Sidebar 根宽度为主时间轴：展开宽度 → 折叠宽度（icon 为 60px，text 为 0px）使用 `SIDE_PANEL_DISAPPEAR_MOTION` 的临界阻尼 spring timing，折叠宽度 → 上次展开宽度使用 `SIDE_PANEL_APPEAR_MOTION` 的同系 timing；该 timing 复用 Frame 默认 move spring。拖拽期间临时关闭宽度 transition，使边缘与指针同步；`enableDefaultMotion={false}` 与系统 reduced motion 均关闭该过渡。
 - 右侧透明调宽命中层仅在 `resizable={true}` 且展开态存在，沿 Sidebar 右侧边框全高铺开，不渲染可见短条。命中层与 Sidebar 的可见 overlay scrollbar Thumb 重叠时由 Indicator 通用能力自动关闭自身 Pointer、hover、拖拽与键盘命中，只保留滚动条交互。折叠不会覆盖已调整的展开宽度，再次展开时恢复该宽度。
 - 根容器默认 padding 为左右 `12px`（`var(--padding-3)`）、上下 `16px`（`var(--padding-4)`）；这是 Sidebar 组件默认值，不由使用方重复补 class 或 style。
 - Header 固定，`ScrollArea` 独立滚动并延伸到 Sidebar 底部；Footer 固定覆盖在 Body 之上。Sidebar 根的 Header / Body 默认 gap 为 `var(--gap-3)`（12px），即 Logo 区域与下方导航区域之间的默认间距；它与 Body 内相邻导航内容的 4px gap 是两个独立层级。
@@ -64,7 +66,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - active 视觉状态由 Sidebar 管理；宿主仍通过 `activeItemId` / `onActiveItemChange` 持有实际导航与内容切换。恢复合法的持久化 active item 时，Sidebar 会调用 `onActiveItemChange` 通知宿主。
 - 默认与自定义 `as="logo"` host 均使用 `4px` 左右 padding，使 Logo 图形与 SidebarItem 图标垂直对齐。
 - Header 在展开 / 折叠状态使用同一套起始对齐结构，Logo Icon 保持固定 leading slot；Test 示例以固定宽度左对齐宿主承载 Sidebar，避免居中宿主在根宽度变化时带动整个 Logo 位移。Logo host 强制保持单行，wordmark 通过 host 裁切与透明度收起，不会在窄宽度下换行并撑高 Logo，也不在动效起点直接切换整体 Header 对齐。
-- 折叠按钮是内置 `<Button bare iconOnly>`，与 Logo 位于同一 Header 水平线上，并始终位于 Logo host 分配区域的右边。透明命中 host 使用 `--size-6` 并由 Header flex 安置到内容右边界，`ResourceSize` 16 图标在 host 内居中；展开态图标不得越过 Header 与导航项共用的内容右边界，在 16px 名义根字号下与该边界保持 `4px` 间距。不得再用额外 transform 或非 Token 偏移改变此位置。Logo host 填充按钮之前的剩余 Header 宽度，只设置稳定的 36px 最小 leading slot；按钮会跟随 Sidebar 宽度以 Frame 默认 move spring 从 Logo 区域右侧平移到折叠位置，不发生瞬移。按钮外层保留同尺寸透明命中 host，因此鼠标进入 Sidebar，或直接进入按钮应出现的位置（包括折叠态超出根视觉边界的部分）时都能显示按钮。默认 `navigationVariant="icon"` 时按上述 hover / focus-within 规则显形；`navigationVariant="text"` 的折叠态隐藏 Logo、Body 和 Footer，只保留水平居中且始终可见的展开按钮。
+- 折叠按钮是内置 `<Button bare iconOnly>`，与 Logo 位于同一 Header 水平线上，并始终位于 Logo host 分配区域的右边。透明命中 host 使用 `--size-6` 并由 Header flex 安置到内容右边界，`ResourceSize` 16 图标在 host 内居中；展开态图标不得越过 Header 与导航项共用的内容右边界，在 16px 名义根字号下与该边界保持 `4px` 间距。不得再用额外 transform 或非 Token 偏移改变此位置。Logo host 填充按钮之前的剩余 Header 宽度，只设置稳定的 36px 最小 leading slot；按钮会跟随 Sidebar 宽度以 Frame 默认 move spring 从 Logo 区域右侧平移到折叠位置，不发生瞬移。按钮外层保留同尺寸透明命中 host，因此鼠标进入 Sidebar，或直接进入按钮应出现的位置（包括折叠态超出根视觉边界的部分）时都能显示按钮。默认 `navigationVariant="icon"` 时按上述 hover / focus-within 规则显形；`navigationVariant="text"` 的折叠态隐藏 Logo、Body 和 Footer，根宽度、padding 与 gap 收到零；展开按钮脱离根布局，挂载到 body 并在支持时进入浏览器 top layer，保持可见、可点击。按钮命中盒距当前可视区域右边 var(--padding-3)（名义 12px），上边 var(--padding-4)（名义 16px）；采用 fixed 定位保证页面滚动不改变边距。旧浏览器回退为 body 浮层。按钮保留原有图形与尺寸；键盘操作后焦点在内置按钮与浮层按钮间恢复，隐藏侧栏 inert 且 aria-hidden。
 - 折叠开始时，Sidebar 宽度、Item 文字与 Section 标题同时开始变化：宽度收窄，Item 文字和标题消费 Frame color bridge 渐隐；Item leading Icon 保持原横向位置。标题透明度归零后，标题高度、padding 与 Section gap 才消费 Frame size bridge 收起，Item 随后上移。展开时按同一组 bridge 平滑恢复。
 - 折叠按钮不内置 Tooltip，通过随状态更新的 `aria-label` 保留“展开 / 折叠侧边栏”可访问名称。其余内置 Tooltip（折叠态 Item label、Item action、Section action）统一位于对应元素右侧（`position="right"`）。Section 标题默认可折叠但不显示 Tooltip。
 - 默认不设置背景色。
@@ -120,6 +122,12 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
 ## 更新日志 (Changelog)
+
+### v1.9.0 (2026-09-18)
+
+- 无图标 text 模式完全收起，不保留 60px 空栏；展开按钮独立浮于可视区域右上角，右侧沿用 Sidebar 12px 间距 Token。
+- 保留有图标模式的 60px 折叠栏；补齐隐藏内容不可聚焦、浮层清理及键盘焦点恢复。
+
 
 ### v1.8.0 (2026-08-25)
 

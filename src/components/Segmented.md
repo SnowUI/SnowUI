@@ -44,18 +44,20 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `value` | `string` | - | 当前激活值,支持 `bind:` |
-| `variant` | `'pill' \| 'solid' \| 'underline' \| 'icon-toggle' \| 'bare'` | `'pill'` | 同 Tab |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'sm'` | 同 Tab；控制容器 padding / radius / gap，并作为 Button Item 默认 size；Item 遵循 `style > class > Button size > Tab size` |
-| `row` | `boolean` | `true` | 同 Tab，横向排列 |
-| `column` | `boolean` | `false` | 同 Tab，纵向排列 |
-| `fill` | `boolean` | `false` | 同 Tab;容器有显式宽度时,横向子项等宽填满 |
-| `onChange` | `(value: string) => void` | - | 切换回调 |
-| `name` | `string` | - | 表单字段名;存在时渲染 hidden input 接入 Form |
-| `enableDefaultMotion` | `boolean` | `true` | 是否启用 Frame 默认动效；indicator 与 item 尺寸变化使用 Frame motion bridge |
-| `items` | `TabItem[]` | `[]` | 默认内置模式数据源，交给真实 Tab 生成 Button |
-| `parts.Button` | `Button Props` | `undefined` | 批量配置默认内置 Button；宿主 Tab 本身不使用 parts |
-| 其余兼容 Props | `ComponentProps<typeof Tab>` | 同 Tab | 平铺到真实 Tab 宿主 |
+| `value` | `string` | — | 当前选项的唯一值，支持 `bind:value`；点击或方向键激活选项时更新。未指定或没有匹配项时，视觉回退到首个可用项，但不会自动写回绑定值；表单场景应显式初始化。 |
+| `variant` | `'pill' \| 'solid' \| 'underline' \| 'icon-toggle' \| 'bare'` | `'pill'` | pill 为带背景滑块，solid 为实色选中项，underline 为下划线，icon-toggle 仅展开选中项文字，bare 仅通过透明度区分。icon-toggle 子项需包含 Icon 与 Text，或在 items 中同时提供 icon 与 label。 |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'sm'` | 控制容器 padding、radius、gap，并作为 Button 子项默认尺寸；子项优先级为 style > class > Button size > Segmented size。 |
+| `row` | `boolean` | `false` | 显式横向排列；row 与 column 都未启用时仍按横向显示，两者同时为 true 时 row 优先。 |
+| `column` | `boolean` | `false` | 纵向排列，方向键改为上下切换；仅在 row 未启用时生效。 |
+| `fill` | `boolean` | `false` | 容器有明确宽度时，让横向子项等宽填满；未限定宽度时按内容布局。 |
+| `onChange` | `(value: string) => void` | — | 用户激活不同的可用选项后调用，参数为新 value；与绑定值同步，不可取消选择。重复激活当前项不触发。 |
+| `name` | `string` | — | 非空时输出同名隐藏字段，原生 FormData 读取当前 value；未定义值提交为空字符串。需置于表单内部；业务绑定初值的恢复由调用方在 reset 时处理。 |
+| `enableDefaultMotion` | `boolean` | `true` | 传递给宿主的默认动效开关；关闭默认 Frame 动效，不改变选择值、键盘或表单语义。 |
+| `items` | `TabItem[]` | `[]` | 默认内置选项。每项必填唯一 value 与可读 label，可选 icon 组件与 disabled；禁用项不可选择。提供 children 时改用显式内容，不渲染 items。 |
+| `children` | `Snippet` | — | 无参数的显式子项内容，使用 Button as="item" 与唯一 value；优先于 items，逐项直接配置 Button Props。 |
+| `class` | `string` | `''` | 合并到真实 Tab 根节点的外部 class，保留 Segmented 自身标识；不作用于隐藏表单字段。 |
+| `parts` | `ComponentPartsOf<{ Button: typeof Button }>` | — | 通过 parts.Button 批量配置 items 模式生成的 Button，例如 scaleOnHover；不覆盖显式 children 子项，不提供 parts.Tab。 |
+| 其余兼容 Props | `ComponentProps<typeof Tab>` | 同 Tab | 直接传递给 Tab 宿主；role、itemRole、selectionFollowsFocus 由 Segmented 固定，不可作为普通 Tab 参数改写。 |
 
 ### 2.2 子项约定
 
@@ -75,7 +77,7 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 <!-- 提交后:{ device: "web" } -->
 ```
 
-实现:当传入 `name` 时,Segmented 在 Tab 的 children 末尾追加 `<input type="hidden" name={name} value={value}>`,通过原生表单提交机制把当前 value 暴露给 Form。
+实现:当传入 `name` 时,Segmented 在 Tab 根节点之后追加 `<input type="hidden" name={name} value={value}>`,通过原生表单提交机制把当前 value 暴露给 Form。
 
 ---
 

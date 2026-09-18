@@ -113,6 +113,22 @@
 
     let internalCollapsed = $state(untrack(() => defaultCollapsed));
     const isCollapsed = $derived(collapsed ?? internalCollapsed);
+    const fullyCollapsed = $derived(isCollapsed && navigationVariant === "text");
+    let floatingToggleHost: HTMLElement | undefined;
+    let restoreToggleFocus = $state(false);
+
+    // 脱离侧栏的布局与裁切；支持时进入浏览器顶层，按钮仍由 Sidebar 拥有。
+    function floatingToggle(node: HTMLElement) {
+        floatingToggleHost = node;
+        document.body.appendChild(node);
+        if (typeof node.showPopover === "function") node.showPopover();
+        if (restoreToggleFocus) node.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+        return { destroy() {
+            if (typeof node.hidePopover === "function" && node.matches(":popover-open")) node.hidePopover();
+            node.remove();
+            floatingToggleHost = undefined;
+        } };
+    }
     let internalActiveItemId = $state<string | undefined>(undefined);
     let activeItemSectionId = $state<string | undefined>(undefined);
     const resolvedActiveItemId = $derived(
@@ -191,11 +207,17 @@
     };
     setContext(SIDEBAR_CONTEXT_KEY, context);
 
-    function toggleCollapsed() {
+    async function toggleCollapsed() {
+        restoreToggleFocus = !!(rootElement?.contains(document.activeElement) || floatingToggleHost?.contains(document.activeElement));
         const next = !isCollapsed;
         internalCollapsed = next;
         collapsed = next;
         onCollapsedChange?.(next);
+        await tick();
+        if (!next && restoreToggleFocus) {
+            headerElement?.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+            restoreToggleFocus = false;
+        }
     }
 
     function handleWidthChange(next: number) {
@@ -477,7 +499,10 @@
     class={["snowui-sidebar", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
     data-collapsed={isCollapsed ? "true" : "false"}
+    aria-hidden={fullyCollapsed ? "true" : undefined}
+    inert={fullyCollapsed}
     data-navigation-variant={navigationVariant}
+    data-restore-toggle-focus={!isCollapsed && restoreToggleFocus ? "true" : undefined}
     data-resizable={resizable ? "true" : "false"}
     data-resizing={resizing ? "true" : undefined}
     data-has-footer={hasExternalFooter ? "true" : undefined}
@@ -586,6 +611,14 @@
     {/if}
 </FramePro>
 
+{#if fullyCollapsed}
+    <div use:floatingToggle popover="manual" class="snowui-sidebar-floating-toggle">
+        <Button bare size="sm" aria-label="Expand sidebar" onclick={toggleCollapsed}>
+            <ComponentIcon name="rightbar" aria-hidden="true" />
+        </Button>
+    </div>
+{/if}
+
 <style>
     :global(:where(.snowui-sidebar)) {
         --snowui-sidebar-width: 220px;
@@ -614,6 +647,37 @@
     :global(:where(.snowui-sidebar[data-collapsed="true"])) {
         width: var(--snowui-sidebar-collapsed-width-override, var(--snowui-sidebar-collapsed-width));
     }
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"])) {
+        width: 0;
+        min-width: 0;
+        padding: 0;
+        gap: 0;
+        flex-shrink: 0;
+    }
+    :global(:where(.snowui-sidebar-floating-toggle)) {
+        position: fixed;
+        inset: var(--padding-4) var(--padding-3) auto auto;
+        width: var(--size-6);
+        height: var(--size-6);
+        margin: 0;
+        padding: 0;
+        border: 0;
+        overflow: visible;
+        background: transparent;
+        color: var(--black-100);
+        z-index: 1000;
+    }
+    :global(:where(.snowui-sidebar-floating-toggle:popover-open)),
+    :global(:where(.snowui-sidebar-floating-toggle:not(:popover-open))) {
+        align-items: center;
+        justify-content: center;
+    }
+    :global(:where(.snowui-sidebar-floating-toggle:popover-open)) {
+        display: flex;
+    }
+    @supports not selector(:popover-open) {
+        :global(:where(.snowui-sidebar-floating-toggle)) { display: flex; }
+    }
     :global(:where(.snowui-sidebar[data-resizing="true"])) {
         transition: none;
     }
@@ -630,6 +694,9 @@
             --snowui-sidebar-logo-padding-y-override,
             var(--padding-1)
         );
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-header)) {
+        display: none;
     }
     :global(:where(.snowui-sidebar-header > [data-as="logo"])) {
         max-width: 100%;
@@ -690,7 +757,7 @@
         visibility: hidden;
         pointer-events: none;
     }
-    :global(:where(.snowui-sidebar:hover, .snowui-sidebar:focus-within, .snowui-sidebar-collapse-button-host:hover) .snowui-sidebar-collapse-button) {
+    :global(:where(.snowui-sidebar:hover, .snowui-sidebar:focus-within, .snowui-sidebar[data-restore-toggle-focus="true"], .snowui-sidebar-collapse-button-host:hover) .snowui-sidebar-collapse-button) {
         visibility: visible;
         pointer-events: auto;
     }

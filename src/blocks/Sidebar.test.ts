@@ -131,8 +131,8 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "text 变体折叠后只显示内置展开按钮，不显示 Logo、导航 Item 或 Footer",
-            layout: "展开按钮在 60px 折叠栏的内容区域水平居中，左对齐 Test 宿主保持 Sidebar 左边缘稳定",
-            interaction: "折叠状态无需 hover 即可看到展开按钮；按钮不内置 Tooltip，并通过 aria-label 保留名称；展开后标题默认可折叠且无 Tooltip",
+            layout: "text 折叠根宽度与 padding 为零，展开按钮在当前可视区域右上角，右边距12px、上边距16px（随 Token 缩放）；有图标模式仍为60px",
+            interaction: "折叠状态无需 hover 即可看到顶层展开按钮；键盘切换后焦点恢复，反复展开/折叠只存在一个浮层按钮，卸载后无浮层残留；展开后标题默认可折叠且无 Tooltip",
             performance: "不扫描 children 或 sections 判断是否存在 Icon，变体完全由 navigationVariant 显式决定",
             responsive: "隐藏导航内容后不存在不可见的键盘焦点；展开恢复完整文本导航",
         },
