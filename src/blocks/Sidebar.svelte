@@ -1,6 +1,6 @@
 <!-- Sidebar PRO Block v1.7.3. 文档: ./Sidebar.md -->
 <script lang="ts">
-    import { onMount, setContext, tick, untrack, type Snippet } from "svelte";
+    import { onDestroy, onMount, setContext, tick, untrack, type Snippet } from "svelte";
     import {
         Button,
         Indicator,
@@ -138,6 +138,42 @@
     let persistenceReady = $state(false);
     let rootElement = $state<HTMLElement>();
     let headerElement = $state<HTMLElement>();
+    let previousFullyCollapsed: boolean | undefined;
+    let toggleMove: Animation | undefined;
+    let toggleMoveRevision = 0;
+
+    // 在 Header 与顶层浮动按钮交接前保留可见位置，复用侧栏宽度动效的时间曲线。
+    $effect.pre(() => {
+        const next = fullyCollapsed;
+        const previous = previousFullyCollapsed;
+        previousFullyCollapsed = next;
+        if (previous === undefined || previous === next) return;
+        const origin = (next
+            ? headerElement?.querySelector<HTMLElement>(".snowui-sidebar-collapse-button-host")
+            : floatingToggleHost)?.getBoundingClientRect();
+        const revision = ++toggleMoveRevision;
+        toggleMove?.cancel();
+        toggleMove = undefined;
+        const enabled = untrack(() => enableDefaultMotion && navigationVariant === "text");
+        if (!origin || !enabled || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        void tick().then(() => {
+            if (revision !== toggleMoveRevision) return;
+            const target = next ? floatingToggleHost
+                : headerElement?.querySelector<HTMLElement>(".snowui-sidebar-collapse-button-host");
+            if (!target) return;
+            const destination = target.getBoundingClientRect();
+            const timing = next ? sidebarCollapseTiming : sidebarExpandTiming;
+            toggleMove = target.animate([
+                { transform: `translate(${origin.left - destination.left}px, ${origin.top - destination.top}px)` },
+                { transform: "translate(0px, 0px)" },
+            ], { duration: timing.duration, easing: timing.easing });
+        });
+    });
+    onDestroy(() => {
+        toggleMoveRevision++;
+        toggleMove?.cancel();
+    });
+
     let bodyViewport = $state<HTMLElement>();
     let navigationElement = $state<HTMLElement>();
     const continuousHoverController = new ContinuousHoverController();
@@ -751,6 +787,9 @@
         flex: 0 0 var(--size-6);
         align-items: center;
         justify-content: center;
+    }
+    :global(:where(.snowui-sidebar[data-collapsed="false"] .snowui-sidebar-collapse-button-host)) {
+        margin-right: var(--padding-1);
     }
     :global(:where(.snowui-sidebar-collapse-button)) {
         flex: 0 0 auto;
