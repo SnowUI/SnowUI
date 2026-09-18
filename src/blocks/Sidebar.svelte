@@ -539,7 +539,7 @@
         {/if}
         <span class="snowui-sidebar-collapse-button-host">
             <Button
-                bare
+                iconOnly
                 size="sm"
                 class="snowui-sidebar-collapse-button"
                 aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -613,7 +613,7 @@
 
 {#if fullyCollapsed}
     <div use:floatingToggle popover="manual" class="snowui-sidebar-floating-toggle">
-        <Button bare size="sm" aria-label="Expand sidebar" onclick={toggleCollapsed}>
+        <Button iconOnly size="sm" aria-label="Expand sidebar" onclick={toggleCollapsed}>
             <ComponentIcon name="rightbar" aria-hidden="true" />
         </Button>
     </div>
