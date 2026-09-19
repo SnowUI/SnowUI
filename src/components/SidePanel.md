@@ -9,6 +9,36 @@
 > **包归属**: PRO
 > **职责**: 右侧详情弹出窗，支持浮层与页面右侧内嵌两种预览形态。
 
+## Props
+
+| Prop | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `open` | `boolean` | `false` | 是否显示面板，支持 `bind:open` |
+| `placement` | `"floating" \| "inline"` | `"floating"` | 浮层或内嵌到页面右侧，支持 `bind:placement` |
+| `width` | `number` | `460` | 面板宽度，支持 `bind:width` |
+| `minWidth` | `number` | `320` | 拖动调整面板宽度时允许的最小宽度。 |
+| `maxWidth` | `number` | `720` | 拖动调整面板宽度时允许的最大宽度。 |
+| `inlineMotionOwner` | `"component" \| "layout"` | `"component"` | 内嵌位移动效归属。组件级 fallback 为 `component`；采用本文默认浮动停靠集成时必须传 `layout`，并配合 layout helper 与常驻 rail。 |
+| `showTopToolbar` | `boolean` | `true` | 是否显示上工具栏（内容固定，不可换按钮） |
+| `editable` | `boolean` | `false` | 内容可编辑；`true` 时自动显示下工具栏默认按钮 |
+| `showBottomToolbar` | `boolean` | 自动 | 显式覆盖下栏显隐；默认 = `editable` 或任一下栏自定义 |
+| `bottomLeading` | `Snippet` | — | 下栏左侧整组显式替换；传入即显示下栏 |
+| `bottomTrailing` | `Snippet` | — | 下栏右侧整组显式替换；传入即显示下栏 |
+| `bottomLeadingActions` | `SidePanelToolbarAction[]` | 可编辑时默认 copy/delete | 数据内置；传入即显示下栏；有 `bottomLeading` 时忽略 |
+| `bottomTrailingActions` | `SidePanelToolbarAction[]` | 可编辑时默认 取消/保存 | 数据内置；传入即显示下栏；有 `bottomTrailing` 时忽略 |
+| `title` | `string` | `"Details"` | 上工具栏右侧标题（只读，Black/20%） |
+| `closeOnEscape` | `boolean` | `true` | Escape 关闭 |
+| `closeOnOutside` | `boolean` | `true` | 点击 SidePanel 外区域关闭 |
+| `onOpenChange` | `(open: boolean) => void` | — | 面板打开状态变化后回调。 |
+| `onPlacementChange` | `(placement: SidePanelPlacement) => void` | — | 浮层与内嵌位置切换后回调。 |
+| `onPrevious` | `() => void \| Promise<void>` | — | 点击上工具栏“上一项”后回调。 |
+| `onNext` | `() => void \| Promise<void>` | — | 点击上工具栏“下一项”后回调。 |
+| `onCopy` | `() => void \| Promise<void>` | — | 点击默认下工具栏复制操作后回调。 |
+| `onDelete` | `() => void \| Promise<void>` | — | 点击默认下工具栏删除操作后回调。 |
+| `onClose` | `() => void \| Promise<void>` | — | 关闭前回调 |
+| `children` | `Snippet` | — | 面板滚动内容区，由调用方提供详情或编辑内容。 |
+| `parts` | `{ Button?: ..., Indicator?: ... }` | — | 内置工具栏 Button 与透明调宽交互层；Indicator 视觉固定隐藏 |
+
 ## AI Zone
 
 - `SidePanel` 是 PRO 复合管理布局组件，放置在 `pro/src/components/SidePanel.svelte`。
@@ -31,30 +61,6 @@
 - 下栏优先级：Snippet **>** actions 数组 **>** 默认可编辑按钮。
 - 内置 Button 与透明调宽交互层通过 `parts.Button` / `parts.Indicator` 批量配置；组件固定隐藏 Indicator 视觉。
 - 内容区滚动渐隐使用 `.snowui-scroll-mask` + `data-scroll-mask`。上/下 solid-ratio **0.8**。
-
-## Props
-
-| Prop | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `open` | `boolean` | `false` | 是否显示面板，支持 `bind:open` |
-| `placement` | `"floating" \| "inline"` | `"floating"` | 浮层或内嵌到页面右侧，支持 `bind:placement` |
-| `width` | `number` | `460` | 面板宽度，支持 `bind:width` |
-| `minWidth` / `maxWidth` | `number` | `320` / `720` | 拖动宽度边界 |
-| `inlineMotionOwner` | `"component" \| "layout"` | `"component"` | 内嵌位移动效归属。组件级 fallback 为 `component`；采用本文默认浮动停靠集成时必须传 `layout`，并配合 layout helper 与常驻 rail。 |
-| `showTopToolbar` | `boolean` | `true` | 是否显示上工具栏（内容固定，不可换按钮） |
-| `editable` | `boolean` | `false` | 内容可编辑；`true` 时自动显示下工具栏默认按钮 |
-| `showBottomToolbar` | `boolean` | 自动 | 显式覆盖下栏显隐；默认 = `editable` 或任一下栏自定义 |
-| `bottomLeading` | `Snippet` | — | 下栏左侧整组显式替换；传入即显示下栏 |
-| `bottomTrailing` | `Snippet` | — | 下栏右侧整组显式替换；传入即显示下栏 |
-| `bottomLeadingActions` | `SidePanelToolbarAction[]` | 可编辑时默认 copy/delete | 数据内置；传入即显示下栏；有 `bottomLeading` 时忽略 |
-| `bottomTrailingActions` | `SidePanelToolbarAction[]` | 可编辑时默认 取消/保存 | 数据内置；传入即显示下栏；有 `bottomTrailing` 时忽略 |
-| `title` | `string` | `"Details"` | 上工具栏右侧标题（只读，Black/20%） |
-| `closeOnEscape` | `boolean` | `true` | Escape 关闭 |
-| `closeOnOutside` | `boolean` | `true` | 点击 SidePanel 外区域关闭 |
-| `onPrevious` / `onNext` | `() => void \| Promise<void>` | — | 上一项 / 下一项（上栏内置按钮） |
-| `onCopy` / `onDelete` | `() => void \| Promise<void>` | — | 下栏默认复制 / 删除 |
-| `onClose` | `() => void \| Promise<void>` | — | 关闭前回调 |
-| `parts` | `{ Button?: ..., Indicator?: ... }` | — | 内置工具栏 Button 与透明调宽交互层；Indicator 视觉固定隐藏 |
 
 `SidePanelToolbarAction` 字段：
 
