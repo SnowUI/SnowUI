@@ -26,7 +26,9 @@
 | `bottomTrailing` | `Snippet` | — | 下栏右侧整组显式替换；传入即显示下栏 |
 | `bottomLeadingActions` | `SidePanelToolbarAction[]` | 可编辑时默认 copy/delete | 数据内置；传入即显示下栏；有 `bottomLeading` 时忽略 |
 | `bottomTrailingActions` | `SidePanelToolbarAction[]` | 可编辑时默认 取消/保存 | 数据内置；传入即显示下栏；有 `bottomTrailing` 时忽略 |
-| `title` | `string` | `"Details"` | 上工具栏右侧标题（只读，Black/20%） |
+| `title` | `string` | `"Details"` | 上工具栏右侧标题及面板无障碍名称 |
+| `backdrop` | `false \| "opaque" \| "blur" \| "transparent"` | `false` | 浮层背景，复用 Dialog 共享遮罩；内嵌模式忽略 |
+| `showTitle` | `boolean` | `false` | 是否显示工具栏标题；关闭后保留无障碍名称与工具栏按钮 |
 | `closeOnEscape` | `boolean` | `true` | Escape 关闭 |
 | `closeOnOutside` | `boolean` | `true` | 点击 SidePanel 外区域关闭 |
 | `onOpenChange` | `(open: boolean) => void` | — | 面板打开状态变化后回调。 |
@@ -338,3 +340,7 @@ SidePanel 本身提供高度能力，但页面负责决定它相对于哪个空�
   </Frame>
 </SidePanel>
 ```
+
+### 浮层背景
+
+默认无遮罩，保留背景记录切换。设置 `backdrop="opaque"` 使用 10% 黑色遮罩；`"blur"` 在同一遮罩上增加 `var(--size-5)`（20px）背景模糊；`"transparent"` 仅阻挡背景交互。视觉复用 OSS 的 `.snowui-backdrop`，淡入淡出复用 Dialog motion token，随 SidePanel presence 卸载。内嵌模式不显示遮罩。点击遮罩遵循 `closeOnOutside`，关闭按钮和 Escape 行为不变。

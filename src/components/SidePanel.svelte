@@ -7,6 +7,7 @@
         Tooltip,
         useLocale,
         type FrameProps,
+        type DialogBackdrop,
     } from "@snowui-design-system/components";
     import { useOverlayPresence } from "@snowui-design-system/components/logic/overlay-presence.svelte";
     import { resizeManager } from "@snowui-design-system/components/logic/observer.svelte";
@@ -15,6 +16,7 @@
         SIDE_PANEL_APPEAR_MOTION,
         SIDE_PANEL_DISAPPEAR_MOTION,
     } from "@snowui-design-system/components/motion/presets/effects";
+    import { DIALOG_BACKDROP_MOTION_STYLE } from "@snowui-design-system/components/motion/presets/dialog";
     import { getMotionTotalDurationMs } from "@snowui-design-system/components/motion/presets/utils";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
     import { provideComponentParts } from "@snowui-design-system/components/logic/component-parts.svelte";
@@ -48,6 +50,10 @@
         /** 下栏右侧数据内置替换；未传 bottomTrailing 时生效；传入即令下工具栏出现 */
         bottomTrailingActions?: SidePanelToolbarAction[];
         title?: string;
+        /** 是否显示上工具栏标题；不影响面板无障碍名称。 */
+        showTitle?: boolean;
+        /** 浮层背景；false 保留页面交互，内嵌模式不显示遮罩。 */
+        backdrop?: DialogBackdrop | false;
         closeOnEscape?: boolean;
         /** 点击 SidePanel 外区域是否关闭，默认 true */
         closeOnOutside?: boolean;
@@ -81,6 +87,8 @@
         bottomLeadingActions = undefined,
         bottomTrailingActions = undefined,
         title = "Details",
+        showTitle = false,
+        backdrop = false,
         closeOnEscape = true,
         closeOnOutside = true,
         onOpenChange = undefined,
@@ -421,7 +429,7 @@
                         {/each}
                     </div>
                     <div class="snowui-side-panel-title-group">
-                        <span class="snowui-side-panel-title">{title}</span>
+                        {#if showTitle}<span class="snowui-side-panel-title">{title}</span>{/if}
                         <Button
                             bare
                             emphasis={parts?.Button?.emphasis ?? "muted"}
@@ -509,11 +517,40 @@
             : "snowui-side-panel-inline-layer"}
         aria-hidden={open ? undefined : "true"}
     >
+        {#if placement === "floating" && backdrop}
+            <div
+                class="snowui-side-panel-backdrop snowui-backdrop"
+                data-backdrop={backdrop}
+                data-closing={presence.closing ? "true" : undefined}
+                style={DIALOG_BACKDROP_MOTION_STYLE}
+                aria-hidden="true"
+            ></div>
+        {/if}
         {@render panelContent()}
     </div>
 {/if}
 
 <style>
+    :global(:where(.snowui-side-panel-backdrop)) {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: auto;
+        opacity: 1;
+        transition: opacity var(--snowui-dialog-backdrop-appear-duration) var(--snowui-dialog-backdrop-appear-easing);
+    }
+    @starting-style {
+        :global(:where(.snowui-side-panel-backdrop)) { opacity: 0; }
+    }
+    :global(:where(.snowui-side-panel-backdrop[data-closing="true"])) {
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--snowui-dialog-backdrop-disappear-duration) var(--snowui-dialog-backdrop-disappear-easing);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-side-panel-backdrop)) { transition: none; }
+    }
+
     :global(:where(.snowui-side-panel-layer)) {
         position: fixed;
         inset: var(--padding-4) var(--padding-4) var(--padding-4) auto;
