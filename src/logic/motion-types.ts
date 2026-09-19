@@ -99,7 +99,7 @@ export interface LayoutTransitionOptions {
 }
 
 /**
- * 元素组注册选项 (用于 SplitText 等)
+ * 元素组注册选项 (用于调用方提供的元素组)
  */
 export interface RegisterGroupOptions {
     /** 编排模式 */

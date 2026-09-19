@@ -141,7 +141,6 @@ export {
     type ContinuousHoverOptions,
 } from "./logic/continuous-hover.svelte";
 
-// SplitText / splitText 已于 2026-05-07 迁入 PRO（复杂动效归 PRO 原则）
 
 // PRO 包跨包消费需要的工具导出
 export { resizeManager } from './logic/observer.svelte'

@@ -16,7 +16,6 @@
 | :--- | :--- | :--- |
 | `src/logic/` | 动效基础设施、状态桥、编排器、默认动效解析 | `motion.svelte.ts`、`frame-motion-defaults.ts`、`timeline.svelte.ts` |
 | `src/motion/` | Frame 默认动效资源文件（`while-*.ts`、`bridge.ts`、`rotate.css`、原子动效构建器） | `bridge.ts`、`while-hover.ts`、`primitives.ts` |
-| `pro/src/motion/` | 复杂动效组件 / PRO 指定动效 | `SplitText.svelte`、`splitText.ts` |
 
 简单理解：
 
@@ -78,12 +77,6 @@
 - 定义 `@keyframes snowui-frame-loop-rotate-clockwise` 全局关键帧。
 - 由 `Frame.svelte` 直接 import。
 
-### `SplitText.svelte` / `splitText.ts` — 已迁入 PRO
-
-- **归属**：`pro/src/motion/`（复杂动效 → PRO 原则，2026-05-07）
-- 职责：只做文字拆分，把文本拆成 `chars / words / lines? / container`。
-- 适用：Hero 标题逐字出现、强调文本入场、按字符/单词序列播放。
-
 ### `FlowText.md`
 
 - 迁移说明，不是实现文件。
@@ -107,7 +100,6 @@
 
 ### 3. 最常见的重复问题
 
-- 不要把 `SplitText` 做成"拆分 + 编排 + 动效一体化胖组件"；现有设计明确要求只负责拆分。
 - 不要再创建 `motion/FlowText.svelte` 一类兼容壳；统一从 `components/` 主实现导入。
 
 ---
@@ -116,7 +108,7 @@
 
 如果组件要支持文字序列动效，推荐顺序是：
 
-1. 先用 PRO 包的 `SplitText.svelte` 或 `splitText.ts` 拆出元素
+1. 由调用方提供待编排的元素数组
 2. 再用 `logic/motion.svelte.ts` 的 `registerGroup()` 注册
 3. 具体顺序、延迟、反向播放交给 Motion 编排器处理
 

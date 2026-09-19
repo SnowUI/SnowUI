@@ -16,7 +16,6 @@ const patterns = [
     /import\s+.*\bFlowText\b/,
     /import\s+.*\bImageViewer\b/,
     /import\s+.*\bField\b/,
-    /import\s+.*\bSplitText\b/,
     /import\s+.*\bAnimatePresence\b/,
     /from\s+['"].*\/(frame-state|frame-motion|frame-orchestrator|frame-scale-observer|frame-scale-resolver|frame-perception|frame-actions|frame-class-state|frame-inline-style|motion-engine|motion-orchestration|timeline|overlay-scrollbar|split-pane)['"]/,
     /from\s+['"]@snowui-design-system\/components-pro['"]/,
