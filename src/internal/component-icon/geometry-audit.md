@@ -4,7 +4,7 @@
 
 扫描 Components 与 PRO 的 src 中 Svelte、TypeScript、CSS：核对 ComponentIcon 随包集合，以及直接 SVG、SVG data URL 和动态 SVG 创建入口；不包括调用方显式传入内容及测试示例自绘图形。
 
-31 个功能图标、34 个 weight 变体逐一对照 raw-assets。浏览器测量 viewBox、图形包围盒相对外框的位置、宽度及高度；viewBox 必须完全一致，包围盒误差在 16px 名义尺寸下不得超过 0.1px（允许 SVG 优化的曲线舍入）。生成器另外校验随包 path 内容与 assets 一致，仅允许黑色归一化为 currentColor。包围盒检查不等同于逐像素光栅比较。
+33 个功能图标、36 个 weight 变体逐一对照 raw-assets。浏览器测量 viewBox、图形包围盒相对外框的位置、宽度及高度；viewBox 必须完全一致，包围盒误差在 16px 名义尺寸下不得超过 0.1px（允许 SVG 优化的曲线舍入）。生成器另外校验随包 path 内容与 assets 一致，仅允许黑色归一化为 currentColor。包围盒检查不等同于逐像素光栅比较。
 
 ## 发现与修复
 
@@ -12,7 +12,7 @@ Indicator corner 原先单独绘制中心线，在 32×32 外框中使用 2 单�
 
 现通过 ComponentIcon 复用 rounded-corner 的资源路径，并加入随包 fallback。删除私有 SVG 和描边加粗规则，各状态维持原图的 8,8,16,16 包围盒；继续保留颜色反馈、宿主显隐、拖拽与键盘调整。没有修改 raw-assets 原文件。
 
-其余 33 个既有功能图标变体未发现比例漂移，无需重绘。
+其余 35 个既有功能图标变体未发现比例漂移，无需重绘。SidePanel 使用的 `rightbar-mode` 与 `windowed` 已加入随包 fallback，并保持资源原始外框比例。
 
 ## 非功能图标 SVG 的逐项归类
 
@@ -57,6 +57,7 @@ Indicator corner 原先单独绘制中心线，在 32×32 外框中使用 2 单�
 | `moon` | `regular` | `resource-base/raw-assets/icons/phosphor/Moon.svg` | 一致 |
 | `plus` | `regular` | `resource-base/raw-assets/icons/phosphor/Plus.svg` | 一致 |
 | `rightbar` | `regular` | `resource-base/raw-assets/icons/snowui/Rightbar.svg` | 一致 |
+| `rightbar-mode` | `regular` | `resource-base/raw-assets/icons/snowui/RightbarMode.svg` | 一致 |
 | `rounded-corner` | `regular` | `resource-base/raw-assets/icons/snowui/RoundedCorner.svg` | 一致 |
 | `search` | `regular` | `resource-base/raw-assets/icons/snowui/Search.svg` | 一致 |
 | `sun` | `regular` | `resource-base/raw-assets/icons/phosphor/Sun.svg` | 一致 |
@@ -65,6 +66,7 @@ Indicator corner 原先单独绘制中心线，在 32×32 外框中使用 2 单�
 | `user` | `regular` | `resource-base/raw-assets/icons/phosphor/User.svg` | 一致 |
 | `warning` | `regular` | `resource-base/raw-assets/icons/phosphor/Warning.svg` | 一致 |
 | `warning` | `fill` | `resource-base/raw-assets/icons/phosphor/Warning-fill.svg` | 一致 |
+| `windowed` | `regular` | `resource-base/raw-assets/icons/snowui/Windowed.svg` | 一致 |
 | `x-circle` | `regular` | `resource-base/raw-assets/icons/snowui/XCircle.svg` | 一致 |
 | `x-circle` | `fill` | `resource-base/raw-assets/icons/snowui/XCircle-fill.svg` | 一致 |
 

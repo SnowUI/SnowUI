@@ -1,5 +1,5 @@
 <!--
- Tooltip 文字提示组件 v1.22.3
+ Tooltip 文字提示组件 v1.22.4
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
  变更 (2026-08-24): warm 切换在新内容提交后立即测量并定位，删除 prepare 后额外等待的启动帧，使连续切换在首个可用绘制帧进入 moving。
@@ -1910,6 +1910,8 @@
 
     :global(:where(.snowui-tooltip-backdrop)) {
         z-index: 0;
+        /* 透明绘制面确保浏览器合成实际 backdrop 像素，不改变 Foreground 的颜色与动效。 */
+        background-image: linear-gradient(transparent, transparent);
         backdrop-filter: blur(1.25rem);
         -webkit-backdrop-filter: blur(1.25rem);
         will-change: backdrop-filter;

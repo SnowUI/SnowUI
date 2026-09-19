@@ -35,6 +35,7 @@ const names = [
     "moon",
     "plus",
     "rightbar",
+    "rightbar-mode",
     "rounded-corner",
     "search",
     "sun",
@@ -42,6 +43,7 @@ const names = [
     "trash",
     "user",
     "warning",
+    "windowed",
     "x-circle",
 ];
 const extraWeights = new Map([

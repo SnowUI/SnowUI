@@ -171,6 +171,13 @@ export const BUILTIN_ICON_DATA: Record<string, BuiltinIconData | undefined> = {
             "regular": "<path fill=\"currentColor\" d=\"M22 26a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6v20z\" opacity=\".08\"/><path fill=\"currentColor\" d=\"M20 6v20a1 1 0 1 0 2 0V6a1 1 0 1 0-2 0\"/><path fill=\"currentColor\" d=\"M27 5s.828 0 1.414.586c0 0 .586.586.586 1.414v18s0 .828-.586 1.414c0 0-.586.586-1.414.586H5s-.828 0-1.414-.586c0 0-.586-.586-.586-1.414V7s0-.828.586-1.414C3.586 5.586 4.172 5 5 5zM5 7v18h22V7z\"/><path fill=\"currentColor\" d=\"M25 11h3a1 1 0 1 0 0-2h-3a1 1 0 1 0 0 2M25 15h3a1 1 0 1 0 0-2h-3a1 1 0 1 0 0 2M25 19h3a1 1 0 1 0 0-2h-3a1 1 0 1 0 0 2\"/>"
         }
     },
+    "rightbar-mode": {
+        "sourceCollection": "snowui",
+        "viewBox": "0 0 32 32",
+        "weights": {
+            "regular": "<path fill=\"currentColor\" fill-rule=\"evenodd\" d=\"M5 7h22v18H5zM3 7a2 2 0 0 1 2-2h22a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zm18 2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2z\" clip-rule=\"evenodd\"/>"
+        }
+    },
     "rounded-corner": {
         "sourceCollection": "snowui",
         "viewBox": "0 0 32 32",
@@ -219,6 +226,13 @@ export const BUILTIN_ICON_DATA: Record<string, BuiltinIconData | undefined> = {
         "weights": {
             "regular": "<path fill=\"currentColor\" d=\"M29.6 23.511 18.669 4.527a3.095 3.095 0 0 0-5.338 0L2.4 23.511a2.94 2.94 0 0 0 0 2.965A3.04 3.04 0 0 0 5.069 28H26.93a3.05 3.05 0 0 0 2.666-1.524 2.94 2.94 0 0 0 .003-2.965m-1.734 1.964a1.06 1.06 0 0 1-.935.525H5.07a1.06 1.06 0 0 1-.935-.525.95.95 0 0 1 0-.965l10.93-18.984a1.093 1.093 0 0 1 1.876 0L27.87 24.51a.95.95 0 0 1-.005.965M15 18v-5a1 1 0 1 1 2 0v5a1 1 0 0 1-2 0m2.5 4.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0\"/>",
             "fill": "<path fill=\"currentColor\" d=\"M29.6 23.511 18.669 4.527a3.095 3.095 0 0 0-5.338 0L2.4 23.511a2.94 2.94 0 0 0 0 2.965A3.04 3.04 0 0 0 5.069 28H26.93a3.05 3.05 0 0 0 2.666-1.524 2.94 2.94 0 0 0 .003-2.965M15 13a1 1 0 1 1 2 0v5a1 1 0 0 1-2 0zm1 11a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3\"/>"
+        }
+    },
+    "windowed": {
+        "sourceCollection": "snowui",
+        "viewBox": "0 0 32 32",
+        "weights": {
+            "regular": "<path fill=\"currentColor\" d=\"M12 7a1 1 0 1 0 0 2h8a3 3 0 0 1 3 3v7.5a1 1 0 1 0 2 0V12a5 5 0 0 0-5-5z\"/><path fill=\"currentColor\" fill-rule=\"evenodd\" d=\"M7 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2zm2 0h10v10H9z\" clip-rule=\"evenodd\"/>"
         }
     },
     "x-circle": {
