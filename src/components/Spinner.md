@@ -22,9 +22,10 @@
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | `variant` | `'circle' \| 'spokes' \| 'pills'` | `'circle'` | 视觉变体风格 |
-| `size` | `ResourceSize` | `16` | 尺寸 (支持 12, 16, 20, 24, 28, 32, 40, 48, 80) |
-| `speed` | `number` | `1` | 动画速度倍率 |
+| `size` | `ResourceSize` | `16` | 尺寸（支持 12、16、20、24、28、32、40、48、80）；省略时优先继承父级 iconSize / size，无上下文时为 16 |
+| `speed` | `number` | `1` | 正数动画速度倍率；circle 基准周期 1000ms，spokes / pills 为 800ms，除以该倍率。非有限值或非正数回退为 1；显式 loopMotion 时序优先。 |
 | `loopMotion` | `LoopMotionConfig` | - | 覆盖默认循环动画桥接配置；优先级高于 `speed` 推导出来的默认时长。若传入 `preset`，Spinner 仅消费其中的时序字段，不让 Frame 根节点重复旋转 |
+| `children` | `Snippet` | - | 兼容 Frame 的类型声明；Spinner 使用内置动画图形，不渲染子内容。文字请在外部组合。 |
 | `class` | `string` | `''` | 自定义样式类 (如颜色) |
 
 ### Note on Color & Label
