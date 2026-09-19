@@ -482,23 +482,6 @@
       "deprecated": false
     },
     {
-      "name": "SplitText",
-      "canonical": "SplitText",
-      "package": "@snowui/components-pro",
-      "import": "import { SplitText } from '@snowui/components-pro';",
-      "tier": "pro",
-      "kind": "component",
-      "source": "src/motion/SplitText.svelte",
-      "documentation": "src/motion/SplitText.md",
-      "description": "文字拆分工具，只负责拆分，编排和动效由 Motion 系统控制。",
-      "intents": [],
-      "aliases": [],
-      "whenToUse": null,
-      "avoidWhen": null,
-      "related": [],
-      "deprecated": false
-    },
-    {
       "name": "Tab",
       "canonical": "Tab",
       "package": "@snowui/components-pro",

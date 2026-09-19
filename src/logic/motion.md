@@ -15,9 +15,6 @@
 | `motion-types.ts`（@snowui-design-system/components） | 类型定义 |
 | [motion-engine.ts](./motion-engine.ts) | 动画执行引擎 (Tween/Spring) |
 | [motion-orchestration.ts](./motion-orchestration.ts) | 编排逻辑 (Play/Reverse) |
-| [SplitText.svelte](./../motion/SplitText.svelte) | 文字拆分组件 |
-| [splitText.ts](./../motion/splitText.ts) | 文字拆分 Action |
-| [SplitText.md](./../motion/SplitText.md) | SplitText 文档 |
 
 ---
 
@@ -393,9 +390,9 @@ whileActive={{
 </script>
 ```
 
-### 8.3 元素组控制 (与 SplitText 配合)
+### 8.3 元素组控制
 
-> 用于接收 SplitText 拆分后的元素数组，进行统一编排和生命周期控制。
+> 用于接收调用方提供的元素数组，进行统一编排和生命周期控制。
 
 | 方法 | 描述 |
 | :--- | :--- |
@@ -423,38 +420,6 @@ interface RegisterGroupOptions {
     /** 单个元素完成回调 */
     onElementComplete?: (element: HTMLElement, index: number) => void;
 }
-```
-
-#### 使用示例
-
-```svelte
-<script>
-    import { SplitText } from "../motion/SplitText.svelte";
-    import { getMotion } from "../logic/motion.svelte";
-    
-    const motion = getMotion();
-    let result = $state();
-    
-    $effect(() => {
-        if (result?.chars?.length > 0) {
-            motion.registerGroup("hero-text", result.chars, {
-                orchestrateMode: "sequential",
-                orchestrateDelay: 50,
-                orchestrateOrder: "ltr",
-                whileAppear: { opacity: [0, 1], y: [20, 0] },
-                onStart: () => console.log("动效开始"),
-                onComplete: () => console.log("所有字符动效完成"),
-                onElementComplete: (el, i) => console.log(`字符 ${i} 完成`)
-            });
-        }
-    });
-</script>
-
-<SplitText text="Welcome" bind:result />
-
-<button onclick={() => motion.playGroup("hero-text")}>播放</button>
-<button onclick={() => motion.playGroup("hero-text", { reverse: true })}>反向</button>
-<button onclick={() => motion.resetGroup("hero-text")}>重置</button>
 ```
 
 ### 8.3 生命周期事件

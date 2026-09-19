@@ -154,7 +154,7 @@ export class Motion {
     }
 
     /**
-     * 注册元素组 (用于 SplitText 等)
+     * 注册元素组 (用于调用方提供的元素组)
      */
     registerGroup(id: string, elements: HTMLElement[], options?: RegisterGroupOptions) {
         this.elementGroups.set(id, {
