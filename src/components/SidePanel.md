@@ -43,7 +43,7 @@
 
 - `SidePanel` 是 PRO 复合管理布局组件，放置在 `pro/src/components/SidePanel.svelte`。
 - 组件视觉复用 Dialog 所属的 `.snowui-quick-action-panel` 面板基类，背景为 `Background/3`，背景模糊为 `blur(var(--size-10))`（基础 40px）。该视觉基类与出现/退出位移共同承接在外层 `.snowui-side-panel-motion-shell`，避免 transform 祖先隔离内层 `aside` 的 backdrop 采样；内层 `aside` 只保持稳定局部坐标系、内容与交互。不直接以 `Dialog` 为宿主。
-- 关闭：`closeOnEscape`（默认 true）+ `closeOnOutside`（默认 true，点击面板外关闭）。点击 `.snowui-table-row` 不关闭，便于已打开时切换行只换内容、不播退场/进场。
+- 关闭：`closeOnEscape`（默认 true）+ `closeOnOutside`（默认 true，点击面板外关闭）。外部关闭在 click 的业务处理完成后判断：同步更新面板内容的点击与本实例已识别的打开/切换入口保持打开，只换内容、不播退场/进场；不要求示例添加特殊标记。普通外部点击仍关闭，保留表格行兼容。异步加载应在点击时同步更新选中记录或加载状态。
 - 内容区 `overflow-y: auto` + overlay scrollbar（根挂 `snowui-overlay-scrollbar-host`，hover 显示），与页面滚动隔离（`overscroll-behavior: contain`）；body 与直系子项 `min-width: 0` 防止长文案顶破右侧 padding。
 - 默认宽度为 `460px`，圆角 `20px`（`--radius-5`）；浮层模式与页面上、右、下边缘保持 16px 间距；左侧边框全高均可拖拽调整宽度，边缘不显示宽度调整指示器。内部复用透明 Indicator 交互层保留 Pointer、键盘与 ARIA 调宽协议。
 - 内嵌模式（`placement="inline"`）默认去掉浮层阴影，使用真实边框 `border: var(--border-1) solid var(--black-10)`（1px / Black/10%），保证圆角边缘连续可见；高度默认 `100dvh - 32px`，可用根 `style` / `class` 或 `--snowui-side-panel-height-override` 覆盖。

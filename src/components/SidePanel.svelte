@@ -285,13 +285,47 @@
         void closePanel();
     }
 
-    function handleOutsidePointerdown(event: PointerEvent) {
-        if (!closeOnOutside || !open) return;
+    // Remember actual open/switch triggers, without requiring consumer-only selectors.
+    const previewTriggers = new WeakSet<Element>();
+    let outsideClickTimer: ReturnType<typeof setTimeout> | undefined;
+
+    async function afterClick() {
+        clearTimeout(outsideClickTimer);
+        // Native events may flush microtasks between capture and target listeners.
+        await new Promise<void>((resolve) => { outsideClickTimer = setTimeout(resolve, 0); });
+        await tick();
+    }
+
+    function contentSnapshot() {
+        if (!panelEl) return "";
+        return JSON.stringify([
+            panelEl.textContent,
+            [...panelEl.querySelectorAll<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>("input, textarea, select")]
+                .map((field) => field.value),
+        ]);
+    }
+
+    async function handleOutsideClick(event: MouseEvent) {
+        if (event.button !== 0) return;
         const target = event.target;
-        if (!(target instanceof Element) || !panelEl) return;
-        if (panelEl.contains(target)) return;
-        // 表格行点击常用于切换预览内容：已打开时不关面板，只换内容，避免退场+进场
-        if (target.closest(".snowui-table-row")) return;
+        if (!(target instanceof Element)) return;
+        const trigger = target.closest("button, a, [role='button'], [role='row']") ?? target;
+        if (!open) {
+            await afterClick();
+            if (open) previewTriggers.add(trigger);
+            return;
+        }
+        if (!closeOnOutside || !panelEl || panelEl.contains(target)) return;
+        if (target.closest(".snowui-table-row") || previewTriggers.has(trigger)) return;
+        const panel = panelEl;
+        const before = contentSnapshot();
+        // Let the consumer's click update the record before deciding to dismiss.
+        await afterClick();
+        if (!open || panelEl !== panel) return;
+        if (contentSnapshot() !== before) {
+            previewTriggers.add(trigger);
+            return;
+        }
         void closePanel();
     }
 
@@ -302,10 +336,11 @@
     });
 
     $effect(() => {
-        if (!open || !closeOnOutside) return;
-        document.addEventListener("pointerdown", handleOutsidePointerdown, true);
-        return () =>
-            document.removeEventListener("pointerdown", handleOutsidePointerdown, true);
+        document.addEventListener("click", handleOutsideClick, true);
+        return () => {
+            document.removeEventListener("click", handleOutsideClick, true);
+            clearTimeout(outsideClickTimer);
+        };
     });
 
     function handleWidthChange(next: number) {
