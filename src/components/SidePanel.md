@@ -5,7 +5,7 @@
 
 > **2026-09-10 浮层内边框**：floating 模式复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
 
-> **版本**: v1.4.0
+> **版本**: v1.4.1
 > **包归属**: PRO
 > **职责**: 右侧详情弹出窗，支持浮层与页面右侧内嵌两种预览形态。
 
@@ -60,6 +60,7 @@
 - 内置 placement、previous、next、copy、delete、cancel、save、close 文案通过 `LocaleProvider` / `useLocale()` 读取；对应 key 为 `sidePanel.placement.toInline`、`sidePanel.placement.toFloating`、`sidePanel.previous`、`sidePanel.next`、`sidePanel.copy`、`sidePanel.delete`、`sidePanel.cancel`、`sidePanel.save`、`sidePanel.close`。无 Provider 时为 `zh-CN`。`title` 与 actions 数组的 `label` / `ariaLabel` 属于调用方业务文案，保持最高优先级且不翻译。
 - 下栏优先级：Snippet **>** actions 数组 **>** 默认可编辑按钮。
 - 内置 Button 与透明调宽交互层通过 `parts.Button` / `parts.Indicator` 批量配置；组件固定隐藏 Indicator 视觉。
+- 无上工具栏时，顶部内容间距与滚动渐隐范围均为 `var(--padding-4)`（16px）；无下工具栏时底部同样为 16px。有工具栏的一侧按工具栏高度预留。到达对应滚动端点后关闭该侧渐隐，保留内容间距。
 - 内容区滚动渐隐使用 `.snowui-scroll-mask` + `data-scroll-mask`。上/下 solid-ratio **0.8**。
 
 `SidePanelToolbarAction` 字段：

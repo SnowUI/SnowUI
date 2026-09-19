@@ -540,7 +540,7 @@
         /* 通过 .snowui-scroll-mask 变量注入 Figma 模拟曲线（见 layout.css） */
         --snowui-scroll-mask-top-size-override: var(
             --snowui-side-panel-scroll-mask-top-size-override,
-            var(--snowui-side-panel-toolbar-height)
+            var(--padding-4)
         );
         /* 底遮罩默认 16px（无下栏时与左右 padding 对齐）；有下栏时再抬到工具栏高 */
         --snowui-scroll-mask-bottom-size-override: var(
@@ -550,7 +550,7 @@
         /* 上/下均对齐 Figma：0–80% 实心 / 80–100% 过渡（内容侧 0%→20% 淡入） */
         --snowui-scroll-mask-top-solid-ratio-override: 0.8;
         --snowui-scroll-mask-bottom-solid-ratio-override: 0.8;
-        --snowui-side-panel-body-padding-top: 0px;
+        --snowui-side-panel-body-padding-top: var(--snowui-scroll-mask-top-size-override);
         --snowui-side-panel-body-padding-bottom: var(--snowui-scroll-mask-bottom-size-override);
     }
 
@@ -564,6 +564,10 @@
     }
 
     :global(:where(.snowui-side-panel[data-top-toolbar="true"])) {
+        --snowui-scroll-mask-top-size-override: var(
+            --snowui-side-panel-scroll-mask-top-size-override,
+            var(--snowui-side-panel-toolbar-height)
+        );
         --snowui-side-panel-body-padding-top: var(--snowui-scroll-mask-top-size-override);
     }
 
