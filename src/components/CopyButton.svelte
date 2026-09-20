@@ -25,6 +25,7 @@
     > {
         text?: string;
         getText?: () => string | Promise<string>;
+        writeText?: (text: string) => void | Promise<void>;
         feedbackDuration?: number;
         showText?: boolean;
         ariaLabel?: string;
@@ -44,6 +45,7 @@
     let {
         text = undefined,
         getText = undefined,
+        writeText = writeClipboardText,
         feedbackDuration = 1600,
         showText = true,
         ariaLabel = undefined,
@@ -78,7 +80,7 @@
         status = "pending";
         try {
             const resolvedText = getText ? await getText() : (text ?? "");
-            await writeClipboardText(resolvedText);
+            await writeText(resolvedText);
             status = "success";
             onCopy?.(resolvedText);
         } catch (error) {

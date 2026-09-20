@@ -4,6 +4,7 @@
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
+    import CopyButton from "./CopyButton.svelte";
     import Separator from "./Separator.svelte";
     import Spinner from "./Spinner.svelte";
     import SearchInput from "./SearchInput.svelte";
@@ -92,9 +93,11 @@
     const table = getTableContext();
     type DefaultBulkAction = "copy" | "delete";
     let pendingAction = $state<DefaultBulkAction | undefined>();
-    const initialSort = table.getSort();
     let query = $state(table.getQuery());
-    let sortValue = $state(initialSort ? `${initialSort.columnId}:${initialSort.direction}` : "default");
+    const sortValue = $derived.by(() => {
+        const current = table.getSort();
+        return current ? `${current.columnId}:${current.direction}` : "default";
+    });
 
     function resolveInitialFilterValue() {
         return filterKey && table.getFilters()[filterKey] !== undefined
@@ -120,7 +123,6 @@
         },
     });
 
-    $effect(() => setSort(sortValue));
     $effect(() => setFilter(filterValue));
 
     function setQuery(value: string) {
@@ -191,14 +193,14 @@
             {#if showClearAction && hasBulkItems}<Separator column length={12} />{/if}
             {#if showCopyAction}
                 <span class="snowui-table-toolbar-bulk-action" data-pending={pendingAction === "copy" ? "true" : undefined}>
-                    {#if pendingAction === "copy"}
-                        <Spinner size={12} aria-label={`${copyLabel}中`} />
-                    {:else}
-                        <Button bare emphasis={builtInBareEmphasis} aria-label={copyLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("copy")}>
+                    <CopyButton bare showText={false} emphasis={builtInBareEmphasis}
+                        ariaLabel={copyLabel} disabled={pendingAction === "delete"}
+                        writeText={() => runDefaultBulkAction("copy")}>
+                        {#snippet icon()}
                             <ComponentIcon name="copy" aria-hidden="true" />
                             <Tooltip as="tooltip">{copyLabel}</Tooltip>
-                        </Button>
-                    {/if}
+                        {/snippet}
+                    </CopyButton>
                 </span>
             {/if}
             {#if showDeleteAction}
@@ -220,7 +222,7 @@
 
     {#if sort}
         <Select class="snowui-table-toolbar-built-in snowui-table-toolbar-picker" as="sort"
-            bind:value={sortValue} buttonTrigger buttonBare ariaLabel={sortLabel} parts={pickerParts}>
+            bind:value={() => sortValue, setSort} buttonTrigger buttonBare ariaLabel={sortLabel} parts={pickerParts}>
             {#snippet triggerContent()}
                 <ComponentIcon name="arrows-down-up" aria-hidden="true" />
                 <Tooltip as="tooltip">{sortLabel}</Tooltip>

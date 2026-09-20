@@ -23,4 +23,21 @@ export const examples = [
         },
         logic: ["IconOnly", "StateContent", "ReplacementMotion"],
     },
+    {
+        name: "CB-03: 自定义异步复制",
+        code: `CB-03
+<CopyButton
+    bare
+    showText={false}
+    text="SnowUI custom copy"
+    writeText={async (text) => {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        await navigator.clipboard.writeText(text);
+    }}
+/>`,
+        expected: {
+            interaction: "等待业务复制完成后显示 Check 并保持 1600ms；等待及反馈期间重复点击不重复执行复制。复制失败时不显示 Check。",
+        },
+        logic: ["Clipboard", "Async", "Bare", "Feedback"],
+    },
 ] as const;

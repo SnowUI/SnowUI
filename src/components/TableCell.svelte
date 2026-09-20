@@ -128,7 +128,7 @@
     }
     $effect(() => {
         const node = roleOverlayElement;
-        if (!node || resolvedRoleLayout !== "overlay" || (!isSelectionRole && !isActionsRole)) return;
+        if (!node || (!isSelectionRole && !isActionsRole)) return;
         const selected = isSelected;
         let frame = 0;
         const rowElement = node.closest<HTMLElement>(".snowui-table-row");
@@ -149,6 +149,10 @@
             });
             if (isActionsRole) rowElement?.style.removeProperty("--snowui-table-role-overlay-content-width");
         };
+        if (resolvedRoleLayout !== "overlay") {
+            reset();
+            return;
+        }
         const updatePosition = () => {
             frame = 0;
             if (!rowElement) {
@@ -229,7 +233,8 @@
             rowElement?.removeEventListener("pointerleave", scheduleDeactivate);
             rowElement?.removeEventListener("focusin", activate);
             rowElement?.removeEventListener("focusout", scheduleDeactivate);
-            reset();
+            // Keep the last fixed geometry through the opacity exit. Resetting here
+            // on selection changes moves the fading control back to its sticky cell.
         };
     });
     const runtimeWidth = $derived(

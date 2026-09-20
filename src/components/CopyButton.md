@@ -26,8 +26,9 @@
 | --- | --- | --- | --- |
 | `text` | `string` | — | 要复制的静态文本；getText 存在时优先使用其返回值，两者均未提供时复制空字符串。 |
 | `getText` | `() => string \| Promise<string>` | — | 点击时读取复制内容，可返回 Promise；优先于 text。求值与写入剪贴板均在 pending 阶段，失败进入 onCopyError。 |
+| `writeText` | `(text: string) => void \| Promise<void>` | 内置剪贴板写入 | 替换实际复制操作；Promise 完成后显示成功，抛出错误进入失败反馈。用于已有业务复制回调，避免重复写入剪贴板。 |
 | `feedbackDuration` | `number` | `1600` | 复制成功或失败后恢复 idle 的等待时间，单位 ms，负值按 0 处理；pending 与反馈期都忽略重复点击。 |
-| `showText` | `boolean` | `true` | 显示图标后的 children 或默认“复制”文字；false 时仅显示状态图标并启用 Button.iconOnly。 |
+| `showText` | `boolean` | `true` | 显示图标后的 children 或默认“复制”文字；false 时仅显示状态图标；bare 模式无外壳，其余模式启用 Button.iconOnly。 |
 | `ariaLabel` | `string` | — | 覆盖可访问名称；纯图标模式默认按成功状态使用“已复制”或“复制”，带文字模式默认由内容命名。 |
 | `disabled` | `boolean` | `false` | 阻止新的复制操作；已开始的异步复制不会因此取消。 |
 | `children` | `Snippet` | —（复制） | showText=true 时替换图标后的文字，成功时仍保持该内容；false 时忽略。 |
