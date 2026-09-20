@@ -41,6 +41,8 @@ Skeleton line 默认按行列交错使用 54%–76% 的占位宽度；可在 Tab
 
 DataTable 在 `loading` 或 `refreshing` 且当前存在可见 rows 时，通过 Context 开启 `loadingSpinner`。TableBody 保留现有数据行，并在末尾追加一个非交互的加载行：加载单元格的 `colspan` 等于 TableHead 注册列数，内部直接使用 SnowUI `<Spinner size={16} />`，在行中水平、垂直居中。Spinner 尺寸由外层 `<Table loadingSpinnerSize={...}>` 设置；未设置时使用表格默认 16×16px。
 
+Spinner 加载行始终使用透明背景，不参与 striped 的奇偶计数；数据行的灰白交替不受加载行插入或移除影响。
+
 独立 Table 可显式声明 `<TableBody loadingSpinner>`。
 
 手动加载按钮可由页面作为普通 TableBody child 放在数据行之后，并调用 `DataTableRenderState.loadMore()`。自动加载哨兵不属于 TableBody 的原生表格结构，由 DataTable 以不占布局的绝对定位元素在根层内部管理；页面只需声明 `loadMoreMode="auto"`。请求期由 DataTable 显示 TableBody Spinner；第一条新行开始渐显时 Spinner 隐藏，普通 TableCell 自动从 Context 获取进入动效，页面不需要手动维护 rows 或声明 `whileAppear`。

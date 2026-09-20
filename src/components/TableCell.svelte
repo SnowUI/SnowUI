@@ -385,7 +385,7 @@
     :global(:where(.snowui-table-cell-content.snowui-line-clamp-3)) { display: -webkit-box; -webkit-box-orient: vertical; white-space: normal; }
     :global(:where(.snowui-table-cell-content.snowui-line-clamp-2)) { -webkit-line-clamp: 2; line-clamp: 2; }
     :global(:where(.snowui-table-cell-content.snowui-line-clamp-3)) { -webkit-line-clamp: 3; line-clamp: 3; }
-    :global(:where(.snowui-table-cell-content[data-row="true"])) { display: inline-flex; align-items: center; flex-wrap: wrap; }
+    :global(:where(.snowui-table-cell-content[data-row="true"])) { display: inline-flex; vertical-align: middle; align-items: center; flex-wrap: wrap; }
     :global(:where(.snowui-table-cell-content[data-nowrap="true"])) { white-space: nowrap; }
     :global(:where(.snowui-table-cell-content[data-row="true"][data-nowrap="true"])) { flex-wrap: nowrap; }
     :global(:where(.snowui-table-cell-content[data-actions="true"])) { display: flex; width: 100%; align-items: center; justify-content: flex-end; gap: var(--snowui-table-cell-actions-gap-override, var(--gap-2)); }
@@ -401,8 +401,8 @@
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control[data-selected="true"]) > :not(.snowui-table-role-blur-layer)),
     :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"] > :not(.snowui-table-role-blur-layer)) { opacity: 1; pointer-events: auto; }
     :global(:where(.snowui-table-cell[data-table-variant="striped"])) { border-bottom-color: transparent; }
-    :global(:where(.snowui-table-body .snowui-table-row:nth-child(odd)) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, var(--surface-3, #f7f7f7)); }
-    :global(:where(.snowui-table-body .snowui-table-row:nth-child(even)) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, transparent); }
+    :global(:where(.snowui-table-body .snowui-table-row:nth-child(odd of :not(:has(> .snowui-table-loading-cell)))) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, var(--surface-3, #f7f7f7)); }
+    :global(:where(.snowui-table-body .snowui-table-row:nth-child(even of :not(:has(> .snowui-table-loading-cell)))) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, transparent); }
     :global(:where(.snowui-table-body[data-continuous-hover-enabled="true"] .snowui-table-row:hover) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, transparent); }
     :global(:where(.snowui-table-body .snowui-table-row[data-force-hover="true"]) > .snowui-table-cell:not([data-role-layout="overlay"])) { background: var(--snowui-table-row-hover-background-override, var(--black-4, #0000000a)); }
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell[data-table-variant="striped"]:first-child) { border-radius: var(--radius-3) 0 0 var(--radius-3); }
