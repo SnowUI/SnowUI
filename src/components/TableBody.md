@@ -16,6 +16,7 @@
 | 属性 | 类型 | 默认值 | 说明 |
 | :--- | :--- | :--- | :--- |
 | loading | `boolean` | Table Context | 首次加载时隐藏业务 children，并按已注册列结构渲染 Skeleton rows |
+| rowCount | `number` | 未指定 | 已知数据行数；首次加载时按此数量渲染 Skeleton，0 不生成占位行 |
 | loadingSpinner | `boolean` | Table Context | 保留业务 children，并在末尾追加跨列、居中的 Spinner 加载行 |
 | continuousHover | `boolean` | `true` | 是否使用唯一的容器级连续 hover 移动层；关闭后不显示行背景 |
 | children | `Snippet` | - | 正常数据行；Skeleton 首次加载期间不渲染 |
@@ -35,7 +36,7 @@ Skeleton line 默认按行列交错使用 54%–76% 的占位宽度；可在 Tab
 </Table>
 ```
 
-位于 DataTable 内时无需重复传入 `loading`；DataTable 仅在首次加载且 rows 为空时向 Context 开启该状态，并将规范化后的 `pageSize` 作为骨架行数。独立 Table 无法读取分页行数时回退为 10 行，与 DataTable 的默认 `pageSize` 一致。Skeleton 行数不提供额外公开属性，避免加载占位数量与真实分页数量分离。
+位于 DataTable 内时无需重复传入 `loading`；DataTable 仅在首次加载且 rows 为空时向 Context 开启该状态，并将规范化后的 `pageSize` 作为骨架行数。已知数据行数时通过 `rowCount` 传入，优先于分页上下文；独立 Table 未提供行数时，根据最近外部纵向滚动/裁切容器的可见剩余高度估算，没有该容器时使用视口。按默认 40px（2.5rem）行高向下取整，至少一行；显式 `rowCount={0}` 时不生成骨架。children 在加载期间不渲染，组件不会隐藏挂载业务内容来推测行数。
 
 ## 已有数据加载 Spinner
 

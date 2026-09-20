@@ -46,11 +46,11 @@ gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell paddin
 
 普通 Table 不提供 checkbox 选择列或按钮操作列。`TableHead/TableCell as="selection|actions"` 只有位于 PRO DataTable Context 中才激活；选择状态、角色布局与批量操作均由 DataTable 持有。
 
-普通数据列的 TableHead 在声明 `columnId` 后默认允许拖动修改列宽；需要固定宽度的列可传入 `resizable={false}`。该默认能力只负责列宽，不会让普通 Table 自动拥有数据排序规则。
+普通 Table 的 TableHead 默认不允许拖动修改列宽；需要时显式传入 `resizable`。DataTable 的普通列保持默认可拖动，显式 `resizable={false}` 可关闭。该默认能力只负责列宽，不会让普通 Table 自动拥有数据排序规则。
 
 DataTable selection 角色中，TableHead 的全选 Checkbox 与 TableCell 的行 Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`，即 17×17px。额外的 `0.0625rem` 是 [StyleSpec.md §2.2.2](../../../specs/StyleSpec.md) 登记的 Table 视觉居中特例，不借用任何边框 Token，也不改变 Checkbox 组件自身的 16px 默认值；可通过 `--snowui-table-selection-checkbox-size-override` 覆盖。
 
-首次加载列协议：TableHead 通过 Table Context 显式注册列结构；TableBody 在 `loading` 生效时按该结构生成真实 `tr / td` Skeleton rows。Table 只协调同一语义表格内部的列注册，不读取子组件私有 class 或内部 DOM。DataTable 可通过继承的同一 Context 提供“首次加载且 rows 为空”状态与规范化后的 `pageSize`；独立 Table 也可由 TableBody 显式启用，无法读取分页行数时回退 10 行。
+首次加载列协议：TableHead 通过 Table Context 显式注册列结构；TableBody 在 `loading` 生效时按该结构生成真实 `tr / td` Skeleton rows。Table 只协调同一语义表格内部的列注册，不读取子组件私有 class 或内部 DOM。DataTable 可通过继承的同一 Context 提供“首次加载且 rows 为空”状态与规范化后的 `pageSize`；独立 Table 也可由 TableBody 显式启用；已知数据数量时传入 `rowCount`，未知时按外部容器可见高度估算，详见 TableBody 文档。
 
 已有数据加载协议：`loading` 或 `refreshing` 生效且当前存在可见数据行时，TableBody 保留业务行并在末尾追加一个真实 `tr / td` 加载行；单元格通过 `colspan` 跨越已注册表头列，内部复用 SnowUI 通用 `<Spinner size={16} />` 并在 40px 行内水平、垂直居中。表格加载 Spinner 默认 16×16px，可通过 Table 的 `loadingSpinnerSize` 统一设置。
 

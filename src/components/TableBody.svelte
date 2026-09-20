@@ -1,16 +1,19 @@
 <!-- Table 表体语义容器。文档: ./TableBody.md -->
 <script lang="ts">
-    import type { Snippet } from "svelte";
+    import { untrack, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import TableRow from "./TableRow.svelte";
     import TableCell from "./TableCell.svelte";
     import Spinner from "./Spinner.svelte";
+    import { resizeManager } from "../logic/observer.svelte";
     import { getTableContext, type TableColumnRegistration } from "../lib/table-context.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import { ContinuousHoverController } from "../logic/continuous-hover.svelte";
     import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
     interface Props extends Omit<FrameProps, "children"> {
         loading?: boolean;
+        /** 已知的数据行数，用于首次加载占位；0 表示没有数据行。 */
+        rowCount?: number;
         loadingSpinner?: boolean;
         /** 数据行之间是否使用容器级连续 hover 背景。 */
         continuousHover?: boolean;
@@ -22,15 +25,20 @@
         }>;
         [key: string]: any;
     }
-    let { loading = undefined, loadingSpinner = undefined, continuousHover = true, children, parts = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
+    let { rowCount = undefined, loading = undefined, loadingSpinner = undefined, continuousHover = true, children, parts = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
     const table = getTableContext();
     const fallbackColumns: readonly TableColumnRegistration[] = [{ align: "start" }];
     const resolvedLoading = $derived(loading ?? table.getLoading());
     const resolvedLoadingSpinner = $derived(
         loadingSpinner ?? table.getLoadingSpinner(),
     );
+    let estimatedRowCount = $state(1);
     const resolvedLoadingRowCount = $derived(
-        Math.max(1, Math.floor(Number(table.getLoadingRowCount()) || 10)),
+        rowCount !== undefined && Number.isFinite(rowCount)
+            ? Math.max(0, Math.floor(rowCount))
+            : table.isDataTable()
+              ? Math.max(0, Math.floor(table.getLoadingRowCount()))
+              : estimatedRowCount,
     );
     const skeletonColumns = $derived(
         table.getColumns().length > 0 ? table.getColumns() : fallbackColumns,
@@ -38,6 +46,29 @@
     const skeletonWidths = ["62%", "76%", "54%", "68%"];
     let bodyElement = $state<HTMLElement | undefined>(undefined);
     let continuousHoverController: ContinuousHoverController | undefined;
+    $effect(() => {
+        const body = bodyElement;
+        if (!body || !resolvedLoading || rowCount !== undefined || table.isDataTable()) return;
+        // 只测量外部滚动边界，不使用由骨架自身撑开的 tbody/table 高度。
+        let container: HTMLElement | null = body.parentElement?.parentElement?.parentElement?.parentElement ?? null;
+        while (container && container !== document.body) {
+            if (/(auto|scroll|hidden|clip)/.test(getComputedStyle(container).overflowY)) break;
+            container = container.parentElement;
+        }
+        const boundary = container && container !== document.body ? container : null;
+        const measure = () => {
+            const top = body.getBoundingClientRect().top;
+            const bottom = boundary
+                ? Math.min(window.innerHeight, boundary.getBoundingClientRect().top + boundary.clientTop + boundary.clientHeight)
+                : window.innerHeight;
+            const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+            estimatedRowCount = Math.max(1, Math.floor(Math.max(0, bottom - Math.max(0, top)) / (2.5 * rem)));
+        };
+        untrack(measure);
+        const unwatch = resizeManager.watch(boundary ?? document.documentElement, measure);
+        window.addEventListener("resize", measure);
+        return () => { unwatch(); window.removeEventListener("resize", measure); };
+    });
     $effect(() => {
         if (!bodyElement || !continuousHover) return;
         const overlayHost = bodyElement.closest<HTMLElement>(".snowui-table-scroll-viewport");

@@ -512,6 +512,7 @@
     /* Level 2: Component Base (降权为 0) */
     :global(:where(.snowui-badge)) {
         display: inline-flex;
+        flex-shrink: 0;
         position: relative;
         vertical-align: middle;
         box-sizing: border-box;

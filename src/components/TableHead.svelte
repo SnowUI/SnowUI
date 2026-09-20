@@ -32,8 +32,9 @@
         }>;
         [key: string]: any;
     }
-    let { columnId = undefined, label = undefined, as: role = undefined, sortDirection = undefined, defaultSort = undefined, defaultSortActive = false, roleLayout = undefined, onSortChange = undefined, resizable: canResize = true, minWidth = 64, maxWidth = Infinity, align = "start", children, parts = undefined, class: userClass = "", style: userStyle = "", use: userActions = [], enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
+    let { columnId = undefined, label = undefined, as: role = undefined, sortDirection = undefined, defaultSort = undefined, defaultSortActive = false, roleLayout = undefined, onSortChange = undefined, resizable: explicitResizable = undefined, minWidth = 64, maxWidth = Infinity, align = "start", children, parts = undefined, class: userClass = "", style: userStyle = "", use: userActions = [], enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
     const table = getTableContext();
+    const canResize = $derived(explicitResizable ?? table.isDataTable());
     const selectionEnabled = $derived(table.isSelectionEnabled());
     const actionsEnabled = $derived(table.isActionsEnabled());
     /** DataTable 关闭对应角色列时，markup 中的 as=selection/actions 整列不渲染 */

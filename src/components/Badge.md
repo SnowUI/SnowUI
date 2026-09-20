@@ -33,7 +33,7 @@
 
 Badge 的根节点是 inline-level 定位外壳，内容整体 Hug：
 
-- 根节点保持 `inline-flex`，负责宿主定位、尺寸测量和 Frame 位移动效。
+- 根节点保持 `inline-flex`，负责宿主定位、尺寸测量和 Frame 位移动效；默认 `flex-shrink: 0`，在窄横向容器内保留文字与内边距，不被相邻内容挤瘦。
 - 内层 `.snowui-badge-surface` 负责 background / padding / radius / min-width / font-size / line-height，并作为完整视觉 Badge 承担 scale / opacity / blur 动效。
 - 内部 `snowui-morph-container` 使用 Grid Stacking 保持数字变化时的布局稳定性；内容层以容器 50% 为锚点并回移自身 50%，固定尺寸小于文字最小宽度时仍以 Badge 中心为原点对称溢出，不依赖 Grid 的安全溢出回退。文字和数字均保持严格几何居中。这是 Badge 私有结构，不改变主布局模型。
 - `dot` 模式仍属于内联外壳布局的特化：外壳收敛为固定点尺寸，padding 清零。

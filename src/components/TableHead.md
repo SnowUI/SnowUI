@@ -24,7 +24,7 @@
 | defaultSortActive | `boolean` | `false` | 使 `defaultSort` 的默认方向也显示激活态和图标，并将交互循环扩展为可取消排序 |
 | roleLayout | `column \| overlay` | Table context | 覆盖当前角色表头的角色列布局；普通表头忽略 |
 | onSortChange | `(direction) => void` | - | 独立使用时的三态排序回调 |
-| resizable | `boolean` | `true` | 是否显示列宽手柄；普通列默认可拖动改宽，设为 `false` 时关闭 |
+| resizable | `boolean` | Table：`false`；DataTable：`true` | 是否显示列宽手柄；显式设置优先于上下文默认值 |
 | minWidth / maxWidth | `number` | `64 / Infinity` | 拖动约束 |
 
 排序状态同步到 `aria-sort`。**只有 DataTable `defaultSort` 命中列的默认方向不显示激活态或图标**（`defaultSortActive` 可覆写）；其他已排序状态显示对应图标。图标遵循主流前端表格的“数值方向”语义：ascending（A→Z、0→9、早→晚）显示内置 `ArrowsUp`；descending（Z→A、9→0、晚→早）显示内置 `ArrowsDown`。图标尺寸为 16px，与文字间距为 0。
@@ -38,7 +38,7 @@
 
 不需要 `sortable` prop。DataTable 根据同名原始字段或 `sorters[columnId]` 自动判断列是否可排序；独立 TableHead 在声明 `sortDirection` / `onSortChange` 时也自动启用交互。没有任何排序规则的列不渲染按钮。
 
-普通数据列只要声明 `columnId`，默认就在列尾渲染 Indicator 并允许拖动修改宽度；不需要重复声明 `resizable`。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。普通与角色表头的左右 padding 与 TableCell 使用同一容器响应规则，在 2px 到 12px 之间流动；常见窄屏宽度使用每侧 2px，使相邻列最小视觉间距为 4px，上下保持 8px。
+普通 Table 的数据列默认不可拖动；需要调整列宽时，在 TableHead 显式传入 `resizable`。DataTable 中声明 `columnId` 的普通数据列默认可拖动，显式 `resizable={false}` 可关闭。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。普通与角色表头的左右 padding 与 TableCell 使用同一容器响应规则，在 2px 到 12px 之间流动；常见窄屏宽度使用每侧 2px，使相邻列最小视觉间距为 4px，上下保持 8px。
 
 未显式固定列宽时，表头的不换行 min-content 与同列 TableCell 共同参与 Table 自动列宽；因此列标题不会因窄宿主被逐字压缩。显式 `columnWidths`、拖动列宽或其他固定宽度优先，宽度不足时仍使用表头省略规则。
 
