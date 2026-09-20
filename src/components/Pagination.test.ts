@@ -29,7 +29,7 @@ export const examples = [
 </Pagination>`,
         expected: {
             render: "宽度足够时渲染 1 到 22 的全部页码和内置箭头，空间不足时自动出现省略符。",
-            layout: "完整页码可容纳时按钮可 Fill；省略状态全部按钮保持 Hug。",
+            layout: "默认 fill 下可见按钮均分剩余宽度，省略符保持 Hug。",
             interaction: "上一页不可点击，下一页可跳转到第 2 页。",
             performance: "先估算完整页码下限；明显放不下时只生成可见窗口。",
             responsive: "省略符不参与焦点。",
@@ -200,7 +200,7 @@ export const examples = [
 	</div>`,
         expected: {
             render: "窄容器中前后页保留图标，文字隐藏；远端页码逐级合并为省略符。",
-            layout: "完整页码先从 Fill 收缩到内容下限；进入省略状态后按钮保持 Hug，分页控件保持单行。",
+            layout: "完整页码先从 Fill 收缩到内容下限；进入省略状态后 fill 按钮继续填满剩余空间，分页控件保持单行。",
             interaction: "响应式阶段不改变页码、禁用状态、aria-label 或 onPageChange。",
             performance: "复用 resizeManager，并在一帧内批量完成测量与布局提交。",
             responsive: "宽度继续变窄时先隐藏 pageSize，再从带首尾锚点的省略布局切换为当前页、上一页、下一页，最后只保留上一页与下一页；恢复宽度时反向恢复。",
@@ -218,7 +218,7 @@ export const examples = [
 </Pagination>`,
         expected: {
             render: "渲染双省略符、全部当前窗口按钮，以及空 prev / next 模板自动注入的默认箭头。",
-            layout: "完整页码可容纳时 current/page/prev/next 等宽填充；出现省略符时全部控件保持 Hug。",
+            layout: "current/page/prev/next 等宽填充；出现省略符时仅省略符保持 Hug。",
             interaction: "宽度模式不改变页码行为。",
             performance: "默认响应式模式复用共享 resizeManager；不创建组件私有 ResizeObserver。",
             responsive: "按钮遵守最小点击尺寸，空间不足时缩减页码且保留前后页。",

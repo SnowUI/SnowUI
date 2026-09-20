@@ -363,8 +363,8 @@
                 var(--snowui-icon-size-default)
             )
         );
-        --snowui-icon-min-width: 0;
-        --snowui-icon-min-height: 0;
+        --snowui-icon-min-width: 12px;
+        --snowui-icon-min-height: 12px;
         width: var(--snowui-icon-width-override, var(--snowui-icon-width));
         height: var(--snowui-icon-height-override, var(--snowui-icon-height));
         min-width: var(
@@ -392,8 +392,8 @@
             --snowui-icon-size-override,
             var(--snowui-icon-size-default)
         );
-        --snowui-icon-min-width: 0;
-        --snowui-icon-min-height: 0;
+        --snowui-icon-min-width: 12px;
+        --snowui-icon-min-height: 12px;
     }
 
     :global(:where(.snowui-icon-background)) {

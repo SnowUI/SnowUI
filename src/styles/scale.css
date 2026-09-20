@@ -65,7 +65,7 @@
   padding-block: var(--snowui-scale-padding-y, var(--snowui-scale-padding-y-default));
   gap: var(--snowui-scale-gap, var(--snowui-scale-gap-default));
   border-radius: var(--snowui-scale-radius, var(--snowui-scale-radius-default));
-  font-size: var(--snowui-scale-text-size, var(--snowui-scale-text-size-default));
+  font-size: max(12px, var(--snowui-scale-text-size, var(--snowui-scale-text-size-default)));
   min-height: var(--snowui-scale-min-height, var(--snowui-scale-basis-size-resolved));
   min-width: var(--snowui-scale-min-width, var(--snowui-scale-basis-size-resolved));
   box-shadow: inset 0 0 0 var(--snowui-scale-border-width, var(--snowui-scale-border-width-default)) var(--snowui-scale-border-color, transparent);
@@ -93,8 +93,8 @@
 :global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(img)),
 :global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(.snowui-icon-wrapper)),
 :global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(.snowui-icon)) {
-  width: var(--snowui-scale-icon-size, var(--snowui-scale-icon-size-default));
-  height: var(--snowui-scale-icon-size, var(--snowui-scale-icon-size-default));
+  width: max(12px, var(--snowui-scale-icon-size, var(--snowui-scale-icon-size-default)));
+  height: max(12px, var(--snowui-scale-icon-size, var(--snowui-scale-icon-size-default)));
 }
 
 :global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(.snowui-avatar)),

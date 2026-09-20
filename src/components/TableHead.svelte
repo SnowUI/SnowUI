@@ -211,6 +211,11 @@
             minSize={resolvedMinWidth}
             maxSize={resolvedMaxWidth}
             applySize={false}
+            ondblclick={(event: MouseEvent) => {
+                event.preventDefault();
+                event.stopPropagation();
+                table.fitColumnWidth(resolvedColumnId, resolvedMinWidth, resolvedMaxWidth);
+            }}
             ariaLabel={`调整 ${resolvedColumnId} 列宽`}
             onSizeChange={(next) => table.setColumnWidth(resolvedColumnId, next)}
         />

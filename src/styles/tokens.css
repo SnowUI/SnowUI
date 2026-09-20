@@ -23,21 +23,21 @@
      映射 12/14/16/18/24/32/48/64
      ========================== */
    /* 12px */
-   --text-12: calc(0.75rem * var(--text-scale));
+   --text-12: max(12px, calc(0.75rem * var(--text-scale)));
    /* 14px */
-   --text-14: calc(0.875rem * var(--text-scale));
+   --text-14: max(12px, calc(0.875rem * var(--text-scale)));
    /* 16px */
-   --text-16: calc(1rem * var(--text-scale));
+   --text-16: max(12px, calc(1rem * var(--text-scale)));
    /* 18px */
-   --text-18: calc(1.125rem * var(--text-scale));
+   --text-18: max(12px, calc(1.125rem * var(--text-scale)));
    /* 24px */
-   --text-24: calc(1.5rem * var(--text-scale));
+   --text-24: max(12px, calc(1.5rem * var(--text-scale)));
    /* 32px */
-   --text-32: calc(2rem * var(--text-scale));
+   --text-32: max(12px, calc(2rem * var(--text-scale)));
    /* 48px */
-   --text-48: calc(3rem * var(--text-scale));
+   --text-48: max(12px, calc(3rem * var(--text-scale)));
    /* 64px */
-   --text-64: calc(4rem * var(--text-scale));
+   --text-64: max(12px, calc(4rem * var(--text-scale)));
 
    /* Line Heights */
    /* 16px */

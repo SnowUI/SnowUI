@@ -44,7 +44,8 @@
     }
     const inheritedTableCellPart = useComponentPart<Props>("TableCell");
     let explicitProps: Props = $props();
-    let { columnId, as: role = undefined, lines = 1, tooltip = true, onTruncate = undefined, align = "start", roleLayout = undefined, row = false, gap = 2, nowrap = false, skeleton = false, children, parts = undefined, whileAppear: userWhileAppear = undefined, currentState: userCurrentState = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $derived(mergeComponentPartProps(inheritedTableCellPart.current, explicitProps));
+    let { columnId, as: role = undefined, lines = 1, tooltip = true, onTruncate = undefined, align = "start", roleLayout = undefined, row = false, gap = 2, nowrap: explicitNowrap = undefined, skeleton = false, children, parts = undefined, whileAppear: userWhileAppear = undefined, currentState: userCurrentState = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $derived(mergeComponentPartProps(inheritedTableCellPart.current, explicitProps));
+    const nowrap = $derived(explicitNowrap ?? (lines !== 2 && lines !== 3));
     let roleOverlayElement = $state<HTMLElement>();
     let hasNestedTruncationOwner = $state(false);
     const table = getTableContext();
@@ -324,7 +325,7 @@
             />
         {/if}</span>
     </span>
-    {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : undefined} data-lines={resolvedLines} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
+    {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : "false"} data-lines={resolvedLines} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
         {#if children}{@render children()}{/if}
         {#if tooltip && !hasNestedTruncationOwner && isTruncated && fullText}
             <Tooltip>

@@ -57,6 +57,7 @@
     />
 {:else if builtin && content}
     <svg
+        data-snowui-component-icon
         width={iconSize}
         height={iconSize}
         viewBox={builtin.viewBox}
@@ -83,6 +84,12 @@
 {/if}
 
 <style>
+    :global([data-snowui-component-icon]),
+    :global(.snowui-component-icon-missing) {
+        min-width: 12px;
+        min-height: 12px;
+        flex-shrink: 0;
+    }
     :global(:where(.snowui-component-icon-missing)) {
         display: inline-flex;
         flex: 0 0 auto;

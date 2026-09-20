@@ -882,7 +882,7 @@
                 .length === resolvedTotal && !controlsEl?.querySelector('[data-as="ellipsis"]');
         const shouldFill =
             widthMode === "fill"
-                ? showsAllPages
+                ? true
                 : widthMode === "hug"
                   ? false
                   : showsAllPages && availableWidth - controlsWidth > 1;

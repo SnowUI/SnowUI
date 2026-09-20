@@ -44,6 +44,13 @@
 
 未声明任何 `defaultSort` 时，TableHead 不会把第一列视为隐式默认排序列。当所有列均未激活排序时，DataTable 保留上层传入的 rows / filteredRows 顺序。
 
+## 双击列宽手柄
+
+- 默认单行列双击 Indicator：按当前已渲染行与表头的最宽内容设置最佳宽度（Hug 内容），包含图标、gap、左右 padding，并为排序图标保留空间；不扫描未加载的服务端数据。
+- 同列任一单元格显式 `nowrap={false}` 时，双击恢复首次拖动前的默认宽度；默认值优先为外部 columnWidths，其次初次布局实测宽度，避免长文本被无限展开。
+- 结果限制在 `minWidth` / `maxWidth` 内，保留其他列宽。按现有 `columnWidths` 绑定与变更回调同步；必要时由表格内部横向滚动承载。
+- 双击不触发排序；`resizable={false}` 的列不提供此操作。连续双击单行列会根据当前页内容重新测量；换行列保持恢复同一初始基准。重新挂载 Table 后重新建立基准。
+
 ## 角色列
 
 - `as="selection"`：渲染内置全选 Checkbox。Checkbox 距角色列左边缘 8px，仅在鼠标进入 Table 区域或键盘焦点进入 Table 时显示；部分选中时使用 indeterminate。该列 padding 为 `8px 0 8px 8px`。

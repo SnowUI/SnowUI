@@ -35,6 +35,7 @@ export interface TableContext {
     isDataTable: () => boolean;
     getColumnWidth: (columnId: string) => number | undefined;
     setColumnWidth: (columnId: string, width: number) => void;
+    fitColumnWidth: (columnId: string, minWidth: number, maxWidth: number) => void;
     getSort: () => TableSortState | undefined;
     getDefaultSort: () => TableSortState | undefined;
     getDefaultSortActive: () => boolean;
@@ -104,6 +105,7 @@ const fallback: TableContext = {
     isDataTable: () => false,
     getColumnWidth: () => undefined,
     setColumnWidth: () => {},
+    fitColumnWidth: () => {},
     getSort: () => undefined,
     getDefaultSort: () => undefined,
     getDefaultSortActive: () => false,

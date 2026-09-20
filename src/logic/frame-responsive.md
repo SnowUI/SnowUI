@@ -33,6 +33,8 @@ const observedElements = new Set<Element>();
 4. 压缩后仍放不下，且消费方传入 `responsive` 时，启用回退方向、对齐和子项宽度策略。
 5. 容器恢复到首选布局所需宽度后，完整恢复首选布局和间距。
 
+文字与功能图标同时遵守 StyleSpec 的 12px 可读性下限。此限制由共享文字 Token / Scale 与图标宿主实现，不依赖单个 Frame 是否开启间距适配。
+
 ## 3. Props
 
 | 属性 | 类型 | 默认 | 描述 |

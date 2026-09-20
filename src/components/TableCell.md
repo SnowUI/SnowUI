@@ -9,7 +9,7 @@
 - Skeleton 是加载基础设施，不作为公开 part。
 
 > **版本**: v1.10.0
-> **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。
+> **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。需要换行时显式传入 `nowrap={false} lines={false}`；声明 `lines={2}` / `lines={3}` 也视为显式开启多行，未指定 nowrap 时自动允许换行；横向图标与文字默认不换行。
 
 默认单元格高度为 40px，内边距上下保持 8px；左右 padding 根据最近 Table 容器宽度在 2px 到 12px 之间流动，常见窄屏宽度即收敛到每侧 2px，宽表恢复为 12px，首尾单元格沿用相同规则。Table 使用原生相邻列布局，列与列之间没有额外 gap；相邻单元格 padding 相加后的最小视觉间距为 4px。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。
 
@@ -25,7 +25,7 @@
 | roleLayout | `column \| overlay` | Table context | 覆盖当前角色单元格的角色列布局；普通单元格忽略 |
 | row | `boolean` | `false` | 内部内容使用横向 flex 布局，根 `<td>` 语义不变 |
 | gap | `number` | `2` | 内部内容间距，默认 8px，对应 `--gap-{n}` token |
-| nowrap | `boolean` | `false` | 文字不换行；与 row 同用时同时禁止 flex 子项换行 |
+| nowrap | `boolean` | `true`（lines=2/3 时 false） | 文字不换行；与 row 同用时同时禁止 flex 子项换行 |
 | as | `selection \| actions` | - | 显式角色列；角色模式关闭默认截断 |
 | skeleton | `boolean` | `false` | TableBody 内部 Skeleton rows 协议；渲染非交互占位内容并关闭截断 |
 

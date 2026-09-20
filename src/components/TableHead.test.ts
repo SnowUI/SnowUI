@@ -41,4 +41,17 @@ export const examples = [
         expected: { render: "内置 Checkbox/Indicator 使用各自 part。", layout: "表头结构保持不变。", interaction: "全选和拖拽仍走原协议。", performance: "同类型直接实例统一配置。", responsive: "保持列布局。" },
         logic: ["Parts", "Checkbox", "Indicator"],
     },
+    {
+        name: "A7: 双击列宽恢复",
+        code: `A7
+<Table columnWidths={{ price: 80, note: 160 }}>
+    <TableHeader><TableRow><TableHead columnId="price" minWidth={64} maxWidth={240}>Price</TableHead><TableHead columnId="note">Note</TableHead></TableRow></TableHeader>
+    <TableBody><TableRow><TableCell columnId="price">$1,234.56</TableCell><TableCell columnId="note" nowrap={false} lines={false}>A long note that can wrap across multiple lines.</TableCell></TableRow></TableBody>
+</Table>`,
+        expected: {
+            interaction: "调整 Price 后双击手柄，宽度适合内容且处于64到240之间；调整 Note 后双击恢复160px；双击不改变排序。",
+            responsive: "默认列不换行；Note 显式允许换行。",
+        },
+        logic: ["Resize", "AutoFit", "Wrap"],
+    },
 ];

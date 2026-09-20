@@ -41,6 +41,7 @@
     let autoLockedColumnWidths = $state<Record<string, number>>({});
     let hasAutoLockedColumnWidths = $state(false);
     const parentTable = getTableContext();
+    const defaultColumnWidths = new Map<string, number>();
     const truncationManager = new TableTruncationManager();
     const horizontalScrollbar = useOverlayScrollbar(
         () => viewportElement,
@@ -55,16 +56,63 @@
         });
     }
 
+    function columnCells(columnId: string) {
+        return [...(tableElement?.querySelectorAll<HTMLElement>(".snowui-table-head, .snowui-table-cell") ?? [])]
+            .filter(cell => cell.dataset.columnId === columnId);
+    }
+
+    function setColumnWidth(columnId: string, width: number) {
+        if (!defaultColumnWidths.has(columnId)) {
+            defaultColumnWidths.set(columnId, columnWidths[columnId]
+                ?? autoLockedColumnWidths[columnId]
+                ?? columnCells(columnId)[0]?.getBoundingClientRect().width ?? width);
+        }
+        columnWidths = { ...columnWidths, [columnId]: Math.round(width) };
+        onColumnWidthsChange?.(columnWidths);
+        truncationManager.schedule();
+    }
+
+    function fitColumnWidth(columnId: string, min: number, max: number) {
+        const cells = columnCells(columnId);
+        if (!cells.length) return;
+        const wraps = cells.some(cell => cell.querySelector<HTMLElement>(".snowui-table-cell-content")?.dataset.nowrap === "false");
+        let preferred = defaultColumnWidths.get(columnId)
+            ?? columnWidths[columnId] ?? autoLockedColumnWidths[columnId]
+            ?? cells[0].getBoundingClientRect().width;
+        if (!wraps) {
+            preferred = 0;
+            for (const cell of cells) {
+                const content = cell.querySelector<HTMLElement>(".snowui-table-cell-content, .snowui-table-head-content");
+                if (!content) continue;
+                const copy = content.cloneNode(true) as HTMLElement;
+                copy.setAttribute("aria-hidden", "true");
+                copy.inert = true;
+                Object.assign(copy.style, {
+                    position: "fixed", visibility: "hidden", pointerEvents: "none",
+                    width: "max-content", minWidth: "0", maxWidth: "none",
+                    whiteSpace: "nowrap", flexWrap: "nowrap", overflow: "visible",
+                    display: content.dataset.row === "true" ? "inline-flex" : "inline-block",
+                    webkitLineClamp: "unset", maskImage: "none",
+                });
+                cell.append(copy);
+                const style = getComputedStyle(cell);
+                const sortIcon = cell.querySelector(".snowui-table-sort")
+                    ? Math.max(12, parseFloat(getComputedStyle(document.documentElement).fontSize)) : 0;
+                preferred = Math.max(preferred, copy.getBoundingClientRect().width
+                    + parseFloat(style.paddingLeft) + parseFloat(style.paddingRight) + sortIcon);
+                copy.remove();
+            }
+        }
+        setColumnWidth(columnId, Math.max(min, Math.min(max, Math.ceil(preferred))));
+    }
+
     provideTableContext({
         getColumnWidth: (columnId) =>
             columnWidths[columnId]
             ?? autoLockedColumnWidths[columnId]
             ?? parentTable.getColumnWidth(columnId),
-        setColumnWidth: (columnId, width) => {
-            columnWidths = { ...columnWidths, [columnId]: Math.round(width) };
-            onColumnWidthsChange?.(columnWidths);
-            truncationManager.schedule();
-        },
+        setColumnWidth,
+        fitColumnWidth,
         getLoadingSpinnerSize: () => loadingSpinnerSize,
         registerColumn: (column) => {
             registeredColumns = [...registeredColumns, column];

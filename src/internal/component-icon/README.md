@@ -14,3 +14,5 @@ Accordion / AccordionItem 的 `plus`、`minus` 随包内置，来源为 `resourc
 图形与外框比例以 `resource-base/raw-assets` 为权威，生成消费源为 `resource-base/assets`。快照生成器核对assets中的viewBox及图形内容（允许黑色转换currentColor），禁止组件私自裁切或缩放path。ComponentIcon尺寸优先级为显式size、最近图标上下文、16px默认值；Provider与包内fallback接收相同尺寸。详见 `specs/ComponentGuidelines.md` §2.7。
 
 本轮逐资源结果与非功能 SVG 归类见 [图形比例核对](./geometry-audit.md)。
+
+功能图标遵守 StyleSpec 可读性下限：最小 12×12 CSS px，并防止 flex 挤压。原始矢量几何不变。
