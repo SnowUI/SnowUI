@@ -12,6 +12,10 @@ Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一�
 
 Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize 命中区优先：手柄继续显示并接收 Pointer 与键盘操作，滚动条在未被手柄覆盖的区域继续响应拖动。组合宿主须保证手柄所在层高于滚动条，不以隐藏手柄或移除焦点来避让。
 
+## 组件介绍
+
+提供可拖动的尺寸调整手柄，支持鼠标与键盘操作，可用于面板和内容区域的大小调整。
+
 ## API 参考
 
 | 关键字 | 类型 | 默认值 | 描述 |

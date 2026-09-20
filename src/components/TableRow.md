@@ -15,6 +15,10 @@
 <TableRow rowId={user.id} active={user.id === activeRowId}><TableCell>{user.name}</TableCell></TableRow>
 ```
 
+## 组件介绍
+
+组织一行表头或数据单元格，统一行内的悬停与交互反馈，适合可浏览和可操作的数据记录。
+
 ## Keyword
 
 | Keyword | 说明 |

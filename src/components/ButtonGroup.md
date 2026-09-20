@@ -6,6 +6,10 @@
 **继承**: 复用 Frame.svelte 的通用能力。
 **默认能力开关**: `enableAutoLayout=false`, `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。ButtonGroup 是内联外壳布局，`row` 只提供方向类，不接入三槽位默认 gap。
 
+## 组件介绍
+
+将相关按钮组合为统一的操作组，支持分割线，适合拆分按钮和紧凑工具栏。
+
 ## 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |

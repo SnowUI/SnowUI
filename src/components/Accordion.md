@@ -7,6 +7,10 @@
 **继承**: 根层复用 Frame.svelte 的通用能力（响应式、上下文、Skeleton、状态与动效关键字透传）。
 **默认能力开关**: `enableResponsive=true`、`enableContext=true`、`enableScaleObserver=false`、`enableDefaultMotion=true`。
 
+## 组件介绍
+
+将相关内容组织为可展开、收起的分组，适合常见问题、设置和分段说明，支持单项或多项同时展开。
+
 ## 功能概览
 
 - 默认内置模式通过 `items` 渲染内容；每项只包含 `title` 与 `content`，内部自动生成 AccordionItem 和 `Frame as="title|content"`。

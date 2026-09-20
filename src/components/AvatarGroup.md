@@ -1,5 +1,9 @@
 # AvatarGroup.svelte 文档
 
+## 组件介绍
+
+将多个头像排列或叠放展示，并以数量提示收起的成员，适合团队、协作者与参与者列表。
+
 ## 组合模式
 
 AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="item">`，AvatarGroup 只负责排列、叠放、溢出计数和统一 size Context，不拥有 Avatar 的业务数据，因此不提供 `parts.Avatar`。每个 Avatar 的差异 Props 直接写在对应实例上。

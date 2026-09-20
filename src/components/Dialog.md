@@ -9,6 +9,10 @@
 
 Dialog 是通用模态容器。面板视觉复用 `.snowui-quick-action-panel`,内容面板出现 / 消失动效使用 `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION`，遮罩 opacity 使用 `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION`。具体 duration / easing / scale 以 motion preset catalog 为准，关闭时保留面板到 disappear preset 完成后再卸载。
 
+## 组件介绍
+
+在模态对话框中呈现需要关注的内容或操作，提供遮罩、焦点管理与背景滚动锁定，适合确认和表单任务。
+
 ## 三种模式 (Modes)
 
 | 模式 | 写法 | 说明 |

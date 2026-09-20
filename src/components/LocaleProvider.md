@@ -3,6 +3,10 @@
 > **版本**: v1.0.0
 > **职责**: 为后代 SnowUI 组件提供内置 UI 文案的 locale Context。
 
+## 组件介绍
+
+为应用或局部区域统一设置 SnowUI 内置界面文案的语言，支持按需覆盖消息内容。
+
 ## AI Zone
 
 - 实现位于 `components/src/components/LocaleProvider.svelte`，Context 解析复用 `../i18n/locale.svelte.ts`，完整协议见 [LocalizationSpec.md](../../../specs/LocalizationSpec.md)。
@@ -54,7 +58,6 @@
 ## Site guide: locale-provider
 
 <!-- site-guide:locale-provider -->
-Set the language of built-in SnowUI interface messages for an application or a specific subtree.
 
 ### How LocaleProvider works {#overview}
 

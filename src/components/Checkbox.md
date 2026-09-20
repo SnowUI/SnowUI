@@ -6,6 +6,10 @@
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
 **默认能力开关**: `enableResponsive=false`, `enableContext=false`。
 
+## 组件介绍
+
+选择一个或多个独立选项，支持选中、未选中和部分选中状态，适合表单与批量选择。
+
 ## 关键字
 
 | 关键字 | Type | Default | Description | Category |

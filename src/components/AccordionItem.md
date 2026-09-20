@@ -9,6 +9,10 @@
 
 AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，通过 AccordionContext 读取展开状态与切换方法。
 
+## 组件介绍
+
+定义 Accordion 中的一项折叠内容，将标题与正文组合起来，并随父级统一管理展开状态。
+
 ## API 参考
 
 | 关键字 | 类型 | 默认值 | 描述 |

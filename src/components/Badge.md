@@ -6,6 +6,10 @@
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
 **默认能力开关**: `enableResponsive=false`, `enableContext=false`。
 
+## 组件介绍
+
+用紧凑的数字、文字或圆点提示未读数量与状态，可搭配按钮、头像和导航项使用。
+
 ## 组件特有属性 (Component-Specific Props)
 
 | 属性 | 类型 | 默认值 | 描述 |

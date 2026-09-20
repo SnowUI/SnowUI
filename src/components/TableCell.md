@@ -2,6 +2,10 @@
 
 > `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
 
+## 组件介绍
+
+在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。
+
 ## 内置组件双模式
 
 - `parts.Tooltip`：配置截断提示。

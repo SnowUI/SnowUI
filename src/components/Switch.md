@@ -6,6 +6,10 @@
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
 **默认能力开关**: `enableResponsive=false`, `enableContext=false`。
 
+## 组件介绍
+
+在开启与关闭之间切换，适合需要即时生效的设置和功能开关。
+
 ## 关键字
 
 | 关键字 | Type | Default | Description |

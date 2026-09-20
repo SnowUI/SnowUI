@@ -6,6 +6,10 @@
 **继承**: 复用 Frame.svelte 的所有通用能力（交互、动效、响应式）。
 **默认能力开关**: `enableResponsive=true`、`enableContext=true`、`enableScaleObserver=false`。
 
+## 组件介绍
+
+以紧凑的行内标签展示分类、状态或简短信息，可与文字、图标和列表内容自然组合。
+
 ## 组件特有属性 (Component-Specific Props)
 
 | 属性 | 类型 | 默认值 | 描述 |

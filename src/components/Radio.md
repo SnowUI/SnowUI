@@ -7,6 +7,10 @@
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
 **默认能力开关**: `enableResponsive=false`, `enableContext=false`。
 
+## 组件介绍
+
+在一组互斥选项中选择一项，适合需要直接展示所有选项的表单设置。
+
 ## 关键字
 
 | 关键字 | Type | Default | Description |

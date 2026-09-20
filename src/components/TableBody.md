@@ -1,5 +1,9 @@
 # TableBody
 
+## 组件介绍
+
+组织 Table 的数据行，保留表格正文语义，适合组合列表记录和自定义行内容。
+
 ## 内置组件双模式
 
 - `parts.TableRow` / `parts.TableCell`：统一配置首次加载时直接生成的行与单元格。

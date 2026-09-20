@@ -6,6 +6,10 @@
 **继承**: 复用 Frame.svelte 的通用能力。
 **默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`, `enableDefaultMotion=true`。
 
+## 组件介绍
+
+以条形或圆形反馈任务进度，支持明确进度与不确定状态，适合上传、处理和加载过程。
+
 ## 布局模型
 
 主布局模型：**复合管理布局**。

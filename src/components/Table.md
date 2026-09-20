@@ -5,6 +5,10 @@
 
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
 
+## 组件介绍
+
+以语义化表格展示结构化数据，支持自适应列宽、局部横向滚动与加载状态，可自由组合表头和单元格。
+
 ## OSS Table 与 PRO DataTable 的边界
 
 普通 OSS `Table` 是纯数据展示组件：只负责以原生表格语义渲染表头和数据行。普通表格不提供加载更多、checkbox 选择列、按钮操作列、排序、筛选、分页或搜索。

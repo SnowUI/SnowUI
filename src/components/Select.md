@@ -3,6 +3,10 @@
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 
+## 组件介绍
+
+在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。
+
 ## 默认内置模式 / 显式组合模式
 
 - 默认内置模式（推荐）：传入 `options`，Select 自动生成 Listbox 与 MenuItem；搜索框默认关闭，通过 `parts.Listbox.search=true` 开启；通过 `parts.Button`、`parts.Listbox`、`parts.Input`、`parts.MenuItem` 配置隐藏实例。

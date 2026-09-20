@@ -5,6 +5,10 @@
 
 > `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
 
+## 组件介绍
+
+定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。
+
 ## 内置组件双模式
 
 - `parts.Indicator`：统一配置 resize Indicator。

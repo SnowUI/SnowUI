@@ -1,5 +1,9 @@
 # Textarea.svelte 文档
 
+## 组件介绍
+
+提供多行文本输入，可承接原生表单属性并组合字段反馈，适合描述、备注和较长内容的编辑。
+
 ## 内置组件双模式
 
 - `parts.Indicator`：统一配置 resize 模式下的内置 Indicator。

@@ -26,6 +26,10 @@
 
 在 Dialog 的直系 `as="footer"` 操作区内，直系 `Button as="item"` 通过尺寸 Context 接收 sm/md/md 默认值（对应 Dialog sm/md/lg）；显式 `size` 优先。正文与嵌套容器中的 Button 不受该默认值影响。
 
+## 组件介绍
+
+触发操作或导航，支持文字、图标、加载与禁用状态，适合从主要操作到轻量工具按钮的不同场景。
+
 ## 组件特有属性 (Component-Specific Props)
 
 | 属性 | 类型 | 默认值 | 描述 |

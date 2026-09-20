@@ -6,6 +6,10 @@
 **继承**: 复用 Frame.svelte 的通用能力。
 **默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`, `enableDefaultMotion=false`。
 
+## 组件介绍
+
+用水平或垂直分割线划分内容与操作区域，帮助建立清晰的信息层次。
+
 ## 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |

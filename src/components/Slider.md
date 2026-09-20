@@ -6,6 +6,10 @@
 **继承**: 复用 Frame.svelte 的通用能力。
 **默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`, `enableDefaultMotion=true`。
 
+## 组件介绍
+
+通过拖动选择单个数值或数值区间，支持水平、垂直、步进与填充式展示，适合范围和参数调整。
+
 ## 布局模型
 
 主布局模型：**复合管理布局**。

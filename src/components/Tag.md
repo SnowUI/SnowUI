@@ -17,6 +17,10 @@
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
 **默认能力开关**: `enableResponsive=false`、`enableContext=true`、`enableScaleObserver=false`。
 
+## 组件介绍
+
+以可交互标签表达标记、筛选条件或路径片段，适合组织内容与收敛选择范围。
+
 ## 设计形态
 
 设计稿中的 Tag 形态统一收敛为以下能力组合：

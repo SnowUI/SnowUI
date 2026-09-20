@@ -3,6 +3,10 @@
 > **版本**: v1.0.0
 > **职责**: 为 SnowUI 组件自己拥有的内置功能图标提供应用级图标库替换，同时保留 Components 随包默认回退。
 
+## 组件介绍
+
+为应用或局部区域统一替换 SnowUI 内置功能图标，未配置的图标继续使用组件默认样式。
+
 ## 概览与选择边界
 
 `IconProvider` 是无视觉 Context Provider。没有 Provider 时，组件使用 Components 包内置的默认功能图标；提供 `icons` 或 `resolver` 后，未被组件实例 Snippet / 具名角色明确替换的内置图标会在当前子树统一改用外部图标库。

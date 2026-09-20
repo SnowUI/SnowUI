@@ -10,6 +10,10 @@ Breadcrumb 支持两种模式：
 - 显式组合模式：直接书写 `Button as="item"` 和 `Text as="separator"`，用于复杂内容和逐项差异。
 - Breadcrumb 的默认组合样式为 Button `borderless`、separator `opacity: 0.5`；常规使用无需传 parts，parts 只用于覆盖默认值。
 
+## 组件介绍
+
+展示当前页面的层级路径，帮助用户理解所在位置并返回上级页面。
+
 ## 功能概览
 
 - 默认 items API + 显式组合高级 API。

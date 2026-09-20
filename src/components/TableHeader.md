@@ -9,6 +9,10 @@
 <TableHeader><TableRow><TableHead columnId="name">名称</TableHead></TableRow></TableHeader>
 ```
 
+## 组件介绍
+
+组织 Table 的表头行，明确各列含义，并保留原生表格的表头语义。
+
 ## Keyword
 
 | Keyword | 说明 |
