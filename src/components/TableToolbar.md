@@ -16,7 +16,25 @@ DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批�
 
 排序选择器读取 DataTable 的当前排序，仅在用户选择新选项时写回；表头排序不被工具栏旧值覆盖。
 
+## 排序选项
+
+| 属性 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| sortOptions | `{ columnId: string; label?: string }[]` | 未指定 | 自定义内置排序菜单字段和顺序，可包含未展示为表格列的数据字段；显式列表替换自动表头列表，空数组仅保留默认排序。 |
+
+未配置 `sortOptions` 时自动读取可排序表头。配置后，每项生成升序、降序两个选项，名称缺省使用 `columnId`；字段标识应唯一。普通字段由 DataTable 读取 `row[columnId]`，派生值由 DataTable 的 `sorters[columnId]` 提供。配置菜单不会创建表格列，也不会改变当前排序；菜单始终保留“默认排序”用于恢复 DataTable 默认顺序。server 模式仍由调用方处理排序请求。
+
+```svelte
+<TableToolbar sortOptions={[
+  { columnId: 'component', label: 'Component' },
+  { columnId: 'priority', label: 'Priority' }
+]} />
+```
+
 ## Changelog
+
+- 2026-09-20：增加 `sortOptions`，内置菜单可按未显示的原始字段或派生值排序。
+
 
 - 2026-08-09：适配 Button bare 默认 100%，内置工具操作显式改用 `emphasis="muted"`。
 
