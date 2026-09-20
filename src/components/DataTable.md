@@ -32,13 +32,16 @@ gap 归属：Root FramePro 统一控制直系区域间距，默认为 `var(--gap
 | mode | `client \| server` | `client` | 客户端切片或服务端受控模式 |
 | sorters | `Record<string, (row) => unknown>` | `{}` | 仅复杂派生列需要显式提供 |
 | defaultSort | `TableSortState` | - | 兼容用的初始单列排序；新代码优先在 TableHead 上声明 `defaultSort` |
-| sort / query / page | bindable | - | 受控交互状态 |
+| sort | `TableSortState`（bindable） | defaultSort | 当前排序列与方向；client 模式执行排序，server 模式由调用方处理。 |
+| query | `string`（bindable） | `""` | 当前搜索文本；client 模式执行搜索，server 模式由调用方处理。 |
+| page | `number`（bindable） | `1` | 当前页码，从 1 开始；渲染状态会夹取到有效页范围。 |
 | filters | `Record<string, unknown>` | `{}` | client 模式按字段执行等值或数组包含过滤 |
 | searcher | `(row, query) => boolean` | 浅层字符串/数字匹配 | 覆盖 client 模式搜索逻辑 |
 | filterer | `(row, filters) => boolean` | 字段等值匹配 | 覆盖 client 模式筛选逻辑 |
 | pageSize | `number`（bindable） | `10` | 每页行数；变化时自动回到第 1 页 |
 | totalRows | `number` | - | server 模式总行数 |
-| loading / refreshing | `boolean` | `false` | 首次加载与后台刷新语义 |
+| loading | `boolean` | `false` | 首次加载状态，传递给表格加载与渲染状态。 |
+| refreshing | `boolean` | `false` | 后台刷新状态，保留现有数据并通过渲染状态提供。 |
 | loadMore | `(request) => Iterable<T> \| AsyncIterable<T> \| Promise<...>` | - | 增量数据源；request 包含 offset、limit 和 AbortSignal |
 | loadMoreSize | `number` | `5` | 每次增量加载的最大行数 |
 | loadMoreMode | `manual \| auto` | `manual` | 手动调用 `state.loadMore()`，或由内部表尾哨兵自动触发 |
@@ -57,6 +60,14 @@ gap 归属：Root FramePro 统一控制直系区域间距，默认为 `var(--gap
 | roleOverlayUniformFeather | `number` | `0.3` | uniform 模式内侧羽化比例 |
 | onRowPreview | `(row, state, event) => void` | - | 配置后，TableRow 行内空白点击打开行预览；未配置时空白点击不响应 |
 | onSelectedRowIdsChange | `(ids) => void` | - | 选择变化后的完整快照 |
+| error | `unknown` | — | 外部错误，优先于增量加载错误进入 state.error；组件不自动生成业务错误文案。 |
+| resetPageOnQuery | `boolean` | `true` | 查询或筛选变化时将页码重置为 1。 |
+| onSortChange | `(sort: TableSortState \| undefined) => void` | — | 排序变化回调，取消排序时传入 undefined。 |
+| onQueryChange | `(query: string) => void` | — | 查询文本变化时回调。 |
+| onPageChange | `(page: number) => void` | — | 页码变化时回调，参数从 1 开始。 |
+| onStateChange | `(state: DataTableRenderState<T>) => void` | — | 当前渲染状态更新时回调，包含可见行、分页、选择及加载状态。 |
+| children | `Snippet<[DataTableRenderState<T>]>` | — | 表格、工具栏和分页组合内容，接收当前渲染状态。 |
+
 
 `columnId` 与行对象字段同名时，DataTable 自动读取原始字段并使该 TableHead 可排序。因此日期列保存 `Date`、数字时间戳或带时区的 ISO 8601 日期时间即可，不需要声明 `sortType: "date"`。展示值来自计算结果时传 `sorters`。无同名字段且无 sorter 的 TableHead 保持静态。
 

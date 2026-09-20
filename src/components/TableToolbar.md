@@ -6,11 +6,15 @@ DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批�
 
 ## 组合模式
 
-- 默认内置模式：由 Props 生成 SearchInput、Select、Listbox、MenuItem、Button、Separator 与 Spinner。
+- 默认内置模式：由 Props 生成 SearchInput、Select、Listbox、MenuItem、Button、CopyButton、Separator 与 Spinner。
 - 显式组合模式：通过 `children` 和 `as="search|bulk|sort|filter|action"` 替换直接子项。
 - `parts` 只配置直接内置子组件，不递归配置子组件内部。
 - 内置 copy、delete、sort、filter 的 icon-only 触发器由工具栏内部嵌入 Tooltip，提示文案分别复用对应 label Props。
 - 内置清除、复制、删除、排序与筛选均显式使用 `Button bare emphasis="muted"`，保留次级工具操作的 40% → hover 100% 视觉；调用方可通过 `parts.Button.emphasis` 统一覆盖。
+
+内置复制复用 `CopyButton bare`，通过 `writeText` 执行已有 `onCopy` 回调；成功反馈默认保留 1600ms，期间忽略重复复制。回调应在复制完成后 resolve，失败时 reject，避免错误显示为成功。
+
+排序选择器读取 DataTable 的当前排序，仅在用户选择新选项时写回；表头排序不被工具栏旧值覆盖。
 
 ## Changelog
 
