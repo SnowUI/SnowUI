@@ -1,5 +1,5 @@
 <!--
- Tooltip 文字提示组件 v1.23.0
+ Tooltip 文字提示组件 v1.23.1
  变更 (2026-09-20): 默认 360px 换行与四边 16px 可视区避让；支持悬停阅读、超高内容滚动和 Escape 关闭。
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
@@ -1005,8 +1005,6 @@
                 : measuredSize;
         const tooltipWidth = targetSize.width || tooltipRect.width;
         const tooltipHeight = targetSize.height || tooltipRect.height;
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
         const viewportPadding = 16;
         const viewportBounds = getTooltipViewport();
         const safeBounds = {
@@ -1078,15 +1076,17 @@
             height: tooltipHeight,
         };
         const startRect = switchStartRect ?? readVisualRect(sizeShellRef);
-        const distance = startRect
-            ? Math.hypot(
-                  targetRect.top - startRect.top,
-                  targetRect.left - startRect.left,
-              )
-            : 0;
-        const maxMoveDistance = Math.min(
-            TOOLTIP_MOVE_MAX_DISTANCE_PX,
-            Math.min(viewportWidth, viewportHeight) * TOOLTIP_MOVE_MAX_VIEWPORT_RATIO,
+        // 以中心判断距离，避免宽度变化被计作额外位移；各轴使用对应视口尺寸。
+        const centerDelta = startRect
+            ? {
+                  x: targetRect.left + targetRect.width / 2 - startRect.left - startRect.width / 2,
+                  y: targetRect.top + targetRect.height / 2 - startRect.top - startRect.height / 2,
+              }
+            : { x: 0, y: 0 };
+        const distance = Math.hypot(centerDelta.x, centerDelta.y);
+        const relativeDistance = Math.hypot(
+            centerDelta.x / Math.max(1, viewportBounds.width),
+            centerDelta.y / Math.max(1, viewportBounds.height),
         );
         const isSwitchingTooltip =
             lastPositionTooltipId !== undefined &&
@@ -1095,7 +1095,8 @@
             tooltipBehavior.smoothMove &&
             overlayState?.continuousMotion !== false &&
             !prefersReducedMotion &&
-            distance <= maxMoveDistance &&
+            distance <= TOOLTIP_MOVE_MAX_DISTANCE_PX &&
+            relativeDistance <= TOOLTIP_MOVE_MAX_VIEWPORT_RATIO &&
             startRect !== undefined &&
             outgoingOverlay !== null &&
             outgoingTargetRect !== undefined;

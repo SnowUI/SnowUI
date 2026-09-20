@@ -4,6 +4,17 @@
  */
 export const examples = [
     {
+        name: "短视口相邻长短提示连续切换",
+        code: `<div style="display: flex; gap: 12px;">
+<Button>权限<Tooltip>管理成员的访问权限</Tooltip></Button>
+<Button>删除<Tooltip>删除此文件</Tooltip></Button>
+</div>`,
+        expected: {
+            interaction: "在 800×220 和 375×220 视口中双向快速切换，外框与内容进入 moving，中心位置连续变化；内容长度差不能造成某一方向跳过过渡。远于 240px 的目标仍直接定位。",
+        },
+        logic: ["Continuous", "Responsive", "Retarget"],
+    },
+    {
         name: "A1: 基础提示 (Composition)",
         code: `A1
 <div class="p-40">
