@@ -3,7 +3,8 @@
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
 
 
-> **版本**: v1.2.2
+> **版本**: v1.2.3
+> **变更记录 (2026-09-20)**: 内置关闭按钮清除最小内容宽度，常态不占位；离开后先淡出 X，再收回宽度和 padding。键盘焦点位于 Tag 内时保持展开。
 > **变更记录 (2026-08-30)**: 收起态内置 X 通过 Tag 直属规则完整覆盖共享按钮的 `flex` shorthand，确保视觉隐藏时不保留 12px 布局占位。
 > **变更记录 (2026-05-22)**: `shape="left-arrow" / "right-arrow"` 改为内部 SVG 背景路径，根据当前 Tag 宽高生成完整圆角箭头轮廓；所有外角均圆角化，尽量复原 Workshop `node-id=11951-40471` 中的箭头 Tag。
 > **变更记录 (2026-05-21)**: 激活态内置 X 颜色改为 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%，不再使用黑色。
@@ -72,7 +73,7 @@
 
 - 子元素通过 `gap` 自然排列；外部覆盖 `--snowui-tag-gap` 或传 `gap` 即可同步影响所有子元素间距（包括内置 X 与文字、外部 Icon 与文字）。
 - **不内置 leading Icon**；需要 Dot 由消费方显式传入 `<Icon as="leading">`。
-- 删除 X 由 `closable={true}` 自动渲染在末尾；视觉与 hover 复用 `Button bare emphasis="muted"`（默认图标为 Components 自有语义 `close`，其包内形状快照来源为 `close-regular.svg`）；默认 `width: 0` 不占位，hover Tag 时显形，hover X 自身时透明度提升到 1。激活态下 X 颜色源切到 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%。
+- 删除 X 由 `closable={true}` 自动渲染在末尾；视觉与 hover 复用 `Button bare emphasis="muted"`（默认图标为 Components 自有语义 `close`，其包内形状快照来源为 `close-regular.svg`）；默认 `width: 0`、`min-width: 0` 不占位，hover Tag 时显形，hover X 自身时透明度提升到 1。激活态下 X 颜色源切到 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%。
 - **边距按元素类型决定**（与 Figma 对齐）：文字与边的间距 8px、Icon / X 与边的间距 4px。组件通过 MutationObserver 检测**真实**首/末位节点（包含文本节点），按节点类型写到 `data-edge-left` / `data-edge-right`（`"icon"` / `"text"`），CSS `[data-edge-*="icon"]` 把对应侧 padding 从 8px 收紧到 4px。**纯 CSS `:first-child` / `:last-child` 只看元素节点，无法识别"末位文字"的情况**，因此走 JS。closable 的 X 不计入边距检测（X 由 `[data-closable]:hover` 单独管理右 padding）。
 - 箭头形状（`left-arrow` / `right-arrow`）由内部 SVG 背景路径实现，不进入子元素布局；组件用 ResizeObserver 获取当前宽高并生成完整外轮廓，所有拐点都通过二次贝塞尔圆角化，尽量复原 Workshop `node-id=11951-40471`。
 
@@ -235,6 +236,10 @@
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.2.3 (2026-09-20)
+
+- 关闭按钮清除最小内容宽度，常态不占位；退出时先淡出再收宽，键盘聚焦保持展开。
 
 ### v1.2.2 (2026-08-30)
 

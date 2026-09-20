@@ -1,5 +1,5 @@
 <!--
-  Tag 组件：标签 v1.2.2
+  Tag 组件：标签 v1.2.3
 
   布局模型：内联外壳布局（与 Button 一致），不接入三槽位。
   - 子元素通过 gap 自然排列；外部覆盖 `--snowui-tag-gap`（或传 gap）即可同步影响所有子元素之间的间距，包括内置 X 与文字、外部 Icon 与文字。
@@ -328,6 +328,7 @@
        挂载 padding-right 的 transition 在该作用域内声明，hover 状态变化时由消费 Frame 桥接动效平滑过渡。
        注：该选择器不会触发 check-standards §5.7.5 根类 transition 禁用规则（规则仅扫描 :global(:where(.snowui-tag)) 根块）。 */
     :global(:where(.snowui-tag)[data-closable="true"]) {
+        --snowui-tag-close-collapse-delay: var(--snowui-frame-color-motion-duration, 0.15s);
         --snowui-frame-component-transition:
             background-color var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),
@@ -336,7 +337,7 @@
             --snowui-hover-overlay-opacity var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),
             padding-right var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out);
+                var(--snowui-frame-color-motion-easing, ease-out) var(--snowui-tag-close-collapse-delay);
     }
 
     /* 首/末位为 Icon → 对应侧 padding 收紧到 4px。
@@ -351,7 +352,8 @@
     }
 
     /* 含内置 closable X 且 hover 时 → 右侧 padding 收紧到 4px（与 X 显形协同） */
-    :global(:where(.snowui-tag)[data-closable="true"]:hover) {
+    :global(:where(.snowui-tag)[data-closable="true"]:is(:hover, :focus-within)) {
+        --snowui-tag-close-collapse-delay: 0s;
         padding-right: var(--padding-1, 4px);
     }
 
@@ -454,21 +456,25 @@
         --snowui-button-opacity-override: 0;
 
         width: 0;
+        min-width: 0;
+        min-inline-size: 0;
+        pointer-events: none;
         flex: 0 0 0;
         overflow: hidden;
         transition:
             width var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out),
+                var(--snowui-frame-color-motion-easing, ease-out) var(--snowui-tag-close-collapse-delay),
             flex-basis var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out),
+                var(--snowui-frame-color-motion-easing, ease-out) var(--snowui-tag-close-collapse-delay),
             opacity var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
 
     /* Hover Tag 时 X 显形并撑出宽度 */
-    :global(:where(.snowui-tag):hover > .snowui-tag-close) {
+    :global(:where(.snowui-tag):is(:hover, :focus-within) > .snowui-tag-close) {
         --snowui-button-opacity-override: var(--snowui-button-opacity);
 
+        pointer-events: auto;
         width: var(--snowui-button-icon-size, var(--size-4));
         flex: 0 0 var(--snowui-button-icon-size, var(--size-4));
     }
