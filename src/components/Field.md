@@ -12,6 +12,10 @@
 **继承**: 复用 Frame.svelte 的所有通用能力（状态、动效、响应式、Skeleton、样式编排）。
 **默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。
 
+## 组件介绍
+
+将输入控件、标签、图标和校验反馈组织为完整的表单字段，统一外观与内容布局。
+
 ## 2026-04-04 表单样式规则
 
 - 基础节奏统一：`Field` 默认 `padding = 12 / 16`，`gap = 8`

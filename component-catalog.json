@@ -18,7 +18,7 @@
       "kind": "component",
       "source": "src/components/BarChart.svelte",
       "documentation": "src/components/BarChart.md",
-      "description": "渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。",
+      "description": "用柱状图比较不同类别的数据，支持横向、纵向、分组与堆叠展示，以及坐标轴和交互提示。",
       "intents": [
         "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
       ],
@@ -41,7 +41,7 @@
       "kind": "component",
       "source": "src/components/ChartGroup.svelte",
       "documentation": "src/components/ChartGroup.md",
-      "description": "承载多个 Chart 原子组件，并协调共享分类单元格 hover、统一叠加画布和单坐标轴组合。",
+      "description": "将多个图表组合在同一区域，协调分类悬停、叠加绘制与共享坐标轴，便于比较关联数据。",
       "intents": [
         "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
       ],
@@ -64,7 +64,7 @@
       "kind": "component",
       "source": "src/components/CircularChart.svelte",
       "documentation": "src/components/CircularChart.md",
-      "description": "渲染可调圆角、环厚、隔断、整体尺寸的圆环/饼形比例图。Hover 动效参考 Apache ECharts pie-borderRadius 示例的强调反馈，并按 SnowUI 规范改为外侧增厚。",
+      "description": "用圆环或饼图展示数据占比，支持分段、圆角、环厚与悬停强调，适合构成分析和比例概览。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -81,7 +81,7 @@
       "kind": "component",
       "source": "src/components/DataTable.svelte",
       "documentation": "src/components/DataTable.md",
-      "description": "协调查询、排序和分页状态；Toolbar、Table 与 Pagination 由使用方自由组合。",
+      "description": "统一管理数据的查询、排序与分页状态，可自由组合工具栏、表格和分页器，构建完整的数据浏览界面。",
       "intents": [
         "数据表格",
         "排序分页表格",
@@ -109,7 +109,7 @@
       "kind": "component",
       "source": "src/components/Field.svelte",
       "documentation": "src/components/Field.md",
-      "description": "表单容器组件，负责承接输入框视觉外壳、组合布局、错误提示与角色化插槽协议。",
+      "description": "将输入控件、标签、图标和校验反馈组织为完整的表单字段，统一外观与内容布局。",
       "intents": [
         "表单字段组合",
         "标签帮助错误信息"
@@ -136,7 +136,7 @@
       "kind": "component",
       "source": "src/components/FlowText.svelte",
       "documentation": "src/components/FlowText.md",
-      "description": "FlowText 以流动动效展示文字和数字的变化，适用于动态文案、计数、计时与倒计时。",
+      "description": "以流动过渡展示文字和数字变化，适合动态文案、计数、计时与倒计时。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -153,7 +153,7 @@
       "kind": "component",
       "source": "src/components/FramePro.svelte",
       "documentation": "src/components/FramePro.md",
-      "description": "OSS Frame 的超集。在 OSS Frame 全部能力之上叠加跨组件协调：编排模式、联动控制、样式编排。",
+      "description": "在 Frame 的布局、状态与动效能力之上，协调多个组件的联动、动效编排与样式变化。",
       "intents": [],
       "aliases": [
         "PRO Frame"
@@ -172,7 +172,7 @@
       "kind": "component",
       "source": "src/components/FramePro.svelte",
       "documentation": "src/components/FramePro.md",
-      "description": "OSS Frame 的超集。在 OSS Frame 全部能力之上叠加跨组件协调：编排模式、联动控制、样式编排。",
+      "description": "在 Frame 的布局、状态与动效能力之上，协调多个组件的联动、动效编排与样式变化。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -189,7 +189,7 @@
       "kind": "component",
       "source": "src/components/GaugeChart.svelte",
       "documentation": "src/components/GaugeChart.md",
-      "description": "渲染可调圆角、环厚、透明间隔、渐变颜色、4% 同色占位层与顺序出现动效的半圆仪表比例图。颜色、几何与出现时间轴能力与 CircularChart 保持同类心智。",
+      "description": "用半圆仪表展示进度或数据占比，支持分段、渐变、环厚与出现动效，适合指标概览。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -206,7 +206,7 @@
       "kind": "component",
       "source": "src/components/GradientMotion.svelte",
       "documentation": "src/components/GradientMotion.md",
-      "description": "按 glimm.dev / glimm@0.1.4 还原 shader sweep 渐变效果，可作为可裁切媒体面、头像默认图或背景扫光层使用。",
+      "description": "以流动扫光呈现动态渐变，可用于背景、头像占位或可裁切的媒体区域。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -223,7 +223,7 @@
       "kind": "component",
       "source": "src/components/ImageViewer.svelte",
       "documentation": "src/components/ImageViewer.md",
-      "description": "页面级媒体预览组件，负责显示当前图片/视频与组合式控制按钮。",
+      "description": "在页面级预览中查看图片或视频，提供前后切换与关闭操作，适合媒体详情浏览。",
       "intents": [
         "图片预览",
         "图片全屏查看",
@@ -250,7 +250,7 @@
       "kind": "component",
       "source": "src/components/LineChart.svelte",
       "documentation": "src/components/LineChart.md",
-      "description": "渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。",
+      "description": "用折线展示数据变化趋势，支持多序列、面积填充、实线与虚线，以及坐标轴、网格和节点样式。",
       "intents": [
         "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
       ],
@@ -273,7 +273,7 @@
       "kind": "component",
       "source": "src/components/NumberFlow.svelte",
       "documentation": "src/components/NumberFlow.md",
-      "description": "展示持续变化的格式化数字，并以逐位滚轮、位数重排和容器宽度过渡表达数值变化。",
+      "description": "以逐位滚动和宽度过渡展示数字变化，保留金额、分组符与小数格式，适合计数器和实时指标。",
       "intents": [
         "数字滚动",
         "数值变化动画"
@@ -298,7 +298,7 @@
       "kind": "component",
       "source": "src/components/NumericText.svelte",
       "documentation": "src/components/NumericText.md",
-      "description": "NumericText 提供 SwiftUI numericText 风格的单行文字 / 数字差异过渡，只动画发生变化的中间区间。",
+      "description": "对文字或数字中发生变化的部分进行过渡，保留未变内容，适合简短状态、数值与计时信息。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -315,7 +315,7 @@
       "kind": "component",
       "source": "src/components/ScrambleText.svelte",
       "documentation": "src/components/ScrambleText.md",
-      "description": "ScrambleText 提供字符扰动、循环并归位到目标文字的动效。默认使用 cascade，动效速度和字符错峰由组件内部统一维护。",
+      "description": "通过字符扰动逐步呈现目标文字，适合标题、短句与状态文案的动态揭示。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -332,7 +332,7 @@
       "kind": "component",
       "source": "src/components/SearchBox.svelte",
       "documentation": "src/components/SearchBox.md",
-      "description": "提供 PRO 搜索入口触发器；点击整个搜索框打开搜索浮层。",
+      "description": "提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。",
       "intents": [
         "站点搜索",
         "带快捷键的搜索框",
@@ -358,7 +358,7 @@
       "kind": "component",
       "source": "src/components/Segmented.svelte",
       "documentation": "src/components/Segmented.md",
-      "description": "RadioGroup 的视觉变体,在多个互斥选项之间切换\"过滤器/参数\"。视觉系统",
+      "description": "将少量互斥选项并排展示，便于快速切换筛选条件或参数，并支持键盘与表单交互。",
       "intents": [
         "互斥参数选择",
         "过滤器单选",
@@ -386,7 +386,7 @@
       "kind": "block",
       "source": "src/blocks/Sidebar.svelte",
       "documentation": "src/blocks/Sidebar.md",
-      "description": "提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。",
+      "description": "组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。",
       "intents": [
         "文档侧边导航",
         "可折叠侧栏",
@@ -413,7 +413,7 @@
       "kind": "block",
       "source": "src/blocks/SidebarItem.svelte",
       "documentation": "src/blocks/SidebarItem.md",
-      "description": "Sidebar 普通导航项，支持 active、状态标签、更新 Badge、leading icon 与可选操作区。",
+      "description": "在 Sidebar 中呈现导航入口，支持激活状态、图标、层级与状态提示，帮助识别当前位置。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -430,7 +430,7 @@
       "kind": "block",
       "source": "src/blocks/SidebarSection.svelte",
       "documentation": "src/blocks/SidebarSection.md",
-      "description": "Sidebar 分类块，内置分类标题、展开/收起按钮与可选操作区。",
+      "description": "将 Sidebar 导航组织为带标题的分组，支持展开、收起与附加操作，便于浏览较长的导航列表。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -447,7 +447,7 @@
       "kind": "component",
       "source": "src/components/SidePanel.svelte",
       "documentation": "src/components/SidePanel.md",
-      "description": "右侧详情弹出窗，支持浮层与页面右侧内嵌两种预览形态。",
+      "description": "从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。",
       "intents": [
         "侧边详情面板",
         "行预览面板",
@@ -473,7 +473,7 @@
       "kind": "component",
       "source": "src/components/SlotText.svelte",
       "documentation": "src/components/SlotText.md",
-      "description": "SlotText 为逐字符纵向槽位滚动文字。动效时序由组件内部维护，不提供时长、错峰、弹性或缓动调参。",
+      "description": "以逐字符的纵向滚动展示文字变化，适合短标题、状态、计数与计时信息。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -490,7 +490,7 @@
       "kind": "component",
       "source": "src/components/Tab.svelte",
       "documentation": "src/components/Tab.md",
-      "description": "在多个互斥选项之间切换\"视图/内容区\"。子项使用 Button,激活态视觉",
+      "description": "在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。",
       "intents": [
         "内容面板切换",
         "视图切换"
@@ -517,7 +517,7 @@
       "kind": "component",
       "source": "src/components/TableToolbar.svelte",
       "documentation": "src/components/TableToolbar.md",
-      "description": "DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批量操作。它读取 DataTable Context，不支持独立搭配普通 Table。公开入口为 @snowui/components-pro。",
+      "description": "为 DataTable 提供搜索、排序、筛选和批量操作入口，并展示选择状态，适合数据管理界面。",
       "intents": [
         "表格工具栏",
         "表格搜索筛选操作"
@@ -542,7 +542,7 @@
       "kind": "component",
       "source": "src/components/Toast.svelte",
       "documentation": "src/components/Toast.md",
-      "description": "全局浮层通知，支持命令式 API、6 位置堆叠、内置/外置图标三槽位与 rich 富文本变体",
+      "description": "用短暂通知反馈操作结果或状态变化，支持图标、操作和富内容，适合保存成功、错误与提醒。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -559,7 +559,7 @@
       "kind": "component",
       "source": "src/components/Toaster.svelte",
       "documentation": "src/components/Toaster.md",
-      "description": "<Toaster",
+      "description": "集中展示通过 toast() 触发的全局通知，支持六个屏幕位置、堆叠动效与可见数量控制，让连续反馈保持有序。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,

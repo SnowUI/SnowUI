@@ -1,5 +1,9 @@
 # Tab (视图切换)
 
+## 组件介绍
+
+在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。
+
 ## 默认内置模式 / 显式组合模式
 
 - 默认内置模式（推荐）：`items` 自动生成 `<Button as="item">`；item 可用 `icon` 声明图标，Tab 内置生成 `Icon + Text`，适用于 `icon-toggle`；`parts.Button / parts.Icon / parts.Text` 配置统一 Props。

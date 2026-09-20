@@ -33,6 +33,10 @@
 
 ---
 
+## 组件介绍
+
+在 Frame 的布局、状态与动效能力之上，协调多个组件的联动、动效编排与样式变化。
+
 ## OSS Frame vs FramePro 职责边界
 
 > **这是向 FramePro 增加新功能时的决策依据**。完整切割原则与判断流程见 [Frame.md（OSS）§1](../../../components/src/components/Frame.md)。
@@ -1574,7 +1578,6 @@ fontSize: "12 + Math.floor($self.width / 100)"
 ## Site guide: frame
 
 <!-- site-guide:frame -->
-Compose layout, state, and motion with the shared foundation of SnowUI components.
 
 ### When to use Frame {#when-to-use}
 
@@ -1656,7 +1659,6 @@ Use stateClass, stateStyle, and stateContent when appearance or content follows 
 ## Site guide: frame-pro
 
 <!-- site-guide:frame-pro -->
-Coordinate multiple Frames while keeping layout, state, and local motion in the shared Frame foundation.
 
 ### When to use FramePro {#when-to-use}
 

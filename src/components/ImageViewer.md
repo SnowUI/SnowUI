@@ -9,6 +9,10 @@
 
 `ImageViewer` 是独立组件，不并入 `Image`。它承载“打开后的预览层”，默认内置上一张、下一张与关闭 Button；需要自定义结构时仍可通过 children 显式组合控制键。
 
+## 组件介绍
+
+在页面级预览中查看图片或视频，提供前后切换与关闭操作，适合媒体详情浏览。
+
 ## 控制按钮双模式
 
 - **默认内置模式**：省略 children 时自动生成三个真实 `Button`，分别使用 `ArrowLineLeft`、`ArrowLineRight`、SnowUI `Close`；默认 `size="md"`、`variant="gray"`、`backgroundBlur={true}`。

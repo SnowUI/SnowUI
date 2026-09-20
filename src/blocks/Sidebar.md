@@ -9,6 +9,10 @@
 
 Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo 与折叠按钮；导航内容既可由 `sections` 数据生成，也可显式组合 `SidebarItem`、`SidebarSection`、`Separator` 和自定义内容。每个 SidebarSection 在分类内容末尾内置 Separator，分类调用方无需手动添加。根容器默认透明。
 
+## 组件介绍
+
+组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
+
 ## API 参考
 
 | 关键字 | 类型 | 默认值 | 描述 |

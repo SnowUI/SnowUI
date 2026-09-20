@@ -1,3 +1,4 @@
+import { readComponentIntroduction } from "./lib/component-introduction.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -7,24 +8,8 @@ const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), 
 const discovery = JSON.parse(fs.readFileSync(path.join(root, "component-discovery.json"), "utf8"));
 const outputPath = path.join(root, "component-catalog.json");
 
-function stripMarkdown(value = "") {
-  return value
-    .replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1")
-    .replace(/[*_`>#]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 function readDescription(documentation, name) {
-  if (!documentation || !fs.existsSync(documentation)) return `${name} SnowUI PRO component.`;
-  const markdown = fs.readFileSync(documentation, "utf8");
-  const responsibility = markdown.match(/^>\s*\*\*职责\*\*:\s*(.+)$/m);
-  if (responsibility) return stripMarkdown(responsibility[1]);
-  const paragraph = markdown
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .find((line) => line && !line.startsWith("#") && !line.startsWith(">") && !line.startsWith("|") && !line.startsWith("-") && !line.startsWith("```"));
-  return stripMarkdown(paragraph) || `${name} SnowUI PRO component.`;
+  return readComponentIntroduction(fs.readFileSync(documentation, "utf8"), name);
 }
 
 function collectExports(indexRelative, defaultKind) {

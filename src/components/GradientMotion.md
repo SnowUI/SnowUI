@@ -6,6 +6,10 @@
 
 GradientMotion 是一个 PRO 动效组件。它输出 glimm.dev 同款 WebGL 扫光带：单条 gaussian band 按方向穿过画布，使用 cosine palette、边缘 wave/ripple、fresnel 与 specular 高光形成虹彩薄膜效果。
 
+## 组件介绍
+
+以流动扫光呈现动态渐变，可用于背景、头像占位或可裁切的媒体区域。
+
 ## 功能概览
 
 - 内置 glimm 的 6 种 palette：`prism`、`berry`、`lagoon`、`citrus`、`azure`、`ember`
