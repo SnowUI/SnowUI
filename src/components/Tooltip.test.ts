@@ -1,8 +1,21 @@
 /**
  * Tooltip.test.ts
- * v1.10.4
+ * v1.11.0
  */
 export const examples = [
+    {
+        name: "E5: 指针速度自适应",
+        code: `E5
+<div class="p-40 flex-row gap-12">
+    <Button>文档<Tooltip>查看组件文档</Tooltip></Button>
+    <Button>源码<Tooltip>查看公开源码</Tooltip></Button>
+    <Button>复制<Tooltip>复制导入代码</Tooltip></Button>
+</div>`,
+        expected: {
+            interaction: "首项显示后，以慢移、快扫、快速反向重复经过同一组按钮；快速段短于慢速段，最新目标及时对齐，外框与内容同步且不排队。静止超过 100ms 后不复用旧速度；reduced-motion 直接定位。",
+        },
+        logic: ["PointerSpeed", "Continuous", "Retarget", "ReducedMotion"],
+    },
     {
         name: "短视口相邻长短提示连续切换",
         code: `<div style="display: flex; gap: 12px;">
@@ -120,7 +133,7 @@ export const examples = [
         expected: {
             render: "左侧显式开启 widthRebound，右侧使用默认关闭；两侧按钮与 Tooltip 内容一一对应",
             interaction:
-                "两侧都保留连续移动与裁切揭示；左侧宽度使用 1000ms 欠阻尼回弹，内容交接结束后即使宽度仍在回弹，复制与下载间再次切换也使用完整普通内容时间线；右侧宽度随 180–360ms 协调时间线单调收敛且不越过目标宽度",
+                "两侧都保留连续移动与裁切揭示；左侧宽度使用 1000ms 欠阻尼回弹，内容交接结束后即使宽度仍在回弹，复制与下载间再次切换也使用完整普通内容时间线；右侧宽度随鼠标速度适配后的协调时间线单调收敛且不越过目标宽度",
             accessibility:
                 "prefers-reduced-motion: reduce 下直接定位到新 Tooltip，只保留新内容，不执行移动、尺寸或裁切过渡",
             performance:
@@ -226,7 +239,7 @@ export const examples = [
     </div>
 </div>`,
         expected: {
-            interaction: "快速扫过同列按钮时，左列的中断段使用 90–160ms 缓出快速接管；右列始终使用普通 180–360ms 协调时间线。两列均从当前可见画面接管且不排队",
+            interaction: "快速扫过同列按钮时，左列中断选用快速缓出基线，右列选用普通协调基线；两列均按有效鼠标速度缩短时程。两列均从当前可见画面接管且不排队",
         },
         logic: ["RapidRetarget", "Comparison", "ContinuousTooltip"],
     },

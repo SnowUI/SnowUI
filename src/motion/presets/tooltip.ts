@@ -1,6 +1,8 @@
 import type { MotionConfig } from "../../logic/motion-config";
 import {
     MOTION_DURATION_TOOLTIP_APPEAR_MS,
+    MOTION_DURATION_TOOLTIP_POINTER_MIN_MS,
+    MOTION_DURATION_TOOLTIP_POINTER_SETTLE_MS,
     MOTION_DURATION_TOOLTIP_DISAPPEAR_MS,
     MOTION_DISTANCE_TOOLTIP_APPEAR_PX,
     MOTION_EASING_TOOLTIP,
@@ -150,3 +152,12 @@ export const TOOLTIP_CONTINUOUS_CONTENT_SPEED_PX_PER_MS = 0.3;
 export const TOOLTIP_CONTINUOUS_CONTENT_END_SPEED_PX_PER_MS = 0.05;
 /** @deprecated Continuous Tooltip now uses one bounded coordinated timeline. */
 export const TOOLTIP_CONTINUOUS_CONTENT_DECELERATE_FROM = 0.9;
+
+/** 鼠标速度只缩短既有时程；缺少有效样本时保留距离相关的基线。 */
+export function getTooltipPointerDuration(distance: number, baselineMs: number, speed: number) {
+    if (!Number.isFinite(speed) || speed <= 0) return baselineMs;
+    return Math.min(baselineMs, Math.max(
+        MOTION_DURATION_TOOLTIP_POINTER_MIN_MS,
+        distance / speed + MOTION_DURATION_TOOLTIP_POINTER_SETTLE_MS,
+    ));
+}

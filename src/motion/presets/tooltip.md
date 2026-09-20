@@ -1,6 +1,6 @@
 # tooltip.ts 文档
 
-> **版本**: v1.7.0
+> **版本**: v1.8.0
 > **职责**: 提供 Tooltip 出现 / 消失 preset。
 
 `TOOLTIP_APPEAR_MOTION`、`getTooltipAppearMotion()` 与 `TOOLTIP_DISAPPEAR_MOTION` 专用于 Tooltip Foreground，不与 dropdown overlay 或 Dialog 共用。
@@ -17,6 +17,8 @@
 4. 退出卸载时间使用 `TOOLTIP_DISAPPEAR_TOTAL_MS`。
 5. 连续切换的宽度变化使用 `getTooltipWidthSpringState()`；该曲线只控制宽度，不替换位置、高度或内容进度。
 6. `rapidRetarget` 默认开启；运动中改目标从当前可见画面使用 `90–160ms` cubic ease-out 与 `0.02` 内容滞后接管。关闭后使用普通 `180–360ms` 正弦协调时间线。
+
+7. `getTooltipPointerDuration(distance, baselineMs, speed)` 在现有普通 / retarget 基线上适配速度。有效鼠标速度只缩短所选基线时程：`min(基线时长, max(80ms, 外框中心距离 / 平滑速度 + 40ms))`，速度单位为 px/ms。采用 32ms 指数平滑，超过 100ms 未采样则失效；慢移或无有效样本时保留距离基线。每次目标切换只读取一次速度，外框位置、高度、默认宽度与内容共用该时长；不在段内反复变速，不改变两种曲线和内容滞后，也不缩短显式 1000ms 宽度回弹。
 
 ## 问题与修复记录
 

@@ -1,5 +1,6 @@
 <!--
- Tooltip 文字提示组件 v1.23.1
+ Tooltip 文字提示组件 v1.24.0
+ 变更 (2026-09-20): 连续切换按平滑鼠标速度缩短协调时程，显示期单例采样并在隐藏时释放。
  变更 (2026-09-20): 默认 360px 换行与四边 16px 可视区避让；支持悬停阅读、超高内容滚动和 Escape 关闭。
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
@@ -133,6 +134,7 @@
         TOOLTIP_DISAPPEAR_MOTION,
         TOOLTIP_DISAPPEAR_TOTAL_MS,
         getTooltipAppearMotion,
+        getTooltipPointerDuration,
         getTooltipWidthSpringState,
     } from "../motion/presets/tooltip";
     import {
@@ -158,6 +160,7 @@
         tooltipOverlayImmediateDismissRevision,
         type TooltipOverlayState,
     } from "../lib/tooltip-overlay";
+    import { trackTooltipPointerSpeed } from "../lib/tooltip-pointer-speed";
     import { registerTooltipMotionDismiss } from "../lib/tooltip-motion-dismiss";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Skeleton from "./Skeleton.svelte";
@@ -323,8 +326,22 @@
     let switchMotionRevision = 0;
     let prefersReducedMotion = $state(false);
     let reducedMotionMedia: MediaQueryList | undefined;
-    let unregisterOverlayHost: (() => void) | undefined;
     const tooltipBehavior = getTooltipBehaviorEnhancement();
+    let pointerSpeedTracker: ReturnType<typeof trackTooltipPointerSpeed> | undefined;
+    const shouldTrackPointer = $derived(
+        isOverlayHost && currentOverlay !== null && !prefersReducedMotion && tooltipBehavior.smoothMove,
+    );
+    $effect(() => {
+        if (!shouldTrackPointer) return;
+        const tracker = trackTooltipPointerSpeed(document);
+        pointerSpeedTracker = tracker;
+        return () => {
+            tracker.destroy();
+            if (pointerSpeedTracker === tracker) pointerSpeedTracker = undefined;
+        };
+    });
+
+    let unregisterOverlayHost: (() => void) | undefined;
 
     const forwardedRest = $derived.by(() => {
         const {
@@ -1168,9 +1185,10 @@
             const contentLag = isRetargeting
                 ? TOOLTIP_CONTINUOUS_RETARGET_CONTENT_LAG
                 : TOOLTIP_CONTINUOUS_CONTENT_LAG;
-            const motionDuration = getContinuousDuration(
+            const motionDuration = getTooltipPointerDuration(
                 shellDistance,
-                isRetargeting,
+                getContinuousDuration(shellDistance, isRetargeting),
+                pointerSpeedTracker?.read() ?? 0,
             );
             const shouldReboundWidth = overlayState?.widthRebound ?? widthRebound;
             const alignment = canJoinContentTrack

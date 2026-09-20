@@ -28,7 +28,7 @@
 - 本模块只管理“同一个外框是否复用”和 active Tooltip 的渲染参数。
 - 首次延迟、快速切换窗口与冷却恢复仍由 [`tooltip-delay.ts`](./tooltip-delay.md) 管理。
 - 视觉样式与 Frame 动效仍在 [`Tooltip.svelte`](../components/Tooltip.svelte) 内消费。
-- 本模块不读取 `performance.now()` 或指针速度，不拥有视觉收敛策略；不得恢复 document `pointermove`、逐实例 pointer 监听或逐帧速度采样。
+- 本模块不读取指针速度，不拥有视觉收敛策略。速度适配由共享 Tooltip 宿主和 [tooltip-pointer-speed](./tooltip-pointer-speed.md) 拥有，仅显示期间监听；不得在本模块新增采样、逐实例监听或逐帧布局测量。
 
 ## 问题与修复记录
 
