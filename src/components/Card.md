@@ -1,22 +1,67 @@
-# Card.svelte
+# Card
 
 > **版本**: v1.0.1
-> **更新**: 2026-05-26
-> **职责**: 提供可承载自定义内容、Pin 子项与溢出滚动的通用表面容器，不内建标题或操作区。
-> **布局模型**: 槽位宿主布局 / 容器内组件间布局
-> **文档**: ./Card.md
-
-Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载和内容溢出滚动。Card 不内建标题、正文、图标或操作区；内部内容完全由使用方自定义。
-
-用户 API 与组合说明如下；源码实现见 [Card.svelte](./Card.svelte)。
-
----
+> **职责**: 为相关内容提供统一的卡片表面，可自由组合文字、媒体和操作，支持固定子项与内容滚动。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 为相关内容提供统一的卡片表面，可自由组合文字、媒体和操作，支持固定子项与内容滚动。
 
-## 关键字速查
+## 使用选择
+
+<!-- usage-guide:start -->
+用于有独立信息层级的内容容器。普通页面网格和留白由页面布局负责；不要给每层嵌套内容重复添加卡片外壳。
+
+- 用 row / column 选择主要布局，contentFill / contentHug 控制内容占位。
+- selected、active 和 interactive 分别表达选择、激活与交互；内容由 children 提供，Card 不生成业务信息。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Card, Frame, Text } from '@snowui-design-system/components';
+</script>
+
+<div style="display: flex; justify-content: center; width: 100%;">
+	<Card style="background-color: var(--background-1);" padding={4} radius={5} width={286} height={84}>
+		<Frame row>
+			<Text style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">Component views</Text>
+			<Text as="trailing" style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">+11.01%</Text>
+		</Frame>
+		<Text style="font-size: var(--text-18); line-height: var(--leading-18); font-weight: 600; color: var(--black-100);">7,265</Text>
+	</Card>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| row | `boolean` | `false` | 横向排列直系普通内容。与 Frame 写法一致 |
+| column | `boolean` | — | 纵向排列普通内容，未传时取 row 的反值；row 与 column 同时为 true 时 row 优先。 |
+| wrap | `boolean` | `false` | 普通内容是否允许换行；默认不换行 |
+| contentFill | `boolean` | `false` | 普通内容子项宽度填满 Card 内容区；优先级高于 `contentHug` |
+| contentHug | `boolean` | `false` | 普通内容子项宽度按内容收缩 |
+| selected | `boolean` | `false` | 激活态语义别名；作用和效果与 `active` 相同 |
+| active | `boolean` | `false` | 是否使用激活态外观 |
+| interactive | `boolean` | `false` | 使容器具备交互外观、指针和 hover 边框；点击副作用仍由调用方事件负责，不自动导航、选择或生成按钮键盘行为。 |
+| scrollable | `boolean` | `true` | 内容溢出时是否启用内部滚动；无高度约束时内容自然撑高 |
+| children | `Snippet` | — | 任意自定义内容 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="关键字速查"></a>
+
+### 关键字速查
 
 | 类别 | 关键字 |
 |:---|:---|
@@ -29,28 +74,22 @@ Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载�
 
 ---
 
-## Props
+<a id="props"></a>
+
+### Props
 
 | 关键字 | 类型 | 默认值 | 描述 |
 |:---|:---|:---|:---|
-| `row` | `boolean` | `false` | 横向排列直系普通内容。与 Frame 写法一致 |
-| `column` | `boolean` | —（!row） | 纵向排列普通内容，未传时取 row 的反值；row 与 column 同时为 true 时 row 优先。 |
-| `wrap` | `boolean` | `false` | 普通内容是否允许换行；默认不换行 |
-| `contentFill` | `boolean` | `false` | 普通内容子项宽度填满 Card 内容区；优先级高于 `contentHug` |
-| `contentHug` | `boolean` | `false` | 普通内容子项宽度按内容收缩 |
-| `active` | `boolean` | `false` | 是否使用激活态外观 |
-| `selected` | `boolean` | `false` | 激活态语义别名；作用和效果与 `active` 相同 |
-| `interactive` | `boolean` | `false` | 使容器具备交互外观、指针和 hover 边框；点击副作用仍由调用方事件负责，不自动导航、选择或生成按钮键盘行为。 |
-| `scrollable` | `boolean` | `true` | 内容溢出时是否启用内部滚动；无高度约束时内容自然撑高 |
 | `pinOffset` | `number \| string` | `12` | Pin 内容统一偏移，数字按 px 处理 |
 | `pinOffsetX` | `number \| string` | - | Pin 水平偏移，优先级高于 `pinOffset` |
 | `pinOffsetY` | `number \| string` | - | Pin 垂直偏移，优先级高于 `pinOffset` |
-| `children` | `Snippet` | - | 任意自定义内容 |
 | `...rest` | `FrameProps` | - | 透传至根 Frame |
 
 ---
 
-## 外观
+<a id="外观"></a>
+
+### 外观
 
 Card 默认外观来自 Figma Card 组件：
 
@@ -70,7 +109,9 @@ Card 默认外观来自 Figma Card 组件：
 
 ---
 
-## 布局
+<a id="布局"></a>
+
+### 布局
 
 Card 使用 `row` / `column`，与 Frame 方向关键字统一。
 
@@ -111,7 +152,9 @@ Card 默认关闭 wrap；需要换行时显式传入 `wrap`。
 
 ---
 
-## 三槽内容
+<a id="三槽内容"></a>
+
+### 三槽内容
 
 Card 不提供 `CardItem` 子组件。需要 leading / content / trailing 三槽内容时，使用现有 Frame：
 
@@ -129,7 +172,9 @@ Card 不提供 `CardItem` 子组件。需要 leading / content / trailing 三槽
 
 ---
 
-## Pin
+<a id="pin"></a>
+
+### Pin
 
 Card 只采用 `as="pin-*"` 协议，不提供 `position` prop 或对象式 pin 配置。
 
@@ -158,7 +203,9 @@ Card 只采用 `as="pin-*"` 协议，不提供 `position` prop 或对象式 pin 
 
 ---
 
-## 内容滚动
+<a id="内容滚动"></a>
+
+### 内容滚动
 
 `scrollable=true` 默认开启。Card 没有高度或最大高度约束时，内容自然撑高，不显示滚动条。
 
@@ -170,7 +217,9 @@ Pin 内容不参与普通内容滚动流，仍以 Card 根容器为定位参照�
 
 ---
 
-## 样式变量
+<a id="样式变量"></a>
+
+### 样式变量
 
 | 变量 | 用途 |
 |:---|:---|
@@ -186,13 +235,32 @@ Pin 内容不参与普通内容滚动流，仍以 Card 根容器为定位参照�
 
 ---
 
+
+
 ## AI Zone
+
+> **更新**: 2026-05-26
+
+> **布局模型**: 槽位宿主布局 / 容器内组件间布局
+> **文档**: ./Card.md
+
+Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载和内容溢出滚动。Card 不内建标题、正文、图标或操作区；内部内容完全由使用方自定义。
+
+用户 API 与组合说明如下；源码实现见 [Card.svelte](./Card.svelte)。
+
+---
+
+<a id="ai-zone"></a>
+
+### AI Zone
 
 - [Card.svelte](./Card.svelte) 拥有根表面、普通内容排列、Pin 与滚动宿主；selected/active 只映射视觉状态，不执行页面操作。
 - 根节点复用 Frame 处理公开属性、状态与尺寸协议；`useOverlayScrollbar` 和 `resizeManager` 分别拥有共享滚动条与尺寸观察能力，Card 不复制其运行时。
 - 内容完全由 children 提供，不生成标题或按钮，也不提供 parts；Pin 子项脱离普通滚动内容流。
 
-## Changelog
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.0.1 (2026-09-02)
 

@@ -1,16 +1,58 @@
 # ExpandButton
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
-
 > **版本**: v1.0.2
-> **职责**: 以真实 Button 为宿主的展开 / 收起二态按钮。
+> **职责**: 在展开与收起之间切换，用一致的按钮反馈表达状态，适合折叠内容和详情入口。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在展开与收起之间切换，用一致的按钮反馈表达状态，适合折叠内容和详情入口。
 
-## 使用
+## 使用选择
+
+<!-- usage-guide:start -->
+用于展开或还原内容。宿主 CodeBlock 等已内置同类操作时优先配置宿主，避免两套展开状态。
+
+- 通过 `bind:expanded` 或 onExpandedChange 接收状态；defaultExpanded 提供初始值。
+- 组件只提供展开操作，不创建或控制内容面板；由页面把状态连接到实际内容。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { ExpandButton } from '@snowui-design-system/components';
+</script>
+
+<ExpandButton />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| expanded | `boolean` | — | 当前展开状态，支持 bind:expanded；未定义时使用 defaultExpanded。点击后写入新布尔值；内容区域由调用方显示或隐藏。 |
+| defaultExpanded | `boolean` | `false` | expanded 未定义时的回退状态；首次点击后使用组件写入的 expanded，不再由此值驱动。 |
+| ariaLabel | `string` | `"展开"` | 未展开时按钮的可访问名称，应描述将要执行的展开动作。 |
+| collapseAriaLabel | `string` | `"收起"` | 已展开时按钮的可访问名称，应描述将要执行的收起动作。 |
+| icon | `Snippet` | `—（arrows-out-simple）` | 未展开时的自定义图标；只替换图形，展开状态与 aria-expanded 仍由组件管理。 |
+| collapseIcon | `Snippet` | `—（arrows-in-simple）` | 已展开时的自定义图标；使用组件现有内容替换动效。 |
+| children | `Snippet` | — | 图标后的自定义内容；不提供时启用 Button.iconOnly。组件不自动创建或控制展开面板。 |
+| onExpandedChange | `(expanded: boolean) => void` | — | 点击切换后接收新状态，先于 onclick 调用；外部赋值不会触发。 |
+| onclick | `(event: MouseEvent) => void` | — | 状态写入及 onExpandedChange 之后调用，不能取消已经完成的切换；禁用时不调用。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="使用"></a>
+
+### 使用
 
 ```svelte
 <script lang="ts">
@@ -27,19 +69,9 @@
 - `ariaLabel` / `collapseAriaLabel`：两种状态的辅助文本。
 - 默认图标为 `arrows-out-simple` / `arrows-in-simple`，内容替换使用轻量状态按钮的 150ms replacement appear 动效。
 
-## API
+<a id="api"></a>
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| --- | --- | --- | --- |
-| `expanded` | `boolean` | — | 当前展开状态，支持 bind:expanded；未定义时使用 defaultExpanded。点击后写入新布尔值；内容区域由调用方显示或隐藏。 |
-| `defaultExpanded` | `boolean` | `false` | expanded 未定义时的回退状态；首次点击后使用组件写入的 expanded，不再由此值驱动。 |
-| `ariaLabel` | `string` | `"展开"` | 未展开时按钮的可访问名称，应描述将要执行的展开动作。 |
-| `collapseAriaLabel` | `string` | `"收起"` | 已展开时按钮的可访问名称，应描述将要执行的收起动作。 |
-| `icon` | `Snippet` | —（arrows-out-simple） | 未展开时的自定义图标；只替换图形，展开状态与 aria-expanded 仍由组件管理。 |
-| `collapseIcon` | `Snippet` | —（arrows-in-simple） | 已展开时的自定义图标；使用组件现有内容替换动效。 |
-| `children` | `Snippet` | — | 图标后的自定义内容；不提供时启用 Button.iconOnly。组件不自动创建或控制展开面板。 |
-| `onExpandedChange` | `(expanded: boolean) => void` | — | 点击切换后接收新状态，先于 onclick 调用；外部赋值不会触发。 |
-| `onclick` | `(event: MouseEvent) => void` | — | 状态写入及 onExpandedChange 之后调用，不能取消已经完成的切换；禁用时不调用。 |
+### API
 
 其他兼容视觉、链接与事件入口参见 [Button](./Button.md)。ExpandButton 接管 children、onclick 和 aria-expanded；继承 disabled 阻止用户切换。
 
@@ -47,9 +79,16 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 | 关键字 | 说明 |
 | --- | --- |
@@ -62,7 +101,9 @@
 - 图标属于内部基础设施，不提供 parts。
 - 作为父组件的默认内置依赖时，可消费 `parts.ExpandButton`。
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.0.2 (2026-09-02)
 

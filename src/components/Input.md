@@ -1,41 +1,105 @@
-# Input.svelte 文档
-
-> **2026-09-12 v1.1.4**：输入表面显式使用 `align-content: center`。带 leading / trailing 的单行 Grid 在指定 height / min-height 时整体垂直居中，避免通用自动布局的 flex-start 将剩余空间堆到下方；SearchInput 同步继承此修复，默认自适应高度不变。
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
-
-
-> **2026-09-11 修复**：分段键盘输入保留未完成草稿，组件自产的 input 通知不重新解析为空值；默认 loading 骨架使用输入表面的完整高度，不重复叠加内容 padding。
+# Input
 
 > **版本**: v1.1.4
-> **职责**: 单行输入，支持文本、搜索、密码、数字、日期时间与颜色；可组合字段标签、图标、校验反馈和表单。
-
-**2026-04-27 补充**: 内建清除 X 恢复为焦点态交互：只有输入内容非空且 `Input` 处于 `focus-within` 时显示；失焦后隐藏且不为隐藏 X 预留额外 gap。
-
-**2026-04-25 补充**: 独立 `Input` 只有内建清除按钮时，未显示 X 的隐藏态不应为按钮预留 `gap`；左右可输入区域应保持同一套 `16px` 内边距。焦点态显示 X 时再恢复 `8px` gap 与按钮列。
-
-**2026-04-20 新增**: `as="search"` — 放入 `<Listbox>` 内时自动接入过滤逻辑；配合 `allowCustomValue` prop 可在无匹配时按 Enter 将输入内容作为自定义选项添加并选中。
-
-**2026-04-09 图标规则补充**: `Input` 内建 error trailing icon，以及放在 `Input` 里的前置 / 后置 icon，位置优先由 `Input` 自身控制。默认要求是 icon 到最近可见内边界保持 `16px`；进入 `Field` 后仍沿用这条规则。若 `Input as="segment"` 处于连续字段表面中，icon 到最近边框或分割线的距离仍保持 `16px`，不因为 `Field` 组合而改成新的偏移规则。
-**2026-04-09 补充**: 根据需求文档中 F-01 的期望 HTML，`type="text"` 已回收为可见原生 `<input>`，不再额外渲染自定义 editor / placeholder 覆盖层；`Field > Input` 的结构收敛为 `div > input`，placeholder 与输入内容共同走浏览器原生单行输入排版。
-**2026-08-12 更正**: `Input` 单独使用时的源码默认 padding 为 `12 / 16`；此前文档中的 `12 / 12` 为记录错误。进入 `Field` 后仍由 Field 的既有 `12 / 16` 规则接管。
-**2026-03-29 补充**: 当 `type="text"` 同时声明 `list` 时，`Input` 会回退为可见原生 `<input>`，以保留浏览器原生 `datalist` 建议项。
-**2026-03-29 补充**: `type="file"` 已从 `Input` 组件支持范围中移除；传入该类型时会回退为普通 `text` 输入，不再透传浏览器原生文件上传器。
-**2026-03-28 补充**: `type="range"` 已从 `Input` 组件支持范围中移除；传入该类型时会回退为普通 `text` 输入，不再直接透传浏览器原生滑杆。
-**2026-03-24 补充**: `type="number"` 的默认 stepper 现在与 `Button bare` 单 Icon 版本共享同一档 `sm` 级按钮高度基准；默认上下箭头不再比自定义 bare 方案更高。
-**2026-03-25 补充**: `type="color"` 默认会显示 Figma 对应的“色点 + # + HEX”展示层，真实值仍由隐藏原生 color input 负责同步。
-
-**继承**: 复用 Frame.svelte 的所有通用能力（状态、动效、响应式、Skeleton、样式编排）。
-**推荐容器**: `Field.svelte`。
-**默认能力开关**: `enableResponsive=true`, `enableContext=true`, `enableScaleObserver=false`。
-
-可见原生 `<input>` 显式接入 `layout.css` 的 `.snowui-native-control`，只归一化 box sizing、margin 并继承消费环境的字体与颜色；Input 自身字号、行高、Padding、边框和状态视觉不依赖可选的 `snowui-base.css`。
+> **职责**: 提供单行输入，支持文本、搜索、密码、数字、日期时间与颜色，可组合标签、图标和校验反馈。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 提供单行输入，支持文本、搜索、密码、数字、日期时间与颜色，可组合标签、图标和校验反馈。
 
-## 2026-04-04 表单样式规则
+## 使用选择
+
+<!-- usage-guide:start -->
+用于单行文本输入。搜索用 SearchInput，多行输入用 Textarea；需要 label、帮助和错误时组合 Field。
+
+- `bind:value` 同步编辑值，显式 value 优先于 defaultValue；数字类型输入后的值仍需业务自行转换。
+- name 用于表单提交，受控表单重置时恢复绑定初值；bind:element 得到外层元素，不能当作原生 input。
+- file / range 不提供上传或滑杆能力；附件用 leading / trailing 角色，清除按钮可接管 trailing。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Input, Button } from '@snowui-design-system/components';
+	let submitted = $state(false);
+	function login(event: SubmitEvent) {
+		event.preventDefault();
+		submitted = true;
+	}
+</script>
+
+<form onsubmit={login} oninput={() => submitted = false} style="display: flex; flex-direction: column; gap: var(--gap-4); width: min(100%, 22.5rem); min-width: 0;">
+	<Input type="email" name="email" aria-label="Email" placeholder="Email" autocomplete="username" required />
+	<Input type="password" name="password" aria-label="Password" placeholder="Password" autocomplete="current-password" required />
+	<Button type="submit" variant="filled" size="md">Log in</Button>
+</form>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| element | `HTMLElement` | — | 外层 Frame 根元素引用，支持 bind:element；不是原生 input 引用。 |
+| type | `HTMLInputAttributes["type"]` | `"text"` | 选择单行输入类型；支持 text、search、email、password、url、tel、number、date、time、datetime-local、month、week、color。日期时间和颜色具有组件展示层及原生值宿主；file / range 会回退为 text，不提供上传或滑杆。 |
+| value | `InputValue` | — | 当前值，支持 bind:value 双向同步；显式 value 优先于 defaultValue。原生编辑和内置清除事件同步 input.value 字符串；number 可使用数字初值，业务计算需自行转换。 |
+| defaultValue | `InputValue` | — | 未传 value 时的初始值；输入后的值由组件同步管理；表单重置若需恢复业务初值，应在 onreset 中显式恢复绑定值。 |
+| placeholder | `string` | — | 空输入的提示文字，不替代可访问标签；日期时间输入保留分段占位。 |
+| name | `string` | — | 原生表单字段名；FormData 使用该名称收集字段。 |
+| disabled | `boolean` | `false` | 禁止用户输入与交互，原生禁用字段不参与表单提交。 |
+| readonly | `boolean` | `false` | 保留聚焦、选择与提交，禁止编辑并隐藏清除入口；使用只读视觉。 |
+| clearable | `boolean` | `true` | 是否允许显示内置清除 X；false 时不渲染 X，不改变编辑、校验或自定义 trailing。适用于普通及 Field 内嵌 Input。 |
+| required | `boolean` | `false` | 参与浏览器原生必填校验；不自动产生业务错误文案。 |
+| autocomplete | `HTMLInputAttributes["autocomplete"]` | — | 透传浏览器自动填充字段语义，如 username、email、new-password；候选来自浏览器已有数据。 |
+| minlength | `number` | — | 适用文本输入的最小字符长度，由浏览器在适用的用户编辑和表单校验路径执行。 |
+| maxlength | `number` | — | 适用文本输入的最大字符长度；浮层 as="search" 未显式设置时回退为 100。 |
+| pattern | `string` | — | 适用文本输入的原生校验正则，不包含斜杠；需要整体匹配，空值是否有效由 required 决定。 |
+| min | `number \| string` | — | 数字或日期时间输入的最小值；数字按输入数值，日期时间按对应原生格式表达。 |
+| max | `number \| string` | — | 数字或日期时间输入的最大值；数字按输入数值，日期时间按对应原生格式表达。 |
+| step | `number \| string` | — | 原生步进约束；number 以数值单位步进，日期时间使用浏览器对应类型的步进单位。 |
+| inputmode | `HTMLInputAttributes["inputmode"]` | — | 向设备提示软键盘类型，如 numeric、decimal、tel；不执行输入过滤或校验。 |
+| enterkeyhint | `HTMLInputAttributes["enterkeyhint"]` | — | 向软键盘提示回车动作，如 next、search、done；不自动执行导航或提交。 |
+| spellcheck | `boolean` | — | 透传拼写检查开关；未指定时遵循浏览器与继承环境。 |
+| list | `string` | — | 关联原生 datalist 的 id，候选与浏览器呈现由调用方和浏览器提供。 |
+| accept | `string` | — | 保留的原生属性透传入口；Input 不支持 file，不能通过此属性获得文件类型限制或上传能力。 |
+| multiple | `boolean` | — | 原生多值提示，适用于 email 多邮箱等浏览器支持的输入；Input 不支持多文件上传。 |
+| capture | `boolean \| "user" \| "environment"` | — | 保留的原生采集属性；由于 file 会回退为 text，在 Input 中不提供相机或文件采集能力。 |
+| form | `string` | — | 按 id 关联外部 form；原生提交与重置包含该字段，不要求字段位于 form 内。 |
+| autofocus | `boolean` | — | 普通输入透传原生自动聚焦提示，浏览器可能保留已有焦点；日期时间展示层在首次挂载主动聚焦首段。避免页面加载抢焦点。 |
+| tabindex | `number` | — | 透传原生焦点顺序；0 使用自然顺序，-1 退出顺序导航，正数定义显式顺序。常规表单推荐自然顺序。 |
+| title | `string` | — | 原生提示文字；日期时间与颜色输入同时为展示层提供相应提示，不替代 label。 |
+| id | `string` | — | 原生输入标识，可供 label 的 for 与原生关联属性引用。 |
+| invalid | `boolean` | `false` | 与 aria-invalid 汇总无效态，显示错误视觉；独立输入自动错误反馈，Field 内由 Field 汇总。 |
+| error | `string \| Snippet` | — | invalid 时生成下方内置错误 Text；字符串为文案，Snippet 无参数并提供错误内容，默认不生成。 |
+| parts | `ComponentPartsOf<{ Text: typeof Text; Button: typeof Button }>` | — | 通过 Text / Button 键配置内置错误文案或操作按钮的公开 Props，仅对组件生成的 Text 生效；显式子项自行声明 Props。 |
+| onclick | `(event: MouseEvent) => void` | — | 单击原生输入或相应展示层时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| ondblclick | `(event: MouseEvent) => void` | — | 双击时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| oninput | `(event: Event) => void` | — | 用户输入以及组件清除、步进等输入同步时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onchange | `(event: Event) => void` | — | 原生提交值变化或组件发出 change 同步时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onfocus | `(event: FocusEvent) => void` | — | 输入获得焦点时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onblur | `(event: FocusEvent) => void` | — | 输入失去焦点时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onkeydown | `(event: KeyboardEvent) => void` | — | 按下键盘按键时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onkeyup | `(event: KeyboardEvent) => void` | — | 释放键盘按键时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onkeypress | `(event: KeyboardEvent) => void` | — | 浏览器触发已弃用的 keypress 时；新代码推荐 onkeydown回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| onpaste | `(event: ClipboardEvent) => void` | — | 粘贴时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| oncopy | `(event: ClipboardEvent) => void` | — | 复制时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| oncut | `(event: ClipboardEvent) => void` | — | 剪切时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+| children | `Snippet` | — | 无参数显式子内容，用 as="leading" / as="trailing" 组合图标或附件；清除可见时接管 trailing 位置。 |
+| allowCustomValue | `boolean` | `false` | 仅 as="search" 位于 Listbox 时生效；无匹配时 Enter 将输入添加为自定义项并选中，支持删除自定义项。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="2026-04-04-表单样式规则"></a>
+
+### 表单组合与间距
 
 - 基础节奏统一：`Field` 默认 `padding = 12 / 16`，`gap = 8`
 - `Input` 单独使用时：组件自身带 `12 / 16` padding 和 `8` gap
@@ -50,7 +114,9 @@
 - 普通 `label + host + error`：不作为 padding、gap 的判断依据，只负责文字内容
 - `Field row` 或 `Field column` 里，如果是连续输入段，子项要显式写 `as="segment"`
 
-## 组件定位
+<a id="组件定位"></a>
+
+### 组件定位
 
 `Input` 现在的推荐定位是字段宿主，而不是完整字段外壳：
 
@@ -59,7 +125,9 @@
 - 因此 `Input` 可以和 `Icon / Text / Checkbox / Switch / Badge / Frame as="row"` 一起组合成更复杂的表单表面
 - 其中 `text` 直接使用可见原生 `<input>`；`date` / `color` 仍保留“可见展示层 + 隐藏原生宿主同步值”的结构
 
-## Frame 能力继承
+<a id="frame-能力继承"></a>
+
+### Frame 能力继承
 
 `Input` 仍然通过外层 `Frame` 承接通用能力，因此可以继续使用：
 
@@ -88,78 +156,15 @@
 
 错误态与 shake 不会自动聚焦，也不会模拟 `focus-within`；焦点态只来自用户真实聚焦、显式 `autofocus` 或业务代码主动调用 `focus()`。
 
-## 组件特有属性 (Component-Specific Props)
+<a id="组件特有属性-component-specific-props"></a>
+
+### 组件特有属性 (Component-Specific Props)
 
 下表逐项对应具名 Props；未重新声明的通用能力见 [Frame](./Frame.md)。
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| element | `HTMLElement` | `—` | 外层 Frame 根元素引用，支持 bind:element；不是原生 input 引用。 |
-| type | `HTMLInputAttributes["type"]` | `"text"` | 选择单行输入类型；支持 text、search、email、password、url、tel、number、date、time、datetime-local、month、week、color。日期时间和颜色具有组件展示层及原生值宿主；file / range 会回退为 text，不提供上传或滑杆。 |
-| value | `string \| number \| undefined` | `—` | 当前值，支持 bind:value 双向同步；显式 value 优先于 defaultValue。原生编辑和内置清除事件同步 input.value 字符串；number 可使用数字初值，业务计算需自行转换。 |
-| defaultValue | `string \| number \| undefined` | `—` | 未传 value 时的初始值；输入后的值由组件同步管理；表单重置若需恢复业务初值，应在 onreset 中显式恢复绑定值。 |
-| placeholder | `string` | `—` | 空输入的提示文字，不替代可访问标签；日期时间输入保留分段占位。 |
-| name | `string` | `—` | 原生表单字段名；FormData 使用该名称收集字段。 |
-| disabled | `boolean` | `false` | 禁止用户输入与交互，原生禁用字段不参与表单提交。 |
-| readonly | `boolean` | `false` | 保留聚焦、选择与提交，禁止编辑并隐藏清除入口；使用只读视觉。 |
-| clearable | `boolean` | `true` | 是否允许显示内置清除 X；false 时不渲染 X，不改变编辑、校验或自定义 trailing。适用于普通及 Field 内嵌 Input。 |
-| required | `boolean` | `false` | 参与浏览器原生必填校验；不自动产生业务错误文案。 |
-| autocomplete | `HTMLInputAttributes["autocomplete"]` | `—` | 透传浏览器自动填充字段语义，如 username、email、new-password；候选来自浏览器已有数据。 |
-| minlength | `number` | `—` | 适用文本输入的最小字符长度，由浏览器在适用的用户编辑和表单校验路径执行。 |
-| maxlength | `number` | `—` | 适用文本输入的最大字符长度；浮层 as="search" 未显式设置时回退为 100。 |
-| pattern | `string` | `—` | 适用文本输入的原生校验正则，不包含斜杠；需要整体匹配，空值是否有效由 required 决定。 |
-| min | `number \| string` | `—` | 数字或日期时间输入的最小值；数字按输入数值，日期时间按对应原生格式表达。 |
-| max | `number \| string` | `—` | 数字或日期时间输入的最大值；数字按输入数值，日期时间按对应原生格式表达。 |
-| step | `number \| string` | `—` | 原生步进约束；number 以数值单位步进，日期时间使用浏览器对应类型的步进单位。 |
-| inputmode | `HTMLInputAttributes["inputmode"]` | `—` | 向设备提示软键盘类型，如 numeric、decimal、tel；不执行输入过滤或校验。 |
-| enterkeyhint | `HTMLInputAttributes["enterkeyhint"]` | `—` | 向软键盘提示回车动作，如 next、search、done；不自动执行导航或提交。 |
-| spellcheck | `boolean` | `—` | 透传拼写检查开关；未指定时遵循浏览器与继承环境。 |
-| list | `string` | `—` | 关联原生 datalist 的 id，候选与浏览器呈现由调用方和浏览器提供。 |
-| accept | `string` | `—` | 保留的原生属性透传入口；Input 不支持 file，不能通过此属性获得文件类型限制或上传能力。 |
-| multiple | `boolean` | `—` | 原生多值提示，适用于 email 多邮箱等浏览器支持的输入；Input 不支持多文件上传。 |
-| capture | `boolean \| "user" \| "environment"` | `—` | 保留的原生采集属性；由于 file 会回退为 text，在 Input 中不提供相机或文件采集能力。 |
-| form | `string` | `—` | 按 id 关联外部 form；原生提交与重置包含该字段，不要求字段位于 form 内。 |
-| autofocus | `boolean` | `—` | 普通输入透传原生自动聚焦提示，浏览器可能保留已有焦点；日期时间展示层在首次挂载主动聚焦首段。避免页面加载抢焦点。 |
-| tabindex | `number` | `—` | 透传原生焦点顺序；0 使用自然顺序，-1 退出顺序导航，正数定义显式顺序。常规表单推荐自然顺序。 |
-| title | `string` | `—` | 原生提示文字；日期时间与颜色输入同时为展示层提供相应提示，不替代 label。 |
-| id | `string` | `—` | 原生输入标识，可供 label 的 for 与原生关联属性引用。 |
-| invalid | `boolean` | `false` | 与 aria-invalid 汇总无效态，显示错误视觉；独立输入自动错误反馈，Field 内由 Field 汇总。 |
-| error | `string \| Snippet` | `—` | invalid 时生成下方内置错误 Text；字符串为文案，Snippet 无参数并提供错误内容，默认不生成。 |
-| parts | `ComponentPartsOf<{ Text: typeof Text; Button: typeof Button }>` | `—` | 通过 Text / Button 键配置内置错误文案或操作按钮的公开 Props，仅对组件生成的 Text 生效；显式子项自行声明 Props。 |
-| children | `Snippet` | `—` | 无参数显式子内容，用 as="leading" / as="trailing" 组合图标或附件；清除可见时接管 trailing 位置。 |
-| allowCustomValue | `boolean` | `false` | 仅 as="search" 位于 Listbox 时生效；无匹配时 Enter 将输入添加为自定义项并选中，支持删除自定义项。 |
-| onclick | `(event: MouseEvent) => void` | `—` | 单击原生输入或相应展示层时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| ondblclick | `(event: MouseEvent) => void` | `—` | 双击时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| oninput | `(event: Event) => void` | `—` | 用户输入以及组件清除、步进等输入同步时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| onchange | `(event: Event) => void` | `—` | 原生提交值变化或组件发出 change 同步时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| onfocus | `(event: FocusEvent) => void` | `—` | 输入获得焦点时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| onblur | `(event: FocusEvent) => void` | `—` | 输入失去焦点时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| onkeydown | `(event: KeyboardEvent) => void` | `—` | 按下键盘按键时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| onkeyup | `(event: KeyboardEvent) => void` | `—` | 释放键盘按键时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| onkeypress | `(event: KeyboardEvent) => void` | `—` | 浏览器触发已弃用的 keypress 时；新代码推荐 onkeydown回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| onpaste | `(event: ClipboardEvent) => void` | `—` | 粘贴时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| oncopy | `(event: ClipboardEvent) => void` | `—` | 复制时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
-| oncut | `(event: ClipboardEvent) => void` | `—` | 剪切时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
+<a id="宿主协议"></a>
 
-## 宿主协议
-
-`Input` 有两种工作模式：
-
-- 独立模式：`.snowui-field-bordered`，兼容历史用法，自己带默认字段外壳
-- 容器模式：检测到 `Field` 上下文后，切到 host 模式，只保留输入宿主，不再重复渲染边框、背景和 focus ring
-
-嵌入态的根及原生输入控件保持透明。Field 与独立 Input 的默认背景均为 `surface-1`；只读输入通过 `data-field-control="input"` 与 `data-readonly` 暴露状态，由 Field 自己绘制 `surface-2` 背景，Input 不再反向定义父容器样式。
-
-容器模式下：
-
-- 根节点会带上 `.snowui-field-host`
-- 根节点会退化为 `.snowui-field-host`，不再携带 `.snowui-field-bordered`
-- 未标 `segment` 时，`Input` 去掉自身 padding（由外层 `Field` 统一负责 `12 / 16` padding 与 `8` gap），但保留自身 gap
-- 标了 `segment` 时，保留 `Input` 自身的 padding 与 gap，作为连续字段表面的一段
-- 不论是否处于 `Field` 中，leading / trailing icon 的最终落点都由 `Input` 自身维护；`segment` 场景下 icon 到最近边框或分割线仍保持 `16px`
-- `invalid / readonly / disabled` 仍会透出给容器汇总
-
-## 布局模型
+### 布局模型
 
 主布局模型：**槽位宿主布局**。定义见 [../../../specs/LayoutProtocol.md §12.3](../../../specs/LayoutProtocol.md)。
 
@@ -171,43 +176,9 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 - 自定义 trailing 存在时替换默认日期/清除等末位槽；内建 warning icon 仍按组件内部 trailing 规则处理。
 - 进入 `Field` 后，Field 只接管字段表面、padding 与分割线；Input 内部 icon / control 的最终落列仍由 Input 自己维护。
 
-## 关键字 (Keyword)
+<a id="浮层搜索输入模式"></a>
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| type | `string` | `"text"` | 原生 input 类型透传 |
-| value | `string \| number` | - | 当前值，支持 `bind:value` |
-| defaultValue | `string \| number` | - | 初始值 |
-| placeholder | `string` | - | 占位提示 |
-| disabled | `boolean` | `false` | 禁用态 |
-| readonly | `boolean` | `false` | 只读态；视觉为 `Background/2` 且无边框 |
-| required | `boolean` | `false` | 必填态 |
-| invalid | `boolean` | `false` | 组件级无效态 |
-| error | `string \| Snippet` | `undefined` | invalid 时显示内置错误文字；与输入框间距默认 8px。校验逻辑由外部决定，可动态传入不同提示。 |
-| parts | `{ Text?, Button? }` | `undefined` | 内置错误 Text 和操作 Button 的部件配置。 |
-| name | `string` | - | 表单字段名 |
-| autocomplete | `string` | - | 浏览器自动填充提示 |
-| minlength | `number` | - | 最小长度 |
-| maxlength | `number` | - | 最大长度 |
-| pattern | `string` | - | 原生正则校验规则 |
-| min | `number \| string` | - | 数字/日期类输入最小值 |
-| max | `number \| string` | - | 数字/日期类输入最大值 |
-| step | `number \| string` | - | 数字类输入步进值 |
-| inputmode | `string` | - | 软键盘输入模式 |
-| enterkeyhint | `string` | - | 移动端回车键文案提示 |
-| spellcheck | `boolean` | - | 拼写检查 |
-| list | `string` | - | datalist 关联 |
-| accept | `string` | - | 保留透传；Input 不支持 file，无法提供上传类型约束 |
-| multiple | `boolean` | - | 原生多值语义，如 email 多邮箱；不支持多文件上传 |
-| capture | `boolean \| "user" \| "environment"` | - | 保留透传；Input 不提供文件采集能力 |
-| form | `string` | - | 指定表单归属 |
-| autofocus | `boolean` | `false` | 首次渲染自动聚焦 |
-| tabindex | `number` | - | Tab 顺序 |
-| title | `string` | - | 原生提示 |
-| id | `string` | - | 原生 id |
-| onclick / ondblclick / oninput / onchange / onfocus / onblur / onkeydown / onkeyup / onkeypress / onpaste / oncopy / oncut | `function` | - | 原生事件透传 |
-
-## 浮层搜索输入模式
+### 浮层搜索输入模式
 
 将 `<Input as="search">` 放入任意提供 header portal 的浮层容器(`<Listbox>` / `<Popover>`)内,Input 自动:
 
@@ -223,7 +194,6 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | `as` | `"search"` | - | 标识为浮层搜索输入;存在 header portal 时自动移入固定头部,Listbox 场景下额外接通 `setFilterText` |
-| `allowCustomValue` | `boolean` | `false` | 启用后，当搜索无匹配结果时，按 Enter 可将输入内容作为自定义选项添加并立即选中；自定义项可在 hover 时点击 × 图标删除(仅 Listbox 场景生效) |
 
 ### 行为说明
 
@@ -262,7 +232,9 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 </Select>
 ```
 
-## 原生能力边界
+<a id="原生能力边界"></a>
+
+### 原生能力边界
 
 `Input` 负责：
 
@@ -278,7 +250,9 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 - 表单规则中心
 - 业务级错误文案
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <!-- 推荐：放入 Field -->
@@ -338,7 +312,45 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 />
 ```
 
-## 与通用逻辑的关系
+<a id="与通用逻辑的关系"></a>
+
+### 无障碍与表单建议
+
+- 需要自动填充时，优先传 `name + autocomplete`
+- 需要原生建议列表时，使用 `list` 关联 `datalist`
+- 需要错误提示时，外部通过 `aria-describedby` 指向 `Field` 内的描述/错误节点
+- 需要 schema/业务校验时，应在 `Field` 或表单层处理，再把结果回传为 `invalid` 或 `aria-invalid`
+
+---
+
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 宿主协议
+
+`Input` 有两种工作模式：
+
+- 独立模式：`.snowui-field-bordered`，兼容历史用法，自己带默认字段外壳
+- 容器模式：检测到 `Field` 上下文后，切到 host 模式，只保留输入宿主，不再重复渲染边框、背景和 focus ring
+
+嵌入态的根及原生输入控件保持透明。Field 与独立 Input 的默认背景均为 `surface-1`；只读输入通过 `data-field-control="input"` 与 `data-readonly` 暴露状态，由 Field 自己绘制 `surface-2` 背景，Input 不再反向定义父容器样式。
+
+容器模式下：
+
+- 根节点会带上 `.snowui-field-host`
+- 根节点会退化为 `.snowui-field-host`，不再携带 `.snowui-field-bordered`
+- 未标 `segment` 时，`Input` 去掉自身 padding（由外层 `Field` 统一负责 `12 / 16` padding 与 `8` gap），但保留自身 gap
+- 标了 `segment` 时，保留 `Input` 自身的 padding 与 gap，作为连续字段表面的一段
+- 不论是否处于 `Field` 中，leading / trailing icon 的最终落点都由 `Input` 自身维护；`segment` 场景下 icon 到最近边框或分割线仍保持 `16px`
+- `invalid / readonly / disabled` 仍会透出给容器汇总
+
+<a id="布局模型"></a>
+
+
+### 与通用逻辑的关系
 
 `Input` 当前优先复用以下通用逻辑，而不是在组件内平行实现：
 
@@ -348,7 +360,44 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 
 后续 `SearchField / Combobox / PasswordField` 应优先复用这条链路，而不是重新写一套 host 分发逻辑。
 
-## 样式规范 (Style Spec)
+<a id="无障碍与表单建议"></a>
+
+
+
+> **2026-09-12 v1.1.4**：输入表面显式使用 `align-content: center`。带 leading / trailing 的单行 Grid 在指定 height / min-height 时整体垂直居中，避免通用自动布局的 flex-start 将剩余空间堆到下方；SearchInput 同步继承此修复，默认自适应高度不变。
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+
+
+> **2026-09-11 修复**：分段键盘输入保留未完成草稿，组件自产的 input 通知不重新解析为空值；默认 loading 骨架使用输入表面的完整高度，不重复叠加内容 padding。
+
+
+
+
+**2026-04-27 补充**: 内建清除 X 恢复为焦点态交互：只有输入内容非空且 `Input` 处于 `focus-within` 时显示；失焦后隐藏且不为隐藏 X 预留额外 gap。
+
+**2026-04-25 补充**: 独立 `Input` 只有内建清除按钮时，未显示 X 的隐藏态不应为按钮预留 `gap`；左右可输入区域应保持同一套 `16px` 内边距。焦点态显示 X 时再恢复 `8px` gap 与按钮列。
+
+**2026-04-20 新增**: `as="search"` — 放入 `<Listbox>` 内时自动接入过滤逻辑；配合 `allowCustomValue` prop 可在无匹配时按 Enter 将输入内容作为自定义选项添加并选中。
+
+**2026-04-09 图标规则补充**: `Input` 内建 error trailing icon，以及放在 `Input` 里的前置 / 后置 icon，位置优先由 `Input` 自身控制。默认要求是 icon 到最近可见内边界保持 `16px`；进入 `Field` 后仍沿用这条规则。若 `Input as="segment"` 处于连续字段表面中，icon 到最近边框或分割线的距离仍保持 `16px`，不因为 `Field` 组合而改成新的偏移规则。
+**2026-04-09 补充**: 根据需求文档中 F-01 的期望 HTML，`type="text"` 已回收为可见原生 `<input>`，不再额外渲染自定义 editor / placeholder 覆盖层；`Field > Input` 的结构收敛为 `div > input`，placeholder 与输入内容共同走浏览器原生单行输入排版。
+**2026-08-12 更正**: `Input` 单独使用时的源码默认 padding 为 `12 / 16`；此前文档中的 `12 / 12` 为记录错误。进入 `Field` 后仍由 Field 的既有 `12 / 16` 规则接管。
+**2026-03-29 补充**: 当 `type="text"` 同时声明 `list` 时，`Input` 会回退为可见原生 `<input>`，以保留浏览器原生 `datalist` 建议项。
+**2026-03-29 补充**: `type="file"` 已从 `Input` 组件支持范围中移除；传入该类型时会回退为普通 `text` 输入，不再透传浏览器原生文件上传器。
+**2026-03-28 补充**: `type="range"` 已从 `Input` 组件支持范围中移除；传入该类型时会回退为普通 `text` 输入，不再直接透传浏览器原生滑杆。
+**2026-03-24 补充**: `type="number"` 的默认 stepper 现在与 `Button bare` 单 Icon 版本共享同一档 `sm` 级按钮高度基准；默认上下箭头不再比自定义 bare 方案更高。
+**2026-03-25 补充**: `type="color"` 默认会显示 Figma 对应的“色点 + # + HEX”展示层，真实值仍由隐藏原生 color input 负责同步。
+
+**继承**: 复用 Frame.svelte 的所有通用能力（状态、动效、响应式、Skeleton、样式编排）。
+**推荐容器**: `Field.svelte`。
+**默认能力开关**: `enableResponsive=true`, `enableContext=true`, `enableScaleObserver=false`。
+
+可见原生 `<input>` 显式接入 `layout.css` 的 `.snowui-native-control`，只归一化 box sizing、margin 并继承消费环境的字体与颜色；Input 自身字号、行高、Padding、边框和状态视觉不依赖可选的 `snowui-base.css`。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 ### 1. 基础几何
 
@@ -562,29 +611,22 @@ invalid=true + !hasCustomTrailing
 
 **浏览器原生 `type="search"` 取消按钮**：使用 `-webkit-appearance: none; display: none; width: 0; height: 0` 组合彻底隐藏，防止与自定义 X 并排出现。
 
-## 无障碍与表单建议
+<a id="开发者指南-ai"></a>
 
-- 需要自动填充时，优先传 `name + autocomplete`
-- 需要原生建议列表时，使用 `list` 关联 `datalist`
-- 需要错误提示时，外部通过 `aria-describedby` 指向 `Field` 内的描述/错误节点
-- 需要 schema/业务校验时，应在 `Field` 或表单层处理，再把结果回传为 `invalid` 或 `aria-invalid`
-
----
-
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
-
-## 开发者指南 (AI)
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
 - **Input 组件**: [./Input.svelte](./Input.svelte)
 
-## Changelog
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - **Input-Docs.2026-09-10** 补齐全部具名属性、事件与 Snippet 说明，明确原生多值与已移除文件类型的边界；同步 Site 拟真示例，不改变组件行为。
 
 - **Input-Motion.2026-06-18** 新增默认错误反馈 shake：独立 `Input invalid / aria-invalid` 自动播放，嵌入 `Field` 时由 `Field` 汇总播放，消费方无需手动传类名或状态。
-- **Input-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- **Input-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.1.4 (2026-09-12)
 
@@ -627,8 +669,6 @@ invalid=true + !hasCustomTrailing
 - **关联规范**: [../../../specs/HTMLSpec.md](../../../specs/HTMLSpec.md)
 
 ---
-
-## 更新日志 (Changelog)
 
 ### v1.0.43 (2026-05-09)
 

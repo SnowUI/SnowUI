@@ -1,13 +1,59 @@
-# SearchInput (简单搜索输入框)
+# SearchInput
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+> **版本**: v1.3.0
+> **职责**: 提供带搜索图标的单行输入框，适合列表过滤、页面搜索和工具栏中的查询输入。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 提供带搜索图标的单行输入框，适合列表过滤、页面搜索和工具栏中的查询输入。
 
-## 宿主组件特化模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于直接输入查询文本，例如列表搜索。全局搜索浮层的入口用 SearchBox；查询如何筛选数据由宿主处理，DataTable 工具栏优先 TableToolbar。
+
+- bind:value 同步输入，查询如何过滤业务数据由页面决定。
+- 默认 as="search" 可接入 Listbox / Popover 的搜索区域；已有外壳时可选 borderless，避免重复表面。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { SearchInput, Icon } from '@snowui-design-system/components';
+</script>
+
+<SearchInput placeholder="Search" style="width: 20rem; max-width: 100%; height: var(--size-12); flex: none;" />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| type | `InputProps["type"]` | `"search"` | 原生输入类型；默认使用搜索输入 |
+| value | `string \| number` | — | 当前值，支持 `bind:value` |
+| element | `HTMLElement` | — | 绑定根元素引用，用于读取实例或聚焦相关内容；不是输入值。 |
+| defaultValue | `string \| number` | — | 初始值 |
+| showSearchIcon | `boolean` | `true` | 是否渲染默认搜索图标 |
+| collapseBelow | `number` | — | 当组件自身宽度小于或等于该 px 阈值时，在空值且未聚焦状态退化为仅搜索图标；未传时不启用 |
+| variant | `"default" \| "borderless"` | `"default"` | 外观变体；`borderless` 移除自身边框、背景、圆角、padding 和 focus ring，在 Flex / Block 宿主中填满可用空间，并在 shrink-to-fit 宿主中保持稳定固有宽度，适合嵌入已有表面的工具栏或面板 |
+| as | `InputProps["as"]` | `"search"` | 角色关键字;默认透传给内部 `Input`,使 SearchInput 放入 `<Popover>` / `<Listbox>` 时自动移入固定 header,行为与 `<Input as="search">` 一致。可显式覆盖。 |
+| class | `string` | `""` | 追加到 SearchInput 根宿主的 class，保留组件自身样式类。 |
+| children | `Snippet` | — | 外置 leading / trailing / 其他 Input 子内容 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="宿主组件特化模式"></a>
+
+### 宿主组件特化模式
 
 - `SearchInput` 以真实 `Input` 为主要视觉与交互宿主，直接平铺 `Input` 的兼容 Props，不提供 `parts.Input`。
 - Props 类型由 `ComponentProps<typeof Input>` 推导；`value`、`defaultValue`、`type`、`as`、`class` 与 `children` 由 SearchInput 接管后显式传给宿主。
@@ -20,7 +66,9 @@
 
 `SearchInput` 是 `Input` 的搜索场景变体。除默认 `type="search"` 和默认 leading 图标为 `Search` 外，其颜色、hover/focus、清除 X、三槽位布局、Frame 能力与 `Input` 保持一致。
 
-## 功能概览
+<a id="功能概览"></a>
+
+### 功能概览
 
 - 默认使用语义名 `search` 的 Components 内置图标；可由应用级 `IconProvider` 或外置 leading 替换
 - 内置默认 `Search` 静止态为 Black/20，输入激活态为 Black/40；该颜色规则只属于 `SearchInput`
@@ -31,21 +79,14 @@
 
 ---
 
-## API 参考
+<a id="api-参考"></a>
+
 
 ### 核心属性
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| type | `Input` 的 `type` | `"search"` | 原生输入类型；默认使用搜索输入 |
-| value | `string \| number` | — | 当前值，支持 `bind:value` |
-| defaultValue | `string \| number` | — | 初始值 |
 | placeholder | `string` | — | 占位文本 |
-| showSearchIcon | `boolean` | `true` | 是否渲染默认搜索图标 |
-| collapseBelow | `number` | — | 当组件自身宽度小于或等于该 px 阈值时，在空值且未聚焦状态退化为仅搜索图标；未传时不启用 |
-| variant | `"default" \| "borderless"` | `"default"` | 外观变体；`borderless` 移除自身边框、背景、圆角、padding 和 focus ring，在 Flex / Block 宿主中填满可用空间，并在 shrink-to-fit 宿主中保持稳定固有宽度，适合嵌入已有表面的工具栏或面板 |
-| as | `"search" \| string` | `"search"` | 角色关键字;默认透传给内部 `Input`,使 SearchInput 放入 `<Popover>` / `<Listbox>` 时自动移入固定 header,行为与 `<Input as="search">` 一致。可显式覆盖。 |
-| children | `Snippet` | — | 外置 leading / trailing / 其他 Input 子内容 |
 | 其余兼容 Props | `ComponentProps<typeof Input>` | 同 Input | 平铺至真实 Input 宿主；包括 size、style、disabled、readonly、invalid、事件、ARIA、Frame Props 与 `parts.Text` |
 
 ### 浮层场景
@@ -79,9 +120,16 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 布局模型
 
@@ -122,7 +170,9 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.3.0 (2026-08-10)
 

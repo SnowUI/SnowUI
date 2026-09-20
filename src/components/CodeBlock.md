@@ -1,13 +1,63 @@
-# CodeBlock.svelte
+# CodeBlock
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+> **版本**: v1.8.0
+> **职责**: 清晰展示可复制的代码，支持语法着色、行号、全屏查看和尺寸调整，适合文档与开发工具。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 清晰展示可复制的代码，支持语法着色、行号、全屏查看和尺寸调整，适合文档与开发工具。
 
-## 内置组件双模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于展示可复制的代码；使用其内置复制与展开能力。需要编辑代码时先核对支持范围，不假定展示组件是编辑器。
+
+- 通过 code 提供代码；默认显示复制与展开按钮，visibleLines 控制初始可见行数。
+- singleLine 是单行展示，没有语言、行号、展开面板或纵向滚动；`as="trailing"` 替换右侧动作区。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { CodeBlock } from '@snowui-design-system/components';
+	const exampleCode = ["import { Button } from '@snowui-design-system/components';", '', "const launchLabel = 'Explore components';", '', '<Button variant="filled" href="/components">', '  {launchLabel}', '</Button>'].join('\n');
+</script>
+
+<CodeBlock style="background-color: var(--background-1);" code={exampleCode} language="svelte" showLineNumbers visibleLines={7} />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| variant | `"default" \| "singleLine"` | `"default"` | `singleLine` 使用 Input 同类 Leading / Content / Trailing 三槽布局；固定为单行展示，不生成高度拖拽、语言、行号、全屏或纵向滚动结构 |
+| code | `string` | `""` | 要显示的代码字符串 |
+| language | `string` | `""` | 语言标识，同时选择格式化解析器；支持 svelte、js/javascript、jsx、ts/typescript、tsx、html、css/scss/less、json/jsonc、yaml/yml、markdown/md、graphql/gql。空值根据代码识别 Svelte/HTML、JSON 或 JS/TS；未知的显式语言保留原文。 |
+| format | `boolean` | `true` | 默认按 language 格式化代码；普通态、全屏、行号与复制共享格式化结果。设为 false 保留原文；singleLine 始终保留原文。解析失败、未知语言或输入超过 200,000 字符时保留原文。 |
+| showLanguage | `boolean` | `true` | 是否显示语言标识 |
+| showLineNumbers | `boolean` | `false` | 是否显示代码行号；普通态与全屏态保持一致，避免切换末帧发生代码横向跳变 |
+| showCopyButton | `boolean` | `true` | 是否显示复制按钮 |
+| showExpandButton | `boolean` | `true` | 是否显示全屏放大按钮 |
+| horizontalScrollbarVisibility | `"always" \| "hover"` | `"always"` | 横向滚动条在内容溢出时常显，或仅在鼠标移入代码块时显示 |
+| visibleLines | `number` | `5` | 默认状态最多显示几行代码；内容不足时自适应高度，超出后滚动；全屏模式不受此限制 |
+| copyTimeout | `number` | `2000` | 复制成功图标（Check）的停留时长（ms），超时后恢复 Copy 图标 |
+| children | `Snippet` | — | 代码内容或附件源；纯文本会作为代码，`as="trailing"` 会替换右侧动作区 |
+| parts | `ComponentPartsOf<{ Indicator: typeof Indicator; CopyButton: typeof CopyButton; ExpandButton: typeof ExpandButton; }>` | — | 内置 CopyButton、ExpandButton、Indicator 的配置入口；操作按钮通过 emphasis 配置强调程度。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="内置组件双模式"></a>
+
+### 内置组件双模式
 
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
@@ -21,17 +71,18 @@
 代码块组件，支持语法显示、基础语法着色、行号、复制到剪贴板与全屏放大。全屏放大/缩小使用共享元素转场的 `layout` 策略：实际过渡位置与尺寸，不缩放代码字形；图标切换动效使用 `REPLACEMENT_APPEAR_MOTION`，避免继承浮层类动效语义。
 
 
-> **以下内容供 AI 阅读，用户可忽略。**
 
 ---
 
-## 关键字速查
+<a id="关键字速查"></a>
+
+### 关键字速查
 
 | 类别 | 关键字 |
 |:---|:---|
 | **内容** | `code`, `language`, `children` |
 | **功能开关** | `format`, `showLanguage`, `showLineNumbers`, `showCopyButton`, `showExpandButton` |
-| **布局** | `variant="default|singleLine"`, `visibleLines`, 默认态拖拽高度 |
+| **布局** | `variant="default\|singleLine"`, `visibleLines`, 默认态拖拽高度 |
 | **行为** | `copyTimeout`；复制能力由默认内置 CopyButton 承担 |
 | **默认内置组件** | `parts.CopyButton` 配置内置 bare CopyButton；`parts.ExpandButton` 配置内置 bare ExpandButton；`parts.Indicator` 配置缩放手柄 |
 | **外置配件槽位** | `singleLine` 支持 `as="leading"`；全部变体支持 `as="trailing"`；兼容 `data-as="copy-icon"`, `data-as="copied-icon"`, `data-as="expand-icon"`, `data-as="collapse-icon"`，前两者映射到 CopyButton icon/successIcon |
@@ -39,28 +90,14 @@
 
 ---
 
-## Props
+<a id="props"></a>
 
-| 关键字 | 类型 | 默认值 | 描述 |
-|:---|:---|:---|:---|
-| `variant` | `"default" \| "singleLine"` | `"default"` | `singleLine` 使用 Input 同类 Leading / Content / Trailing 三槽布局；固定为单行展示，不生成高度拖拽、语言、行号、全屏或纵向滚动结构 |
-| `code` | `string` | `""` | 要显示的代码字符串 |
-| `language` | `string` | `""` | 语言标识，同时选择格式化解析器；支持 svelte、js/javascript、jsx、ts/typescript、tsx、html、css/scss/less、json/jsonc、yaml/yml、markdown/md、graphql/gql。空值根据代码识别 Svelte/HTML、JSON 或 JS/TS；未知的显式语言保留原文。 |
-| `format` | `boolean` | `true` | 默认按 language 格式化代码；普通态、全屏、行号与复制共享格式化结果。设为 false 保留原文；singleLine 始终保留原文。解析失败、未知语言或输入超过 200,000 字符时保留原文。 |
-| `showLanguage` | `boolean` | `true` | 是否显示语言标识 |
-| `showLineNumbers` | `boolean` | `false` | 是否显示代码行号；普通态与全屏态保持一致，避免切换末帧发生代码横向跳变 |
-| `showCopyButton` | `boolean` | `true` | 是否显示复制按钮 |
-| `showExpandButton` | `boolean` | `true` | 是否显示全屏放大按钮 |
-| `horizontalScrollbarVisibility` | `"always" \| "hover"` | `"always"` | 横向滚动条在内容溢出时常显，或仅在鼠标移入代码块时显示 |
-| `visibleLines` | `number` | `5` | 默认状态最多显示几行代码；内容不足时自适应高度，超出后滚动；全屏模式不受此限制 |
-| `copyTimeout` | `number` | `2000` | 复制成功图标（Check）的停留时长（ms），超时后恢复 Copy 图标 |
-| `children` | `Snippet` | — | 代码内容或附件源；纯文本会作为代码，`as="trailing"` 会替换右侧动作区 |
-| `parts` | `ComponentPartsOf` | — | 内置 CopyButton、ExpandButton、Indicator 的配置入口；操作按钮通过 emphasis 配置强调程度。 |
-| `...rest` | — | — | 透传至根 Frame（class、style、动效关键字等） |
 
 ---
 
-## `singleLine` 单行变体
+<a id="singleline-单行变体"></a>
+
+### `singleLine` 单行变体
 
 `variant="singleLine"` 面向 import、install command、短配置值等独占一行的只读代码条。它仍使用 `<pre><code>`、内置轻量语法着色和 CopyButton，不改用 Input，也不引入表单语义。
 
@@ -91,7 +128,9 @@
 
 ---
 
-## 自动代码格式化
+<a id="自动代码格式化"></a>
+
+### 自动代码格式化
 
 默认 `format={true}`。使用 Prettier 的浏览器入口与官方 Svelte 插件，按需加载解析器；统一 Tab 缩进（宽度 4）、80 字符目标行宽、JS 单引号、分号、无尾逗号和多属性逐行排版。保留 Svelte 区块顺序和文本空白语义；长字符串不会强制截断。HTML/Markdown 中的空白和代码内容由对应解析器处理，不使用正则改写源码。
 
@@ -106,7 +145,9 @@
 <CodeBlock language="svelte" code={exampleSource} format={false} />
 ```
 
-## 语法着色
+<a id="语法着色"></a>
+
+### 语法着色
 
 当使用 `code` prop 时，组件内置轻量语法着色规则，覆盖 JS / TS / JSON / HTML / CSS 常见 token。规则来自参考仓库中 `shiki` / `rehype-pretty-code` 的高亮分层思路，但当前实现不新增依赖。
 
@@ -136,7 +177,9 @@
 
 ---
 
-## 内置 Icon
+<a id="内置-icon"></a>
+
+### 内置 Icon
 
 组件内置 SVG 图标，无需外部 Icon 组件依赖：
 
@@ -149,7 +192,9 @@
 
 ---
 
-## 外置 Icon 替换
+<a id="外置-icon-替换"></a>
+
+### 外置 Icon 替换
 
 推荐使用与 Input 一致的 `as="trailing"` 写法替换右侧默认动作区：
 
@@ -170,7 +215,9 @@
 
 ---
 
-## Icon 动效行为
+<a id="icon-动效行为"></a>
+
+### Icon 动效行为
 
 | 场景 | 动效 |
 |:---|:---|
@@ -185,7 +232,9 @@
 
 ---
 
-## 滚动条与高度
+<a id="滚动条与高度"></a>
+
+### 滚动条与高度
 
 默认代码区高度由代码内容和 `visibleLines` 共同控制：内容不足 `visibleLines` 时按内容自适应（hug 高度），内容超过后固定到 `visibleLines` 行并滚动。默认 `visibleLines={5}`，与 Textarea 的自动高度上限保持一致。右下角提供与 Textarea 一致的拖拽手柄；拖拽后进入手动高度，代码区占满容器剩余高度并滚动。
 
@@ -205,7 +254,9 @@ CodeBlock 的默认态、全屏态和 `singleLine` 都由 `useOverlayScrollbar` 
 
 ---
 
-## Frame 能力接入说明
+<a id="frame-能力接入说明"></a>
+
+### Frame 能力接入说明
 
 | Frame 能力 | 接入层 | 说明 |
 |:---|:---|:---|
@@ -221,7 +272,8 @@ CodeBlock 的默认态、全屏态和 `singleLine` 都由 `useOverlayScrollbar` 
 
 ---
 
-## 使用示例
+<a id="使用示例"></a>
+
 
 ### 基础用法
 
@@ -280,7 +332,9 @@ pnpm build`}
 
 ---
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 默认态主布局模型：**复合管理布局**（参见 [LayoutProtocol.md §12.6](../../../specs/LayoutProtocol.md)）。`singleLine` 改用**槽位宿主布局**，根层直接管理 Leading / Content / Trailing，且不生成下列默认态的滚动、全屏与 resize 子树。
 
@@ -291,7 +345,15 @@ pnpm build`}
 
 ---
 
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
 ## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 | 日期 | 版本 | 说明 |
 |:---|:---|:---|

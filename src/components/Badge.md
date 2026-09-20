@@ -1,37 +1,72 @@
-# Badge.svelte 文档
+# Badge
 
 > **版本**: v1.3.3
-> **职责**: 徽标组件，用于显示数字或状态指示。
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+> **职责**: 用紧凑的数字、文字或圆点提示未读数量与状态，可搭配按钮、头像和导航项使用。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 用紧凑的数字、文字或圆点提示未读数量与状态，可搭配按钮、头像和导航项使用。
 
-## 组件特有属性 (Component-Specific Props)
+## 使用选择
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `children` | `Snippet` | — | 自定义徽标内容，显示优先于 count；有 children 且未指定 dot 时使用内容模式，dot=true 时不渲染这些内容。 |
+<!-- usage-guide:start -->
+用于简短状态或数量提示。需要用户点击执行动作时使用 Button；输入中的可操作标签按 Chip 或 Tag 的交互选择。
+
+- children 优先于 count；显式 `dot` 只显示圆点，不显示内容。
+- 数量默认最大显示 99，零默认隐藏；使用 max / showZero 修改。Avatar 或 Icon 上的角标用 `as="badge"`。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Avatar, Badge } from '@snowui-design-system/components';
+	import { AvatarAbstract03 } from '@snowui-design-system/resource-svelte';
+</script>
+
+<div style="display: flex; align-items: center; flex-wrap: wrap; gap: var(--gap-4) var(--gap-3);">
+	<Avatar fallbackColor="orange" aria-label="Release notifications" size={48}><Badge as="badge" count={5} /></Avatar>
+	<Avatar fallbackColor="cyan" aria-label="Documentation inbox" size={48} badgePosition="bottom"><Badge as="badge" count={120} max={99} color="Orange" /></Avatar>
+	<Avatar src={AvatarAbstract03} aria-label="New components" size={48}><Badge as="badge" count="New" color="Red" /></Avatar>
+	<Avatar fallbackColor="red" aria-label="Maintainer online" size={48} badgePosition="bottom"><Badge as="badge" dot color="Green" /></Avatar>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
 | variant | `"filled" \| "border"` | `"filled"` | 视觉变体。`border` 与 Kbd 默认 `border` 视觉一致：透明背景、内描边、继承文字色、0×4px padding 与 6px 圆角 |
-| `count` | `number \| string` | — | 徽标数字或文字；数字超过 max 显示 max+，普通字符串保持原文。0 和字符串 "0" 默认隐藏，showZero 可保留；stateCount 命中状态时覆盖此值。 |
-| stateCount | `StateValueMap<number \| string>` | undefined | 根据最近父级 Frame 状态映射 `count`，用于声明式控制 Badge 显隐 |
-| `dot` | `boolean` | —（自动判断） | true 强制圆点，false 使用内容模式；未传时仅在解析后的 count 为 undefined 且没有 children 时自动显示圆点。 |
-| max | number | 99 | 数字模式的最大值 (超过显示 max+) |
-| `showZero` | `boolean` | `false` | false 时隐藏数值 0、字符串 "0" 及无内容的非圆点徽标；true 保留。圆点与 loading 显示不受零值隐藏控制。 |
-| `color` | `SnowUIColor \| string` | `"Indigo"` | filled 与 dot 的填充颜色，支持 PascalCase 语义色及 CSS 颜色值；filled 文字保持白色，border 内容模式仍使用透明背景与继承文字色。 |
-| `size` | `ResourceSize` | — | 12/16/20/24/28/32/40/48/80；未指定时读取父级尺寸上下文。border 内容模式保持文字 Hug；作为 Avatar/Icon 角标时尺寸由宿主角标协议解析。 |
+| count | `number \| string` | — | 徽标数字或文字；数字超过 max 显示 max+，普通字符串保持原文。0 和字符串 "0" 默认隐藏，showZero 可保留；stateCount 命中状态时覆盖此值。 |
+| stateCount | `StateValueMap<number \| string>` | — | 根据最近父级 Frame 状态映射 `count`，用于声明式控制 Badge 显隐 |
+| dot | `boolean` | — | true 强制圆点，false 使用内容模式；未传时仅在解析后的 count 为 undefined 且没有 children 时自动显示圆点。 |
+| max | `number` | `99` | 数字模式的最大值 (超过显示 max+) |
+| showZero | `boolean` | `false` | false 时隐藏数值 0、字符串 "0" 及无内容的非圆点徽标；true 保留。圆点与 loading 显示不受零值隐藏控制。 |
+| color | `SnowUIColor \| string` | `"Indigo"` | filled 与 dot 的填充颜色，支持 PascalCase 语义色及 CSS 颜色值；filled 文字保持白色，border 内容模式仍使用透明背景与继承文字色。 |
+| size | `ResourceSize` | — | 12/16/20/24/28/32/40/48/80；未指定时读取父级尺寸上下文。border 内容模式保持文字 Hug；作为 Avatar/Icon 角标时尺寸由宿主角标协议解析。 |
+| children | `Snippet` | — | 自定义徽标内容，显示优先于 count；有 children 且未指定 dot 时使用内容模式，dot=true 时不渲染这些内容。 |
 
-## 关键字 (Keyword)
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="关键字-keyword"></a>
+
+### 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
 | `as` | `string` | — | 向外部宿主声明角色；"badge" 使 Icon/Avatar 按其角标协议定位并配置此 Badge，不改变其 dot/count 内容选择。 |
-| `dot` | `boolean` | —（自动判断） | true 强制圆点，false 使用内容模式；未传时仅在解析后的 count 为 undefined 且没有 children 时自动显示圆点。 |
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
@@ -76,7 +111,9 @@ Badge 的根节点是 inline-level 定位外壳，内容整体 Hug：
 <Badge count="PRO" variant="border" />
 ```
 
-## 角色化组合
+<a id="角色化组合"></a>
+
+### 角色化组合
 
 ```svelte
 <!-- 在 Icon 中作为徽标 (必须使用命名 snippet `badge`) -->
@@ -92,7 +129,9 @@ Badge 的根节点是 inline-level 定位外壳，内容整体 Hug：
 <Badge dot />                   <!-- 显示为小圆点 -->
 ```
 
-## 智能行为
+<a id="智能行为"></a>
+
+### 智能行为
 
 1. **自动隐藏**: count 模式默认仅在数值大于等于 1 时出现；数值为 0 且 `showZero=false` 时自动隐藏，退场期间保留最后一次可见值（例如从 1 退场，不显示 0）
 2. **溢出格式化**: 超过 max 自动显示为 `max+`
@@ -101,7 +140,9 @@ Badge 的根节点是 inline-level 定位外壳，内容整体 Hug：
    - **独立使用**: 自动读取父级 `Frame` (如列表项容器) 的尺寸上下文完成自适应缩放。
    - **作为徽标 (`as="badge"`)**: 忽略负级 Group 的尺寸上下文，优先保持徽标比例并由宿主（Avatar/Icon）驱动定位。
 
-## 默认动效
+<a id="默认动效"></a>
+
+### 默认动效
 
 Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notification badge 的结构一致：
 
@@ -125,7 +166,16 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 | `--snowui-badge-motion-pop-easing` | `cubic-bezier(0.34, 1.36, 0.64, 1)` | Badge 整体出现缓动 |
 | `--snowui-badge-motion-close-easing` | `cubic-bezier(0.4, 0, 0.2, 1)` | Badge 整体隐藏缓动 |
 
-## 样式规范 (Style Spec)
+
+
+## AI Zone
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 > [!IMPORTANT]
 > **数字颜色**: 徽标数字/文字颜色已按用户要求制定为固定白色 **`--static-white-100`** (#FFFFFFFF)。
@@ -172,7 +222,9 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -184,7 +236,9 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.3.3 (2026-09-02)
 
@@ -208,7 +262,7 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 - **Badge-Motion.2026-06-18** 按 transitions.dev Notification badge 的双层结构还原默认动效：Frame 根层执行左下偏移进场，完整视觉 surface 执行中心 scale / opacity / blur；退场时 surface 整体缩小，而不是只缩放数字内容。
 - **Badge-Motion.2026-06-30** 统一 `while*` 完整视觉通道语义：显式对象不再浅合并 Badge 默认 x / y / scale / opacity，只继承默认时序 / 动力学参数。
 
-- **Badge-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- **Badge-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.2.8 (2026-06-18)
 

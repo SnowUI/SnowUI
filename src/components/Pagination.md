@@ -1,13 +1,90 @@
-# Pagination (分页)
+# Pagination
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+> **版本**: v1.6.1
+> **职责**: 提供页码导航，帮助用户在多页数据之间切换，适合表格、列表和搜索结果。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 提供页码导航，帮助用户在多页数据之间切换，适合表格、列表和搜索结果。
 
-## 内置组件双模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于多页内容导航。DataTable 场景与其渲染状态连接；页码变化与数据请求是不同责任，不能假定组件自动发请求。
+
+- page 从 1 开始，total 表示总页数，不是数据条数；onPageChange 连接页面状态。
+- pageSizeOptions 配置每页条数选择，pageSize 可绑定；数据请求和总页数计算由页面或 DataTable 负责。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button, Pagination, Text } from '@snowui-design-system/components';
+	const totalItems = 156;
+	let page = $state(3);
+	let pageSize = $state(20);
+	const totalPages = $derived(Math.ceil(totalItems / pageSize));
+	const firstItem = $derived((page - 1) * pageSize + 1);
+	const lastItem = $derived(Math.min(page * pageSize, totalItems));
+	function setPage(nextPage: number) { page = nextPage; }
+	function setPageSize(nextPageSize: number) { pageSize = nextPageSize; page = 1; }
+</script>
+
+<div class="pagination-example-centered" style="display: flex; justify-content: center; width: 100%; min-width: 0;">
+	<Pagination
+		page={page}
+		total={totalPages}
+		onPageChange={setPage}
+		{pageSize}
+		onPageSizeChange={setPageSize}
+		pageSizeOptions={[10, 20, 50]}
+		pageSizeAriaLabel="Components per page"
+		ariaLabel="Component catalog pages"
+		widthMode="fill"
+	/>
+</div>
+
+<style>
+	.pagination-example-centered :global(.snowui-pagination-items) { justify-content: center; }
+</style>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| page | `number` | `1` | 当前页，从 1 开始 |
+| total | `number` | `1` | 总页数 |
+| disabled | `boolean` | `false` | 禁用整个 Pagination |
+| disabledPages | `number[]` | `[]` | 禁用指定页码；上一页 / 下一页会跳过连续禁用页，指向该方向最近的可用页 |
+| ariaLabel | `string` | `"Pagination"` | 根导航区域的无障碍标签 |
+| variant | `PaginationVariant` | `"outline"` | 普通页与前后页的按钮样式；当前页使用对应的强调搭配 |
+| responsive | `PaginationResponsive` | `"auto"` | `auto` 根据容器宽度自动选择完整页码、省略页码与最小前后页；`none` 保持静态页码窗口与原有换行行为 |
+| widthMode | `PaginationWidthMode` | `"fill"` | `auto` 在完整页码可容纳时按剩余空间判断，`hug` 保持内容宽度，`fill` 始终等宽填充；fill 模式含省略号时也填满可用宽度；hug 保持内容宽度 |
+| gap | `string \| number` | — | 页码、prev、next 之间的间距；数字按 px 处理 默认行为：4px。 |
+| pageSize | `number` | `20` | 当前每页条数；选择后组件自行更新绑定值，仅在 `pageSizeOptions` 非空时显示选择器 |
+| pageSizeOptions | `number[]` | `[]` | 可选的每页条数；非正数会被忽略，重复项会被去重 |
+| pageSizeGap | `string \| number` | `16` | pageSize 与分页按钮组之间的独立间距；数字按 px 处理 |
+| pageSizeAriaLabel | `string` | `"每页条数"` | 每页条数选择器的无障碍名称 |
+| onPageChange | `(page: number) => void` | — | 可点击页码变化时触发 |
+| onPageSizeChange | `(pageSize: number) => void` | — | 每页条数变化时触发 |
+| children | `Snippet` | — | 角色样式模板 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Listbox: typeof Listbox; MenuItem: typeof MenuItem; }>` | — | 统一配置内置页码按钮、每页条数 Listbox 与选项；显式角色模板 Props 优先 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="内置组件双模式"></a>
+
+### 内置组件双模式
 
 - `parts.Button`：统一配置 Pagination 默认内置的角色模板。
 - `parts.Listbox`：统一配置 Pagination 直接拥有的 pageSize Listbox。
@@ -22,7 +99,9 @@ Pagination 默认内置 Button 角色模板，并根据 `page` 和 `total` 生�
 
 Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `nav` 容器、直系角色模板和内部生成项，不引入 PRO 编排能力，也不新增专用 PageButton 组件。
 
-## 功能概览
+<a id="功能概览"></a>
+
+### 功能概览
 
 - 默认内置模式：当前页使用 gray Button，普通页、上一页、下一页使用 outline Button。
 - pageSize 默认位于左侧并保持 Hug；分页按钮组位于右侧，默认与 pageSize 间隔 16px。
@@ -41,29 +120,11 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 
 ---
 
-## API 参考
+<a id="api-参考"></a>
+
 
 ### 核心属性
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| page | `number` | `1` | 当前页，从 1 开始 |
-| total | `number` | `1` | 总页数 |
-| disabled | `boolean` | `false` | 禁用整个 Pagination |
-| disabledPages | `number[]` | `[]` | 禁用指定页码；上一页 / 下一页会跳过连续禁用页，指向该方向最近的可用页 |
-| ariaLabel | `string` | `"Pagination"` | 根导航区域的无障碍标签 |
-| variant | `"outline" \| "gray" \| "borderless"` | `"outline"` | 普通页与前后页的按钮样式；当前页使用对应的强调搭配 |
-| responsive | `"auto" \| "none"` | `"auto"` | `auto` 根据容器宽度自动选择完整页码、省略页码与最小前后页；`none` 保持静态页码窗口与原有换行行为 |
-| widthMode | `"auto" \| "hug" \| "fill"` | `"fill"` | `auto` 在完整页码可容纳时按剩余空间判断，`hug` 保持内容宽度，`fill` 始终等宽填充；fill 模式含省略号时也填满可用宽度；hug 保持内容宽度 |
-| gap | `string \| number` | `4px` | 页码、prev、next 之间的间距；数字按 px 处理 |
-| pageSize | `number`（bindable） | `20` | 当前每页条数；选择后组件自行更新绑定值，仅在 `pageSizeOptions` 非空时显示选择器 |
-| pageSizeOptions | `number[]` | `[]` | 可选的每页条数；非正数会被忽略，重复项会被去重 |
-| pageSizeGap | `string \| number` | `16` | pageSize 与分页按钮组之间的独立间距；数字按 px 处理 |
-| pageSizeAriaLabel | `string` | `"每页条数"` | 每页条数选择器的无障碍名称 |
-| onPageChange | `(page: number) => void` | - | 可点击页码变化时触发 |
-| onPageSizeChange | `(pageSize: number) => void` | - | 每页条数变化时触发 |
-| children | `Snippet` | - | 角色样式模板 |
-| parts | `{ Button?, Listbox?, MenuItem? }` | - | 统一配置内置页码按钮、每页条数 Listbox 与选项；显式角色模板 Props 优先 |
 
 `total` 会被归一化为至少 `1`。`page` 会被归一化到 `[1, total]`，避免渲染越界页码。
 
@@ -90,7 +151,8 @@ Pagination 属于 OSS 基础导航原语。它的作用半径只覆盖自身 `na
 - Pagination 生成的 Button 默认 `scaleOnHover=false`；模板显式传 `scaleOnHover={true}` 时保留放大反馈。
 - Pagination 只接管生成后的宽度模式、页码文本、可点击性和无障碍状态。
 
-## 使用示例
+<a id="使用示例"></a>
+
 
 ### 基础用法
 
@@ -207,6 +269,11 @@ Pagination 只识别直系角色模板。不要用 `div` 包裹 `Button as="curr
 每页条数也可以完全由页面管理，Pagination 不要求选择器必须成为自己的子项：
 
 ```svelte
+<script lang="ts">
+  import { Frame, Pagination, Button, Select, Listbox, MenuItem } from '@snowui-design-system/components';
+  let pageSize = $state('20');
+</script>
+
 <Frame row justify="between" width="100%">
     <Pagination page={1} total={5}>
         <Button as="current" />
@@ -215,9 +282,9 @@ Pagination 只识别直系角色模板。不要用 `div` 包裹 `Button as="curr
 
     <Select bind:value={pageSize}>
         <Listbox>
-            <MenuItem value={10} showCheck={false}>10</MenuItem>
-            <MenuItem value={20} showCheck={false}>20</MenuItem>
-            <MenuItem value={50} showCheck={false}>50</MenuItem>
+            <MenuItem as="item" value="10" showCheck={false}>10</MenuItem>
+            <MenuItem as="item" value="20" showCheck={false}>20</MenuItem>
+            <MenuItem as="item" value="50" showCheck={false}>50</MenuItem>
         </Listbox>
     </Select>
 </Frame>
@@ -316,7 +383,9 @@ Pagination 只复制模板的外观属性并替换页码文本；点击和可用
 
 `onPageChange` 只会在目标页可点击时触发。当前页、禁用页、越界页、第一页的 prev、最后一页的 next 都不会触发回调。
 
-## 行为规则
+<a id="行为规则"></a>
+
+### 行为规则
 
 1. `total <= 可完整展示数量` 时展示全部页码，不插入 `...`。
 2. 完整页码不适合容器时，组件自动保留首尾页、当前页附近页码，并在断点处插入 `...`。
@@ -356,7 +425,9 @@ Pagination 只复制模板的外观属性并替换页码文本；点击和可用
 - 不可点击项输出 `aria-disabled="true"`，不进入正常 Tab 序列。
 - 自动插入的 `...` 使用 `aria-hidden="true"`，不参与焦点。
 
-## 默认样式
+<a id="默认样式"></a>
+
+### 默认样式
 
 角色模板缺失时，Pagination 优先使用所选 `variant` 的内置 Button 模板。以下 `snowui-pagination-default-*` 规则只作为模板节点不可用时的防御性回退：
 
@@ -382,7 +453,9 @@ Figma 对照：
 | 非当前页描边 | 由默认搭配或显式 `Button as="page"` 模板提供 |
 | `ArrowLineLeft/Right` | 内置 SVG 路径来自 `resource-base` 同名图标 |
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
@@ -424,7 +497,9 @@ Root Frame(nav)
 | `--snowui-pagination-idle-opacity` | `0.4` | 默认非当前项透明度 |
 | `--snowui-pagination-hover-opacity` | `1` | 默认 hover 透明度 |
 
-## 样式边界
+<a id="样式边界"></a>
+
+### 样式边界
 
 - Pagination 不通过 context 改写使用方 Button 模板的 variant。
 - Pagination 不重写使用方 Button 模板的 hover、active、focus、disabled、border、background、padding、radius。
@@ -436,9 +511,16 @@ Root Frame(nav)
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 开发者关键字
 
@@ -501,7 +583,9 @@ Root Frame(nav)
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.6.1 (2026-09-18)
 

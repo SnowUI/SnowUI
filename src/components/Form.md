@@ -1,34 +1,58 @@
-# Form 文档
+# 表单组合指南
 
 > **版本**: v1.0.0
-> **职责**: 表单组合规则文档；用于约束 `Field / Input / Select / Textarea` 在真实表单示例中的结构、padding、gap 与分割线归属。
+> **职责**: 组合字段、输入、说明与错误提示，明确间距和分割线的归属。
+> **文档修订**: 2026-09-21
 
-**2026-06-21 组合契约升级**：`Field` 与 `Input / Select / Textarea` 通过公开的 `FIELD_CONTEXT_KEY` 建立表单宿主契约；这不是父级按子组件类名猜测身份。普通 host 由子组件主动消费 Context 并输出 `data-embedded="true"`，父级只使用公开的 field-host 协议和 CSS bridge。连续字段另外通过 `as="segment"` 声明 segment 角色。未消费 Field Context、也未声明 `as` 角色的普通子组件只作为内容渲染，Field 不得修改其状态、样式或行为。
+## 使用选择
 
-## 2026-04-04 表单样式规则
+Form 是组合指南，不是公开组件。表单使用原生 `<form>`，字段使用 Field，按输入语义选择 Input、Select、Textarea、Checkbox、Radio 或 Switch。
 
-- 基础节奏统一：`Field` 默认 `padding = 12 / 16`，`gap = 8`
-- `Input / Select / Textarea` 单独使用时：组件自身带 `12 / 16` padding 和 `8` gap
-- 放进 `Field` 后，先确认子组件是否主动接入 `FIELD_CONTEXT_KEY`；只有接入者才是 field host
-- field host 没有 `as="segment"`：通过公开 Context 与 bridge 协议协作，由 `Field` 提供 `12 / 16` padding 与 `8` gap，host 自己消费嵌入态并移除自身 padding
-- 有 `as="segment"`：这是连续字段表面的一段；保留组件自身的 padding 与 gap
-- `segment` 之间才有分割线：横向是左右分割线，纵向是上下分割线
-- 相邻 `segment` 之间只能有一条分割线，不能重复画线
-- `label / description / error` 不负责 padding、gap、分割线，它们只是内容元素
-- 普通 `label + host + error`：不作为 padding、gap 的判断依据，只负责文字内容
-- `Field row` 或 `Field column` 里，如果是连续输入段，子项要显式写 `as="segment"`
-- Field CSS 禁止再用 `.snowui-input / .snowui-select / .snowui-textarea` 猜测 host；应使用 Context 约定输出的公开宿主标记及公开 override 变量
+## 快速开始
 
-## 在表单示例中的用法
+```svelte
+<script lang="ts">
+  import { Field, Input, Button } from '@snowui-design-system/components';
+  let email = $state('');
+</script>
 
-- `FM-01` 这类地址字段：属于连续字段表面；`Country / Address / State / City / ZIP` 都应该显式使用 `as="segment"`
-- `FM-02` 这类信用卡字段：属于横向连续字段表面；每一段都应显式使用 `as="segment"`
-- `FM-03` 这类 checkbox 行：不是连续字段表面；不使用 `segment`，需要的行间距直接写在示例的 `Frame` 上
-- `F-02 / F-07` 这类单输入错误态：不是连续字段表面；不使用 `segment`
+<form style="display: flex; flex-direction: column; gap: var(--gap-4);">
+  <Field label="电子邮箱">
+    <Input type="email" name="email" bind:value={email} required />
+  </Field>
+  <Button type="submit">保存</Button>
+</form>
+```
 
-## 关联文档
+## 布局与样式
 
-- [Field.md]([项目目录]/snowui/components/src/components/Field.md)
-- [Input.md]([项目目录]/snowui/components/src/components/Input.md)
-- [Select.md]([项目目录]/snowui/components/src/components/Select.md)
-- [Textarea.md]([项目目录]/snowui/components/src/components/Textarea.md)
+- 普通字段使用 label、输入与 error。Field 统一外层留白；Input / Select / Textarea 嵌入后移除重复内边距，不要在页面手动覆盖内部节点。
+- 地址、银行卡等连续输入表面，在每一段输入上声明 `as="segment"`，由组件保留各段留白并生成相邻分割线。
+- `Field row` 表示横向排列，`Field column` 表示纵向排列；只有连续输入段需要 segment，Checkbox 行或单输入错误态不需要。
+- 标签、说明和错误只负责内容；不要给它们重复添加表面、内边距或分割线。
+- 组件默认内边距为 12 / 16，间距为 8；需要调整时先使用公开 Props 或已登记的 override，并提供相应 padding / gap Token。
+
+## 值、提交与校验
+
+- 输入值通过组件公开的 `bind:value`、`bind:checked` 或 `bind:group` 同步，具体字段以各组件 API 为准。
+- Input / Select / Textarea 使用 name 接入原生表单。并非所有看似输入的组件都转发表单属性；例如 Switch 的 name 不转发给内部 input，需要由表单层同步提交字段。
+- 受控表单重置时，在原生 form 的 onreset 中恢复业务绑定初值，不假定 defaultValue 会替应用管理状态。
+- 用 Field 的 invalid / error 展示错误；校验规则、提交请求与请求结果由应用负责。
+
+## 相关组件
+
+- [Field](./Field.md)：标签、表面与错误。
+- [Input](./Input.md)：单行输入与原生类型。
+- [Select](./Select.md)：单选值与下拉选项。
+- [Textarea](./Textarea.md)：多行文本与尺寸调整。
+- [Checkbox](./Checkbox.md)、[Radio](./Radio.md)、[Switch](./Switch.md)：选择与开关。
+
+## AI Zone
+
+Field 与输入组件通过 FIELD_CONTEXT_KEY 建立宿主契约，输入组件主动消费 Context 并输出嵌入标记。父级不得按私有组件类名推断宿主或修改无关子组件。连续表面另以 as="segment" 声明角色，普通内容不自动成为输入段。
+
+## 更新日志
+
+- 2026-09-21（文档）：整理使用选择、真实表单示例、状态提交与样式归属；明确 Form 不是组件。
+- 2026-06-21：Field 与输入组件使用公开 Context 和 segment 角色建立组合契约。
+- 2026-04-04：登记表单 padding、gap 与分割线归属。

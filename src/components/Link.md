@@ -1,25 +1,76 @@
-# Link (链接)
+# Link
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+> **版本**: v1.3.0
+> **职责**: 在正文、说明和导航中提供清晰的文字链接，支持箭头等视觉形式，表达可继续访问的内容。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在正文、说明和导航中提供清晰的文字链接，支持箭头等视觉形式，表达可继续访问的内容。
 
-## 内置组件双模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于导航到地址或资源。即时动作使用 Button；提供真实 href，不能用占位地址伪装按钮。
+
+- 提供真实 href，target / rel 控制打开方式；disabled 表达不可用状态。
+- lines、tooltip 和 onTruncate 控制截断提示；parts 只配置内置 Tooltip。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Link } from '@snowui-design-system/components';
+</script>
+
+<Link href="/components/quick-start" target="_top">Get started with SnowUI</Link>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| variant | `LinkVariant` | `"default"` | 链接视觉变体 |
+| color | `SnowUIColor \| string` | `"Black40"` | 常态颜色；Black100 / Black（或 `var(--black-100)`）自动 hover 为 Black40，其他颜色自动 hover 为 Black100。 |
+| href | `string` | — | 链接地址 |
+| target | `string` | — | 链接打开方式 |
+| rel | `string` | — | 链接关系 |
+| disabled | `boolean` | `false` | 禁用状态；禁用后不响应 hover |
+| hoverColor | `SnowUIColor \| string \| false` | — | hover 文字颜色。未传时使用 color 对应的自动 hover 色；`false` 表示 hover 不变色。trailing 装饰仍按规范执行 `opacity: 0.4 -> 1` |
+| underline | `LinkUnderline` | `"none"` | 下划线显示策略。下划线只覆盖 Link 文字，不覆盖 trailing 装饰或 Icon |
+| lines | `false \| 1` | `false` | 单行截断开关；启用后文字超出 Link 可用宽度时显示省略号 |
+| tooltip | `TooltipProp` | — | 截断 Tooltip。默认仅在真实截断时显示完整文字；`false` 关闭；字符串 / Snippet 自定义内容；对象透传 Tooltip 配置 |
+| onTruncate | `(isTruncated: boolean) => void` | — | 真实截断状态变化回调 |
+| children | `Snippet` | — | 链接文字与可选外置槽位 |
+| parts | `ComponentPartsOf<{ Tooltip: typeof Tooltip }>` | — | 配置默认内置 Tooltip；显式声明的 Tooltip 子项自行传入属性。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="内置组件双模式"></a>
+
+### 内置组件双模式
 
 - `parts.Tooltip`：配置单行截断时的内置 Tooltip。
 - 自定义提示结构时使用外置 Tooltip 组合；显式 Props 高于 part。
 
 > **版本**: v1.3.0
-> **变更记录 (2026-08-15)**: Link 根节点显式移除原生下划线，不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；`underline` 仍由组件公开 Prop 控制。
+> **更新日志 (2026-08-15)**: Link 根节点显式移除原生下划线，不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；`underline` 仍由组件公开 Prop 控制。
 > **职责**: 提供正文、说明与导航中的文字链接样式。
 > **设计稿**: [Workshop / Link](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12417-11133&t=GYb3gHf9U5Ff6hcQ-4)
 
 Link 是独立的 OSS 文字链接组件。按钮外观但点击后跳转的场景继续使用 `<Button href>`；正文文字链接、带文字箭头链接与外链图标链接使用 `<Link>`。
 
-## 功能概览
+<a id="功能概览"></a>
+
+### 功能概览
 
 - 所有变体默认 `color="Black40"`，hover 变为 Black100；`color="Black100"` / `"Black"` 反向变为 Black40；Indigo 等其他颜色 hover 变为 Black100。
 - `arrow`：Figma 样式 2。默认颜色文字 + 内置 `ArrowUpRight` trailing Icon；文字 hover 遵守统一颜色规则，装饰箭头使用 `currentColor × opacity: 0.4 -> 1`。
@@ -29,26 +80,13 @@ Link 是独立的 OSS 文字链接组件。按钮外观但点击后跳转的场�
 - `lines={1}`：启用单行截断；仅在真实溢出时自动显示 Tooltip，完整链接文字来自共享 `TruncationController`。
 - `external` 内置 trailing Icon 可由外置直系 `as="trailing"` 替换。
 
-## API 参考
+<a id="api-参考"></a>
 
-### 核心属性
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| variant | `"default" \| "arrow" \| "external"` | `"default"` | 链接视觉变体 |
-| color | `SnowUIColor \| string` | `"Black40"` | 常态颜色；Black100 / Black（或 `var(--black-100)`）自动 hover 为 Black40，其他颜色自动 hover 为 Black100。 |
-| href | `string` | - | 链接地址 |
-| target | `string` | - | 链接打开方式 |
-| rel | `string` | - | 链接关系 |
-| disabled | `boolean` | `false` | 禁用状态；禁用后不响应 hover |
-| hoverColor | `string \| false` | - | hover 文字颜色。未传时使用 color 对应的自动 hover 色；`false` 表示 hover 不变色。trailing 装饰仍按规范执行 `opacity: 0.4 -> 1` |
-| underline | `"none" \| "always" \| "hover"` | `"none"` | 下划线显示策略。下划线只覆盖 Link 文字，不覆盖 trailing 装饰或 Icon |
-| lines | `false \| 1` | `false` | 单行截断开关；启用后文字超出 Link 可用宽度时显示省略号 |
-| tooltip | `boolean \| string \| Snippet \| Record<string, any>` | - | 截断 Tooltip。默认仅在真实截断时显示完整文字；`false` 关闭；字符串 / Snippet 自定义内容；对象透传 Tooltip 配置 |
-| onTruncate | `(isTruncated: boolean) => void` | - | 真实截断状态变化回调 |
-| children | `Snippet` | - | 链接文字与可选外置槽位 |
 
-## 文字截断
+<a id="文字截断"></a>
+
+### 文字截断
 
 Link 复用 OSS 通用 `TruncationController` 与 `fitTextToElement()`，不自行创建尺寸观察器。`lines={1}` 时控制器测量文字层并判断真实截断状态；可见前缀按实际字体宽度拟合，英文等字母文字只保留完整单词，单个单词放不下时只显示省略符；中日韩文字可退回 Unicode 字素边界，因此不会出现半个字或组合字符。显式 `…` 作为可见文字的行内尾部渲染，与最后一个完整单词 / 字之间没有额外间距。
 
@@ -62,7 +100,9 @@ Link 复用 OSS 通用 `TruncationController` 与 `fitTextToElement()`，不自�
 </Link>
 ```
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**槽位宿主布局**（三槽位：leading / content / trailing）。
 
@@ -85,7 +125,9 @@ Link 复用 OSS 通用 `TruncationController` 与 `fitTextToElement()`，不自�
 </Link>
 ```
 
-## 下划线
+<a id="下划线"></a>
+
+### 下划线
 
 ```svelte
 <Link href="/docs" underline="always">常态下划线</Link>
@@ -95,7 +137,9 @@ Link 复用 OSS 通用 `TruncationController` 与 `fitTextToElement()`，不自�
 
 下划线只应用于链接文字。`arrow` 与 `external` 的 Icon 均不绘制下划线。
 
-## Hover 颜色
+<a id="hover-颜色"></a>
+
+### Hover 颜色
 
 ```svelte
 <Link href="/docs" hoverColor="#ff4747">自定义 hover 色</Link>
@@ -112,7 +156,9 @@ Link 复用 OSS 通用 `TruncationController` 与 `fitTextToElement()`，不自�
 
 `arrow` 的默认 Icon、`external` 的默认 Icon 与外置 trailing Icon 均继承文字颜色，不单独切换颜色源。它们按照无底色轻量 Icon 规范使用 `opacity: 0.4 -> 1` 表达 hover 活跃度。
 
-## 布局变量链
+<a id="布局变量链"></a>
+
+### 布局变量链
 
 | 变量 | 默认来源 | 用途 |
 | :--- | :--- | :--- |
@@ -129,9 +175,16 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引
 
@@ -147,7 +200,9 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 - **通用截断**：复用 [`frame-truncation.svelte.ts`](../logic/frame-truncation.svelte.ts) 的 `TruncationController`；与 Text / TableCell 共用截断检测和 `resizeManager`。
 - **迁移**：原 `<Button variant="link">` 已移除；按钮式跳转继续使用 `<Button href>`。
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.3.0 (2026-09-16)
 

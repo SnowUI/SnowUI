@@ -1,16 +1,66 @@
-# ImageGroup.svelte 文档
+# ImageGroup
 
 > **版本**: v1.1.2
-> **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局，明确 row / column / grid 是媒体集合布局。
-> **职责**: 图片组容器，统一控制组内图片尺寸与基础布局，并为页面级 `ImageViewer` 提供组列表快照。
-
-用于将多个 `Image` 以线性或网格形式组合展示，并向子图片透传统一尺寸上下文。
+> **职责**: 统一组织多张图片的尺寸与排列，并提供成组预览，适合图库、附件和图片集合。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 统一组织多张图片的尺寸与排列，并提供成组预览，适合图库、附件和图片集合。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于在共享配置下组织图片。需要全屏查看、缩放或组间导航时配合 ImageViewer；布局与图片加载状态由公开 API 表达。
+
+- 用 layout 选择组布局、size 统一图片尺寸。
+- Image 子项自动加入媒体组；子项显式尺寸或 previewMode 优先于组默认配置。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Image, ImageGroup } from '@snowui-design-system/components';
+	import { ImageViewer } from '@snowui/components-pro';
+	import cover01 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-01-1024.jpg';
+	import cover02 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-02-1024.jpg';
+	import cover03 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-03-1024.jpg';
+	import cover04 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-04-1024.jpg';
+</script>
+
+<ImageGroup size={80} style="flex-wrap: wrap; max-width: 100%;">
+<Image src={cover01} alt="SnowUI gradient resource 1"  />
+<Image src={cover02} alt="SnowUI gradient resource 2"  />
+<Image src={cover03} alt="SnowUI gradient resource 3"  />
+<Image src={cover04} alt="SnowUI gradient resource 4"  />
+</ImageGroup>
+<ImageViewer />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| size | `ImageGroupSize` | — | 统一控制组内图片尺寸 |
+| layout | `ImageGroupLayout` | `"row"` | 布局模式 |
+| previewMode | `PreviewMode` | — | 作为组内 Image 的显式预览模式；省略时由页面共享 Viewer 是否存在自动决定 |
+| enableResponsive | `boolean` | `true` | 启用 Frame 响应式能力，按公开响应式配置调整集合布局。 |
+| enableContext | `boolean` | `true` | 是否向 Frame 子组件提供通用上下文；Image 的组尺寸和预览策略仍通过专属组上下文提供。 |
+| children | `Snippet` | — | 组内图片内容；Image 自动注册媒体并继承组尺寸与预览策略，显式子项设置优先。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：复合管理布局。
 
@@ -19,7 +69,9 @@
 - `previewMode` 是集合预览策略，不改变子项 Image 的内部布局模型。
 - ImageGroup 不内嵌 ImageViewer；页面级 Viewer 作为独立复合管理组件消费组列表。
 
-## 功能概览 (User)
+<a id="功能概览-user"></a>
+
+### 功能概览 (User)
 
 - 统一组内图片尺寸
 - 支持 `row / column / grid` 布局
@@ -27,18 +79,10 @@
 - 与页面级 `ImageViewer` 配合承载多图预览索引
 - 组内可自动收集 `Image` 媒体并向页面级 Viewer 提供组列表
 
-## API 参考 (User)
+<a id="api-参考-user"></a>
 
-### 1. 核心属性
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `size` | `12\|16\|20\|24\|28\|32\|40\|48\|56\|64\|72\|80` | `undefined` | 统一控制组内图片尺寸 |
-| `layout` | `"row" \| "column" \| "grid"` | `"row"` | 布局模式 |
-| `previewMode` | `"viewer" \| "window" \| "none"` | `undefined` | 作为组内 Image 的显式预览模式；省略时由页面共享 Viewer 是否存在自动决定 |
-| `enableContext` | `boolean` | `true` | 是否向 Frame 子组件提供通用上下文；Image 的组尺寸和预览策略仍通过专属组上下文提供。 |
-| `enableResponsive` | `boolean` | `true` | 启用 Frame 响应式能力，按公开响应式配置调整集合布局。 |
-| `children` | `Snippet` | `undefined` | 组内图片内容；Image 自动注册媒体并继承组尺寸与预览策略，显式子项设置优先。 |
+
 
 ### 2. 视觉规则
 
@@ -80,9 +124,19 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **更新日志 (2026-04-28)**: 标注主布局模型为复合管理布局，明确 row / column / grid 是媒体集合布局。
+
+
+用于将多个 `Image` 以线性或网格形式组合展示，并向子图片透传统一尺寸上下文。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -108,9 +162,11 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
-- **ImageGroup-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
+
+- **ImageGroup-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.1.2 (2026-03-13)
 

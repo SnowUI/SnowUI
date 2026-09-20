@@ -1,13 +1,84 @@
-# Select.svelte 文档
+# Select
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+> **版本**: v3.2.2
+> **职责**: 在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。
 
-## 默认内置模式 / 显式组合模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于下拉单选。默认传 options 生成 Listbox / MenuItem；显式 children 替换默认选项面板。命令菜单优先 SelectButton；不是任意多选或自由输入控件。
+
+- options 默认生成列表；显式 children 提供 Listbox / MenuItem 后替换默认列表。
+- persistent 保存选择；action 只调用 onAction 并关闭，不保存本次选择。默认子项用 parts，显式子项直接配置。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Select, Listbox, MenuItem, Text, Button } from '@snowui-design-system/components';
+</script>
+
+<Select placeholder="请选择城市" style="width: 20rem; max-width: 100%;">
+    <Listbox>
+        <MenuItem as="item" value="shanghai">Shanghai</MenuItem>
+        <MenuItem as="item" value="hangzhou">Hangzhou</MenuItem>
+        <MenuItem as="item" value="shenzhen">Shenzhen</MenuItem>
+    </Listbox>
+</Select>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| value | `SelectValue` | — | 当前值，支持 `bind:value` |
+| defaultValue | `SelectValue` | — | 初始值 |
+| placeholder | `string` | — | 空值占位文字，显示在 Trigger 中 |
+| name | `string` | — | 表单提交字段名 |
+| disabled | `boolean` | `false` | 禁用状态 |
+| readonly | `boolean` | `false` | 只读状态 |
+| required | `boolean` | `false` | 必填状态 |
+| form | `string` | — | 指定外部表单归属 |
+| autofocus | `boolean` | — | 首次渲染自动聚焦 |
+| tabindex | `number` | — | Tab 顺序 |
+| title | `string` | — | 原生提示 |
+| id | `string` | — | 原生 id |
+| invalid | `boolean` | `false` | 组件级无效态 |
+| children | `Snippet` | — | `<Listbox>` + `<MenuItem>` 组合内容 |
+| options | `SelectOption[]` | `[]` | 默认内置列表数据，字段遵循 ListboxItem；传入显式 children 时不渲染该默认列表。 |
+| triggerContent | `Snippet<[SelectTriggerContext]>` | — | buttonTrigger 开启时替换触发按钮内容；接收 value、option、label、placeholder、open、disabled。 |
+| buttonTrigger | `boolean` | `false` | 使用 Button 代替字段型触发器；保留展开、选择与焦点恢复协议。 |
+| buttonBare | `boolean` | `true` | 只在 buttonTrigger 模式生效，控制内置 Button 是否为无外壳 bare 外观。 |
+| selectionMode | `"persistent" \| "action"` | `"persistent"` | persistent 保存选择值；action 只执行 onAction、关闭面板并恢复触发器焦点，不保存本次选项。 |
+| onAction | `(value: string) => void` | — | action 模式选择选项后调用，参数为字符串选项值；此时面板已关闭，返回值不参与选择。 |
+| parts | `SelectParts` | — | 配置默认 Listbox、Input、MenuItem 与按钮触发器；显式 child 不消费父级 parts。 |
+| ariaLabel | `string` | — | 触发器的可访问名称；按钮触发模式无自定义内容时也作为后备显示内容。 |
+| onclick | `(event: MouseEvent) => void` | — | 非 disabled、非 readonly 的触发器点击切换展开状态后调用，接收原始 MouseEvent。 |
+| oninput | `(event: Event) => void` | — | persistent 模式选择了不同值时调用，接收隐藏表单输入派发的 change Event；实际新值从绑定 value 读取，不是原生文本输入过程。 |
+| onchange | `(event: Event) => void` | — | persistent 模式选择值改变后调用，接收同一次 change Event；相同值与 action 模式不触发。 |
+| onfocus | `(event: FocusEvent) => void` | — | 字段型触发器取得焦点时调用，接收 FocusEvent；按钮触发模式不使用此直接处理器。 |
+| onblur | `(event: FocusEvent) => void` | — | 字段型触发器失去焦点时调用，接收 FocusEvent；按钮触发模式不使用此直接处理器。 |
+| onkeydown | `(event: KeyboardEvent) => void` | — | 触发器的内置方向键、Enter/Space 和 Escape 处理后调用，接收 KeyboardEvent；不能撤销已处理的动作。 |
+| onkeyup | `(event: KeyboardEvent) => void` | — | 字段型触发器松开按键时调用，接收 KeyboardEvent；按钮触发模式不使用此直接处理器。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="默认内置模式-显式组合模式"></a>
+
+### 默认内置模式 / 显式组合模式
 
 - 默认内置模式（推荐）：传入 `options`，Select 自动生成 Listbox 与 MenuItem；搜索框默认关闭，通过 `parts.Listbox.search=true` 开启；通过 `parts.Button`、`parts.Listbox`、`parts.Input`、`parts.MenuItem` 配置隐藏实例。
 - 显式组合模式：显式书写 Listbox / Input / MenuItem，用于复杂内容或逐项差异；子组件 Props 直接写在实例上。
@@ -26,7 +97,7 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 
 `buttonTrigger` 可将字段型 trigger 切换为真正的 bare `Button`；优先使用 `triggerContent` snippet，未提供时依次回退到选中项、`placeholder`、`ariaLabel`。适合 TableToolbar 的排序、筛选等图标操作。按钮保持 `aria-haspopup="listbox"`、`aria-expanded`、键盘导航和选中后焦点恢复。该模式的 Select 外层是无视觉 wrapper，不接入独立字段的 `.snowui-field-bordered` 外壳，最终背景、边框、尺寸与圆角只由真实 Button 宿主拥有。
 
-**2026-04-20 更新**: 新增搜索 + 自定义值支持 — `filterText` / `customOptions` 状态由 Select 持有，内嵌 `<Input as="search">` 可连接过滤逻辑；`allowCustomValue` prop 允许用户添加自定义选项。`Combobox` 已废弃。
+**2026-04-20 更新**: 新增搜索 + 自定义值支持 — `filterText` / `customOptions` 状态由 Select 持有，内嵌 `<Input as="search">` 可连接过滤逻辑；内嵌 Input 的 `allowCustomValue` prop 允许用户添加自定义选项；该属性不属于 Select。`Combobox` 已废弃。
 
 **2026-04-18 架构升级**: Select v3.0.0 — Listbox 拆分为独立组件，API 从 `<option>` 切换到 `<Listbox>` + `<MenuItem>` 组合模式，表单提交改用 hidden `<input>`，不再依赖隐藏 `<select>` + MutationObserver。
 
@@ -41,18 +112,22 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 
 **2026-04-27 更新**: Select v3.1.0 — 支持直系复杂 `leading` / `trailing` 槽位；自定义 trailing 替换默认 indicator。
 
-## 2026-04-27 v3.1.0 复杂槽位规则
+<a id="2026-04-27-v310-复杂槽位规则"></a>
+
+### 显式内容与默认槽位
 
 - 直系 `Frame as="leading" row` / `Frame as="trailing" row` 支持复杂结构。
 - Select 根布局为 `leading: auto`、`trigger: minmax(0, 1fr)`、`trailing: auto`。
 - 存在自定义直系 `as="trailing"` 时，默认 indicator 隐藏，由自定义 trailing 替换末位槽。
 
-### 复杂槽位变更（v3.1.0，2026-04-27）
+### 槽位组合边界
 
 - 支持直系复杂 `leading` / `trailing` 槽位。
 - 自定义 trailing 替换默认 indicator。
 
-## 2026-04-04 表单样式规则
+<a id="2026-04-04-表单样式规则"></a>
+
+### 表单组合与间距
 
 - 基础节奏统一：`Field` 默认 `padding = 12 / 16`，`gap = 8`
 - `Select` 单独使用时：组件自身带 `12 / 16` padding 和 `8` gap
@@ -65,7 +140,9 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 - 普通 `label + host + error`：不作为 padding、gap 的判断依据，只负责文字内容
 - `Field row` 或 `Field column` 里，如果是连续输入段，子项要显式写 `as="segment"`
 
-## 组件定位
+<a id="组件定位"></a>
+
+### 组件定位
 
 `Select` 是自定义下拉选择框，采用 **Trigger + Listbox 组合架构**：
 
@@ -76,25 +153,7 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 - 标签、错误提示与连续字段段逻辑建议通过 `Field` 容器组合完成
 - 单独使用时可保持兼容性的默认输入框表现
 
-### 架构图
-
-```
-Select (Frame row)
-├── <input type="hidden">        ← 表单提交
-├── <button role="combobox">    ← Trigger（content/fill）
-│   └── <span>选中值/placeholder</span>
-├── <Icon as="trailing">        ← 指示器（trailing/hug）
-│   └── ArrowLineUpDown
-└── children slot
-    └── <Listbox>                  ← portal 到 body
-        ├── <Input as="search">   ← 可选搜索框
-        ├── <MenuItem value="a">A</MenuItem>
-        └── <MenuItem value="b">B</MenuItem>
-```
-        └── <MenuItem value="b">B</MenuItem>
-```
-
-## Frame 能力继承
+### Frame 能力继承
 
 `Select` 仍然通过外层 `Frame` 继承：
 
@@ -105,40 +164,7 @@ Select (Frame row)
 
 因此 `Select` 不是一个单纯的裸 `<select>`，而是 `Frame + 原生 select host`。
 
-## 组件特有属性 (Component-Specific Props)
-
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| value | `string \| number` | - | 当前值，支持 `bind:value` |
-| defaultValue | `string \| number` | - | 初始值 |
-| placeholder | `string` | - | 空值占位文字，显示在 Trigger 中 |
-| name | `string` | - | 表单提交字段名 |
-| disabled | `boolean` | `false` | 禁用状态 |
-| readonly | `boolean` | `false` | 只读状态 |
-| required | `boolean` | `false` | 必填状态 |
-| invalid | `boolean` | `false` | 组件级无效态 |
-| form | `string` | - | 指定外部表单归属 |
-| autofocus | `boolean` | `false` | 首次渲染自动聚焦 |
-| tabindex | `number` | - | Tab 顺序 |
-| title | `string` | - | 原生提示 |
-| id | `string` | - | 原生 id |
-| children | `Snippet` | - | `<Listbox>` + `<MenuItem>` 组合内容 |
-| onclick / oninput / onchange / onfocus / onblur / onkeydown / onkeyup | `function` | - | 事件回调 |
-
-## 宿主协议
-
-`Select` 同样遵循 `Field` 容器协议：
-
-- 独立使用时保留兼容性的字段外壳
-- 进入 `Field` 后退化为 `.snowui-field-host`
-- 默认箭头由 `Select` 自己负责渲染
-- 直系 `as="leading"` / `as="trailing"` 支持复杂结构；`leading` 为 Hug，trigger 为 Fill，`trailing` 为 Hug
-- 存在自定义直系 `as="trailing"` 时，默认箭头 indicator 被隐藏，自定义 trailing 替换默认 trailing 槽
-- 标签、错误提示与容器外壳继续交给 `Field`
-- 未标 `segment` 时，`Select` 去掉自身 padding（由外层 `Field` 统一负责 `12 / 16` padding 与 `8` gap），但保留自身 gap
-- 标了 `segment` 时，保留 `Select` 自身的 padding 与 gap，作为连续字段表面的一段
-
-这意味着常规下拉场景不再需要额外手写 trailing `Icon`。
+<a id="宿主协议"></a>
 
 ### 错误反馈 Shake
 
@@ -146,7 +172,9 @@ Select (Frame row)
 
 错误态与 shake 不会自动聚焦，也不会模拟 `focus-within`；焦点态只来自用户真实聚焦、显式 `autofocus` 或业务代码主动调用 `focus()`。
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**槽位宿主布局**。定义见 [../../../specs/LayoutProtocol.md §12.3](../../../specs/LayoutProtocol.md)。
 
@@ -158,26 +186,9 @@ Select 的根布局固定按 Leading / Trigger / Trailing 三段组织：
 - 存在直系自定义 `as="trailing"` 时，默认 indicator 隐藏，由自定义 trailing 替换末位槽。
 - Listbox / MenuItem 是 Select 的弹层内容协议，不参与 Select 根三槽位布局。
 
-## 关键字 (Keyword)
+<a id="能力边界"></a>
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| value | `string \| number` | - | 当前值，支持 `bind:value` |
-| defaultValue | `string \| number` | - | 初始值 |
-| placeholder | `string` | - | 空值占位文字 |
-| disabled | `boolean` | `false` | 禁用态 |
-| readonly | `boolean` | `false` | 只读态 |
-| required | `boolean` | `false` | 必填态 |
-| invalid | `boolean` | `false` | 组件级无效态 |
-| name | `string` | - | 表单字段名 |
-| form | `string` | - | 指定外部表单归属 |
-| autofocus | `boolean` | `false` | 首次渲染自动聚焦 |
-| tabindex | `number` | - | Tab 顺序 |
-| title | `string` | - | 原生提示 |
-| id | `string` | - | 原生 id |
-| children | `Snippet` | - | `<Listbox>` + `<MenuItem>` 组合内容 |
-
-## 能力边界
+### 能力边界
 
 `Select` 负责：
 
@@ -195,7 +206,9 @@ Select 的根布局固定按 Leading / Trigger / Trailing 三段组织：
 - 业务级选项获取与远程联想
 - 多选模式（未来可扩展）
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <!-- 推荐：放入 Field -->
@@ -254,7 +267,60 @@ Select 的根布局固定按 Leading / Trigger / Trailing 三段组织：
 </Select>
 ```
 
-## 与通用逻辑的关系
+<a id="与通用逻辑的关系"></a>
+
+### 无障碍与表单建议
+
+- Trigger 使用 `role="combobox"` + `aria-haspopup="listbox"` + `aria-expanded` + `aria-controls`
+- Listbox 使用 `role="listbox"`，每个选项 `role="option"` + `aria-selected`
+- 键盘导航完整支持：↑↓ 移动焦点，Enter/Space 确认，Escape 关闭，Tab 关闭
+- 如果需要错误提示，建议通过 `aria-describedby` 关联 `Field` 内错误节点
+- 如果需要搜索型下拉或异步联想，应使用 `Combobox` 组件
+
+---
+
+
+
+## AI Zone
+
+### 架构图
+
+```
+Select (Frame row)
+├── <input type="hidden">        ← 表单提交
+├── <button role="combobox">    ← Trigger（content/fill）
+│   └── <span>选中值/placeholder</span>
+├── <Icon as="trailing">        ← 指示器（trailing/hug）
+│   └── ArrowLineUpDown
+└── children slot
+    └── <Listbox>                  ← portal 到 body
+        ├── <Input as="search">   ← 可选搜索框
+        ├── <MenuItem value="a">A</MenuItem>
+        └── <MenuItem value="b">B</MenuItem>
+```
+
+<a id="frame-能力继承"></a>
+
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 宿主协议
+
+`Select` 同样遵循 `Field` 容器协议：
+
+- 独立使用时保留兼容性的字段外壳
+- 进入 `Field` 后退化为 `.snowui-field-host`
+- 默认箭头由 `Select` 自己负责渲染
+- 直系 `as="leading"` / `as="trailing"` 支持复杂结构；`leading` 为 Hug，trigger 为 Fill，`trailing` 为 Hug
+- 存在自定义直系 `as="trailing"` 时，默认箭头 indicator 被隐藏，自定义 trailing 替换默认 trailing 槽
+- 标签、错误提示与容器外壳继续交给 `Field`
+- 未标 `segment` 时，`Select` 去掉自身 padding（由外层 `Field` 统一负责 `12 / 16` padding 与 `8` gap），但保留自身 gap
+- 标了 `segment` 时，保留 `Select` 自身的 padding 与 gap，作为连续字段表面的一段
+
+这意味着常规下拉场景不再需要额外手写 trailing `Icon`。
+
+
+### 与通用逻辑的关系
 
 `Select` 复用了：
 
@@ -264,7 +330,15 @@ Select 的根布局固定按 Leading / Trigger / Trailing 三段组织：
 
 因此它和 `Input / Textarea` 共享同一套宿主分发、值同步和字段上下文协议。
 
-## 样式规范 (Style Spec)
+<a id="无障碍与表单建议"></a>
+
+
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 ### 1. 基础几何
 
@@ -466,19 +540,9 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 </Field>
 ```
 
-## 无障碍与表单建议
+<a id="开发者指南-ai"></a>
 
-- Trigger 使用 `role="combobox"` + `aria-haspopup="listbox"` + `aria-expanded` + `aria-controls`
-- Listbox 使用 `role="listbox"`，每个选项 `role="option"` + `aria-selected`
-- 键盘导航完整支持：↑↓ 移动焦点，Enter/Space 确认，Escape 关闭，Tab 关闭
-- 如果需要错误提示，建议通过 `aria-describedby` 关联 `Field` 内错误节点
-- 如果需要搜索型下拉或异步联想，应使用 `Combobox` 组件
-
----
-
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
-
-## 开发者指南 (AI)
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -497,7 +561,9 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v3.2.2 (2026-08-29)
 
@@ -513,7 +579,7 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 - 内置下拉指示图标使用 `ComponentIcon name="arrow-line-up-down"`；默认由 Components 自包含，应用级 `IconProvider` 可统一切换图标库。
 - 保持直系 trailing 槽位协议；自定义 trailing 继续替换默认指示图标。
 
-- **Select-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- **Select-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v3.0.0 (2026-04-18)
 

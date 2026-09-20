@@ -1,28 +1,57 @@
-# Switch 组件
+# Switch
 
 > **版本**: v1.1.17
-> **职责**: 开关切换控件，用于在两个状态之间切换。
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+> **职责**: 在开启与关闭之间切换，适合需要即时生效的设置和功能开关。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在开启与关闭之间切换，适合需要即时生效的设置和功能开关。
 
-## 关键字
+## 使用选择
 
-| 关键字 | Type | Default | Description |
-|:---|:---|:---|:---|
-| `checked` | `boolean` | `false` | 开关状态，支持 `bind:checked`。点击标签或聚焦后按 Space 切换；绑定变量、可见轨道与原生输入状态同步。禁用时用户操作不改变状态。 |
-| `value` | `any` | — | 传给内部原生 checkbox 的值，不决定开关状态，也不建立选择组。当前 `name` / `form` 等其余属性传给外层标签，不转发至内部 input，因此仅设置 `value` 不会产生具名表单提交项。 |
-| `size` | `ResourceSize \| number` | — | 可见轨道高度，数字按根字号为 16px 时的名义 px 解析，外侧留白另计。支持 12 / 16 / 20 / 24 / 28 / 32 / 40 / 48 / 80 及其它有限正数；未传时依次读取父级尺寸 Context 的 `iconSize`、`size`，最后回退到 16。非法数字回退到默认尺寸 Token。显式值优先，随根字号缩放。 |
-| `disabled` | `boolean` | `false` | 禁用原生输入及用户切换，保留当前开关值和标签，退出 Tab 顺序。外部仍可更新 `checked`。 |
-| `children` | `Snippet` | — | 无参数标签内容，显示在轨道后；省略时不显示标签。标签文字同时为内部开关提供可访问名称，可通过内容 Snippet 组合文本。 |
-| `enableResponsive` | `boolean` | `false` | 传给根 Frame，启用其容器内容适配监听；不改变 Switch 的标准尺寸值域。通用行为见 [Frame 能力开关](./Frame.md)。 |
-| `enableContext` | `boolean` | `false` | 传给根 Frame，控制向子组件提供状态、加载与动效等 Context；不控制 Switch 读取父级尺寸 Context。通用行为见 [Frame 能力开关](./Frame.md)。 |
+<!-- usage-guide:start -->
+用于立即生效的二态设置。表单多选使用 Checkbox，互斥参数组使用 Radio 或 Segmented。
 
-## 布局模型
+- bind:checked 同步开关状态；value 只表示内部输入值，不决定开关状态。
+- 当前 name / form 不转发给内部 input；需要原生表单提交时由表单层显式同步字段。提供可读标签。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Switch } from '@snowui-design-system/components';
+	let subscribed = $state(false);
+</script>
+
+<Switch bind:checked={subscribed}>Email me product updates</Switch>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| checked | `boolean` | `false` | 开关状态，支持 `bind:checked`。点击标签或聚焦后按 Space 切换；绑定变量、可见轨道与原生输入状态同步。禁用时用户操作不改变状态。 |
+| value | `any` | — | 传给内部原生 checkbox 的值，不决定开关状态，也不建立选择组。当前 `name` / `form` 等其余属性传给外层标签，不转发至内部 input，因此仅设置 `value` 不会产生具名表单提交项。 |
+| size | `ResourceSize \| number` | — | 可见轨道高度，数字按根字号为 16px 时的名义 px 解析，外侧留白另计。支持 12 / 16 / 20 / 24 / 28 / 32 / 40 / 48 / 80 及其它有限正数；未传时依次读取父级尺寸 Context 的 `iconSize`、`size`，最后回退到 16。非法数字回退到默认尺寸 Token。显式值优先，随根字号缩放。 |
+| disabled | `boolean` | `false` | 禁用原生输入及用户切换，保留当前开关值和标签，退出 Tab 顺序。外部仍可更新 `checked`。 |
+| children | `Snippet` | — | 无参数标签内容，显示在轨道后；省略时不显示标签。标签文字同时为内部开关提供可访问名称，可通过内容 Snippet 组合文本。 |
+| enableResponsive | `boolean` | `false` | 传给根 Frame，启用其容器内容适配监听；不改变 Switch 的标准尺寸值域。通用行为见 [Frame 能力开关](./Frame.md)。 |
+| enableContext | `boolean` | `false` | 传给根 Frame，控制向子组件提供状态、加载与动效等 Context；不控制 Switch 读取父级尺寸 Context。通用行为见 [Frame 能力开关](./Frame.md)。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
@@ -37,9 +66,111 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 
 ---
 
-## 更新日志 (Changelog)
+<a id="使用示例"></a>
 
-- **Switch-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+### 使用示例
+
+```svelte
+<script>
+  import { Switch } from '@snowui-design-system/components';
+  let checked = $state(false);
+</script>
+
+<!-- 基础用法 -->
+<Switch bind:checked>开关</Switch>
+
+<!-- 自定义尺寸 -->
+<Switch bind:checked size={20}>大号开关</Switch>
+
+<!-- 禁用状态 -->
+<Switch checked disabled>禁用开关</Switch>
+```
+
+<a id="状态"></a>
+
+### 状态
+
+- **unchecked**: 未选中状态，灰色轨道
+- **checked**: 选中状态，主题色轨道
+- **disabled**: 禁用状态，降低透明度
+
+<a id="无障碍性"></a>
+
+### 无障碍性
+
+- 使用原生 `<input type="checkbox">` 确保键盘导航
+- 支持 Tab 键聚焦
+- 支持 Space 键切换
+- 禁用状态下 `tabindex=-1`
+
+
+
+## AI Zone
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
+
+### 模块索引 (Module Index)
+
+- **Switch 组件**: [./Switch.svelte](./Switch.svelte)
+
+### 关联关系
+
+- **父组件**: [Frame.svelte](./Frame.svelte)
+
+---
+
+<a id="样式规范"></a>
+
+### 样式规范
+
+### CSS 变量
+
+| 变量 | 默认值 | 说明 |
+|:---|:---|:---|
+| `--snowui-switch-size` | `var(--size-4)` | 基准尺寸（16px） |
+| `--switch-primary` | `var(--primary, var(--black-100, #000000))` | 激活态背景色 |
+| `--switch-width` | `size * 1.8` | 轨道宽度 |
+| `--switch-height` | `size` | 轨道高度 |
+| `--switch-thumb-gap` | `height * 0.125` | 滑块与轨道间距（等比缩放） |
+| `--thumb-size` | `height - gap * 2` | 滑块尺寸 |
+
+### 尺寸与圆角
+
+- **轨道圆角**: `var(--radius-full, 50%)` (pill shape)
+- **滑块圆角**: `var(--radius-full, 50%)` (circle)
+- **组件间距**: `var(--gap-1)` (4px)
+
+### 状态样式
+
+| 状态 | Track 背景色 | Thumb 位置 |
+|:---|:---|:---|
+| Unchecked | `--black-20` | `left: gap` |
+| Checked | `--switch-primary` | `translateX(width - size - gap*2)` |
+| Disabled | 同上 + `opacity: 0.5` | 同上 |
+
+### Hover 效果 (StyleGuide 7.4)
+
+| 状态 | Hover 叠加 |
+|:---|:---|
+| Unchecked | `background-image` 叠加 4% `currentColor` |
+| Checked | `background-image` 叠加 20% `--white-100` |
+
+### 动画
+
+- **Transition**: Track 背景色与 Thumb 位置消费 Frame `control` 通用时序，默认上限为 `150ms ease-out`，与 Checkbox、Radio 的常规点击状态一致
+- **减少动效**: `prefers-reduced-motion: reduce` 下取消 Track 与 Thumb 过渡，直接提交最终状态
+- **阴影**: Thumb 带 Drop Shadow 2
+
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
+
+- **Switch-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.1.17 (2026-08-31)
 
@@ -121,86 +252,3 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 ---
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
-
-## 开发者指南 (AI)
-
-### 模块索引 (Module Index)
-
-- **Switch 组件**: [./Switch.svelte](./Switch.svelte)
-
-### 关联关系
-
-- **父组件**: [Frame.svelte](./Frame.svelte)
-
----
-
-## 使用示例
-
-```svelte
-<script>
-  import { Switch } from '@snowui-design-system/components';
-  let checked = $state(false);
-</script>
-
-<!-- 基础用法 -->
-<Switch bind:checked>开关</Switch>
-
-<!-- 自定义尺寸 -->
-<Switch bind:checked size={20}>大号开关</Switch>
-
-<!-- 禁用状态 -->
-<Switch checked disabled>禁用开关</Switch>
-```
-
-## 状态
-
-- **unchecked**: 未选中状态，灰色轨道
-- **checked**: 选中状态，主题色轨道
-- **disabled**: 禁用状态，降低透明度
-
-## 样式规范
-
-### CSS 变量
-
-| 变量 | 默认值 | 说明 |
-|:---|:---|:---|
-| `--snowui-switch-size` | `var(--size-4)` | 基准尺寸（16px） |
-| `--switch-primary` | `var(--primary, var(--black-100, #000000))` | 激活态背景色 |
-| `--switch-width` | `size * 1.8` | 轨道宽度 |
-| `--switch-height` | `size` | 轨道高度 |
-| `--switch-thumb-gap` | `height * 0.125` | 滑块与轨道间距（等比缩放） |
-| `--thumb-size` | `height - gap * 2` | 滑块尺寸 |
-
-### 尺寸与圆角
-
-- **轨道圆角**: `var(--radius-full, 50%)` (pill shape)
-- **滑块圆角**: `var(--radius-full, 50%)` (circle)
-- **组件间距**: `var(--gap-1)` (4px)
-
-### 状态样式
-
-| 状态 | Track 背景色 | Thumb 位置 |
-|:---|:---|:---|
-| Unchecked | `--black-20` | `left: gap` |
-| Checked | `--switch-primary` | `translateX(width - size - gap*2)` |
-| Disabled | 同上 + `opacity: 0.5` | 同上 |
-
-### Hover 效果 (StyleGuide 7.4)
-
-| 状态 | Hover 叠加 |
-|:---|:---|
-| Unchecked | `background-image` 叠加 4% `currentColor` |
-| Checked | `background-image` 叠加 20% `--white-100` |
-
-### 动画
-
-- **Transition**: Track 背景色与 Thumb 位置消费 Frame `control` 通用时序，默认上限为 `150ms ease-out`，与 Checkbox、Radio 的常规点击状态一致
-- **减少动效**: `prefers-reduced-motion: reduce` 下取消 Track 与 Thumb 过渡，直接提交最终状态
-- **阴影**: Thumb 带 Drop Shadow 2
-
-## 无障碍性
-
-- 使用原生 `<input type="checkbox">` 确保键盘导航
-- 支持 Tab 键聚焦
-- 支持 Space 键切换
-- 禁用状态下 `tabindex=-1`

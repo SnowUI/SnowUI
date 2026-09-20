@@ -1,21 +1,77 @@
-# Popover.svelte 文档
-
-> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+# Popover
 
 > **版本**: v3.1.1
-> **变更记录 (2026-05-15)**: 旧 Popover 定义全部废弃,合并 QuickAction(小尺寸)、取代 SearchPopup(中尺寸)。
-> **新增 (2026-05-15) v3.1.0**: 内嵌模式 `as="popover"`(Tooltip 风格):放入宿主子节点即自动绑定。
-> **职责**: Popover 是承载内容的浮层容器。QuickAction 视为小尺寸 Popover,SearchPopup 视为中尺寸 Popover。
-
-**继承**: 浮层根使用 Frame;内嵌 / 模版模式下通过 Portal 渲染到 `document.body`;面板复用 `.snowui-quick-action-panel` 共享视觉基类,出现 / 消失动效使用 `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION`。动效只包含 opacity，具体 duration / easing 以 motion preset catalog 为准,关闭时保留面板到 disappear preset 完成后再卸载。
-
----
+> **职责**: 在触发器附近展示补充内容或操作，支持不同尺寸与触发方式，适合快捷操作和轻量交互面板。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在触发器附近展示补充内容或操作，支持不同尺寸与触发方式，适合快捷操作和轻量交互面板。
 
-## 三种模式 (Modes)
+## 使用选择
+
+<!-- usage-guide:start -->
+用于与触发锚点相关的浮层内容。短文本提示用 Tooltip，需要对话框焦点流程用 Dialog；关闭行为使用公开 closeOn。
+
+- as="popover" 放在触发宿主内可自动关联锚点；静态模式可用 bind:open 手动控制。
+- trigger 控制触发方式，closeOn 控制关闭策略；需要持续显示的交互示例可设置 closeOn="manual"。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button, Kbd, MenuItem, Popover, SearchInput, Text } from '@snowui-design-system/components';
+	const actions = [
+		{ value: 'copy-import', label: 'Copy import', shortcut: '⌘ C' },
+		{ value: 'open-figma', label: 'Open in Figma', shortcut: '' },
+		{ value: 'view-source', label: 'View source', shortcut: '' }
+	];
+	let query = $state('');
+	const filteredActions = $derived(actions.filter((action) => action.label.toLowerCase().includes(query.toLowerCase())));
+</script>
+
+<Popover size="md" closeOn="manual">
+	<SearchInput as="search" bind:value={query} placeholder="Search…" aria-label="Search component actions" />
+	{#each filteredActions as action}
+		<MenuItem as="item" value={action.value}>{action.label}{#if action.shortcut}<Kbd as="trailing">{action.shortcut}</Kbd>{/if}</MenuItem>
+	{:else}
+		<Text style="padding: var(--padding-3); color: var(--black-40);">No matching actions</Text>
+	{/each}
+</Popover>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| id | `string` | — | 模版模式的唯一标识 |
+| template | `boolean` | `false` | 模版模式;不直接渲染,通过 `showPopover(id)` 激活 |
+| size | `PopoverSize` | `"sm"` | 尺寸档位 |
+| trigger | `PopoverTrigger` | `"click"` | 触发方式;模版模式生效 |
+| placement | `PopoverPlacement` | `"bottom"` | 优先弹出方位,视口空间不足时自动翻转 |
+| offset | `number` | `8` | 浮层与触发器距离,单位 px |
+| closeOn | `PopoverCloseMode` | `"outside"` | 关闭方式:`outside` 点击空白关闭,`manual` 仅由 Popover 内按钮关闭 |
+| closeOnEscape | `boolean` | `true` | Escape 是否关闭;两种 closeOn 模式都默认支持 |
+| closeOnSelect | `boolean` | — | 点击内部 `MenuItem` 是否关闭;单个 `MenuItem closeOnSelect` 可覆盖 默认行为：`true` (sm) / `false` (md/lg)。 |
+| continuousHover | `boolean` | `true` | 直接 `MenuItem` 之间是否使用容器级连续 hover 背景 |
+| open | `boolean` | `true` | 静态模式手动控制显示,支持 `bind:open` |
+| onOpenChange | `(open: boolean) => void` | — | 打开状态变化回调 |
+| as | `"popover" \| undefined` | — | `as="popover"` 启用**内嵌模式**:自动发现宿主父元素为 anchor 和触发源 |
+| children | `Snippet` | — | 面板内容 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="三种模式-modes"></a>
+
+### 三种模式 (Modes)
 
 Popover 同时支持三种使用模式:**面板模式 (Panel)**、**内嵌模式 (Inline)**、**模版模式 (Template)**。
 
@@ -84,7 +140,9 @@ Popover 同时支持三种使用模式:**面板模式 (Panel)**、**内嵌模式
 
 ---
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型:复合管理布局。
 
@@ -114,28 +172,14 @@ Popover 与 Listbox 共用同一套 `header + scroll-body` 结构,所有浮层�
 
 ---
 
-## 关键字 (Props)
+<a id="关键字-props"></a>
 
-| 关键字 | 类型 | 默认值 | 说明 |
-| :--- | :--- | :--- | :--- |
-| `id` | `string` | — | 模版模式的唯一标识 |
-| `template` | `boolean` | `false` | 模版模式;不直接渲染,通过 `showPopover(id)` 激活 |
-| `as` | `'popover' \| undefined` | `undefined` | `as="popover"` 启用**内嵌模式**:自动发现宿主父元素为 anchor 和触发源 |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'sm'` | 尺寸档位 |
-| `trigger` | `'click' \| 'hover'` | `'click'` | 触发方式;模版模式生效 |
-| `placement` | `'top' \| 'bottom' \| 'left' \| 'right'` | `'bottom'` | 优先弹出方位,视口空间不足时自动翻转 |
-| `offset` | `number` | `8` | 浮层与触发器距离,单位 px |
-| `closeOn` | `'outside' \| 'manual'` | `'outside'` | 关闭方式:`outside` 点击空白关闭,`manual` 仅由 Popover 内按钮关闭 |
-| `closeOnEscape` | `boolean` | `true` | Escape 是否关闭;两种 closeOn 模式都默认支持 |
-| `closeOnSelect` | `boolean` | `true` (sm) / `false` (md/lg) | 点击内部 `MenuItem` 是否关闭;单个 `MenuItem closeOnSelect` 可覆盖 |
-| `continuousHover` | `boolean` | `true` | 直接 `MenuItem` 之间是否使用容器级连续 hover 背景 |
-| `open` | `boolean` | `false` | 静态模式手动控制显示,支持 `bind:open` |
-| `onOpenChange` | `(open: boolean) => void` | — | 打开状态变化回调 |
-| `children` | `Snippet` | — | 面板内容 |
 
 ---
 
-## 尺寸
+<a id="尺寸"></a>
+
+### 尺寸
 
 | size | padding | border-radius | 典型用途 |
 | :--- | :--- | :--- | :--- |
@@ -145,7 +189,8 @@ Popover 与 Listbox 共用同一套 `header + scroll-body` 结构,所有浮层�
 
 ---
 
-## 交互
+<a id="交互"></a>
+
 
 ### 触发(模版模式)
 
@@ -160,13 +205,17 @@ Popover 与 Listbox 共用同一套 `header + scroll-body` 结构,所有浮层�
 
 ---
 
-## 定位
+<a id="定位"></a>
+
+### 定位
 
 默认首选方位 `bottom`,距触发器 `8px`。未配置 `placement` 或发生视口碰撞时,按 **首选 → 相反方向 → 垂直/水平候选** 顺序选择可见方位,确保浮层不会出现在可视区域外。
 
 ---
 
-## 命令式 API
+<a id="命令式-api"></a>
+
+### 命令式 API
 
 定义在 `../logic/popover.svelte.ts`,完整文档见 [`../logic/popover.md`](../logic/popover.md)。
 
@@ -180,7 +229,8 @@ togglePopover("pop-01", buttonEl); // 切换
 
 ---
 
-## 使用示例
+<a id="使用示例"></a>
+
 
 ### 模版 + 点击触发
 
@@ -230,7 +280,9 @@ togglePopover("pop-01", buttonEl); // 切换
 
 ---
 
-## 合并说明
+<a id="合并说明"></a>
+
+### 合并说明
 
 | 旧组件 | 新等价写法 |
 | :--- | :--- |
@@ -239,7 +291,8 @@ togglePopover("pop-01", buttonEl); // 切换
 
 QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中保留为搜索浮层组合参考。
 
-## 规范 (Spec)
+<a id="规范-spec"></a>
+
 
 ### 1. 模版宿主(模版模式)
 - `<Popover template id="X">` 不渲染任何 DOM,仅向 store 注册配置和内容
@@ -258,9 +311,33 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中�
 
 ---
 
-> **以下内容供 AI 阅读,用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="连续-hover"></a>
+
+### 连续 Hover
+
+`continuousHover` 默认 `true`，作用于滚动内容区的直接 `MenuItem`。单一背景层在
+菜单项之间连续移动；`false` 恢复 MenuItem 原有逐项 hover。嵌套 Listbox 使用自己
+最近的连续 hover 容器，不由 Popover 越界接管。
+
+
+
+## AI Zone
+
+> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+
+
+> **更新日志 (2026-05-15)**: 旧 Popover 定义全部废弃,合并 QuickAction(小尺寸)、取代 SearchPopup(中尺寸)。
+> **新增 (2026-05-15) v3.1.0**: 内嵌模式 `as="popover"`(Tooltip 风格):放入宿主子节点即自动绑定。
+
+
+**继承**: 浮层根使用 Frame;内嵌 / 模版模式下通过 Portal 渲染到 `document.body`;面板复用 `.snowui-quick-action-panel` 共享视觉基类,出现 / 消失动效使用 `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION`。动效只包含 opacity，具体 duration / easing 以 motion preset catalog 为准,关闭时保留面板到 disappear preset 完成后再卸载。
+
+---
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -270,7 +347,9 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中�
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v3.1.1 (2026-06-02)
 - Popover hover 显示延迟调整为 `450ms`,与 Tooltip 首次 hover 延迟统一。
@@ -295,8 +374,3 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中�
 
 ### v1.1.1 (2026-02-03)
 - 初始版本
-## 连续 Hover
-
-`continuousHover` 默认 `true`，作用于滚动内容区的直接 `MenuItem`。单一背景层在
-菜单项之间连续移动；`false` 恢复 MenuItem 原有逐项 hover。嵌套 Listbox 使用自己
-最近的连续 hover 容器，不由 Popover 越界接管。

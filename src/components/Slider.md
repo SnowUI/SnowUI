@@ -1,16 +1,73 @@
-# Slider 滑动输入组件
+# Slider
 
 > **版本**: v1.4.2
-> **职责**: 提供单值、区间、水平、纵向、可切割 steps 与填充式视觉变体的滑动输入。
-
-**继承**: 复用 Frame.svelte 的通用能力。
-**默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`, `enableDefaultMotion=true`。
+> **职责**: 通过拖动选择单个数值或数值区间，支持水平、垂直、步进与填充式展示，适合范围和参数调整。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 通过拖动选择单个数值或数值区间，支持水平、垂直、步进与填充式展示，适合范围和参数调整。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于连续值或范围调整。离散选项切换用 Segmented / Select；明确 minValue、maxValue、step 和可访问名称。
+
+- bind:value 使用数值表示单滑块，数组表示双滑块范围；边界属性为 minValue / maxValue。
+- step 控制步长，ariaLabel 提供名称；显式 Text as="label" 替换默认标签。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Slider, Text } from '@snowui-design-system/components';
+</script>
+
+<div style="width: 20rem; max-width: 100%; display: flex; flex-direction: column; gap: var(--gap-6);">
+    <Slider value={69} variant="soft" title="Volume" showLabel ariaLabel="Volume" />
+    <Slider value={88} variant="soft" title="Music" showLabel ariaLabel="Music volume" />
+    <Slider value={75} variant="soft" title="Notifications" step={25} showSteps showLabel ariaLabel="Notification volume" />
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| value | `number \| number[]` | `0` | 当前值；数组表达双拖动块 Range Slider；支持 `bind:value` |
+| minValue | `number` | `0` | 最小值 |
+| maxValue | `number` | `100` | 最大值 |
+| step | `number` | `1` | 步进值 |
+| orientation | `SliderOrientation` | `"horizontal"` | 轨道方向 |
+| variant | `SliderVariant` | `"default"` | `solid` 为高对比条形样式；`soft` 为使用 Black token 的主题自适应低对比条形样式 |
+| title | `string` | `"Text"` | `solid` / `soft` 左侧内置标题；空字符串可隐藏；不是 label |
+| showSteps | `boolean` | `false` | 使用 1px 透明缝隙按照 step 切割轨道与填充条 |
+| showLabel | `boolean` | `false` | 是否生成跟随拖动块的内置 Text label；水平条形 Range 合并为一个范围标签，其他 Range 生成两个 |
+| thickness | `number \| string` | — | 轨道粗细；在条形变体中控制整体高度 |
+| background | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
+| color | `SnowUIColor \| string` | — | 填充条颜色；显式传值可覆盖变体默认值 |
+| thumbColor | `SnowUIColor \| string` | `"StaticWhite80"` | 拖动块颜色 |
+| disabled | `boolean` | `false` | 禁用交互 |
+| name | `string` | — | 原生表单字段名 |
+| ariaLabel | `string \| string[]` | — | 单值可访问名称；Range 可分别声明两个名称 |
+| oninput | `(event: Event) => void` | — | 指针拖动或原生输入更新后调用，传入 Event（指针路径为 PointerEvent）；value 已完成范围与步长归一化，回调不能取消该更新。 |
+| onchange | `(event: Event) => void` | — | 指针拖动结束或原生 change 时调用，参数为对应 Event；读取绑定 value 获得提交值。 |
+| children | `Snippet` | — | 显式组合入口；可放置一至两个直系 `Text as="label"` 并替换内置 label |
+| parts | `ComponentPartsOf<{ Text: typeof Text }>` | — | 配置 `showLabel` 生成的内置 Text |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**复合管理布局**。
 
@@ -30,32 +87,15 @@
 - `thickness` 同时控制条形变体的整体高度；`default` 仍为 4px，`solid` / `soft` 默认 32px。
 - `solid` / `soft` + `showSteps` 使用固定 `Black/10%` 的 2px 圆点，只渲染内部刻度，不显示 0% / 100% 端点；圆点不响应 hover，也不随填充覆盖范围改变颜色。条形变体当前只定义水平布局，纵向 Slider 继续使用 `default` 视觉。
 
-## 关键字
+<a id="关键字"></a>
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `value` | `number \| number[]` | `0` | 当前值；数组表达双拖动块 Range Slider；支持 `bind:value` |
-| `minValue` | `number` | `0` | 最小值 |
-| `maxValue` | `number` | `100` | 最大值 |
-| `step` | `number` | `1` | 步进值 |
-| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` | 轨道方向 |
-| `variant` | `"default" \| "solid" \| "soft"` | `"default"` | `solid` 为高对比条形样式；`soft` 为使用 Black token 的主题自适应低对比条形样式 |
-| `title` | `string` | `"Text"` | `solid` / `soft` 左侧内置标题；空字符串可隐藏；不是 label |
-| `showSteps` | `boolean` | `false` | 使用 1px 透明缝隙按照 step 切割轨道与填充条 |
-| `showLabel` | `boolean` | `false` | 是否生成跟随拖动块的内置 Text label；水平条形 Range 合并为一个范围标签，其他 Range 生成两个 |
-| `thickness` | `number \| string` | `4`；`solid` / `soft` 为 `32` | 轨道粗细；在条形变体中控制整体高度 |
-| `background` | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
-| `color` | `SnowUIColor \| string` | `"Primary"`；`soft` 为 `"Black10"` | 填充条颜色；显式传值可覆盖变体默认值 |
-| `thumbColor` | `SnowUIColor \| string` | `"StaticWhite80"` | 拖动块颜色 |
-| `disabled` | `boolean` | `false` | 禁用交互 |
-| `name` | `string` | - | 原生表单字段名 |
-| `ariaLabel` | `string \| string[]` | - | 单值可访问名称；Range 可分别声明两个名称 |
-| `parts` | `{ Text? }` | - | 配置 `showLabel` 生成的内置 Text |
-| `children` | `Snippet` | - | 显式组合入口；可放置一至两个直系 `Text as="label"` 并替换内置 label |
+### 关键字
 
 `gap` 沿用 Frame 关键字，但在 Slider 中用于覆盖 label 与拖动块间距。数字仍使用 Frame gap 倍率语义；默认值为 2px。
 
-## 示例
+<a id="示例"></a>
+
+### 示例
 
 ```svelte
 <script lang="ts">
@@ -88,9 +128,17 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+**继承**: 复用 Frame.svelte 的通用能力。
+**默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`, `enableDefaultMotion=true`。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 - **实现**: [./Slider.svelte](./Slider.svelte)
 - **颜色协议**: [../lib/color.md](../lib/color.md)
@@ -98,7 +146,9 @@
 - Range Slider 渲染两个原生 range input；拖动轨道时选择距离最近的拖动块。
 - steps 只在固定尺寸的 track 上使用 CSS mask 生成 1px 透明缝隙；父级 mask 同时裁切内部 fill，切割线不会随填充宽度移动，也不假设页面背景色。
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.4.2 (2026-09-12)
 

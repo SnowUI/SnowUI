@@ -1,18 +1,65 @@
-# Gradient 矢量渐变
+# Gradient
 
 > **版本**: v2.13.2
-> **职责**: 以可缩放 SVG 矢量绘制 Workshop Frame 200 的六种固定渐变视觉，并以预栅格图层保持四层柔和形变。
-> **包归属**: OSS
-
-Gradient 使用六种 SVG 矢量渐变。六种配色共用同一套 `360 × 360` 几何：底色矩形、两枚旋转椭圆和两条曲线路径；每个图层使用 Figma 原始模糊参数与固定色值。静态 Avatar 复用包内 SVG 文件，活动图层使用模块级缓存的 SVG data source；不加载 PNG 或网络资源。
-
-当前版本固定底色矩形，只让 Vector 4、Vector 3、Subtract、Subtract 2 四个有色模糊图层独立运动。Gaussian Blur 在 SVG 图片解码时一次生成，运行中的 DOM 不包含 SVG filter；动效仅修改承载已栅格结果的 HTML 图层 `transform`，不逐帧修改滤镜、路径、颜色或混合模式。
+> **职责**: 以柔和的多层渐变丰富背景与占位画面，提供六种配色与可缩放的形变效果。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 以柔和的多层渐变丰富背景与占位画面，提供六种配色与可缩放的形变效果。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于已内置的装饰性渐变图形或头像占位。艺术配色不作为普通 UI 的主题颜色；页面表面和文字仍使用语义颜色。
+
+- size 同时设置宽高且优先于 width / height；seed 用于稳定同一对象的图形。
+- 作为装饰保持 decorative；配色仅用于该装饰图形，页面文字与表面继续使用语义 Token。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Gradient } from '@snowui-design-system/components';
+</script>
+
+<div style="display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap-4) var(--gap-3); max-width: 100%;">
+    <Gradient variant="blue" size={80} radius="50%" aria-label="Blue gradient" />
+    <Gradient variant="cyan" size={80} radius="50%" aria-label="Cyan gradient" />
+    <Gradient variant="green" size={80} radius="50%" aria-label="Green gradient" />
+    <Gradient variant="red" size={80} radius="50%" aria-label="Red gradient" />
+    <Gradient variant="orange" size={80} radius="50%" aria-label="Orange gradient" />
+    <Gradient variant="purple" size={80} radius="50%" aria-label="Purple gradient" />
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| variant | `GradientVariant` | — | 选择 Frame 200 从左到右对应的六种固定配色 |
+| seed | `string \| number` | — | 仅在 `as="avatar-image"` 且未显式传 `variant` 时用于稳定选择六种配色；配色名可直接命中对应 variant |
+| size | `number \| string` | — | 同时设置宽高；优先级高于 `width` / `height` |
+| width | `number \| string` | — | 宽度；数字值按 px 处理 |
+| height | `number \| string` | — | 高度；数字值按 px 处理 |
+| radius | `number \| string` | — | 外部裁切圆角；数字值按 px 处理 |
+| motion | `boolean` | — | 控制四个 SVG 有色图层是否常驻运行；Avatar 为 false 时仍会在 hover 期间按需运行水波形变，不影响多色 Overlay 默认行为：普通 Gradient 为 `true`；`as="avatar-image"` 为 `false`。 |
+| avatarHoverActive | `boolean` | — | 由 Avatar 宿主控制头像变体的 hover 艺术色反馈；未传时使用组件自己的交互检测，非头像变体不使用此控制。 |
+| decorative | `boolean` | `true` | 装饰图默认隐藏于无障碍树；设为 `false` 时应同时提供 `aria-label` |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：内禀原子布局。
 
@@ -29,18 +76,12 @@ Gradient 使用六种 SVG 矢量渐变。六种配色共用同一套 `360 × 360
 - Gradient 通过模块级共享 `IntersectionObserver` 在离开视口 `128px` 预热范围后暂停内部 transform 并释放 `will-change`；浏览器不支持该能力时保持原有持续动效，不影响视觉与语义。
 - `prefers-reduced-motion: reduce` 下停止内部循环并恢复未经 transform 的静态设计基线。
 
-## API
+<a id="api"></a>
+
+### API
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `variant` | `"blue" \| "cyan" \| "green" \| "red" \| "orange" \| "purple"` | `"blue"` | 选择 Frame 200 从左到右对应的六种固定配色 |
-| `seed` | `string \| number` | - | 仅在 `as="avatar-image"` 且未显式传 `variant` 时用于稳定选择六种配色；配色名可直接命中对应 variant |
-| `size` | `number \| string` | - | 同时设置宽高；优先级高于 `width` / `height` |
-| `width` | `number \| string` | `360` | 宽度；数字值按 px 处理 |
-| `height` | `number \| string` | `360` | 高度；数字值按 px 处理 |
-| `radius` | `number \| string` | `0` | 外部裁切圆角；数字值按 px 处理 |
-| `motion` | `boolean` | 普通 Gradient 为 `true`；`as="avatar-image"` 为 `false` | 控制四个 SVG 有色图层是否常驻运行；Avatar 为 false 时仍会在 hover 期间按需运行水波形变，不影响多色 Overlay |
-| `decorative` | `boolean` | `true` | 装饰图默认隐藏于无障碍树；设为 `false` 时应同时提供 `aria-label` |
 | `as` | `string` | - | Frame 角色声明；Avatar 场景可使用 `as="avatar-image"` |
 
 ### CSS 动效覆盖
@@ -68,7 +109,9 @@ Gradient 使用六种 SVG 矢量渐变。六种配色共用同一套 `360 × 360
 
 `motion` 只决定基础矢量形变是否运行。Test 的 GD-05 提供 19 条控制条：时长、整体速度、四项缓动坐标以及四层全部 13 项幅度参数；控制条以四列网格排列在图形下方，并以每条控制的可调上限初始化。
 
-## 六种配色
+<a id="六种配色"></a>
+
+### 六种配色
 
 | `variant` | Figma Frame | 底色 | Vector 4 | Vector 3 | Subtract | Subtract 2 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -81,13 +124,17 @@ Gradient 使用六种 SVG 矢量渐变。六种配色共用同一套 `360 × 360
 
 这些颜色是视觉资产自身的固定填色，不是公开颜色 Prop，也不映射主题语意色。
 
-## 专业艺术色例外
+<a id="专业艺术色例外"></a>
+
+### 专业艺术色例外
 
 Gradient 的六组固定 SVG palette、中心色与 Avatar 模式多色 Overlay 已在 [StyleSpec §2.1.3](../../../specs/StyleSpec.md#213-专业艺术色例外强制) 单独登记为专业艺术色例外。它们共同构成经设计确认的生成式矢量视觉资产，因此不映射到 SnowUI 语义 Token，也不能作为按钮、文字、状态、表面或其他组件的通用颜色来源。
 
 例外只覆盖 Gradient 画面及其 Avatar 视觉分支。组件根的尺寸、圆角、外部 `class` / `style` 覆盖、无障碍与 reduced-motion 仍遵守现行 StyleSpec；新增 palette 或将颜色用于新的语义前必须重新登记。
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <Gradient variant="blue" />
@@ -110,7 +157,9 @@ Gradient 的六组固定 SVG palette、中心色与 Avatar 模式多色 Overlay 
 
 Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gradientMotion` 开关。默认头像常态使用缓存静态图；hover 时 Gradient 在圆形裁切内按需淡入四个预栅格 SVG 图层，并持续过渡到当前 variant 之外的五种颜色。`gradientMotion` 只决定活动图层是否常驻。
 
-## 矢量与缩放
+<a id="矢量与缩放"></a>
+
+### 矢量与缩放
 
 - 画布：`360 × 360`。
 - 图层顺序：底色矩形 → Vector 4 → Vector 3 → Subtract → Subtract 2。
@@ -123,7 +172,9 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 - SVG 图片 viewport 负责统一缩放全部几何与 blur；组件不读取实际像素尺寸，也不重新计算 blur。
 - 非正方形宽高按 Figma Fill 行为分别缩放 X / Y 轴。四个 HTML 图层先在 SVG foreignObject 的 360 × 360 设计坐标内运动，再由外层 viewBox 整体 Fill；禁止先拉成长方形再旋转，以免露出预栅格图片的硬裁切边界。
 
-## 动效与性能
+<a id="动效与性能"></a>
+
+### 动效与性能
 
 - 底色保持静止；开启 `motion` 后，单个实例只在四个承载预栅格 SVG 图片的 HTML 图层上运行 CSS transform keyframes。
 - 动画只使用 `translate3d + rotate + scale / scaleX / scaleY`；常驻 Gradient 在每个相邻关键帧区间使用90级更新密度，单步位移在默认 360px 画布中低于约1px；仅在 `motion` 开启且接近视口时使用 `will-change: transform`。
@@ -138,9 +189,18 @@ Avatar 会向 Gradient fallback 传入 `as="avatar-image"`、稳定 seed 与 `gr
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南
+
+
+## AI Zone
+
+Gradient 使用六种 SVG 矢量渐变。六种配色共用同一套 `360 × 360` 几何：底色矩形、两枚旋转椭圆和两条曲线路径；每个图层使用 Figma 原始模糊参数与固定色值。静态 Avatar 复用包内 SVG 文件，活动图层使用模块级缓存的 SVG data source；不加载 PNG 或网络资源。
+
+当前版本固定底色矩形，只让 Vector 4、Vector 3、Subtract、Subtract 2 四个有色模糊图层独立运动。Gaussian Blur 在 SVG 图片解码时一次生成，运行中的 DOM 不包含 SVG filter；动效仅修改承载已栅格结果的 HTML 图层 `transform`，不逐帧修改滤镜、路径、颜色或混合模式。
+
+<a id="开发者指南"></a>
+
+### 开发者指南
 
 ### 模块索引
 
@@ -165,7 +225,9 @@ Gradient 是无 children、无内置公开子组件的原子视觉组件，组�
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### 圆角边缘修复（2026-09-15）
 

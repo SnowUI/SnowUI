@@ -1,16 +1,52 @@
-# SnowUILogo（SnowUI 品牌标志）
+# SnowUILogo
 
 > **版本**: v1.12.0
-> **职责**: 按 Workshop 设计稿渲染 SnowUI 图标、字标，以及横向或纵向组合。
-> **包归属**: OSS
-
-SnowUILogo 是 SnowUI 的品牌视觉原子组件。图标与字标均使用设计稿原始矢量路径；组合形式、比例和间距会随 `scale` 一起等比缩放。
+> **职责**: 展示 SnowUI 图标、字标或组合标识，支持横向与纵向排列，适合品牌入口和页面署名。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 展示 SnowUI 图标、字标或组合标识，支持横向与纵向排列，适合品牌入口和页面署名。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于 SnowUI 品牌图形与字标。复用公开变体，不用文字、截图或手写 SVG 模仿品牌图形。
+
+- variant 选择图标、字标或组合方向；scale 调整整体比例。
+- 组件本身不创建导航；需要跳转时由页面提供真实链接，纯装饰时设置 decorative。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { SnowUILogo, Text } from '@snowui-design-system/components';
+</script>
+
+<SnowUILogo scale={2} />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| variant | `SnowUILogoVariant` | `"horizontal"` | 图标、字标或两种组合方向 |
+| scale | `number` | `1` | 等比缩放图标、字标和组合间距；非有限值或非正数回退为 `1` |
+| decorative | `boolean` | `false` | 设为 `true` 时从无障碍树隐藏 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：内禀原子布局。
 
@@ -20,15 +56,9 @@ SnowUILogo 是 SnowUI 的品牌视觉原子组件。图标与字标均使用设�
 - `vertical`：`64 × 64` 图标 + `8` 间距 + `71 × 12` 字标，整体 `71 × 84`。
 - 内部图标与字标是固定品牌几何，不是公开 SnowUI 子组件，不接受 children，也不接入通用槽位。
 
-## 关键字
+<a id="使用示例"></a>
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `variant` | `"icon" \| "text" \| "horizontal" \| "vertical"` | `"horizontal"` | 图标、字标或两种组合方向 |
-| `scale` | `number` | `1` | 等比缩放图标、字标和组合间距；非有限值或非正数回退为 `1` |
-| `decorative` | `boolean` | `false` | 设为 `true` 时从无障碍树隐藏 |
-
-## 使用示例
+### 使用示例
 
 ```svelte
 <SnowUILogo variant="icon" />
@@ -63,7 +93,9 @@ SnowUILogo 只负责品牌视觉，不内置 `href`、路由或打开方式。�
 
 速度与方向属于 SnowUI 品牌动效的固定参数，不作为 SnowUILogo Props 或公开 CSS override。Test 中的 Hover 动效调节器仅用于内部调试和参数确认，不构成组件 API。
 
-## Hover 动效
+<a id="hover-动效"></a>
+
+### Hover 动效
 
 - 白色米字位于最上层，以恒定的 `0.20x` 速度顺时针旋转；蓝条 1/2 与蓝条 3/4 分别作为同步整体，均以 `0.10x` 顺时针旋转。
 - 四条蓝色色条均以 Logo 1 (`#4C98FD`) 为底色；按设计图层从上到下叠加 `30% / 20% / 40% / 0%` 白色，最底层的 `0%` 保留统一绘制语义但不改变颜色。
@@ -76,7 +108,9 @@ SnowUILogo 只负责品牌视觉，不内置 `href`、路由或打开方式。�
 
 字标中的 `UI` 严格按 Figma Fill 顺序绘制：底层 Logo 2，上叠 `white-100/20%`，最上叠 `white-100/10%`；两层均消费主题 Token，因此在暗色模式中会切换为黑色叠加层。`Snow` 仍使用 Logo 2。
 
-## 无障碍
+<a id="无障碍"></a>
+
+### 无障碍
 
 默认输出 `role="img"` 与 `aria-label="SnowUI"`。纯装饰场景应传入 `decorative`；自定义可访问名称可传入 `aria-label`。
 
@@ -86,9 +120,16 @@ SnowUILogo 只负责品牌视觉，不内置 `href`、路由或打开方式。�
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+SnowUILogo 是 SnowUI 的品牌视觉原子组件。图标与字标均使用设计稿原始矢量路径；组合形式、比例和间距会随 `scale` 一起等比缩放。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 设计来源
 
@@ -113,7 +154,9 @@ SnowUILogo 的分层旋转只服务组件内部品牌图层，不与其他组件
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.12.0 (2026-07-22)
 

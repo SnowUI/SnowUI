@@ -1,12 +1,66 @@
 # TableCell
 
-> `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
+> **版本**: v1.10.1
+> **职责**: 在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。
 
-## 内置组件双模式
+## 使用选择
+
+<!-- usage-guide:start -->
+作为 TableRow 中的数据单元格。选择列与操作列角色只在启用相应能力的 DataTable 中成立；显式内容替换该单元格默认内容。
+
+- 放在 TableRow 内，通过 columnId 对齐列；lines / tooltip 控制长内容展示。
+- 选择列与操作列由 DataTable 启用；actions 单元格的显式 children 替换默认操作。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { TableCell, Badge, Link, Table, TableHeader, TableHead, TableBody, TableRow, Chip } from '@snowui-design-system/components';
+</script>
+
+<Table ariaLabel="Component documentation details" minWidth={620} columnWidths={{ component: 160 }}>
+	<TableHeader><TableRow><TableHead columnId="component">Component</TableHead><TableHead columnId="summary">Summary</TableHead><TableHead columnId="status">Status</TableHead></TableRow></TableHeader>
+	<TableBody><TableRow rowId="data-table">
+		<TableCell columnId="component" row nowrap><Link onclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} href="/components/data-table">DataTable</Link><Badge count="PRO" variant="border" /></TableCell>
+		<TableCell columnId="summary" lines={2} tooltip>Coordinates search, filtering, sorting, selection, responsive row actions, and pagination while keeping table composition explicit.</TableCell>
+		<TableCell columnId="status" align="end"><Chip variant="background" style="color: var(--secondary-indigo);">Review</Chip></TableCell>
+	</TableRow></TableBody>
+</Table>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| columnId | `string` | — | 与表头共享列宽 |
+| lines | `false \| 1 \| 2 \| 3` | `1` | 截断行数，false 关闭 |
+| tooltip | `TooltipProp` | `true` | 溢出后展示完整或自定义提示 |
+| onTruncate | `(isTruncated: boolean) => void` | — | 真实溢出状态变化 |
+| align | `"start" \| "center" \| "end"` | `"start"` | 内容对齐 默认行为：start。 |
+| roleLayout | `TableRoleLayout` | — | 覆盖当前角色单元格的角色列布局；普通单元格忽略 默认行为：Table context。 |
+| nowrap | `boolean` | — | 文字不换行；与 row 同用时同时禁止 flex 子项换行 默认行为：`true`（lines=2/3 时 false）。 |
+| skeleton | `boolean` | `false` | TableBody 内部 Skeleton rows 协议；渲染非交互占位内容并关闭截断 |
+| children | `Snippet` | — | 单元格内容，无参数；actions 角色提供显式内容时替换默认操作，选择角色仍由 DataTable 协议管理。 |
+| parts | `ComponentPartsOf<{ Tooltip: typeof Tooltip; Checkbox: typeof Checkbox; }>` | — | 配置内置截断 Tooltip 和选择 Checkbox；只作用于当前单元格拥有的默认实例。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="内置组件双模式"></a>
+
+### 内置组件双模式
 
 - `parts.Tooltip`：配置截断提示。
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
@@ -21,17 +75,9 @@
 
 | 属性 | 类型 | 默认值 | 说明 |
 | :--- | :--- | :--- | :--- |
-| columnId | `string` | - | 与表头共享列宽 |
-| lines | `false \| 1 \| 2 \| 3` | `1` | 截断行数，false 关闭 |
-| tooltip | `boolean \| string \| Snippet` | `true` | 溢出后展示完整或自定义提示 |
-| onTruncate | `(isTruncated) => void` | - | 真实溢出状态变化 |
-| align | `start \| center \| end` | `start` | 内容对齐 |
-| roleLayout | `column \| overlay` | Table context | 覆盖当前角色单元格的角色列布局；普通单元格忽略 |
 | row | `boolean` | `false` | 内部内容使用横向 flex 布局，根 `<td>` 语义不变 |
 | gap | `number` | `2` | 内部内容间距，默认 8px，对应 `--gap-{n}` token |
-| nowrap | `boolean` | `true`（lines=2/3 时 false） | 文字不换行；与 row 同用时同时禁止 flex 子项换行 |
 | as | `selection \| actions` | - | 显式角色列；角色模式关闭默认截断 |
-| skeleton | `boolean` | `false` | TableBody 内部 Skeleton rows 协议；渲染非交互占位内容并关闭截断 |
 
 ```svelte
 <TableCell columnId="name">未知长度的文字</TableCell>
@@ -57,19 +103,28 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 
 行点击协议：点击真实链接、按钮、输入控件、label 或 ARIA button / checkbox 不切换行；点击非交互空白区域切换当前行选中态；再次点击取消选中。
 
-## Keyword
+<a id="keyword"></a>
+
+### Keyword
 
 | Keyword | 说明 |
 | :--- | :--- |
 | component | 当前组件公开契约 |
 
-> **以下内容供 AI 阅读，不展示在文档站点**
 
 - 默认单行截断登记到当前 Table 的 `TableTruncationManager`；同一表只观察 viewport / table，不允许恢复逐 Cell ResizeObserver。
 - 普通 Cell 未声明高级 Frame 能力时使用原生 td 快路径；高级能力存在时自动回退完整 Frame。
 - 子级 Text 显式声明 lines 时成为最近的截断 owner，Cell 不再重复生成 Tooltip。
 
-## Changelog
+
+
+## AI Zone
+
+> `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
+
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 2026-09-20：v1.10.1，普通单元格 `lines={false}` 同时关闭内容层裁切，保留子 Button 的完整 hover 背景和边框；默认单行、多行截断、角色浮层和 Skeleton 裁切不变。
 

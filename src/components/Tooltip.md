@@ -1,38 +1,79 @@
-# Tooltip.svelte 文档
+# Tooltip
 
 > **版本**: v1.24.1
-> **职责**: 文字提示组件，在悬停时显示额外信息。
-
-**能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
-
-> **实现**: Tooltip 使用 Portal 模式渲染到 `document.body`；OSS 默认包含 hover / skip-delay、视口边缘碰撞避让、生命周期动效，以及页面级共享 Portal 的连续切换。近距离切换时，单一圆角外框沿任意二维方向移动并同步改变宽高。两个目标 Tooltip 的矩形最短距离不超过 `4px` 时，旧、新内容按各自真实 Snippet 边界沿移动方向以 `16px` 间距拼接，外框与内容带同帧进入有界协调时间线。light 外观保留透明 Black/4 与背景模糊，最终颜色会随被覆盖的宿主像素自然变化。
+> **职责**: 在悬停时展示简短说明，支持位置避让与连续切换动效，适合图标按钮和需要补充解释的内容。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在悬停时展示简短说明，支持位置避让与连续切换动效，适合图标按钮和需要补充解释的内容。
 
-## 组件特有属性 (Component-Specific Props)
+## 使用选择
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| position | 'top'\|'bottom'\|'left'\|'right' | 'top' | 首选弹出方向；空间不足时按视口安全区自动翻转或平移，以最终方向定位和进入 |
-| open | boolean | undefined | 可绑定的受控显示状态；未传入时使用父级触发器 hover 与共享 Portal，显式 true / false 时由调用方控制独立 Portal，不参与 hover 延迟与速度采样 |
-| maxWidth | number | 360 | 气泡最大外框宽度（px）；仍受当前可视区域四边 16px 安全区限制 |
-| offset | number | 4 | 沿弹出方向与触发器的目标间距，单位 px；最终仍受视口碰撞约束 |
-| variant | 'dark'\|'light' | 'light' | Tooltip 外观变体，默认 light，可显式切换为 dark |
-| dismissOnMotion | boolean | true | 非受控 hover 模式下，触发元素或其祖先开始动效，或后代开始几何 transition 时立即隐藏 Tooltip；后代装饰性 animation 不关闭 |
-| widthRebound | boolean | false | 连续切换时是否为外框宽度启用越界回弹；默认关闭，开启后宽度会越过目标再回弹 |
-| rapidRetarget | boolean | true | 连续动效进行中再次切换目标时，是否选用 90–160ms cubic ease-out 快速基线；关闭后选用普通 120–180ms 协调基线；两者均可根据有效鼠标速度缩短至最低 60ms |
-| children | Snippet | — | 提示内容，无参数；支持文本或公开组件组合。不提供时读取父级触发元素的文本；Tooltip 本身不包裹触发器，而是放在触发元素内 |
+<!-- usage-guide:start -->
+用于为现有控件提供简短补充提示。主要内容不能只放在 Tooltip；交互表单、菜单或复杂内容优先 Popover / Dialog。
 
-## 关键字 (Keyword)
+- 放在触发元素内，不包裹触发器；未提供 children 时读取触发元素文字。
+- open 未传时由 hover 触发；显式 true / false 时由页面控制。主要内容和必要操作不能只藏在提示中。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Tooltip, Button } from '@snowui-design-system/components';
+</script>
+
+<div style="display: flex; align-items: center; gap: var(--gap-4) var(--gap-3); flex-wrap: wrap;">
+	<Button>
+		Source
+		<Tooltip as="tooltip" position="top">Open the component source file on GitHub.</Tooltip>
+	</Button>
+	<Button>
+		Figma
+		<Tooltip as="tooltip" position="top">Inspect the component and its variants in the SnowUI library.</Tooltip>
+	</Button>
+	<Button>
+		Copy import
+		<Tooltip as="tooltip" position="top">Copy the public package import statement.</Tooltip>
+	</Button>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| position | `"top" \| "bottom" \| "left" \| "right"` | `"top"` | 首选弹出方向；空间不足时按视口安全区自动翻转或平移，以最终方向定位和进入 |
+| open | `boolean` | — | 可绑定的受控显示状态；未传入时使用父级触发器 hover 与共享 Portal，显式 true / false 时由调用方控制独立 Portal，不参与 hover 延迟与速度采样 |
+| offset | `number` | `4` | 沿弹出方向与触发器的目标间距，单位 px；最终仍受视口碰撞约束 |
+| maxWidth | `number` | `360` | 气泡最大外框宽度（px）；仍受当前可视区域四边 16px 安全区限制 |
+| variant | `"dark" \| "light"` | `"light"` | Tooltip 外观变体，默认 light，可显式切换为 dark |
+| dismissOnMotion | `boolean` | `true` | 非受控 hover 模式下，触发元素或其祖先开始动效，或后代开始几何 transition 时立即隐藏 Tooltip；后代装饰性 animation 不关闭 |
+| widthRebound | `boolean` | `false` | 连续切换时是否为外框宽度启用越界回弹；默认关闭，开启后宽度会越过目标再回弹 |
+| rapidRetarget | `boolean` | `true` | 连续动效进行中再次切换目标时，是否选用 90–160ms cubic ease-out 快速基线；关闭后选用普通 120–180ms 协调基线；两者均可根据有效鼠标速度缩短至最低 60ms |
+| children | `Snippet` | — | 提示内容，无参数；支持文本或公开组件组合。不提供时读取父级触发元素的文本；Tooltip 本身不包裹触发器，而是放在触发元素内 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="关键字-keyword"></a>
+
+### 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| position | `'top' \| 'bottom' \| 'left' \| 'right'` | `'top'` | 弹出位置 |
 | as | `'tooltip'` | - | 角色化：作为父组件的提示层 |
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <!-- 基础使用 (父元素为触发器) -->
@@ -53,7 +94,9 @@
 </Text>
 ```
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
@@ -75,7 +118,9 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 | `--snowui-tooltip-font-size` | `var(--text-12)` | 提示文字字号 |
 | `--snowui-tooltip-line-height` | `var(--leading-12)` | 提示文字行高 |
 
-## 智能行为
+<a id="智能行为"></a>
+
+### 智能行为
 
 1. **hover 延迟**: 首次 hover 延迟 `450ms` 显示；Tooltip 成功显示后，在 `300ms` cooldown 窗口内进入其他 Tooltip 时立即切换，不增加固定意图延迟。
 2. **OSS 共享外框**: 非受控 hover 模式始终复用页面级 Portal。离开当前触发器后的外框保留窗口与 `300ms` skip-delay 一致；窗口内进入另一个 Tooltip 时取消隐藏，不重新播放出现动效。warm 切换的新内容提交后立即读取一次真实 Snippet 尺寸并定位，连续时间线在首个可用绘制帧进入 moving；后续内容尺寸变化仍由共享 ResizeObserver 合帧处理。
@@ -91,7 +136,7 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 12. **交互宿主解析**: Tooltip 直接放在 Link / Button 的内部包装层时，以最近的 `a` / `button` / `role="link"` / `role="button"` 祖先作为 hover 命中与定位触发器；无交互祖先时保持以 Tooltip 的直接父元素为触发器。因此组件内部 label 在折叠态变为零宽或隐藏时，可见主操作仍保留完整 Tooltip 命中区。
 13. **多实例性能边界**: 非受控 Tooltip 实例只保留各自触发器的 enter / leave 监听。页面级 Overlay store 响应、动效关闭注册、`prefers-reduced-motion` 查询和 window scroll / resize 定位监听只由唯一共享 Portal host 承担；只有当前可见的受控 Tooltip 会额外注册自身定位监听。scroll、resize 与尺寸测量引起的重复定位请求通过 `requestAnimationFrame` 合并，每帧最多执行一次布局读取。
 
-## 样式逻辑（实现对照）
+<a id="样式逻辑实现对照"></a>
 
 ### 1) 气泡基础布局
 - 渲染层通过 Portal 挂载到 `document.body`，定位方式为 `position: fixed`。
@@ -144,9 +189,21 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+### 样式逻辑（实现对照）
+
+
+**能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
+
+> **实现**: Tooltip 使用 Portal 模式渲染到 `document.body`；OSS 默认包含 hover / skip-delay、视口边缘碰撞避让、生命周期动效，以及页面级共享 Portal 的连续切换。近距离切换时，单一圆角外框沿任意二维方向移动并同步改变宽高。两个目标 Tooltip 的矩形最短距离不超过 `4px` 时，旧、新内容按各自真实 Snippet 边界沿移动方向以 `16px` 间距拼接，外框与内容带同帧进入有界协调时间线。light 外观保留透明 Black/4 与背景模糊，最终颜色会随被覆盖的宿主像素自然变化。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -159,7 +216,9 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.24.1 (2026-09-21)
 - 普通切换改用立即起步的 cubic ease-out，基线收紧到 120–180ms，内容滞后减至 0.02；速度适配下限降至 60ms，收尾余量降至 20ms。

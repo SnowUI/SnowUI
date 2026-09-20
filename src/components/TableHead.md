@@ -1,15 +1,72 @@
 # TableHead
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
-
-> `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
+> **版本**: v2.3.0
+> **职责**: 定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。
 
-## 内置组件双模式
+## 使用选择
+
+<!-- usage-guide:start -->
+作为表头行的标题单元格。DataTable 协调数据排序；列宽调整与数据排序是两项独立能力，不把 resizable 当成 sortable。
+
+- columnId 对齐列；resizable 控制调宽，排序状态通过独立 sortDirection / onSortChange 表达。
+- selection 角色使用 DataTable 的全选控件；parts 配置默认 Indicator / Checkbox，显式标题自行配置。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { TableHead, Table, TableHeader, TableRow, TableBody, TableCell, Button } from '@snowui-design-system/components';
+</script>
+
+<Table ariaLabel="Recently updated component documentation" minWidth={560}>
+	<TableHeader><TableRow>
+		<TableHead columnId="component">Component</TableHead>
+		<TableHead columnId="updated" defaultSort="descending" defaultSortActive>Updated</TableHead>
+		<TableHead columnId="coverage" align="end" resizable={false}>API coverage</TableHead>
+	</TableRow></TableHeader>
+	<TableBody>
+		<TableRow rowId="dialog"><TableCell columnId="component">Dialog</TableCell><TableCell columnId="updated">2026-08-28</TableCell><TableCell columnId="coverage" align="end">100%</TableCell></TableRow>
+		<TableRow rowId="table"><TableCell columnId="component">Table</TableCell><TableCell columnId="updated">2026-08-27</TableCell><TableCell columnId="coverage" align="end">96%</TableCell></TableRow>
+	</TableBody>
+</Table>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| columnId | `string` | — | 稳定列标识；角色列使用内置标识 默认行为：普通列必填。 |
+| label | `string` | — | 注册给 TableToolbar 排序 Listbox 的可读列名 默认行为：columnId。 |
+| sortDirection | `"ascending" \| "descending"` | — | 独立受控排序方向 默认行为：context 推导。 |
+| defaultSort | `"ascending" \| "descending"` | — | 声明表格默认按当前列的正序或反序排列；同时使当前列可排序 |
+| defaultSortActive | `boolean` | `false` | 使 `defaultSort` 的默认方向也显示激活态和图标，并将交互循环扩展为可取消排序 |
+| roleLayout | `TableRoleLayout` | — | 覆盖当前角色表头的角色列布局；普通表头忽略 默认行为：Table context。 |
+| onSortChange | `(direction: "ascending" \| "descending" \| undefined) => void` | — | 独立使用时的三态排序回调 |
+| resizable | `boolean` | — | 是否显示列宽手柄；显式设置优先于上下文默认值 默认行为：Table：`false`；DataTable：`true`。 |
+| minWidth | `number` | `64` | 列宽调节的下限，单位 CSS px；仅在列宽调节能力启用时参与夹取。 |
+| maxWidth | `number` | `Infinity` | 列宽调节的上限，单位 CSS px；默认 Infinity 表示不额外限制。 |
+| align | `"start" \| "center" \| "end"` | `"start"` | 表头内容对齐：start 为起始侧，center 居中，end 为末端；不改变数据排序。 |
+| children | `Snippet` | — | 表头标题内容，无参数；可排序时放入内置排序按钮，selection 角色由内置全选控件承担。 |
+| parts | `ComponentPartsOf<{ Indicator: typeof Indicator; Checkbox: typeof Checkbox; }>` | — | 配置内置列宽 Indicator 与全选 Checkbox；不配置显式子内容。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="内置组件双模式"></a>
+
+### 内置组件双模式
 
 - `parts.Indicator`：统一配置 resize Indicator。
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
@@ -21,14 +78,6 @@
 | 属性 | 类型 | 默认值 | 说明 |
 | :--- | :--- | :--- | :--- |
 | as | `selection \| actions` | - | 显式角色列；角色列不参与排序与列宽拖动 |
-| columnId | `string` | 普通列必填 | 稳定列标识；角色列使用内置标识 |
-| label | `string` | `columnId` | 注册给 TableToolbar 排序 Listbox 的可读列名 |
-| sortDirection | `ascending \| descending` | context 推导 | 独立受控排序方向 |
-| defaultSort | `ascending \| descending` | - | 声明表格默认按当前列的正序或反序排列；同时使当前列可排序 |
-| defaultSortActive | `boolean` | `false` | 使 `defaultSort` 的默认方向也显示激活态和图标，并将交互循环扩展为可取消排序 |
-| roleLayout | `column \| overlay` | Table context | 覆盖当前角色表头的角色列布局；普通表头忽略 |
-| onSortChange | `(direction) => void` | - | 独立使用时的三态排序回调 |
-| resizable | `boolean` | Table：`false`；DataTable：`true` | 是否显示列宽手柄；显式设置优先于上下文默认值 |
 | minWidth / maxWidth | `number` | `64 / Infinity` | 拖动约束 |
 
 排序状态同步到 `aria-sort`。**只有 DataTable `defaultSort` 命中列的默认方向不显示激活态或图标**（`defaultSortActive` 可覆写）；其他已排序状态显示对应图标。图标遵循主流前端表格的“数值方向”语义：ascending（A→Z、0→9、早→晚）显示内置 `ArrowsUp`；descending（Z→A、9→0、晚→早）显示内置 `ArrowsDown`。图标尺寸为 16px，与文字间距为 0。
@@ -48,14 +97,18 @@
 
 未声明任何 `defaultSort` 时，TableHead 不会把第一列视为隐式默认排序列。当所有列均未激活排序时，DataTable 保留上层传入的 rows / filteredRows 顺序。
 
-## 双击列宽手柄
+<a id="双击列宽手柄"></a>
+
+### 双击列宽手柄
 
 - 默认单行列双击 Indicator：按当前已渲染行与表头的最宽内容设置最佳宽度（Hug 内容），包含图标、gap、左右 padding，并为排序图标保留空间；不扫描未加载的服务端数据。
 - 同列任一单元格显式 `nowrap={false}` 时，双击恢复首次拖动前的默认宽度；默认值优先为外部 columnWidths，其次初次布局实测宽度，避免长文本被无限展开。
 - 结果限制在 `minWidth` / `maxWidth` 内，保留其他列宽。按现有 `columnWidths` 绑定与变更回调同步；必要时由表格内部横向滚动承载。
 - 双击不触发排序；`resizable={false}` 的列不提供此操作。连续双击单行列会根据当前页内容重新测量；换行列保持恢复同一初始基准。重新挂载 Table 后重新建立基准。
 
-## 角色列
+<a id="角色列"></a>
+
+### 角色列
 
 - `as="selection"`：渲染内置全选 Checkbox。Checkbox 距角色列左边缘 8px，仅在鼠标进入 Table 区域或键盘焦点进入 Table 时显示；部分选中时使用 indeterminate。该列 padding 为 `8px 0 8px 8px`。
 - `as="actions"`：默认无标题且不渲染任何业务按钮；传入 children 时可显示自定义标题。该列 padding 为 `8px 8px 8px 0`。
@@ -67,7 +120,9 @@
 
 渐隐采样代理仅在紧邻 selection/actions 角色列的数据表头参与布局；其他列的代理不生成布局盒，避免锁定列宽或增量加载后不可见遮罩制造横向滚动。采样宽度来自角色覆盖宽度，不使用普通数据列宽。
 
-## 排序类型决策
+<a id="排序类型决策"></a>
+
+### 排序类型决策
 
 TableHead **不声明内容类别**，也不公开 `sortType="text | number | date"`。DataTable 根据行数据的原始字段自动比较：
 
@@ -79,7 +134,9 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 这样可避免把格式化文案（例如 `Just now`、`$1,299`）当作数据排序，也避免页面重复声明数据层已经知道的类型。
 
-## 默认排序声明
+<a id="默认排序声明"></a>
+
+### 默认排序声明
 
 默认排序由对应列头直接声明：
 
@@ -103,13 +160,14 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 `defaultSortActive` 不是纯视觉开关。开启后交互循环改为“默认（激活） → 反向（激活） → 无排序 → 默认（激活）”。
 
-## Keyword
+<a id="keyword"></a>
+
+### Keyword
 
 | Keyword | 说明 |
 | :--- | :--- |
 | component | 当前组件公开契约 |
 
-> **以下内容供 AI 阅读，不展示在文档站点**
 
 - 排序与列宽都通过 Table context 协调，不在组件内保存业务 Store。
 - DataTable 下 `as="selection"` / `as="actions"` 受 Context `isSelectionEnabled` / `isActionsEnabled` 控制；关闭时整列不渲染。
@@ -117,7 +175,18 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 - 所有表头单元格与数据行使用相同的响应式左右 padding，范围为 2px 到 12px。
 - `resizable` 使用通用 Indicator；命中带沿用 line 全高协议（表头单元格右缘全高）；常态视觉线为 **1px × 16px**、贴列右缘、垂直居中（TableHead 覆盖 `.snowui-indicator-visual`）；进入命中带时加粗到 2px。
 
-## Changelog
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
+> `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
+
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 2026-09-01：v2.3.0，未显式固定列宽时，表头不换行 min-content 参与 Table 自动总最小宽度。
 - 2026-09-01：v2.2.1，表头跟随 Table 新响应曲线，在常见窄屏容器收敛到每侧 2px，并明确相邻列最小视觉间距为 4px。

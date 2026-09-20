@@ -1,23 +1,70 @@
-# Text 组件文档
+# Text
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+> **版本**: v3.5.2
+> **职责**: 统一展示文本，支持排版与截断，适合正文、标签和受限空间中的信息表达。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 统一展示文本，支持排版与截断，适合正文、标签和受限空间中的信息表达。
 
-## 内置组件双模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于文本语义、截断、展开和提示。默认不启用 hover 动效；静态普通文字可使用语义 HTML，动态数值或文字过渡按动效组件选择。
+
+- tag 指定文本语义，lines 控制截断，more / tooltip 提供展开与补充提示。
+- 默认不启动 hover 交互；stateText 可按状态替换文字，parts 配置默认 Button / Tooltip。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Text, Button, Frame } from '@snowui-design-system/components';
+</script>
+
+<div style="width: min(100%, 24rem); min-width: 0;">
+	<Text lines={1} tooltip style="font-size: var(--text-14); line-height: var(--leading-14); width: 100%;">Design system documentation — component behavior, accessibility, and release notes</Text>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| tag | `string` | — | 根节点标签。 默认行为：span。 |
+| stateText | `StateValueMap<string \| number>` | — | 根据最近父级 Frame 的 `currentState` 渲染文本；未命中当前状态时回退 `Idle`，再回退 children。 |
+| interactive | `boolean` | `false` | 是否启用 Text hover 动效；显式传 `true` 时开启，默认关闭。 |
+| lines | `0 \| 1 \| 2 \| 3` | — | 文本截断模式：`0`=可展开，`1/2/3`=固定行数。 |
+| more | `boolean` | `false` | `lines=0` 时生成内置展开 Button；默认样式为示例 6 的 ArrowLineDown 按钮。 |
+| tooltip | `TooltipProp` | — | Tooltip 配置。支持自动推导、固定文本、Snippet，或传对象仅覆写 Tooltip 位置/偏移等配置。 |
+| onTruncate | `(isTruncated: boolean) => void` | — | 截断状态变化回调。 |
+| children | `Snippet<[any]>` | — | 默认文字或自定义内容，接收含 breakpoint 的渲染上下文；stateText 命中时以对应状态文本替代。 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Tooltip: typeof Tooltip; }>` | — | 配置内置 Button 与 Tooltip。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="内置组件双模式"></a>
+
+### 内置组件双模式
 
 - `parts.Button`：配置 `lines=0 + more` 生成的内置展开按钮。
 - `parts.Tooltip`：配置截断时内置 Tooltip。
 - 外置 Tooltip 或其他 children 不受 Text 私有 DOM 选择器控制。
 
 > **版本**: v3.5.2
-> **变更记录 (2026-08-15)**: `p / h1…h6` 语义宿主显式启用长词换行保护，不依赖可选 `snowui-base.css`；`tag="code"` 仍按契约允许消费应用级 code 初始化。
-> **变更记录 (2026-05-18)**: 新增 `stateText`，支持读取父 Frame `currentState` 后声明式切换文本。
-> **变更记录 (2026-04-28)**: 标注主布局模型为文本流布局；Text hover 位移改为 transform 变量，不再通过 margin 改变文本流外部间距。
-> **变更记录 (2026-03-16)**: 按需求将 Text 自带 hover 态改为默认关闭，显式传入 `interactive={true}` 才开启。
+> **更新日志 (2026-08-15)**: `p / h1…h6` 语义宿主显式启用长词换行保护，不依赖可选 `snowui-base.css`；`tag="code"` 仍按契约允许消费应用级 code 初始化。
+> **更新日志 (2026-05-18)**: 新增 `stateText`，支持读取父 Frame `currentState` 后声明式切换文本。
+> **更新日志 (2026-04-28)**: 标注主布局模型为文本流布局；Text hover 位移改为 transform 变量，不再通过 margin 改变文本流外部间距。
+> **更新日志 (2026-03-16)**: 按需求将 Text 自带 hover 态改为默认关闭，显式传入 `interactive={true}` 才开启。
 > **职责**: 智能文本显示与截断组件。
 
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式、形态等)。
@@ -26,7 +73,9 @@
 
 未声明 `lines` 时，截断控制器保持休眠，不读取文本、不排队 rAF，也不登记 MutationObserver / ResizeObserver；动态设置 `lines` 后再按既有协议激活，不改变默认文本视觉。
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：文本流布局。
 
@@ -35,7 +84,8 @@
 - `<Tooltip as="tooltip">` 与 `<Button as="more">` 是 Text 内的角色子项：Tooltip 负责截断提示，Button 仍按 Button 的内联外壳布局渲染。
 - Text 不使用 padding/gap 管理内部排列，也不通过 margin 改变外部文本流间距；交互位移只能走 transform 变量。
 
-## 1. 用户区域 (User Zone)
+<a id="1-用户区域-user-zone"></a>
+
 
 ### 1.1 功能概览
 
@@ -52,14 +102,6 @@
 
 | Keyword | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **tag** | `string` | `span` | 根节点标签。 |
-| **stateText** | `Partial<Record<CoreState, string \| number>>` | `undefined` | 根据最近父级 Frame 的 `currentState` 渲染文本；未命中当前状态时回退 `Idle`，再回退 children。 |
-| **interactive** | `boolean` | `false` | 是否启用 Text hover 动效；显式传 `true` 时开启，默认关闭。 |
-| **lines** | `0 \| 1 \| 2 \| 3` | `undefined` | 文本截断模式：`0`=可展开，`1/2/3`=固定行数。 |
-| **more** | `boolean` | `false` | `lines=0` 时生成内置展开 Button；默认样式为示例 6 的 ArrowLineDown 按钮。 |
-| **parts** | `{ Button?; Tooltip? }` | `undefined` | 配置内置 Button 与 Tooltip。 |
-| **tooltip** | `boolean \| string \| Snippet \| Record<string, any>` | `undefined` | Tooltip 配置。支持自动推导、固定文本、Snippet，或传对象仅覆写 Tooltip 位置/偏移等配置。 |
-| **onTruncate** | `(isTruncated: boolean) => void` | `undefined` | 截断状态变化回调。 |
 | **variants** | `object` | `undefined` | 样式变体配置 (供 Layout 使用)。 |
 
 ### `stateText` 解析规则
@@ -138,7 +180,6 @@
 ```
 
 
-### 样式规范 (Style Spec)
 
 #### 1. 基础样式
 
@@ -171,21 +212,6 @@
 | `.snowui-text-hover-enabled:hover:not(.snowui-disabled):not(:disabled)` | Hover 位移变量 | `--snowui-text-hover-shift-x: 0.285em` |
 | `.snowui-text-hover-enabled:hover:not(.snowui-disabled):not(:disabled)` | Cursor | `default` (不强制 pointer) |
 
-#### 4. 基础动效链路 (Parallax + State)
-
-```css
-transform: translate(
-  calc(var(--snowui-parallax-x, 0px) + var(--snowui-text-hover-shift-x, 0px)),
-  var(--snowui-parallax-y, 0px)
-) scale(var(--snowui-parallax-scale, 1));
-opacity: var(
-  --snowui-button-group-content-opacity,
-  var(--snowui-state-opacity, var(--snowui-parallax-opacity, 1))
-);
-```
-
-说明：基础层只保留 `transform/opacity` 链路；真正的 hover 过渡由 `.snowui-text-hover-enabled` 以显式属性列表注入，避免 `transition: all` 抢占 Frame 默认动效。`--snowui-button-group-content-opacity` 仅由 disabled ButtonGroup 的嵌入态内容提供，用于避免外壳与内部 Text 重复衰减。
-
 #### 5. 截断与可展开样式 (lines=0/2/3)
 
 | Selector | 作用 |
@@ -204,9 +230,32 @@ opacity: var(
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+#### 4. 基础动效链路 (Parallax + State)
+
+```css
+transform: translate(
+  calc(var(--snowui-parallax-x, 0px) + var(--snowui-text-hover-shift-x, 0px)),
+  var(--snowui-parallax-y, 0px)
+) scale(var(--snowui-parallax-scale, 1));
+opacity: var(
+  --snowui-button-group-content-opacity,
+  var(--snowui-state-opacity, var(--snowui-parallax-opacity, 1))
+);
+```
+
+说明：基础层只保留 `transform/opacity` 链路；真正的 hover 过渡由 `.snowui-text-hover-enabled` 以显式属性列表注入，避免 `transition: all` 抢占 Frame 默认动效。`--snowui-button-group-content-opacity` 仅由 disabled ButtonGroup 的嵌入态内容提供，用于避免外壳与内部 Text 重复衰减。
+
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 - **Implementation**: [Text.svelte](./Text.svelte)
 - **Core Logic**:
@@ -268,7 +317,9 @@ graph TD
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v3.5.2 (2026-08-15)
 
@@ -294,7 +345,7 @@ graph TD
 - **TX-Fix.61** 修复多行宿主仍被 `.snowui-text-inline-block` 覆盖的问题，确保 `lines={2|3}` 根节点使用 block 布局，不再产生 inline baseline 底部留白；同时将 collapse 的高度样式写入真实的多行内容层，避免根层与内容层之间形成高度反馈循环。
 - **TX-Test.59** 示例 4 改用 `tooltip="完整内容…"` 配置，避免子 Tooltip 与 Text 自动 Tooltip 重复注册共享浮层，恢复 mouseleave 自动关闭。
 - **TX-Fix.56** Text 基础 opacity 链新增 ButtonGroup 局部内容透明度桥接，确保 disabled ButtonGroup 只由外壳统一应用一次 `opacity: 0.2`。
-- **Text-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- **Text-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 - **TX-Adjust.55** `Button as="more"` 的展开操作改为组件内聚：示例层不再传 `Click.run` 修改宿主高度；只要按钮位于 `Text lines={0}` 内容中并声明 `as="more"`，即可通过 Text 内部 context 触发展开动画与按钮隐藏。
 - **TX-Adjust.54** `Button as="more"` 触发展开时新增宿主高度动效：参考 Accordion 内容区的 size motion，从当前高度过渡到完整内容高度；动画期间保持收起态与 more 按钮可见，结束后再切换 expanded 并隐藏按钮，避免示例层直接设置 `height:auto` 抢掉动画起点。
 - **TX-Adjust.53** `Button as="more"` 的定位改为自动布局 Pin：Button 仍声明在 Text 内容中，内部翻译为 `pin-bottom-right`，Text 挂载后将按钮提升到根层避开内容 mask，并在展开 / 未截断时隐藏。

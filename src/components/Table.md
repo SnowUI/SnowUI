@@ -1,15 +1,81 @@
-# Table（语义表格）
+# Table
 
 > **版本**: v2.5.2
-> **职责**: 提供 OSS 原生表格语义、自动固有列宽、局部横向滚动与加载展示。
-
-Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
+> **职责**: 以语义化表格展示结构化数据，支持自适应列宽、局部横向滚动与加载状态，可自由组合表头和单元格。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 以语义化表格展示结构化数据，支持自适应列宽、局部横向滚动与加载状态，可自由组合表头和单元格。
 
-## OSS Table 与 PRO DataTable 的边界
+## 使用选择
+
+<!-- usage-guide:start -->
+用于纯展示结构化数据，并组合 TableHeader、TableBody、TableRow、TableHead、TableCell。出现搜索、排序、勾选、操作列或分页时由 PRO DataTable 协调，不在普通 Table 外复制数据管理行为。
+
+- 通过 TableHeader / TableBody / TableRow 等保持合法表格层级。
+- columnWidths 保存列宽，columnId 对齐同一列；数据查询、选择、分页交给 DataTable。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Table, Chip, Button, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@snowui-design-system/components';
+	const invoices = [
+	  { id: "INV-1048", customer: "Linear", status: "Paid", amount: "$240.00", note: "Design system subscription" },
+	  { id: "INV-1047", customer: "Figma", status: "Paid", amount: "$120.00", note: "Additional seats for the product team" },
+	  { id: "INV-1046", customer: "Notion", status: "Pending", amount: "$360.00", note: "Annual subscription, awaiting approval" },
+	  { id: "INV-1045", customer: "Vercel", status: "Paid", amount: "$180.00", note: "Component library subscription" },
+	  { id: "INV-1044", customer: "Framer", status: "Overdue", amount: "$90.00", note: "Payment reminder sent" },
+	];
+</script>
+
+<Table ariaLabel="Sample invoices">
+  <TableHeader>
+    <TableRow>
+      <TableHead columnId="invoice">Invoice</TableHead>
+      <TableHead columnId="customer">Customer</TableHead>
+      <TableHead columnId="status">Status</TableHead>
+      <TableHead columnId="amount" align="end">Amount</TableHead>
+    </TableRow>
+  </TableHeader>
+  <TableBody>
+    {#each invoices as invoice (invoice.id)}
+      <TableRow rowId={invoice.id}>
+        <TableCell columnId="invoice">{invoice.id}</TableCell>
+        <TableCell columnId="customer">{invoice.customer}</TableCell>
+        <TableCell columnId="status"><Chip variant="background" style={`color: ${invoice.status === "Paid" ? "var(--secondary-green)" : invoice.status === "Pending" ? "var(--secondary-orange)" : "var(--secondary-red)"};`}>{invoice.status}</Chip></TableCell>
+        <TableCell columnId="amount" align="end">{invoice.amount}</TableCell>
+      </TableRow>
+    {/each}
+  </TableBody>
+</Table>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| columnWidths | `Record<string, number>` | `{}` | 受控列宽，可 `bind:` |
+| minWidth | `number \| string` | — | 显式扩大表格最小宽度；未设置时由各列 min-content + Cell padding 自动汇总，溢出由 Table 内置局部横向 viewport 承接 |
+| ariaLabel | `string` | — | 表格无障碍名称 |
+| loadingSpinnerSize | `ResourceSize` | `16` | 已有数据继续加载时，表体末尾居中 Spinner 的尺寸 |
+| onColumnWidthsChange | `(widths: Record<string, number>) => void` | — | 拖动列宽后的完整快照 |
+| children | `Snippet` | — | 语义表格内容，无参数；组合 TableHeader / TableBody，数据管理由外层 DataTable 提供。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="oss-table-与-pro-datatable-的边界"></a>
+
+### OSS Table 与 PRO DataTable 的边界
 
 普通 OSS `Table` 是纯数据展示组件：只负责以原生表格语义渲染表头和数据行。普通表格不提供加载更多、checkbox 选择列、按钮操作列、排序、筛选、分页或搜索。
 
@@ -27,7 +93,9 @@ Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、
 
 首次加载 Skeleton 与已有数据加载 Spinner 是 Table 的加载**展示协议**，不包含请求、加载更多、分页或其他数据管理逻辑；这些状态由调用方显式传入，或由 PRO DataTable 协调。
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**复合管理布局**。
 
@@ -68,7 +136,9 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 角色列布局：默认 `roleLayout="column"` 时，selection/actions 作为普通窄列参与表格列宽；`roleLayout="overlay"` 时，角色单元格仍保留合法 table DOM，但自身宽度归零并 sticky 到表格左右边缘，内容以覆盖块浮在表格行之上。覆盖块使用左右方向相反的横向交叠 blur strip 柔化后方内容：selection 从左向右透明，actions 从右向左透明；blur layer 常驻，控件自身独立淡入淡出，避免 hover 时重建模糊层。
 
-### Overlay selection 技术实现
+### 在 DataTable 中的选择与覆盖布局
+
+本节描述 DataTable 协调下的组合行为。`roleLayout`、`roleOverlayLayers`、`roleOverlayBlurMode`、`roleOverlayUniformFeather` 与 `selectedRowIds` 均传给外层 DataTable，不能传给 OSS Table。
 
 `roleLayout="overlay"` 的数据行 selection 采用“合法 table 单元格 + fixed 覆盖块”的两层结构：
 
@@ -76,9 +146,9 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 - 单元格内部的 `.snowui-table-selection-control` 通过 `getBoundingClientRect()` 读取当前 `tr` 的屏幕位置，在 scroll / resize / row resize 时同步为 `position: fixed`。selection 覆盖块固定到行左侧，宽度为 `--size-8`（32px），高度等于当前行高度，`z-index` 设为最高层，保证压在第一列真实内容之上。
 - Checkbox 和 `.snowui-table-role-blur-layer` 位于同一个 `.snowui-table-selection-control` 容器内。Checkbox 作为真实交互控件保留在最上层；blur layer 使用 `aria-hidden` 且 `pointer-events: none`，只承担视觉效果，不参与点击命中。
 - 渐进式模糊复用 `components/src/lib/progressive-blur.ts`。selection 方向为 left-to-right：左侧强模糊，向右逐渐清晰；actions 方向相反。Table Demo 中的控制条通过 `--snowui-table-role-overlay-blur-override` 和 `--snowui-table-role-overlay-width-override` 修改最大 blur 半径和可见宽度。
-- 模糊层数与模糊模式由 `roleOverlayLayers` 和 `roleOverlayBlurMode` 两个 Table 属性统一控制，并通过 Table context 下发给同一个表格内的 selection / actions 角色块（表头 TableHead 与数据单元格 TableCell 共用同一控制器，无需逐处传参）。`roleOverlayLayers` 决定渐进式模糊叠加的层数（层数越多强度过渡越平滑）；`roleOverlayBlurMode="uniform"` 时改用 `createUniformBlurStyles` 渲染单层、固定强度的普通背景模糊，便于和渐进式模糊做 A/B 对比。`uniform` 模式下可再用 `roleOverlayUniformFeather`（0~1）给模糊块内侧边缘加渐变 mask，柔化硬边界。
+- 模糊层数与模糊模式由 `roleOverlayLayers` 和 `roleOverlayBlurMode` 两个 DataTable 属性统一控制，并通过 Table context 下发给同一个表格内的 selection / actions 角色块（表头 TableHead 与数据单元格 TableCell 共用同一控制器，无需逐处传参）。`roleOverlayLayers` 决定渐进式模糊叠加的层数（层数越多强度过渡越平滑）；`roleOverlayBlurMode="uniform"` 时改用 `createUniformBlurStyles` 渲染单层、固定强度的普通背景模糊，便于和渐进式模糊做 A/B 对比。`uniform` 模式下可再用 `roleOverlayUniformFeather`（0~1）给模糊块内侧边缘加渐变 mask，柔化硬边界。
 - 角色块模糊层底色固定为白色（`white/100%`）；其叠加强度（透明度）由 CSS 变量 `--snowui-table-role-overlay-tint-opacity-override`（默认 `0%`，即不可见）控制，可用于在 `uniform` 背景模糊上叠加一层可调透明度的白色磨砂质感。`0%` 时层为全透明，仅有 `backdrop-filter` 模糊；`100%` 时为不透明白块。
-- Table 位于 DataTable 内时会向父级共享当前 `selectedRowIds` 与清除选择能力，供内置 TableToolbar 自动显示批量操作；页面无需重复传递 `selectedCount` / `onClearSelection`。
+- DataTable 持有 `selectedRowIds` 与清除选择能力，并通过 Context 共享，供内置 TableToolbar 自动显示批量操作；页面无需重复传递 `selectedCount` / `onClearSelection`。
 - `.snowui-table-role-blur-layer` 默认隐藏，只在行 hover、focus-within 或已选中时显示。这样未交互状态不会额外绘制 blur，选中后 Checkbox 与模糊状态保持可见。
 - 不要把第一列内容通过 padding 推开；selection 必须覆盖在第一列之上。若使用方在单元格内容上额外提升 `z-index`，会导致第一列内容压过 Checkbox 和 blur，破坏 overlay 语义。
 
@@ -89,7 +159,7 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 - 点击单元格内的真实交互内容（`a`、`button`、`input`、`label`、`select`、`textarea`、`[role="button"]`、`[role="checkbox"]`）不会触发行选择。
 - 点击行内非交互空白区域会切换当前行选中态；再次点击取消选中。
 
-选择归属：Table 持有 `selectedRowIds`，TableRow 以 `rowId` 注册当前渲染行。表头全选只作用于当前已渲染的行（分页场景即当前页），跨页已选 id 会保留。
+选择归属：DataTable 持有 `selectedRowIds`，TableRow 以 `rowId` 注册当前渲染行。表头全选只作用于当前已渲染的行（分页场景即当前页），跨页已选 id 会保留。
 
 表头全选 Checkbox 的可见规则：仅在以下情况显示——①**hover 任意数据行**（`.snowui-table-viewport:has(.snowui-table-body .snowui-table-row:hover)`，与行内 Checkbox 同步出现）；②**hover 紧邻 selection 覆盖块的首个数据列表头**（overlay 下即 Date 列表头，`.snowui-table-head[data-as="selection"] + .snowui-table-head:hover`）；③**直接 hover / 键盘聚焦全选浮层自身**（保证指针从数据行上移到全选框时其仍可见、可点击）；④表格存在**选中态**（`data-selected="true"`）。hover 其他表头列（Stores、Subscriber 等）不会显示全选框。overlay 下全选容器恒为 `pointer-events:none`，仅其中的 Checkbox 子元素在触发时 `pointer-events:auto`。
 
@@ -160,19 +230,16 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 滚动归属：Table **自己创建唯一的局部横向 viewport**，并通过共享 `useOverlayScrollbar` 将同一条横向轨道 sticky 到当前页面视口底部。轨道只在表格固有最小宽度超过宿主时显示，表格离开视口或到达底端后收回表格边界。不把宽表宽度传播为页面最小宽度，不应再用外层 ScrollArea 包裹 Table，也不得创建第二条同步滚动条。`minWidth` 仍可进一步扩大表格的固有宽度。Table / DataTable 仍不创建纵向滚动容器。吸底轨道必须高于 table 内容层；即使 `TableBody` 默认连续 Hover 将 table 提升为内容层，轨道仍完整接收 hover、pointer down 与拖动，不得由其下方的数据行截获。连续 Hover 层由局部横向 viewport 承载，其背景只绘制在当前可见的表格范围内，不得把隐藏列对应的背景泄露到 viewport 外。
 
-## API
+<a id="示例"></a>
 
-| 属性 | 类型 | 默认值 | 说明 |
-| :--- | :--- | :--- | :--- |
-| columnWidths | `Record<string, number>` | `{}` | 受控列宽，可 `bind:` |
-| minWidth | `number \| string` | - | 显式扩大表格最小宽度；未设置时由各列 min-content + Cell padding 自动汇总，溢出由 Table 内置局部横向 viewport 承接 |
-| onColumnWidthsChange | `(widths) => void` | - | 拖动列宽后的完整快照 |
-| ariaLabel | `string` | - | 表格无障碍名称 |
-| loadingSpinnerSize | `ResourceSize` | `16` | 已有数据继续加载时，表体末尾居中 Spinner 的尺寸 |
-
-## 示例
+### 示例
 
 ```svelte
+<script lang="ts">
+  import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@snowui-design-system/components';
+  let columnWidths = $state<Record<string, number>>({});
+</script>
+
 <Table bind:columnWidths minWidth={600}>
     <TableHeader><TableRow><TableHead columnId="name">名称</TableHead></TableRow></TableHeader>
     <TableBody><TableRow rowId="one"><TableCell columnId="name">一段很长的名称</TableCell></TableRow></TableBody>
@@ -181,7 +248,25 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hover 时首尾单元格会自动形成 12px 圆角。
 
-## 密集表格性能协议
+<a id="密集表格性能协议"></a>
+
+### Keyword
+
+| Keyword | 说明 |
+| :--- | :--- |
+| component | 当前组件公开契约 |
+
+
+- 保持合法 table DOM 树，不使用 div 模拟网格。
+- 排序状态由上层 DataTable 通过共享 context 提供。
+- 列宽持久化属于页面层，Table 只发出变化。
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 密集表格性能协议
 
 默认普通 `TableRow` / `TableCell` 在未声明高级 Frame 能力时使用等价的原生 `tr / td` 语义快路径，并保留既有 class、data state、样式、事件和无障碍语义。传入动效、响应式、Context、Scale Observer、parts 或其他 Frame 配置时自动回到完整 Frame 路径，公开能力不受限制。
 
@@ -191,19 +276,15 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 行动按钮（actions 列）被包裹在 `.snowui-table-role-overlay-controls` 容器内：表格的显隐渐变作用在这个**包裹层**的 `opacity` 上，而不是直接作用在按钮元素上。因此按钮自身的 `opacity`（次级操作应使用 `Button bare emphasis="muted"`，常态 40%、hover 100%）得以保留并与包裹层的渐变相乘，避免表格的 `opacity:1` 覆盖掉按钮自身的状态透明度导致图标按钮失去 hover 反馈。
 
-## Keyword
+<a id="keyword"></a>
 
-| Keyword | 说明 |
-| :--- | :--- |
-| component | 当前组件公开契约 |
 
-> **以下内容供 AI 阅读，不展示在文档站点**
 
-- 保持合法 table DOM 树，不使用 div 模拟网格。
-- 排序状态由上层 DataTable 通过共享 context 提供。
-- 列宽持久化属于页面层，Table 只发出变化。
+Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
 
-## Changelog
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 2026-09-02：v2.5.2，连续 Hover 层由 Table 局部横向 viewport 承载并裁切，宽表隐藏列不再把行背景绘制到当前可见边界之外。
 - 2026-09-01：v2.5.1，修复吸底横向滚动条与数据行重叠时无法操作的问题。根因是连续 Hover 将 table 提升至 `z-index: 1`，轨道仍处于默认层级；Table 现在固定让横向轨道处于内容层之上，并通过真实命中与拖动回归验证。

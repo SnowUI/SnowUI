@@ -1,16 +1,59 @@
 # ColorSchemeButton
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
-
 > **版本**: v1.0.2
-> **职责**: 以真实 Button 为宿主，在页面亮色与暗色方案之间切换。
+> **职责**: 在亮色与暗色主题之间切换，并以图标反馈当前方案，适合网站和应用的主题入口。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在亮色与暗色主题之间切换，并以图标反馈当前方案，适合网站和应用的主题入口。
 
-## 使用
+## 使用选择
+
+<!-- usage-guide:start -->
+用于切换浅色与深色方案。新代码使用此名称；ThemeButton 是兼容导出。设计风格切换使用 StyleButton。
+
+- 通过 `bind:scheme` 或 onSchemeChange 同步明暗状态，defaultScheme 提供默认方案。
+- 默认同步文档主题；局部控制设置 `applyToDocument={false}`。不提供 children 时使用纯图标布局。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { ColorSchemeButton } from '@snowui-design-system/components';
+</script>
+
+<ColorSchemeButton />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| scheme | `ColorScheme` | — | 当前配色方案，支持 bind:scheme。挂载时优先于 defaultScheme；点击更新该值，同步页面属性时也会跟随根节点变化。 |
+| defaultScheme | `ColorScheme` | — | 挂载时的非受控初值；scheme 优先。均未提供时读取页面根节点；applyToDocument=false 时回退为 light。 |
+| applyToDocument | `boolean` | `true` | 将当前状态同步到 document.documentElement：theme="dark"；亮色时移除 theme。false 时不读写或观察页面属性，由调用方处理主题目标；不写入 storage。 |
+| ariaLabel | `string` | — | 覆盖按钮的可访问名称；默认描述点击后切换到的状态，跟随 LocaleProvider。 |
+| lightIcon | `Snippet` | `—（内置图形）` | 替换当前为 light 时显示的 Sun 图标。仅改变图形，不接管切换逻辑。 |
+| darkIcon | `Snippet` | `—（内置图形）` | 替换当前为 dark 时显示的 Moon 图标。仅改变图形，不接管切换逻辑。 |
+| children | `Snippet` | — | 显示在状态图形之后的自定义内容；未提供时宿主 Button 自动使用 iconOnly 布局。 |
+| disabled | `boolean` | `false` | 禁用按钮操作；不会阻止外部绑定值或页面属性的同步。 |
+| onSchemeChange | `(scheme: ColorScheme) => void` | — | 用户点击切换后接收新值；初始化、外部赋值及页面属性观察同步不会调用此回调。 |
+| onclick | `(event: MouseEvent) => void` | — | 有效点击时先调用，再执行状态切换；当前实现不会以 preventDefault() 取消后续切换。disabled 时不调用。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="使用"></a>
+
+### 使用
 
 ```svelte
 <script lang="ts">
@@ -26,26 +69,21 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 
 点击后立即更新方案，不写入 storage；图标替换使用 150ms 动效，不对整页主题增加过渡。`applyToDocument={false}` 时组件只维护受控状态，适合由 Test、iframe 等宿主管理实际主题目标。
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| --- | --- | --- | --- |
-| `scheme` | `"light" \| "dark"` | — | 当前配色方案，支持 bind:scheme。挂载时优先于 defaultScheme；点击更新该值，同步页面属性时也会跟随根节点变化。 |
-| `defaultScheme` | `"light" \| "dark"` | — | 挂载时的非受控初值；scheme 优先。均未提供时读取页面根节点；applyToDocument=false 时回退为 light。 |
-| `applyToDocument` | `boolean` | `true` | 将当前状态同步到 document.documentElement：theme="dark"；亮色时移除 theme。false 时不读写或观察页面属性，由调用方处理主题目标；不写入 storage。 |
-| `ariaLabel` | `string` | —（本地化的下一步操作） | 覆盖按钮的可访问名称；默认描述点击后切换到的状态，跟随 LocaleProvider。 |
-| `lightIcon` | `Snippet` | —（内置图形） | 替换当前为 light 时显示的 Sun 图标。仅改变图形，不接管切换逻辑。 |
-| `darkIcon` | `Snippet` | —（内置图形） | 替换当前为 dark 时显示的 Moon 图标。仅改变图形，不接管切换逻辑。 |
-| `children` | `Snippet` | — | 显示在状态图形之后的自定义内容；未提供时宿主 Button 自动使用 iconOnly 布局。 |
-| `disabled` | `boolean` | `false` | 禁用按钮操作；不会阻止外部绑定值或页面属性的同步。 |
-| `onSchemeChange` | `(scheme: "light" \| "dark") => void` | — | 用户点击切换后接收新值；初始化、外部赋值及页面属性观察同步不会调用此回调。 |
-| `onclick` | `(event: MouseEvent) => void` | — | 有效点击时先调用，再执行状态切换；当前实现不会以 preventDefault() 取消后续切换。disabled 时不调用。 |
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 - 包归属：OSS；主布局模型为内联外壳布局。
 - 组合身份：Button 宿主组件特化，不提供 `parts.Button`。
@@ -53,7 +91,9 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 - 多实例通过观察根节点 `theme` 属性同步；`applyToDocument={false}` 时由受控 `scheme` 同步。
 - 状态切换不接入 replacement preset、CSS transition 或 View Transition。
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.0.2 (2026-09-02)
 

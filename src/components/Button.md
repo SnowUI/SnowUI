@@ -1,70 +1,84 @@
-# Button.svelte 文档
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+# Button
 
 > **版本**: v2.18.1
-> **变更记录 (2026-09-04)**: hover 改为标准高度反比补偿；默认 / sm 保持原效果，md / lg 的背景放大与 Borderless 隐藏起点同步减弱，点击继续缩回当前尺寸放大量的一半。计算规则见下文，具体数值以 preset catalog 为准。
-> **变更记录 (2026-08-27)**: 恢复 Owner 在 2026-08-19 确认的背景层比例放大方案：gray / filled / outline 从 `1` 放大到 `1.06`，Borderless 从隐藏的 `0.84` 背景显示并放大到 `1.06`，最终颜色保持 Light 4% / Dark 10%；文字、Icon、Spinner、命中区和布局不变。背景缩放使用 `BUTTON_HOVER_SCALE_UP_MOTION` 的 `200ms ease`，颜色使用通用 `150ms ease-out`。
-> **变更记录 (2026-08-19)**: Button hover 的背景颜色与背景外扩统一使用 `150ms ease-in-out`，进入和退出时同时开始、同时结束；固定 `1px` 外扩、radius 同步、内容与布局尺寸均不变。
-> **变更记录 (2026-08-19)**: Button 背景 inset 与 radius 的几何动效由 `200ms ease` 优化为 `150ms ease-in-out`，减少 filled 高对比边缘停留在亚像素重绘状态的时间，并缓和 hover 进入 / 退出首段的视觉抖动；固定 `1px` 外扩、radius 同步、`300ms ease-in-out` 颜色渐变、内容与布局尺寸均不变。
-> **变更记录 (2026-08-19)**: Button 的独立 hover 背景每边外扩 `1px` 时，背景圆角半径同步增加 `1px`，并与 inset 共用当前 `150ms ease-in-out` 几何动效。该规则同时作用于 `iconOnly` 与普通圆角矩形 Button；`iconOnly` 不建立圆形语义或独立曲线分支，根圆角、连续角、内容和布局尺寸保持不变。
-> **变更记录 (2026-08-19)**: Button 外壳接入 `layout.css` 的 `.snowui-rounded-rectangle` 共享视觉类，曲线值统一来自 `tokens.css` 的 `--corner-shape-rounded-rectangle`；独立 hover 背景层显式继承根曲线。sm / md / lg 与公开 override 的 `border-radius` 数值不变，不支持该实验 CSS 属性的浏览器继续使用现有普通圆角；bare 与 ButtonGroup 嵌入态仍保持 `radius: 0`。
-> **变更记录 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` 固定扩张背景层；sm / md / lg 以及不同内容宽度的背景总宽、总高统一增加 `2px`（四边各外扩 `1px`），文字、Icon 与命中区保持原尺寸。背景颜色与外扩统一使用 `150ms ease-in-out`。`scaleOnHover` 作为兼容 Prop 名可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 使用同一固定像素扩张与颜色渐现；bare 没有背景，因此不执行内置放大。
-> **性能说明 (2026-08-19)**: 有背景的 Button 将基础背景与 hover 颜色叠层分开；放大阶段只动画绝对定位背景层的 `inset`，不会改变 Button 或父容器布局。hover 背景颜色仅动画预计算颜色叠层的 `opacity`，不在扩张或渐现期间逐帧重算 `color-mix()` 背景。Outline 原有边框颜色过渡继续保留。
-> **变更记录 (2026-08-16)**: SnowUI 宿主基线改为固定低优先级层，`filled` 的 Static White 前景色不再因动态模块加载顺序被 Frame `color: inherit` 覆盖。
-> **变更记录 (2026-08-11)**: 新增显式 `iconOnly` 布局声明，默认 `false`；移除基于 children DOM 的自动推断，并为缺少可访问名称的 icon-only Button 提供开发警告。
-> **变更记录 (2026-08-09)**: `bare` 默认改为 100% 不透明；新增 `emphasis="muted"` 显式启用 40% → hover 100% 的弱化交互。
-> **变更记录 (2026-07-08)**: Button 默认最小宽度改为 `max-content`，保留“文字 + gap + padding”的自然下限，避免 fill 布局吞掉默认 padding。
-> **变更记录 (2026-07-08)**: 文字型 Button 默认 `white-space: nowrap`，避免在 Pagination 等压缩布局中被中文逐字换行。
-> **变更记录 (2026-06-01)**: 移除 `variant="link"`；文字链接统一迁移到独立 [Link.svelte](./Link.svelte)。
-> **变更记录 (2026-05-21)**: 自动输出 `aria-pressed`；Toggle 激活态配色统一为 Secondary/Indigo（`.snowui-button-active`），与 Tag `variant="active"` 一致。
-> **职责**: 基础交互按钮组件。
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`, `enableContext=true`。
-
-在 Dialog 的直系 `as="footer"` 操作区内，直系 `Button as="item"` 通过尺寸 Context 接收 sm/md/md 默认值（对应 Dialog sm/md/lg）；显式 `size` 优先。正文与嵌套容器中的 Button 不受该默认值影响。
+> **职责**: 触发操作或导航，支持文字、图标、加载与禁用状态，适合从主要操作到轻量工具按钮的不同场景。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 触发操作或导航，支持文字、图标、加载与禁用状态，适合从主要操作到轻量工具按钮的不同场景。
 
-## 组件特有属性 (Component-Specific Props)
+## 使用选择
+
+<!-- usage-guide:start -->
+用于触发操作。无外壳图标操作用 bare；有内边距的纯图标按钮显式声明 iconOnly 并提供 aria-label。bare 需要透明度 hover 时用 emphasis="muted"。内容切换用 Tab，互斥参数选择用 Segmented。
+
+- 无上下文时默认 gray、sm；显式 variant / size 优先于组配置。
+- 纯图标必须提供可访问名称；bare 去掉外壳，iconOnly 保留按钮外壳，组件不会根据内容自动判断。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button } from '@snowui-design-system/components';
+</script>
+
+<div style="display: flex; align-items: center; flex-wrap: wrap; gap: var(--gap-4) var(--gap-3);">
+	<Button variant="filled">Filled</Button>
+	<Button variant="gray">Gray</Button>
+	<Button variant="outline">Outline</Button>
+	<Button variant="borderless">Borderless</Button>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| variant | `"gray" \| "filled" \| "outline" \| "borderless"` | — | 按钮变体；显式值优先，其次嵌入 ButtonGroup 或 Breadcrumb 的上下文，无上下文时回退 gray。 |
+| size | `"sm" \| "md" \| "lg"` | — | 控制按钮字号、内边距、圆角及子图标尺寸；显式值优先，其次 ButtonGroup/集合及父级尺寸上下文，无上下文时为 sm。 |
+| iconOnly | `boolean` | `false` | 有 padding 的纯图标按钮模式，专门控制只有图标时的对称 padding 和图标大小；sm/md/lg 图标为 16/20/24px。无外壳图标按钮直接使用 bare。缺少 aria-label、aria-labelledby 或 title 时开发环境警告。 |
+| bare | `boolean` | `false` | 无外壳按钮，以图标操作为主，也可包含文字或其他内容。忽略 variant，移除 padding、radius、背景、边框和 hover overlay，保留内容 gap。无需叠加 iconOnly；同 size 的图标与 iconOnly 一致，为 16/20/24px，子图标显式 size 优先。默认 100% 不透明，emphasis="muted" 启用 40% → hover 100%。 |
+| emphasis | `"normal" \| "muted"` | `"normal"` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
+| backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
+| scaleOnHover | `boolean` | — | 是否同时启用 Button 内置背景层 hover 放大及配套点击缩回 / 恢复动效。独立动作默认开启；文字、Icon、Spinner 与命中区不缩放。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
+| toggle | `boolean` | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 Secondary/Indigo 配色（gray / outline / borderless 生效，filled 排除）；`aria-pressed` 由 Frame 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
+| holdRepeat | `boolean` | `false` | 开启指针按住连发；仅对未禁用的 button 宿主主按钮按压生效。按下立即触发一次 click，等待后周期触发，松开或取消停止；不为链接或键盘增加连发。 |
+| holdRepeatDelay | `number` | `260` | 开始周期连发前的等待时间，单位 ms，负值按 0 处理；仅 holdRepeat=true 生效，第一次周期点击还需等待 holdRepeatInterval。 |
+| holdRepeatInterval | `number` | `80` | 按住期间相邻周期 click 的间隔，单位 ms，最小按 1 处理；仅 holdRepeat=true 生效。 |
+| children | `Snippet` | — | 按钮内的文字、图标或其他内容；有外壳纯图标用法设置 iconOnly，无外壳用 bare；两者的纯图标用法均须提供可访问名称，组件不通过内容自动推断。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="组件特有属性-component-specific-props"></a>
+
+### 组件特有属性 (Component-Specific Props)
 
 | 属性 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `children` | `Snippet` | — | 按钮内的文字、图标或其他内容；有外壳纯图标用法设置 iconOnly，无外壳用 bare；两者的纯图标用法均须提供可访问名称，组件不通过内容自动推断。 |
-| `holdRepeatInterval` | `number` | `80` | 按住期间相邻周期 click 的间隔，单位 ms，最小按 1 处理；仅 holdRepeat=true 生效。 |
-| `holdRepeatDelay` | `number` | `260` | 开始周期连发前的等待时间，单位 ms，负值按 0 处理；仅 holdRepeat=true 生效，第一次周期点击还需等待 holdRepeatInterval。 |
-| `holdRepeat` | `boolean` | `false` | 开启指针按住连发；仅对未禁用的 button 宿主主按钮按压生效。按下立即触发一次 click，等待后周期触发，松开或取消停止；不为链接或键盘增加连发。 |
-| variant | 'gray'\|'filled'\|'outline'\|'borderless' | 'gray' | 按钮变体样式 |
-| `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "sm"） | 控制按钮字号、内边距、圆角及子图标尺寸；显式值优先，其次 ButtonGroup/集合及父级尺寸上下文，无上下文时为 sm。 |
-| iconOnly | `boolean` | `false` | 有 padding 的纯图标按钮模式，专门控制只有图标时的对称 padding 和图标大小；sm/md/lg 图标为 16/20/24px。无外壳图标按钮直接使用 bare。缺少 aria-label、aria-labelledby 或 title 时开发环境警告。 |
-| bare | `boolean` | `false` | 无外壳按钮，以图标操作为主，也可包含文字或其他内容。忽略 variant，移除 padding、radius、背景、边框和 hover overlay，保留内容 gap。无需叠加 iconOnly；同 size 的图标与 iconOnly 一致，为 16/20/24px，子图标显式 size 优先。默认 100% 不透明，emphasis="muted" 启用 40% → hover 100%。 |
-| emphasis | `'normal'\|'muted'` | `'normal'` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
-| backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
-| scaleOnHover | `boolean` | `true` | 是否同时启用 Button 内置背景层 hover 放大及配套点击缩回 / 恢复动效。独立动作默认开启；文字、Icon、Spinner 与命中区不缩放。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
-| toggle | boolean | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 Secondary/Indigo 配色（gray / outline / borderless 生效，filled 排除）；`aria-pressed` 由 Frame 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
 | href | string | undefined | 链接地址 (渲染为 a 标签) |
 | target | string | undefined | 链接打开方式 |
 | rel | string | undefined | 链接关系 |
 
-## 关键字 (Keyword)
+<a id="关键字-keyword"></a>
+
+### 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| variant | `'gray' \| 'filled' \| 'outline' \| 'borderless'` | `'gray'` | 按钮变体 |
-| `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "sm"） | 控制按钮字号、内边距、圆角及子图标尺寸；显式值优先，其次 ButtonGroup/集合及父级尺寸上下文，无上下文时为 sm。 |
-| iconOnly | `boolean` | `false` | 有 padding 的纯图标按钮模式，专门控制只有图标时的对称 padding 和图标大小；sm/md/lg 图标为 16/20/24px。无外壳图标按钮直接使用 bare。缺少 aria-label、aria-labelledby 或 title 时开发环境警告。 |
-| bare | `boolean` | `false` | 无外壳按钮，以图标操作为主，也可包含文字或其他内容。忽略 variant，移除 padding、radius、背景、边框和 hover overlay，保留内容 gap。无需叠加 iconOnly；同 size 的图标与 iconOnly 一致，为 16/20/24px，子图标显式 size 优先。默认 100% 不透明，emphasis="muted" 启用 40% → hover 100%。 |
-| emphasis | `'normal'\|'muted'` | `'normal'` | bare 的强调级别；`muted` 使用 `currentColor × opacity: 0.4 -> 1`。 |
-| backgroundBlur | `boolean` | `false` | 开启按钮背景模糊，默认强度为 `1.25rem`。 |
-| scaleOnHover | `boolean` | `true` | 统一控制背景层内置 hover 放大与配套点击缩回 / 恢复；内容不缩放。复合控件项从 owner 继承 `false`，实例显式值优先。 |
-| toggle | `boolean` | `false` | Toggle 模式语法糖。等价于显式声明 `Click={{ Idle: "Active", Active: "Idle" }} whileClick={false}`；Active 配色由 `data-state="Active"` 自动套 Indigo；`aria-pressed` 自动输出。 |
 | as | `'more' \| 'badge' \| 'icon' \| 'prev' \| 'next' \| 'close' \| 'item' \| 'current' \| 'page' \| 'leading' \| 'trailing'` | - | 角色化：作为 Text 展开按钮、Breadcrumb item、Pagination 模板，或接入 Image / ImageViewer / Field 宿主定位协议；进入 Image / ImageViewer 宿主时会翻译为对应 `pin-*` 方位 |
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
@@ -98,7 +112,9 @@ Button 的内部布局不接入三槽位模型：
 | `--snowui-button-font-size` | size 档位 | 文本字号 |
 | `--snowui-button-line-height` | size 档位 | 文本行高 |
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <!-- 基础按钮 -->
@@ -130,9 +146,11 @@ Button 的内部布局不接入三槽位模型：
 <Button loading>Loading...</Button>
 ```
 
-> **变更记录 (2026-09-12)**：横向外扩增加 rem 上限，纵向比例不变；Borderless 起点与点击缩回同步分轴补偿。
+> **更新日志 (2026-09-12)**：横向外扩增加 rem 上限，纵向比例不变；Borderless 起点与点击缩回同步分轴补偿。
 
-## Hover 尺寸补偿
+<a id="hover-尺寸补偿"></a>
+
+### Hover 尺寸补偿
 
 内置背景动效由 `getButtonBackgroundScale(resolvedSize)` 解析，保留 `BUTTON_HOVER_SCALE_UP_MOTION` 的时序及纵向默认 / sm 基线。以标准高度 `Hsm / Hsize` 为补偿系数 `k`：hover 终点为 `1 + (sm 终点 - 1) × k`；Borderless 隐藏起点为 `1 + (sm 隐藏起点 - 1) × k`；点击中点为 `1 + (当前 hover 终点 - 1) / 2`。
 
@@ -140,7 +158,9 @@ Button 的内部布局不接入三槽位模型：
 
 采用最终解析的 size（显式 Prop 优先于 Context）。横向总扩张量由 preset 限制为最多 0.25rem（16px 根字号下左右各 2px），纵向保持原比例；Borderless 隐藏起点与点击缩回同步使用横向补偿。仅启用默认背景动效时复用共享 resizeManager，初始化、尺寸变化和交互开始时刷新几何，不逐帧测量、不新增 DOM。根字号变化时上限随 rem 缩放；圆角随背景分轴缩放。自定义高度 / padding 不重新做纵向补偿。内容、命中区、布局、颜色和时序不变。
 
-## Hover 配套点击动效
+<a id="hover-配套点击动效"></a>
+
+### Hover 配套点击动效
 
 启用内置 hover 放大时，每次 click（包括键盘激活）从背景当前显示大小缩回当前尺寸标准 hover 区间的中点，再恢复到 hover 放大大小。所有变体（包括 Borderless）的纵向共享同一规则，横向同步按上述上限补偿：sm 为 `1.06 → 1.03 → 1.06`，md 为 `1.04 → 1.02 → 1.04`，lg 为 `1.03 → 1.015 → 1.03`；具体值以 preset catalog 为准。Borderless 隐藏背景的起点仅用于 hover，不参与点击缩回。缩回与恢复两段各使用 `BUTTON_HOVER_SCALE_UP_MOTION` 一半的时长，保持相同 easing；当前 hover 为 200ms，点击为 100ms 缩回 + 100ms 恢复。文字、Icon、Spinner、命中区与布局保持原尺寸，点击回调、链接和 Toggle 状态立即生效，不等待动效。
 
@@ -148,7 +168,9 @@ Button 的内部布局不接入三槽位模型：
 
 实现只在有效点击时读取一次背景 transform，复用已有背景伪元素的 CSS animation；不增加 DOM、Observer、定时器或逐帧 JS 任务。SSR 不读取浏览器 API。
 
-## ButtonGroup 嵌入态
+<a id="buttongroup-嵌入态"></a>
+
+### ButtonGroup 嵌入态
 
 Button 放入 ButtonGroup 后不需要写额外 prop，ButtonGroup 默认在相邻单元格之间绘制分割线：
 
@@ -174,7 +196,9 @@ Button 放入 ButtonGroup 后不需要写额外 prop，ButtonGroup 默认在相�
 - 嵌入态仍保留 `href` / `target` / `rel`、状态机、动效与 `aria-*` 等 Button 既有能力。
 - 纯图标单元格必须在 Button 上显式声明 `iconOnly`；ButtonGroup 嵌入态会覆盖 icon-only padding，确保图标单元格的点击和 hover 区域与普通单元格一致。
 
-## Toggle 与瞬时反馈 (声明式)
+<a id="toggle-与瞬时反馈-声明式"></a>
+
+### Toggle 与瞬时反馈 (声明式)
 
 **Button 不提供 `pressed` / `feedback` 等独立 Props**,也**不使用 `stateContent` snippet 切换内容**。Toggle 与瞬时反馈两类模式都通过 Frame 现有的**状态机 + `stateStyle`** 声明式实现 —— 内容固定不变,仅按状态应用 inline-style。
 
@@ -260,7 +284,9 @@ OSS Button **自动输出 `aria-pressed`**:
 
 > 同一规则同步落地于 Tag,详见 [Tag.md 无障碍](./Tag.md)。
 
-## 与 Field / Date Input 的组合
+<a id="与-field-date-input-的组合"></a>
+
+### 与 Field / Date Input 的组合
 
 `Button` 现在只保留一层日期触发规则：
 
@@ -290,7 +316,9 @@ OSS Button **自动输出 `aria-pressed`**:
 </Field>
 ```
 
-## 与 Breadcrumb 的组合
+<a id="与-breadcrumb-的组合"></a>
+
+### 与 Breadcrumb 的组合
 
 Button 放入 Breadcrumb 时使用 `as="item"`：
 
@@ -307,7 +335,9 @@ Button 放入 Breadcrumb 时使用 `as="item"`：
 - 当 Button 同时满足 `data-as="item"` 与 `aria-current="page"` 时，Button 不响应 hover、click、Enter 或 Space，也不显示 hover overlay。
 - Button 不因 `as="item"` 改变 `size`；未写 `variant` 时可继承 Breadcrumb 的 `variant`，Breadcrumb 未写 `variant` 时继续使用 Button 默认值。
 
-## 与 Pagination 的组合
+<a id="与-pagination-的组合"></a>
+
+### 与 Pagination 的组合
 
 Button 放入 Pagination 时使用角色模板：
 
@@ -323,14 +353,48 @@ Button 放入 Pagination 时使用角色模板：
 - `as="prev"` / `as="next"` 可定义上一页 / 下一页模板；缺失时 Pagination 使用内置默认箭头。
 - Pagination 会替换模板文本、生成真实页码并接管点击。
 
-## Bare 与 IconOnly 的选择
+<a id="bare-与-icononly-的选择"></a>
+
+### Bare 与 IconOnly 的选择
 
 - `bare`：无外壳按钮，以图标操作为主，适合轻量工具与行内动作；也允许文字。
 - `iconOnly`：有 padding 的特殊图标按钮，用于只有图标时控制对称 padding 和图标大小；外壳样式由 variant 决定。
 - 两者同 size 的图标大小一致；文字按钮配图标仍使用 12/16/20px。精确尺寸见下表。
 - 历史记录中的 bare 12/16/20px 及纯图标统一叠加 iconOnly 的要求，已由 2026-09-11 用户定义取代。
 
-## 样式规范 (Style Spec)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
+
+> **更新日志 (2026-09-04)**: hover 改为标准高度反比补偿；默认 / sm 保持原效果，md / lg 的背景放大与 Borderless 隐藏起点同步减弱，点击继续缩回当前尺寸放大量的一半。计算规则见下文，具体数值以 preset catalog 为准。
+> **更新日志 (2026-08-27)**: 恢复 Owner 在 2026-08-19 确认的背景层比例放大方案：gray / filled / outline 从 `1` 放大到 `1.06`，Borderless 从隐藏的 `0.84` 背景显示并放大到 `1.06`，最终颜色保持 Light 4% / Dark 10%；文字、Icon、Spinner、命中区和布局不变。背景缩放使用 `BUTTON_HOVER_SCALE_UP_MOTION` 的 `200ms ease`，颜色使用通用 `150ms ease-out`。
+> **更新日志 (2026-08-19)**: Button hover 的背景颜色与背景外扩统一使用 `150ms ease-in-out`，进入和退出时同时开始、同时结束；固定 `1px` 外扩、radius 同步、内容与布局尺寸均不变。
+> **更新日志 (2026-08-19)**: Button 背景 inset 与 radius 的几何动效由 `200ms ease` 优化为 `150ms ease-in-out`，减少 filled 高对比边缘停留在亚像素重绘状态的时间，并缓和 hover 进入 / 退出首段的视觉抖动；固定 `1px` 外扩、radius 同步、`300ms ease-in-out` 颜色渐变、内容与布局尺寸均不变。
+> **更新日志 (2026-08-19)**: Button 的独立 hover 背景每边外扩 `1px` 时，背景圆角半径同步增加 `1px`，并与 inset 共用当前 `150ms ease-in-out` 几何动效。该规则同时作用于 `iconOnly` 与普通圆角矩形 Button；`iconOnly` 不建立圆形语义或独立曲线分支，根圆角、连续角、内容和布局尺寸保持不变。
+> **更新日志 (2026-08-19)**: Button 外壳接入 `layout.css` 的 `.snowui-rounded-rectangle` 共享视觉类，曲线值统一来自 `tokens.css` 的 `--corner-shape-rounded-rectangle`；独立 hover 背景层显式继承根曲线。sm / md / lg 与公开 override 的 `border-radius` 数值不变，不支持该实验 CSS 属性的浏览器继续使用现有普通圆角；bare 与 ButtonGroup 嵌入态仍保持 `radius: 0`。
+> **更新日志 (2026-08-19)**: 独立动作 Button 默认使用 `BUTTON_HOVER_BACKGROUND_GROWTH_MOTION` 固定扩张背景层；sm / md / lg 以及不同内容宽度的背景总宽、总高统一增加 `2px`（四边各外扩 `1px`），文字、Icon 与命中区保持原尺寸。背景颜色与外扩统一使用 `150ms ease-in-out`。`scaleOnHover` 作为兼容 Prop 名可独立关闭，ButtonGroup、Tab/Segmented、Pagination、Breadcrumb 等复合控件项由容器默认关闭。Borderless 使用同一固定像素扩张与颜色渐现；bare 没有背景，因此不执行内置放大。
+> **性能说明 (2026-08-19)**: 有背景的 Button 将基础背景与 hover 颜色叠层分开；放大阶段只动画绝对定位背景层的 `inset`，不会改变 Button 或父容器布局。hover 背景颜色仅动画预计算颜色叠层的 `opacity`，不在扩张或渐现期间逐帧重算 `color-mix()` 背景。Outline 原有边框颜色过渡继续保留。
+> **更新日志 (2026-08-16)**: SnowUI 宿主基线改为固定低优先级层，`filled` 的 Static White 前景色不再因动态模块加载顺序被 Frame `color: inherit` 覆盖。
+> **更新日志 (2026-08-11)**: 新增显式 `iconOnly` 布局声明，默认 `false`；移除基于 children DOM 的自动推断，并为缺少可访问名称的 icon-only Button 提供开发警告。
+> **更新日志 (2026-08-09)**: `bare` 默认改为 100% 不透明；新增 `emphasis="muted"` 显式启用 40% → hover 100% 的弱化交互。
+> **更新日志 (2026-07-08)**: Button 默认最小宽度改为 `max-content`，保留“文字 + gap + padding”的自然下限，避免 fill 布局吞掉默认 padding。
+> **更新日志 (2026-07-08)**: 文字型 Button 默认 `white-space: nowrap`，避免在 Pagination 等压缩布局中被中文逐字换行。
+> **更新日志 (2026-06-01)**: 移除 `variant="link"`；文字链接统一迁移到独立 [Link.svelte](./Link.svelte)。
+> **更新日志 (2026-05-21)**: 自动输出 `aria-pressed`；Toggle 激活态配色统一为 Secondary/Indigo（`.snowui-button-active`），与 Tag `variant="active"` 一致。
+
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=true`。
+
+在 Dialog 的直系 `as="footer"` 操作区内，直系 `Button as="item"` 通过尺寸 Context 接收 sm/md/md 默认值（对应 Dialog sm/md/lg）；显式 `size` 优先。正文与嵌套容器中的 Button 不受该默认值影响。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 ### 1. Dimensions (尺寸规范)
 
@@ -392,7 +456,9 @@ Button 放入 Pagination 时使用角色模板：
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -405,7 +471,9 @@ Button 放入 Pagination 时使用角色模板：
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v2.18.1 (2026-09-12)
 
@@ -498,7 +566,7 @@ Button 放入 Pagination 时使用角色模板：
 - Filled 的 Static White 文字与图标色恢复；宿主基线的继承色不再依赖 CSS 注入顺序覆盖组件自有前景色。
 - 外部 class / inline style 的既有覆盖优先级保持不变。
 
-- **Button-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- **Button-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v2.5.0 (2026-08-11)
 

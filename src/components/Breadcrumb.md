@@ -1,20 +1,62 @@
-# Breadcrumb (面包屑)
+# Breadcrumb
 
 > **版本**: v1.1.1
-> **职责**: 提供页面层级路径导航容器。
-> **设计稿**: [Workshop / Breadcrumb](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12046-1772&t=nY2VC3oisn12OH01-4)
-
-Breadcrumb 支持两种模式：
-
-- 默认内置模式（推荐）：`items` 自动生成 Button 与 Text separator，使用 `parts.Button` / `parts.Text` 配置隐藏实例。
-- 显式组合模式：直接书写 `Button as="item"` 和 `Text as="separator"`，用于复杂内容和逐项差异。
-- Breadcrumb 的默认组合样式为 Button `borderless`、separator `opacity: 0.5`；常规使用无需传 parts，parts 只用于覆盖默认值。
+> **职责**: 展示当前页面的层级路径，帮助用户理解所在位置并返回上级页面。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 展示当前页面的层级路径，帮助用户理解所在位置并返回上级页面。
 
-## 功能概览
+## 使用选择
+
+<!-- usage-guide:start -->
+用于表达当前页面的层级路径。平级内容切换用 Tab，应用导航用 Sidebar；路由跳转由页面处理。
+
+- items 生成路径，最后一项自动成为不可交互的当前页。
+- 显式 children 使用 `Button as="item"` 与 `Text as="separator"`，会替换 items；parts 仅配置默认生成的内容。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Breadcrumb } from '@snowui-design-system/components';
+</script>
+
+<Breadcrumb
+	ariaLabel="SnowUI component page path"
+	items={[
+		{ label: 'Components' },
+		{ label: 'Navigation' },
+		{ label: 'Breadcrumb' }
+	]}
+/>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| ariaLabel | `string` | `"Breadcrumb"` | 根导航区域的无障碍标签 |
+| variant | `BreadcrumbVariant` | `"borderless"` | 内部 `Button as="item"` 的默认 Button 变体；parts 与子级 Button 显式 `variant` 可覆盖 |
+| children | `Snippet` | — | 显式声明 Button as="item" 与 Text as="separator"，替换内建 items 与 separator；最后一个 item 仍自动成为当前页。 |
+| items | `BreadcrumbItem[]` | `[]` | 内建路径数据，每项含 label、可选 href/disabled；自动生成 Button 与分隔 Text，最后一项为不可交互的当前页。children 存在时忽略此数组。 |
+| separator | `string` | `"/"` | 内建路径项之间的分隔文字；仅在 items 模式使用，显式组合时自行声明 as="separator"。 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Text: typeof Text }>` | — | 配置 items 模式生成的 Button 与分隔 Text；不作用于显式 children，当前页及角色语义仍由 Breadcrumb 接管。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="功能概览"></a>
+
+### 功能概览
 
 - 默认 items API + 显式组合高级 API。
 - 最后一个 `as="item"` 自动作为当前页面。
@@ -26,18 +68,10 @@ Breadcrumb 支持两种模式：
 
 ---
 
-## API 参考
+<a id="api-参考"></a>
 
-### 核心属性
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `parts` | `ComponentPartsOf<{ Button: typeof Button; Text: typeof Text }>` | — | 配置 items 模式生成的 Button 与分隔 Text；不作用于显式 children，当前页及角色语义仍由 Breadcrumb 接管。 |
-| `separator` | `string` | `"/"` | 内建路径项之间的分隔文字；仅在 items 模式使用，显式组合时自行声明 as="separator"。 |
-| `items` | `BreadcrumbItem[]` | `[]` | 内建路径数据，每项含 label、可选 href/disabled；自动生成 Button 与分隔 Text，最后一项为不可交互的当前页。children 存在时忽略此数组。 |
-| ariaLabel | `string` | `"Breadcrumb"` | 根导航区域的无障碍标签 |
-| variant | `'gray' \| 'filled' \| 'outline' \| 'borderless'` | `'borderless'` | 内部 `Button as="item"` 的默认 Button 变体；parts 与子级 Button 显式 `variant` 可覆盖 |
-| `children` | `Snippet` | — | 显式声明 Button as="item" 与 Text as="separator"，替换内建 items 与 separator；最后一个 item 仍自动成为当前页。 |
+
 
 ### 子级角色
 
@@ -48,7 +82,8 @@ Breadcrumb 支持两种模式：
 
 SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as="item"` / `data-as="separator"`。
 
-## 使用示例
+<a id="使用示例"></a>
+
 
 ### 基础用法
 
@@ -88,7 +123,9 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 
 最后一个 item 会被自动标记为当前页，即使写了 `href` 也不会触发点击或跳转。
 
-## 行为规则
+<a id="行为规则"></a>
+
+### 行为规则
 
 1. 当前页面固定为 Breadcrumb 内最后一个 `as="item"` / `data-as="item"`。
 2. 不提供 `currentIndex`，不支持指定任意一项为当前页。
@@ -98,7 +135,9 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 6. Breadcrumb 的 `variant` 只影响 `Button as="item"` 的默认 Button 变体，且不覆盖子级显式 `variant`。
 7. Breadcrumb 为 item 提供 `scaleOnHover=false` 默认值；子级 Button 的显式值优先。
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
@@ -122,9 +161,22 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **设计稿**: [Workshop / Breadcrumb](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12046-1772&t=nY2VC3oisn12OH01-4)
+
+Breadcrumb 支持两种模式：
+
+- 默认内置模式（推荐）：`items` 自动生成 Button 与 Text separator，使用 `parts.Button` / `parts.Text` 配置隐藏实例。
+- 显式组合模式：直接书写 `Button as="item"` 和 `Text as="separator"`，用于复杂内容和逐项差异。
+- Breadcrumb 的默认组合样式为 Button `borderless`、separator `opacity: 0.5`；常规使用无需传 parts，parts 只用于覆盖默认值。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 开发者关键字
 
@@ -163,7 +215,9 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.1.1 (2026-09-02)
 

@@ -1,32 +1,61 @@
-# Checkbox 组件
+# Checkbox
 
 > **版本**: v1.2.28
-> **职责**: 复选框控件，用于选择多个选项或表示开关状态。
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+> **职责**: 选择一个或多个独立选项，支持选中、未选中和部分选中状态，适合表单与批量选择。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 选择一个或多个独立选项，支持选中、未选中和部分选中状态，适合表单与批量选择。
 
-## 关键字
+## 使用选择
 
-| 关键字 | Type | Default | Description | Category |
-|:---|:---|:---|:---|:---|
-| `checked` | `boolean` | `false` | 选中状态（双向绑定） | **State** |
-| `indeterminate` | `boolean` | `false` | 不确定状态（双向绑定） | **State** |
-| `onCheckedChange` | `(checked: boolean) => void` | - | 原生复选状态变化后的回调 | Event |
-| `ariaLabel` | `string` | - | 无可见 label 时的无障碍名称 | Accessibility |
-| `disabled` | `boolean` | `false` | 禁用状态 | **State** |
-| `group` | `any[]` | `undefined` | 多选值数组，配合 value 双向绑定 | Data |
-| `value` | `any` | - | 表单值 | Data |
-| `size` | `number` | `16` | 组件尺寸（像素，梯度与 Icon 一致：12/16/20/24/28/32/40/48/80） | Style |
-| `children` | `Snippet` | - | 标签内容 | Content |
-| `enableResponsive` | `boolean` | `false` | 启用响应式 | Capability |
-| `enableContext` | `boolean` | `false` | 启用上下文 | Capability |
+<!-- usage-guide:start -->
+用于独立开关或多项选择。互斥单选用 Radio，立即生效的二态设置用 Switch；DataTable 选择列优先使用其内置选择协议。
 
-## 布局模型
+- 独立布尔状态使用 `bind:checked`；多选数组使用 `bind:group` 并为各项提供稳定 value。
+- indeterminate 表示部分选中；与 checked 分开管理。提供标签或 ariaLabel，禁用使用 disabled。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Checkbox } from '@snowui-design-system/components';
+	let subscribed = $state(false);
+</script>
+
+<Checkbox bind:checked={subscribed}>Email me product updates</Checkbox>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| checked | `boolean` | `false` | 选中状态（双向绑定） |
+| group | `any[]` | — | 多选值数组，配合 value 双向绑定 |
+| value | `any` | — | 表单值 |
+| size | `ResourceSize \| number` | — | 组件尺寸（像素，梯度与 Icon 一致：12/16/20/24/28/32/40/48/80） |
+| disabled | `boolean` | `false` | 禁用状态 |
+| indeterminate | `boolean` | `false` | 不确定状态（双向绑定） |
+| onCheckedChange | `(checked: boolean) => void` | — | 原生复选状态变化后的回调 |
+| ariaLabel | `string` | — | 无可见 label 时的无障碍名称 |
+| children | `Snippet` | — | 标签内容 |
+| enableResponsive | `boolean` | `false` | 启用响应式 |
+| enableContext | `boolean` | `false` | 启用上下文 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
@@ -42,9 +71,198 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 
 ---
 
-## 更新日志 (Changelog)
+<a id="使用示例"></a>
 
-- **Checkbox-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+### 使用示例
+
+```svelte
+<script>
+  import { Checkbox } from '@snowui-design-system/components';
+  let checked = $state(false);
+  let indeterminate = $state(false);
+</script>
+
+<!-- 基础用法 (双向绑定) -->
+<!-- bind:checked 意味着父组件的 checked 变量会随 Checkbox 状态变化而自动更新 -->
+<Checkbox bind:checked>复选框</Checkbox>
+
+<!-- 不确定状态 -->
+<Checkbox bind:indeterminate>不确定状态</Checkbox>
+
+<!-- 自定义尺寸 -->
+<Checkbox bind:checked size={24}>大号复选框 (24px)</Checkbox>
+
+<!-- 禁用状态 -->
+<Checkbox checked disabled>禁用复选框</Checkbox>
+```
+
+<a id="状态"></a>
+
+
+### Unchecked（未选中）
+- 空的方框
+- 灰色边框
+
+### Checked（选中）
+- 显示勾选图标
+- 主题色背景和边框
+
+### Indeterminate（不确定）
+- 显示横线图标
+- 主题色背景和边框
+- 常用于"全选"场景
+
+<a id="图标"></a>
+
+### 图标
+
+- **勾选图标**: 选中状态显示
+- **横线图标**: 不确定状态显示
+- 使用 28×28 SVG 描边路径绘制，随组件尺寸缩放并继承选中态颜色
+
+<a id="无障碍性"></a>
+
+### 无障碍性
+
+- 使用原生 `<input type="checkbox">` 确保键盘导航
+- 支持 Tab 键聚焦
+- 支持 Space 键切换
+- 支持 `indeterminate` 属性
+- 禁用状态下 `tabindex=-1`
+
+<a id="典型场景"></a>
+
+
+### 单个复选框
+```svelte
+<script lang="ts">
+  import { Checkbox } from '@snowui-design-system/components';
+  let checked = $state(false);
+</script>
+
+<Checkbox bind:checked>同意条款</Checkbox>
+```
+
+### 全选/部分选中
+
+```svelte
+<script>
+  import { Checkbox, Frame } from '@snowui-design-system/components';
+
+  let items = $state([
+    { id: 1, checked: false },
+    { id: 2, checked: false },
+    { id: 3, checked: false }
+  ]);
+
+  let allChecked = $derived(items.every(item => item.checked));
+  let someChecked = $derived(items.some(item => item.checked) && !allChecked);
+</script>
+
+<!-- 使用 Frame Container 布局 -->
+<Frame class="flex flex-col gap-2 p-4">
+  <Checkbox
+    checked={allChecked}
+    indeterminate={someChecked}
+    onclick={() => {
+      const newState = !allChecked;
+      items.forEach(item => item.checked = newState);
+    }}
+  >
+    全选
+  </Checkbox>
+
+  <Frame class="flex flex-col gap-2 pl-6 border-l border-black-10">
+    {#each items as item}
+      <Checkbox bind:checked={item.checked}>选项 {item.id}</Checkbox>
+    {/each}
+  </Frame>
+</Frame>
+```
+
+<a id="样式规则-style-spec"></a>
+
+### 样式规则 (Style Spec)
+
+| 属性 | 值 | 说明 |
+|:---|:---|:---|
+| **Class** | `.snowui-checkbox` | 组件根类名 |
+| **CSS 行为** | 组件自管 | hover 视觉由组件内部选择器声明 |
+| **Tag** | `label` | 语义化标签，点击区域包含文字 |
+
+### 2. 默认样式 (Defaults)
+
+- **Display**: `inline-flex`, `align-items: center`
+- **Gap**: `var(--gap-1)` (4px) - 图标与文字间距
+- **Cursor**: `pointer` (Disabled 时为 `default`)
+- **Font**: `var(--text-14)` (14px), `line-height: var(--leading-14)` (20px)
+
+### 3. CSS 变量 (Variables)
+
+组件使用 CSS 变量实现等比缩放：
+
+```css
+--snowui-checkbox-size: var(--size-4); /* 基准 16px */
+--snowui-checkbox-size-resolved: var(--snowui-checkbox-size-override, var(--snowui-checkbox-size));
+--snowui-checkbox-radius: calc(var(--snowui-checkbox-visual-size) * 0.3125); /* 可见尺寸的 31.25% */
+--snowui-checkbox-radius-resolved: var(--snowui-checkbox-radius-override, var(--snowui-checkbox-radius));
+--snowui-checkbox-border-width: calc(var(--snowui-checkbox-size-resolved) * 0.0625); /* 16px 时 1px，32px 时 2px */
+--snowui-checkbox-border-width-resolved: var(--snowui-checkbox-border-width-override, var(--snowui-checkbox-border-width));
+--primary: var(--primary, var(--black-100, #000000)); /* 使用全局 Primary Token (默认黑色) */
+```
+
+
+#### Unchecked
+- **Visual**: 透明背景 + `var(--black-20)` 边框
+- **Icon**: 勾选与横线均不可见
+- **Hover**: 填充保持不变；独立 inset 覆盖层在基础 **20%** 黑色边框上再叠加 **20%** 黑色，默认等效约 **36%** 黑色；仅此状态适用 `StyleSpec §2.4.3` 例外
+
+#### Checked / Indeterminate
+- **触发**: 原生 input 的 `:checked` / `:indeterminate` 通过 sibling 选择器驱动
+- **Visual**: `var(--primary)` 背景 + 边框
+- **Icon**: color: `var(--static-white-100)`；checked 使用路径绘制，indeterminate 保留缩放 / 透明度过渡
+- **Hover**: 填充与 inset 边框统一在主色上混合 **20%** Static White
+
+#### Disabled
+- **Attr**: `[data-disabled="true"]`
+- **Style**: `opacity: 0.5`, `pointer-events: none`, `cursor: default`
+
+### 5. 交互细节
+
+- **点击区域**: 原生 `<input>` 使用 `position: absolute; inset: 0` 覆盖整个 label 区域，确保点击响应灵敏。
+- **Focus**: 支持键盘导航，聚焦时显示 `20% primary` 的 Ring。
+- **动画**:
+  - 容器: hover 填充与 inset 边框使用相同颜色和时序
+  - checked 勾选: 参考 Fluid Functionalism 的 pathLength 语义，进入使用 `200ms ease-out` 绘制；取消选择时以常规 `150ms ease-out` 随底色淡出，不反向绘制
+  - indeterminate 横线: 与 Radio 状态动效一致，使用 `150ms ease-out`
+  - `prefers-reduced-motion: reduce`: 取消视觉体、勾选与横线过渡，直接显示最终状态
+
+
+
+## AI Zone
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
+
+### 模块索引 (Module Index)
+
+- **Checkbox 组件**: [./Checkbox.svelte](./Checkbox.svelte)
+
+### 关联关系
+
+- **父组件**: [Frame.svelte](./Frame.svelte)
+
+---
+
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
+
+- **Checkbox-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.2.28 (2026-08-20)
 
@@ -198,168 +416,3 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 ---
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
-
-## 开发者指南 (AI)
-
-### 模块索引 (Module Index)
-
-- **Checkbox 组件**: [./Checkbox.svelte](./Checkbox.svelte)
-
-### 关联关系
-
-- **父组件**: [Frame.svelte](./Frame.svelte)
-
----
-
-## 使用示例
-
-```svelte
-<script>
-  import { Checkbox } from '@snowui-design-system/components';
-  let checked = $state(false);
-  let indeterminate = $state(false);
-</script>
-
-<!-- 基础用法 (双向绑定) -->
-<!-- bind:checked 意味着父组件的 checked 变量会随 Checkbox 状态变化而自动更新 -->
-<Checkbox bind:checked>复选框</Checkbox>
-
-<!-- 不确定状态 -->
-<Checkbox bind:indeterminate>不确定状态</Checkbox>
-
-<!-- 自定义尺寸 -->
-<Checkbox bind:checked size={24}>大号复选框 (24px)</Checkbox>
-
-<!-- 禁用状态 -->
-<Checkbox checked disabled>禁用复选框</Checkbox>
-```
-
-## 状态
-
-### Unchecked（未选中）
-- 空的方框
-- 灰色边框
-
-### Checked（选中）
-- 显示勾选图标
-- 主题色背景和边框
-
-### Indeterminate（不确定）
-- 显示横线图标
-- 主题色背景和边框
-- 常用于"全选"场景
-
-## 图标
-
-- **勾选图标**: 选中状态显示
-- **横线图标**: 不确定状态显示
-- 使用 28×28 SVG 描边路径绘制，随组件尺寸缩放并继承选中态颜色
-
-## 无障碍性
-
-- 使用原生 `<input type="checkbox">` 确保键盘导航
-- 支持 Tab 键聚焦
-- 支持 Space 键切换
-- 支持 `indeterminate` 属性
-- 禁用状态下 `tabindex=-1`
-
-## 典型场景
-
-### 单个复选框
-```svelte
-<Checkbox bind:checked>同意条款</Checkbox>
-```
-
-### 全选/部分选中
-
-```svelte
-<script>
-  import { Checkbox, Frame } from '@snowui-design-system/components';
-
-  let items = $state([
-    { id: 1, checked: false },
-    { id: 2, checked: false },
-    { id: 3, checked: false }
-  ]);
-  
-  let allChecked = $derived(items.every(item => item.checked));
-  let someChecked = $derived(items.some(item => item.checked) && !allChecked);
-</script>
-
-<!-- 使用 Frame Container 布局 -->
-<Frame class="flex flex-col gap-2 p-4">
-  <Checkbox 
-    checked={allChecked} 
-    indeterminate={someChecked}
-    onclick={() => {
-      const newState = !allChecked;
-      items.forEach(item => item.checked = newState);
-    }}
-  >
-    全选
-  </Checkbox>
-
-  <Frame class="flex flex-col gap-2 pl-6 border-l border-black-10">
-    {#each items as item}
-      <Checkbox bind:checked={item.checked}>选项 {item.id}</Checkbox>
-    {/each}
-  </Frame>
-</Frame>
-```
-
-## 样式规则 (Style Spec)
-
-
-| 属性 | 值 | 说明 |
-|:---|:---|:---|
-| **Class** | `.snowui-checkbox` | 组件根类名 |
-| **CSS 行为** | 组件自管 | hover 视觉由组件内部选择器声明 |
-| **Tag** | `label` | 语义化标签，点击区域包含文字 |
-
-### 2. 默认样式 (Defaults)
-
-- **Display**: `inline-flex`, `align-items: center`
-- **Gap**: `var(--gap-1)` (4px) - 图标与文字间距
-- **Cursor**: `pointer` (Disabled 时为 `default`)
-- **Font**: `var(--text-14)` (14px), `line-height: var(--leading-14)` (20px)
-
-### 3. CSS 变量 (Variables)
-
-组件使用 CSS 变量实现等比缩放：
-
-```css
---snowui-checkbox-size: var(--size-4); /* 基准 16px */
---snowui-checkbox-size-resolved: var(--snowui-checkbox-size-override, var(--snowui-checkbox-size));
---snowui-checkbox-radius: calc(var(--snowui-checkbox-visual-size) * 0.3125); /* 可见尺寸的 31.25% */
---snowui-checkbox-radius-resolved: var(--snowui-checkbox-radius-override, var(--snowui-checkbox-radius));
---snowui-checkbox-border-width: calc(var(--snowui-checkbox-size-resolved) * 0.0625); /* 16px 时 1px，32px 时 2px */
---snowui-checkbox-border-width-resolved: var(--snowui-checkbox-border-width-override, var(--snowui-checkbox-border-width));
---primary: var(--primary, var(--black-100, #000000)); /* 使用全局 Primary Token (默认黑色) */
-```
-
-### 4. 状态样式 (States)
-
-#### Unchecked
-- **Visual**: 透明背景 + `var(--black-20)` 边框
-- **Icon**: 勾选与横线均不可见
-- **Hover**: 填充保持不变；独立 inset 覆盖层在基础 **20%** 黑色边框上再叠加 **20%** 黑色，默认等效约 **36%** 黑色；仅此状态适用 `StyleSpec §2.4.3` 例外
-
-#### Checked / Indeterminate
-- **触发**: 原生 input 的 `:checked` / `:indeterminate` 通过 sibling 选择器驱动
-- **Visual**: `var(--primary)` 背景 + 边框
-- **Icon**: color: `var(--static-white-100)`；checked 使用路径绘制，indeterminate 保留缩放 / 透明度过渡
-- **Hover**: 填充与 inset 边框统一在主色上混合 **20%** Static White
-
-#### Disabled
-- **Attr**: `[data-disabled="true"]`
-- **Style**: `opacity: 0.5`, `pointer-events: none`, `cursor: default`
-
-### 5. 交互细节
-
-- **点击区域**: 原生 `<input>` 使用 `position: absolute; inset: 0` 覆盖整个 label 区域，确保点击响应灵敏。
-- **Focus**: 支持键盘导航，聚焦时显示 `20% primary` 的 Ring。
-- **动画**:
-  - 容器: hover 填充与 inset 边框使用相同颜色和时序
-  - checked 勾选: 参考 Fluid Functionalism 的 pathLength 语义，进入使用 `200ms ease-out` 绘制；取消选择时以常规 `150ms ease-out` 随底色淡出，不反向绘制
-  - indeterminate 横线: 与 Radio 状态动效一致，使用 `150ms ease-out`
-  - `prefers-reduced-motion: reduce`: 取消视觉体、勾选与横线过渡，直接显示最终状态

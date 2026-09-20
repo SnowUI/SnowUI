@@ -6,6 +6,23 @@
 > **包归属**: `@snowui-design-system/components`（OSS，公开）
 
 
+## 组件介绍
+
+通过声明式关键字组合布局、状态与动效，为自定义界面和 SnowUI 组件提供统一的基础容器。
+
+## 使用选择
+
+<!-- usage-guide:start -->
+用于需要 SnowUI 布局、状态与动效能力的容器；普通页面结构可以使用语义 HTML。
+
+- 通过 row / column / grid 选择布局；as 声明组合角色，bind:element 获取根元素。
+- loading 表示状态，具体加载视觉由内容组件提供；颜色、间距和圆角优先使用 Token。
+- orchestrate*、styles 和跨 Frame 联动属于 FramePro。共享 API 在 [FramePro.md](../../../pro/src/components/FramePro.md)，本文其余部分是实现架构。
+<!-- usage-guide:end -->
+
+
+## AI Zone
+
 `Frame.svelte` 是 OSS 组件层的基础容器。它承载所有「单个 Frame 自身就能完成」的运行时能力，供所有 OSS 组件复用。当组件需要让一个 Frame 去**控制另一个 Frame**（启动时机、动效播放、远程改样式）时，使用 `FramePro.svelte`（OSS Frame 的超集）。
 
 > **以下内容供 AI 阅读，用户可忽略。**
@@ -16,7 +33,7 @@
 >
 > 本文档章节 §1–§5 是**架构与切割原则**。
 >
-> **OSS Frame 实际支持的全部关键字、参数、示例**见仓库根 [/Frame.md](../../../Frame.md)，章节标题加 `[OSS]` 标签的部分即 OSS 版完整支持的能力：
+> **OSS Frame 实际支持的全部关键字、参数、示例**见仓库根 [FramePro.md](../../../pro/src/components/FramePro.md)，章节标题加 `[OSS]` 标签的部分即 OSS 版完整支持的能力：
 >
 > - **[OSS] §1** 能力开关 (`enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion` / `enableAutoLayout`)
 > - **[OSS] 布局模型** + **§1.1 动效时序桥接变量**
@@ -35,9 +52,6 @@
 
 ---
 
-## 组件介绍
-
-通过声明式关键字组合布局、状态与动效，为自定义界面和 SnowUI 组件提供统一的基础容器。
 
 ## 1. OSS / PRO 职责切割原则
 
@@ -242,11 +256,13 @@ Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级�
 - OSS 实现：`./Frame.svelte`
 - PRO 超集：`../../../pro/src/components/FramePro.svelte`（薄层：仅挂载 §7.7 / §8 / §10 的跨组件协调器）
 - PRO 文档：`../../../pro/src/components/FramePro.md`
-- 全量关键字 API 速查：`../../../Frame.md`（仓库根，按章节列出所有 `while*` / `state*` / `orchestrate*` 等）
+- 全量关键字 API 速查：`../../../pro/src/components/FramePro.md`（共享 API 权威，按章节列出所有 `while*` / `state*` / `orchestrate*` 等）
 - 组件开发规范：`../../../specs/ComponentGuidelines.md`（含 OSS vs PRO 判断流程 §0.5）
-- 切割线变更日志：本文档 §1.6
+- 切割线更新日志：本文档 §1.6
 
 ## 更新日志
+
+- 2026-09-21（文档）：整理阅读入口，修正共享 API 路径，明确架构正文与使用文档的边界。
 
 - v1.3.1 (2026-08-17): Frame responsive 与 Scale Observer 统一复用延迟创建、按帧交付的 `resizeManager`；SSR 与能力缺失时只关闭尺寸增强。
 

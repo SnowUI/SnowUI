@@ -1,18 +1,57 @@
-# Spinner 加载组件 (Spinner)
+# Spinner
 
 > **版本**: v1.2.2
-> **职责**: 表达加载中的非文本状态，并提供 circle、spokes 与 pills 三种内禀视觉变体。
-> **变更记录 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确 Spinner 尺寸和动画层为组件私有布局。
-> **描述**: 这是一个通用的加载状态指示器，支持多种视觉变体和响应式尺寸。
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+> **职责**: 以持续旋转的视觉提示表示加载中，提供圆环、辐条和胶囊三种形式，适合按钮与内容区域。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 以持续旋转的视觉提示表示加载中，提供圆环、辐条和胶囊三种形式，适合按钮与内容区域。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于等待状态的持续指示。能提供完成度时使用 Progress；已有按钮或表格加载态优先使用宿主内置 Spinner。
+
+- variant 选择等待图形；size 优先于父级尺寸，无上下文时为 16。
+- 不渲染 children；加载说明文字在外部组合。需要完成比例时改用 Progress。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Spinner, Text, Button } from '@snowui-design-system/components';
+</script>
+
+<div style="display: flex; align-items: center; gap: var(--gap-3);">
+	<Spinner aria-label="Loading components" />
+	<Text>Loading components…</Text>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| variant | `SpinnerVariant` | `"circle"` | 视觉变体风格 |
+| size | `ResourceSize` | — | 尺寸（支持 12、16、20、24、28、32、40、48、80）；省略时优先继承父级 iconSize / size，无上下文时为 16 |
+| speed | `number` | `1` | 正数动画速度倍率；circle 基准周期 1000ms，spokes / pills 为 800ms，除以该倍率。非有限值或非正数回退为 1；显式 loopMotion 时序优先。 |
+| loopMotion | `LoopMotionConfig` | — | 覆盖默认循环动画桥接配置；优先级高于 `speed` 推导出来的默认时长。若传入 `preset`，Spinner 仅消费其中的时序字段，不让 Frame 根节点重复旋转 |
+| children | `Snippet` | — | 兼容 Frame 的类型声明；Spinner 使用内置动画图形，不渲染子内容。文字请在外部组合。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：内禀原子布局。
 
@@ -21,22 +60,21 @@
 - Spinner 不提供 label 排列能力；需要“图标 + 文案”时由外部 Button、Frame 或 Text 组合负责。
 - `loopMotion` 只覆盖内部循环动效时序，不改变根布局模型。
 
-## 关键字 (Keywords)
+<a id="关键字-keywords"></a>
+
+### 关键字 (Keywords)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `variant` | `'circle' \| 'spokes' \| 'pills'` | `'circle'` | 视觉变体风格 |
-| `size` | `ResourceSize` | `16` | 尺寸（支持 12、16、20、24、28、32、40、48、80）；省略时优先继承父级 iconSize / size，无上下文时为 16 |
-| `speed` | `number` | `1` | 正数动画速度倍率；circle 基准周期 1000ms，spokes / pills 为 800ms，除以该倍率。非有限值或非正数回退为 1；显式 loopMotion 时序优先。 |
-| `loopMotion` | `LoopMotionConfig` | - | 覆盖默认循环动画桥接配置；优先级高于 `speed` 推导出来的默认时长。若传入 `preset`，Spinner 仅消费其中的时序字段，不让 Frame 根节点重复旋转 |
-| `children` | `Snippet` | - | 兼容 Frame 的类型声明；Spinner 使用内置动画图形，不渲染子内容。文字请在外部组合。 |
 | `class` | `string` | `''` | 自定义样式类 (如颜色) |
 
 ### Note on Color & Label
 - **Color**: `Spinner` 不提供 `color` 属性。它默认继承当前文本颜色 (`currentColor`)。如需修改颜色，请使用工具类：`<Spinner class="snowui-text-blue-500" />`。
 - **Label**: `Spinner` 不提供 `label` 属性。如需组合文字，请使用外部布局。
 
-## 变体 (Variants)
+<a id="变体-variants"></a>
+
+### 变体 (Variants)
 
 | 变体名 | 描述 |
 | :--- | :--- |
@@ -44,7 +82,8 @@
 | `spokes` | 辐射线条，具有拖尾效果 |
 | `pills` | 粗线条辐射，具有拖尾效果 |
 
-## 示例
+<a id="示例"></a>
+
 
 ### 1. 基础用法
 默认显示 16px 的 `circle` 变体。
@@ -67,9 +106,20 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **更新日志 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确 Spinner 尺寸和动画层为组件私有布局。
+> **描述**: 这是一个通用的加载状态指示器，支持多种视觉变体和响应式尺寸。
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -77,9 +127,11 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
-- **Spinner-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
+
+- **Spinner-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.2.2 (2026-03-06)
 

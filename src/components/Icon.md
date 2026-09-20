@@ -1,22 +1,64 @@
-# Icon.svelte 文档
+# Icon
 
 > **版本**: v2.3.3
-> **变更记录 (2026-08-15)**: 内置图片与 SVG 显式拥有 block、100% 尺寸和 max-width 基线，不依赖可选 `snowui-base.css` 的媒体初始化。
-> **变更记录 (2026-05-18)**: 新增 `stateIcon`，支持读取父 Frame `currentState` 后声明式切换图标。
-> **变更记录 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确 `as` 仅作为外部/宿主角色，不改变 Icon 内部尺寸原语语义。
-> **变更记录 (2026-03-31)**: 新增 `icon` 资源组件透传能力：支持 `<Icon icon={Warning} />` 直接渲染 `resource-svelte` 图标，避免回退为默认占位块。
-> **变更记录 (2026-03-10)**: 新增 Image / ImageViewer 宿主角色接入，支持 `as="icon" / "badge" / "prev" / "next" / "close"`。
-> **变更记录 (2026-03-02)**: 移除 Badge 的 `mask-image` 镂空切割效果，支持 `<Badge>` 组件直接作为默认子节点嵌套。
-> **职责**: 图标组件，用于显示 SVG 图标。
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+> **职责**: 展示 SVG 图标，并统一尺寸与颜色，适合按钮、导航和内容中的视觉标识。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 展示 SVG 图标，并统一尺寸与颜色，适合按钮、导航和内容中的视觉标识。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于统一图标宿主与尺寸。优先复用 SnowUI 资源图标；有操作行为时放入 Button 并提供可访问名称，不把装饰图形误作功能图标。
+
+- 优先提供资源图标；src 与解析后的 icon 均未命中时才渲染 children。
+- size 可继承父级尺寸；角标使用 Badge as="badge"。交互名称应提供给拥有操作的按钮。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Icon } from '@snowui-design-system/components';
+	import { IconSet } from '@snowui-design-system/resource-svelte';
+	const sizes = [12, 16, 20, 24, 28, 32, 40, 48, 80] as const;
+</script>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--gap-4) var(--gap-3); max-width: 100%;">
+{#each sizes as size}
+    <Icon icon={IconSet} {size} aria-label={`Component icon, size ${size}`} />
+{/each}
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| src | `string` | — | 图标图片 URL |
+| icon | `Component<any>` | — | 直接渲染 resource-svelte 图标组件。 |
+| stateIcon | `StateValueMap<Component<any> \| null>` | — | 根据最近父级 Frame 的 `currentState` 解析图标。未命中当前状态时回退 `Idle`，再回退 `icon` / `src` / children；状态值为 `null` 时隐藏 Icon。 |
+| size | `IconSize` | — | 图标尺寸。未显式设置时，自动继承父级 `Frame` 提供尺寸上下文。 |
+| background | `boolean` | `false` | 是否显示背景 |
+| weight | `string` | — | 透传给图标资源的视觉权重；资源支持时可用 thin、light、regular、bold、fill、duotone。未设置时由资源或上下文决定，不会凭空生成资源缺少的变体。 |
+| as | `\| "badge" \| "icon" \| "prev" \| "next" \| "close" \| (string & {})` | `"icon"` | 角色：作为独立图标、徽标、图片中央图标或 Viewer 控制图标 |
+| children | `Snippet` | — | 图标内容与角标组合；仅当 src 和解析后的 icon 均未命中时渲染；可同时放入资源图标与 Badge as="badge"，角标由宿主定位。 |
+| badgePosition | `"top" \| "bottom"` | `"top"` | 作为角标宿主时的位置：top 为右上，bottom 为右下。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：内禀原子布局。
 
@@ -25,27 +67,8 @@
 - 背景、空占位、badge overlay 与图片资源渲染都是 Icon 私有结构，不对外承诺通用槽位。
 - 外部需要图标加文字排列时，应由 Button、MenuItem、Frame 等宿主组件负责 gap / padding / alignment。
 
-## 组件特有属性 (Component-Specific Props)
+<a id="关键字-keyword"></a>
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| src | string | undefined | 图标图片 URL |
-| icon | Component | undefined | 直接渲染 resource-svelte 图标组件。 |
-| stateIcon | `Partial<Record<CoreState, Component \| null>>` | undefined | 根据最近父级 Frame 的 `currentState` 解析图标。未命中当前状态时回退 `Idle`，再回退 `icon` / `src` / children；状态值为 `null` 时隐藏 Icon。 |
-| size | 12\|16\|20\|24\|28\|32\|40\|48\|80 | 16 | 图标尺寸。未显式设置时，自动继承父级 `Frame` 提供尺寸上下文。 |
-| background | boolean | false | 是否显示背景 |
-| weight | string | undefined | 透传给图标资源的视觉权重；资源支持时可用 thin、light、regular、bold、fill、duotone。未设置时由资源或上下文决定，不会凭空生成资源缺少的变体。 |
-| as | 'badge'\|'icon'\|'prev'\|'next'\|'close' | 'icon' | 角色：作为独立图标、徽标、图片中央图标或 Viewer 控制图标 |
-| children | `Snippet` | undefined | 图标内容与角标组合；仅当 src 和解析后的 icon 均未命中时渲染；可同时放入资源图标与 Badge as="badge"，角标由宿主定位。 |
-| badgePosition | 'top'\|'bottom' | 'top' | 作为角标宿主时的位置：top 为右上，bottom 为右下。 |
-
-## 关键字 (Keyword)
-
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| size | `12 \| 16 \| 20 \| 24 \| 28 \| 32 \| 40 \| 48 \| 80` | `16` | 图标尺寸。支持从上下文自动继承。 |
-| background | `boolean` | `false` | 是否显示背景 |
-| stateIcon | `Partial<Record<CoreState, Component \| null>>` | - | 父状态驱动图标。消费最近父 Frame Context 的 `currentState`，只改变 Icon 自身展示，不修改父状态；值为 `null` 时隐藏。 |
 
 ### `stateIcon` 解析规则
 
@@ -58,7 +81,9 @@
 
 > `Load` 是 Frame loading / skeleton 协议状态名。若只是按钮任务处理中并需要展示真实 Spinner,优先使用 `Pending`。
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <!-- 基础使用 -->
@@ -103,14 +128,33 @@
 </Avatar>
 ```
 
-## 子组件上下文 (Context)
+<a id="子组件上下文-context"></a>
+
+### 子组件上下文 (Context)
 
 Icon 为子组件 (如 Badge 或 另一个 Icon) 提供自适应定位上下文：
 - `badgeStyle`: 基于 `em` 的绝对定位样式，确保图标外缘角落对齐。
 - `badgeSize`: 默认点状态尺寸 (`0.25em`)。
  - `size/weight`: Icon 容器默认透传；子图标显式传入时覆盖（不推荐）。
 
-## 样式规范 (Style Spec)
+
+
+## AI Zone
+
+> **更新日志 (2026-08-15)**: 内置图片与 SVG 显式拥有 block、100% 尺寸和 max-width 基线，不依赖可选 `snowui-base.css` 的媒体初始化。
+> **更新日志 (2026-05-18)**: 新增 `stateIcon`，支持读取父 Frame `currentState` 后声明式切换图标。
+> **更新日志 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确 `as` 仅作为外部/宿主角色，不改变 Icon 内部尺寸原语语义。
+> **更新日志 (2026-03-31)**: 新增 `icon` 资源组件透传能力：支持 `<Icon icon={Warning} />` 直接渲染 `resource-svelte` 图标，避免回退为默认占位块。
+> **更新日志 (2026-03-10)**: 新增 Image / ImageViewer 宿主角色接入，支持 `as="icon" / "badge" / "prev" / "next" / "close"`。
+> **更新日志 (2026-03-02)**: 移除 Badge 的 `mask-image` 镂空切割效果，支持 `<Badge>` 组件直接作为默认子节点嵌套。
+
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 ### 1. 默认样式 (Defaults)
 
@@ -171,7 +215,9 @@ Icon 为子组件 (如 Badge 或 另一个 Icon) 提供自适应定位上下文�
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -188,7 +234,9 @@ Icon 为子组件 (如 Badge 或 另一个 Icon) 提供自适应定位上下文�
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -201,9 +249,11 @@ Icon 为子组件 (如 Badge 或 另一个 Icon) 提供自适应定位上下文�
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
-- **Icon-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
+
+- **Icon-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v2.3.3 (2026-08-15)
 

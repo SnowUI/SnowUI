@@ -1,18 +1,83 @@
-# ScrollArea（可滚动区域）
+# ScrollArea
 
 > **版本**: v1.4.0
-> **更新**: 2026-09-18
-> **职责**: 提供隐藏原生滚动条、使用 SnowUI 自建滚动条的通用可滚动容器
-> **布局模型**: 复合管理布局
-> **文档**: ./ScrollArea.md
-
-ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步与拖动交互。页面和普通容器只需要声明滚动方向，不需要手写滚动条 DOM 或调用底层 hook。
+> **职责**: 为内容提供可滚动区域与统一的滚动条，适合长列表、面板和受限空间中的正文。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 为内容提供可滚动区域与统一的滚动条，适合长列表、面板和受限空间中的正文。
 
-## 功能概览
+## 使用选择
+
+<!-- usage-guide:start -->
+用于需要独立滚动的区域。页面不应无意创建多层嵌套滚动；表格的局部横向滚动优先沿用 Table。
+
+- axis 选择滚动方向；内容或宿主需要有限尺寸才能形成滚动区域。
+- bind:viewport 获取实际滚动元素，onscroll 接收滚动事件；用 ariaLabel 描述区域用途。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { ScrollArea } from '@snowui-design-system/components';
+</script>
+
+<ScrollArea axis="vertical" ariaLabel="SnowUI documentation guide" style="width: min(100%, 30rem); height: 220px;">
+	<article style="display: flex; flex-direction: column; gap: var(--gap-4); padding: var(--padding-3); font-size: var(--text-14); line-height: var(--leading-14);">
+		<section>
+			<h3 style="font-size: var(--text-14); font-weight: 600;">Getting started</h3>
+			<p>Install SnowUI in a Svelte 5 project and load the component stylesheet once at the application root.</p>
+		</section>
+		<section>
+			<h3 style="font-size: var(--text-14); font-weight: 600;">Choose a component</h3>
+			<p>Start with the public components. Read their usage and API reference before adding custom layout or behavior.</p>
+		</section>
+		<section>
+			<h3 style="font-size: var(--text-14); font-weight: 600;">Build with tokens</h3>
+			<p>Use the same typography, spacing, and color tokens across the SnowUI website and component documentation.</p>
+		</section>
+		<section>
+			<h3 style="font-size: var(--text-14); font-weight: 600;">Compose the page</h3>
+			<p>Keep navigation, content, and supporting information in clear sections that remain readable on narrow screens.</p>
+		</section>
+		<section>
+			<h3 style="font-size: var(--text-14); font-weight: 600;">Check interactions</h3>
+			<p>Try keyboard navigation, loading states, and disabled controls. Give every action a clear accessible name.</p>
+		</section>
+		<section>
+			<h3 style="font-size: var(--text-14); font-weight: 600;">Review the result</h3>
+			<p>Compare the rendered page with its source, then verify light and dark themes before sharing the documentation.</p>
+		</section>
+	</article>
+</ScrollArea>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| axis | `ScrollAreaAxis` | `"vertical"` | 允许滚动的方向 |
+| horizontalTrackPosition | `ScrollAreaHorizontalTrackPosition` | `"container"` | 横向轨道停靠在容器底边，或在长容器经过页面视口时贴近视口底部 |
+| horizontalScrollbarVisibility | `"always" \| "hover"` | `"always"` | 横向滚动条在内容溢出时常显，或仅在鼠标移入区域时显示 |
+| ariaLabel | `string` | `"Scrollable content"` | viewport 的无障碍标签；viewport 使用 `role="region"` |
+| viewport | `HTMLElement` | — | 暴露内部可滚动 viewport，供读取或设置原生滚动位置 |
+| onscroll | `(event: Event) => void` | — | viewport 原生 scroll 事件 |
+| children | `Snippet` | — | 任意可滚动内容 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="功能概览"></a>
+
+### 功能概览
 
 - 支持纵向、横向和双轴滚动
 - 隐藏浏览器原生滚动条
@@ -24,20 +89,10 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 
 ---
 
-## API 参考
+<a id="api-参考"></a>
 
-### 核心属性
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `axis` | `"vertical" \| "horizontal" \| "both"` | `"vertical"` | 允许滚动的方向 |
-| `horizontalTrackPosition` | `"container" \| "viewport"` | `"container"` | 横向轨道停靠在容器底边，或在长容器经过页面视口时贴近视口底部 |
-| `horizontalScrollbarVisibility` | `"always" \| "hover"` | `"always"` | 横向滚动条在内容溢出时常显，或仅在鼠标移入区域时显示 |
-| `ariaLabel` | `string` | `"Scrollable content"` | viewport 的无障碍标签；viewport 使用 `role="region"` |
-| `viewport` | `HTMLElement`（可绑定） | - | 暴露内部可滚动 viewport，供读取或设置原生滚动位置 |
-| `onscroll` | `(event: Event) => void` | - | viewport 原生 scroll 事件 |
-| `children` | `Snippet` | - | 任意可滚动内容 |
-| `...rest` | `FrameProps` | - | 透传到根 Frame，包括 `class`、`style`、尺寸、状态和动效关键字 |
+
 
 ### 基础用法
 
@@ -74,9 +129,21 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **更新**: 2026-09-18
+
+> **布局模型**: 复合管理布局
+> **文档**: ./ScrollArea.md
+
+ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步与拖动交互。页面和普通容器只需要声明滚动方向，不需要手写滚动条 DOM 或调用底层 hook。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 开发者关键字
 
@@ -122,7 +189,9 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.4.0 (2026-09-18)
 

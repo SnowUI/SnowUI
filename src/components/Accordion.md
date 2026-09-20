@@ -1,17 +1,84 @@
-# Accordion.svelte 文档
+# Accordion
 
 > **版本**: v1.6.2
-> **职责**: 提供可展开 / 收起的内容分组容器，用于 FAQ、设置项、分段说明与信息折叠。
-> **包归属**: OSS（标准 UI 原语；不使用跨 Frame 协调、复杂 PRO 动效或产品级区块能力）
-
-**继承**: 根层复用 Frame.svelte 的通用能力（响应式、上下文、Skeleton、状态与动效关键字透传）。
-**默认能力开关**: `enableResponsive=true`、`enableContext=true`、`enableScaleObserver=false`、`enableDefaultMotion=true`。
+> **职责**: 将相关内容组织为可展开、收起的分组，适合常见问题、设置和分段说明，支持单项或多项同时展开。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 将相关内容组织为可展开、收起的分组，适合常见问题、设置和分段说明，支持单项或多项同时展开。
 
-## 功能概览
+## 使用选择
+
+<!-- usage-guide:start -->
+适合 FAQ、设置分组和可折叠说明。需要切换同一区域的内容面板时使用 Tab；AccordionItem 应放在 Accordion 中。
+
+- `type="single"` 使用字符串值，`multiple` 使用数组；`bind:value` 同步展开项，`defaultValue` 只提供初始状态。
+- `items` 模式使用索引字符串作为值；显式 children 替换 items，子项自行配置，不读取默认子项的 parts。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Accordion, AccordionItem, Frame, Icon } from '@snowui-design-system/components';
+	import { BookOpen, Package, Palette, Rocket, ShieldCheck } from '@snowui-design-system/resource-svelte';
+</script>
+
+<Accordion type="multiple" defaultValue={['installation', 'themes']} variant="filled" size="md" style="width: min(100%, 36rem);">
+	<AccordionItem value="installation">
+		<Frame as="title" row><Icon as="leading"><Package /></Icon>How do I install SnowUI?</Frame>
+		<Frame as="content" row>Install the Components and Resource packages, then import only the components your page uses.</Frame>
+	</AccordionItem>
+	<AccordionItem value="components">
+		<Frame as="title" row><Icon as="leading"><BookOpen /></Icon>Where can I explore every component?</Frame>
+		<Frame as="content" row>Open the Components catalog for live previews, copy-ready code, API details, and source links.</Frame>
+	</AccordionItem>
+	<AccordionItem value="themes">
+		<Frame as="title" row><Icon as="leading"><Palette /></Icon>Does SnowUI support light and dark themes?</Frame>
+		<Frame as="content" row>Yes. Components use the same semantic theme contract in applications and isolated documentation previews.</Frame>
+	</AccordionItem>
+	<AccordionItem value="quality">
+		<Frame as="title" row><Icon as="leading"><ShieldCheck /></Icon>How are components verified?</Frame>
+		<Frame as="content" row>Public behavior is checked with type validation, accessibility coverage, and real browser previews.</Frame>
+	</AccordionItem>
+	<AccordionItem value="pro">
+		<Frame as="title" row><Icon as="leading"><Rocket /></Icon>When should I use SnowUI PRO?</Frame>
+		<Frame as="content" row>Use PRO for advanced components and product-ready blocks that coordinate richer application workflows.</Frame>
+	</AccordionItem>
+</Accordion>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| type | `AccordionType` | `"single"` | single 一次只展开一项；multiple 可同时展开多项。决定 value/defaultValue 与 onValueChange 的值形态。 |
+| value | `AccordionValue` | — | 当前展开值，支持 bind:value；优先于内部状态。single 使用字符串，multiple 使用数组；single 空字符串表示全部收起。 |
+| defaultValue | `AccordionValue` | — | 非受控初始展开值；仅初始化内部状态时读取，value 优先。items 模式使用索引字符串，显式 AccordionItem 使用其 value。 |
+| collapsible | `boolean` | `true` | 单开模式下，点击已展开项是否允许收起。 |
+| variant | `AccordionVariant` | `"filled"` | filled 为带背景的独立折叠项；divided 使用项间分割线。两者共享展开状态与交互。 |
+| size | `AccordionSize` | — | 尺寸密度；显式值优先，其次父级尺寸上下文，再回退 md。统一控制标题、正文、间距及子项尺寸。 |
+| disabled | `boolean` | `false` | 禁用整个 Accordion。 |
+| continuousHover | `boolean` | `true` | 是否使用容器级唯一连续 hover 背景；关闭后恢复 title 的普通 hover。 |
+| role | `string` | `"presentation"` | 根容器的 ARIA role；默认仅作展示分组，标题触发器与内容 region 的语义仍由 AccordionItem 管理。 |
+| items | `AccordionEntry[]` | `[]` | 默认内置模式的数据；内部 value 使用数组索引字符串。 |
+| children | `Snippet` | — | 显式组合内容；存在时替换内置 items。 |
+| parts | `ComponentPartsOf<{ AccordionItem: typeof AccordionItem; Frame: typeof Frame; }>` | — | 仅配置 items 模式内建的 AccordionItem 与标题、正文 Frame；显式 children 不读取这些默认子项配置。 |
+| onValueChange | `(value: AccordionValue) => void` | — | 用户切换展开项后回调；single 返回当前项字符串（全部收起时为空字符串），multiple 返回展开项数组。可配合 bind:value 同步页面状态。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="功能概览"></a>
+
+### 功能概览
 
 - 默认内置模式通过 `items` 渲染内容；每项只包含 `title` 与 `content`，内部自动生成 AccordionItem 和 `Frame as="title|content"`。
 - 显式 children 存在时替换内置 items，用于自定义 AccordionItem 结构。
@@ -26,30 +93,17 @@
 
 ---
 
-## API 参考
+<a id="api-参考"></a>
+
 
 ### 核心属性
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `role` | `string` | `"presentation"` | 根容器的 ARIA role；默认仅作展示分组，标题触发器与内容 region 的语义仍由 AccordionItem 管理。 |
-| `type` | `"single" \| "multiple"` | `"single"` | single 一次只展开一项；multiple 可同时展开多项。决定 value/defaultValue 与 onValueChange 的值形态。 |
-| `value` | `string \| string[]` | — | 当前展开值，支持 bind:value；优先于内部状态。single 使用字符串，multiple 使用数组；single 空字符串表示全部收起。 |
-| `defaultValue` | `string \| string[]` | — | 非受控初始展开值；仅初始化内部状态时读取，value 优先。items 模式使用索引字符串，显式 AccordionItem 使用其 value。 |
-| `collapsible` | `boolean` | `true` | 单开模式下，点击已展开项是否允许收起。 |
-| `variant` | `"filled" \| "divided"` | `"filled"` | filled 为带背景的独立折叠项；divided 使用项间分割线。两者共享展开状态与交互。 |
-| `size` | `"sm" \| "md" \| "lg"` | —（最终回退 "md"） | 尺寸密度；显式值优先，其次父级尺寸上下文，再回退 md。统一控制标题、正文、间距及子项尺寸。 |
-| `disabled` | `boolean` | `false` | 禁用整个 Accordion。 |
-| `continuousHover` | `boolean` | `true` | 是否使用容器级唯一连续 hover 背景；关闭后恢复 title 的普通 hover。 |
-| `items` | `{ title: string; content: string }[]` | `[]` | 默认内置模式的数据；内部 value 使用数组索引字符串。 |
-| `onValueChange` | `(value: string \| string[]) => void` | — | 用户切换展开项后回调；single 返回当前项字符串（全部收起时为空字符串），multiple 返回展开项数组。可配合 bind:value 同步页面状态。 |
-| `parts` | `ComponentPartsOf<{ AccordionItem: typeof AccordionItem; Frame: typeof Frame }>` | — | 仅配置 items 模式内建的 AccordionItem 与标题、正文 Frame；显式 children 不读取这些默认子项配置。 |
-| `children` | `Snippet` | - | 显式组合内容；存在时替换内置 items。 |
-| `...rest` | `FrameProps` | - | 透传到根 `Frame`。 |
 
 默认内置模式的 value 为数组索引字符串，例如 `defaultValue="1"` 默认展开第二项。显式组合模式仍使用 AccordionItem 自己声明的稳定 value。尺寸只由 `Accordion size` 控制，`AccordionItem` 不提供独立尺寸属性。
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**复合管理布局**。定义见 [../../../specs/LayoutProtocol.md §12.6](../../../specs/LayoutProtocol.md)。
 
@@ -86,7 +140,9 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 | `filled md` | `12px 16px` | `12px 16px` | `16px` | `4px` |
 | `filled lg` | `16px 20px` | `16px 20px` | `24px` | `4px` |
 
-## 样式变量链
+<a id="样式变量链"></a>
+
+### 样式变量链
 
 | 变量 | 默认值 | 用途 |
 | :--- | :--- | :--- |
@@ -109,7 +165,9 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 
 公开覆盖入口见 [components.css](../styles/components.css) 的 Accordion 段。
 
-## 无障碍
+<a id="无障碍"></a>
+
+### 无障碍
 
 - 根节点输出 `role`，默认 `presentation`；消费方可通过 `role` 覆盖。
 - `Frame as="title"` 由 AccordionItem 接管 button-like 语义，输出 `role="button"`、`tabindex`、`aria-expanded`、`aria-controls`。
@@ -118,7 +176,9 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 - 禁用 Title 输出 `aria-disabled="true"`，并从 tab 顺序中移除。
 - 键盘 button 语义仍只归属 Title；展开 content 的普通指针点击可收起，但 Link、Button、Input、Label、Select、Textarea、Summary、显式交互 role 与可编辑区域不会触发父项收起。
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <Accordion
@@ -152,9 +212,17 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+**继承**: 根层复用 Frame.svelte 的通用能力（响应式、上下文、Skeleton、状态与动效关键字透传）。
+**默认能力开关**: `enableResponsive=true`、`enableContext=true`、`enableScaleObserver=false`、`enableDefaultMotion=true`。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 开发者关键字
 
@@ -193,7 +261,9 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.6.2 (2026-09-02)
 

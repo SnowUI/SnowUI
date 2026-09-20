@@ -1,21 +1,59 @@
-# Image.svelte 文档
+# Image
 
 > **版本**: v1.4.0
-> **变更记录 (2026-05-20)**: 明确 Image 默认具备点击预览交互；只有具备点击交互时才显示 hover 变色和手形指针，`previewMode="none"` 且无点击回调时不显示交互 hover。
-> **变更记录 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确媒体裁切、loading 层与角标/图标定位为组件私有布局。
-> **变更记录 (2026-03-13)**: 字符串图片与字符串视频在真实加载阶段新增 Skeleton 占位，媒体加载完成后再显示内容。
-> **变更记录 (2026-03-13)**: 扩展尺寸梯度，新增 `56 / 64 / 72`；圆角映射更新为 `56→16px`、`64/72/80→20px`。
-> **变更记录 (2026-03-13)**: 移除 `openable / disableImageViewer` 兼容属性；当前预览行为只由 `previewMode="viewer" | "window" | "none"` 控制。
-> **职责**: 图片组件，负责展示图片资源、占位态、组合挂件与预览触发。
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+> **职责**: 展示图片及其占位状态，支持组合角标、操作与预览入口，适合内容图片和媒体缩略图。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 展示图片及其占位状态，支持组合角标、操作与预览入口，适合内容图片和媒体缩略图。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于展示图片与其公开加载/预览能力。头像优先 Avatar，多张图片组合用 ImageGroup，专业查看用 ImageViewer。
+
+- 提供 src 与有意义的 alt；附属内容用 as="icon" 或 as="badge"，不会替换图片。
+- 通过 previewMode 配置预览；ImageGroup 可统一组尺寸和预览策略，查看器由 ImageViewer 承载。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Image } from '@snowui-design-system/components';
+	import { ImageViewer } from '@snowui/components-pro';
+	import cover01 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-01-1024.jpg';
+</script>
+
+<Image src={cover01} alt="SnowUI gradient resource 1" size={80} />
+<ImageViewer />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| src | `string \| Component` | — | 图片 / 视频 URL，或 `resource-svelte` 图片组件 |
+| size | `ImageSize` | — | 图片尺寸。未显式设置时自动继承 `ImageGroup` 提供的尺寸上下文。 |
+| alt | `string` | — | 图片替代文本 |
+| previewMode | `PreviewMode` | — | 显式控制预览方式；未声明时，页面存在共享 ImageViewer 则接入 Viewer，否则字符串媒体回退为新窗口 |
+| onOpen | `(event?: MouseEvent \| KeyboardEvent) => void` | — | 点击或键盘触发打开时调用；提供后接管默认 Viewer / 新窗口动作，调用方负责处理打开行为。 |
+| badgePosition | `"top" \| "bottom"` | `"top"` | 角标位置：top 为右上，bottom 为右下。 |
+| children | `Snippet` | — | 媒体挂件；子组件通过 as="icon" 居中或 as="badge" 定位，不替换媒体内容。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：内禀原子布局。
 
@@ -24,28 +62,17 @@
 - 子组件的 `as="icon"` / `as="badge"` 只用于 Image 内部定位，不改变子组件自己的布局模型。
 - 外部需要排列多张图片时应使用 `ImageGroup`，不要把 Image 改造成集合布局。
 
-## 组件特有属性 (Component-Specific Props)
+<a id="关键字-keyword"></a>
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `src` | `string \| Component` | `undefined` | 图片 / 视频 URL，或 `resource-svelte` 图片组件 |
-| `size` | `12\|16\|20\|24\|28\|32\|40\|48\|56\|64\|72\|80` | `16` | 图片尺寸。未显式设置时自动继承 `ImageGroup` 提供的尺寸上下文。 |
-| `alt` | `string` | `undefined` | 图片替代文本 |
-| `previewMode` | `"viewer" \| "window" \| "none"` | 自动 | 显式控制预览方式；未声明时，页面存在共享 ImageViewer 则接入 Viewer，否则字符串媒体回退为新窗口 |
-| `badgePosition` | `'top' \| 'bottom'` | `'top'` | 角标位置：top 为右上，bottom 为右下。 |
-| `children` | `Snippet` | `undefined` | 媒体挂件；子组件通过 as="icon" 居中或 as="badge" 定位，不替换媒体内容。 |
-| `onOpen` | `(event?: MouseEvent \| KeyboardEvent) => void` | `undefined` | 点击或键盘触发打开时调用；提供后接管默认 Viewer / 新窗口动作，调用方负责处理打开行为。 |
-
-## 关键字 (Keyword)
+### 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `size` | `12 \| 16 \| 20 \| 24 \| 28 \| 32 \| 40 \| 48 \| 56 \| 64 \| 72 \| 80` | `16` | 图片尺寸，支持从上下文继承 |
-| `previewMode` | `"viewer" \| "window" \| "none"` | 自动 | 未声明时按共享 Viewer 是否存在选择 viewer / window |
 | `as` | `'badge' \| 'icon'` | - | 子组件角色：`badge` 右上角，`icon` 居中 |
-| `badgePosition` | `'top' \| 'bottom'` | `'top'` | 角标定位方向 |
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <!-- 基础图片 -->
@@ -70,7 +97,9 @@
 </Image>
 ```
 
-## 智能行为
+<a id="智能行为"></a>
+
+### 智能行为
 
 1. **素材兼容**: `src` 同时支持字符串图片地址、字符串视频地址与 `resource-svelte` 图片组件。
 2. **默认占位**: 未传素材时展示单一 `--black-4` 占位背景，不输出额外文案。
@@ -89,7 +118,23 @@
 15. **焦点策略**: `Image` 与 `Avatar` 一样保持 `Surface` 语义，但默认不显示额外 focus ring，避免预览缩略图出现按钮式焦点描边。
 16. **组合子渲染**: 传入的 `children` 会在媒体容器外层渲染，继续通过 `as="icon"` / `as="badge"` 使用定位上下文，不会再被 `Image` 内部的媒体模板吞掉。
 
-## 样式规范 (Style Spec)
+
+
+## AI Zone
+
+> **更新日志 (2026-05-20)**: 明确 Image 默认具备点击预览交互；只有具备点击交互时才显示 hover 变色和手形指针，`previewMode="none"` 且无点击回调时不显示交互 hover。
+> **更新日志 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确媒体裁切、loading 层与角标/图标定位为组件私有布局。
+> **更新日志 (2026-03-13)**: 字符串图片与字符串视频在真实加载阶段新增 Skeleton 占位，媒体加载完成后再显示内容。
+> **更新日志 (2026-03-13)**: 扩展尺寸梯度，新增 `56 / 64 / 72`；圆角映射更新为 `56→16px`、`64/72/80→20px`。
+> **更新日志 (2026-03-13)**: 移除 `openable / disableImageViewer` 兼容属性；当前预览行为只由 `previewMode="viewer" | "window" | "none"` 控制。
+
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 ### 1. Token 映射
 
@@ -142,7 +187,9 @@
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -168,9 +215,11 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
-- **Image-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
+
+- **Image-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.4.0 (2026-07-05)
 

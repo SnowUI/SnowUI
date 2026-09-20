@@ -1,27 +1,60 @@
-# Tag.svelte 文档
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
-
+# Tag
 
 > **版本**: v1.2.3
-> **变更记录 (2026-09-20)**: 内置关闭按钮清除最小内容宽度，常态不占位；离开后先淡出 X，再收回宽度和 padding。键盘焦点位于 Tag 内时保持展开。
-> **变更记录 (2026-08-30)**: 收起态内置 X 通过 Tag 直属规则完整覆盖共享按钮的 `flex` shorthand，确保视觉隐藏时不保留 12px 布局占位。
-> **变更记录 (2026-05-22)**: `shape="left-arrow" / "right-arrow"` 改为内部 SVG 背景路径，根据当前 Tag 宽高生成完整圆角箭头轮廓；所有外角均圆角化，尽量复原 Workshop `node-id=11951-40471` 中的箭头 Tag。
-> **变更记录 (2026-05-21)**: 激活态内置 X 颜色改为 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%，不再使用黑色。
-> **变更记录 (2026-08-16)**: 内置 X 改由 Components 自有 `ComponentIcon name="close"` 解析；无外部资源包时保持相同默认形状，应用级 `IconProvider` 可统一替换。
-> **变更记录 (2026-08-16)**: Tag 自有颜色、padding 与 hover overlay 过渡稳定覆盖 Level 1 共享行为，不依赖 CSS 注入顺序。
-> **变更记录 (2026-05-21)**: 新增 `toggle` 语法糖，与 Button 一致自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；点击进入激活态，再次点击回到常态。
-> **职责**: 标签组件，用于用户标记 / 筛选 / 路径片段等交互语义。
-> **设计稿**: [Workshop / Tag](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=11841-21705&t=nY2VC3oisn12OH01-4)
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`、`enableContext=true`、`enableScaleObserver=false`。
+> **职责**: 以可交互标签表达标记、筛选条件或路径片段，适合组织内容与收敛选择范围。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 以可交互标签表达标记、筛选条件或路径片段，适合组织内容与收敛选择范围。
 
-## 设计形态
+## 使用选择
+
+<!-- usage-guide:start -->
+用于带边界的标签内容及公开的关闭操作。关闭和选中是不同语义；需要独立按钮或选择控件时使用对应组件。
+
+- closable 显示关闭操作，onClose 通知页面移除数据；关闭不会替页面修改列表。
+- variant、shape 和 toggle 分别控制外观、形状与切换能力；parts 仅配置默认关闭按钮。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Tag, Button } from '@snowui-design-system/components';
+</script>
+
+<div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--gap-4) var(--gap-3);">
+	<Tag toggle>Design</Tag>
+	<Tag toggle>Engineering</Tag>
+	<Tag toggle>Product</Tag>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置组件生成的关闭 Button；不影响显式 children 内的按钮。 |
+| variant | `"default" \| "active"` | `"default"` | 视觉变体。`default` = Black/4% 背景；`active` = Secondary/Indigo 10% 背景 + Indigo 文字 |
+| toggle | `boolean` | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态由 Frame 输出的 `data-state="Active"` 触发 Indigo 激活态；`aria-pressed` 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
+| closable | `boolean` | `false` | 是否显示内置删除 X（hover Tag 时显形） |
+| shape | `"default" \| "left-arrow" \| "right-arrow"` | `"default"` | 外壳形状，用于路径 / 面包屑片段 |
+| onClose | `(event: MouseEvent) => void` | — | 点击 X 时回调（不直接销毁 Tag，移除逻辑由消费方决定） |
+| children | `Snippet` | — | 标签显示内容，由 Frame 的 children 渲染协议承接；关闭按钮由组件另行管理。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="设计形态"></a>
+
+### 设计形态
 
 设计稿中的 Tag 形态统一收敛为以下能力组合：
 
@@ -37,7 +70,9 @@
 
 设计稿中的左侧 Dot 仅作组合展示，Tag 不内置 leading Icon；X 由 `closable` 内置提供。设计稿内 X 与文字紧贴，组件默认 `gap=0`，外部覆盖 `--snowui-tag-gap` 或传 `gap` 时会同步影响 Icon、文字与 X 的间距。
 
-## 与 Chip / Badge 的区分
+<a id="与-chip-badge-的区分"></a>
+
+### 与 Chip / Badge 的区分
 
 | 维度 | Tag | Chip | Badge |
 | :--- | :--- | :--- | :--- |
@@ -49,29 +84,23 @@
 | 主要语义 | 用户标记 / 筛选 / 路径片段 | 状态 / 分类展示 | 数字 / 圆点徽标 |
 | 布局 | 内联外壳（同 Button） | 三槽位 | 内联外壳 |
 
-## 组件特有属性 (Component-Specific Props)
+<a id="组件特有属性-component-specific-props"></a>
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| variant | `'default' \| 'active'` | `'default'` | 视觉变体。`default` = Black/4% 背景；`active` = Secondary/Indigo 10% 背景 + Indigo 文字 |
-| toggle | `boolean` | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态由 Frame 输出的 `data-state="Active"` 触发 Indigo 激活态；`aria-pressed` 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
-| closable | `boolean` | `false` | 是否显示内置删除 X（hover Tag 时显形） |
-| shape | `'default' \| 'left-arrow' \| 'right-arrow'` | `'default'` | 外壳形状，用于路径 / 面包屑片段 |
-| onClose | `(event: MouseEvent) => void` | - | 点击 X 时回调（不直接销毁 Tag，移除逻辑由消费方决定） |
+### 组件特有属性 (Component-Specific Props)
 
 > **不提供 `size` 属性**：设计稿只有单一尺寸。
 
-## 关键字 (Keyword)
+<a id="关键字-keyword"></a>
+
+### 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| variant | `'default' \| 'active'` | `'default'` | 视觉变体 |
-| toggle | `boolean` | `false` | Toggle 模式语法糖。等价于显式声明 `Click={{ Idle: "Active", Active: "Idle" }} whileClick={false}`；Active 配色由 `data-state="Active"` 自动套 Indigo；`aria-pressed` 自动输出。 |
-| closable | `boolean` | `false` | 是否含删除 X |
-| shape | `'default' \| 'left-arrow' \| 'right-arrow'` | `'default'` | 外壳形状 |
 | as | `'leading' \| 'trailing'` | - | 角色化：作为外部容器（Field 等）的槽位 |
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**内联外壳布局**（与 Button 一致）。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
 
@@ -81,7 +110,9 @@
 - **边距按元素类型决定**（与 Figma 对齐）：文字与边的间距 8px、Icon / X 与边的间距 4px。组件通过 MutationObserver 检测**真实**首/末位节点（包含文本节点），按节点类型写到 `data-edge-left` / `data-edge-right`（`"icon"` / `"text"`），CSS `[data-edge-*="icon"]` 把对应侧 padding 从 8px 收紧到 4px。**纯 CSS `:first-child` / `:last-child` 只看元素节点，无法识别"末位文字"的情况**，因此走 JS。closable 的 X 不计入边距检测（X 由 `[data-closable]:hover` 单独管理右 padding）。
 - 箭头形状（`left-arrow` / `right-arrow`）由内部 SVG 背景路径实现，不进入子元素布局；组件用 ResizeObserver 获取当前宽高并生成完整外轮廓，所有拐点都通过二次贝塞尔圆角化，尽量复原 Workshop `node-id=11951-40471`。
 
-## 无障碍 (Accessibility)
+<a id="无障碍-accessibility"></a>
+
+### 无障碍 (Accessibility)
 
 与 Button 一致，自动输出 `aria-pressed`：
 
@@ -90,7 +121,9 @@
 - 删除 X 渲染为 `<button type="button" aria-label="Close tag">`，键盘可达，屏幕阅读器可识别。
 - 删除 X 点击时组件内部会 `stopPropagation()`，避免误触 Tag 根节点的 `onclick`；移除逻辑仍由消费方在 `onClose` 中决定。
 
-## 布局变量链
+<a id="布局变量链"></a>
+
+### 布局变量链
 
 | 变量 | 默认值 | 用途 |
 | :--- | :--- | :--- |
@@ -106,7 +139,9 @@
 | `--snowui-tag-bg` | `var(--black-4, rgba(0,0,0,0.04))` | 背景 |
 | `--snowui-tag-color` | `inherit` | 文字颜色 |
 
-## 用法示例
+<a id="用法示例"></a>
+
+### 用法示例
 
 ```svelte
 <!-- 默认（仅文字） -->
@@ -154,7 +189,30 @@
 </Tag>
 ```
 
-## 样式规范 (Style Spec)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+
+
+
+> **更新日志 (2026-09-20)**: 内置关闭按钮清除最小内容宽度，常态不占位；离开后先淡出 X，再收回宽度和 padding。键盘焦点位于 Tag 内时保持展开。
+> **更新日志 (2026-08-30)**: 收起态内置 X 通过 Tag 直属规则完整覆盖共享按钮的 `flex` shorthand，确保视觉隐藏时不保留 12px 布局占位。
+> **更新日志 (2026-05-22)**: `shape="left-arrow" / "right-arrow"` 改为内部 SVG 背景路径，根据当前 Tag 宽高生成完整圆角箭头轮廓；所有外角均圆角化，尽量复原 Workshop `node-id=11951-40471` 中的箭头 Tag。
+> **更新日志 (2026-05-21)**: 激活态内置 X 颜色改为 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%，不再使用黑色。
+> **更新日志 (2026-08-16)**: 内置 X 改由 Components 自有 `ComponentIcon name="close"` 解析；无外部资源包时保持相同默认形状，应用级 `IconProvider` 可统一替换。
+> **更新日志 (2026-08-16)**: Tag 自有颜色、padding 与 hover overlay 过渡稳定覆盖 Level 1 共享行为，不依赖 CSS 注入顺序。
+> **更新日志 (2026-05-21)**: 新增 `toggle` 语法糖，与 Button 一致自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；点击进入激活态，再次点击回到常态。
+
+> **设计稿**: [Workshop / Tag](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=11841-21705&t=nY2VC3oisn12OH01-4)
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`、`enableContext=true`、`enableScaleObserver=false`。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 ### 1. 默认态 (variant=default)
 
@@ -223,7 +281,9 @@
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引
 
@@ -239,7 +299,9 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.2.3 (2026-09-20)
 

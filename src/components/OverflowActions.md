@@ -1,16 +1,75 @@
 # OverflowActions
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
-
 > **版本**: v1.0.2
-> **职责**: 在有限宽度内保留一组操作，并把容纳不下的操作转移到 More 菜单。
+> **职责**: 在有限宽度内优先展示操作按钮，并将放不下的操作收进更多菜单，保持工具栏紧凑可用。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在有限宽度内优先展示操作按钮，并将放不下的操作收进更多菜单，保持工具栏紧凑可用。
 
-## 使用
+## 使用选择
+
+<!-- usage-guide:start -->
+用于一组操作随可用宽度逐步收进更多菜单。使用 OverflowAction 和 Separator 组合，不在页面重做宽度检测和菜单分配。
+
+- items 使用唯一 id 的 action / separator；显式 children 替换 items。
+- 显式组合使用 OverflowAction as="item" 与 Separator as="separator"；compact / overflow / overflowFrom 控制收纳方式。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { OverflowActions, Text } from '@snowui-design-system/components';
+	const websiteActions = [
+		{ id: 'preview', label: 'Preview site', icon: 'code', href: '/components/showcase' },
+		{ id: 'copy-install', label: 'Copy install', icon: 'copy' },
+		{ id: 'edit-page', label: 'Edit page', icon: 'pencil-simple' },
+		{ type: 'separator' as const, id: 'content-tools' },
+		{ id: 'translate', label: 'Translate', icon: 'translate' },
+		{ id: 'theme', label: 'Switch theme', icon: 'sun' },
+		{ id: 'github', label: 'GitHub source', icon: 'github-logo', href: 'https://github.com/SnowUI/SnowUI' },
+		{ type: 'separator' as const, id: 'publishing-tools' },
+		{ id: 'publish', label: 'Publish update', icon: 'upload' },
+		{ id: 'delete-draft', label: 'Delete draft', icon: 'trash' }
+	];
+</script>
+
+<div style="display: flex; flex-direction: column; align-items: center; width: 100%; gap: var(--gap-4) var(--gap-3);">
+	<OverflowActions items={websiteActions} moreLabel="More website actions" style="justify-content: center;" />
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| items | `OverflowActionsItem[]` | `[]` | 默认内建操作与分隔项数组；action 提供 id、label，可选 icon/disabled/href/onAction，separator 提供 type="separator" 与 id。每个 id 唯一；children 存在时改用显式子项。 |
+| compact | `"auto" \| "none"` | `"auto"` | auto 在宽度不足且所有 Action 都有 icon 与 label 时先统一隐藏文字；none 跳过此步骤，直接按 overflow 转移操作。 |
+| overflow | `"all" \| "progressive"` | `"all"` | all 在放不下时将全部操作转入 More；progressive 按 overflowFrom 逐项转入，保留可容纳的操作。菜单展开时冻结布局。 |
+| overflowFrom | `"start" \| "end"` | `"end"` | progressive 模式从数据/组合顺序的开头或末尾依次转移操作；all 模式不区分方向。 |
+| availableWidth | `number` | — | 外部给定可用于操作组布局的宽度，单位 px；提供后不再注册自身尺寸观察，适合 DataTable 复用列宽。 |
+| moreLabel | `string` | `"更多操作"` | More 按钮的无障碍名称 |
+| align | `"start" \| "end"` | `"end"` | Listbox 水平对齐 |
+| disabled | `boolean` | `false` | 禁用全部操作 |
+| buttonProps | `GlobalButtonProps` | — | 所有 Action、More 与隐藏测量副本共享的 Button 默认 Props；支持 variant/size/bare/emphasis/class/style，排除由操作组接管的内容、角色、点击、链接、禁用与名称字段。 |
+| children | `Snippet` | — | 声明直系 OverflowAction as="item" 与 Separator as="separator"；存在时替换 items 内建操作，结构项不作为独立溢出候选。 |
+| parts | `Parts` | — | 配置默认生成的 Button、SelectButton、Listbox、MenuItem、Separator；More 的 parts.SelectButton 高于组级 parts.Button。公开 Parts 结构与覆盖优先级见下文。 |
+| onAction | `(event: OverflowActionsActionEvent) => void` | — | 操作执行后回调：id 为稳定标识，source 为 "button" 或 "menu"；item 为匹配的内建数据（显式模式通常无），originalEvent 为可选鼠标事件。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="使用"></a>
+
+### 使用
 
 默认内置模式通过稳定数据生成 Button、Separator、SelectButton、Listbox 与 MenuItem：
 
@@ -35,7 +94,9 @@
 </OverflowActions>
 ```
 
-## 响应式规则
+<a id="响应式规则"></a>
+
+### 响应式规则
 
 组件按以下顺序适应可用宽度：
 
@@ -49,22 +110,9 @@
 
 More 按钮使用 `SelectButton selectionMode="action"`，内部直接组合 `Listbox + MenuItem`，不引入 Popover。菜单展开期间冻结当前布局，避免触发器因列宽或容器宽度变化而消失。
 
-## API
+<a id="api"></a>
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| --- | --- | --- | --- |
-| `items` | `OverflowActionsItem[]` | `[]` | 默认内建操作与分隔项数组；action 提供 id、label，可选 icon/disabled/href/onAction，separator 提供 type="separator" 与 id。每个 id 唯一；children 存在时改用显式子项。 |
-| `compact` | `"auto" \| "none"` | `"auto"` | auto 在宽度不足且所有 Action 都有 icon 与 label 时先统一隐藏文字；none 跳过此步骤，直接按 overflow 转移操作。 |
-| `overflow` | `"all" \| "progressive"` | `"all"` | all 在放不下时将全部操作转入 More；progressive 按 overflowFrom 逐项转入，保留可容纳的操作。菜单展开时冻结布局。 |
-| `overflowFrom` | `"start" \| "end"` | `"end"` | progressive 模式从数据/组合顺序的开头或末尾依次转移操作；all 模式不区分方向。 |
-| `availableWidth` | `number` | —（实测容器宽度） | 外部给定可用于操作组布局的宽度，单位 px；提供后不再注册自身尺寸观察，适合 DataTable 复用列宽。 |
-| `moreLabel` | `string` | `"更多操作"` | More 按钮的无障碍名称 |
-| `align` | `"start" \| "end"` | `"end"` | Listbox 水平对齐 |
-| `disabled` | `boolean` | `false` | 禁用全部操作 |
-| `buttonProps` | `GlobalButtonProps` | — | 所有 Action、More 与隐藏测量副本共享的 Button 默认 Props；支持 variant/size/bare/emphasis/class/style，排除由操作组接管的内容、角色、点击、链接、禁用与名称字段。 |
-| `children` | `Snippet` | — | 声明直系 OverflowAction as="item" 与 Separator as="separator"；存在时替换 items 内建操作，结构项不作为独立溢出候选。 |
-| `parts` | `Parts` | — | 配置默认生成的 Button、SelectButton、Listbox、MenuItem、Separator；More 的 parts.SelectButton 高于组级 parts.Button。公开 Parts 结构与覆盖优先级见下文。 |
-| `onAction` | `(event: OverflowActionsActionEvent) => void` | — | 操作执行后回调：id 为稳定标识，source 为 "button" 或 "menu"；item 为匹配的内建数据（显式模式通常无），originalEvent 为可选鼠标事件。 |
+### API
 
 `OverflowAction` 的 `icon` 支持资源图标名称或 Snippet；MenuItem 自动复用相同 icon。内置资源图标使用 MenuItem 的默认 16px，文字使用 MenuItem 的默认 14px / 20px，不继承 More 触发按钮的 Icon-only 尺寸；自定义 Snippet 保留自身视觉。当前不提供菜单项图标或文字尺寸接口。`href` Action 在可见状态使用链接，在菜单中执行时导航到同一地址。每个 Action 的 `id` 在组内必须唯一。
 
@@ -85,9 +133,16 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 ---
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 - 包归属：OSS；主布局模型为复合管理布局。
 - 组合模式：默认内置模式与显式组合模式并存；显式模式只识别直系 `OverflowAction as="item"` 与 `Separator as="separator"`。
@@ -97,7 +152,9 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - DataTable 应从列宽上下文传入 `availableWidth`，禁止为每个 actions 单元格新增 Observer。
 - More 菜单由 SelectButton / Listbox / MenuItem 承担打开、Portal、焦点、键盘与关闭行为。
 
-## 模块索引
+<a id="模块索引"></a>
+
+### 模块索引
 
 - [OverflowActions.svelte](./OverflowActions.svelte)
 - [OverflowAction.svelte](./OverflowAction.svelte)
@@ -105,7 +162,9 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - [Listbox.svelte](./Listbox.svelte)
 - [MenuItem.svelte](./MenuItem.svelte)
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.0.2 (2026-09-02)
 

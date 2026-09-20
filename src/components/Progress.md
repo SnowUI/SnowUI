@@ -1,16 +1,74 @@
-# Progress 进度组件
+# Progress
 
 > **版本**: v1.1.2
-> **职责**: 提供长条形与圆形进度反馈。
-
-**继承**: 复用 Frame.svelte 的通用能力。
-**默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`, `enableDefaultMotion=true`。
+> **职责**: 以条形或圆形反馈任务进度，支持明确进度与不确定状态，适合上传、处理和加载过程。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 以条形或圆形反馈任务进度，支持明确进度与不确定状态，适合上传、处理和加载过程。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于已知或未知完成度的进度反馈；未知进度使用 isIndeterminate。纯等待指示也可用 Spinner，业务数值仪表可选 GaugeChart。
+
+- value 是 0–100 的百分比；未知进度使用 isIndeterminate，不能用虚构百分比代替。
+- variant 选择 line / circle；circle 的 showLabel 生成标签，显式 children 替换默认标签。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button, Frame, Progress, Text } from '@snowui-design-system/components';
+	let progress = $state(38);
+	const status = $derived(progress === 100 ? 'Documentation ready' : 'Generating documentation');
+	function advance() { progress = Math.min(100, progress + 16); }
+</script>
+
+<div style="display: flex; flex-direction: column; align-items: stretch; gap: var(--gap-4); width: min(100%, 32rem); min-width: 0;">
+	<Progress value={progress} aria-label="Documentation generation progress">
+		<Frame as="label" row style="justify-content: space-between;">
+			<Text>{status}</Text>
+			<Text as="trailing">{progress}%</Text>
+		</Frame>
+	</Progress>
+	<div style="display: flex; justify-content: center; gap: var(--gap-2);">
+		<Button onclick={advance} disabled={progress === 100}>Advance</Button>
+		<Button onclick={() => progress = 0}>Reset</Button>
+	</div>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| value | `number` | `0` | 百分比进度，自动 clamp 到 0–100 |
+| variant | `ProgressVariant` | `"line"` | 长条形或圆形 |
+| size | `number \| string` | `16` | 圆形宽高；与 Spinner 默认一致 |
+| thickness | `number \| string` | — | 长条形高度或圆环粗细；circle / 不确定态对齐 Spinner 环宽 默认行为：line 确定态 `4`；circle 与不确定态为 size 的 `15%`（size=16 时 2.4px）。 |
+| background | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
+| color | `SnowUIColor \| string` | `"Primary"` | 填充颜色 |
+| isIndeterminate | `boolean` | `false` | 不确定态 |
+| showLabel | `boolean` | `false` | 仅 circle 生效；确定态下生成显示实时 value 的内置 Text |
+| loopMotion | `LoopMotionConfig` | — | 覆盖不确定态循环时序 |
+| children | `Snippet` | — | 显式 label 组合；存在时替换 circle 内置 label |
+| parts | `ComponentPartsOf<{ Text: typeof Text }>` | — | 配置 circle 的内置 Text label |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**复合管理布局**。
 
@@ -20,23 +78,9 @@
 - label 默认排版为 12px / 16px，不限制外部自定义文字、字号和颜色。
 - line 不提供内置 label：其常见结构是标题、状态与百分比的横向信息区，单一内置文本无法确定内容和对齐语义。
 
-## 关键字
+<a id="示例"></a>
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `value` | `number` | `0` | 百分比进度，自动 clamp 到 0–100 |
-| `variant` | `"line" \| "circle"` | `"line"` | 长条形或圆形 |
-| `size` | `number \| string` | `16` | 圆形宽高；与 Spinner 默认一致 |
-| `thickness` | `number \| string` | line 确定态 `4`；circle 与不确定态为 size 的 `15%`（size=16 时 2.4px） | 长条形高度或圆环粗细；circle / 不确定态对齐 Spinner 环宽 |
-| `background` | `SnowUIColor \| string` | `"Black4"` | 轨道底色 |
-| `color` | `SnowUIColor \| string` | `"Primary"` | 填充颜色 |
-| `isIndeterminate` | `boolean` | `false` | 不确定态 |
-| `showLabel` | `boolean` | `false` | 仅 circle 生效；确定态下生成显示实时 value 的内置 Text |
-| `loopMotion` | `LoopMotionConfig` | - | 覆盖不确定态循环时序 |
-| `parts` | `{ Text? }` | - | 配置 circle 的内置 Text label |
-| `children` | `Snippet` | - | 显式 label 组合；存在时替换 circle 内置 label |
-
-## 示例
+### 示例
 
 ```svelte
 <Progress value={60}>
@@ -55,9 +99,17 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+**继承**: 复用 Frame.svelte 的通用能力。
+**默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`, `enableDefaultMotion=true`。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 - **实现**: [./Progress.svelte](./Progress.svelte)
 - **颜色协议**: [../lib/color.md](../lib/color.md)
@@ -67,7 +119,9 @@
 - line 确定态 thickness 默认 4px。
 - 空的直系 `as="label"` 由组件自动写入实时值；显式内容不被改写。
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.1.2 (2026-07-12)
 

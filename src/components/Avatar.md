@@ -1,32 +1,69 @@
-# Avatar.svelte 文档
-
-> **变更记录 (2026-08-28)**: 默认 Gradient 新增 `fallbackColor` 与 `fallbackSeed`。显式颜色优先；稳定用户 ID 通过确定性哈希映射到六种具名配色；完全无身份信息时固定为 `blue`，不再依赖组件实例 ID。
+# Avatar
 
 > **版本**: v2.12.5
-> **变更记录 (2026-08-15)**: 默认 Gradient hover 改为按需挂载预栅格 SVG 图层；不再创建运行时 filter DOM，并继承 Gradient 的共享视口暂停能力。
-> **变更记录 (2026-08-15)**: 将 Avatar hover alpha 艺术色与 Gradient、GradientMotion 的画面艺术色分项登记，明确 Avatar 只拥有自己的 hover 染色例外。
-> **变更记录 (2026-08-15)**: 正式登记默认 Gradient 与图片 / 普通组件头像 hover 六色为专业艺术色例外；例外不建立通用语义色，也不豁免 Avatar 的其他 Token / 样式规则。
-> **变更记录 (2026-08-06)**: 默认 Gradient 头像常态改为轻量共享静态图；仅 hover 或 `gradientMotion` 开启时挂载完整 Gradient 组件，降低长表格中的组件、响应式状态与 SVG 资源开销。
-> **变更记录 (2026-08-03)**: 修复外部 Badge / Icon 子内容被内部 Frame 片段遮蔽的问题；Avatar 根盒统一使用中线对齐，确保 `empty` 与图片、Gradient 头像同排等高。
-> **变更记录 (2026-08-03)**: 默认 Gradient 头像 hover 使用七段非对称路径；每次进入随机切换且不重复上一组相位 / 方向配置。
-> **变更记录 (2026-08-02)**: 默认头像改为随机 Gradient；原灰色用户图标改为 `empty` 空头像变体；Avatar 单色 hover 通过像素 alpha 仅叠加实际图形。
-> **变更记录 (2026-08-02)**: Avatar 默认 hover 使用单层 Overlay；每次进入随机六色之一，同一次 hover 内颜色不变，默认文字与用户图标位于叠加层上方。
-> **变更记录 (2026-06-10)**: 新增 `fallback` 组件入口，允许 PRO `GradientMotion` 等视觉组件作为默认头像；补充 `as="avatar-image"` 头像图片层组合规则。
-> **变更记录 (2026-05-20)**: 点击型 Avatar 补齐 `cursor: pointer`，与 hover 视觉反馈保持一致。
-> **变更记录 (2026-03-10)**: 补全文档中的 hover 实现方式与样式定义，明确有图 / 首字母 / 默认回退三种 hover 分支。
-> **变更记录 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确头像尺寸、回退层与 badge 定位为组件私有布局。
-> **变更记录 (2026-03-06)**: 恢复 Avatar 旧版 hover 视觉分层，保留 Surface 语义并关闭默认 hover 叠加层。
-> **变更记录 (2026-02-05)**: 默认头像 hover 仅背景过渡，图标不变色。
-> **职责**: 头像组件，显示用户头像或占位符。
-
-**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
-**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+> **职责**: 展示用户或团队头像，支持图片、文字和渐变占位，让列表、评论与成员信息更易辨认。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 展示用户或团队头像，支持图片、文字和渐变占位，让列表、评论与成员信息更易辨认。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于用户或团队身份。单个头像用 Avatar，重叠成员用 AvatarGroup；纵向联系人列表使用 Avatar 配合普通列表和文本。
+
+- 通过 src 显示头像，使用 fallback / fallbackText 配置回退；为同一身份提供稳定 fallbackSeed。
+- 附属角标用 `as="badge"`，替换头像视觉用 `as="avatar-image"`；尺寸优先使用显式 size，其次父级头像尺寸。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Avatar } from '@snowui-design-system/components';
+	import { AvatarByewind, SnowLogo } from '@snowui-design-system/resource-svelte';
+</script>
+
+<div style="display: flex; align-items: center; flex-wrap: wrap; gap: var(--gap-4) var(--gap-3);">
+	<Avatar fallbackColor="blue" aria-label="Blue default avatar" size={48} />
+	<Avatar fallbackColor="cyan" aria-label="Cyan default avatar" size={48} />
+	<Avatar fallbackColor="green" aria-label="Green default avatar" size={48} />
+	<Avatar fallbackColor="red" aria-label="Red default avatar" size={48} />
+	<Avatar fallbackColor="orange" aria-label="Orange default avatar" size={48} />
+	<Avatar fallbackColor="purple" aria-label="Purple default avatar" size={48} />
+	<Avatar src={SnowLogo} dataName="SnowUI logo" size={48} />
+	<Avatar src={AvatarByewind} dataName="ByeWind" size={48} />
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| src | `string \| Component` | — | 头像图片 URL 或图标组件 |
+| size | `ResourceSize` | — | 头像尺寸档位为 12/16/20/24/28/32/40/48/80；显式值优先，其次父级头像或通用尺寸上下文，无上下文时为 16。 |
+| fallback | `Component` | — | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与解析后的稳定 `seed`。 |
+| fallbackText | `string` | — | 图片不可用时显示的显式回退文字；去除首尾空格，非空时替代默认 Gradient，显式 fallback 组件仍优先。不会从姓名自动生成首字母。 |
+| fallbackColor | `GradientVariant` | — | 显式选择默认 Gradient 的具名艺术配色；优先级高于 `fallbackSeed` 和名称回退。 |
+| fallbackSeed | `string \| number` | — | 稳定身份种子，推荐传入 `user.id`；组件以确定性哈希映射到六种具名配色，相同 seed 始终得到相同颜色，无需持久化颜色字段。 |
+| variant | `AvatarVariant` | `"default"` | 默认样式使用稳定身份 seed 或显式具名颜色的 Gradient 配色；空头像样式使用灰色背景与默认用户图标。 |
+| gradientMotion | `boolean` | `false` | 是否常驻运行默认 Gradient fallback 的四层基础矢量形变；为 false 时 Gradient 仍会在 hover 期间按需运行水波形变和多色 Overlay |
+| children | `Snippet` | — | 头像附属内容；as="badge" 声明角标，as="avatar-image" 声明外置头像视觉并覆盖默认回退层。 |
+| badgePosition | `"top" \| "bottom"` | `"top"` | as="badge" 子内容定位在头像右上或右下；Dot 角标同时参与头像切割。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：内禀原子布局。
 
@@ -36,30 +73,18 @@
 - `as="badge"` 只用于 Avatar 内部识别角标角色；Avatar 自身不会输出 `data-auto-layout`，也不会接管子组件的通用排列能力。
 - 外部需要排列多个头像时应使用 `AvatarGroup`，不要把 Avatar 改造成集合布局。
 
-## 组件特有属性 (Component-Specific Props)
+<a id="关键字-keyword"></a>
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `children` | `Snippet` | — | 头像附属内容；as="badge" 声明角标，as="avatar-image" 声明外置头像视觉并覆盖默认回退层。 |
-| `fallbackText` | `string` | — | 图片不可用时显示的显式回退文字；去除首尾空格，非空时替代默认 Gradient，显式 fallback 组件仍优先。不会从姓名自动生成首字母。 |
-| src | string \| Component | undefined | 头像图片 URL 或图标组件 |
-| `size` | `ResourceSize` | —（最终回退 16） | 头像尺寸档位为 12/16/20/24/28/32/40/48/80；显式值优先，其次父级头像或通用尺寸上下文，无上下文时为 16。 |
-| fallback | Component | undefined | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与解析后的稳定 `seed`。 |
-| fallbackColor | `'blue' \| 'cyan' \| 'green' \| 'red' \| 'orange' \| 'purple'` | `undefined` | 显式选择默认 Gradient 的具名艺术配色；优先级高于 `fallbackSeed` 和名称回退。 |
-| fallbackSeed | `string \| number` | `undefined` | 稳定身份种子，推荐传入 `user.id`；组件以确定性哈希映射到六种具名配色，相同 seed 始终得到相同颜色，无需持久化颜色字段。 |
-| variant | `'default' \| 'empty'` | `'default'` | 默认样式使用稳定身份 seed 或显式具名颜色的 Gradient 配色；空头像样式使用灰色背景与默认用户图标。 |
-| gradientMotion | boolean | false | 是否常驻运行默认 Gradient fallback 的四层基础矢量形变；为 false 时 Gradient 仍会在 hover 期间按需运行水波形变和多色 Overlay |
-| `badgePosition` | `"top" \| "bottom"` | `"top"` | as="badge" 子内容定位在头像右上或右下；Dot 角标同时参与头像切割。 |
-
-## 关键字 (Keyword)
+### 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `badgePosition` | `"top" \| "bottom"` | `"top"` | as="badge" 子内容定位在头像右上或右下；Dot 角标同时参与头像切割。 |
 | `as` | `string` | — | 声明 Avatar 在外部宿主中的角色，例如在 AvatarGroup 内使用 "item"；头像内部子项的 "badge" / "avatar-image" 属于 children 的角色协议。 |
 | `as` | `string` | — | 声明 Avatar 在外部宿主中的角色，例如在 AvatarGroup 内使用 "item"；头像内部子项的 "badge" / "avatar-image" 属于 children 的角色协议。 |
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <!-- 基础使用 -->
@@ -98,7 +123,9 @@
 </Avatar>
 ```
 
-## 智能行为
+<a id="智能行为"></a>
+
+### 智能行为
 
 1. **默认回退**: 无图片或图片加载失败时，优先显示显式 `fallback` 组件；未传时 `default` 使用 Gradient，`empty` 使用灰色用户图标。默认 Gradient 的选择优先级为 `fallbackColor` → `fallbackSeed` → `aria-label` / `data-name` / `title` → 固定 `blue`。推荐把稳定 `user.id` 传给 `fallbackSeed`；哈希结果跨刷新稳定，不需要存储颜色。名称只作为兼容 seed，不生成首字母；Gradient 常态基础形变默认关闭，可用 `gradientMotion` 常驻开启，或由 hover 按需运行。
 2. **回退延迟**: 内部固定延迟显示回退图标，减少加载闪烁。
@@ -109,7 +136,35 @@
 
 图片与普通组件 fallback 的六色 hover Overlay 是 [StyleSpec §2.1.3](../../../specs/StyleSpec.md#213-专业艺术色例外强制) 为 Avatar 单独登记的专业艺术色例外：颜色由 Avatar 私有 hover 视觉拥有，不映射为 SnowUI 通用 Token。默认 Gradient 画面的固定配色由 [Gradient](./Gradient.md#专业艺术色例外) 自己的例外登记拥有；作为 fallback 使用 [GradientMotion](../../../pro/src/components/GradientMotion.md#专业艺术色例外) 时，其 shader 画面颜色同样由 GradientMotion 自己拥有。三项例外都不扩展到 Avatar 的尺寸、排版、常规背景、状态、公开通用颜色入口或样式优先级。
 
-## 样式规范 (Style Spec)
+
+
+## AI Zone
+
+> **更新日志 (2026-08-28)**: 默认 Gradient 新增 `fallbackColor` 与 `fallbackSeed`。显式颜色优先；稳定用户 ID 通过确定性哈希映射到六种具名配色；完全无身份信息时固定为 `blue`，不再依赖组件实例 ID。
+
+
+> **更新日志 (2026-08-15)**: 默认 Gradient hover 改为按需挂载预栅格 SVG 图层；不再创建运行时 filter DOM，并继承 Gradient 的共享视口暂停能力。
+> **更新日志 (2026-08-15)**: 将 Avatar hover alpha 艺术色与 Gradient、GradientMotion 的画面艺术色分项登记，明确 Avatar 只拥有自己的 hover 染色例外。
+> **更新日志 (2026-08-15)**: 正式登记默认 Gradient 与图片 / 普通组件头像 hover 六色为专业艺术色例外；例外不建立通用语义色，也不豁免 Avatar 的其他 Token / 样式规则。
+> **更新日志 (2026-08-06)**: 默认 Gradient 头像常态改为轻量共享静态图；仅 hover 或 `gradientMotion` 开启时挂载完整 Gradient 组件，降低长表格中的组件、响应式状态与 SVG 资源开销。
+> **更新日志 (2026-08-03)**: 修复外部 Badge / Icon 子内容被内部 Frame 片段遮蔽的问题；Avatar 根盒统一使用中线对齐，确保 `empty` 与图片、Gradient 头像同排等高。
+> **更新日志 (2026-08-03)**: 默认 Gradient 头像 hover 使用七段非对称路径；每次进入随机切换且不重复上一组相位 / 方向配置。
+> **更新日志 (2026-08-02)**: 默认头像改为随机 Gradient；原灰色用户图标改为 `empty` 空头像变体；Avatar 单色 hover 通过像素 alpha 仅叠加实际图形。
+> **更新日志 (2026-08-02)**: Avatar 默认 hover 使用单层 Overlay；每次进入随机六色之一，同一次 hover 内颜色不变，默认文字与用户图标位于叠加层上方。
+> **更新日志 (2026-06-10)**: 新增 `fallback` 组件入口，允许 PRO `GradientMotion` 等视觉组件作为默认头像；补充 `as="avatar-image"` 头像图片层组合规则。
+> **更新日志 (2026-05-20)**: 点击型 Avatar 补齐 `cursor: pointer`，与 hover 视觉反馈保持一致。
+> **更新日志 (2026-03-10)**: 补全文档中的 hover 实现方式与样式定义，明确有图 / 首字母 / 默认回退三种 hover 分支。
+> **更新日志 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确头像尺寸、回退层与 badge 定位为组件私有布局。
+> **更新日志 (2026-03-06)**: 恢复 Avatar 旧版 hover 视觉分层，保留 Surface 语义并关闭默认 hover 叠加层。
+> **更新日志 (2026-02-05)**: 默认头像 hover 仅背景过渡，图标不变色。
+
+
+**继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
+**默认能力开关**: `enableResponsive=false`, `enableContext=false`。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 ### 1. 尺寸与比例 (Sizes & Scaling)
 
@@ -211,7 +266,9 @@
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -225,6 +282,8 @@
 ---
 
 ## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v2.12.5 (2026-09-02)
 
@@ -284,7 +343,7 @@
 - Gradient 直接成为圆形裁切容器的视觉内容；Avatar 只负责尺寸、最外层裁切、hover 状态与 Badge，Gradient 自行管理 SVG、颜色顺序和双层 Overlay。
 - 图片、Logo 与其他组件 fallback 继续使用 Avatar 原有 visual / alpha filter hover，不受此分支影响。
 
-- **Avatar-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- **Avatar-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v2.7.0 (2026-08-02)
 

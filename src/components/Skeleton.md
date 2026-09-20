@@ -1,17 +1,63 @@
-# Skeleton.svelte 文档
+# Skeleton
 
 > **版本**: v1.4.0
-> **变更记录 (2026-08-15)**: `renderHints` 升级为组件自注册协议并优先于 class 映射；Frame 首层探测只收集已注册 child；完整消费 `radius`；集中 class 映射降级为兼容层。
-> **变更记录 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确多项骨架只是内部渲染布局，不注册为通用宿主布局。
-> **职责**: 通用骨架渲染器，供 `Frame` 默认加载协议与测试示例复用。
-
-`Skeleton.svelte` 是独立骨架原语，不继承 `Frame`。它只负责“骨架长什么样”，而“何时进入骨架态”由 [Frame.svelte](./Frame.svelte) 的 `loading + skeleton` 协议负责。
+> **职责**: 在内容加载时展示占位轮廓，帮助用户预先理解页面结构，并保持加载过程中的布局连续。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在内容加载时展示占位轮廓，帮助用户预先理解页面结构，并保持加载过程中的布局连续。
 
-## 布局模型
+## 使用选择
+
+<!-- usage-guide:start -->
+用于内容加载占位。已有组件支持 loading / skeleton 时先声明状态，让组件提供正确形状，不在页面重画它的骨架。
+
+- loading=false 渲染真实 children；加载时按 variant / width / height 或 renderHints 显示占位。
+- 优先让已有组件通过 loading 提供形状；独立骨架的尺寸和圆角仍使用设计系统 Token。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Skeleton, Frame } from '@snowui-design-system/components';
+</script>
+
+<Frame row enableAutoLayout={false} style="width: min(100%, 20rem); display: flex; align-items: center; gap: var(--gap-3);">
+	<Skeleton variant="circle" width={48} height={48} />
+	<Frame column enableAutoLayout={false} style="flex: 1; min-width: 0; gap: var(--gap-2);"><Skeleton variant="line" width="42%" height={14} /><Skeleton variant="line" width="92%" height={12} /><Skeleton variant="line" width="68%" height={12} /></Frame>
+	<Skeleton variant="rect" width={72} height={32} />
+</Frame>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| variant | `SkeletonVariant` | — | 显式指定骨架形状；别名会归一化到 `line / circle / rect` |
+| width | `string \| number` | — | 显式宽度；数字会自动转成 `rem` |
+| height | `string \| number` | — | 显式高度；数字会自动转成 `rem` |
+| componentClass | `string` | — | 旧调用方兼容入口；仅在没有 `renderHints` 时匹配历史默认布局，新组件不得以此登记 |
+| renderHints | `FrameRenderHints` | — | 组件自注册协议，支持 `variant / width / height / radius / rows` |
+| loading | `boolean` | `true` | 是否显示骨架；为 `false` 时回退渲染 `children` |
+| responsive | `ResponsiveConfig` | — | 响应式宽高覆写 |
+| class | `string` | `""` | 外部类名；多项骨架时挂到布局容器，单项骨架时挂到骨架块本身 |
+| style | `string` | `""` | 行内样式；多项骨架时挂到布局容器，单项骨架时挂到骨架块本身 |
+| children | `Snippet` | — | 未显示骨架时渲染的真实子内容，无参数；骨架激活期间按组件骨架布局渲染。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：内禀原子布局。
 
@@ -19,27 +65,18 @@
 - 多条 text skeleton、avatar-group skeleton overlap 等只是 Skeleton 私有渲染布局，用于模拟目标组件占位，不向外提供通用区域协议。
 - Skeleton 不输出 `data-auto-layout`；Frame 的 loading 协议负责决定是否渲染 Skeleton，Skeleton 本身不接管宿主布局。
 
-## 1. 适用范围
+<a id="1-适用范围"></a>
+
+### 适用范围
 
 - 直接在 test / demo 中显式渲染骨架，用于观察默认样式。
 - 被 `Frame` 在 `loading + skeleton` 协议中内部调用，作为默认占位渲染器。
 - 配合组件侧的 `renderHints` 接收最终的骨架尺寸与行数提示。
 
-## 2. 输入协议
+<a id="2-输入协议"></a>
 
-### 2.1 组件 Props
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `variant` | `"line" \| "circle" \| "rect" \| "text" \| "circular" \| "rectangular"` | `undefined` | 显式指定骨架形状；别名会归一化到 `line / circle / rect` |
-| `width` | `string \| number` | `undefined` | 显式宽度；数字会自动转成 `rem` |
-| `height` | `string \| number` | `undefined` | 显式高度；数字会自动转成 `rem` |
-| `componentClass` | `string` | `undefined` | 旧调用方兼容入口；仅在没有 `renderHints` 时匹配历史默认布局，新组件不得以此登记 |
-| `renderHints` | `RenderHints` | `undefined` | 组件自注册协议，支持 `variant / width / height / radius / rows` |
-| `loading` | `boolean` | `true` | 是否显示骨架；为 `false` 时回退渲染 `children` |
-| `responsive` | `ResponsiveConfig` | `undefined` | 响应式宽高覆写 |
-| `class` | `string` | `""` | 外部类名；多项骨架时挂到布局容器，单项骨架时挂到骨架块本身 |
-| `style` | `string` | `""` | 行内样式；多项骨架时挂到布局容器，单项骨架时挂到骨架块本身 |
+
 
 ### 2.2 `renderHints` 规则
 
@@ -53,7 +90,9 @@
 
 未传 `radius` 时，非圆形 Skeleton 使用 `var(--radius-3, 0.75rem)`；`circle` 始终使用 `50%`。旧 Icon class 映射仍保留 `rect + 50%` 的兼容外观。
 
-## 3. 解析顺序
+<a id="3-解析顺序"></a>
+
+### 解析顺序
 
 `Skeleton` 的布局解析顺序固定如下：
 
@@ -62,7 +101,8 @@
 3. 仅旧调用方没有 hints / 显式几何时，才根据 `componentClass` 读取历史默认布局。
 4. 完全未命中时回退为通用 `rect` 骨架。
 
-## 4. 默认样式规则
+<a id="4-默认样式规则"></a>
+
 
 ### 4.1 通用样式
 
@@ -103,15 +143,9 @@
 - `circle` 永远保持 `border-radius: 50%`。
 - `line / circle / rect` 都有 `max-width: 100%; max-height: 100%;` 兜底。
 
-## 5. 组件自注册规则
+<a id="5-组件自注册规则"></a>
 
-支持默认 Skeleton 的组件在真实根 Frame 上提供最终 `renderHints`。默认值由组件拥有，调用方传入的 `renderHints` 逐字段优先；尺寸随公开 `size / width / height / rows` 变化时，组件必须先解析最终值再注册。
-
-Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` 及对应 `data-render-hint-*`；Tooltip 等直接以 Skeleton 为加载根的窄例外由 Skeleton 输出同一登记属性。父 Frame 进入加载态时，只探测第一层带该标记的 child；未注册的纯布局 / 逻辑节点不生成多余骨架。若当前 Frame 自身没有 hints、首层也没有注册项，仍生成通用 fallback，因此页面无需手写 Skeleton。
-
-`COMPONENT_CLASS_MAPPING` 与 `getSkeletonComponentKey()` 只为旧版直接传 `componentClass` 的调用方保留。SnowUI 新组件与新骨架布局不得新增 class 映射；应在组件根提供 hints，并在组件文档说明动态几何来源。
-
-## 6. 文本骨架规则
+### 文本骨架规则
 
 任何已注册组件都可以用 `renderHints.rows` 展开成多条文字骨架；Text 会根据内容自动计算行数。
 
@@ -137,7 +171,9 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 | 最后一行宽度 | `30%` |
 | 单行高度 | `1.25rem` |
 
-## 7. 第一层渲染规则
+<a id="7-第一层渲染规则"></a>
+
+### 第一层渲染规则
 
 `Skeleton` 本身不负责递归拆解整棵组件树，当前规则固定为“只看第一层”。
 
@@ -147,14 +183,62 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
   - 若第一层存在已自注册的直接子组件，则只渲染这些第一层组件对应的 Skeleton。
   - 若第一层不存在组件，则 `Frame` 自身回退为文字形态 Skeleton。
 
-## 8. 尺寸规则
+<a id="8-尺寸规则"></a>
+
+### 尺寸规则
 
 - 数字型 `width / height` 会统一转成 `rem`。
 - `Skeleton` 优先使用组件通过 `renderHints.width / height / radius / rows` 提供的最终几何。
 - 这意味着圆角矩形 Skeleton 在组件已经提供尺寸提示时，会跟随组件的最终宽高，而不是回退成通用短宽。
 - 当前没有启用“读取真实 DOM 实测尺寸”的通用机制。
 
-## 9. 上下文与协议关系
+<a id="9-上下文与协议关系"></a>
+
+### 使用示例
+
+```svelte
+<!-- 直接显示 Skeleton，用于查看默认样式 -->
+<div class="flex flex-col gap-8">
+    <Skeleton variant="text" width="12rem" />
+    <Skeleton variant="circular" width={40} height={40} />
+    <Skeleton variant="rectangular" width="16rem" height="6rem" />
+</div>
+
+<!-- 页面或区块根使用 loading，子组件自动继承骨架态 -->
+<Frame loading={pageLoading}>
+    <Button>提交</Button>
+    <Text>加载中的文本</Text>
+</Frame>
+
+<!-- Frame 只渲染第一层组件 Skeleton -->
+<Frame loading skeleton>
+    <Button variant="filled">
+        <Icon />
+        <Text>Search</Text>
+    </Button>
+</Frame>
+
+<!-- Text 按第一层段落数渲染多条 Skeleton -->
+<Text loading skeleton class="w-full">
+    <div>段落一</div>
+    <div>段落二</div>
+    <div>段落三</div>
+</Text>
+
+<!-- 禁用骨架，只保留真实组件的加载态动效 -->
+<Frame
+    loading={pageLoading}
+    skeleton={false}
+    whileLoad={{ opacity: 0.6, scale: 0.98 }}
+>
+    <Button>提交</Button>
+</Frame>
+```
+
+
+## AI Zone
+
+### 上下文与协议关系
 
 骨架加载上下文通过 `SKELETON_CONTEXT_KEY` 传递：
 
@@ -173,7 +257,32 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="使用示例"></a>
+
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 组件自注册规则
+
+支持默认 Skeleton 的组件在真实根 Frame 上提供最终 `renderHints`。默认值由组件拥有，调用方传入的 `renderHints` 逐字段优先；尺寸随公开 `size / width / height / rows` 变化时，组件必须先解析最终值再注册。
+
+Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` 及对应 `data-render-hint-*`；Tooltip 等直接以 Skeleton 为加载根的窄例外由 Skeleton 输出同一登记属性。父 Frame 进入加载态时，只探测第一层带该标记的 child；未注册的纯布局 / 逻辑节点不生成多余骨架。若当前 Frame 自身没有 hints、首层也没有注册项，仍生成通用 fallback，因此页面无需手写 Skeleton。
+
+`COMPONENT_CLASS_MAPPING` 与 `getSkeletonComponentKey()` 只为旧版直接传 `componentClass` 的调用方保留。SnowUI 新组件与新骨架布局不得新增 class 映射；应在组件根提供 hints，并在组件文档说明动态几何来源。
+
+<a id="6-文本骨架规则"></a>
+
+
+
+> **更新日志 (2026-08-15)**: `renderHints` 升级为组件自注册协议并优先于 class 映射；Frame 首层探测只收集已注册 child；完整消费 `radius`；集中 class 映射降级为兼容层。
+> **更新日志 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确多项骨架只是内部渲染布局，不注册为通用宿主布局。
+
+
+`Skeleton.svelte` 是独立骨架原语，不继承 `Frame`。它只负责“骨架长什么样”，而“何时进入骨架态”由 [Frame.svelte](./Frame.svelte) 的 `loading + skeleton` 协议负责。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引
 
@@ -195,7 +304,9 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 | 布局函数 | `createTextLayout` | 生成多条文字骨架布局 |
 | 覆写函数 | `applyRenderHints` | 将 `renderHints` 叠加到默认布局 |
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.4.0 (2026-08-15)
 
@@ -276,44 +387,3 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 - Skeleton 改为不依赖 `Frame` 的独立骨架原语组件，供 `Frame` 默认加载协议与测试示例共同复用。
 - 骨架形状收敛为 `line / circle / rect` 三类。
 - 新增基于组件根类名的集中骨架分配逻辑。
-
-## 使用示例
-
-```svelte
-<!-- 直接显示 Skeleton，用于查看默认样式 -->
-<div class="flex flex-col gap-8">
-    <Skeleton variant="text" width="12rem" />
-    <Skeleton variant="circular" width={40} height={40} />
-    <Skeleton variant="rectangular" width="16rem" height="6rem" />
-</div>
-
-<!-- 页面或区块根使用 loading，子组件自动继承骨架态 -->
-<Frame loading={pageLoading}>
-    <Button>提交</Button>
-    <Text>加载中的文本</Text>
-</Frame>
-
-<!-- Frame 只渲染第一层组件 Skeleton -->
-<Frame loading skeleton>
-    <Button variant="filled">
-        <Icon />
-        <Text>Search</Text>
-    </Button>
-</Frame>
-
-<!-- Text 按第一层段落数渲染多条 Skeleton -->
-<Text loading skeleton class="w-full">
-    <div>段落一</div>
-    <div>段落二</div>
-    <div>段落三</div>
-</Text>
-
-<!-- 禁用骨架，只保留真实组件的加载态动效 -->
-<Frame
-    loading={pageLoading}
-    skeleton={false}
-    whileLoad={{ opacity: 0.6, scale: 0.98 }}
->
-    <Button>提交</Button>
-</Frame>
-```

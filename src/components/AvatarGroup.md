@@ -1,20 +1,78 @@
-# AvatarGroup.svelte 文档
+# AvatarGroup
+
+> **版本**: v1.8.7
+> **职责**: 将多个头像排列或叠放展示，并以数量提示收起的成员，适合团队、协作者与参与者列表。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 将多个头像排列或叠放展示，并以数量提示收起的成员，适合团队、协作者与参与者列表。
 
-## 组合模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于多个参与者头像的横向或叠放展示。联系人详情列表仍使用普通列表，不用 AvatarGroup 承载整行信息。
+
+- 参与排列与 +N 计数的直接子项必须声明 `as="item"`；用 max 限制可见数量。
+- row 的 size 表示单个头像尺寸；stack 的 size 表示组容器尺寸，不要用同一数值假定两种布局的头像大小相同。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Avatar, AvatarGroup } from '@snowui-design-system/components';
+	import { Avatar3d04, AvatarAbstract02, AvatarAbstract04, AvatarByewind, AvatarFemale04, AvatarFemale06, AvatarMale03, AvatarMale05 } from '@snowui-design-system/resource-svelte';
+</script>
+
+<AvatarGroup size={40} layout="row" max={4}>
+	<Avatar as="item" src={AvatarByewind} dataName="ByeWind, maintainer" />
+	<Avatar as="item" src={AvatarFemale04} dataName="Maya, design" />
+	<Avatar as="item" src={Avatar3d04} dataName="Leo, components" />
+	<Avatar as="item" src={AvatarMale03} dataName="Noah, documentation" />
+	<Avatar as="item" src={AvatarAbstract02} dataName="Ari, accessibility" />
+	<Avatar as="item" src={AvatarFemale06} dataName="Sofia, research" />
+	<Avatar as="item" src={AvatarMale05} dataName="Eli, engineering" />
+	<Avatar as="item" src={AvatarAbstract04} dataName="Kai, community" />
+	<Avatar as="item" fallbackSeed="user-community-108" aria-label="Additional community member" />
+</AvatarGroup>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| max | `number` | — | 未传时 row 不限制数量，stack 最多四个位置。row 显示最多 max 个头像，另加 +N；stack 的 max 包含 +N 的位置，最多四个。显式值向下取整且不小于 0，计数文案最高为 +99。 |
+| layout | `AvatarGroupLayout` | `"row"` | row 为水平重叠排列；stack 为圆形堆叠，最多四个显示位置。两种模式对 size 和 max 的解释不同，见对应属性。 |
+| size | `ResourceSize` | — | 12/16/20/24/28/32/40/48/80；row 表示单个头像尺寸，stack 表示组容器尺寸并按 max 推导头像大小。未传时读取父级尺寸上下文。 |
+| enableResponsive | `boolean` | `true` | 启用根 Frame 的响应式能力；头像排列与溢出计数仍由 AvatarGroup 自身管理，关闭此项不会关闭溢出逻辑。 |
+| enableContext | `boolean` | `true` | 是否为子组件（Avatar/Icon/Badge）提供尺寸上下文。 |
+| children | `Snippet` | — | 按顺序提供 as="item" 的直接子元素，通常为 Avatar；这些子项参与排列、隐藏与 +N 计数，其他内容不计入。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="组合模式"></a>
+
+### 组合模式
 
 AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="item">`，AvatarGroup 只负责排列、叠放、溢出计数和统一 size Context，不拥有 Avatar 的业务数据，因此不提供 `parts.Avatar`。每个 Avatar 的差异 Props 直接写在对应实例上。
 
 > **版本**: v1.8.7
-> **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局，明确 row / stack 是头像集合布局。
+> **更新日志 (2026-04-28)**: 标注主布局模型为复合管理布局，明确 row / stack 是头像集合布局。
 > **职责**: 头像组容器，负责定义内部头像的堆叠布局与溢出计数展示。
 
 用于将多个头像或任意子元素以叠放形式组合展示，并在超出显示数量时自动以数字提示。
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：复合管理布局。
 
@@ -23,7 +81,9 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 - `row` 和 `stack` 是集合布局模式，不是 Button 式内联外壳，也不是 Frame 的三槽位宿主。
 - 尺寸上下文通过 Frame context 下发给子项，排列和重叠规则属于 AvatarGroup 私有逻辑。
 
-## 功能概览 (User)
+<a id="功能概览-user"></a>
+
+### 功能概览 (User)
 
 - 多头像布局（支持线性叠放与圆形堆叠）
 - 超出数量时自动显示 `+N` 溢出计数（最高显示 `+99`）
@@ -32,18 +92,10 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 
 ---
 
-## API 参考 (User)
+<a id="api-参考-user"></a>
 
-### 1. 核心属性
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `children` | `Snippet` | — | 按顺序提供 as="item" 的直接子元素，通常为 Avatar；这些子项参与排列、隐藏与 +N 计数，其他内容不计入。 |
-| `enableResponsive` | `boolean` | `true` | 启用根 Frame 的响应式能力；头像排列与溢出计数仍由 AvatarGroup 自身管理，关闭此项不会关闭溢出逻辑。 |
-| `size` | `ResourceSize` | — | 12/16/20/24/28/32/40/48/80；row 表示单个头像尺寸，stack 表示组容器尺寸并按 max 推导头像大小。未传时读取父级尺寸上下文。 |
-| `layout` | `"row" \| "stack"` | `"row"` | row 为水平重叠排列；stack 为圆形堆叠，最多四个显示位置。两种模式对 size 和 max 的解释不同，见对应属性。 |
-| `max` | `number` | —（按布局解析） | 未传时 row 不限制数量，stack 最多四个位置。row 显示最多 max 个头像，另加 +N；stack 的 max 包含 +N 的位置，最多四个。显式值向下取整且不小于 0，计数文案最高为 +99。 |
-| `enableContext` | `boolean` | `true` | 是否为子组件（Avatar/Icon/Badge）提供尺寸上下文。 |
+
 
 ### 2. 视觉规则
 
@@ -51,11 +103,11 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
    - `row`: 线性排列，数量不限；使用边框切割方式进行叠放。
    - `stack`: 圆形堆叠，2/3 个头像固定位置排列，4 个及以上固定显示 3 个头像 + `+N`。当发生溢出时，`+N` 占用一个头像位置（stack 中如 `max=2` 或 `max=3` 时显示 1/2 个头像 + `+N`；row 则保留 max 个头像，另显示计数）。
 2. **位置与层级（stack 模式）**：
-   - **中心点角度**（以圆心为原点，顺时针为负角）：  
-     - `max=2`：`-45°`、`135°`  
+   - **中心点角度**（以圆心为原点，顺时针为负角）：
+     - `max=2`：`-45°`、`135°`
      - `max=3`：`-90°`、`150°`、`30°`
      - `max>=4`：`-45°`、`-135°`、`135°`、`45°`
-   - **层级顺序**：从下到上依次为 **红、绿、蓝、紫**。  
+   - **层级顺序**：从下到上依次为 **红、绿、蓝、紫**。
    - **+N 位置**：始终占用 **红色位置**（最低层）。
 3. **True Cutout 边框切割**：头像叠放使用基于 CSS Mask 的真实边框切割技术，确保在任何背景颜色下均呈现精准的缝隙。
    - **切割比例**：边框厚度基准为 **`0.04em`**（相对于头像尺寸）。
@@ -107,9 +159,14 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 ---
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -146,13 +203,15 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.8.7 (2026-09-02)
 
 - 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
-- **AvatarGroup-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- **AvatarGroup-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.8.6 (2026-04-25)
 
