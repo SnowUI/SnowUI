@@ -1,43 +1,81 @@
-# FlowText 文本流动效
+# FlowText
 
 > **版本**: v2.0.5
-> **组件路径**: `pro/src/components/FlowText.svelte`  
-> **包归属**: PRO
-
-`FlowText` 以流动动效展示文字和数字的变化，适用于动态文案、计数、计时与倒计时。
+> **职责**: 以流动过渡展示文字和数字变化，适合动态文案、计数、计时与倒计时。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 以流动过渡展示文字和数字变化，适合动态文案、计数、计时与倒计时。
 
-## 关键字
+## 使用选择
+
+<!-- usage-guide:start -->
+用于文本内容更新时的流动过渡。普通静态文字用 Text；数字专属变化先比较 NumericText 与 NumberFlow。
+
+- value 是目标文本或数值；数值格式用 locales / format，附加内容通过 children 提供。
+- motionColor、transition 等控制公开动效；需要遵循系统减少动效偏好时显式启用 respectMotionPreference。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button } from '@snowui-design-system/components';
+	import { FlowText, chromatic } from '@snowui/components-pro';
+	const headlines = ['Build with SnowUI', 'Ship components', 'Write better docs'];
+	let headlineIndex = $state(0);
+</script>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: var(--gap-4);">
+	<FlowText value={headlines[headlineIndex]} motionRole="text" motionColor={chromatic()} size="--text-32" lineHeight="--leading-32" weight={600} />
+	<Button onclick={() => headlineIndex = (headlineIndex + 1) % headlines.length}>Next headline</Button>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
 
 | 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `value` | `number \| string` | - | 目标文本或数值 |
-| `locales` | `string` | `"en-US"` | 数字格式化区域 |
-| `format` | `Intl.NumberFormatOptions` | `undefined` | 数字格式化选项 |
-| `trend` | `-1 \| 0 \| 1` | `0` | 数值趋势；`0` 使用公共分类能力自动判断 |
-| `motionRole` | `"auto" \| "text" \| "number" \| "timer" \| "countdown"` | `"auto"` | 内容语义定性 |
-| `transition` | `{ duration?: number; layoutDuration?: number; opacityDuration?: number; deformDuration?: number; stagger?: number; easing?: string; deformEasing?: string }` | `undefined` | 可覆盖时序；默认主动画与布局 550ms，逐位间隔与 NumericText 一致 |
-| `digits` | `Record<number, { max?: number }>` | `undefined` | 分段计时器的 modulo 定义，仅参与公共趋势判断 |
-| `textPosition` | `"left" \| "right"` | `"right"` | FlowText 内容相对 `children` 的位置 |
-| `rollDirection` | `"normal" \| "reverse"` | `"normal"` | 控制统一字符纵向流动语义；`normal` 使用公共趋势方向，`reverse` 完整取反 |
-| `respectMotionPreference` | `boolean` | `false` | 显式开启后遵循系统减少动效设置 |
-| `font` | `string` | `undefined` | 字体；未设置时继承容器 |
-| `size` | `string \| number` | `undefined` | 字号；未设置时继承容器 |
-| `weight` | `string \| number` | `undefined` | 字重；未设置时继承容器 |
-| `lineHeight` | `string \| number` | `undefined` | 行高；未设置时继承容器 |
-| `color` | `SnowUIColor \| string` | `undefined` | 文字最终颜色；未设置时继承容器 |
-| `align` | `TextMotionAlign` | `undefined` | 文字对齐方式 |
-| `motionColor` | `TextMotionColor` | `undefined` | 内容变化时全部目标字符的临时颜色，包括保留字符；resolver 的 index / total 对应目标全文的 grapheme 索引与总数，动效结束后回到文字颜色 |
-| `loading` | `boolean` | `undefined` | 加载状态；与 skeleton 同时开启时显示骨架，未设置时遵循容器状态 |
-| `skeleton` | `boolean` | `undefined` | 控制骨架显示，未设置时遵循容器骨架状态 |
-| `renderHints` | `RenderHints` | `undefined` | 骨架形状与尺寸提示 |
-| `children` | `Snippet` | `undefined` | 文本前后缀内容 |
-| `...rest` | `FrameProps` | - | 透传到根 `FramePro` |
+| --- | --- | --- | --- |
+| value | `FlowTextValue` | — | 目标文本或数值 |
+| locales | `string` | `"en-US"` | 数字格式化区域 |
+| format | `Intl.NumberFormatOptions` | — | 数字格式化选项 |
+| trend | `FlowTextTrend` | `0` | 数值趋势；`0` 使用公共分类能力自动判断 |
+| motionRole | `TextMotionRole` | `"auto"` | 内容语义定性 |
+| transition | `FlowTextTransition` | — | 可覆盖时序；默认主动画与布局 550ms，逐位间隔与 NumericText 一致 |
+| digits | `Record<number, { max?: number }>` | — | 分段计时器的 modulo 定义，仅参与公共趋势判断 |
+| textPosition | `"left" \| "right"` | `"right"` | FlowText 内容相对 `children` 的位置 |
+| rollDirection | `FlowTextRollDirection` | `"normal"` | 控制统一字符纵向流动语义；`normal` 使用公共趋势方向，`reverse` 完整取反 |
+| loading | `boolean` | — | 加载状态；与 skeleton 同时开启时显示骨架，未设置时遵循容器状态 |
+| skeleton | `boolean` | — | 控制骨架显示，未设置时遵循容器骨架状态 |
+| renderHints | `RenderHints` | — | 骨架形状与尺寸提示 |
+| respectMotionPreference | `boolean` | `false` | 显式开启后遵循系统减少动效设置 |
+| font | `string` | — | 字体；未设置时继承容器 |
+| size | `string \| number` | — | 字号；未设置时继承容器 |
+| weight | `string \| number` | — | 字重；未设置时继承容器 |
+| lineHeight | `string \| number` | — | 行高；未设置时继承容器 |
+| color | `SnowUIColor \| string` | — | 文字最终颜色；未设置时继承容器 |
+| align | `TextMotionAlign` | — | 文字对齐方式 |
+| motionColor | `TextMotionColor` | — | 内容变化时全部目标字符的临时颜色，包括保留字符；resolver 的 index / total 对应目标全文的 grapheme 索引与总数，动效结束后回到文字颜色 |
+| children | `Snippet` | — | 文本前后缀内容 |
 
-## 实现约束
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+具体组合、默认行为与限制见上方使用选择和 API；可运行代码见快速开始。
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 实现约束
 
 - 容器尺寸变化后的临时滚轮与遮罩定位复用 OSS `resizeManager`，合帧交付并在卸载时取消监听；浏览器缺少尺寸监听能力时仅关闭这项增强，内容更新与原有字符动效继续工作。
 - 动画差值与逻辑终点由 `../lib/text-motion/animation.ts` 分离管理；连续更新保留未结束的位移，旧清理回调不能覆盖最新目标。
@@ -63,7 +101,17 @@
 - `motionColor` 在内容变化时覆盖全部目标字符：如 `ab → ac`，`a` 保持静止但与 `c` 一样着色。全部目标字符按全文索引从左到右参与同一颜色回落序列；保留前后缀与数字分隔符也占有对应顺序。颜色顺序不跟随数字、计时器或倒计时的位移方向。颜色使用目标全文计算默认 stagger，显式 `transition.stagger` 优先；维持主动画时长与各自 delay 后，用公共 `280ms linear` 回落。位移继续只按变化字符编排。未传颜色、内容未变或启用的减少动效偏好生效时不播放颜色动效。
 - 根节点提供稳定的最终 `aria-label`，内部动画字符对辅助技术隐藏。
 
+
+
+
+> **组件路径**: `pro/src/components/FlowText.svelte`
+
+
+`FlowText` 以流动动效展示文字和数字的变化，适用于动态文案、计数、计时与倒计时。
+
 ## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v2.0.5 (2026-09-12)
 

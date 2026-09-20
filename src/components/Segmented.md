@@ -1,10 +1,54 @@
-# Segmented (分段控制器)
+# Segmented
+
+> **版本**: v1.3.0
+> **职责**: 将少量互斥选项并排展示，便于快速切换筛选条件或参数，并支持键盘与表单交互。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 将少量互斥选项并排展示，便于快速切换筛选条件或参数，并支持键盘与表单交互。
 
-## 默认内置模式 / 显式组合模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于多个互斥参数或过滤条件之间单选，使用 radiogroup 语义。切换不同内容面板或视图时使用 Tab。
+
+- 使用 bind:value 与稳定选项值；缺失或不匹配时只视觉回退到首项，不自动写回绑定值，表单请显式初始化。
+- 显式子项使用 Button as="item"；name 非空时提供隐藏表单字段，表单重置由应用恢复业务值。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Segmented } from '@snowui/components-pro';
+</script>
+
+<Segmented size="lg" value="all" aria-label="Filter components by tier" items={[{ value: 'all', label: 'All' }, { value: 'oss', label: 'OSS' }, { value: 'pro', label: 'PRO' }]} />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| value | `string` | — | 当前选项的唯一值，支持 `bind:value`；点击或方向键激活选项时更新。未指定或没有匹配项时，视觉回退到首个可用项，但不会自动写回绑定值；表单场景应显式初始化。 |
+| name | `string` | — | 非空时输出同名隐藏字段，原生 FormData 读取当前 value；未定义值提交为空字符串。需置于表单内部；业务绑定初值的恢复由调用方在 reset 时处理。 |
+| children | `Snippet` | — | 无参数的显式子项内容，使用 Button as="item" 与唯一 value；优先于 items，逐项直接配置 Button Props。 |
+| class | `string` | `""` | 合并到真实 Tab 根节点的外部 class，保留 Segmented 自身标识；不作用于隐藏表单字段。 |
+| parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 通过 parts.Button 批量配置 items 模式生成的 Button，例如 scaleOnHover；不覆盖显式 children 子项，不提供 parts.Tab。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="默认内置模式-显式组合模式"></a>
+
+### 默认内置模式 / 显式组合模式
 
 - **Tab 宿主组件特化**：Segmented 实际渲染真实 Tab，全部兼容 Tab Props 在根级平铺；不提供 `parts.Tab`。
 - 默认内置模式（推荐）：`items` 交给 Tab 生成 Button；`parts.Button` 沿默认生成链路显式转发。
@@ -18,7 +62,9 @@
 
 ---
 
-## 1. 与 Tab 的关系
+<a id="1-与-tab-的关系"></a>
+
+### 与 Tab 的关系
 
 | 维度 | Tab | Segmented |
 | :--- | :--- | :--- |
@@ -42,25 +88,21 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 
 ---
 
-## 2. API
+<a id="2-api"></a>
+
 
 ### 2.1 Props
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `value` | `string` | — | 当前选项的唯一值，支持 `bind:value`；点击或方向键激活选项时更新。未指定或没有匹配项时，视觉回退到首个可用项，但不会自动写回绑定值；表单场景应显式初始化。 |
 | `variant` | `'pill' \| 'solid' \| 'underline' \| 'icon-toggle' \| 'bare'` | `'pill'` | pill 为带背景滑块，solid 为实色选中项，underline 为下划线，icon-toggle 仅展开选中项文字，bare 仅通过透明度区分。icon-toggle 子项需包含 Icon 与 Text，或在 items 中同时提供 icon 与 label。 |
 | `size` | `'sm' \| 'md' \| 'lg'` | `'sm'` | 控制容器 padding、radius、gap，并作为 Button 子项默认尺寸；子项优先级为 style > class > Button size > Segmented size。 |
 | `row` | `boolean` | `false` | 显式横向排列；row 与 column 都未启用时仍按横向显示，两者同时为 true 时 row 优先。 |
 | `column` | `boolean` | `false` | 纵向排列，方向键改为上下切换；仅在 row 未启用时生效。 |
 | `fill` | `boolean` | `false` | 容器有明确宽度时，让横向子项等宽填满；未限定宽度时按内容布局。 |
 | `onChange` | `(value: string) => void` | — | 用户激活不同的可用选项后调用，参数为新 value；与绑定值同步，不可取消选择。重复激活当前项不触发。 |
-| `name` | `string` | — | 非空时输出同名隐藏字段，原生 FormData 读取当前 value；未定义值提交为空字符串。需置于表单内部；业务绑定初值的恢复由调用方在 reset 时处理。 |
 | `enableDefaultMotion` | `boolean` | `true` | 传递给宿主的默认动效开关；关闭默认 Frame 动效，不改变选择值、键盘或表单语义。 |
 | `items` | `TabItem[]` | `[]` | 默认内置选项。每项必填唯一 value 与可读 label，可选 icon 组件与 disabled；禁用项不可选择。提供 children 时改用显式内容，不渲染 items。 |
-| `children` | `Snippet` | — | 无参数的显式子项内容，使用 Button as="item" 与唯一 value；优先于 items，逐项直接配置 Button Props。 |
-| `class` | `string` | `''` | 合并到真实 Tab 根节点的外部 class，保留 Segmented 自身标识；不作用于隐藏表单字段。 |
-| `parts` | `ComponentPartsOf<{ Button: typeof Button }>` | — | 通过 parts.Button 批量配置 items 模式生成的 Button，例如 scaleOnHover；不覆盖显式 children 子项，不提供 parts.Tab。 |
 | 其余兼容 Props | `ComponentProps<typeof Tab>` | 同 Tab | 直接传递给 Tab 宿主；role、itemRole、selectionFollowsFocus 由 Segmented 固定，不可作为普通 Tab 参数改写。 |
 
 ### 2.2 子项约定
@@ -69,7 +111,9 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 
 ---
 
-## 3. Form 接入
+<a id="3-form-接入"></a>
+
+### Form 接入
 
 ```svelte
 <Form onSubmit={data => console.log(data)}>
@@ -85,23 +129,17 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 
 ---
 
-## 4. 样式 Token
+<a id="5-动效"></a>
 
-完全继承 Tab。详见 [Tab.md §3](./Tab.md)。
-
-`--snowui-tab-*-override` 变量同样适用于 Segmented(Segmented 内部包裹 Tab,共享同一组 CSS 变量与类名)。
-
-`pill` 与 `icon-toggle` 变体继承 Tab 的 `blur(1.25rem)`（20px）背景模糊；可通过 `--snowui-tab-background-blur-override` 覆盖。
-
----
-
-## 5. 动效
+### 动效
 
 完全继承 Tab。详见 [Tab.md §4](./Tab.md)。
 
 ---
 
-## 6. 键盘行为
+<a id="6-键盘行为"></a>
+
+### 键盘行为
 
 - `←` / `→`(row)或 `↑` / `↓`(column):**直接切换并激活**(Tab 的 `selectionFollowsFocus=true` 模式)。
 - `Home` / `End`:跳到首/末项并激活。
@@ -109,16 +147,25 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 
 ---
 
-## 7. 使用示例
+<a id="7-使用示例"></a>
+
+### 使用示例
 
 ```svelte
+<script lang="ts">
+  import { Button, Icon } from '@snowui-design-system/components';
+  import { Segmented } from '@snowui/components-pro';
+  import { FourLeafClover, Star } from '@snowui-design-system/resource-svelte';
+  let value = $state('web');
+</script>
+
 <Segmented bind:value variant="pill" size="md">
   <Button as="item" value="web"><Icon><FourLeafClover /></Icon>Web</Button>
   <Button as="item" value="mobile"><Icon><Star /></Icon>Mobile</Button>
 </Segmented>
 
 <!-- Figma fill 宽度 -->
-<Segmented fill style="width: 320px" value="web">
+<Segmented fill style="width: calc(var(--size-20) * 4)" value="web">
   <Button as="item" value="web">Web</Button>
   <Button as="item" value="mobile">Mobile</Button>
 </Segmented>
@@ -130,17 +177,35 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 </Segmented>
 
 <!-- 接入 Form -->
-<Form>
+<form>
   <Segmented name="device" value="web" variant="solid">
     <Button as="item" value="web">Web</Button>
     <Button as="item" value="mobile">Mobile</Button>
   </Segmented>
-</Form>
+</form>
 ```
 
 ---
 
-## 8. 更新日志 (Changelog)
+
+
+## AI Zone
+
+<a id="4-样式-token"></a>
+
+### 样式 Token
+
+完全继承 Tab。详见 [Tab.md §3](./Tab.md)。
+
+`--snowui-tab-*-override` 变量同样适用于 Segmented(Segmented 内部包裹 Tab,共享同一组 CSS 变量与类名)。
+
+`pill` 与 `icon-toggle` 变体继承 Tab 的 `blur(1.25rem)`（20px）背景模糊；可通过 `--snowui-tab-background-blur-override` 覆盖。
+
+---
+
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.2.2 (2026-08-14)
 

@@ -1,89 +1,152 @@
 # SidePanel
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
-
-> **2026-09-10 浮层内边框**：floating 模式复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
-
 > **版本**: v1.4.1
-> **包归属**: PRO
-> **职责**: 右侧详情弹出窗，支持浮层与页面右侧内嵌两种预览形态。
+> **职责**: 从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。
 
-## Props
+## 使用选择
 
-| Prop | 类型 | 默认值 | 说明 |
+<!-- usage-guide:start -->
+用于可打开、关闭的详情或辅助面板，支持浮动与内嵌。一直显示的通知、活动、联系人栏可用页面 aside，不因位置在右侧就使用此组件。
+
+- bind:open 控制显示，placement 选择浮动或内嵌，width 可绑定并受最小/最大值限制。
+- children 是滚动内容；内嵌位移动效按 inlineMotionOwner 指定唯一负责方，避免页面与组件重复移动。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Badge, Button, Frame, Input, Text, Textarea } from '@snowui-design-system/components';
+	import { SidePanel, createSidePanelLayoutMotionStyle, type SidePanelPlacement } from '@snowui/components-pro';
+	type ComponentRecord = { name: string; tier: 'OSS' | 'PRO'; packageName: string; description: string; notes: string; };
+	let componentRecords = $state<ComponentRecord[]>([
+		{ name: 'DataTable', tier: 'PRO', packageName: '@snowui/components-pro', description: 'Sort, select, and manage records.', notes: 'Review responsive columns.' },
+		{ name: 'SidePanel', tier: 'PRO', packageName: '@snowui/components-pro', description: 'View and edit record details.', notes: 'Check floating and inline layouts.' },
+		{ name: 'Button', tier: 'OSS', packageName: '@snowui-design-system/components', description: 'Actions for SnowUI products.', notes: 'Variants ready for release.' }
+	]);
+	let panelOpen = $state(false);
+	let panelPlacement = $state<SidePanelPlacement>('floating');
+	let activeIndex = $state(0);
+	let panelWidth = $state(420);
+	let activity = $state('');
+	const activeComponent = $derived(componentRecords[activeIndex]);
+	const inlineLayoutActive = $derived(panelOpen && panelPlacement === 'inline');
+	const sidePanelLayoutStyle = $derived(createSidePanelLayoutMotionStyle(inlineLayoutActive, panelWidth));
+	function openComponent(index: number) { activeIndex = index; panelOpen = true; activity = ''; }
+	function setPanelOpen(next: boolean) { panelOpen = next; }
+	function showPrevious() { activeIndex = (activeIndex - 1 + componentRecords.length) % componentRecords.length; activity = ''; }
+	function showNext() { activeIndex = (activeIndex + 1) % componentRecords.length; activity = ''; }
+	async function copyActive() { try { await navigator.clipboard?.writeText(activeComponent.name); activity = 'Copied ' + activeComponent.name + '.'; } catch { activity = 'Copy unavailable.'; } }
+	function deleteActive() { if (componentRecords.length === 1) { activity = 'Keep one component.'; return; } const removed = activeComponent.name; componentRecords = componentRecords.filter((_, index) => index !== activeIndex); activeIndex = Math.min(activeIndex, componentRecords.length - 1); activity = 'Removed ' + removed + '.'; }
+</script>
+
+<div data-side-panel-layout style={sidePanelLayoutStyle}>
+	<div data-side-panel-main style="display: flex; flex-direction: column; align-items: stretch; gap: var(--gap-3); width: min(100%, 28rem); margin-inline: auto;">
+		<Text style="color: var(--black-40);">Components</Text>
+		<div style="display: grid; gap: var(--gap-2);">
+			{#each componentRecords as component, index (component.name)}
+				<Button variant={index === activeIndex ? 'gray' : 'outline'} onclick={() => openComponent(index)}>{component.name} · {component.tier}</Button>
+			{/each}
+		</div>
+	</div>
+	<div data-side-panel-layer aria-hidden={inlineLayoutActive ? undefined : 'true'}>
+		<div data-side-panel-rail>
+			<SidePanel
+				bind:open={panelOpen}
+				bind:placement={panelPlacement}
+				bind:width={panelWidth}
+				inlineMotionOwner="layout"
+				minWidth={320}
+				maxWidth={560}
+				title={activeComponent.name}
+				editable
+				onOpenChange={setPanelOpen}
+				onPrevious={showPrevious}
+				onNext={showNext}
+				onCopy={copyActive}
+				onDelete={deleteActive}
+				style={panelPlacement === 'inline' ? 'height: 100%;' : undefined}
+			>
+				<Frame column gap={4} style="min-width: 0; width: 100%;">
+					<Frame row><Text size={20} weight={600}>{activeComponent.name}</Text><Badge as="trailing" count={activeComponent.tier} color={activeComponent.tier === 'PRO' ? 'Indigo' : 'Blue'} /></Frame>
+					<Text style="color: var(--black-40);">{activeComponent.description}</Text>
+					<Input value={activeComponent.packageName} ariaLabel="Package name" />
+					<Textarea value={activeComponent.notes} ariaLabel="Release note" style="height: 8rem;" />
+				</Frame>
+			</SidePanel>
+		</div>
+	</div>
+</div>
+
+<style>
+	[data-side-panel-layout] { position: relative; box-sizing: border-box; width: 100%; min-width: 0; padding-right: var(--snowui-side-panel-layout-space, 0px); transition: padding-right var(--snowui-side-panel-layout-motion-duration, 500ms) var(--snowui-side-panel-layout-motion-easing, ease-out); }
+	[data-side-panel-main] { min-width: 0; }
+	[data-side-panel-layer] { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 40; }
+	[data-side-panel-rail] { position: absolute; top: var(--padding-4); right: var(--padding-4); bottom: var(--padding-4); box-sizing: border-box; width: var(--snowui-side-panel-layout-panel-width, 420px); transform: translateX(var(--snowui-side-panel-layout-rail-translate-x, 436px)); transition: transform var(--snowui-side-panel-layout-motion-duration, 500ms) var(--snowui-side-panel-layout-motion-easing, ease-out); pointer-events: auto; }
+	@media (prefers-reduced-motion: reduce) { [data-side-panel-layout], [data-side-panel-rail] { transition: none; } }
+</style>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| `open` | `boolean` | `false` | 是否显示面板，支持 `bind:open` |
-| `placement` | `"floating" \| "inline"` | `"floating"` | 浮层或内嵌到页面右侧，支持 `bind:placement` |
-| `width` | `number` | `460` | 面板宽度，支持 `bind:width` |
-| `minWidth` | `number` | `320` | 拖动调整面板宽度时允许的最小宽度。 |
-| `maxWidth` | `number` | `720` | 拖动调整面板宽度时允许的最大宽度。 |
-| `inlineMotionOwner` | `"component" \| "layout"` | `"component"` | 内嵌位移动效归属。组件级 fallback 为 `component`；采用本文默认浮动停靠集成时必须传 `layout`，并配合 layout helper 与常驻 rail。 |
-| `showTopToolbar` | `boolean` | `true` | 是否显示上工具栏（内容固定，不可换按钮） |
-| `editable` | `boolean` | `false` | 内容可编辑；`true` 时自动显示下工具栏默认按钮 |
-| `showBottomToolbar` | `boolean` | 自动 | 显式覆盖下栏显隐；默认 = `editable` 或任一下栏自定义 |
-| `bottomLeading` | `Snippet` | — | 下栏左侧整组显式替换；传入即显示下栏 |
-| `bottomTrailing` | `Snippet` | — | 下栏右侧整组显式替换；传入即显示下栏 |
-| `bottomLeadingActions` | `SidePanelToolbarAction[]` | 可编辑时默认 copy/delete | 数据内置；传入即显示下栏；有 `bottomLeading` 时忽略 |
-| `bottomTrailingActions` | `SidePanelToolbarAction[]` | 可编辑时默认 取消/保存 | 数据内置；传入即显示下栏；有 `bottomTrailing` 时忽略 |
-| `title` | `string` | `"Details"` | 上工具栏右侧标题及面板无障碍名称 |
-| `backdrop` | `false \| "opaque" \| "blur" \| "transparent"` | `false` | 浮层背景，复用 Dialog 共享遮罩；内嵌模式忽略 |
-| `showTitle` | `boolean` | `false` | 是否显示工具栏标题；关闭后保留无障碍名称与工具栏按钮 |
-| `closeOnEscape` | `boolean` | `true` | Escape 关闭 |
-| `closeOnOutside` | `boolean` | `true` | 点击 SidePanel 外区域关闭 |
-| `onOpenChange` | `(open: boolean) => void` | — | 面板打开状态变化后回调。 |
-| `onPlacementChange` | `(placement: SidePanelPlacement) => void` | — | 浮层与内嵌位置切换后回调。 |
-| `onPrevious` | `() => void \| Promise<void>` | — | 点击上工具栏“上一项”后回调。 |
-| `onNext` | `() => void \| Promise<void>` | — | 点击上工具栏“下一项”后回调。 |
-| `onCopy` | `() => void \| Promise<void>` | — | 点击默认下工具栏复制操作后回调。 |
-| `onDelete` | `() => void \| Promise<void>` | — | 点击默认下工具栏删除操作后回调。 |
-| `onClose` | `() => void \| Promise<void>` | — | 关闭前回调 |
-| `children` | `Snippet` | — | 面板滚动内容区，由调用方提供详情或编辑内容。 |
-| `parts` | `{ Button?: ..., Indicator?: ... }` | — | 内置工具栏 Button 与透明调宽交互层；Indicator 视觉固定隐藏 |
+| open | `boolean` | `false` | 是否显示面板，支持 `bind:open` |
+| placement | `SidePanelPlacement` | `"floating"` | 浮层或内嵌到页面右侧，支持 `bind:placement` |
+| width | `number` | `460` | 面板宽度，支持 `bind:width` |
+| minWidth | `number` | `320` | 拖动调整面板宽度时允许的最小宽度。 |
+| maxWidth | `number` | `720` | 拖动调整面板宽度时允许的最大宽度。 |
+| inlineMotionOwner | `"component" \| "layout"` | `"component"` | 内嵌位移动效归属。组件级 fallback 为 `component`；采用本文默认浮动停靠集成时必须传 `layout`，并配合 layout helper 与常驻 rail。 |
+| showTopToolbar | `boolean` | `true` | 是否显示上工具栏（内容固定，不可换按钮） |
+| editable | `boolean` | `false` | 内容可编辑；`true` 时自动显示下工具栏默认按钮 |
+| showBottomToolbar | `boolean` | — | 显式覆盖下栏显隐；默认 = `editable` 或任一下栏自定义 |
+| bottomLeading | `Snippet` | — | 下栏左侧整组显式替换；传入即显示下栏 |
+| bottomTrailing | `Snippet` | — | 下栏右侧整组显式替换；传入即显示下栏 |
+| bottomLeadingActions | `SidePanelToolbarAction[]` | — | 数据内置；传入即显示下栏；有 `bottomLeading` 时忽略 默认行为：可编辑时默认 copy/delete。 |
+| bottomTrailingActions | `SidePanelToolbarAction[]` | — | 数据内置；传入即显示下栏；有 `bottomTrailing` 时忽略 默认行为：可编辑时默认 取消/保存。 |
+| title | `string` | `"Details"` | 上工具栏右侧标题及面板无障碍名称 |
+| showTitle | `boolean` | `false` | 是否显示工具栏标题；关闭后保留无障碍名称与工具栏按钮 |
+| backdrop | `DialogBackdrop \| false` | `false` | 浮层背景，复用 Dialog 共享遮罩；内嵌模式忽略 |
+| closeOnEscape | `boolean` | `true` | Escape 关闭 |
+| closeOnOutside | `boolean` | `true` | 点击 SidePanel 外区域关闭 |
+| onOpenChange | `(open: boolean) => void` | — | 面板打开状态变化后回调。 |
+| onPlacementChange | `(placement: SidePanelPlacement) => void` | — | 浮层与内嵌位置切换后回调。 |
+| onPrevious | `() => void \| Promise<void>` | — | 点击上工具栏“上一项”后回调。 |
+| onNext | `() => void \| Promise<void>` | — | 点击上工具栏“下一项”后回调。 |
+| onCopy | `() => void \| Promise<void>` | — | 点击默认下工具栏复制操作后回调。 |
+| onDelete | `() => void \| Promise<void>` | — | 点击默认下工具栏删除操作后回调。 |
+| onClose | `() => void \| Promise<void>` | — | 关闭前回调 |
+| children | `Snippet` | — | 面板滚动内容区，由调用方提供详情或编辑内容。 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Indicator: typeof Indicator; }>` | — | 内置工具栏 Button 与透明调宽交互层；Indicator 视觉固定隐藏 |
 
-## AI Zone
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 
-- `SidePanel` 是 PRO 复合管理布局组件，放置在 `pro/src/components/SidePanel.svelte`。
-- 组件视觉复用 Dialog 所属的 `.snowui-quick-action-panel` 面板基类，背景为 `Background/3`，背景模糊为 `blur(var(--size-10))`（基础 40px）。该视觉基类与出现/退出位移共同承接在外层 `.snowui-side-panel-motion-shell`，避免 transform 祖先隔离内层 `aside` 的 backdrop 采样；内层 `aside` 只保持稳定局部坐标系、内容与交互。不直接以 `Dialog` 为宿主。
-- 关闭：`closeOnEscape`（默认 true）+ `closeOnOutside`（默认 true，点击面板外关闭）。外部关闭在 click 的业务处理完成后判断：同步更新面板内容的点击与本实例已识别的打开/切换入口保持打开，只换内容、不播退场/进场；不要求示例添加特殊标记。普通外部点击仍关闭，保留表格行兼容。异步加载应在点击时同步更新选中记录或加载状态。
-- 内容区 `overflow-y: auto` + overlay scrollbar（根挂 `snowui-overlay-scrollbar-host`，hover 显示），与页面滚动隔离（`overscroll-behavior: contain`）；body 与直系子项 `min-width: 0` 防止长文案顶破右侧 padding。
-- 默认宽度为 `460px`，圆角 `20px`（`--radius-5`）；浮层模式与页面上、右、下边缘保持 16px 间距；左侧边框全高均可拖拽调整宽度，边缘不显示宽度调整指示器。内部复用透明 Indicator 交互层保留 Pointer、键盘与 ARIA 调宽协议。
-- 内嵌模式（`placement="inline"`）默认去掉浮层阴影，使用真实边框 `border: var(--border-1) solid var(--black-10)`（1px / Black/10%），保证圆角边缘连续可见；高度默认 `100dvh - 32px`，可用根 `style` / `class` 或 `--snowui-side-panel-height-override` 覆盖。
-- 浮层以及独立内嵌模式的面板本体使用 `SIDE_PANEL_APPEAR_MOTION` / `SIDE_PANEL_DISAPPEAR_MOTION`。SidePanel 的**默认内嵌集成效果**以 `SidePanel-Demo.svelte` 为基准：面板仍浮在页面内容上方，由页面常驻 fixed rail 承载；指定内容区同步让出 `panelWidth + 16px`，形成“浮动停靠 + 挤压指定内容”的效果。
-- 浮层 / 内嵌切换复用同一个稳定渲染宿主；组件只把该宿主在 `document.body` 与原 rail 位置之间迁移，不销毁并重建内容子树，避免切换时面板丢失或未提交的表单 DOM 状态被清空。
-- 默认内嵌集成必须传 `inlineMotionOwner="layout"`，由页面常驻 rail 接管面板位移，避免与内容收缩形成两个启动时钟。页面使用 `createSidePanelLayoutMotionStyle()` 让被挤压区域的 `padding-right` 与 rail 的 `transform` 复用同一 spring timing；内嵌关闭时仍保留 presence 至退场完成。
-- SidePanel 不查询或改写页面兄弟 DOM。哪些元素被挤压由页面把哪些元素放入 `data-side-panel-layout` / `data-side-panel-main` 决定；未进入该预留空间链路的 header、导航、悬浮控件或其他区域会保持原宽度，并由 SidePanel 覆盖。
-- 内容区默认不生成业务内容；调用方显式写入 children。
-- **默认只读**（`editable={false}`）：不显示下工具栏；内容区仍有上下滚动渐隐遮罩（无下栏时底遮罩默认 **16px**，与左右 padding 一致）。
-- **`editable={true}`**：自动显示下工具栏默认按钮（左 copy/delete，右取消 `borderless` + 保存 `gray`，组内 gap 8px）。
-- **只读 + 自定义下栏**：传入 `bottomLeading` / `bottomTrailing` / `bottomLeadingActions` / `bottomTrailingActions` 任一即显示下工具栏；只自定义一侧时另一侧为空，可编辑时缺省侧用默认按钮。
-- **上工具栏固定默认内置**（placement / previous / next + 标题 + 关闭 X），**不支持**替换。
-- 上、下工具栏的内置 icon-only Button 显式使用 `emphasis="muted"`，并在 hover 时显示自身 `ariaLabel` 的 Tooltip；调用方显式传入的 `bottomLeading` / `bottomTrailing` 不会被改写。可通过 `parts.Button.emphasis` 统一覆盖内置按钮的强调级别。
-- 内置 placement、previous、next、copy、delete、cancel、save、close 文案通过 `LocaleProvider` / `useLocale()` 读取；对应 key 为 `sidePanel.placement.toInline`、`sidePanel.placement.toFloating`、`sidePanel.previous`、`sidePanel.next`、`sidePanel.copy`、`sidePanel.delete`、`sidePanel.cancel`、`sidePanel.save`、`sidePanel.close`。无 Provider 时为 `zh-CN`。`title` 与 actions 数组的 `label` / `ariaLabel` 属于调用方业务文案，保持最高优先级且不翻译。
-- 下栏优先级：Snippet **>** actions 数组 **>** 默认可编辑按钮。
-- 内置 Button 与透明调宽交互层通过 `parts.Button` / `parts.Indicator` 批量配置；组件固定隐藏 Indicator 视觉。
-- 无上工具栏时，顶部内容间距与滚动渐隐范围均为 `var(--padding-4)`（16px）；无下工具栏时底部同样为 16px。有工具栏的一侧按工具栏高度预留。到达对应滚动端点后关闭该侧渐隐，保留内容间距。
-- 内容区滚动渐隐使用 `.snowui-scroll-mask` + `data-scroll-mask`。上/下 solid-ratio **0.8**。
+## 使用边界与详细说明
 
-`SidePanelToolbarAction` 字段：
+<a id="下工具栏替换"></a>
 
-| 字段 | 说明 |
-| --- | --- |
-| `role` | `"placement" \| "previous" \| "next" \| "copy" \| "delete" \| "close" \| "custom"`；`placement` / `close` 有内置行为 |
-| `icon` | `ResourceIcon name` |
-| `label` | 按钮文本；无文本时默认 icon-only bare |
-| `variant` / `bare` / `disabled` | 透传 Button |
-| `onClick` | 自定义回调 |
-
-## 下工具栏替换
+### 下工具栏替换
 
 优先级：`bottomLeading` / `bottomTrailing` Snippet **>** 对应 actions 数组 **>** 默认内置。
 
 ```svelte
+<script lang="ts">
+  import { Frame, Button } from '@snowui-design-system/components';
+  import { SidePanel } from '@snowui/components-pro';
+  let open = $state(true);
+function download() { /* 接入业务下载 */ }
+</script>
+
 <!-- 默认只读：无下工具栏，仍有底滚动遮罩 -->
 <SidePanel bind:open title="Subscription">
   <Frame column gap={3}>…</Frame>
@@ -105,7 +168,7 @@
   {#snippet bottomLeading()}
     <Frame row gap={2}>
       <Button bare iconOnly emphasis="muted" size="sm" aria-label="下载" onclick={download}>
-        <ResourceIcon name="arrow-line-down" size={16} />
+        下载
       </Button>
     </Frame>
   {/snippet}
@@ -115,7 +178,8 @@
 
 上工具栏（预览切换 / 上一项 / 下一项 / 标题 / 关闭）**不可**通过 props 或 snippet 替换。
 
-## 默认内嵌布局协议
+<a id="默认内嵌布局协议"></a>
+
 
 ### 效果定义
 
@@ -280,6 +344,50 @@ SidePanel 本身提供高度能力，但页面负责决定它相对于哪个空�
 
 默认内嵌模式不要同时使用组件默认 `100dvh - 32px` 和 rail 的 top/bottom 高度约束；应让 rail 决定高度，再以 `height: 100%` 传给 SidePanel。这样高度只有一个事实来源。
 
+### 内嵌模式样式（公开入口）
+
+| 目标 | 公开做法 |
+| --- | --- |
+| **宽度** | `width` / `bind:width` |
+| **高度** | 根 `style` / `class`，或 `--snowui-side-panel-height-override` |
+| **圆角** | 根 `border-radius` 或 `--snowui-side-panel-radius-override` |
+| **边框 / 阴影** | 内嵌默认真实边框；浮层 quick-action 阴影 |
+
+<a id="布局模型"></a>
+
+### 布局模型
+
+主布局模型：**复合管理布局**。定义见 [../../../specs/LayoutProtocol.md §12.3](../../../specs/LayoutProtocol.md)。
+
+<a id="user-zone"></a>
+
+
+### 示例
+
+```svelte
+<script lang="ts">
+  import { Frame, Text } from '@snowui-design-system/components';
+  import { SidePanel } from '@snowui/components-pro';
+  let open = $state(true);
+function download() { /* 接入业务下载 */ }
+</script>
+
+<SidePanel bind:open title="Subscription">
+  <Frame column gap={3}>
+    <Text>内容由调用方显式写入。</Text>
+  </Frame>
+</SidePanel>
+```
+
+### 浮层背景
+
+默认无遮罩，保留背景记录切换。设置 `backdrop="opaque"` 使用 10% 黑色遮罩；`"blur"` 在同一遮罩上增加 `var(--size-5)`（20px）背景模糊；`"transparent"` 仅阻挡背景交互。视觉复用 OSS 的 `.snowui-backdrop`，淡入淡出复用 Dialog motion token，随 SidePanel presence 卸载。内嵌模式不显示遮罩。点击遮罩遵循 `closeOnOutside`，关闭按钮和 Escape 行为不变。
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
 ### 不变量与验收
 
 - 打开后 SidePanel 与可视区域上、右、下默认各 `16px`。
@@ -290,20 +398,54 @@ SidePanel 本身提供高度能力，但页面负责决定它相对于哪个空�
 - 长页面只改变页面滚动长度，不得扩大 SidePanel 与当前可视区域底部的 16px 间距。
 - 可运行权威示例为 [`playground/demo/SidePanel-Demo.svelte`](../../../playground/demo/SidePanel-Demo.svelte)。
 
-## 内嵌模式样式（公开入口）
+<a id="内嵌模式样式公开入口"></a>
 
-| 目标 | 公开做法 |
+
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
+> **2026-09-10 浮层内边框**：floating 模式复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+
+<a id="ai-zone"></a>
+
+### AI Zone
+
+- `SidePanel` 是 PRO 复合管理布局组件，放置在 `pro/src/components/SidePanel.svelte`。
+- 组件视觉复用 Dialog 所属的 `.snowui-quick-action-panel` 面板基类，背景为 `Background/3`，背景模糊为 `blur(var(--size-10))`（基础 40px）。该视觉基类与出现/退出位移共同承接在外层 `.snowui-side-panel-motion-shell`，避免 transform 祖先隔离内层 `aside` 的 backdrop 采样；内层 `aside` 只保持稳定局部坐标系、内容与交互。不直接以 `Dialog` 为宿主。
+- 关闭：`closeOnEscape`（默认 true）+ `closeOnOutside`（默认 true，点击面板外关闭）。外部关闭在 click 的业务处理完成后判断：同步更新面板内容的点击与本实例已识别的打开/切换入口保持打开，只换内容、不播退场/进场；不要求示例添加特殊标记。普通外部点击仍关闭，保留表格行兼容。异步加载应在点击时同步更新选中记录或加载状态。
+- 内容区 `overflow-y: auto` + overlay scrollbar（根挂 `snowui-overlay-scrollbar-host`，hover 显示），与页面滚动隔离（`overscroll-behavior: contain`）；body 与直系子项 `min-width: 0` 防止长文案顶破右侧 padding。
+- 默认宽度为 `460px`，圆角 `20px`（`--radius-5`）；浮层模式与页面上、右、下边缘保持 16px 间距；左侧边框全高均可拖拽调整宽度，边缘不显示宽度调整指示器。内部复用透明 Indicator 交互层保留 Pointer、键盘与 ARIA 调宽协议。
+- 内嵌模式（`placement="inline"`）默认去掉浮层阴影，使用真实边框 `border: var(--border-1) solid var(--black-10)`（1px / Black/10%），保证圆角边缘连续可见；高度默认 `100dvh - 32px`，可用根 `style` / `class` 或 `--snowui-side-panel-height-override` 覆盖。
+- 浮层以及独立内嵌模式的面板本体使用 `SIDE_PANEL_APPEAR_MOTION` / `SIDE_PANEL_DISAPPEAR_MOTION`。SidePanel 的**默认内嵌集成效果**以 `SidePanel-Demo.svelte` 为基准：面板仍浮在页面内容上方，由页面常驻 fixed rail 承载；指定内容区同步让出 `panelWidth + 16px`，形成“浮动停靠 + 挤压指定内容”的效果。
+- 浮层 / 内嵌切换复用同一个稳定渲染宿主；组件只把该宿主在 `document.body` 与原 rail 位置之间迁移，不销毁并重建内容子树，避免切换时面板丢失或未提交的表单 DOM 状态被清空。
+- 默认内嵌集成必须传 `inlineMotionOwner="layout"`，由页面常驻 rail 接管面板位移，避免与内容收缩形成两个启动时钟。页面使用 `createSidePanelLayoutMotionStyle()` 让被挤压区域的 `padding-right` 与 rail 的 `transform` 复用同一 spring timing；内嵌关闭时仍保留 presence 至退场完成。
+- SidePanel 不查询或改写页面兄弟 DOM。哪些元素被挤压由页面把哪些元素放入 `data-side-panel-layout` / `data-side-panel-main` 决定；未进入该预留空间链路的 header、导航、悬浮控件或其他区域会保持原宽度，并由 SidePanel 覆盖。
+- 内容区默认不生成业务内容；调用方显式写入 children。
+- **默认只读**（`editable={false}`）：不显示下工具栏；内容区仍有上下滚动渐隐遮罩（无下栏时底遮罩默认 **16px**，与左右 padding 一致）。
+- **`editable={true}`**：自动显示下工具栏默认按钮（左 copy/delete，右取消 `borderless` + 保存 `gray`，组内 gap 8px）。
+- **只读 + 自定义下栏**：传入 `bottomLeading` / `bottomTrailing` / `bottomLeadingActions` / `bottomTrailingActions` 任一即显示下工具栏；只自定义一侧时另一侧为空，可编辑时缺省侧用默认按钮。
+- **上工具栏固定默认内置**（placement / previous / next + 标题 + 关闭 X），**不支持**替换。
+- 上、下工具栏的内置 icon-only Button 显式使用 `emphasis="muted"`，并在 hover 时显示自身 `ariaLabel` 的 Tooltip；调用方显式传入的 `bottomLeading` / `bottomTrailing` 不会被改写。可通过 `parts.Button.emphasis` 统一覆盖内置按钮的强调级别。
+- 内置 placement、previous、next、copy、delete、cancel、save、close 文案通过 `LocaleProvider` / `useLocale()` 读取；对应 key 为 `sidePanel.placement.toInline`、`sidePanel.placement.toFloating`、`sidePanel.previous`、`sidePanel.next`、`sidePanel.copy`、`sidePanel.delete`、`sidePanel.cancel`、`sidePanel.save`、`sidePanel.close`。无 Provider 时为 `zh-CN`。`title` 与 actions 数组的 `label` / `ariaLabel` 属于调用方业务文案，保持最高优先级且不翻译。
+- 下栏优先级：Snippet **>** actions 数组 **>** 默认可编辑按钮。
+- 内置 Button 与透明调宽交互层通过 `parts.Button` / `parts.Indicator` 批量配置；组件固定隐藏 Indicator 视觉。
+- 无上工具栏时，顶部内容间距与滚动渐隐范围均为 `var(--padding-4)`（16px）；无下工具栏时底部同样为 16px。有工具栏的一侧按工具栏高度预留。到达对应滚动端点后关闭该侧渐隐，保留内容间距。
+- 内容区滚动渐隐使用 `.snowui-scroll-mask` + `data-scroll-mask`。上/下 solid-ratio **0.8**。
+
+`SidePanelToolbarAction` 字段：
+
+| 字段 | 说明 |
 | --- | --- |
-| **宽度** | `width` / `bind:width` |
-| **高度** | 根 `style` / `class`，或 `--snowui-side-panel-height-override` |
-| **圆角** | 根 `border-radius` 或 `--snowui-side-panel-radius-override` |
-| **边框 / 阴影** | 内嵌默认真实边框；浮层 quick-action 阴影 |
+| `role` | `"placement" \| "previous" \| "next" \| "copy" \| "delete" \| "close" \| "custom"`；`placement` / `close` 有内置行为 |
+| `icon` | `ResourceIcon name` |
+| `label` | 按钮文本；无文本时默认 icon-only bare |
+| `variant` / `bare` / `disabled` | 透传 Button |
+| `onClick` | 自定义回调 |
 
-## 布局模型
+## 更新日志
 
-主布局模型：**复合管理布局**。定义见 [../../../specs/LayoutProtocol.md §12.3](../../../specs/LayoutProtocol.md)。
-
-## Changelog
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - **SP-Init.31 / v1.4.0 (2026-08-25)**：左侧边框全高保持可拖拽调宽，移除可见宽度调整短条；透明 Indicator 交互层继续承接 Pointer、键盘、ARIA 与滚动条避让。
 - **SP-Init.30 / v1.3.2 (2026-08-09)**：适配 Button bare 默认 100%，内置 icon-only 工具操作显式使用 `emphasis="muted"` 保留原弱化视觉。
@@ -332,19 +474,3 @@ SidePanel 本身提供高度能力，但页面负责决定它相对于哪个空�
 - **SP-Init.9 (2026-07-12)**：内嵌模式去掉阴影；高度支持 `--snowui-side-panel-height-override`。
 - **SP-Init.8 (2026-07-12)**：上工具栏标题与关闭 X 拆分；标题只读、固定 Black/20%。
 - **SP-Init.1 (2026-07-08)**：新增 PRO `SidePanel`。
-
-## User Zone
-
-### 示例
-
-```svelte
-<SidePanel bind:open title="Subscription">
-  <Frame column gap={3}>
-    <Text>内容由调用方显式写入。</Text>
-  </Frame>
-</SidePanel>
-```
-
-### 浮层背景
-
-默认无遮罩，保留背景记录切换。设置 `backdrop="opaque"` 使用 10% 黑色遮罩；`"blur"` 在同一遮罩上增加 `var(--size-5)`（20px）背景模糊；`"transparent"` 仅阻挡背景交互。视觉复用 OSS 的 `.snowui-backdrop`，淡入淡出复用 Dialog motion token，随 SidePanel presence 卸载。内嵌模式不显示遮罩。点击遮罩遵循 `closeOnOutside`，关闭按钮和 Escape 行为不变。

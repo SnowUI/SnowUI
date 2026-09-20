@@ -1,32 +1,67 @@
-# ScrambleText 代码文字动效
+# ScrambleText
 
 > **版本**: v1.4.0
-> **组件路径**: `pro/src/components/ScrambleText.svelte`  
-> **包归属**: PRO
-
-`ScrambleText` 提供字符扰动、循环并归位到目标文字的动效。默认使用 `cascade`，动效速度和字符错峰由组件内部统一维护。
+> **职责**: 通过字符扰动逐步呈现目标文字，适合标题、短句与状态文案的动态揭示。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 通过字符扰动逐步呈现目标文字，适合标题、短句与状态文案的动态揭示。
 
-## 关键字
+## 使用选择
+
+<!-- usage-guide:start -->
+用于文本更新时的字符扰动效果。静态文字用 Text，连续文本位移用 FlowText；减少动效环境保留可读内容。
+
+- text 提供目标文字，mode / charset / customSequence 选择字符变化方式。
+- 需要遵循系统减少动效偏好时启用 respectMotionPreference；关键信息应始终以最终可读文本表达。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button, Text } from '@snowui-design-system/components';
+	import { ScrambleText, chromatic } from '@snowui/components-pro';
+	const statuses = ['Preparing docs', 'Checking APIs', 'Ready to publish'];
+	let statusIndex = $state(0);
+</script>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: var(--gap-4);">
+	<ScrambleText text={statuses[statusIndex]} mode="cascade" charset="glyphs" motionColor={chromatic()} size="--text-32" lineHeight="--leading-32" weight={600} />
+	<Button onclick={() => statusIndex = (statusIndex + 1) % statuses.length}>Update status</Button>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
 
 | 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `text` | `string \| number` | `""` | 最终文字 |
-| `charset` | `"glyphs" \| "symbols" \| "numbers"` | `"glyphs"` | 预设替换字符集 |
-| `customSequence` | `string` | `undefined` | 自定义替换序列，最多 64 个 grapheme |
-| `mode` | `"scramble" \| "cascade"` | `"cascade"` | 离散动效模式 |
-| `respectMotionPreference` | `boolean` | `false` | 显式开启后才遵循系统减少动效设置 |
-| `font` | `string` | `undefined` | 字体 |
-| `size` | `string \| number` | `undefined` | 字号 |
-| `weight` | `string \| number` | `undefined` | 字重 |
-| `lineHeight` | `string \| number` | `undefined` | 行高 |
-| `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色 |
-| `align` | `"left" \| "center" \| "right" \| "justify"` | `undefined` | 对齐；默认继承父级 |
-| `motionColor` | `TextMotionColor` | `undefined` | 全部目标字符从左到右依次回落的临时颜色；支持语义色、CSS 色与逐字 resolver，默认不改变颜色 |
-| `...rest` | `FrameProps` | - | 透传到根 `FramePro`，包括 `as="label"` |
+| --- | --- | --- | --- |
+| text | `string \| number` | `""` | 最终文字 |
+| charset | `ScrambleTextCharset` | `"glyphs"` | 预设替换字符集 |
+| customSequence | `string` | — | 自定义替换序列，最多 64 个 grapheme |
+| mode | `ScrambleTextMode` | `"cascade"` | 离散动效模式 |
+| respectMotionPreference | `boolean` | `false` | 显式开启后才遵循系统减少动效设置 |
+| font | `string` | — | 字体 |
+| size | `string \| number` | — | 字号 |
+| weight | `string \| number` | — | 字重 |
+| color | `SnowUIColor \| string` | — | 最终文字颜色 |
+| lineHeight | `string \| number` | — | 行高 |
+| align | `TextMotionAlign` | — | 对齐；默认继承父级 |
+| motionColor | `TextMotionColor` | — | 全部目标字符从左到右依次回落的临时颜色；支持语义色、CSS 色与逐字 resolver，默认不改变颜色 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="关键字"></a>
+
+### 关键字
 
 ```svelte
 <script lang="ts">
@@ -46,9 +81,15 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 实现约束
+<a id="实现约束"></a>
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 实现约束
 
 - 组件持有字符目标与进度，连续更新只替换正在播放字符的终点；仅显式重播或配置变化重新启动。一个运行中的循环驱动全部字符，结束或卸载时释放。
 
@@ -60,7 +101,17 @@
 - `cascadeSpeed`、`cascadeDelay`、`duration`、`settleDuration` 等时序不得公开。
 - `customSequence` 是内容语义，不是动效速度调参，可以保留。
 
+
+
+
+> **组件路径**: `pro/src/components/ScrambleText.svelte`
+
+
+`ScrambleText` 提供字符扰动、循环并归位到目标文字的动效。默认使用 `cascade`，动效速度和字符错峰由组件内部统一维护。
+
 ## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.4.0 (2026-09-17)
 

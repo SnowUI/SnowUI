@@ -1,64 +1,93 @@
 # NumberFlow
 
 > **版本**: v2.1.0
-> **职责**: 展示持续变化的格式化数字，并以逐位滚轮、位数重排和容器宽度过渡表达数值变化。
+> **职责**: 以逐位滚动和宽度过渡展示数字变化，保留金额、分组符与小数格式，适合计数器和实时指标。
 > **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 以逐位滚动和宽度过渡展示数字变化，保留金额、分组符与小数格式，适合计数器和实时指标。
 
-## 概览与选择边界
+## 使用选择
 
-NumberFlow 适合计数器、金额、指标和时钟等连续数值。它以 `Intl.NumberFormat` 拆分数字，保留符号、分组符和小数，并按数位执行滚轮变化。只需要静态数字时使用 Text；需要字符级重组或非滚轮文字动效时使用 NumericText、SlotText 或 FlowText。
+<!-- usage-guide:start -->
+用于数字滚动效果。需要不同数字过渡时比较 NumericText；普通静态数值用 Text，不额外启动动效。
 
-## 原始实现与 SnowUI 扩展
+- value 表示数值，无法解析的字符串显示为 0；locales / format 控制数字格式。
+- children 放置前后附加内容；需要遵循系统减少动效偏好时显式启用 respectMotionPreference。
+<!-- usage-guide:end -->
 
-SnowUI NumberFlow 以 Maxwell Barvian 的 MIT 开源项目 Number Flow 为原始实现参考：工作区源代码见 [`number-flow-main`](../../../../repos/number-flow-main/README.md)，原始 API、示例和使用限制见 [Number Flow 官方文档](https://number-flow.barvian.me/)。当前对照版本为 core `number-flow@0.6.2` 与 Svelte wrapper `@number-flow/svelte@0.4.2`。
+## 快速开始
 
-SnowUI 在原始逐位滚轮、`Intl.NumberFormat` parts、趋势方向和进退场架构上增加：
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
 
-- FramePro 根宿主、SnowUI 排版 / 语义颜色、Skeleton 与 RenderHints；
-- `motionRole`、`rollDirection`、低位到高位交错，以及时间 / 倒计时的循环数位；
-- `motionColor` 全文颜色序列；`chromatic()` 把完整彩谱连续铺满一位、三位或更多数位，并用独立覆盖层保证颜色不改变原始滚轮；
-- `children` 与 `numberPosition`，以及同帧更新、连续中断时的布局和宽度重定向。
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button, Text } from '@snowui-design-system/components';
+	import { NumberFlow, chromatic } from '@snowui/components-pro';
+	let count = $state(0);
+</script>
 
-SnowUI 没有原样公开上游的 `plugins`、`NumberFlowGroup`、CSS parts / Shadow DOM、`prefix` / `suffix`、`willChange`、`animated`、事件和分离的 spin / transform / opacity timing。需要这些原始接口时直接使用上游包；SnowUI 只承诺本文 API。
-
-## Import
-
-```ts
-import { NumberFlow } from "@snowui/components-pro";
+<div style="display: flex; flex-direction: column; align-items: center; gap: var(--gap-4);">
+	<NumberFlow value={count} format={{ useGrouping: true }} motionRole="number" motionColor={chromatic()} size="--text-48" lineHeight="--leading-48" weight={600} />
+	<div style="display: flex; align-items: center; gap: var(--gap-2);">
+		<Button aria-label="Decrease installs" onclick={() => count -= 128}>−128</Button>
+		<Button aria-label="Increase installs" onclick={() => count += 128}>+128</Button>
+		<Button onclick={() => count = 0}>Reset</Button>
+	</div>
+</div>
 ```
+<!-- /quick-start:generated -->
 
 ## API
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| `value` | `number \| string` | — | 当前数值；无法解析的字符串按 `0` 处理 |
-| `locales` | `string` | `"en-US"` | 传给 `Intl.NumberFormat` 的 locale |
-| `format` | `Intl.NumberFormatOptions` | `{}` | 数字格式化选项 |
-| `trend` | `-1 \| 0 \| 1` | `0` | 明确变化趋势；`0` 时根据前后数值解析 |
-| `motionRole` | `"auto" \| "text" \| "number" \| "timer" \| "countdown"` | `"auto"` | 数值趋势的语义角色 |
-| `transition` | `{ duration?: number }` | — | 覆盖滚轮时长 |
-| `digits` | `Record<number, { max?: number }>` | — | 为指定数位声明循环上限，例如时间的十位 |
-| `numberPosition` | `"left" \| "right"` | `"right"` | `children` 相对数字的位置 |
-| `rollDirection` | `"normal" \| "reverse"` | `"normal"` | 正常或反向解释趋势方向 |
-| `loading` | `boolean` | — | 显示按当前文本宽度推导的 Skeleton |
-| `skeleton` | `boolean` | `false` | 接入 Skeleton Context |
-| `renderHints` | `RenderHints` | — | 覆盖 Skeleton 形状与尺寸提示 |
-| `respectMotionPreference` | `boolean` | `false` | 为 `true` 时遵守 reduced-motion 并立即提交最终数值 |
-| `font` | `string` | `undefined` | 数字字体；未传时继承容器字体 |
-| `size` | `string \| number` | `undefined` | 数字字号；数字转换为 `px`，字符串可使用 SnowUI token 或 CSS 值 |
-| `weight` | `string \| number` | `undefined` | 数字字重；未传时继承容器字重 |
-| `lineHeight` | `string \| number` | `undefined` | 根排版行高；内部滚轮仍使用独立 `1em` 裁切窗口 |
-| `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色，未设置时继承容器 |
-| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符从左到右依次回落的临时颜色；`chromatic()` 将完整彩谱连续铺满全部数位，包含保留数位、分隔符及格式化货币符号，不影响 children 附加内容 |
-| `align` | `TextMotionAlign` | — | 数字内部对齐 |
-| `children` | `Snippet` | — | 数字左侧或右侧的附加内容 |
-| FramePro Props | `FrameProps` | 见 FramePro | 支持 `tag`、`as`、class/style、状态与外层动效 |
+| value | `number \| string` | — | 当前数值；无法解析的字符串按 `0` 处理 |
+| locales | `string` | `"en-US"` | 传给 `Intl.NumberFormat` 的 locale |
+| format | `Intl.NumberFormatOptions` | `{}` | 数字格式化选项 |
+| trend | `TrendResolver` | `0` | 明确变化趋势；`0` 时根据前后数值解析 |
+| motionRole | `TextMotionRole` | `"auto"` | 数值趋势的语义角色 |
+| transition | `NumberFlowTransition` | — | 覆盖滚轮时长 |
+| digits | `Record<number, { max?: number }>` | — | 为指定数位声明循环上限，例如时间的十位 |
+| numberPosition | `"left" \| "right"` | `"right"` | `children` 相对数字的位置 |
+| rollDirection | `RollDirection` | `"normal"` | 正常或反向解释趋势方向 |
+| loading | `boolean` | — | 显示按当前文本宽度推导的 Skeleton |
+| skeleton | `boolean` | — | 接入 Skeleton Context |
+| renderHints | `RenderHints` | — | 覆盖 Skeleton 形状与尺寸提示 |
+| respectMotionPreference | `boolean` | `false` | 为 `true` 时遵守 reduced-motion 并立即提交最终数值 |
+| font | `string` | — | 数字字体；未传时继承容器字体 |
+| size | `string \| number` | — | 数字字号；数字转换为 `px`，字符串可使用 SnowUI token 或 CSS 值 |
+| weight | `string \| number` | — | 数字字重；未传时继承容器字重 |
+| lineHeight | `string \| number` | — | 根排版行高；内部滚轮仍使用独立 `1em` 裁切窗口 |
+| color | `SnowUIColor \| string` | — | 最终文字颜色，未设置时继承容器 |
+| align | `TextMotionAlign` | — | 数字内部对齐 |
+| motionColor | `TextMotionColor` | — | 全部目标字符从左到右依次回落的临时颜色；`chromatic()` 将完整彩谱连续铺满全部数位，包含保留数位、分隔符及格式化货币符号，不影响 children 附加内容 |
+| children | `Snippet` | — | 数字左侧或右侧的附加内容 |
 
-## 示例
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="概览与选择边界"></a>
+
+### 概览与选择边界
+
+NumberFlow 适合计数器、金额、指标和时钟等连续数值。它以 `Intl.NumberFormat` 拆分数字，保留符号、分组符和小数，并按数位执行滚轮变化。只需要静态数字时使用 Text；需要字符级重组或非滚轮文字动效时使用 NumericText、SlotText 或 FlowText。
+
+<a id="原始实现与-snowui-扩展"></a>
+
+### Import
+
+```ts
+import { NumberFlow } from "@snowui/components-pro";
+```
+
+<a id="示例"></a>
+
+### 示例
 
 ```svelte
 <NumberFlow
@@ -77,7 +106,9 @@ import { NumberFlow } from "@snowui/components-pro";
 </NumberFlow>
 ```
 
-## 无障碍与组合边界
+<a id="无障碍与组合边界"></a>
+
+### 无障碍与组合边界
 
 - 最终格式化文本保留在真实 DOM 中；NumberFlow 不替代业务侧对指标含义的可访问名称。
 - `respectMotionPreference={true}` 时 reduced-motion 关闭滚轮、位移和等待，直接显示最终值。
@@ -86,7 +117,31 @@ import { NumberFlow } from "@snowui/components-pro";
 
 ---
 
+
 ## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 原始实现与 SnowUI 扩展
+
+SnowUI NumberFlow 以 Maxwell Barvian 的 MIT 开源项目 Number Flow 为原始实现参考：工作区源代码见 [`number-flow-main`](../../../../repos/number-flow-main/README.md)，原始 API、示例和使用限制见 [Number Flow 官方文档](https://number-flow.barvian.me/)。当前对照版本为 core `number-flow@0.6.2` 与 Svelte wrapper `@number-flow/svelte@0.4.2`。
+
+SnowUI 在原始逐位滚轮、`Intl.NumberFormat` parts、趋势方向和进退场架构上增加：
+
+- FramePro 根宿主、SnowUI 排版 / 语义颜色、Skeleton 与 RenderHints；
+- `motionRole`、`rollDirection`、低位到高位交错，以及时间 / 倒计时的循环数位；
+- `motionColor` 全文颜色序列；`chromatic()` 把完整彩谱连续铺满一位、三位或更多数位，并用独立覆盖层保证颜色不改变原始滚轮；
+- `children` 与 `numberPosition`，以及同帧更新、连续中断时的布局和宽度重定向。
+
+SnowUI 没有原样公开上游的 `plugins`、`NumberFlowGroup`、CSS parts / Shadow DOM、`prefix` / `suffix`、`willChange`、`animated`、事件和分离的 spin / transform / opacity timing。需要这些原始接口时直接使用上游包；SnowUI 只承诺本文 API。
+
+<a id="import"></a>
+
+
+
+<a id="ai-zone"></a>
+
+### AI Zone
 
 ### 模块与所有权
 
@@ -125,6 +180,8 @@ import { NumberFlow } from "@snowui/components-pro";
 - 与 NumericText、SlotText、FlowText 共用 text-motion 数值与排版能力，但保留自己的滚轮视觉时间线。
 
 ## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v2.1.0 (2026-09-17)
 

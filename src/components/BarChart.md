@@ -1,17 +1,149 @@
-# BarChart (柱状图)
+# BarChart
 
 > **版本**: v1.4.1
-> **状态**: 已实现(PRO)
+> **职责**: 用柱状图比较不同类别的数据，支持横向、纵向、分组与堆叠展示，以及坐标轴和交互提示。
 > **包归属**: `@snowui/components-pro`
-> **职责**: 渲染支持纵向 / 横向、单柱、多段、相叠、多柱并排与坐标轴的柱状图。
-
----
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 用柱状图比较不同类别的数据，支持横向、纵向、分组与堆叠展示，以及坐标轴和交互提示。
 
-## 1. 设计原则
+## 使用选择
+
+<!-- usage-guide:start -->
+用于比较类别数据。连续时间趋势可选 LineChart，占比可选 CircularChart；数值轴和颜色使用图表公开 API，不手写页面 SVG。
+
+- 传入业务 data；省略 data 会显示内置示例数据。mode 控制单柱、分组、堆叠等形态，具体结构见 API 与数据结构。
+- loading 保留图表占位并暂停数据交互；HoverPanel 默认开启。图表颜色通过 colors / colorMode 配置。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button, Frame } from '@snowui-design-system/components';
+	import { BarChart } from '@snowui/components-pro';
+	let monthlyCoverageChart: any;
+</script>
+
+<Frame column style="align-items: center; gap: var(--gap-5); width: 100%;">
+	<BarChart
+		bind:this={monthlyCoverageChart}
+		width="100%"
+		barWidth={32}
+		groupGap={4}
+		showYAxis
+		showGrid
+		hoverMode="cell"
+		showHoverLabel={true}
+		showHoverPanel={true}
+		alwaysShowHoverLabel={true}
+		hoverPanelPlacement="pointer"
+		hoverPanelVariant="dark"
+		data={[
+			{ name: 'Jan', value: 82.6 },
+			{ name: 'Feb', value: 84.1 },
+			{ name: 'Mar', value: 83.4 },
+			{ name: 'Apr', value: 85.7 },
+			{ name: 'May', value: 86.2 },
+			{ name: 'Jun', value: 84.9 },
+			{ name: 'Jul', value: 87.3 },
+			{ name: 'Aug', value: 86.8 },
+			{ name: 'Sep', value: 88.1 },
+			{ name: 'Oct', value: 87.6 },
+			{ name: 'Nov', value: 89.2 },
+			{ name: 'Dec', value: 88.7 }
+		]}
+	/>
+	<div style="display: flex; justify-content: center; gap: var(--gap-2); width: 100%;">
+		<Button onclick={() => monthlyCoverageChart?.replay?.()}>Replay animation</Button>
+		<Button onclick={() => monthlyCoverageChart?.reverseAppearance?.()}>Reverse animation</Button>
+	</div>
+</Frame>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| data | `BarChartItem[]` | `DEFAULT_DATA` | 分类数据；overlay 推荐用每类 bars 的前两项表示后层与前层，名称、数值、颜色和数字格式分别配置，详见数据结构。 默认行为：内置默认数据。 |
+| orientation | `BarChartOrientation` | `"vertical"` | 图表方向 |
+| mode | `BarChartMode` | `"single"` | 单元内部柱模式 |
+| width | `number \| string` | `800` | 图表整体宽度；支持 `100%`，内部按最终显示宽度重算几何 |
+| height | `number \| string` | `400` | 图表整体高度；内部按最终显示高度重算几何 |
+| barWidth | `number \| string` | `32` | 单根柱粗细；纵向时为宽度，横向时为高度；响应式下限 `2px` |
+| barGap | `number \| string` | `4` | `group` 模式中同一单元内相邻柱间距；下限 `4px` |
+| groupGap | `number \| string` | `20` | 分类单元内容与 cell 边缘的预留间距；下限 `4px` |
+| segmentGap | `number \| string` | `0` | `stack` 模式中分段间隔；`0` 表示无间隔 |
+| cornerRadius | `number \| string` | `8` | 柱圆角大小 |
+| roundedStart | `boolean` | `true` | 是否保留起点端圆角；纵向为底部，横向为左侧 |
+| roundedEnd | `boolean` | `true` | 是否保留终点端圆角；纵向为顶部，横向为右侧 |
+| xLabels | `string[]` | — | 分类 label 覆盖；未传时使用 `ChartGroup.xLabels` 或 `data[].name` |
+| yMin | `number` | — | 数值轴 domain 最小值 默认行为：自动 / 继承 `ChartGroup`。 |
+| yMax | `number` | — | 数值轴 domain 最大值；自动时等于实际最大数据值，不向上取整 默认行为：自动 / 继承 `ChartGroup`。 |
+| yTicks | `number[]` | — | 数值轴刻度 默认行为：自动 nice ticks / 继承 `ChartGroup`。 |
+| yTickCount | `number` | — | 自动 tick 目标数量 |
+| yTickFormatter | `(value: number) => string` | — | 数值轴 label 格式化 默认行为：K 格式 / 继承 `ChartGroup`。 |
+| showXAxis | `boolean` | — | 是否显示底部轴线与底部 label |
+| showYAxis | `boolean` | — | 是否显示左侧 label |
+| showGrid | `boolean` | — | 是否显示网格线 |
+| showGuides | `boolean` | — | 保留 Chart API 命名；当前不绘制额外 guide |
+| showHoverLabel | `boolean` | — | hover / focus 柱体时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 默认行为：按 `showHoverPanel` 推导。 |
+| alwaysShowHoverLabel | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
+| adaptiveContrast | `boolean` | — | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 默认行为：继承 ChartGroup，否则 `true`。 |
+| showHoverPanel | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前柱 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
+| hoverPanelVariant | `ChartHoverPanelVariant` | `"light"` | hover 面板视觉样式 |
+| hoverPanelPlacement | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
+| showHoverPanelLabel | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
+| hoverMode | `ChartGroupHoverMode` | — | hover 命中模式；`cell` 时按分类中心左右半格生成整格命中区，同一分类单元内的所有柱 / 分段一起响应 |
+| activeCellIndex | `number \| null` | — | 受控当前 hover 分类单元；未传时可继承 `ChartGroup` |
+| onCellHoverChange | `(index: number \| null) => void` | — | 分类单元 hover 变化回调 |
+| valueFormat | `NumberFormatOptions` | — | 柱体数值 label 的组件级数字格式；可设置 `notation: "auto"` / `"compact"` 使用英文 `k/m/b/t` 缩写 默认行为：NumberFormats 默认。 |
+| labelFormatter | `( value: number, context: BarChartValueLabelContext, ) => string` | — | 柱体数值 label 自定义格式化；优先级高于全局、组件和数据项 `valueFormat` |
+| xLabelAutoCull | `boolean` | — | 按最终显示尺寸减少分类 label；完整文字间距最小 `4px`，首尾仍放不下时全部隐藏；不删除柱体、坐标轴或命中 cell |
+| xMaxLabelCount | `number` | — | 分类 label 最大显示数量 默认行为：- / 继承 `ChartGroup`。 |
+| valueLabelAutoCull | `boolean` | `true` | `alwaysShowHoverLabel` 常驻数值是否按最终显示尺寸自动抽稀；hover / focus 数值不受影响 |
+| valueMaxLabelCount | `number` | — | 常驻顶部数值最大显示数量 |
+| yLabelAutoCull | `boolean` | — | 是否自动减少数值轴 label |
+| yMaxLabelCount | `number` | — | 数值轴 label 最大显示数量 默认行为：- / 继承 `ChartGroup`。 |
+| colors | `(BarChartColor \| undefined)[]` | — | 调色板；空项回退当前 `colorMode` |
+| colorMode | `BarChartColorMode` | `"sequence"` | Chart 通用颜色模式 |
+| color | `BarChartColor` | — | 单色模式主色 |
+| monochromeColor | `BarChartColor` | `"Primary"` | 单色渐浅来源 |
+| mutedMonochromeColor | `BarChartColor` | `"Black4"` | 单色来源 |
+| showBaseLayer | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。与 overlay 的后层数据柱无关；横向柱按最终宽度绘制。 |
+| appearMotion | `boolean` | `true` | 是否启用出现动效 |
+| appearOnView | `boolean` | `true` | 是否进入视口后自动播放；同源 iframe 中按最外层同源页面的真实位置判断 |
+| appearanceProgress | `number` | — | 受控出现进度 |
+| defaultAppearanceProgress | `number` | `0` | 非受控初始出现进度 |
+| appearanceDuration | `number` | — | 自动播放总时长覆盖 |
+| appearAnchorId | `string` | — | 动效触发锚点 ID |
+| appearAnchorPoint | `AnchorPoint` | `"top"` | 锚点触发位置 |
+| appearViewportPoint | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发位置 |
+| scrollAppearance | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动时间轴；同源 iframe 同时响应外层页面滚动 |
+| scrollAppearanceDistance | `number \| string` | `320` | 滚动映射距离 |
+| onAppearanceProgressChange | `(progress: number) => void` | — | 出现进度变化回调 |
+| loading | `boolean` | — | 数据等待状态。保持声明的画布尺寸、坐标轴和网格，将柱体固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文。 |
+| children | `Snippet` | — | 图表主体后的自定义内容，无参数；不会替换坐标轴或数据系列。 |
+| class | `string` | `""` | 根层附加 class |
+| style | `string` | `""` | 根层附加 style |
+| enableResponsive | `boolean` | `true` | 是否启用 Frame responsive |
+| enableContext | `boolean` | `true` | 是否启用 Frame context |
+| enableScaleObserver | `boolean` | `false` | 是否启用 Frame scale observer |
+| enableDefaultMotion | `boolean` | `true` | 是否启用 Frame 默认动效 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="1-设计原则"></a>
+
+### 设计原则
 
 - **PRO Chart 原子组件**: `BarChart` 只负责柱状图本体，不内置标题、卡片背景、legend 或 toolbar。
 - **单元模型**: 一个分类项是一个 **bar unit**。单元统一控制柱粗细、圆角、方向和分类坐标；单元内部可以渲染单柱、多段、相叠柱或多根并排柱。
@@ -32,76 +164,11 @@
 
 ---
 
-## 2. API
+<a id="2-api"></a>
+
 
 ### 2.1 Props
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `data` | `BarChartItem[]` | 内置默认数据 | 分类数据；overlay 推荐用每类 bars 的前两项表示后层与前层，名称、数值、颜色和数字格式分别配置，详见数据结构。 |
-| `orientation` | `"vertical" \| "horizontal"` | `"vertical"` | 图表方向 |
-| `mode` | `"single" \| "stack" \| "overlay" \| "group"` | `"single"` | 单元内部柱模式 |
-| `width` | `number \| string` | `800` | 图表整体宽度；支持 `100%`，内部按最终显示宽度重算几何 |
-| `height` | `number \| string` | `400` | 图表整体高度；内部按最终显示高度重算几何 |
-| `barWidth` | `number \| string` | `32` | 单根柱粗细；纵向时为宽度，横向时为高度；响应式下限 `2px` |
-| `barGap` | `number \| string` | `4` | `group` 模式中同一单元内相邻柱间距；下限 `4px` |
-| `groupGap` | `number \| string` | `20` | 分类单元内容与 cell 边缘的预留间距；下限 `4px` |
-| `segmentGap` | `number \| string` | `0` | `stack` 模式中分段间隔；`0` 表示无间隔 |
-| `cornerRadius` | `number \| string` | `8` | 柱圆角大小 |
-| `roundedStart` | `boolean` | `true` | 是否保留起点端圆角；纵向为底部，横向为左侧 |
-| `roundedEnd` | `boolean` | `true` | 是否保留终点端圆角；纵向为顶部，横向为右侧 |
-| `xLabels` | `string[]` | `[]` / 继承 `ChartGroup` | 分类 label 覆盖；未传时使用 `ChartGroup.xLabels` 或 `data[].name` |
-| `yMin` | `number` | 自动 / 继承 `ChartGroup` | 数值轴 domain 最小值 |
-| `yMax` | `number` | 自动 / 继承 `ChartGroup` | 数值轴 domain 最大值；自动时等于实际最大数据值，不向上取整 |
-| `yTicks` | `number[]` | 自动 nice ticks / 继承 `ChartGroup` | 数值轴刻度 |
-| `yTickCount` | `number` | `6` / 继承 `ChartGroup` | 自动 tick 目标数量 |
-| `yTickFormatter` | `(value: number) => string` | K 格式 / 继承 `ChartGroup` | 数值轴 label 格式化 |
-| `showXAxis` | `boolean` | `true` / 继承 `ChartGroup` | 是否显示底部轴线与底部 label |
-| `showYAxis` | `boolean` | `false` / 继承 `ChartGroup` | 是否显示左侧 label |
-| `showGrid` | `boolean` | `false` / 继承 `ChartGroup` | 是否显示网格线 |
-| `showGuides` | `boolean` | `false` / 继承 `ChartGroup` | 保留 Chart API 命名；当前不绘制额外 guide |
-| `showHoverLabel` | `boolean` | 按 `showHoverPanel` 推导 | hover / focus 柱体时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 |
-| `alwaysShowHoverLabel` | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
-| `adaptiveContrast` | `boolean` | 继承 ChartGroup，否则 `true` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 |
-| `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前柱 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
-| `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
-| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
-| `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
-| `hoverMode` | `"item" \| "cell"` | `"cell"` / 继承 `ChartGroup` | hover 命中模式；`cell` 时按分类中心左右半格生成整格命中区，同一分类单元内的所有柱 / 分段一起响应 |
-| `activeCellIndex` | `number \| null` | - | 受控当前 hover 分类单元；未传时可继承 `ChartGroup` |
-| `onCellHoverChange` | `(index: number \| null) => void` | - | 分类单元 hover 变化回调 |
-| `valueFormat` | `NumberFormatOptions` | NumberFormats 默认 | 柱体数值 label 的组件级数字格式；可设置 `notation: "auto"` / `"compact"` 使用英文 `k/m/b/t` 缩写 |
-| `labelFormatter` | `(value, context) => string` | - | 柱体数值 label 自定义格式化；优先级高于全局、组件和数据项 `valueFormat` |
-| `xLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 按最终显示尺寸减少分类 label；完整文字间距最小 `4px`，首尾仍放不下时全部隐藏；不删除柱体、坐标轴或命中 cell |
-| `xMaxLabelCount` | `number` | - / 继承 `ChartGroup` | 分类 label 最大显示数量 |
-| `valueLabelAutoCull` | `boolean` | `true` | `alwaysShowHoverLabel` 常驻数值是否按最终显示尺寸自动抽稀；hover / focus 数值不受影响 |
-| `valueMaxLabelCount` | `number` | - | 常驻顶部数值最大显示数量 |
-| `yLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 是否自动减少数值轴 label |
-| `yMaxLabelCount` | `number` | - / 继承 `ChartGroup` | 数值轴 label 最大显示数量 |
-| `colors` | `(BarChartColor \| undefined)[]` | - | 调色板；空项回退当前 `colorMode` |
-| `colorMode` | `"sequence" \| "monochromeFade" \| "monochrome"` | `"sequence"` | Chart 通用颜色模式 |
-| `color` | `BarChartColor` | - | 单色模式主色 |
-| `monochromeColor` | `BarChartColor` | `"Primary"` | 单色渐浅来源 |
-| `mutedMonochromeColor` | `BarChartColor` | `"Black4"` | 单色来源 |
-| `showBaseLayer` | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。与 overlay 的后层数据柱无关；横向柱按最终宽度绘制。 |
-| `appearMotion` | `boolean` | `true` | 是否启用出现动效 |
-| `appearOnView` | `boolean` | `true` | 是否进入视口后自动播放；同源 iframe 中按最外层同源页面的真实位置判断 |
-| `appearanceProgress` | `number` | - | 受控出现进度 |
-| `defaultAppearanceProgress` | `number` | `0` | 非受控初始出现进度 |
-| `appearanceDuration` | `number` | - | 自动播放总时长覆盖 |
-| `appearAnchorId` | `string` | - | 动效触发锚点 ID |
-| `appearAnchorPoint` | `"top" \| "center" \| "bottom"` | `"top"` | 锚点触发位置 |
-| `appearViewportPoint` | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发位置 |
-| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动时间轴；同源 iframe 同时响应外层页面滚动 |
-| `scrollAppearanceDistance` | `number \| string` | `320` | 滚动映射距离 |
-| `onAppearanceProgressChange` | `(progress: number) => void` | - | 出现进度变化回调 |
-| `loading` | `boolean` | - | 数据等待状态。保持声明的画布尺寸、坐标轴和网格，将柱体固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文。 |
-| `enableResponsive` | `boolean` | `true` | 是否启用 Frame responsive |
-| `enableContext` | `boolean` | `true` | 是否启用 Frame context |
-| `enableScaleObserver` | `boolean` | `false` | 是否启用 Frame scale observer |
-| `enableDefaultMotion` | `boolean` | `true` | 是否启用 Frame 默认动效 |
-| `class` | `string` | `""` | 根层附加 class |
-| `style` | `string` | `""` | 根层附加 style |
 
 其余未声明属性会透传给根层 `Frame`。
 
@@ -179,7 +246,106 @@ interface BarChartItem {
 
 ---
 
-## 3. 样式 Token 详表
+<a id="4-布局模型"></a>
+
+### 布局模型
+
+主布局模型:**内禀原子布局**。
+
+- 根层为 `Frame`，内部为单个 SVG 绘图区。
+- 根层 CSS 尺寸由 `width` / `height` 决定，SVG 坐标算法使用根层最终实测尺寸；`width="100%"` 可直接 Fill，无需页面监听容器后回传像素宽度。
+- `orientation="vertical"` 时分类轴为横向 cell，柱位于 cell 中心；`orientation="horizontal"` 时分类轴为纵向 cell。
+- Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘与绘图区起点间距固定为 `12px`。
+- 自动 domain 上限直接使用当前数据最大值；nice ticks 只生成到不高于该值的最后一个易读刻度。最高柱可以高于最后一条网格线，顶部仅由 `8px / 16px` 内容安全区控制。显式 `yMax` 或 `yTicks` 不受此自动规则改写。
+- 绘图区顶部由共享内容感知规则计算：普通柱 `8px`，纵向数值 Y 轴 `16px`；二者取最大值。数值 label 不增加该值，继续保持柱顶上方 `4px` 的位置，必要时可溢出绘图区顶边。横向柱的数值 label 位于柱右侧，同样不额外增加顶部安全区。有 X 轴时 `bottom=24px`，只包含 `8px` label 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
+- 单元内部规则：
+  - `single`: 一个单元一根柱。
+  - `stack`: 一个单元一根多段柱；`segmentGap=0` 时中间段无间隔并只在整体首尾保留圆角；`segmentGap>0` 时每段独立圆角；数值 label 只属于最顶段，内容为所有分段总和。
+  - `overlay`: 一个单元两层同轴柱，后层 10%，前层 100%。
+  - `group`: 一个单元多根并排柱，粗细统一，颜色可逐根定义。
+- 响应式收窄时先压缩柱粗细至 `2px`；同分类并排柱间距和相邻分类柱间距都保留至少 `4px`。横坐标和常驻顶部数值分别按自身文本需求抽稀，柱体数量、数据 domain、命中 cell 和动效顺序保持完整。
+- 不接入三槽位协议，不承担通用子元素排列。
+
+详见 [LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
+
+---
+
+<a id="5-无障碍与-frame-集成"></a>
+
+### 无障碍与 Frame 集成
+
+- 根层使用 `role="img"` 和 `aria-label="柱状图"`。
+- 每根柱 / 每个分段有独立透明命中层，使用 `role="button"`、`tabindex="0"` 和包含名称与数值的 `aria-label`。
+- 独立使用或接入 `ChartGroup` 时均支持 `hoverMode="cell"`；cell 命中区按分类中心左右半格覆盖绘图区，同一分类单元的所有单柱、多段、相叠层或并排柱一起响应 hover。
+- `loading` 保留完整画布与坐标结构，只把柱体恢复到出现动效起点；根 Frame 明确关闭 Skeleton。显式空 `data={[]}` 不回退默认演示数据，可配合 `xLabels`、`yMin`、`yMax` 先建立最终坐标。
+- 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
+- `class`、`style` 与未声明属性透传到根层 Frame。
+
+---
+
+<a id="6-图层与动效"></a>
+
+### 图层与动效
+
+SVG 图层从下到上为：
+
+1. `defs`: 颜色渐变。
+2. grid / axis layer: 网格线和 x 轴基线。
+3. base layer: `showBaseLayer=true` 时绘制最终尺寸占位柱，`fill-opacity=0.04`；默认不渲染。
+4. series layer: 真实柱体。
+5. hit layer: 完整命中区域。
+6. axis label layer: X / Y 轴文本。
+
+出现动效 API 与 `ChartSpec.md §9` 保持一致。所有柱共享同一张图表级时间轴，分类单元按顺序启动；单元内部的并排柱、堆叠段或相叠层使用同一局部进度。柱体出现形式为高度 / 宽度补齐：纵向柱先显示目标高度的 `80%`，再从顶部向上补齐到 `100%`；横向柱先显示目标宽度的 `80%`，再向右补齐到 `100%`。相邻分类单元的启动间隔固定；整条时间轴先应用 `easeOut` 缓动；单元升高持续时长按分类顺序逐步拉长，让越靠右的单元升高速度越慢。`stack` 模式中，一个分类单元内的所有分段共享同一个局部进度，因此 BC-02 / BC-03 不会出现每段分别启动的节奏；在任意时刻，底段 / 中段 / 顶段都按各自目标高度的同一比例同步变高。`segmentGap` 只作用在相邻分段边界上，动效过程中保持固定像素值；`segmentGap=0` 时相邻分段始终贴合无间距。`appearanceDuration` 仍可覆盖整段时间轴的播放速度。常显或 hover label 的数值直接使用当前柱高比例计算；`stack` 使用整柱总值，从总值的当前比例补到最终总值。
+
+---
+
+<a id="7-共享逻辑边界"></a>
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 共享逻辑边界
+
+来自 `pro/src/lib/chart/`：
+
+- `colors.ts`: Chart 默认色序、SnowUI 语意色解析、单色透明度梯度。
+- `gradients.ts`: CSS `linear-gradient(...)` 与渐变对象解析。
+- `geometry.ts`: 数值、CSS 长度与 clamp。
+- `axis.ts`: Y 轴可见标签实际渲染宽度测量。
+- Frame 默认 morph 时序: BarChart 出现动效的单柱升高基准时长来源。
+- `pointer.ts`: HoverPanel 指针坐标按绘制帧合并，每帧最多读取一次根层布局。
+
+保留在组件内：
+
+- 纵向 / 横向坐标映射。
+- 单元内部 `single` / `stack` / `overlay` / `group` 几何。
+- 矩形圆角 path 与起点 / 终点圆角规则。
+- 坐标轴 label、网格线与命中层 SVG 结构。
+
+---
+
+<a id="自适应黑白对比接入"></a>
+
+
+### 自适应黑白对比接入
+
+使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
+
+
+
+
+> **状态**: 已实现(PRO)
+
+
+
+---
+
+<a id="3-样式-token-详表"></a>
+
+### 样式 Token 详表
 
 | 属性 | 默认值 | Token / 变量 |
 | :--- | :--- | :--- |
@@ -211,81 +377,18 @@ interface BarChartItem {
 
 ---
 
-## 4. 布局模型
+<a id="8-ai-zone"></a>
 
-主布局模型:**内禀原子布局**。
 
-- 根层为 `Frame`，内部为单个 SVG 绘图区。
-- 根层 CSS 尺寸由 `width` / `height` 决定，SVG 坐标算法使用根层最终实测尺寸；`width="100%"` 可直接 Fill，无需页面监听容器后回传像素宽度。
-- `orientation="vertical"` 时分类轴为横向 cell，柱位于 cell 中心；`orientation="horizontal"` 时分类轴为纵向 cell。
-- Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘与绘图区起点间距固定为 `12px`。
-- 自动 domain 上限直接使用当前数据最大值；nice ticks 只生成到不高于该值的最后一个易读刻度。最高柱可以高于最后一条网格线，顶部仅由 `8px / 16px` 内容安全区控制。显式 `yMax` 或 `yTicks` 不受此自动规则改写。
-- 绘图区顶部由共享内容感知规则计算：普通柱 `8px`，纵向数值 Y 轴 `16px`；二者取最大值。数值 label 不增加该值，继续保持柱顶上方 `4px` 的位置，必要时可溢出绘图区顶边。横向柱的数值 label 位于柱右侧，同样不额外增加顶部安全区。有 X 轴时 `bottom=24px`，只包含 `8px` label 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
-- 单元内部规则：
-  - `single`: 一个单元一根柱。
-  - `stack`: 一个单元一根多段柱；`segmentGap=0` 时中间段无间隔并只在整体首尾保留圆角；`segmentGap>0` 时每段独立圆角；数值 label 只属于最顶段，内容为所有分段总和。
-  - `overlay`: 一个单元两层同轴柱，后层 10%，前层 100%。
-  - `group`: 一个单元多根并排柱，粗细统一，颜色可逐根定义。
-- 响应式收窄时先压缩柱粗细至 `2px`；同分类并排柱间距和相邻分类柱间距都保留至少 `4px`。横坐标和常驻顶部数值分别按自身文本需求抽稀，柱体数量、数据 domain、命中 cell 和动效顺序保持完整。
-- 不接入三槽位协议，不承担通用子元素排列。
+### User Notes
 
-详见 [LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
+- 保留。
 
----
+数值标签按所在位置的实际背景明暗显示静态黑色或白色；主题切换刷新背景遮罩，跨越重叠柱体时按覆盖区域反白。
 
-## 5. 无障碍与 Frame 集成
+## 更新日志
 
-- 根层使用 `role="img"` 和 `aria-label="柱状图"`。
-- 每根柱 / 每个分段有独立透明命中层，使用 `role="button"`、`tabindex="0"` 和包含名称与数值的 `aria-label`。
-- 独立使用或接入 `ChartGroup` 时均支持 `hoverMode="cell"`；cell 命中区按分类中心左右半格覆盖绘图区，同一分类单元的所有单柱、多段、相叠层或并排柱一起响应 hover。
-- `loading` 保留完整画布与坐标结构，只把柱体恢复到出现动效起点；根 Frame 明确关闭 Skeleton。显式空 `data={[]}` 不回退默认演示数据，可配合 `xLabels`、`yMin`、`yMax` 先建立最终坐标。
-- 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
-- `class`、`style` 与未声明属性透传到根层 Frame。
-
----
-
-## 6. 图层与动效
-
-SVG 图层从下到上为：
-
-1. `defs`: 颜色渐变。
-2. grid / axis layer: 网格线和 x 轴基线。
-3. base layer: `showBaseLayer=true` 时绘制最终尺寸占位柱，`fill-opacity=0.04`；默认不渲染。
-4. series layer: 真实柱体。
-5. hit layer: 完整命中区域。
-6. axis label layer: X / Y 轴文本。
-
-出现动效 API 与 `ChartSpec.md §9` 保持一致。所有柱共享同一张图表级时间轴，分类单元按顺序启动；单元内部的并排柱、堆叠段或相叠层使用同一局部进度。柱体出现形式为高度 / 宽度补齐：纵向柱先显示目标高度的 `80%`，再从顶部向上补齐到 `100%`；横向柱先显示目标宽度的 `80%`，再向右补齐到 `100%`。相邻分类单元的启动间隔固定；整条时间轴先应用 `easeOut` 缓动；单元升高持续时长按分类顺序逐步拉长，让越靠右的单元升高速度越慢。`stack` 模式中，一个分类单元内的所有分段共享同一个局部进度，因此 BC-02 / BC-03 不会出现每段分别启动的节奏；在任意时刻，底段 / 中段 / 顶段都按各自目标高度的同一比例同步变高。`segmentGap` 只作用在相邻分段边界上，动效过程中保持固定像素值；`segmentGap=0` 时相邻分段始终贴合无间距。`appearanceDuration` 仍可覆盖整段时间轴的播放速度。常显或 hover label 的数值直接使用当前柱高比例计算；`stack` 使用整柱总值，从总值的当前比例补到最终总值。
-
----
-
-## 7. 共享逻辑边界
-
-来自 `pro/src/lib/chart/`：
-
-- `colors.ts`: Chart 默认色序、SnowUI 语意色解析、单色透明度梯度。
-- `gradients.ts`: CSS `linear-gradient(...)` 与渐变对象解析。
-- `geometry.ts`: 数值、CSS 长度与 clamp。
-- `axis.ts`: Y 轴可见标签实际渲染宽度测量。
-- Frame 默认 morph 时序: BarChart 出现动效的单柱升高基准时长来源。
-- `pointer.ts`: HoverPanel 指针坐标按绘制帧合并，每帧最多读取一次根层布局。
-
-保留在组件内：
-
-- 纵向 / 横向坐标映射。
-- 单元内部 `single` / `stack` / `overlay` / `group` 几何。
-- 矩形圆角 path 与起点 / 终点圆角规则。
-- 坐标轴 label、网格线与命中层 SVG 结构。
-
----
-
-## 自适应黑白对比接入
-
-使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
-
-## 8. AI Zone
-
-### Changelog
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.4.1 (2026-09-05)
 
@@ -322,9 +425,3 @@ SVG 图层从下到上为：
 - 2026-08-31 v1.0.2 — 移除笛卡尔绘图区顶部和底部的额外留白；底部仅保留 X 轴标签自身所需的 `24px`。
 - 2026-08-31 v1.0.1 — Y 轴改为按最宽可见标签的实际渲染宽度自适应，标签与绘图区之间固定保留 `12px`。
 - 2026-06-05 v1.0.0 — 新增 BarChart，支持纵向 / 横向、单柱、多段、相叠、多柱并排、坐标轴与 Chart 出现动效；出现动效采用 80% 初始高度、固定分类间隔、Frame morph 基准时长与单柱独立缓动的逐柱升高形式，label 数值可随柱高补间变化。
-
-### User Notes
-
-- 保留。
-
-数值标签按所在位置的实际背景明暗显示静态黑色或白色；主题切换刷新背景遮罩，跨越重叠柱体时按覆盖区域反白。

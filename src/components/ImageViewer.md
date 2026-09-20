@@ -1,19 +1,65 @@
-# ImageViewer.svelte 文档
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+# ImageViewer
 
 > **版本**: v1.4.1
-> **变更记录 (2026-04-28)**: 标注主布局模型为复合管理布局，明确 overlay / media / controls 的区域关系。
-> **职责**: 页面级媒体预览组件，负责显示当前图片/视频与组合式控制按钮。
-
-`ImageViewer` 是独立组件，不并入 `Image`。它承载“打开后的预览层”，默认内置上一张、下一张与关闭 Button；需要自定义结构时仍可通过 children 显式组合控制键。
+> **职责**: 在页面级预览中查看图片或视频，提供前后切换与关闭操作，适合媒体详情浏览。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 在页面级预览中查看图片或视频，提供前后切换与关闭操作，适合媒体详情浏览。
 
-## 控制按钮双模式
+## 使用选择
+
+<!-- usage-guide:start -->
+用于图片的放大查看与组间导航。页面内普通图片展示用 Image；不要重写组件已有的缩放、关闭与键盘操作。
+
+- open / items / index 一起省略时使用页面级自动模式；手动模式显式提供预览列表与当前项。
+- children 替换全部默认控制按钮；只调整内置按钮外观时使用 parts，避免误删关闭与前后导航。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button, Image, ImageGroup } from '@snowui-design-system/components';
+	import { ImageViewer } from '@snowui/components-pro';
+	import cover01 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-01-1024.jpg';
+	import cover02 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-02-1024.jpg';
+	import cover03 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-03-1024.jpg';
+</script>
+
+<ImageGroup size={80}>
+<Image src={cover01} alt="SnowUI resource cover 1" />
+<Image src={cover02} alt="SnowUI resource cover 2" />
+<Image src={cover03} alt="SnowUI resource cover 3" />
+</ImageGroup>
+<ImageViewer />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| open | `boolean` | — | 手动模式下控制 Viewer 显示；与 `items/index` 一起省略时进入页面级自动模式 |
+| items | `ImageViewerItem[]` | — | 手动模式下提供预览项列表；省略时自动消费页面级预览状态 |
+| index | `number` | — | 手动模式下提供当前显示项索引；省略时自动消费页面级预览状态 |
+| dismissMode | `"button" \| "backdrop"` | `"backdrop"` | 关闭策略：backdrop 隐藏关闭按钮并允许点击媒体外空白关闭；button 显示关闭按钮且禁用空白关闭 |
+| backdrop | `BackdropVariant` | `"opaque"` | 与 Dialog 共用遮罩视觉：opaque 为 10% 黑色遮罩，blur 在其上模糊背景，transparent 透明；不改变关闭策略。 |
+| children | `Snippet` | — | 显式组合控制按钮；提供后替换全部默认内置按钮 |
+| parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 批量配置默认内置的 prev / next / close Button |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="控制按钮双模式"></a>
+
+### 控制按钮双模式
 
 - **默认内置模式**：省略 children 时自动生成三个真实 `Button`，分别使用 `ArrowLineLeft`、`ArrowLineRight`、SnowUI `Close`；默认 `size="md"`、`variant="gray"`、`backgroundBlur={true}`。
 - **parts 批量配置**：`parts.Button` 配置全部内置控制按钮的可配置 Props；`as`、ARIA、点击动作和图标由 ImageViewer 接管。
@@ -21,7 +67,9 @@
 
 当前主路径是：**在页面根布局声明一个自动模式 `ImageViewer` 作为共享服务**。页面中的 Image / ImageGroup 未显式设置 previewMode 时会自动接入；若误声明多个自动 Viewer，仅注册顺序中的第一个 owner 响应和渲染。
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：复合管理布局。
 
@@ -30,30 +78,18 @@
 - Viewer 只管理预览层、焦点恢复、键盘切换和媒体显示，不把内部控制区抽象为三槽位宿主。
 - ImageGroup 负责集合注册，ImageViewer 负责打开后的单一预览层。
 
-## 组件特有属性 (Component-Specific Props)
+<a id="关键字-keyword"></a>
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `open` | `boolean` | `undefined` | 手动模式下控制 Viewer 显示；与 `items/index` 一起省略时进入页面级自动模式 |
-| `items` | `Array<{ src?: string \| Component; alt?: string }>` | `undefined` | 手动模式下提供预览项列表；省略时自动消费页面级预览状态 |
-| `index` | `number` | `undefined` | 手动模式下提供当前显示项索引；省略时自动消费页面级预览状态 |
-| `backdrop` | `"opaque" \| "blur" \| "transparent"` | `"opaque"` | 与 Dialog 共用遮罩视觉：opaque 为 10% 黑色遮罩，blur 在其上模糊背景，transparent 透明；不改变关闭策略。 |
-| `dismissMode` | `"button" \| "backdrop"` | `"backdrop"` | 关闭策略：backdrop 隐藏关闭按钮并允许点击媒体外空白关闭；button 显示关闭按钮且禁用空白关闭 |
-| `children` | `Snippet` | `undefined` | 显式组合控制按钮；提供后替换全部默认内置按钮 |
-| `parts` | `{ Button? }` | `undefined` | 批量配置默认内置的 prev / next / close Button |
-
-## 关键字 (Keyword)
+### 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| `open` | `boolean` | `undefined` | 手动模式显隐控制；与 `items/index` 一起省略时进入自动模式 |
-| `items` | `Array<{ src?: string \| Component; alt?: string }>` | `undefined` | 手动模式媒体列表 |
-| `index` | `number` | `undefined` | 手动模式当前预览项索引 |
-| `dismissMode` | `"button" \| "backdrop"` | `"backdrop"` | 以交互策略统一决定关闭按钮视觉与空白点击行为 |
 | `parts.Button` | `Button Props` | `undefined` | 配置全部内置控制按钮；默认 md / gray / backgroundBlur |
 | `as` | `'prev' \| 'next' \| 'close'` | - | 控制按钮角色 |
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <ImageViewer open={viewerOpen} items={items} index={currentIndex} />
@@ -147,7 +183,9 @@
 <ImageViewer />
 ```
 
-## 智能行为
+<a id="智能行为"></a>
+
+### 智能行为
 
 1. **独立组件**: 预览态与展示态拆分，避免 `Image` 承担弹层、导航和组索引状态。
 2. **全页面共享服务**: 页面根部声明一个自动模式 ImageViewer；所有未显式指定 previewMode 的 Image / ImageGroup 自动共享它。
@@ -183,7 +221,7 @@
 32. **按钮单独层**: 控制按钮放在独立 `controls` 层，层本身 `pointer-events: none`，只有按钮自身恢复 `pointer-events: auto`。
 33. **关闭策略**: `dismissMode="button"` 显示内置/显式 close Button 并禁止点击空白关闭；`dismissMode="backdrop"` 隐藏 close Button，并允许点击媒体与控制按钮之外的空白区域关闭。Escape 键仍作为自动模式的无障碍退出入口。
 
-## 实现逻辑
+<a id="实现逻辑"></a>
 
 ### 1. 运行模式
 
@@ -268,7 +306,7 @@
 - 浮层并不在原始页面树中就地渲染，而是通过 `use={[portalToBody]}` 挂到 `document.body`。
 - 同时保留 `bind:element`，让 portal host 仍然维持在 `Frame` 体系内，避免脱离现有 portal 组件约束。
 
-## 样式实现
+<a id="样式实现"></a>
 
 ### 1. 根层
 
@@ -330,7 +368,8 @@
 - `dismissMode="backdrop"` 不创建内置 close Button；显式组合的 `Button as="close"` 也由 Context 隐藏。
 - 内置关闭按钮沿用 ImageViewer 的 Button 默认配置：md / gray / backgroundBlur。
 
-## 使用方式定义
+<a id="使用方式定义"></a>
+
 
 ### 1. 推荐用法：页面级自动模式
 
@@ -372,7 +411,6 @@
 - `previewMode="none"`：当前图片完全不参与预览。
 - `data-snowui-image-viewer-mode="window"`：原生 HTML / `resource-svelte` 图片直接新窗口打开。
 
-### 6. 完整使用方式
 
 #### 6.1 `Image` 组件
 
@@ -460,7 +498,20 @@
 - 视频在 Viewer 中默认自动播放
 - 缩略图阶段的视频行为不由 `ImageViewer` 负责，而由 `Image` 负责 hover 播放
 
-## 本轮新增需求
+<a id="本轮新增需求"></a>
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 实现逻辑
+
+
+### 样式实现
+
+
+### 本轮新增需求
 
 - 媒体和屏幕四边保持 `10%` 距离。
 - 按钮和屏幕边缘保持 `3%` 距离。
@@ -468,7 +519,21 @@
 - `Esc` 关闭 `ImageViewer`。
 - `ArrowLeft / ArrowRight` 切换上一张 / 下一张。
 
-## 样式规范 (Style Spec)
+
+
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
+
+> **更新日志 (2026-04-28)**: 标注主布局模型为复合管理布局，明确 overlay / media / controls 的区域关系。
+
+
+`ImageViewer` 是独立组件，不并入 `Image`。它承载“打开后的预览层”，默认内置上一张、下一张与关闭 Button；需要自定义结构时仍可通过 children 显式组合控制键。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 - 预览层默认覆盖当前界面，不切路由。
 - 预览层是原位放大的媒体显示，不跳转新页面。
@@ -495,7 +560,9 @@
 
 > **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -541,9 +608,11 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
-- **ImageViewer-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
+
+- **ImageViewer-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.4.1 (2026-07-05)
 

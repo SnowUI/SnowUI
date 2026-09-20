@@ -1,18 +1,80 @@
-# SearchBox (搜索框触发器)
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
-
+# SearchBox
 
 > **版本**: v1.1.0
-> **职责**: 提供 PRO 搜索入口触发器；点击整个搜索框打开搜索浮层。
-
-`SearchBox` 是搜索浮层的触发器，交互类似 `Select`。它不是原生输入框，整个组件都是可点击区域；视觉颜色、hover、focus、清除 X、内部布局参考 `Input`，并通过 `FramePro` 接通 PRO Frame 能力。
+> **职责**: 提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。
 
-## 功能概览
+## 使用选择
+
+<!-- usage-guide:start -->
+用于打开全局搜索浮层的可点击入口，并非直接编辑查询的输入框。工具栏或列表直接输入查询用 SearchInput。
+
+- 这是可点击搜索入口；bind:open 同步浮层状态，value 用于展示当前查询。
+- 通过 children 组合浮层或快捷键提示；需要直接编辑查询时使用 SearchInput。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { SearchBox } from '@snowui/components-pro';
+	import { Kbd, Popover, SearchInput, MenuItem, Icon, Avatar } from '@snowui-design-system/components';
+	import { MagnifyingGlass, AvatarByewind } from '@snowui-design-system/resource-svelte';
+</script>
+
+<Popover template id="search-box-usage-popup" size="md" closeOnSelect={false} style="width: 20rem;">
+    <SearchInput placeholder="Search" />
+    <MenuItem value="overview" closeOnSelect={true}>
+        <Icon as="leading"><MagnifyingGlass /></Icon>
+        搜索历史：Overview
+    </MenuItem>
+    <MenuItem value="contact-byewind" closeOnSelect={true}>
+        <Avatar src={AvatarByewind} size={24} as="leading" />
+        联系人：Byewind
+    </MenuItem>
+</Popover>
+
+<SearchBox data-popover-target="search-box-usage-popup" style="width: 10rem;" placeholder="搜索">
+    <Kbd as="trailing">⌘K</Kbd>
+</SearchBox>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置内部生成的清除 Button；显式子内容不消费该默认配置。 |
+| variant | `"gray" \| "outline"` | `"gray"` | 搜索框样式 |
+| value | `string \| number` | — | 当前搜索文本或展示值 |
+| placeholder | `string` | `"Search"` | 占位文本 |
+| open | `boolean` | `false` | 浮层打开状态，支持 `bind:open` |
+| disabled | `boolean` | `false` | 禁用触发器 |
+| readonly | `boolean` | `false` | 只读触发器，不响应打开 |
+| showSearchIcon | `boolean` | `true` | 是否渲染默认搜索图标 |
+| collapseBelow | `number` | — | 当组件自身宽度小于或等于该 px 阈值时，仅保留 leading 搜索图标；未传时不启用 |
+| clearable | `boolean` | `true` | 有值时是否显示清除按钮 |
+| children | `Snippet` | — | 外置 leading/trailing，如 `Kbd` |
+| onOpenChange | `(open: boolean) => void` | — | 打开状态变化回调 |
+| onClear | `() => void` | — | 清除回调 |
+| onclick | `(event: MouseEvent) => void` | — | 入口点击后调用，参数为原始 MouseEvent；非 disabled、非 readonly 时组件先打开搜索层，回调不能取消已执行的打开。 |
+| onkeydown | `(event: KeyboardEvent) => void` | — | 处理 Escape 关闭及 Enter/Space 打开后调用，接收原始 KeyboardEvent；不能撤销已经发生的状态变化。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="功能概览"></a>
+
+### 功能概览
 
 - 两种样式：`gray` 与 `outline`
 - 默认 leading 图标为 `Search`
@@ -24,24 +86,10 @@
 
 ---
 
-## API 参考
+<a id="api-参考"></a>
 
-### 核心属性
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| variant | `"gray" \| "outline"` | `"gray"` | 搜索框样式 |
-| value | `string \| number` | — | 当前搜索文本或展示值 |
-| placeholder | `string` | `"Search"` | 占位文本 |
-| open | `boolean` | — | 浮层打开状态，支持 `bind:open` |
-| disabled | `boolean` | `false` | 禁用触发器 |
-| readonly | `boolean` | `false` | 只读触发器，不响应打开 |
-| showSearchIcon | `boolean` | `true` | 是否渲染默认搜索图标 |
-| collapseBelow | `number` | — | 当组件自身宽度小于或等于该 px 阈值时，仅保留 leading 搜索图标；未传时不启用 |
-| clearable | `boolean` | `true` | 有值时是否显示清除按钮 |
-| children | `Snippet` | — | 外置 leading/trailing，如 `Kbd` |
-| onOpenChange | `(open: boolean) => void` | — | 打开状态变化回调 |
-| onClear | `() => void` | — | 清除回调 |
+
 
 ### 使用示例
 
@@ -57,6 +105,12 @@
 ```
 
 ```svelte
+<script lang="ts">
+  import { Kbd } from '@snowui-design-system/components';
+  import { SearchBox } from '@snowui/components-pro';
+  let open = $state(false);
+</script>
+
 <SearchBox variant="outline" bind:open>
   <Kbd as="trailing">⌘K</Kbd>
 </SearchBox>
@@ -67,9 +121,22 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+
+
+
+
+
+`SearchBox` 是搜索浮层的触发器，交互类似 `Select`。它不是原生输入框，整个组件都是可点击区域；视觉颜色、hover、focus、清除 X、内部布局参考 `Input`，并通过 `FramePro` 接通 PRO Frame 能力。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 布局模型
 
@@ -124,7 +191,9 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.1.1 (2026-08-14)
 

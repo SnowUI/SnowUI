@@ -1,22 +1,92 @@
-# Field.svelte 文档
+# Field
 
 > **版本**: v1.3.0
-> **职责**: 表单容器组件，负责承接输入框视觉外壳、组合布局、错误提示与角色化插槽协议。
-
-**2026-05-06 补充**: `Field row > Input/Select as="segment"` 这类直接横向分段宿主必须保留自身 `12 / 16` padding；只有 `Field row > Frame as="segment" > Input/Select` 这类嵌套在 segment 容器内的宿主，才由外层 segment 容器持有 padding，内部 host 归零。
-**2026-04-25 补充**: `Field` 内嵌非 `segment` 的 `Textarea` 时，右侧内容留白由外层 `Field` 的 `padding-right: 16px` 单独负责；`Textarea` 自身不再额外保留右侧 padding，只保留底部 resize/footer 保留区，确保与独立 `Textarea` 的右侧视觉间距一致。
-**2026-04-04 补充**: 参考 Figma `9996:17631`，`as="segment"` 是 `Field` 里处理 padding、gap 和分割线的唯一主语义。没标 `segment` 时，由外层 `Field` 负责默认 `padding = 12 / 16` 与 `gap = 8`，`Input / Select / Textarea` 去掉组件自身 padding，但保留组件自身 gap；标了 `segment` 时保留组件自身的 padding 与 gap，并参与连续字段表面的分割线。`label / description / error` 只负责文字样式，不再参与 padding、gap、分割线判断。
-**2026-04-09 图标规则补充**: `Field` 负责字段外壳、分割线与 segment 切角，但不重新定义 `Input` 内 icon 的最终定位。`Input` 内的 leading / trailing / invalid warning icon 间距由 `Input` 自身控制；进入 `Field` 后只允许继承，不允许二次改写。若 `Input as="segment"` 处于连续字段表面中，icon 到最近边框或分割线的距离仍保持 `16px`。
-**2026-03-24 补充**: 当 `Field` 里只有一个嵌入态 `Input / Select / Textarea` 宿主时，根容器会退回 block 容器，不再保留多列 grid 轨道；同时这类嵌入宿主不再继承 `Field` 面向普通 host 的 `display:flex / align-items / min-height` 注入，避免按钮区和内容区尺寸与独立组件继续偏离。
-
-**继承**: 复用 Frame.svelte 的所有通用能力（状态、动效、响应式、Skeleton、样式编排）。
-**默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。
+> **职责**: 将输入控件、标签、图标和校验反馈组织为完整的表单字段，统一外观与内容布局。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 将输入控件、标签、图标和校验反馈组织为完整的表单字段，统一外观与内容布局。
 
-## 2026-04-04 表单样式规则
+## 使用选择
+
+<!-- usage-guide:start -->
+用于组合标签、输入、帮助和错误。Input / Select / Textarea 放在 Field 内时由 Field 统一相关表面；连续字段段使用 as="segment"，不要重复边框与错误区。
+
+- label 与 error 提供默认文案，invalid 与 readonly 表达字段状态。
+- 用 children 组合 Input、Select、Textarea 及附件；parts 配置默认 label / error，显式子组件自行传 Props。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Frame, Input, Select } from '@snowui-design-system/components';
+	import { Field } from '@snowui/components-pro';
+</script>
+
+<Field
+	style="width: min(100%, 22.5rem); min-width: 0; overflow: hidden; gap: 0;"
+	column
+>
+	<Select
+		as="segment"
+		defaultValue="us"
+		name="addressCountry"
+		aria-label="addressCountry"
+		options={[
+			{ value: "us", label: "United States" },
+			{ value: "cn", label: "China" },
+			{ value: "jp", label: "Japan" },
+		]}
+	/>
+	<Input
+		as="segment"
+		name="addressLine1"
+		placeholder="Address"
+		aria-label="addressLine1"
+	/>
+	<Select
+		as="segment"
+		defaultValue="ca"
+		name="addressState"
+		aria-label="addressState"
+		options={[
+			{ value: "ca", label: "State" },
+			{ value: "ny", label: "New York" },
+			{ value: "tx", label: "Texas" },
+		]}
+	/>
+	<Frame as="segment" row gap={0} width="100%">
+		<Input as="segment" name="city" placeholder="City" aria-label="city" />
+		<Input as="segment" name="zip" placeholder="ZIP" aria-label="zip" />
+	</Frame>
+</Field>
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| invalid | `boolean` | `false` | 容器级无效态，强制显示错误边框 |
+| readonly | `boolean` | `false` | 容器级只读态 |
+| label | `string \| Snippet` | — | 生成内置 `<Text as="label">`；默认不生成。 |
+| error | `string \| Snippet` | — | `invalid=true` 时生成内置 `<Text as="error">`；默认不生成。 |
+| parts | `ComponentPartsOf<{ Text: typeof Text }>` | — | 配置内置 label / error Text。 |
+| children | `Snippet` | — | 自由组合的字段内容 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="2026-04-04-表单样式规则"></a>
+
+### 表单组合与间距
 
 - 基础节奏统一：`Field` 默认 `padding = 12 / 16`，`gap = 8`
 - `Input / Select / Textarea` 单独使用时：组件自身带 `12 / 16` padding 和 `8` gap
@@ -33,7 +103,9 @@
 - 普通 `label + host + error`：不作为 padding、gap 的判断依据，只负责文字内容
 - `Field row` 或 `Field column` 里，如果是连续输入段，子项要显式写 `as="segment"`
 
-## 组件定位
+<a id="组件定位"></a>
+
+### 组件定位
 
 `Field` 是表单体系里的“外壳容器”：
 
@@ -47,7 +119,9 @@
 - `Field` 是字段容器（container）
 - 推荐用法是按结构显式声明：普通宿主直接放入 `Field`，连续字段段显式写 `as="segment"`
 
-## Frame 能力继承
+<a id="frame-能力继承"></a>
+
+### Frame 能力继承
 
 `Field` 自身仍然是一个 `Frame` 封装，因此保留：
 
@@ -58,32 +132,19 @@
 
 也就是说，`Field` 不是写死的表单盒子，而是带字段语义的 `Frame` 容器。
 
-## 组件特有属性 (Component-Specific Props)
+<a id="关键字-keyword"></a>
 
-| 属性 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| invalid | `boolean` | `false` | 容器级无效态，强制显示错误边框 |
-| readonly | `boolean` | `false` | 容器级只读态 |
-| label | `string \| Snippet` | `undefined` | 生成内置 `<Text as="label">`；默认不生成。 |
-| error | `string \| Snippet` | `undefined` | `invalid=true` 时生成内置 `<Text as="error">`；默认不生成。 |
-| parts | `{ Text? }` | `undefined` | 配置内置 label / error Text。 |
-| children | `Snippet` | - | 自由组合的字段内容 |
-
-## 关键字 (Keyword)
+### 关键字 (Keyword)
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | :--- | :--- | :--- | :--- |
-| invalid | `boolean` | `false` | 容器级无效态，强制显示错误边框 |
-| readonly | `boolean` | `false` | 容器级只读态 |
-| label | `string \| Snippet` | `undefined` | 内置 label 内容；也可继续显式声明 `<Text as="label">`。 |
-| error | `string \| Snippet` | `undefined` | invalid 时显示内置错误文字；样式与 F-02 一致。 |
-| parts | `{ Text? }` | `undefined` | 内置 label / error Text 的部件配置。 |
-| children | `Snippet` | - | 自由组合的字段内容 |
 | enableResponsive | `boolean` | `false` | 响应式能力开关 |
 | enableContext | `boolean` | `true` | 上下文能力开关 |
 | enableScaleObserver | `boolean` | `false` | 尺寸观察能力开关 |
 
-## 容器协议
+<a id="容器协议"></a>
+
+### 容器协议
 
 `Field` 会通过上下文向后代宿主暴露“当前位于字段容器内”的协议。
 
@@ -109,7 +170,9 @@
 
 错误态与 shake 不会自动聚焦，也不会模拟 `focus-within`；焦点态只来自用户真实聚焦、显式 `autofocus` 或业务代码主动调用 `focus()`。
 
-## 布局模型
+<a id="布局模型"></a>
+
+### 布局模型
 
 主布局模型：**槽位宿主布局**。定义见 [../../../specs/LayoutProtocol.md §12.3](../../../specs/LayoutProtocol.md)。
 
@@ -122,7 +185,9 @@ Field 是字段表面的槽位宿主特化：
 - `segment` 场景由 Field 负责连续字段表面、分割线和切角；这部分是 Field 特有规则，不应下沉到 `auto-layout.css`。
 - `Input / Select / Textarea` 进入 Field 后退化为 `.snowui-field-host`；是否保留自身 padding 由 `as="segment"` 决定。
 
-## 角色协议 (`as`)
+<a id="角色协议-as"></a>
+
+### 角色协议 (`as`)
 
 `Field` 自身不限制子组件类型，而是通过 `as` 角色识别不同部分。
 
@@ -175,7 +240,9 @@ Field 是字段表面的槽位宿主特化：
 - 当布局只影响整个 `Field` 根节点时，优先使用 `Field row / column`
 - 当你只想在字段内部某一段做局部分组时，再使用 `Frame as="row"` 或 `Frame as="col"`
 
-## 使用示例
+<a id="使用示例"></a>
+
+### 使用示例
 
 ```svelte
 <!-- 单个输入 -->
@@ -239,7 +306,9 @@ Field 是字段表面的槽位宿主特化：
 </Field>
 ```
 
-## 状态与交互边界
+<a id="状态与交互边界"></a>
+
+### 状态与交互边界
 
 - `Field` 负责字段表面的视觉状态：默认、hover、focus-within、invalid、disabled、readonly
 - `Field` 不负责真实值、原生输入事件和浏览器校验细节，这些由 host 组件负责
@@ -253,7 +322,33 @@ Field 是字段表面的槽位宿主特化：
 - 转发逻辑不干预直接点击可聚焦元素时的原生行为；点击 `Input / Select / Textarea` 区域本身时沿用浏览器默认焦点行为
 - `disabled` 状态下不执行转发
 
-## 样式规范 (Style Spec)
+<a id="无障碍与表单建议"></a>
+
+### 无障碍与表单建议
+
+- 推荐由 host 组件承接 `id / name / aria-* / form` 等原生属性
+- 如果有错误提示，建议让 host 的 `aria-describedby` 指向 `Field` 内部的 `error` 或 `description` 节点
+- `Field` 本身不替代 `<label>` 语义；需要明确标签时，请显式渲染 `Text as="label"` 或原生 `<label>`
+
+---
+
+
+
+
+## AI Zone
+
+**2026-05-06 补充**: `Field row > Input/Select as="segment"` 这类直接横向分段宿主必须保留自身 `12 / 16` padding；只有 `Field row > Frame as="segment" > Input/Select` 这类嵌套在 segment 容器内的宿主，才由外层 segment 容器持有 padding，内部 host 归零。
+**2026-04-25 补充**: `Field` 内嵌非 `segment` 的 `Textarea` 时，右侧内容留白由外层 `Field` 的 `padding-right: 16px` 单独负责；`Textarea` 自身不再额外保留右侧 padding，只保留底部 resize/footer 保留区，确保与独立 `Textarea` 的右侧视觉间距一致。
+**2026-04-04 补充**: 参考 Figma `9996:17631`，`as="segment"` 是 `Field` 里处理 padding、gap 和分割线的唯一主语义。没标 `segment` 时，由外层 `Field` 负责默认 `padding = 12 / 16` 与 `gap = 8`，`Input / Select / Textarea` 去掉组件自身 padding，但保留组件自身 gap；标了 `segment` 时保留组件自身的 padding 与 gap，并参与连续字段表面的分割线。`label / description / error` 只负责文字样式，不再参与 padding、gap、分割线判断。
+**2026-04-09 图标规则补充**: `Field` 负责字段外壳、分割线与 segment 切角，但不重新定义 `Input` 内 icon 的最终定位。`Input` 内的 leading / trailing / invalid warning icon 间距由 `Input` 自身控制；进入 `Field` 后只允许继承，不允许二次改写。若 `Input as="segment"` 处于连续字段表面中，icon 到最近边框或分割线的距离仍保持 `16px`。
+**2026-03-24 补充**: 当 `Field` 里只有一个嵌入态 `Input / Select / Textarea` 宿主时，根容器会退回 block 容器，不再保留多列 grid 轨道；同时这类嵌入宿主不再继承 `Field` 面向普通 host 的 `display:flex / align-items / min-height` 注入，避免按钮区和内容区尺寸与独立组件继续偏离。
+
+**继承**: 复用 Frame.svelte 的所有通用能力（状态、动效、响应式、Skeleton、样式编排）。
+**默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。
+
+<a id="样式规范-style-spec"></a>
+
+### 样式规范 (Style Spec)
 
 ### 1. 容器基础视觉
 
@@ -379,17 +474,9 @@ Field 与独立 Input 使用相同的默认背景 `surface-1`。普通、横向�
 </Field>
 ```
 
-## 无障碍与表单建议
+<a id="开发者指南-ai"></a>
 
-- 推荐由 host 组件承接 `id / name / aria-* / form` 等原生属性
-- 如果有错误提示，建议让 host 的 `aria-describedby` 指向 `Field` 内部的 `error` 或 `description` 节点
-- `Field` 本身不替代 `<label>` 语义；需要明确标签时，请显式渲染 `Text as="label"` 或原生 `<label>`
-
----
-
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
-
-## 开发者指南 (AI)
+### 开发者指南 (AI)
 
 ### 模块索引 (Module Index)
 
@@ -404,10 +491,12 @@ Field 与独立 Input 使用相同的默认背景 `surface-1`。普通、横向�
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - **Field-Motion.2026-06-18** 新增默认错误反馈 shake：`Field invalid` 或内部 host invalid 时整体播放，消费方无需手动传类名或状态。
-- **Field-Docs.2026-05-25** 源码顶部历史变更记录已归档；后续新增变更统一写入本文档 Changelog，源码顶部只保留职责、当前关键架构与文档路径。
+- **Field-Docs.2026-05-25** 源码顶部历史更新日志已归档；后续新增变更统一写入本文档 更新日志，源码顶部只保留职责、当前关键架构与文档路径。
 
 ### v1.3.0 (2026-07-05)
 

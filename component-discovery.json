@@ -69,7 +69,13 @@
       "intents": [
         "数据表格",
         "排序分页表格",
-        "带操作的数据列表"
+        "带操作的数据列表",
+        "文件列表",
+        "文件管理",
+        "勾选",
+        "分页",
+        "搜索",
+        "批量操作"
       ],
       "aliases": [
         "高级表格",
@@ -78,8 +84,15 @@
       "related": [
         "TableToolbar",
         "Table",
-        "SidePanel"
-      ]
+        "TableHeader",
+        "TableHead",
+        "TableBody",
+        "TableRow",
+        "TableCell",
+        "Pagination"
+      ],
+      "whenToUse": "数据列表需要搜索、排序、筛选、勾选、操作列或分页；组合 TableToolbar、Table 与 Pagination。",
+      "avoidWhen": "只展示表头和数据行时使用 Table。"
     },
     "TableToolbar": {
       "intents": [
@@ -185,6 +198,22 @@
       ],
       "intents": [
         "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ]
+    },
+    "GaugeChart": {
+      "intents": [
+        "半环比例图",
+        "半饼图",
+        "分段占比"
+      ],
+      "aliases": [
+        "半圆占比"
+      ],
+      "whenToUse": "以半环或半饼展示多项正数占比，分母为实际显示项之和。",
+      "avoidWhen": "单指标 min/max 仪表没有对应公开 API；任务完成百分比用 Progress。",
+      "related": [
+        "CircularChart",
+        "Progress"
       ]
     }
   }

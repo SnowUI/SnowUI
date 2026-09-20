@@ -1,38 +1,73 @@
-# SlotText 槽位滚动文字
+# SlotText
 
 > **版本**: v1.11.2
-> **组件路径**: `pro/src/components/SlotText.svelte`  
-> **包归属**: PRO
-
-`SlotText` 为逐字符纵向槽位滚动文字。动效时序由组件内部维护，不提供时长、错峰、弹性或缓动调参。
+> **职责**: 以逐字符的纵向滚动展示文字变化，适合短标题、状态、计数与计时信息。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 以逐字符的纵向滚动展示文字变化，适合短标题、状态、计数与计时信息。
 
-## 关键字
+## 使用选择
+
+<!-- usage-guide:start -->
+用于槽位式文本替换动效。静态文字用 Text；数值专属滚动可选 NumberFlow 或 NumericText。
+
+- text 更新内容，replayKey 可重播同一内容，playOnMount 控制首次展示动效。
+- animated=false 直接显示；需要遵循系统减少动效偏好时启用 respectMotionPreference。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Button, Text } from '@snowui-design-system/components';
+	import { SlotText, chromatic } from '@snowui/components-pro';
+	const componentNames = ['Button', 'DataTable', 'SidePanel', 'Tooltip'];
+	let componentIndex = $state(0);
+</script>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: var(--gap-4);">
+	<SlotText text={componentNames[componentIndex]} motionRole="text" motionColor={chromatic()} size="--text-32" lineHeight="--leading-32" weight={600} />
+	<Button onclick={() => componentIndex = (componentIndex + 1) % componentNames.length}>Next component</Button>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
 
 | 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `text` | `string \| number` | `""` | 最终文字 |
-| `direction` | `"normal" \| "reverse"` | `"normal"` | 文字与数字的语义方向；`normal` 使用公共趋势方向，`reverse` 完整取反 |
-| `trend` | `-1 \| 0 \| 1` | `0` | 数字趋势；`0` 自动判断，增加向上、减少向下 |
-| `motionRole` | `"auto" \| "text" \| "number" \| "timer" \| "countdown"` | `"auto"` | 内容语义定性；`text` 显式关闭数字推断，其他值用于普通数值、计时器或倒计时 |
-| `skipUnchanged` | `boolean` | `true` | 跳过未变化字符 |
-| `interrupt` | `boolean` | `true` | 新内容是否中断当前播放；`true` 从当前画面继续过渡到最新文字，`false` 等待当前播放结束后处理最新文字 |
-| `replayKey` | `string \| number` | `0` | 文字不变时值变化会从空槽位重播；文字变化时只执行正常 diff 动画 |
-| `playOnMount` | `boolean` | `false` | 挂载后是否从空槽位重播 |
-| `animated` | `boolean` | `true` | 是否启用文字动效 |
-| `respectMotionPreference` | `boolean` | `false` | 显式开启后才遵循系统减少动效设置 |
-| `transition` | `{ duration?, stagger?, exitOffset?, colorFade? }` | 参考项目默认值 | 调试 / Demo 用时序覆盖；不改变默认复刻基线 |
-| `font` | `string` | `undefined` | 字体；支持 SnowUI Token |
-| `size` | `string \| number` | `undefined` | 字号；支持 SnowUI Token |
-| `weight` | `string \| number` | `undefined` | 字重 |
-| `lineHeight` | `string \| number` | `undefined` | 行高；支持 SnowUI Token |
-| `color` | `SnowUIColor \| string` | `undefined` | 最终文字颜色；支持 PascalCase 语意色 |
-| `align` | `"left" \| "center" \| "right" \| "justify"` | `undefined` | 对齐；默认继承父级 |
-| `motionColor` | `SnowUIColor \| string \| TextMotionColorResolver` | `undefined` | 全部目标字符从左到右回落的临时颜色；默认不改变颜色，支持 `chromatic()` 逐字符渐变 |
-| `...rest` | `FrameProps` | - | 透传到根 `FramePro`，包括 `as="label"` |
+| --- | --- | --- | --- |
+| text | `string \| number` | `""` | 最终文字 |
+| direction | `SlotTextDirection` | — | 文字与数字的语义方向；`normal` 使用公共趋势方向，`reverse` 完整取反 |
+| trend | `SlotTextTrend` | `0` | 数字趋势；`0` 自动判断，增加向上、减少向下 |
+| motionRole | `SlotTextMotionRole` | `"auto"` | 内容语义定性；`text` 显式关闭数字推断，其他值用于普通数值、计时器或倒计时 |
+| skipUnchanged | `boolean` | `true` | 跳过未变化字符 |
+| interrupt | `boolean` | `true` | 新内容是否中断当前播放；`true` 从当前画面继续过渡到最新文字，`false` 等待当前播放结束后处理最新文字 |
+| replayKey | `string \| number` | `0` | 文字不变时值变化会从空槽位重播；文字变化时只执行正常 diff 动画 |
+| playOnMount | `boolean` | `false` | 挂载后是否从空槽位重播 |
+| animated | `boolean` | `true` | 是否启用文字动效 |
+| respectMotionPreference | `boolean` | `false` | 显式开启后才遵循系统减少动效设置 |
+| transition | `Partial<SlotTextTransition>` | — | 调试 / Demo 用时序覆盖；不改变默认复刻基线 默认行为：参考项目默认值。 |
+| font | `string` | — | 字体；支持 SnowUI Token |
+| size | `string \| number` | — | 字号；支持 SnowUI Token |
+| weight | `string \| number` | — | 字重 |
+| color | `SnowUIColor \| string` | — | 最终文字颜色；支持 PascalCase 语意色 |
+| lineHeight | `string \| number` | — | 行高；支持 SnowUI Token |
+| align | `TextMotionAlign` | — | 对齐；默认继承父级 |
+| motionColor | `TextMotionColor` | — | 全部目标字符从左到右回落的临时颜色；默认不改变颜色，支持 `chromatic()` 逐字符渐变 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="关键字"></a>
+
+### 关键字
 
 六项排版默认全部继承父级。`motionColor` 在更新时覆盖目标全文，并从左到右在主时长与逐字 delay 后回到 `color` 或父级继承色；颜色主时长保留 `duration + exitOffset`，回落时长保留 `colorFade`。数字位移仍按低位到高位启动，两条时间线互不改变对方的方向。
 
@@ -65,9 +100,15 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 实现约束
+<a id="实现约束"></a>
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 实现约束
 
 - 动画差值与逻辑终点由 `../lib/text-motion/animation.ts` 分离管理；连续更新保留未结束的位移，旧清理回调不能覆盖最新目标。
 
@@ -91,7 +132,17 @@
 - `duration`、`exitOffset`、`easing`、`bounce`、颜色回落时长仅为内部常量，不得恢复为公开 Props。
 - 字符按 grapheme 拆分；动画字符对辅助技术隐藏，根节点提供最终 `aria-label`。
 
+
+
+
+> **组件路径**: `pro/src/components/SlotText.svelte`
+
+
+`SlotText` 为逐字符纵向槽位滚动文字。动效时序由组件内部维护，不提供时长、错峰、弹性或缓动调参。
+
 ## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.11.2 (2026-09-09)
 

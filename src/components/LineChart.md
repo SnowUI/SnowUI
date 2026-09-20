@@ -1,18 +1,106 @@
-# LineChart (折线图)
+# LineChart
 
 > **版本**: v1.6.1
-> **状态**: 已实现(PRO)
+> **职责**: 用折线展示数据变化趋势，支持多序列、面积填充、实线与虚线，以及坐标轴、网格和节点样式。
 > **包归属**: `@snowui/components-pro`
-> **职责**: 渲染带横坐标、纵坐标、网格线、实线 / 虚线、Area 填充、多序列、圆角转折线与可定制节点点样式的折线图。
-> **参考**: Figma Workshop 节点 `12617:1780`。
-
----
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 用折线展示数据变化趋势，支持多序列、面积填充、实线与虚线，以及坐标轴、网格和节点样式。
 
-## 1. 设计原则
+## 使用选择
+
+<!-- usage-guide:start -->
+用于连续数据或时间趋势。类别比较用 BarChart；数据点、轴、提示与颜色通过公开图表配置声明。
+
+- 通过 series 提供数据；组件不生成示例数据，xLabels 与数据点应保持对应。
+- loading 保留轴与画布，等待结束后展示数据；HoverPanel 默认开启，颜色和格式使用图表公开配置。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Frame } from '@snowui-design-system/components';
+	import { LineChart } from '@snowui/components-pro';
+</script>
+
+<LineChart series={[{ name: 'Component pages', data: [1280, 1460, 1390, 1720, 1880, 2140, 2360], color: 'Primary', strokeWidth: 3 }, { name: 'Quick Start', data: [620, 710, 680, 840, 920, 1040, 1180], color: 'var(--secondary-purple)', strokeStyle: 'dashed' }]} xLabels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']} width="100%" height={280} yTicks={[0, 500, 1000, 1500, 2000, 2500]} yTickFormatter={(value) => value < 1000 ? String(value) : `${value / 1000}K`} showYAxis showGrid showHoverPanel hoverPanelVariant="surface" />
+```
+<!-- /quick-start:generated -->
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| series | `LineChartSeries[]` | `[]` | 图表序列数据；组件不内置模拟数据 |
+| xLabels | `string[]` | — | 横坐标标签；未传时使用 `ChartGroup.xLabels` 或按数据点索引生成内部坐标标签 |
+| width | `number \| string` | `800` | 图表整体宽度；支持 `100%`，内部按根层最终实测宽度重算几何 |
+| height | `number \| string` | `400` | 图表整体高度；数字按 px 语义转为 rem |
+| yMin | `number` | — | 纵坐标最小值；未传时根据数据生成 nice domain，正数数据默认包含 `0` 默认行为：自动 / 继承 `ChartGroup`。 |
+| yMax | `number` | — | 纵坐标最大值；自动时等于实际最大数据值，不向上取整 默认行为：自动 / 继承 `ChartGroup`。 |
+| yTicks | `number[]` | — | 纵坐标刻度 默认行为：自动 nice ticks / 继承 `ChartGroup`。 |
+| yTickCount | `number` | — | 未传 `yTicks` 时用于生成 nice ticks 的目标刻度数量 |
+| yTickFormatter | `(value: number) => string` | — | 纵坐标格式化 默认行为：K 格式 / 继承 `ChartGroup`。 |
+| showXAxis | `boolean` | — | 是否显示横坐标 |
+| showYAxis | `boolean` | — | 是否显示纵坐标 |
+| showGrid | `boolean` | — | 是否显示水平网格线 |
+| showGuides | `boolean` | — | 是否允许序列绘制节点垂直辅助线 |
+| showHoverLabel | `boolean` | — | hover / focus 节点时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 默认行为：按 `showHoverPanel` 推导。 |
+| alwaysShowHoverLabel | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
+| adaptiveContrast | `boolean` | — | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 默认行为：继承 ChartGroup，否则 `true`。 |
+| showHoverPanel | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前节点 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
+| hoverPanelVariant | `ChartHoverPanelVariant` | `"light"` | hover 面板视觉样式 |
+| hoverPanelPlacement | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
+| showHoverPanelLabel | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
+| hoverMode | `ChartGroupHoverMode` | — | hover 命中模式；`cell` 时按分类点位中心左右半格生成整格命中区，并响应共享 hover |
+| activeCellIndex | `number \| null` | — | 受控当前 hover 分类点位；未传时可继承 `ChartGroup` |
+| onCellHoverChange | `(index: number \| null) => void` | — | 分类点位 hover 变化回调 |
+| valueFormat | `NumberFormatOptions` | — | 节点数值 label 的组件级数字格式；可设置 `notation: "auto"` / `"compact"` 使用英文 `k/m/b/t` 缩写 默认行为：NumberFormats 默认。 |
+| labelFormatter | `( value: number, context: { series: LineChartSeries; point: NormalizedPoint; seriesIndex: number; pointIndex: number; }, ) => string` | — | 节点数值 label 自定义格式化；优先级高于全局、组件、序列和点级 `valueFormat` |
+| xAxisMode | `LineChartXAxisMode` | — | 横坐标点位模式；`edge` 表示首尾数据点与首尾 label 中心都对齐到绘图区两端，`cell` 为分类 cell 中心 |
+| xLabelAutoCull | `boolean` | — | 是否根据完整 label 实测宽度自动减少横坐标 label；不删除数据点、路径或命中 cell |
+| xMaxLabelCount | `number` | — | 横坐标最多显示 label 数量；始终保留首尾，并按等步数减少中间 label 与对应数据点 默认行为：- / 继承 `ChartGroup`。 |
+| yLabelAutoCull | `boolean` | — | 是否根据纵向空间自动减少纵坐标 label |
+| yMaxLabelCount | `number` | — | 纵坐标最多显示 label 数量；未传 `yTicks` 时也会作为生成 nice ticks 的上限 默认行为：- / 继承 `ChartGroup`。 |
+| cornerRadius | `number \| string` | `8` | 圆角转折线的转角圆角半径；`0` 时为直线 |
+| colors | `(LineChartColor \| undefined)[]` | — | 调色板；空项回退当前 `colorMode` |
+| colorMode | `LineChartColorMode` | `"sequence"` | Chart 通用颜色模式：默认色序、单色渐浅、单色 |
+| color | `LineChartColor` | — | 单色模式主色；传入后同时作为 `monochromeFade` 与 `monochrome` 的默认颜色 |
+| monochromeColor | `LineChartColor` | `"Primary"` | `monochromeFade` 的单色来源；第一条序列为 100%，最后一条序列为 20%，中间按序列数量均匀递减 |
+| mutedMonochromeColor | `LineChartColor` | `"Black4"` | `monochrome` 的单色来源；默认所有未自定义序列为 4% 黑色本体颜色，描边透明度保持 100% |
+| showBaseLayer | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。同时控制完整折线及 Area 底层，不关闭真实 Area 渐变。 |
+| appearMotion | `boolean` | `true` | 是否启用出现动效 |
+| appearOnView | `boolean` | `true` | 是否在触发锚点进入视口默认位置时自动播放出现动效；同源 iframe 中按最外层同源页面的真实位置判断 |
+| appearanceProgress | `number` | — | 受控出现进度，范围 `0..1`；传入后组件只根据该进度渲染，不自行播放 |
+| defaultAppearanceProgress | `number` | `0` | 非受控初始出现进度 |
+| appearanceDuration | `number` | — | 自动播放总时长覆盖；未设置时每条序列自身绘制时长固定为 `1000ms`，多序列总完成时间会随 `360ms` stagger 增加 |
+| appearAnchorId | `string` | — | 动效触发锚点元素 ID；不传时使用图表自身根元素 |
+| appearAnchorPoint | `AnchorPoint` | `"top"` | 使用锚点元素的顶端、中间或底部作为触发点 |
+| appearViewportPoint | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发位置；`0.7` 表示视口高度 70% |
+| scrollAppearance | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动条时间轴控制出现动效；同源 iframe 同时响应外层页面滚动 |
+| scrollAppearanceDistance | `number \| string` | `320` | 滚动时间轴从 `0` 到 `1` 对应的滚动距离 |
+| onAppearanceProgressChange | `(progress: number) => void` | — | 出现进度变化回调 |
+| loading | `boolean` | — | 数据等待状态。保持声明的画布尺寸、坐标轴和网格，将折线、面积和 marker 固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文。 |
+| children | `Snippet` | — | 图表主体后的自定义内容，无参数；不会替换坐标轴或数据系列。 |
+| class | `string` | `""` | 根层附加 class |
+| style | `string` | `""` | 根层附加 style |
+| enableResponsive | `boolean` | `true` | 是否启用 Frame responsive 能力 |
+| enableContext | `boolean` | `true` | 是否启用 Frame context 能力 |
+| enableScaleObserver | `boolean` | `false` | 是否启用 Frame scale observer |
+| enableDefaultMotion | `boolean` | `true` | 是否启用 Frame 默认动效 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="1-设计原则"></a>
+
+### 设计原则
 
 - **PRO Chart 原子组件**: `LineChart` 只负责折线图本体，不内置标题、卡片背景、legend 或 toolbar。
 - **无内置示例数据**: `LineChart` 不在组件内部模拟业务数据；示例、业务页面或外层组合组件必须显式传入 `series` 与 `xLabels`。
@@ -29,67 +117,11 @@
 
 ---
 
-## 2. API
+<a id="2-api"></a>
+
 
 ### 2.1 Props
 
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `series` | `LineChartSeries[]` | `[]` | 图表序列数据；组件不内置模拟数据 |
-| `xLabels` | `string[]` | `[]` / 继承 `ChartGroup` | 横坐标标签；未传时使用 `ChartGroup.xLabels` 或按数据点索引生成内部坐标标签 |
-| `width` | `number \| string` | `800` | 图表整体宽度；支持 `100%`，内部按根层最终实测宽度重算几何 |
-| `height` | `number \| string` | `400` | 图表整体高度；数字按 px 语义转为 rem |
-| `yMin` | `number` | 自动 / 继承 `ChartGroup` | 纵坐标最小值；未传时根据数据生成 nice domain，正数数据默认包含 `0` |
-| `yMax` | `number` | 自动 / 继承 `ChartGroup` | 纵坐标最大值；自动时等于实际最大数据值，不向上取整 |
-| `yTicks` | `number[]` | 自动 nice ticks / 继承 `ChartGroup` | 纵坐标刻度 |
-| `yTickCount` | `number` | `6` / 继承 `ChartGroup` | 未传 `yTicks` 时用于生成 nice ticks 的目标刻度数量 |
-| `yTickFormatter` | `(value: number) => string` | K 格式 / 继承 `ChartGroup` | 纵坐标格式化 |
-| `showXAxis` | `boolean` | `true` / 继承 `ChartGroup` | 是否显示横坐标 |
-| `showYAxis` | `boolean` | `false` / 继承 `ChartGroup` | 是否显示纵坐标 |
-| `showGrid` | `boolean` | `false` / 继承 `ChartGroup` | 是否显示水平网格线 |
-| `showGuides` | `boolean` | `false` / 继承 `ChartGroup` | 是否允许序列绘制节点垂直辅助线 |
-| `showHoverLabel` | `boolean` | 按 `showHoverPanel` 推导 | hover / focus 节点时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 |
-| `alwaysShowHoverLabel` | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
-| `adaptiveContrast` | `boolean` | 继承 ChartGroup，否则 `true` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 |
-| `showHoverPanel` | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前节点 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
-| `hoverPanelVariant` | `"dark" \| "light" \| "surface"` | `"light"` | hover 面板视觉样式 |
-| `hoverPanelPlacement` | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
-| `showHoverPanelLabel` | `boolean` | `false` | 是否在 hover 面板顶部显示当前分类 label |
-| `hoverMode` | `"item" \| "cell"` | `"cell"` / 继承 `ChartGroup` | hover 命中模式；`cell` 时按分类点位中心左右半格生成整格命中区，并响应共享 hover |
-| `activeCellIndex` | `number \| null` | - | 受控当前 hover 分类点位；未传时可继承 `ChartGroup` |
-| `onCellHoverChange` | `(index: number \| null) => void` | - | 分类点位 hover 变化回调 |
-| `valueFormat` | `NumberFormatOptions` | NumberFormats 默认 | 节点数值 label 的组件级数字格式；可设置 `notation: "auto"` / `"compact"` 使用英文 `k/m/b/t` 缩写 |
-| `labelFormatter` | `(value, context) => string` | - | 节点数值 label 自定义格式化；优先级高于全局、组件、序列和点级 `valueFormat` |
-| `xAxisMode` | `"cell" \| "edge"` | `"edge"` / 继承 `ChartGroup` | 横坐标点位模式；`edge` 表示首尾数据点与首尾 label 中心都对齐到绘图区两端，`cell` 为分类 cell 中心 |
-| `xLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 是否根据完整 label 实测宽度自动减少横坐标 label；不删除数据点、路径或命中 cell |
-| `xMaxLabelCount` | `number` | - / 继承 `ChartGroup` | 横坐标最多显示 label 数量；始终保留首尾，并按等步数减少中间 label 与对应数据点 |
-| `yLabelAutoCull` | `boolean` | `true` / 继承 `ChartGroup` | 是否根据纵向空间自动减少纵坐标 label |
-| `yMaxLabelCount` | `number` | - / 继承 `ChartGroup` | 纵坐标最多显示 label 数量；未传 `yTicks` 时也会作为生成 nice ticks 的上限 |
-| `cornerRadius` | `number \| string` | `8` | 圆角转折线的转角圆角半径；`0` 时为直线 |
-| `colors` | `(LineChartColor \| undefined)[]` | - | 调色板；空项回退当前 `colorMode` |
-| `colorMode` | `"sequence" \| "monochromeFade" \| "monochrome"` | `"sequence"` | Chart 通用颜色模式：默认色序、单色渐浅、单色 |
-| `color` | `LineChartColor` | - | 单色模式主色；传入后同时作为 `monochromeFade` 与 `monochrome` 的默认颜色 |
-| `monochromeColor` | `LineChartColor` | `"Primary"` | `monochromeFade` 的单色来源；第一条序列为 100%，最后一条序列为 20%，中间按序列数量均匀递减 |
-| `mutedMonochromeColor` | `LineChartColor` | `"Black4"` | `monochrome` 的单色来源；默认所有未自定义序列为 4% 黑色本体颜色，描边透明度保持 100% |
-| `showBaseLayer` | `boolean` | `false` | 是否显示最终尺寸的同色轮廓（影子 / 占位底层），默认不渲染；开启后以 4% 不透明度绘制，不参与出现动效，不改变真实图形、命中区域或时间轴。同时控制完整折线及 Area 底层，不关闭真实 Area 渐变。 |
-| `appearMotion` | `boolean` | `true` | 是否启用出现动效 |
-| `appearOnView` | `boolean` | `true` | 是否在触发锚点进入视口默认位置时自动播放出现动效；同源 iframe 中按最外层同源页面的真实位置判断 |
-| `appearanceProgress` | `number` | - | 受控出现进度，范围 `0..1`；传入后组件只根据该进度渲染，不自行播放 |
-| `defaultAppearanceProgress` | `number` | `0` | 非受控初始出现进度 |
-| `appearanceDuration` | `number` | - | 自动播放总时长覆盖；未设置时每条序列自身绘制时长固定为 `1000ms`，多序列总完成时间会随 `360ms` stagger 增加 |
-| `appearAnchorId` | `string` | - | 动效触发锚点元素 ID；不传时使用图表自身根元素 |
-| `appearAnchorPoint` | `"top" \| "center" \| "bottom"` | `"top"` | 使用锚点元素的顶端、中间或底部作为触发点 |
-| `appearViewportPoint` | `number \| "top" \| "center" \| "bottom"` | `0.7` | 视口触发位置；`0.7` 表示视口高度 70% |
-| `scrollAppearance` | `boolean \| { distance?: number \| string }` | `false` | 是否启用滚动条时间轴控制出现动效；同源 iframe 同时响应外层页面滚动 |
-| `scrollAppearanceDistance` | `number \| string` | `320` | 滚动时间轴从 `0` 到 `1` 对应的滚动距离 |
-| `onAppearanceProgressChange` | `(progress: number) => void` | - | 出现进度变化回调 |
-| `loading` | `boolean` | - | 数据等待状态。保持声明的画布尺寸、坐标轴和网格，将折线、面积和 marker 固定在出现动效起点并暂停交互；变为 false 后按当前视口条件播放出现动效。图表不渲染 Skeleton，也会读取上层 Frame 的 loading 上下文。 |
-| `enableResponsive` | `boolean` | `true` | 是否启用 Frame responsive 能力 |
-| `enableContext` | `boolean` | `true` | 是否启用 Frame context 能力 |
-| `enableScaleObserver` | `boolean` | `false` | 是否启用 Frame scale observer |
-| `enableDefaultMotion` | `boolean` | `true` | 是否启用 Frame 默认动效 |
-| `class` | `string` | `""` | 根层附加 class |
-| `style` | `string` | `""` | 根层附加 style |
 
 其余未声明属性会透传给根层 `Frame`。
 
@@ -176,7 +208,97 @@ Marker 说明：
 
 ---
 
-## 3. 样式 Token 详表
+<a id="4-布局模型"></a>
+
+### 布局模型
+
+主布局模型:**内禀原子布局**。
+
+- 根层为 `Frame`，内部为单个 SVG 绘图区。
+- 根层直接观察最终显示尺寸并重算 SVG 坐标；`width="100%"` / `height="100%"` 不要求页面回传容器尺寸。
+- 横向分类轴按 `max(xLabels.length, ...series.data.length)` 计算点位数量；`cell` 模式节点位置为 `bounds.left + (plotWidth / count) * (index + 0.5)`，`edge` 模式节点位置为 `bounds.left + (plotWidth / (count - 1)) * index`，单点时居中。
+- X 轴 label 使用当前点位间距作为 cell 宽度，文字居中且单行省略；整体高度为 `16px`。
+- `edge` 模式下首尾 label 的中心与首尾数据点同 x 坐标，label cell 允许向绘图区外侧延伸。
+- X 轴 label 自动显示规则：按最终字体实测完整文字宽度与当前 `xAxisMode` 的原始数据位置判断，相邻可见文字至少间隔 `4px`。抽稀只减少 label，不删除或重排数据点、折线路径、marker、guide 与命中 cell。保留索引必须形成等差步数；若首尾两个完整 label 仍放不下，则隐藏全部 X label。
+- Y 轴 label 抽稀规则：自动生成刻度时优先通过 `yTickCount` / `yMaxLabelCount` 生成合适数量；显式传入 `yTicks` 或纵向空间不足时，按首尾保留、等步数的规则减少显示 label，水平网格线跟随可见 Y label。
+- X 轴 label cell 顶部到最下面 x 轴基线的间距为 `8px`。
+- 绘图区顶部由共享内容感知规则计算：线条宽度的一半或当前最大 marker 半径作为图形向上溢出量；普通图形保持 `8px` 安全距离，Y 轴顶刻度至少需要 `16px`。顶部数值 label 不增加该值，继续保持节点上方 `4px` 并可溢出绘图区顶边；marker 的溢出量始终计入，不依赖 label 是否显示。有 X 轴时 `bottom=24px`，只包含上述 `8px` 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
+- Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘到绘图区线段起点的间距固定为 `12px`。例如 formatter 输出 `100000` 时，绘图区只按该文本比短刻度新增的实际宽度缩小，固定间距不变。
+- 不接入三槽位协议，不承担通用子元素排列。
+
+详见 [LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
+
+---
+
+<a id="5-无障碍与-frame-集成"></a>
+
+### 无障碍与 Frame 集成
+
+- 根层使用 `role="img"` 和 `aria-label="折线图"`。
+- 每个 marker 使用独立 `aria-label`，内容包含序列名、横坐标标签和值。
+- marker 内部包含透明命中圆，保证键盘焦点与鼠标命中不只依赖可见圆点半径。
+- marker 可见层不接管 pointer events，白色中心、黑色外圈与透明命中圆统一由命中圆触发；默认命中区域不小于 `16x16`。
+- 独立使用或接入 `ChartGroup` 时均支持 `hoverMode="cell"`；cell 命中区按分类点位中心左右半格覆盖绘图区，对应分类点位的 marker 响应 hover，marker 自身命中区仍独立保留。
+- `loading` 保留完整画布与坐标结构，只把折线、面积和 marker 恢复到出现动效起点；根 Frame 明确关闭 Skeleton。空 `series={[]}` 可配合 `xLabels`、`yMin`、`yMax` 先建立最终坐标。
+- 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
+- `class`、`style` 与未声明属性透传到根层 Frame。
+
+---
+
+<a id="6-图层与动效"></a>
+
+### 图层与动效
+
+SVG 图层从下到上为：
+
+1. `defs`: 颜色渐变、Area 渐变、序列 reveal clipPath。
+2. grid / axis layer: 水平网格线和 x 轴基线。
+3. base layer: `showBaseLayer=true` 时绘制完整 Area 与折线路径的同色 4% 占位层，不参与出现动效；默认不渲染。
+4. area layer: 真实 Area 路径，按对应序列 clipPath 从左到右揭示。
+5. guide layer: 节点垂直辅助线，跟随对应序列进度显隐。
+6. series layer: 真实折线路径，按对应序列 clipPath 从左到右揭示。
+7. marker layer: 节点点、hover 竖线与透明命中圆，在线条 reveal 到对应点位时立即显隐。
+8. axis label layer: 横纵坐标文本。
+
+出现动效沿用 Chart 通用 API：
+
+- `appearMotion={false}` 时直接显示完整图表。
+- 默认进入视口后自动播放，播放顺序按 `series` 数组顺序。
+- 每条序列使用 `appearance-timeline.ts` 的 `fillProgress` 与 `opacityProgress`。
+- 每条序列自身绘制时长固定为 `1000ms`，与 CircularChart 一致。
+- 多序列默认相隔 `360ms` 启动；第一条序列立即出现，后续序列依次延迟启动。
+- `fillProgress` 控制从左到右的 reveal clip 宽度，并使用缓出；LineChart 当前使用 `easeOut` power `6`。
+- `opacityProgress` 控制真实线、Area 和辅助线的透明度，并使用同一缓出。
+- marker 不消费 `opacityProgress`；线条 reveal 边界到达该点 x 坐标时立即出现。
+- 支持 `appearanceProgress` 受控时间轴、滚动时间轴和 `replay()` / `resetAppearance()` / `reverseAppearance()` 方法。
+
+---
+
+
+<a id="自适应黑白对比接入"></a>
+
+
+## AI Zone
+
+以下章节保留源码维护约束，不属于应用接入步骤。
+
+### 自适应黑白对比接入
+
+使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
+
+
+
+
+> **状态**: 已实现(PRO)
+
+
+> **参考**: Figma Workshop 节点 `12617:1780`。
+
+---
+
+<a id="3-样式-token-详表"></a>
+
+### 样式 Token 详表
 
 | 属性 | 默认值 | Token / 变量 |
 | :--- | :--- | :--- |
@@ -206,69 +328,9 @@ Marker 说明：
 
 ---
 
-## 4. 布局模型
+<a id="开发者指南-ai"></a>
 
-主布局模型:**内禀原子布局**。
-
-- 根层为 `Frame`，内部为单个 SVG 绘图区。
-- 根层直接观察最终显示尺寸并重算 SVG 坐标；`width="100%"` / `height="100%"` 不要求页面回传容器尺寸。
-- 横向分类轴按 `max(xLabels.length, ...series.data.length)` 计算点位数量；`cell` 模式节点位置为 `bounds.left + (plotWidth / count) * (index + 0.5)`，`edge` 模式节点位置为 `bounds.left + (plotWidth / (count - 1)) * index`，单点时居中。
-- X 轴 label 使用当前点位间距作为 cell 宽度，文字居中且单行省略；整体高度为 `16px`。
-- `edge` 模式下首尾 label 的中心与首尾数据点同 x 坐标，label cell 允许向绘图区外侧延伸。
-- X 轴 label 自动显示规则：按最终字体实测完整文字宽度与当前 `xAxisMode` 的原始数据位置判断，相邻可见文字至少间隔 `4px`。抽稀只减少 label，不删除或重排数据点、折线路径、marker、guide 与命中 cell。保留索引必须形成等差步数；若首尾两个完整 label 仍放不下，则隐藏全部 X label。
-- Y 轴 label 抽稀规则：自动生成刻度时优先通过 `yTickCount` / `yMaxLabelCount` 生成合适数量；显式传入 `yTicks` 或纵向空间不足时，按首尾保留、等步数的规则减少显示 label，水平网格线跟随可见 Y label。
-- X 轴 label cell 顶部到最下面 x 轴基线的间距为 `8px`。
-- 绘图区顶部由共享内容感知规则计算：线条宽度的一半或当前最大 marker 半径作为图形向上溢出量；普通图形保持 `8px` 安全距离，Y 轴顶刻度至少需要 `16px`。顶部数值 label 不增加该值，继续保持节点上方 `4px` 并可溢出绘图区顶边；marker 的溢出量始终计入，不依赖 label 是否显示。有 X 轴时 `bottom=24px`，只包含上述 `8px` 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
-- Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘到绘图区线段起点的间距固定为 `12px`。例如 formatter 输出 `100000` 时，绘图区只按该文本比短刻度新增的实际宽度缩小，固定间距不变。
-- 不接入三槽位协议，不承担通用子元素排列。
-
-详见 [LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
-
----
-
-## 5. 无障碍与 Frame 集成
-
-- 根层使用 `role="img"` 和 `aria-label="折线图"`。
-- 每个 marker 使用独立 `aria-label`，内容包含序列名、横坐标标签和值。
-- marker 内部包含透明命中圆，保证键盘焦点与鼠标命中不只依赖可见圆点半径。
-- marker 可见层不接管 pointer events，白色中心、黑色外圈与透明命中圆统一由命中圆触发；默认命中区域不小于 `16x16`。
-- 独立使用或接入 `ChartGroup` 时均支持 `hoverMode="cell"`；cell 命中区按分类点位中心左右半格覆盖绘图区，对应分类点位的 marker 响应 hover，marker 自身命中区仍独立保留。
-- `loading` 保留完整画布与坐标结构，只把折线、面积和 marker 恢复到出现动效起点；根 Frame 明确关闭 Skeleton。空 `series={[]}` 可配合 `xLabels`、`yMin`、`yMax` 先建立最终坐标。
-- 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
-- `class`、`style` 与未声明属性透传到根层 Frame。
-
----
-
-## 6. 图层与动效
-
-SVG 图层从下到上为：
-
-1. `defs`: 颜色渐变、Area 渐变、序列 reveal clipPath。
-2. grid / axis layer: 水平网格线和 x 轴基线。
-3. base layer: `showBaseLayer=true` 时绘制完整 Area 与折线路径的同色 4% 占位层，不参与出现动效；默认不渲染。
-4. area layer: 真实 Area 路径，按对应序列 clipPath 从左到右揭示。
-5. guide layer: 节点垂直辅助线，跟随对应序列进度显隐。
-6. series layer: 真实折线路径，按对应序列 clipPath 从左到右揭示。
-7. marker layer: 节点点、hover 竖线与透明命中圆，在线条 reveal 到对应点位时立即显隐。
-8. axis label layer: 横纵坐标文本。
-
-出现动效沿用 Chart 通用 API：
-
-- `appearMotion={false}` 时直接显示完整图表。
-- 默认进入视口后自动播放，播放顺序按 `series` 数组顺序。
-- 每条序列使用 `appearance-timeline.ts` 的 `fillProgress` 与 `opacityProgress`。
-- 每条序列自身绘制时长固定为 `1000ms`，与 CircularChart 一致。
-- 多序列默认相隔 `360ms` 启动；第一条序列立即出现，后续序列依次延迟启动。
-- `fillProgress` 控制从左到右的 reveal clip 宽度，并使用缓出；LineChart 当前使用 `easeOut` power `6`。
-- `opacityProgress` 控制真实线、Area 和辅助线的透明度，并使用同一缓出。
-- marker 不消费 `opacityProgress`；线条 reveal 边界到达该点 x 坐标时立即出现。
-- 支持 `appearanceProgress` 受控时间轴、滚动时间轴和 `replay()` / `resetAppearance()` / `reverseAppearance()` 方法。
-
----
-
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
-
-## 开发者指南 (AI)
+### 开发者指南 (AI)
 
 ### 模块索引
 
@@ -292,11 +354,9 @@ SVG 图层从下到上为：
 
 ---
 
-## 自适应黑白对比接入
+## 更新日志
 
-使用 [Adaptive Contrast](../../../components/src/lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
-
-## 更新日志 (Changelog)
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.6.1 (2026-09-05)
 

@@ -1,40 +1,85 @@
-# Sidebar（PRO Block）
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
-
+# Sidebar
 
 > **版本**: v1.9.0
-> **职责**: 提供可折叠的应用侧边栏骨架，管理固定 Header、滚动导航区与底部覆盖 Footer。
-> **归属**: PRO Blocks / Template Block
-
-Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo 与折叠按钮；导航内容既可由 `sections` 数据生成，也可显式组合 `SidebarItem`、`SidebarSection`、`Separator` 和自定义内容。每个 SidebarSection 在分类内容末尾内置 Separator，分类调用方无需手动添加。根容器默认透明。
+> **职责**: 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
+> **包归属**: `@snowui/components-pro`
+> **文档修订**: 2026-09-21
 
 ## 组件介绍
 
 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
 
-## API 参考
+## 使用选择
+
+<!-- usage-guide:start -->
+用于应用左侧分组导航，组合 SidebarSection 与 SidebarItem。页面负责路由和内容；公开 logo / footer 角色可替换内置内容，普通右侧信息列不使用 Sidebar。
+
+- sections 提供导航数据；children 与 sections 同时渲染，并非替换关系。
+- 直属 as="logo" 替换标识，as="footer" 进入固定底部；宽度和折叠状态可绑定，默认启用持久化。
+<!-- usage-guide:end -->
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+<!-- quick-start:generated -->
+```svelte
+<script lang="ts">
+	import { Avatar, Button, Icon, Separator } from '@snowui-design-system/components';
+	import { AvatarByewind, Github } from '@snowui-design-system/resource-svelte';
+	import { Sidebar, SidebarItem, SidebarSection } from '@snowui/components-pro';
+	let collapsed = $state(false);
+	let activeItemId = $state('components');
+</script>
+
+<div style="display: flex; align-items: flex-start; justify-content: center; width: min(100%, 24rem); height: 24rem; min-width: 0;">
+    <Sidebar bind:collapsed activeItemId={activeItemId} onActiveItemChange={(id: string) => activeItemId = id} persistence={false} resizable={false} ariaLabel="SnowUI documentation" navigationVariant="icon">
+        <SidebarItem id="introduction" label="Introduction" icon="book" iconCollection="phosphor" />
+        <SidebarItem id="quick-start" label="Quick Start" icon="rocket" iconCollection="phosphor" updated />
+        <Separator />
+        <SidebarSection id="library" title="Library">
+            <SidebarItem id="components" label="Components" icon="squares-four" iconCollection="phosphor" />
+            <SidebarItem id="pro" label="PRO components" icon="stack" iconCollection="phosphor" />
+        </SidebarSection>
+        <div data-as="footer" style="display: flex; align-items: center; gap: var(--gap-3);">
+            <Button bare iconOnly href="https://byewind.com" target="_blank" rel="noopener noreferrer" aria-label="SnowUI maintainer"><Avatar src={AvatarByewind} size={24} dataName="SnowUI maintainer" /></Button>
+            <Button bare iconOnly href="https://github.com/SnowUI" target="_blank" rel="noopener noreferrer" aria-label="SnowUI on GitHub"><Icon size={24}><Github /></Icon></Button>
+        </div>
+    </Sidebar>
+</div>
+```
+<!-- /quick-start:generated -->
+
+## API
 
 | 关键字 | 类型 | 默认值 | 描述 |
-|:---|:---|:---|:---|
-| `sections` | `SidebarSectionData[]` | `[]` | 分类数组，每项必填唯一 id，可选 title、collapsible、defaultCollapsed、actions、items、content；content 优先于 items。items 使用 SidebarItemData 的 id、label、icon、href 等字段。 |
-| `navigationVariant` | `"icon" \| "text"` | `"icon"` | 导航结构变体；`text` 表示无图标导航，折叠后根宽度与 padding 为零，只保留位于当前页面可视区域左上方的展开按钮；不自动扫描内容推断图标 |
-| `collapsed` | `boolean` | — | 受控折叠状态，支持 bind:collapsed；未传时从 defaultCollapsed 初始化内部状态。 |
-| `defaultCollapsed` | `boolean` | `false` | 非受控初始折叠状态 |
-| `width` | `number` | `220` | 展开宽度，支持 `bind:width`；拖拽右侧边框时实时更新 |
-| `minWidth` | `number` | `160` | 可拖拽展开宽度下限 |
-| `maxWidth` | `number` | `480` | 可拖拽展开宽度上限 |
-| `resizable` | `boolean` | `true` | 是否启用右侧边框调宽命中层 |
-| `activeItemId` | `string` | — | 外部控制的选中项 id；未传时使用内部选择或恢复的持久化值。仅选择状态，不自动替宿主进行路由。 |
-| `persistence` | `boolean` | `true` | 是否记忆 active item 与各 Section 折叠状态 |
-| `persistenceKey` | `string` | `"default"` | localStorage 实例命名空间；同一页面存在多个 Sidebar 时必须分别设置 |
-| `onCollapsedChange` | `(collapsed: boolean) => void` | — | 用户点击内置按钮切换后调用，参数为新折叠状态，不可取消。 |
-| `onWidthChange` | `(width: number) => void` | — | 用户调宽时调用，参数为夹取到 minWidth/maxWidth 的整数像素宽度。 |
-| `onActiveItemChange` | `(itemId: string) => void` | — | 导航选择或恢复合法持久化选中项时调用，参数为选中项 id；宿主处理内容与路由。 |
-| `children` | `Snippet` | — | 无参数显式内容，与 sections 同时渲染；直属 as="logo" 替换 Header Logo，as="footer" 放入固定 Footer，其余内容进入导航区。 |
-| `parts` | `ComponentPartsOf` | — | 配置调宽交互层使用的 Indicator，以及默认生成的 SnowUILogo / SidebarSection / SidebarItem；组件固定隐藏 Indicator 视觉 |
-| `ariaLabel` | `string` | `"Primary navigation"` | 导航及其滚动区域的可访问名称，多实例应提供可区分的名称。 |
-| `continuousHover` | `boolean` | `true` | 是否在可用导航项之间移动共享 hover 背景；关闭后恢复逐项 hover，选中状态不受影响。 |
+| --- | --- | --- | --- |
+| sections | `SidebarSectionData[]` | `[]` | 分类数组，每项必填唯一 id，可选 title、collapsible、defaultCollapsed、actions、items、content；content 优先于 items。items 使用 SidebarItemData 的 id、label、icon、href 等字段。 |
+| navigationVariant | `"icon" \| "text"` | `"icon"` | 导航结构变体；`text` 表示无图标导航，折叠后根宽度与 padding 为零，只保留位于当前页面可视区域左上方的展开按钮；不自动扫描内容推断图标 |
+| collapsed | `boolean` | — | 受控折叠状态，支持 bind:collapsed；未传时从 defaultCollapsed 初始化内部状态。 |
+| defaultCollapsed | `boolean` | `false` | 非受控初始折叠状态 |
+| width | `number` | `220` | 展开宽度，支持 `bind:width`；拖拽右侧边框时实时更新 |
+| minWidth | `number` | `160` | 可拖拽展开宽度下限 |
+| maxWidth | `number` | `480` | 可拖拽展开宽度上限 |
+| resizable | `boolean` | `true` | 是否启用右侧边框调宽命中层 |
+| activeItemId | `string` | — | 外部控制的选中项 id；未传时使用内部选择或恢复的持久化值。仅选择状态，不自动替宿主进行路由。 |
+| persistence | `boolean` | `true` | 是否记忆 active item 与各 Section 折叠状态 |
+| persistenceKey | `string` | `"default"` | localStorage 实例命名空间；同一页面存在多个 Sidebar 时必须分别设置 |
+| ariaLabel | `string` | `"Primary navigation"` | 导航及其滚动区域的可访问名称，多实例应提供可区分的名称。 |
+| continuousHover | `boolean` | `true` | 是否在可用导航项之间移动共享 hover 背景；关闭后恢复逐项 hover，选中状态不受影响。 |
+| onCollapsedChange | `(collapsed: boolean) => void` | — | 用户点击内置按钮切换后调用，参数为新折叠状态，不可取消。 |
+| onWidthChange | `(width: number) => void` | — | 用户调宽时调用，参数为夹取到 minWidth/maxWidth 的整数像素宽度。 |
+| onActiveItemChange | `(itemId: string) => void` | — | 导航选择或恢复合法持久化选中项时调用，参数为选中项 id；宿主处理内容与路由。 |
+| children | `Snippet` | — | 无参数显式内容，与 sections 同时渲染；直属 as="logo" 替换 Header Logo，as="footer" 放入固定 Footer，其余内容进入导航区。 |
+| parts | `ComponentPartsOf<{ Indicator: typeof Indicator; SnowUILogo: typeof SnowUILogo; SidebarSection: typeof SidebarSection; SidebarItem: typeof SidebarItem; }>` | — | 配置调宽交互层使用的 Indicator，以及默认生成的 SnowUILogo / SidebarSection / SidebarItem；组件固定隐藏 Indicator 视觉 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="api-参考"></a>
+
+### API 参考
 
 默认 Logo 的 host 为 `as="logo"`，内部以 `SnowUILogo as="logo-icon" variant="icon"` 与 `SnowUILogo as="logo-wordmark" variant="text"` 明确区分图形和字标。直接子节点 `as="logo"` 会被安置到 Header 并完整替换默认 Logo；自定义 Logo 同样必须用它的直接子节点 `as="logo-icon"` 标记折叠后保留的图形，其余直接子节点视为展开态文字或字标并在折叠时隐藏。直接子节点 `as="footer"` 会被安置到底部覆盖 Footer。它们不抑制 `sections` 生成的 Body 内容，其余显式子节点会与 `sections` 依次渲染在 Body。第三方内容不支持 `as` 时，用对应角色的 `Frame` 包裹。Sidebar 根输出 `data-collapsed`，并提供 Sidebar Context。
 
@@ -53,7 +98,9 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 </Sidebar>
 ```
 
-## 布局与行为
+<a id="布局与行为"></a>
+
+### 布局与行为
 
 - 展开默认宽度 `220px`，有图标模式折叠宽度 `60px`，text 模式折叠宽度 `0px`，高度 `100%`。`resizable={true}` 时，右侧边框全高均可在默认 `160px`～`480px` 范围内拖拽调整展开宽度，并通过 `width` / `bind:width` 与 `onWidthChange` 对外同步；边缘不显示宽度调整指示器。设为 `false` 时不渲染透明调宽命中层。
 - 折叠与展开以 Sidebar 根宽度为主时间轴：展开宽度 → 折叠宽度（icon 为 60px，text 为 0px）使用 `SIDE_PANEL_DISAPPEAR_MOTION` 的临界阻尼 spring timing，折叠宽度 → 上次展开宽度使用 `SIDE_PANEL_APPEAR_MOTION` 的同系 timing；该 timing 复用 Frame 默认 move spring。拖拽期间临时关闭宽度 transition，使边缘与指针同步；`enableDefaultMotion={false}` 与系统 reduced motion 均关闭该过渡。
@@ -79,9 +126,32 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
-## 开发者指南 (AI)
+<a id="连续-hover"></a>
+
+### 连续 Hover
+
+`continuousHover` 默认 `true`。导航容器拥有唯一背景层，在所有可用
+SidebarItem（包括 Section 内项目）之间连续移动。active 项的持久背景不被替换，
+hover 到 active 项时两个背景叠加形成更深颜色。Section 标题属于明确阻断区域：
+pointer 位于标题时共享层隐藏，不把标题当作相邻 Item 间隙。设为 `false` 恢复逐项 hover。
+
+
+
+## AI Zone
+
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+
+
+
+
+> **归属**: PRO Blocks / Template Block
+
+Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo 与折叠按钮；导航内容既可由 `sections` 数据生成，也可显式组合 `SidebarItem`、`SidebarSection`、`Separator` 和自定义内容。每个 SidebarSection 在分类内容末尾内置 Separator，分类调用方无需手动添加。根容器默认透明。
+
+<a id="开发者指南-ai"></a>
+
+### 开发者指南 (AI)
 
 ### 开发者关键字
 
@@ -125,7 +195,9 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **依赖**: Frame、ScrollArea、SnowUILogo、Button、Indicator、ResourceIcon、SidePanel motion preset
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
-## 更新日志 (Changelog)
+## 更新日志
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.9.0 (2026-09-18)
 
@@ -269,9 +341,3 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 #### 新功能
 - 初始 PRO Block 版本：默认 Logo、`as="logo"` 替换、整体折叠、数据/显式组合、覆盖 Footer 与滚动 Body。
-## 连续 Hover
-
-`continuousHover` 默认 `true`。导航容器拥有唯一背景层，在所有可用
-SidebarItem（包括 Section 内项目）之间连续移动。active 项的持久背景不被替换，
-hover 到 active 项时两个背景叠加形成更深颜色。Section 标题属于明确阻断区域：
-pointer 位于标题时共享层隐藏，不把标题当作相邻 Item 间隙。设为 `false` 恢复逐项 hover。
