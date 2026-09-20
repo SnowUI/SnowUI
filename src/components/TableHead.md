@@ -61,6 +61,8 @@
 
 每个 TableHead 会向最近的 Table Context 注册自身列结构（`columnId`、selection/actions 角色与对齐方式），供 TableBody 首次加载时按真实列顺序生成 Skeleton rows。该注册只传递公开列语义，不暴露或扫描 TableHead 内部 DOM。
 
+渐隐采样代理仅在紧邻 selection/actions 角色列的数据表头参与布局；其他列的代理不生成布局盒，避免锁定列宽或增量加载后不可见遮罩制造横向滚动。采样宽度来自角色覆盖宽度，不使用普通数据列宽。
+
 ## 排序类型决策
 
 TableHead **不声明内容类别**，也不公开 `sortType="text | number | date"`。DataTable 根据行数据的原始字段自动比较：

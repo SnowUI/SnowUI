@@ -114,7 +114,7 @@
             ? undefined
             : width,
     );
-    const finalStyle = $derived(`${runtimeWidth ? `--snowui-table-head-width-runtime:${runtimeWidth}px;width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));min-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));max-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime))` : ""};${hasActionsOverlay ? `--snowui-table-role-overlay-width-override:${width ?? table.getActionsColumnWidth()}px;` : ""}text-align:${align};${userStyle}`);
+    const finalStyle = $derived(`${runtimeWidth ? `--snowui-table-head-width-runtime:${runtimeWidth}px;width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));min-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));max-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime))` : ""};${hasActionsOverlay ? `--snowui-table-role-overlay-width-override:${(isActionsRole ? width : undefined) ?? table.getActionsColumnWidth()}px;` : ""}text-align:${align};${userStyle}`);
     $effect(() => {
         const declaredDefaultSort = defaultSort;
         const declaredColumnId = columnId;
@@ -242,7 +242,11 @@
     :global(:where(.snowui-table-head[data-role-layout="overlay"] .snowui-table-role-blur-layer)) { opacity: 0; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
     :global(:where(.snowui-table-header:hover) .snowui-table-head[data-role-layout="overlay"] .snowui-table-role-blur-layer) { opacity: 0; }
     :global(:where(.snowui-table-head-selection-blur-proxy)),
-    :global(:where(.snowui-table-head-actions-blur-proxy)) { opacity: 0; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
+    :global(:where(.snowui-table-head-actions-blur-proxy)) { display: none; opacity: 0; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
+    /* Only the cells adjacent to role overlays own blur sampling geometry.
+       Invisible proxies in other columns must not extend scrollable overflow. */
+    :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"] + .snowui-table-head) .snowui-table-head-selection-blur-proxy),
+    :global(:where(.snowui-table-head:has(+ .snowui-table-head[data-role-layout="overlay"][data-as="actions"])) .snowui-table-head-actions-blur-proxy) { display: block; }
     :global(:where(.snowui-table-header:hover) .snowui-table-head[data-role-layout="overlay"][data-as="selection"] + .snowui-table-head .snowui-table-head-selection-blur-proxy),
     :global(:where(.snowui-table-header:hover) .snowui-table-head:has(+ .snowui-table-head[data-role-layout="overlay"][data-as="actions"]) .snowui-table-head-actions-blur-proxy) { opacity: 1; }
     :global(:where(.snowui-table-head[data-role-layout="overlay"] .snowui-table-selection-control) > :not(.snowui-table-role-blur-layer)),

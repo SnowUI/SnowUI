@@ -8,7 +8,7 @@
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
 - Skeleton 是加载基础设施，不作为公开 part。
 
-> **版本**: v1.10.0
+> **版本**: v1.10.1
 > **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。需要换行时显式传入 `nowrap={false} lines={false}`；声明 `lines={2}` / `lines={3}` 也视为显式开启多行，未指定 nowrap 时自动允许换行；横向图标与文字默认不换行。
 
 默认单元格高度为 40px，内边距上下保持 8px；左右 padding 根据最近 Table 容器宽度在 2px 到 12px 之间流动，常见窄屏宽度即收敛到每侧 2px，宽表恢复为 12px，首尾单元格沿用相同规则。Table 使用原生相邻列布局，列与列之间没有额外 gap；相邻单元格 padding 相加后的最小视觉间距为 4px。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。
@@ -41,7 +41,7 @@
 
 `as="actions"` 不内置默认按钮，children 可放任意行动按钮。内容距角色列右边缘 8px，并与数据行水平中线垂直居中对齐；只在行 hover 时显示。内部横向排列、gap 为 8px，padding 为 `8px 8px 8px 0`。
 
-`roleLayout="overlay"` 时，selection/actions 单元格自身宽度归零并 sticky 到表格左右边缘。selection 的真实 `<td>` 只保留 table 语义和定位锚点；Checkbox 与渐进式模糊层都放在 `.snowui-table-selection-control` 中，并由运行时同步为 `position: fixed`，固定到当前行左上角。Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`（17px），在当前奇数像素行高内上下各留 16px；固定增量已登记为 Table selection 特例，不借用边框 Token，也不改变独立 Checkbox 的 16px 默认值。覆盖块不推开第一列内容，而是直接压在第一列之上。取消选择时保留覆盖块的定位，仅淡出，不产生横向位移。
+`roleLayout="overlay"` 时，selection/actions 单元格自身宽度归零并 sticky 到表格左右边缘。selection 的真实 `<td>` 只保留 table 语义和定位锚点；Checkbox 与渐进式模糊层都放在 `.snowui-table-selection-control` 中，并由运行时同步为 `position: fixed`，固定到当前行左上角。Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`（17px），在当前奇数像素行高内上下各留 16px；固定增量已登记为 Table selection 特例，不借用边框 Token，也不改变独立 Checkbox 的 16px 默认值。覆盖块不推开第一列内容，而是直接压在第一列之上。取消选择时保留覆盖块的定位，仅淡出，不产生横向位移。第一数据列的渐隐遮罩与 Checkbox 可见状态同步：行 hover、键盘 focus、已选中或 force-hover 时均生效；选中后移开鼠标也保持遮罩。
 
 selection 覆盖块的层级必须高于第一列内容：它使用最高 `z-index`，并要求使用方不要再给第一列链接或图标额外提升 `z-index`。Checkbox 本体是真实交互控件，`onCheckedChange` 直接写入 Table 选择状态并停止冒泡；TableRow 同时对行左侧 32px 点击做兜底，确保浏览器即使命中到底下第一列内容，也会优先切换行选中并阻止底层链接跳转。
 
@@ -66,6 +66,8 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 - 子级 Text 显式声明 lines 时成为最近的截断 owner，Cell 不再重复生成 Tooltip。
 
 ## Changelog
+
+- 2026-09-20：v1.10.1，普通单元格 `lines={false}` 同时关闭内容层裁切，保留子 Button 的完整 hover 背景和边框；默认单行、多行截断、角色浮层和 Skeleton 裁切不变。
 
 - 2026-09-01：v1.10.0，未显式固定列宽时，单元格 min-content 参与 Table 自动总最小宽度，可换行内容保留最长不可断片段。
 

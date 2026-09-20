@@ -934,7 +934,7 @@
       "kind": "component",
       "source": "src/components/TableCell.svelte",
       "documentation": "src/components/TableCell.md",
-      "description": "接受任意 Svelte/HTML 内容的 <td，默认单行截断。",
+      "description": "接受任意 Svelte/HTML 内容的 <td，默认单行截断。需要换行时显式传入 nowrap={false} lines={false}；声明 lines={2} / lines={3} 也视为显式开启多行，未指定 nowrap 时自动允许换行；横向图标与文字默认不换行。",
       "intents": [],
       "aliases": [],
       "whenToUse": null,

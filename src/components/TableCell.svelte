@@ -325,7 +325,7 @@
             />
         {/if}</span>
     </span>
-    {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : "false"} data-lines={resolvedLines} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
+    {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : "false"} data-lines={resolvedLines ?? "none"} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
         {#if children}{@render children()}{/if}
         {#if tooltip && !hasNestedTruncationOwner && isTruncated && fullText}
             <Tooltip>
@@ -378,6 +378,8 @@
     :global(:where(.snowui-table-body .snowui-table-row:hover, .snowui-table-body .snowui-table-row[data-force-hover="true"]) > .snowui-table-cell:has(+ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"])) { border-radius: 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0; }
     :global(:where(.snowui-table-body .snowui-table-row:last-child) > .snowui-table-cell) { border-bottom-color: transparent; }
     :global(:where(.snowui-table-cell-content)) { position: relative; display: block; min-width: 0; max-width: 100%; overflow: hidden; --snowui-table-cell-actions-fade-width: calc(var(--snowui-table-role-overlay-content-width, var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3))) * var(--snowui-table-actions-fade-coverage-override, 0.9)); }
+    /* 关闭截断的普通内容保留子组件外扩；角色浮层和 Skeleton 仍使用各自裁切。 */
+    :global(:where(.snowui-table-cell-content[data-lines="none"])) { overflow: visible; }
     :global(:where(.snowui-table-cell-content.snowui-line-clamp-1)) { white-space: nowrap; text-overflow: ellipsis; }
     :global(:where(.snowui-table-cell-content.snowui-line-clamp-2)),
     :global(:where(.snowui-table-cell-content.snowui-line-clamp-3)) { display: -webkit-box; -webkit-box-orient: vertical; white-space: normal; }
@@ -413,7 +415,7 @@
     :global(:where(.snowui-table-body .snowui-table-row:hover) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }
     /* overlay 模式 hover 边缘渐进式透明（复用 OSS edge-fade 通用能力 ../lib/edge-fade.ts；详见 Table.md）。
        selection mask 由 Table 根生成；actions mask 依赖行级实测宽度，由内容 TableCell 在自身作用域生成。
-       此处状态规则只消费对应 CSS 变量，未触发时无 mask。紧邻 selection / actions 覆盖块的单元格内容在行 hover 时从靠控件一侧渐隐到清晰：
+       此处状态规则只消费对应 CSS 变量，未触发时无 mask。selection 的内容遮罩与 Checkbox 可见条件一致（hover、键盘 focus、选中或 force-hover）；actions 保持行 hover 时触发。相邻内容从靠控件一侧渐隐到清晰：
        - checkbox 侧（to right）：Fade start / end 使用固定宽度（默认约 16px → 60px），不随内容单元格宽度变化；
        - actions 侧（to left）：完全透明（遮住按钮）区域宽度 = 实测按钮组宽度（含右侧内边距，由 JS 写入行级变量 `--snowui-table-role-overlay-content-width`）× `--snowui-table-actions-fade-coverage-override`（默认 0.9）；柔和尾巴终点 = 该宽度 × `--snowui-table-actions-fade-feather-override`（默认 3，尾巴长度 = 透明区的两倍）。coverage 越小整条遮罩越窄、feather 越大过渡越缓；coverage 低于按钮实际占比时宽按钮如 Edit 会透出内容。中间量 `--snowui-table-cell-actions-fade-width`（= 实测宽度 × coverage）让宽度只写一处。
        这些变量与表头渐隐（--snowui-table-head-fade-*-override）相互独立，可在 Table / 容器上单独设置覆盖。
@@ -424,7 +426,7 @@
             -webkit-mask-image var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out),
             mask-image var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out);
     }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"]) .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell .snowui-table-cell-content) {
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell .snowui-table-cell-content) {
         -webkit-mask-image: var(--snowui-table-selection-fade-mask);
         mask-image: var(--snowui-table-selection-fade-mask);
     }

@@ -16,8 +16,8 @@ export const examples = [
     {
         name: "A3: 任意复合内容",
         code: `A3
-<Table><TableBody><TableRow><TableCell lines={false} row><Avatar /><Chip>Pro</Chip><Button size="sm">操作</Button></TableCell></TableRow></TableBody></Table>`,
-        expected: { render: "保留 SnowUI 复合组件。", layout: "lines=false 关闭整体裁剪；row 让内容横向排列并垂直居中。", interaction: "内部 Button 可独立操作。", performance: "不转换 children。", responsive: "由内容与列宽共同决定布局。" },
+<Table><TableBody><TableRow><TableCell lines={false} row><Avatar /><Chip>Pro</Chip><Button size="sm" variant="outline">操作</Button></TableCell></TableRow></TableBody></Table>`,
+        expected: { render: "保留 SnowUI 复合组件。", layout: "lines=false 关闭整体裁剪；row 让内容横向排列并垂直居中。", interaction: "内部 Button 可独立操作，hover 外扩时上下边框不被裁切。", performance: "不转换 children。", responsive: "由内容与列宽共同决定布局。" },
         logic: ["ArbitraryContent", "NoTruncate"],
     },
     {
