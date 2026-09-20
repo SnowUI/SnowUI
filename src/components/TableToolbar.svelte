@@ -20,11 +20,18 @@
         value: string | number | undefined;
     }
 
+    export interface TableToolbarSortOption {
+        columnId: string;
+        label?: string;
+    }
+
     interface Props extends Omit<FrameProps, "children"> {
         ariaLabel?: string;
         search?: boolean;
         bulkActionsEnabled?: boolean;
         sort?: boolean;
+        /** 自定义排序字段；未指定时读取表头，显式列表替换自动列表。 */
+        sortOptions?: TableToolbarSortOption[];
         filter?: boolean;
         searchPlaceholder?: string;
         searchAriaLabel?: string;
@@ -62,6 +69,7 @@
         search = true,
         bulkActionsEnabled = true,
         sort = true,
+        sortOptions = undefined,
         filter = true,
         searchPlaceholder = "搜索",
         searchAriaLabel = "搜索",
@@ -111,7 +119,7 @@
         selectedCount ?? table.getSelectedRowIds().length,
     );
     const hasSelection = $derived(resolvedSelectedCount > 0);
-    const columns = $derived(table.getColumns().filter((column) =>
+    const columns = $derived(sortOptions ?? table.getColumns().filter((column) =>
         column.columnId && column.sortable && !column.role,
     ));
     const hasBulkItems = $derived(showCopyAction || showDeleteAction || bulkActions !== undefined);
