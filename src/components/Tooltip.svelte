@@ -1,5 +1,6 @@
 <!--
- Tooltip 文字提示组件 v1.22.4
+ Tooltip 文字提示组件 v1.23.0
+ 变更 (2026-09-20): 默认 360px 换行与四边 16px 可视区避让；支持悬停阅读、超高内容滚动和 Escape 关闭。
 
  继承 Frame.svelte 的通用能力 (交互、动效、响应式)。
  变更 (2026-08-24): warm 切换在新内容提交后立即测量并定位，删除 prepare 后额外等待的启动帧，使连续切换在首个可用绘制帧进入 moving。
@@ -140,16 +141,17 @@
         scheduleTooltipWarmupReset,
     } from "../lib/tooltip-delay";
     import {
+        clampFloatingPosition,
         constrainFloatingAnchor,
         getFloatingVisualBounds,
         getOppositeFloatingSide,
-        hasFloatingCollision,
         type FloatingSide,
     } from "../lib/floating-position";
     import { getTooltipBehaviorEnhancement } from "../lib/tooltip-behavior";
     import {
         dismissTooltipOverlayImmediately,
         hideTooltipOverlay,
+        keepTooltipOverlayOpen,
         scheduleTooltipOverlayHide,
         showTooltipOverlay,
         tooltipOverlay,
@@ -186,6 +188,7 @@
         position?: "top" | "bottom" | "left" | "right";
         open?: boolean;
         offset?: number;
+        maxWidth?: number;
         variant?: "dark" | "light";
         dismissOnMotion?: boolean;
         widthRebound?: boolean;
@@ -209,6 +212,7 @@
     let {
         position = "top",
         offset = 4,
+        maxWidth = 360,
         variant = "light",
         dismissOnMotion = true,
         widthRebound = false,
@@ -864,11 +868,7 @@
         }
     });
 
-    function measureTooltipContentSize(
-        el: HTMLElement,
-        entry?: ResizeObserverEntry,
-    ) {
-        const borderBox = entry?.borderBoxSize?.[0];
+    function measureTooltipContentSize(el: HTMLElement) {
         const shellStyle = sizeShellRef
             ? getComputedStyle(sizeShellRef)
             : undefined;
@@ -879,11 +879,15 @@
             parseFloat(shellStyle?.paddingTop ?? "0") +
             parseFloat(shellStyle?.paddingBottom ?? "0");
 
+        const viewport = getTooltipViewport();
+        const requestedWidth = renderedOverlay?.maxWidth ?? maxWidth;
+        const widthLimit = Number.isFinite(requestedWidth) && requestedWidth > 0
+            ? requestedWidth : 360;
+        el.style.maxWidth = `${Math.max(0, Math.min(widthLimit, viewport.width - 32) - paddingX)}px`;
+        el.style.maxHeight = `${Math.max(0, viewport.height - 32 - paddingY)}px`;
         return {
-            width: Math.ceil((borderBox?.inlineSize ?? el.offsetWidth) + paddingX),
-            height: Math.ceil(
-                (borderBox?.blockSize ?? el.offsetHeight) + paddingY,
-            ),
+            width: Math.ceil(el.offsetWidth + paddingX),
+            height: Math.ceil(el.offsetHeight + paddingY),
         };
     }
 
@@ -891,8 +895,8 @@
         const el = sizeContentRef;
         if (!el) return;
 
-        const updateMeasuredSize = (entry?: ResizeObserverEntry) => {
-            const nextMeasuredSize = measureTooltipContentSize(el, entry);
+        const updateMeasuredSize = () => {
+            const nextMeasuredSize = measureTooltipContentSize(el);
             const nextMeasuredOverlayId = renderedOverlay?.id ?? tooltipId;
             const needsPositionUpdate =
                 measuredOverlayId !== nextMeasuredOverlayId ||
@@ -947,6 +951,30 @@
         return { top, left };
     }
 
+    function getTooltipViewport() {
+        const viewport = window.visualViewport;
+        return {
+            left: viewport?.offsetLeft ?? 0,
+            top: viewport?.offsetTop ?? 0,
+            width: viewport?.width ?? window.innerWidth,
+            height: viewport?.height ?? window.innerHeight,
+        };
+    }
+
+    function retainOverlay() {
+        if (currentOverlay) keepTooltipOverlayOpen(currentOverlay.id);
+    }
+
+    function dismissOnEscape(event: KeyboardEvent) {
+        if (event.key !== "Escape") return;
+        if (currentOverlay) dismissTooltipOverlayImmediately(currentOverlay.id);
+        else if (open) open = false;
+    }
+
+    function releaseOverlay() {
+        if (currentOverlay) scheduleTooltipOverlayHide(currentOverlay.id);
+    }
+
     function updatePosition() {
         if (!tooltipRef) return;
         const overlayState =
@@ -968,6 +996,7 @@
         const activeOffset = overlayState?.offset ?? offset;
         const triggerRect = activeTriggerEl.getBoundingClientRect();
         const tooltipRect = tooltipRef.getBoundingClientRect();
+        if (sizeContentRef) pendingMeasuredSize = measureTooltipContentSize(sizeContentRef);
         const targetSize =
             measuredOverlayId === activeTooltipId &&
             pendingMeasuredSize.width &&
@@ -978,13 +1007,13 @@
         const tooltipHeight = targetSize.height || tooltipRect.height;
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
-        const viewportPadding = 8;
-
-        const viewportBounds = {
-            left: 0,
-            top: 0,
-            width: viewportWidth,
-            height: viewportHeight,
+        const viewportPadding = 16;
+        const viewportBounds = getTooltipViewport();
+        const safeBounds = {
+            left: viewportBounds.left + viewportPadding,
+            top: viewportBounds.top + viewportPadding,
+            width: Math.max(0, viewportBounds.width - viewportPadding * 2),
+            height: Math.max(0, viewportBounds.height - viewportPadding * 2),
         };
 
         const positions: FloatingSide[] = [
@@ -998,6 +1027,7 @@
         let bestPos = positions[0];
         let bestCoords = { top: 0, left: 0 };
 
+        let leastOverflow = Infinity;
         for (const pos of positions) {
             let { top, left } = getPositionCoords(
                 pos,
@@ -1020,22 +1050,27 @@
                 { width: tooltipWidth, height: tooltipHeight },
             );
 
-            if (!hasFloatingCollision(bounds, viewportBounds)) {
+            const overflow = Math.max(0, safeBounds.left - bounds.left)
+                + Math.max(0, safeBounds.top - bounds.top)
+                + Math.max(0, bounds.left + bounds.width - safeBounds.left - safeBounds.width)
+                + Math.max(0, bounds.top + bounds.height - safeBounds.top - safeBounds.height);
+            if (overflow < leastOverflow) {
+                leastOverflow = overflow;
                 bestPos = pos;
                 bestCoords = { top, left };
-                break;
             }
-
-            if (pos === positions[0]) {
-                bestCoords = { top, left };
-            }
+            if (overflow === 0) break;
         }
 
         const targetBounds = getFloatingVisualBounds(
-            bestPos,
-            bestCoords,
-            { width: tooltipWidth, height: tooltipHeight },
+            bestPos, bestCoords, { width: tooltipWidth, height: tooltipHeight },
         );
+        const clamped = clampFloatingPosition(targetBounds,
+            { width: tooltipWidth, height: tooltipHeight }, viewportBounds, viewportPadding);
+        bestCoords.left += clamped.left - targetBounds.left;
+        bestCoords.top += clamped.top - targetBounds.top;
+        targetBounds.left = clamped.left;
+        targetBounds.top = clamped.top;
         const targetRect: TooltipVisualRect = {
             left: targetBounds.left,
             top: targetBounds.top,
@@ -1259,7 +1294,7 @@
                         contentLag,
                     );
                     const currentSize = {
-                        width: currentWidth,
+                        width: Math.min(currentWidth, safeBounds.width),
                         height: interpolate(
                             startRect.height,
                             targetRect.height,
@@ -1272,7 +1307,7 @@
                         bestCoords,
                         currentSize,
                     );
-                    const currentShell = {
+                    const currentShell = clampFloatingPosition({
                         left: getWidthAnchoredLeft(
                             startRect,
                             targetRect,
@@ -1285,7 +1320,7 @@
                             targetRect.top,
                             shellProgress,
                         ),
-                    };
+                    }, currentSize, viewportBounds, viewportPadding);
                     shellMotionOffset = {
                         x: currentShell.left - currentBaseBounds.left,
                         y: currentShell.top - currentBaseBounds.top,
@@ -1468,6 +1503,7 @@
             style: tooltipFrameStyle,
             children: tooltipChildren,
             fallbackContent: displayContent,
+            get maxWidth() { return maxWidth; },
             get dismissOnMotion() {
                 return dismissOnMotion;
             },
@@ -1569,12 +1605,18 @@
         reducedMotionMedia?.addEventListener("change", updateReducedMotion);
         window.addEventListener("scroll", schedulePositionUpdate, true);
         window.addEventListener("resize", schedulePositionUpdate);
+        window.addEventListener("keydown", dismissOnEscape);
+        window.visualViewport?.addEventListener("resize", schedulePositionUpdate);
+        window.visualViewport?.addEventListener("scroll", schedulePositionUpdate);
 
         return () => {
             reducedMotionMedia?.removeEventListener("change", updateReducedMotion);
             reducedMotionMedia = undefined;
             window.removeEventListener("scroll", schedulePositionUpdate, true);
             window.removeEventListener("resize", schedulePositionUpdate);
+            window.removeEventListener("keydown", dismissOnEscape);
+            window.visualViewport?.removeEventListener("resize", schedulePositionUpdate);
+            window.visualViewport?.removeEventListener("scroll", schedulePositionUpdate);
             cancelPositionUpdate();
         };
     });
@@ -1672,6 +1714,8 @@
                         .filter(Boolean)
                         .join("; ")}
                     role="tooltip"
+                    onmouseenter={retainOverlay}
+                    onmouseleave={releaseOverlay}
                     {...renderedOverlay.rest}
                 >
                     <span class="snowui-tooltip-backdrop" aria-hidden="true"></span>
@@ -1765,6 +1809,8 @@
                     .filter(Boolean)
                     .join("; ")}
                 role="tooltip"
+                    onmouseenter={retainOverlay}
+                    onmouseleave={releaseOverlay}
                 {...forwardedRest}
             >
                 <span class="snowui-tooltip-backdrop" aria-hidden="true"></span>
@@ -1891,7 +1937,7 @@
             var(--snowui-tooltip-line-height)
         );
         color: var(--static-white-100, #ffffffff);
-        white-space: nowrap;
+        white-space: normal;
         pointer-events: none;
     }
 
@@ -1956,7 +2002,7 @@
             var(--snowui-tooltip-padding)
         );
         color: inherit;
-        white-space: nowrap;
+        white-space: normal;
         pointer-events: none;
         transform: translate3d(
             var(--snowui-tooltip-layer-x, 0),
@@ -1979,12 +2025,16 @@
     }
 
     :global(:where(.snowui-tooltip-inner)) {
+        width: max-content;
+        flex-shrink: 0;
+        overflow-wrap: anywhere;
+        overflow: auto;
         display: inline-flex;
         align-items: center;
         justify-content: flex-start;
         gap: var(--snowui-tooltip-gap-override, var(--snowui-tooltip-gap));
-        white-space: nowrap;
-        pointer-events: none;
+        white-space: normal;
+        pointer-events: auto;
     }
 
     @media (prefers-reduced-motion: reduce) {

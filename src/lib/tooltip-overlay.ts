@@ -10,6 +10,7 @@ export interface TooltipOverlayState {
     triggerEl: HTMLElement;
     position: "top" | "bottom" | "left" | "right";
     offset: number;
+    maxWidth?: number;
     variant: "dark" | "light";
     className: string;
     style?: string;
@@ -77,4 +78,8 @@ export function dismissTooltipOverlayImmediately(id: string): void {
     activeTooltipId = undefined;
     tooltipOverlayImmediateDismissRevision.update((revision) => revision + 1);
     tooltipOverlay.set(null);
+}
+
+export function keepTooltipOverlayOpen(id: string): void {
+    if (activeTooltipId === id) clearHideTimer();
 }

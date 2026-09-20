@@ -1,6 +1,6 @@
 # Tooltip.svelte 文档
 
-> **版本**: v1.22.4
+> **版本**: v1.23.0
 > **职责**: 文字提示组件，在悬停时显示额外信息。
 
 **能力**: 支持通用交互与动效能力 (交互、动效、响应式)。
@@ -13,6 +13,7 @@
 | :--- | :--- | :--- | :--- |
 | position | 'top'\|'bottom'\|'left'\|'right' | 'top' | 弹出方向 |
 | open | boolean | undefined | 手动控制显示状态 (可绑定) |
+| maxWidth | number | 360 | 气泡最大外框宽度（px）；仍受当前可视区域四边 16px 安全区限制 |
 | offset | number | 4 | 与触发器的距离 (px) |
 | variant | 'dark'\|'light' | 'light' | Tooltip 外观变体，默认 light，可显式切换为 dark |
 | dismissOnMotion | boolean | true | 非受控 hover 模式下，触发元素或其祖先开始动效，或后代开始几何 transition 时立即隐藏 Tooltip；后代装饰性 animation 不关闭 |
@@ -56,8 +57,8 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 - `.snowui-tooltip-content` 是 inline-level 外壳，内容整体 Hug。
 - 子内容通过 `gap` 自然排列，不提供 Content Fill。
 - 气泡自身负责 padding / gap / radius / font-size / line-height，并通过 `--snowui-tooltip-*-override` 变量允许外部覆盖。
-- `white-space: nowrap` 是 Tooltip 气泡的稳定尺寸策略，避免提示内容在默认场景下折行导致定位抖动。
-- Tooltip 自身 `pointer-events: none`，交互命中由触发器处理，不属于布局协议。
+- 短内容保持 Hug；长内容先按最大宽度换行，再统一测量并选择方向，避免位置与换行互相反馈。长单词和 URL 允许断行。
+- 内容支持鼠标移入保留显示；超高内容限制到安全区高度并内部滚动，移出后沿用共享隐藏延迟。
 
 布局变量链：
 
@@ -77,7 +78,7 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 4. **内容带拼接与协调时间线**: 新旧目标 Tooltip 矩形最短距离不超过 `4px` 时，旧、新内容沿外框移动向量拼成投影间距为 `16px` 的内容带。测量边界是完整 Snippet 的 `.snowui-tooltip-inner`。外框位置与内容移动同帧开始，并在 `180–360ms` 内完成对齐；旧内容层保留至宽度弹簧首次回弹点 `450ms`。旧层清理只卸载 outgoing，不重置 incoming 偏移；incoming 继续按当前外框宽度补偿位置，直到宽度弹簧精确收敛，避免清理帧文字瞬间归零后又恢复造成抖动。运动中改目标时，以裁切窗口内实际可见面积更大的内容层接管，并在同一帧冻结实时视口矩形。圆角外框是唯一裁切窗口；距离超过 `4px` 时不拼接、不保留旧内容，但新内容必须在过渡中的外框内按最终 placement 保持局部对齐：top / bottom 水平居中，left 靠右，right 靠左；垂直方向 top 靠下、bottom 靠上、left / right 居中。
 5. **重新出现规则**: 外框已经隐藏后，不论间隔多久再次 hover，都重置上一次的坐标、尺寸和触发器记录；新一轮 Tooltip 首帧先完成不可见测量和定位，再直接从当前 hover 位置出现，不做位移动效和宽度变化动效。
 6. **冷却恢复**: 离开 Tooltip 触发器超过 `300ms` 后，恢复首次 hover 的 `450ms` 延迟。未成功显示就移开时，不进入立即显示模式。
-7. **边界碰撞**: 自动翻转位置避免溢出视口。
+7. **边界碰撞**: 使用当前文档的 visualViewport（不可用时使用 window），iframe 内以 iframe 可视区为界。四边保留 16px；先限制外框宽度到 min(maxWidth, 可视宽度 − 32px)，高度到可视高度 − 32px，再测量。依次尝试指定方向、反方向、其余两个方向，每个方向先沿交叉轴平移；优先完整落入安全区的位置，否则选择总溢出距离最小的位置并沿两轴移回安全区。窗口缩放、滚动、软键盘和内容尺寸变化均重新计算。连续切换（包括显式宽度回弹）也按安全区限制宽度和位置。Escape 关闭当前提示。安全区小于内容内边距的极小视口无法保证 16px。
 8. **动效感知关闭**: 默认只在 Tooltip 已显示期间，以页面级单例监听触发元素与祖先的 transition / animation，以及后代真实元素的几何 transition；命中后立即卸载 Tooltip 并跳过退出动效。后代 Logo / Icon 等装饰性 animation、颜色、背景、透明度以及 `::before` / `::after` 伪元素 transition 不触发关闭；可通过 `dismissOnMotion={false}` 显式关闭。
 9. **连续打断与性能**: 位置或内容交接未结束又切换目标时，从当前外框和主要可见内容层的实时矩形重新计算下一段移动；旧时间线立即作废，不排队、不等待，也不得先跳到上一段终点。`rapidRetarget` 默认开启并使用 `90–160ms` cubic ease-out；关闭后使用普通 `180–360ms` 正弦协调曲线。独立宽度回弹的尾段不属于快速重定向窗口；此时切换目标使用完整普通内容时间线，同时宽度从当前可见值重新响应。warm 目标不得在内容已提交后再额外等待一个定位 rAF 和一个启动 rAF；切换专用同步测量只执行一次，不新增 Observer 或逐帧测量。合成提示只在 `moving` 阶段使用 `will-change`。
 10. **触发与减少动态效果**: warm Tooltip 的每次目标变化都立即提交，不用固定意图延迟、瞬时指针速度或 burst 窗口决定是否播放连续裁切，也不监听 document `pointermove`。`prefers-reduced-motion: reduce` 下，所有连续切换都立即定位并只显示新内容，不保留移动、宽高过渡或中间裁切状态。
@@ -89,8 +90,8 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ### 1) 气泡基础布局
 - 渲染层通过 Portal 挂载到 `document.body`，定位方式为 `position: fixed`。
 - 内容容器使用 `inline-flex`，并固定 `align-items: center`、`justify-content: flex-start`。
-- 交互命中由触发器处理，Tooltip 自身 `pointer-events: none`。
-- 层级固定为 `z-index: 9999`，并保持 `white-space: nowrap`。
+- 内容层可悬停；移入取消隐藏计时，移出恢复隐藏计时。
+- 层级固定为 `z-index: 9999`，正文使用 `white-space: normal` 和 `overflow-wrap: anywhere`。
 
 ### 2) Figma Token 映射
 - `padding`: `--snowui-tooltip-padding` → `var(--padding-1) var(--padding-2)`（上下 4，左右 8）
@@ -153,6 +154,11 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ---
 
 ## 更新日志 (Changelog)
+
+### v1.23.0 (2026-09-20)
+
+- 增加 maxWidth，默认 360px；正文自动换行，四边保留 16px 可视区安全距离。
+- 测量后选择方向和最小溢出回退；响应 visualViewport 变化，超高内容可悬停滚动，Escape 关闭。
 
 ### v1.22.4 (2026-09-19)
 - 为独立 Backdrop 添加完全透明的渐变绘制面，修复内嵌浏览器中滤镜有计算值但底层文字仍清晰穿透的问题；保留 20px 模糊与原有透明颜色。
