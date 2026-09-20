@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.11.0
+ * v1.11.1
  */
 export const examples = [
     {
@@ -12,7 +12,7 @@ export const examples = [
     <Button>复制<Tooltip>复制导入代码</Tooltip></Button>
 </div>`,
         expected: {
-            interaction: "首项显示后，以慢移、快扫、快速反向重复经过同一组按钮；快速段短于慢速段，最新目标及时对齐，外框与内容同步且不排队。静止超过 100ms 后不复用旧速度；reduced-motion 直接定位。",
+            interaction: "首项显示后，以慢移、快扫、快速反向重复经过同一组按钮；普通段立即起步并在 120–180ms 基线内收敛；快速段最低 60ms，短于慢速段，文字紧随外框，最新目标及时对齐，外框与内容同步且不排队。静止超过 100ms 后不复用旧速度；reduced-motion 直接定位。",
         },
         logic: ["PointerSpeed", "Continuous", "Retarget", "ReducedMotion"],
     },

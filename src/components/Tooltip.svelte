@@ -1,5 +1,5 @@
 <!--
- Tooltip 文字提示组件 v1.24.0
+ Tooltip 文字提示组件 v1.24.1
  变更 (2026-09-20): 连续切换按平滑鼠标速度缩短协调时程，显示期单例采样并在隐藏时释放。
  变更 (2026-09-20): 默认 360px 换行与四边 16px 可视区避让；支持悬停阅读、超高内容滚动和 Escape 关闭。
 
@@ -539,9 +539,8 @@
         );
     }
 
-    function getCoordinatedProgress(progress: number, retargeting: boolean) {
-        if (retargeting) return 1 - Math.pow(1 - progress, 3);
-        return (1 - Math.cos(Math.PI * progress)) / 2;
+    function getCoordinatedProgress(progress: number) {
+        return 1 - Math.pow(1 - progress, 3);
     }
 
     function getContentProgress(shellProgress: number, lag: number) {
@@ -1238,7 +1237,7 @@
             switchContentDistancePx = contentDistance;
             switchContentSpeedProfile = isRetargeting
                 ? `retarget-ease-out(${contentLag})`
-                : `coordinated-ease(${contentLag})`;
+                : `coordinated-ease-out(${contentLag})`;
             shellMotionOffset = {
                 x: startRect.left - initialBaseBounds.left,
                 y: startRect.top - initialBaseBounds.top,
@@ -1287,7 +1286,6 @@
                     );
                     const shellProgress = getCoordinatedProgress(
                         timelineProgress,
-                        isRetargeting,
                     );
                     const contentTimelineProgress = getMotionProgress(
                         elapsed,
@@ -1295,7 +1293,6 @@
                     );
                     const contentBaseProgress = getCoordinatedProgress(
                         contentTimelineProgress,
-                        isRetargeting,
                     );
                     const currentWidth = shouldReboundWidth
                         ? getTooltipWidthSpringState(
