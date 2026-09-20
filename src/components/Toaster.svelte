@@ -1,6 +1,6 @@
 <!--
   Toaster 全局 Toast 容器
-  v1.0.0
+  v1.0.1
 
   职责：
   - 在 <body> 上挂载 6 个固定位置的 Toast 栈（Portal）
@@ -314,13 +314,13 @@
         const base = `--toast-width: ${resolvedWidth}; --snowui-toast-exit-offset: ${px};`;
         switch (position) {
             case "top":
-                return `${base} top: ${px}; left: 0; right: 0; margin-inline: auto;`;
+                return `${base} top: ${px}; left: ${px}; right: ${px}; width: auto; margin-inline: auto;`;
             case "top-left":
                 return `${base} top: ${px}; left: ${px};`;
             case "top-right":
                 return `${base} top: ${px}; right: ${px};`;
             case "bottom":
-                return `${base} bottom: ${px}; left: 0; right: 0; margin-inline: auto;`;
+                return `${base} bottom: ${px}; left: ${px}; right: ${px}; width: auto; margin-inline: auto;`;
             case "bottom-left":
                 return `${base} bottom: ${px}; left: ${px};`;
             case "bottom-right":

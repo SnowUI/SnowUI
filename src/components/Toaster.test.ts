@@ -1,6 +1,6 @@
 /**
  * Toaster.test.ts
- * v1.0.0
+ * v1.0.1
  * 覆盖全局挂载、队列触发和位置分组的公开消费路径。
  */
 export const examples = [
@@ -28,5 +28,18 @@ export const examples = [
             interaction: "同一位置最多保留三层可见 Toast，超出项按队列规则推出。",
         },
         logic: ["Position", "Stack", "Limit"],
+    },
+    {
+        name: "TSR-03: 内容自适应通知在上下区域居中",
+        code: `TSR-03
+<Toaster />
+<Button onclick={() => toast({ text: "Saved", position: "top", duration: 0 })}>Top</Button>
+<Button onclick={() => toast({ text: "A longer notification", position: "bottom", duration: 0 })}>Bottom</Button>
+<Button onclick={() => dismissAllToasts()}>Clear all</Button>`,
+        expected: {
+            render: "桌面与窄屏下，每条通知的左右边界中点等于视口水平中点；不依赖通知文字长度。",
+            interaction: "连续点击后各层仍水平居中；指定 Toaster width 时保持同样的居中规则，入场和堆叠动效不被覆盖。",
+        },
+        logic: ["Position", "Stack", "Responsive"],
     },
 ] as const;
