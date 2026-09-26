@@ -1,6 +1,6 @@
 # Input
 
-> **版本**: v1.1.4
+> **版本**: v1.1.5
 > **职责**: 提供单行输入，支持文本、搜索、密码、数字、日期时间与颜色，可组合标签、图标和校验反馈。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
@@ -53,7 +53,7 @@
 | placeholder | `string` | — | 空输入的提示文字，不替代可访问标签；日期时间输入保留分段占位。 |
 | name | `string` | — | 原生表单字段名；FormData 使用该名称收集字段。 |
 | disabled | `boolean` | `false` | 禁止用户输入与交互，原生禁用字段不参与表单提交。 |
-| readonly | `boolean` | `false` | 保留聚焦、选择与提交，禁止编辑并隐藏清除入口；使用只读视觉。 |
+| readonly | `boolean` | `false` | 保留聚焦、选择与提交，禁止编辑并隐藏清除入口；自定义 trailing 聚焦后仍保留，使用只读视觉。 |
 | clearable | `boolean` | `true` | 是否允许显示内置清除 X；false 时不渲染 X，不改变编辑、校验或自定义 trailing。适用于普通及 Field 内嵌 Input。 |
 | required | `boolean` | `false` | 参与浏览器原生必填校验；不自动产生业务错误文案。 |
 | autocomplete | `HTMLInputAttributes["autocomplete"]` | — | 透传浏览器自动填充字段语义，如 username、email、new-password；候选来自浏览器已有数据。 |
@@ -313,6 +313,10 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 ```
 
 <a id="与通用逻辑的关系"></a>
+
+### 展示可打开、可复制的链接
+
+“链接输入框 / 链接 input / 可复制链接”不是可编辑输入。使用 [CopyLink](./CopyLink.md)，无边框和输入框 hover 动效；链接文字 hover 显示下划线、点击在新标签页打开，其余区域点击复制。完整组合约定见 [自然语言映射](../../../specs/NaturalLanguageToSnowUI.md)。Input 保留给需要编辑地址或只读选择值的场景。
 
 ### 无障碍与表单建议
 
@@ -620,6 +624,10 @@ invalid=true + !hasCustomTrailing
 - **Input 组件**: [./Input.svelte](./Input.svelte)
 
 ## 更新日志
+
+### v1.1.5 (2026-09-27)
+
+- 只读与禁用输入不再进入清除接管状态，避免聚焦只读输入时误隐藏自定义 trailing 复制按钮。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

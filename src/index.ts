@@ -239,3 +239,5 @@ export {
     type EdgeFadeMaskOptions,
 } from "./lib/edge-fade";
 export { writeClipboardText } from "./lib/clipboard";
+
+export { default as CopyLink } from "./components/CopyLink.svelte";

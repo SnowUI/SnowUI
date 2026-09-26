@@ -1,6 +1,6 @@
 # CodeBlock
 
-> **版本**: v1.8.0
+> **版本**: v1.8.1
 > **职责**: 清晰展示可复制的代码，支持语法着色、行号、全屏查看和尺寸调整，适合文档与开发工具。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
@@ -62,7 +62,7 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.8.0
+> **版本**: v1.8.1
 > **更新**: 2026-09-08
 > **职责**: 展示代码、基础语法着色与行号，并提供复制、全屏和可选尺寸调整能力。
 > **布局模型**: 默认态为复合管理布局；`singleLine` 为槽位宿主布局
@@ -148,6 +148,8 @@
 <a id="语法着色"></a>
 
 ### 语法着色
+
+`language="text"`（别名 plain、plaintext、txt）保留原文与换行；英文标识和数字使用关键字粉色，http/https URL 使用注释灰色，其余正文使用默认文字色。文本中的 `//` 不启动注释；字体、字号和行高与其他语言共用同一套继承规则。仅保留复制操作时，传入 `showLanguage={false}` 和 `showExpandButton={false}`；默认开关不变。
 
 当使用 `code` prop 时，组件内置轻量语法着色规则，覆盖 JS / TS / JSON / HTML / CSS 常见 token。规则来自参考仓库中 `shiki` / `rehype-pretty-code` 的高亮分层思路，但当前实现不新增依赖。
 
@@ -352,6 +354,8 @@ pnpm build`}
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 ## 更新日志
+
+- 2026-09-27：text/plain/plaintext/txt 独立文本着色，英文标识及数字复用关键字粉色，URL 复用注释灰色；不再把 URL 后正文误判为注释。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

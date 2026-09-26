@@ -546,4 +546,13 @@ export const examples = [
         expected: { render: "输入文字与 leading 在 48px 输入表面内垂直居中，上下剩余空间对称。" },
         logic: ["Layout", "Leading", "Height"],
     },
+    {
+        name: "I-42：只读输入保留复制附件",
+        code: `I-42
+<Input readonly value="https://snowui.dev/llms.txt" aria-label="只读链接" style="width: 20rem;">
+    <CopyButton as="trailing" text="https://snowui.dev/llms.txt" bare emphasis="muted" showText={false} />
+</Input>`,
+        expected: { render: "点击或 Tab 聚焦只读输入后，复制按钮仍可见且可操作，不出现清除按钮。" },
+        logic: ["Readonly", "Trailing", "Focus"],
+    },
 ] as const;

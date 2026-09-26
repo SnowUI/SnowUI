@@ -1,6 +1,6 @@
 <!--
  Input 组件：基础单行输入框
- v1.1.4
+ v1.1.5
 
  文档: ./Input.md
 -->
@@ -234,7 +234,7 @@
             !isCustomTemporalType,
     );
     const hasClearableValue = $derived(
-        clearable && isClearableType &&
+        clearable && isClearableType && !readonly && !disabled &&
             resolvedValue !== undefined &&
             String(resolvedValue) !== "",
     );

@@ -7,6 +7,13 @@
  */
 export const examples = [
     {
+        name: "CB-10：文本提示词，仅保留复制",
+        code: `CB-10
+<CodeBlock language="text" showLanguage={false} showExpandButton={false}
+    code={'请使用 SnowUI 和 API。\\n先阅读 http://localhost:5174/llms.txt，按照文档实现。\\n保留 // 普通文字、数字 123 与中文标点。'} />`,
+        logic: ["language", "showLanguage", "showExpandButton", "textHighlight"],
+    },
+    {
         name: "CB-09：横向滚动条仅在 Hover 时显示",
         code: `CB-09
 <CodeBlock

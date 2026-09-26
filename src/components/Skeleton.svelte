@@ -91,6 +91,7 @@
         [/\bsnowui-chip\b/, "chip"],
         [/\bsnowui-link\b/, "link"],
         [/\bsnowui-tag\b/, "tag"],
+        [/\bsnowui-copy-link\b/, "copy-link"],
         [/\bsnowui-code-block\b/, "code-block"],
         [/\bsnowui-kbd\b/, "kbd"],
         [/\bsnowui-switch\b/, "switch"],
@@ -518,6 +519,12 @@
                         fit("3rem"),
                         fit("1.25rem"),
                     ),
+                    options.renderHints,
+                    options,
+                );
+            case "copy-link":
+                return applyRenderHints(
+                    createSingleLayout(componentKey, "rect", fit("100%"), fit("2.75rem")),
                     options.renderHints,
                     options,
                 );

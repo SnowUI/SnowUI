@@ -1,6 +1,6 @@
 <!--
   CodeBlock 组件：代码块显示，支持行号、复制、全屏放大
-  v1.8.0
+  v1.8.1
 
   布局模型：默认态为复合管理布局；singleLine 变体为槽位宿主布局
 
@@ -319,6 +319,20 @@
     }
 
     function highlightLine(line: string): CodeToken[] {
+        // 文本内容不解释 JS 注释；URL 后的正文保持默认色。
+        if (["text", "plain", "plaintext", "txt"].includes(language.trim().toLowerCase())) {
+            const tokens: CodeToken[] = [];
+            const pattern = /https?:\/\/[^\s<>"`，。；！？、（）【】]+|[A-Za-z_$][A-Za-z0-9_$-]*|\d+(?:\.\d+)?/g;
+            let cursor = 0;
+            for (const match of line.matchAll(pattern)) {
+                const start = match.index!;
+                if (start > cursor) tokens.push({ text: line.slice(cursor, start), kind: "plain" });
+                tokens.push({ text: match[0], kind: /^https?:\/\//.test(match[0]) ? "comment" : "keyword" });
+                cursor = start + match[0].length;
+            }
+            if (cursor < line.length) tokens.push({ text: line.slice(cursor), kind: "plain" });
+            return tokens.length ? tokens : [{ text: " ", kind: "plain" }];
+        }
         const tokens: CodeToken[] = [];
         let cursor = 0;
 

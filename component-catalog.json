@@ -301,6 +301,33 @@
       "deprecated": false
     },
     {
+      "name": "CopyLink",
+      "canonical": "CopyLink",
+      "package": "@snowui-design-system/components",
+      "import": "import { CopyLink } from '@snowui-design-system/components';",
+      "tier": "oss",
+      "kind": "component",
+      "source": "src/components/CopyLink.svelte",
+      "documentation": "src/components/CopyLink.md",
+      "description": "展示可打开、可复制的链接地址，文字打开链接，其余区域复制地址。",
+      "intents": [
+        "展示并复制链接地址"
+      ],
+      "aliases": [
+        "链接输入框",
+        "链接 input",
+        "可复制链接"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "Link",
+        "CopyButton",
+        "Input"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Dialog",
       "canonical": "Dialog",
       "package": "@snowui-design-system/components",
