@@ -19,7 +19,7 @@
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |
 | `CONTINUOUS_HOVER_MOTION` | Sidebar、Listbox、Popover、TableBody、Accordion、Tab / Segmented 的共享 hover 背景移动 | 单项独立 hover、生命周期进入 | Fluid Functionalism proximity hover |
 | `HOVER_SCALE_UP_MOTION` | hover 轻微放大 | 生命周期出现、Modal | transitions.dev Avatar group hover-in |
-| `BUTTON_HOVER_SCALE_UP_MOTION` / `getButtonBackgroundScale(size)` | 独立动作 Button 背景使用 `200ms ease`；标准高度 `H=24/36/48`，系数 `k=24/H`，hover 终点 `1+0.06k` 为 sm `1.06`、md `1.04`、lg `1.03`；Borderless 隐藏起点 `1-0.16k` 为 `0.84/0.893333…/0.92`；点击中点 `1+0.03k` 为 `1.03/1.02/1.015`，两段各 100ms。颜色、内容、命中区与布局不变；按 size 校准，不测量自定义高度，横向总外扩由 `getButtonBackgroundWidthFactor` 限制为 `MOTION_BUTTON_HOVER_MAX_WIDTH_GROWTH_REM=0.25rem`；横向系数 q=min(1, 0.25rem / (实际宽度 × (hoverTo-1)))，hover、Borderless 起点与点击相对 1 的差值均乘 q，纵向不变 | bare、默认关闭的复合控件项、非 Button hover、生命周期出现 | 保留 2026-08-27 恢复的默认 / sm 基线；2026-09-04 用户要求直接实现 md / lg 感知幅度补偿，等待视觉验收 |
+| `BUTTON_HOVER_SCALE_UP_MOTION` / `getButtonBackgroundScale(size)` | 独立动作 Button 背景使用 `200ms ease`；标准高度 `H=24/36/48`，系数 `k=24/H`，hover 终点 `1+0.06k` 为 sm `1.06`、md `1.04`、lg `1.03`；Borderless 隐藏起点 `1-0.16k` 为 `0.84/0.893333…/0.92`；点击中点 `1+0.03k` 为 `1.03/1.02/1.015`，两段各 100ms。内容默认整体跟随，可独立关闭；颜色、命中区与布局不变；按 size 校准，不测量自定义高度，横向总外扩由 `getButtonBackgroundWidthFactor` 限制为 `MOTION_BUTTON_HOVER_MAX_WIDTH_GROWTH_REM=0.25rem`；横向系数 q=min(1, 0.25rem / (实际宽度 × (hoverTo-1)))，hover、Borderless 起点与点击相对 1 的差值均乘 q，纵向不变 | bare、默认关闭的复合控件项、非 Button hover、生命周期出现 | 保留 2026-08-27 恢复的默认 / sm 基线；2026-09-04 用户要求直接实现 md / lg 感知幅度补偿，等待视觉验收 |
 | `HOVER_LIFT_MOTION` | hover 上浮并轻微放大 | 普通内容进入 | transitions.dev Avatar group hover |
 | `NUMBER_POP_APPEAR_MOTION` | 数字或短计数值弹入 | 长文本、页面切换 | transitions.dev Number pop-in |
 | `TEXT_SWAP_APPEAR_MOTION` | 短文字状态替换 | 长段落、Overlay | transitions.dev Text states swap |
@@ -35,7 +35,7 @@
 2. 第二个组件复用同一语义值时，必须抽到 preset。
 3. 组件文档应引用 preset 名称；如写具体数字，必须注明以本 catalog 为准。
 4. 触发延迟不是 MotionConfig，归共享 lib 管理。
-5. 自然语言出现“放大”时必须结合触发语义选择：Button 默认 hover 用 `BUTTON_HOVER_SCALE_UP_MOTION` 只缩放背景层，其他 hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
+5. 自然语言出现“放大”时必须结合触发语义选择：Button 默认 hover 用 `BUTTON_HOVER_SCALE_UP_MOTION` 缩放背景与默认跟随的整体内容，其他 hover 放大用 `HOVER_SCALE_UP_MOTION`；生命周期从小到大进入用对应 appear preset；Modal / Dropdown 不得改用 hover preset。
 6. 自然语言出现“尺寸变化 / 展开 / 收起 / 高度变化 / 宽度变化”时，优先使用 `RESIZE_MOTION`；只有语义明确不同且已存在专项 preset 时例外。
 7. Tab / Segmented indicator 同时移动和变形时必须使用 `TAB_INDICATOR_MOTION`，不得使用普通 `RESIZE_MOTION` 或分别维护 transform / size 时序。
 8. `GENERIC_APPEAR_MOTION` 默认只包含 opacity；需要生命周期缩放时必须显式声明 scale 或选择含 scale 的组件族 preset。

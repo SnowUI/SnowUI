@@ -286,7 +286,7 @@ export const examples = [
 </style>`,
         expected: {
             render: "按钮内图标 hover 后持续旋转",
-            interaction: "Tooltip 显示后，后代图标的 animationstart 与 Button ::before / ::after hover 背景 transition 不会使 Tooltip 消失",
+            interaction: "Tooltip 显示后，后代图标的 animationstart、Button 背景 transition 与内容整体缩放不会使 Tooltip 消失；真正的后代尺寸或触发器位置变化仍立即关闭",
         },
         logic: ["DismissOnMotion", "DescendantAnimation", "Regression"],
     },

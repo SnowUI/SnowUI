@@ -36,7 +36,7 @@ export const HOVER_SCALE_UP_MOTION: MotionConfig = {
     easing: MOTION_EASING_STANDARD,
 };
 
-/** Button 默认 hover 背景层放大；内容不缩放，颜色反馈继续由 Button variant 自己拥有。 */
+/** Button 默认 hover 背景与内容整体放大；内容可独立关闭，颜色反馈继续由 Button variant 自己拥有。 */
 export const BUTTON_HOVER_SCALE_UP_MOTION: MotionConfig = {
     scale: [MOTION_SCALE_HOVER_FROM, MOTION_SCALE_BUTTON_HOVER_TO],
     duration: MOTION_DURATION_BUTTON_HOVER_MS,

@@ -109,9 +109,12 @@ function getDocumentState(document: Document): DocumentMotionDismissState {
             // 会被重定向到宿主，但伪元素自身的 inset 不会移动宿主锚点。
             if (event.pseudoElement) return;
             if (!affectsGeometry(event.propertyName)) return;
-            // A descendant geometry transition can still resize or move the
-            // trigger's border box, so retain the conservative dismissal path.
-            dismissRelatedTooltips(state, event.target, true);
+            // 已登记的内容视觉层只变换绘制，不移动外层触发器锚点。
+            // 标记只豁免后代 transform；自身 / 祖先及真实尺寸变化仍须关闭。
+            const isAnchorDecoration = event.propertyName === "transform" &&
+                event.target instanceof Element &&
+                event.target.hasAttribute("data-tooltip-anchor-decoration");
+            dismissRelatedTooltips(state, event.target, !isAnchorDecoration);
         },
         handleAnimationStart: (event) => {
             // Keyframe events do not expose animated property names. Only the

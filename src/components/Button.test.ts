@@ -1,6 +1,7 @@
 /**
  * Button.test.ts
- * v1.15.0
+ * v1.16.0
+ * 变更记录 (2026-09-27): 内容默认整体跟随背景缩放，新增独立开关与动态切换对照。
  * 变更记录 (2026-09-04): 按标准高度补偿 md / lg 的背景 hover 与点击行程，补充三尺寸四变体对照。
  * 变更记录 (2026-08-27): 恢复背景层比例放大：普通背景 1 -> 1.06，Borderless 0.84 -> 1.06；内容与布局不变。
  * 变更记录 (2026-08-19): hover 颜色与背景外扩统一为 150ms ease-in-out，同步进入与退出。
@@ -30,6 +31,24 @@
  */
 export const examples = [
     {
+        name: "BTN-Content：内容整体缩放开关",
+        code: `BTN-Content
+<Frame column class="gap-16">
+    <Frame row class="gap-16">
+        <Button contentScaleOnHover><FourLeafClover />保存修改</Button>
+        <Button contentScaleOnHover={false}><FourLeafClover />仅背景放大</Button>
+        <Button scaleOnHover={false} contentScaleOnHover><FourLeafClover />均不放大</Button>
+        <Button bare contentScaleOnHover><FourLeafClover />无外壳</Button>
+    </Frame>
+</Frame>`,
+        expected: {
+            interaction: "文字、Icon 与间距整体围绕按钮中心缩放，复用背景比例、时长、曲线及点击反馈；放大结束时文字不应再次下移或跳位；内容可单独关闭，背景关闭时不能单独开启内容。",
+            layout: "hover 前后按钮和父容器布局尺寸不变，切换开关不重建 children。",
+            accessibility: "减少动效时立即到达 hover 最终比例，移出立即恢复原尺寸，不播放点击缩放。",
+        },
+        logic: ["ContentScaleOnHover", "HoverScale", "ReducedMotion"],
+    },
+    {
         name: "BTN-Width：长按钮 hover 横向扩张上限",
         code: `BTN-Width
 <Frame column class="gap-16" style="width: 100%; max-width: 600px;">
@@ -56,7 +75,7 @@ export const examples = [
     <Button toggle>Toggle</Button>
 </Frame>`,
         expected: {
-            render: "内置 hover 放大与点击缩回 / 恢复共用 scaleOnHover 开关；文字、图标与布局不缩放。",
+            render: "内置 hover 放大与点击缩回 / 恢复共用 scaleOnHover 开关；文字、图标整体跟随缩放，布局不变。",
             interaction: "点击从背景当前尺寸缩回纵向 1.03 倍，再恢复纵向 1.06 倍 hover 大小；横向按外扩上限同比补偿，两段各用 hover 一半时长；重复点击重新接管，键盘与 Toggle 正常生效；减少动效不播放点击缩放。",
         },
         logic: ["HoverScale", "ClickMotion", "ScaleOnHover", "Keyboard", "ReducedMotion"],
@@ -77,9 +96,9 @@ export const examples = [
         expected: {
             render: "全部 variant 与 bare 保持各自原有背景、边框和前景色。",
             layout: "hover 缩放只影响绘制，Button 与自适应父容器的布局尺寸不变。",
-            interaction: "独立动作默认只缩放背景层到 1.06，文字与 Icon 保持原尺寸；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 从隐藏的 0.84 背景显示并放大到 1.06，最终颜色保持 Light 4% / Dark 10%；bare 不出现背景或内置放大。",
+            interaction: "独立动作默认背景与内容整体放大，contentScaleOnHover=false 可只关闭内容缩放；scaleOnHover=false、disabled 与复合控件项不放大；Borderless 从隐藏的 0.84 背景显示并放大到 1.06，最终颜色保持 Light 4% / Dark 10%；bare 不出现背景或内置放大。",
             performance: "基础背景层与 hover 颜色叠层只动画 transform / opacity，不逐帧重算 color-mix 背景，也不触发布局重排。",
-            responsive: "背景按比例缩放，Button 根尺寸、内容与父容器布局保持不变。",
+            responsive: "背景按比例缩放，Button 根尺寸与父容器布局保持不变。",
             accessibility: "prefers-reduced-motion: reduce 下直接提交 scale(1.06) 和最终颜色，不执行 transform 或 opacity 过渡。",
         },
 
@@ -103,7 +122,7 @@ export const examples = [
         expected: {
             render: "三种尺寸的 filled Button 均保持 Primary 背景与 Static White 文字，文字清晰可见。",
             layout: "尺寸与原有 padding、圆角和内容布局不变。",
-            interaction: "sm/md/lg 的 hover 背景终点分别为 1.06/1.04/1.03；标准高度下上下外扩量一致，不改变前景色、内容尺寸或布局。",
+            interaction: "sm/md/lg 的 hover 背景终点分别为 1.06/1.04/1.03；标准高度下上下外扩量一致，内容同步缩放，不改变前景色或布局。",
             performance: "宿主基线与组件样式的先后加载不影响 filled 前景色。",
             responsive: "sm、md、lg 使用同一变体颜色契约。",
         },
@@ -138,9 +157,9 @@ export const examples = [
         expected: {
             render: "四种变体及三种尺寸保持各自颜色、圆角与内容；默认 / sm 的原效果不变。",
             interaction: "hover 终点按 24/36/48 标准高度反比补偿为 1.06/1.04/1.03，Borderless 起点为 0.84/约 0.893333/0.92；点击缩回各尺寸放大量的一半。",
-            layout: "只缩放背景，不改变文字、图标、命中区或父容器布局；等比 transform 下不同宽高比的左右外扩量允许不同。",
+            layout: "背景与内容整体缩放，不改变命中区或父容器布局；横向扩张保持上限。",
             accessibility: "减少动效直接提交各尺寸 hover 终点和最终颜色，不播放点击缩放。",
-            performance: "只按 resolvedSize 计算比例；不增加 DOM、Observer 或逐帧测量。",
+            performance: "按 resolvedSize 与实际宽度计算比例，复用尺寸监听；内容由稳定视觉层承载，不逐帧测量。",
         },
         logic: ["Size", "HoverScale", "ClickMotion", "ReducedMotion"],
     },

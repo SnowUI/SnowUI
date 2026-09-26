@@ -9,7 +9,7 @@
 - `::before` / `::after` 的 transition 不关闭 Tooltip。伪元素事件会把 target 重定向到宿主，但 SnowUI Button 等组件的 hover 背景 inset / radius 只改变装饰层，不移动触发器 border box。
 - 触发器自身或祖先开始 CSS animation 时立即关闭 Tooltip，因为这两类目标可能直接改变锚点。
 - 后代 CSS animation 不关闭 Tooltip。关键帧事件不提供属性名，后代 Logo / Icon 的装饰动效不能被推断为触发器锚点位移。
-- 后代的几何 `transitionrun` 仍会关闭 Tooltip，因为后代尺寸或位置过渡可能改变触发器的 border box。
+- 后代的几何 `transitionrun` 仍会关闭 Tooltip，因为后代尺寸或位置过渡可能改变触发器的 border box。唯一显式豁免是标记 `data-tooltip-anchor-decoration` 的后代视觉层自身的 `transform`：Button 内容整体缩放不改变外层触发器锚点。该标记不豁免其他属性、未标记子节点，也不豁免标记节点作为触发器自身或祖先时的运动。
 - 动效关闭跳过 Tooltip 的退出动效，确保目标的第一帧位移前浮层已经卸载。
 - 非受控 hover Tooltip 关闭后需要重新进入触发器才会再次显示；受控 `open` 模式继续由外部状态完整拥有。
 

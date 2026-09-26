@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.18.1
+  v2.19.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -54,6 +54,8 @@
     backgroundBlur?: boolean;
     /** 是否同时启用内置 hover 放大与配套点击缩回 / 恢复；复合控件项可由容器默认关闭。 */
     scaleOnHover?: boolean;
+    /** 内容整体跟随背景 hover / 点击缩放；默认跟随背景，可独立关闭。 */
+    contentScaleOnHover?: boolean;
     /**
      * Toggle 模式：内部自动注入 `Click={{Idle:"Active",Active:"Idle"}}` 与 `whileClick=false` 默认值，
      * 配合 Frame 自动暴露的 `data-state="Active"` 让根节点在激活态自动套用 Secondary/Indigo 配色。
@@ -84,6 +86,7 @@
     emphasis = "normal",
     backgroundBlur = false,
     scaleOnHover = undefined,
+    contentScaleOnHover = undefined,
     toggle = false,
     href = undefined,
     target = undefined,
@@ -148,7 +151,11 @@
   const hasDefaultBackgroundMotion = $derived(
     resolvedScaleOnHover && rest.whileHover === undefined && !bare && !resolvedDisabled,
   );
-  let clickMotion = $state<{ phase: "a" | "b"; from: string } | undefined>();
+  const hasContentMotion = $derived(
+    hasDefaultBackgroundMotion && (contentScaleOnHover ?? resolvedScaleOnHover),
+  );
+  let contentElement = $state<HTMLSpanElement | undefined>();
+  let clickMotion = $state<{ phase: "a" | "b"; from: string; contentFrom: string } | undefined>();
   let lastClickPhase: "a" | "b" = "b";
 
   $effect(() => {
@@ -338,7 +345,7 @@
       `--snowui-button-hover-motion-easing: ${easing}`,
     ].join("; ");
     const clickMotionStyle = clickMotion
-      ? `--snowui-button-click-transform-from: ${clickMotion.from}`
+      ? `--snowui-button-click-transform-from: ${clickMotion.from}; --snowui-button-content-click-transform-from: ${clickMotion.contentFrom}`
       : "";
     const styles = [`--snowui-button-icon-size: ${contextPixelSize / 16}rem`, defaultHoverMotionStyle, clickMotionStyle, hostStyle, userStyle]
       .filter(Boolean)
@@ -489,8 +496,11 @@
 
     // 每次有效点击只读一次当前背景；连续点击从当前画面接管，不等待旧动画。
     const from = getComputedStyle(node, "::before").transform;
+    const contentFrom = hasContentMotion && contentElement
+      ? getComputedStyle(contentElement).transform
+      : "none";
     lastClickPhase = lastClickPhase === "a" ? "b" : "a";
-    clickMotion = { phase: lastClickPhase, from };
+    clickMotion = { phase: lastClickPhase, from, contentFrom };
   }
 
   function handleAnimationEnd(event: AnimationEvent) {
@@ -628,7 +638,9 @@
 </script>
 
 {#snippet buttonChildren()}
-  {@render children?.()}
+  <span bind:this={contentElement} class="snowui-button-content" data-tooltip-anchor-decoration>
+    {@render children?.()}
+  </span>
 {/snippet}
 
 <Frame
@@ -646,6 +658,7 @@
   data-icon-only={iconOnly ? "true" : undefined}
   data-emphasis={bare ? emphasis : undefined}
   data-default-hover-scale={resolvedScaleOnHover && rest.whileHover === undefined ? "true" : undefined}
+  data-content-hover-scale={hasContentMotion ? "true" : undefined}
   data-click-scale={hasDefaultBackgroundMotion ? clickMotion?.phase : undefined}
   data-embedded={isButtonGroupEmbedded ? "button-group" : undefined}
   data-leading={as === "leading" ? "true" : undefined}
@@ -898,7 +911,37 @@
     --snowui-button-border-color: transparent;
   }
 
-  /* 默认 hover scale 只作用于独立背景层；Button 内容与命中区保持原尺寸。 */
+  /* 内容共用一个缩放平面；未启用时不改变原有内容布局或重建子组件。 */
+  :global(:where(.snowui-button) > .snowui-button-content) {
+    display: contents;
+  }
+
+  :global(:where(.snowui-button[data-content-hover-scale="true"]) > .snowui-button-content) {
+    display: flex;
+    flex: 1 1 auto;
+    align-self: stretch;
+    flex-direction: inherit;
+    flex-wrap: inherit;
+    align-items: inherit;
+    justify-content: inherit;
+    gap: inherit;
+    min-width: 0;
+    transform: scale(1);
+    transform-origin: center;
+    /* 保持动画前后使用同一合成层，避免结束时文字重新栅格化产生下移感。 */
+    will-change: transform;
+    transition: transform var(--snowui-button-background-hover-motion-duration, var(--snowui-button-hover-motion-duration, 0.2s)) var(--snowui-button-hover-motion-easing, ease);
+    --snowui-button-click-transform-from: var(--snowui-button-content-click-transform-from, none);
+    animation-name: var(--snowui-button-click-animation, none);
+    animation-duration: var(--snowui-button-hover-motion-duration, 0.2s);
+    animation-timing-function: var(--snowui-button-hover-motion-easing, ease);
+  }
+
+  :global(:where(.snowui-button[data-content-hover-scale="true"]):is(:hover, [data-click-scale]):not(.snowui-disabled):not(:disabled):not([aria-disabled="true"]) > .snowui-button-content) {
+    transform: scale(var(--snowui-button-hover-scale-x-to), var(--snowui-button-hover-scale-to));
+  }
+
+  /* 背景独立绘制，根布局与命中区保持原尺寸。 */
   :global(:where(.snowui-button).snowui-button-background-scale-surface) {
     --snowui-button-background-layer-opacity: 1;
     --snowui-button-background-hover-layer-opacity: 0;
@@ -1176,7 +1219,8 @@
       transition: none;
     }
     :global(:where(.snowui-button)[data-default-hover-scale="true"])::before,
-    :global(:where(.snowui-button)[data-default-hover-scale="true"])::after {
+    :global(:where(.snowui-button)[data-default-hover-scale="true"])::after,
+    :global(:where(.snowui-button[data-content-hover-scale="true"]) > .snowui-button-content) {
       animation: none;
     }
   }

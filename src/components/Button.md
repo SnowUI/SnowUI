@@ -1,9 +1,9 @@
 # Button
 
-> **版本**: v2.18.1
+> **版本**: v2.19.0
 > **职责**: 触发操作或导航，支持文字、图标、加载与禁用状态，适合从主要操作到轻量工具按钮的不同场景。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-09-27
 
 ## 组件介绍
 
@@ -47,7 +47,8 @@
 | bare | `boolean` | `false` | 无外壳按钮，以图标操作为主，也可包含文字或其他内容。忽略 variant，移除 padding、radius、背景、边框和 hover overlay，保留内容 gap。无需叠加 iconOnly；同 size 的图标与 iconOnly 一致，为 16/20/24px，子图标显式 size 优先。默认 100% 不透明，emphasis="muted" 启用 40% → hover 100%。 |
 | emphasis | `"normal" \| "muted"` | `"normal"` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
 | backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
-| scaleOnHover | `boolean` | — | 是否同时启用 Button 内置背景层 hover 放大及配套点击缩回 / 恢复动效。独立动作默认开启；文字、Icon、Spinner 与命中区不缩放。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
+| scaleOnHover | `boolean` | — | 是否同时启用 Button 内置背景层 hover 放大及配套点击缩回 / 恢复动效。独立动作默认开启；内容默认跟随缩放，命中区和布局不变。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
+| contentScaleOnHover | `boolean` | 跟随背景缩放 | 是否让文字、Icon、Spinner 等内容作为整体跟随内置背景 hover 与点击缩放。`false` 仅关闭内容缩放；`true` 仍要求背景缩放生效，不能绕过 scaleOnHover=false、bare、disabled 或显式 whileHover 接管。 |
 | toggle | `boolean` | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 Secondary/Indigo 配色（gray / outline / borderless 生效，filled 排除）；`aria-pressed` 由 Frame 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
 | holdRepeat | `boolean` | `false` | 开启指针按住连发；仅对未禁用的 button 宿主主按钮按压生效。按下立即触发一次 click，等待后周期触发，松开或取消停止；不为链接或键盘增加连发。 |
 | holdRepeatDelay | `number` | `260` | 开始周期连发前的等待时间，单位 ms，负值按 0 处理；仅 holdRepeat=true 生效，第一次周期点击还需等待 holdRepeatInterval。 |
@@ -89,7 +90,7 @@ Button 的内部布局不接入三槽位模型：
 - 文字型 Button 默认 `white-space: nowrap`，保证按钮文案作为一个操作短语保持单行；特殊长文案可由使用方通过外部 style / class 显式覆盖。
 - 默认最小宽度为 `max-content`，即“内容 + gap + padding”的自然下限；外层 fill 布局可以把 Button 拉宽，但不能把 Button 压到吞掉默认 padding。
 - Button 自身负责 padding / gap / radius / font-size / line-height，并通过 `--snowui-button-*-override` 变量允许外部覆盖。
-- gray / filled / outline / borderless 通过共享 `.snowui-rounded-rectangle` 消费 `--corner-shape-rounded-rectangle: superellipse(1.1)`；该曲线只比普通 `round` 略微平滑，同时不改变 `--snowui-button-radius` 或 `--snowui-button-radius-override` 解析出的根 corner area。独立 hover 背景伪元素显式继承同一 `border-radius` 与 `corner-shape`，并随背景 transform 等比放大；根 Button 的圆角、内容和布局尺寸保持不变。`iconOnly` 只是内容布局，不建立圆形语义或圆角特例。不支持 `corner-shape` 时自然回退为现有 `border-radius`。bare 与 ButtonGroup 嵌入态的半径仍为 `0`，外壳所有权不变。
+- gray / filled / outline / borderless 通过共享 `.snowui-rounded-rectangle` 消费 `--corner-shape-rounded-rectangle: superellipse(1.1)`；该曲线只比普通 `round` 略微平滑，同时不改变 `--snowui-button-radius` 或 `--snowui-button-radius-override` 解析出的根 corner area。独立 hover 背景伪元素显式继承同一 `border-radius` 与 `corner-shape`，并随背景 transform 等比放大；根 Button 的圆角和布局尺寸保持不变。`iconOnly` 只是内容布局，不建立圆形语义或圆角特例。不支持 `corner-shape` 时自然回退为现有 `border-radius`。bare 与 ButtonGroup 嵌入态的半径仍为 `0`，外壳所有权不变。
 - `iconOnly` 是单视觉内容布局的唯一开关，默认 `false`；Button 不读取 children 的 DOM 类型推断该状态。内容可以是 Icon、Logo 或其他单一视觉原子。
 - `as="leading"` / `as="trailing"` 只表示 Button 作为 Field / Input 等外层槽位宿主的配件；不会改变 Button 内部布局模型。
 - `as="item"` 表示 Button 作为 Breadcrumb 的路径片段；当前页不可交互规则由 Breadcrumb 标记 `aria-current="page"` 后触发。Button 未显式写 `variant` 时可继承 Breadcrumb 的 `variant`，显式 Button `variant` 优先。
@@ -156,17 +157,25 @@ Button 的内部布局不接入三槽位模型：
 
 当前 sm / md / lg 标准高度为 24 / 36 / 48（16px 根字号名义值），对应 hover 终点 1.06 / 1.04 / 1.03，Borderless 起点 0.84 / 约 0.893333 / 0.92。标准高度按钮的上下边缘各外扩约 0.72px，Borderless 完整展开行程也保持一致；数值以 [preset catalog](../motion/presets/README.md) 为准。
 
-采用最终解析的 size（显式 Prop 优先于 Context）。横向总扩张量由 preset 限制为最多 0.25rem（16px 根字号下左右各 2px），纵向保持原比例；Borderless 隐藏起点与点击缩回同步使用横向补偿。仅启用默认背景动效时复用共享 resizeManager，初始化、尺寸变化和交互开始时刷新几何，不逐帧测量、不新增 DOM。根字号变化时上限随 rem 缩放；圆角随背景分轴缩放。自定义高度 / padding 不重新做纵向补偿。内容、命中区、布局、颜色和时序不变。
+采用最终解析的 size（显式 Prop 优先于 Context）。横向总扩张量由 preset 限制为最多 0.25rem（16px 根字号下左右各 2px），纵向保持原比例；Borderless 隐藏起点与点击缩回同步使用横向补偿。仅启用默认背景动效时复用共享 resizeManager，初始化、尺寸变化和交互开始时刷新几何，不逐帧测量。根字号变化时上限随 rem 缩放；圆角随背景分轴缩放。自定义高度 / padding 不重新做纵向补偿。命中区、布局、颜色和时序不变。内容默认使用相同分轴比例整体缩放，可通过 `contentScaleOnHover={false}` 保留原尺寸。
 
 <a id="hover-配套点击动效"></a>
 
 ### Hover 配套点击动效
 
-启用内置 hover 放大时，每次 click（包括键盘激活）从背景当前显示大小缩回当前尺寸标准 hover 区间的中点，再恢复到 hover 放大大小。所有变体（包括 Borderless）的纵向共享同一规则，横向同步按上述上限补偿：sm 为 `1.06 → 1.03 → 1.06`，md 为 `1.04 → 1.02 → 1.04`，lg 为 `1.03 → 1.015 → 1.03`；具体值以 preset catalog 为准。Borderless 隐藏背景的起点仅用于 hover，不参与点击缩回。缩回与恢复两段各使用 `BUTTON_HOVER_SCALE_UP_MOTION` 一半的时长，保持相同 easing；当前 hover 为 200ms，点击为 100ms 缩回 + 100ms 恢复。文字、Icon、Spinner、命中区与布局保持原尺寸，点击回调、链接和 Toggle 状态立即生效，不等待动效。
+启用内置 hover 放大时，每次 click（包括键盘激活）从背景当前显示大小缩回当前尺寸标准 hover 区间的中点，再恢复到 hover 放大大小。所有变体（包括 Borderless）的纵向共享同一规则，横向同步按上述上限补偿：sm 为 `1.06 → 1.03 → 1.06`，md 为 `1.04 → 1.02 → 1.04`，lg 为 `1.03 → 1.015 → 1.03`；具体值以 preset catalog 为准。Borderless 隐藏背景的起点仅用于 hover，不参与点击缩回。缩回与恢复两段各使用 `BUTTON_HOVER_SCALE_UP_MOTION` 一半的时长，保持相同 easing；当前 hover 为 200ms，点击为 100ms 缩回 + 100ms 恢复。文字、Icon、Spinner 作为整体默认同步缩回 / 恢复；关闭内容缩放时保持原尺寸。命中区与布局保持原尺寸，点击回调、链接和 Toggle 状态立即生效，不等待动效。
 
 `scaleOnHover={false}`、复合控件的默认关闭值、bare、disabled 或显式 `whileHover` 接管时，都不运行这份配套动效。作为其他组件的子 Button 时，同样遵循宿主传递的开关；关闭 hover 放大就同时关闭点击缩放。显式重新开启复合控件子 Button 的 hover 放大时，点击效果也随之开启。连续点击从当前背景尺寸重新播放，不排队；点击结束后按实际 hover 状态恢复背景。减少动效模式直接保留当前 hover / idle 视觉，不播放点击缩放。
 
-实现只在有效点击时读取一次背景 transform，复用已有背景伪元素的 CSS animation；不增加 DOM、Observer、定时器或逐帧 JS 任务。SSR 不读取浏览器 API。
+内容视觉层以 `data-tooltip-anchor-decoration` 声明不改变外层 Tooltip 锚点，避免 hover 缩放中断连续提示。内容使用一个稳定的视觉宿主承载文字、图标及其间距，复用根的对齐与布局设置；开关变化不重建 children。启用内容缩放时通过 `will-change: transform` 保持动画前后的合成层，避免结束时文字重新栅格化产生下移感。背景与内容以按钮中心为缩放原点，复用同一 preset，避免各个叶子独立放大。Borderless 内容从原尺寸开始，背景仍保留隐藏起点，两者同时收敛到相同 hover 比例。减少动效时直接提交最终比例，无过渡或点击缩放。
+
+有效点击只读取背景与内容各自当前 transform，连续点击从当前画面接管；不增加 Observer、定时器或逐帧 JS 任务。SSR 不读取浏览器 API。
+
+```svelte
+<Button>内容默认跟随背景</Button>
+<Button contentScaleOnHover={false}>仅背景放大</Button>
+<Button scaleOnHover={false}>背景与内容均不放大</Button>
+```
 
 <a id="buttongroup-嵌入态"></a>
 
@@ -472,6 +481,11 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志
+
+### v2.19.0 (2026-09-27)
+
+- 新增 contentScaleOnHover，内容默认作为整体跟随背景 hover 与点击缩放；可独立关闭。背景不缩放时内容也不缩放，布局与命中区保持不变。
+- 修复 hover 缩放结束时文字重绘造成的视觉下移；sm / md / lg 覆盖动画尾帧与结束帧的像素一致性回归。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
