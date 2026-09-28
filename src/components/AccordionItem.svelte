@@ -49,6 +49,7 @@
     let contentElement = $state<HTMLElement | null>(null);
     let contentBlockSize = $state(0);
 
+    const indicatorVariant = $derived(accordion?.indicatorVariant ?? "cross");
     const open = $derived(accordion?.isOpen(value) ?? false);
     const itemDisabled = $derived(disabled || accordion?.disabled === true);
     const triggerId = $derived(
@@ -86,7 +87,7 @@
             return;
         }
 
-        const iconName = open ? "minus" : "plus";
+        const iconName = indicatorVariant === "minus" && open ? "minus" : "plus";
         if (!indicator) {
             indicator = document.createElement("span");
             indicator.className =
@@ -111,7 +112,15 @@
 
     function updateContentBlockSize() {
         if (!contentElement) return;
-        contentBlockSize = contentElement.scrollHeight;
+        // Measure content independently of the animated padding. Including it
+        // retargets the opening transition every frame while closing keeps a
+        // fixed target, making equal-height item switches dip and rebound.
+        const computed = getComputedStyle(contentElement);
+        contentBlockSize = Math.max(0, Math.round(
+            contentElement.scrollHeight
+                - parseFloat(computed.paddingTop)
+                - parseFloat(computed.paddingBottom),
+        ));
     }
 
     function syncRoleElements() {
@@ -120,7 +129,6 @@
 
         titleElement?.classList.add(
             "snowui-accordion-title-item",
-            "snowui-hoverable",
         );
         contentElement?.classList.add("snowui-accordion-content");
 
@@ -158,20 +166,6 @@
         return title === titleElement && title?.parentElement === itemElement;
     }
 
-    function isContentEventTarget(target: EventTarget | null) {
-        if (!itemElement || !target) return false;
-        const content = (target as Element).closest?.('[data-as="content"]');
-        return content === contentElement && content?.parentElement === itemElement;
-    }
-
-    function isInteractiveContentTarget(target: EventTarget | null) {
-        if (!(target instanceof Element) || !contentElement) return false;
-        const interactive = target.closest(
-            'a, button, input, label, select, textarea, summary, [role="button"], [role="link"], [role="checkbox"], [role="menuitem"], [contenteditable]:not([contenteditable="false"])',
-        );
-        return !!interactive && contentElement.contains(interactive);
-    }
-
     function toggle() {
         if (itemDisabled) return;
         accordion?.toggle(value);
@@ -182,13 +176,6 @@
             toggle();
             return;
         }
-        if (
-            !open ||
-            event.defaultPrevented ||
-            !isContentEventTarget(event.target) ||
-            isInteractiveContentTarget(event.target)
-        ) return;
-        toggle();
     }
 
     function handleKeydown(event: KeyboardEvent) {
@@ -213,6 +200,7 @@
     $effect(() => {
         value;
         open;
+        indicatorVariant;
         itemDisabled;
         triggerId;
         contentId;
@@ -237,6 +225,7 @@
         .filter(Boolean)
         .join(" ")}
     data-open={open ? "true" : "false"}
+    data-indicator-variant={indicatorVariant}
     data-disabled={itemDisabled ? "true" : undefined}
     onclick={handleClick}
     onkeydown={handleKeydown}
@@ -326,10 +315,6 @@
         cursor: default;
     }
 
-    :global(:where(.snowui-accordion[data-continuous-hover-enabled="true"] .snowui-accordion-title-item)) {
-        --snowui-hover-overlay-opacity: 0%;
-    }
-
     :global(:where(.snowui-accordion-title-item > :not([data-as]))),
     :global(:where(.snowui-accordion-content > :not([data-as]))) {
         min-width: 0;
@@ -359,6 +344,10 @@
     }
 
     :global(:where(.snowui-accordion-item[data-open="true"]) .snowui-accordion-indicator) {
+        transform: rotate(45deg);
+    }
+
+    :global(:where(.snowui-accordion-item[data-open="true"][data-indicator-variant="minus"]) .snowui-accordion-indicator) {
         transform: rotate(180deg);
     }
 
@@ -411,7 +400,10 @@
             --snowui-accordion-item-content-block-size-override,
             var(
                 --snowui-accordion-content-max-block-size-override,
-                var(--snowui-accordion-item-content-block-size, 100vh)
+                calc(
+                    var(--snowui-accordion-item-content-block-size, 100vh)
+                    + var(--snowui-accordion-content-padding-y-override, var(--snowui-accordion-content-padding-y))
+                )
             )
         );
         padding-bottom: var(
@@ -422,12 +414,9 @@
         pointer-events: auto;
     }
 
-    :global(:where(.snowui-accordion-item[data-open="true"]:not([data-disabled="true"]) > .snowui-accordion-content)) {
-        cursor: pointer;
-    }
-
     @media (prefers-reduced-motion: reduce) {
-        :global(:where(.snowui-accordion-content)) {
+        :global(:where(.snowui-accordion-content)),
+        :global(:where(.snowui-accordion-indicator)) {
             transition: none;
             will-change: auto;
         }

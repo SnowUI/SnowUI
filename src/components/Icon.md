@@ -16,6 +16,7 @@
 
 - 优先提供资源图标；src 与解析后的 icon 均未命中时才渲染 children。
 - size 可继承父级尺寸；角标使用 Badge as="badge"。交互名称应提供给拥有操作的按钮。
+- Accordion 内的 `Icon as="leading"` 在未显式指定 `size` 时继承 Accordion 图标尺寸：sm/md/lg 分别为 16/20/24；未声明 leading 的 Icon 不参与这项继承，显式 `size` 优先。
 <!-- usage-guide:end -->
 
 ## 快速开始

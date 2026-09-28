@@ -75,9 +75,9 @@
 - 直系 `Frame as="title" row` 作为标题触发器，固定启用三槽位布局；直系 `as="leading"`、普通内容与直系 `as="trailing"` 分别落入三槽位。
 - 直系 `Frame as="content" row` 作为内容区，同样固定启用三槽位布局；折叠时保持宽度，使用向下高度收起与透明度渐隐。
 - title 继承父级 Accordion 或外层容器的 `color`；content 默认消费父 Accordion 的 `--snowui-accordion-content-color`，使用主题自适应 `Black/40%` 次要文字色。
-- title 默认通过包内 `ComponentIcon` 解析 `plus / minus` trailing 图标；无外部 Provider 或 resolver 未命中时使用随包内置图形，不需要安装 `resource-svelte`。展开 / 收起时切换 `+ / -`，整颗图标容器旋转半圈，动效时序消费 Frame motion bridge。外部在 title 内提供直系 `as="trailing"` 子项时，默认图标隐藏。
-- hover 背景由父级 Accordion 的唯一 Continuous Hover Background 表达：收起时覆盖 title，展开时覆盖整个 item。`continuousHover=false` 时 title 恢复普通 hover overlay。
-- 展开 content 的非交互区域点击会收起当前项；Link、Button、表单控件、交互 role 与可编辑内容不触发父项收起。
+- 默认通过 ComponentIcon plus 渲染同一图形，展开时旋转 45° 成为 ×；父 Accordion 的 indicatorVariant="minus" 保留 plus/minus 替换及半圈旋转。外置 trailing 优先。
+- 无 hover 背景；只有标题 hover 时默认指示图标颜色变化。
+- 仅 title 可切换展开状态，正文区域的点击不收起。所有尺寸的正文默认与标题字号、行高一致。
 
 <a id="样式变量链"></a>
 
@@ -149,11 +149,13 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 | :--- | :--- | :--- |
 | `value` | Context 查询 | 与 Accordion 当前展开值匹配 |
 | `disabled` | title DOM 属性 | 输出 `aria-disabled` 并阻止 title 交互 |
-| 展开 content 点击 | Item 事件委托 | 非交互区域收起；交互后代保持自身行为 |
+| content 点击 | 不切换展开状态 | 文字、空白及内部交互元素均保留自身行为 |
 
 ---
 
 ## 更新日志
+
+- 2026-09-28：只有标题可切换；移除 hover 背景；默认图标不换形，只旋转为 ×，旧 minus 模式仍可选。正文默认字号与标题一致。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
@@ -213,3 +215,7 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 
 #### 新功能
 - 新增 AccordionItem，统一承载 Accordion 标题项与内容项。
+
+### 展开高度测量
+
+默认展开目标为正文自然高度加展开后的下内边距。自然高度测量排除当前动画中的内边距，避免每帧重设展开目标；单选模式切换等高正文时，展开与收起使用同一高度曲线，不产生先收缩再回弹。显式最大高度覆盖仍按原值生效。

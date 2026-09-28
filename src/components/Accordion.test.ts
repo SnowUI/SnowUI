@@ -127,17 +127,14 @@ export const examples = [
         logic: ["disabled-item"],
     },
     {
-        name: "D2: continuous hover opt-out",
+        name: "D2: 加减号兼容模式",
         code: `D2
-<Accordion continuousHover={false} variant="filled" size="md" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
+<Accordion indicatorVariant="minus" defaultValue="shipping" style="width: min(100%, 31.25rem);">${items}
 </Accordion>`,
         expected: {
-            render: "默认 Accordion 只创建一个整项 Continuous Hover 背景；关闭后不创建共享层。",
-            layout: "共享层在收起项匹配 title 高度，在展开项匹配 title 与 content 的完整实时高度。",
-            interaction: "默认背景在 Item 间连续移动；disabled Item 阻断背景；关闭后恢复 title 普通 hover。",
-            performance: "容器级 rAF 与共享 ResizeObserver 追踪 Item，不为每个 Item 创建视觉层。",
-            responsive: "展开动效和宽度变化期间重新测量当前 Item。",
+            render: "展开使用减号；默认模式则为加号旋转成 ×。",
+            interaction: "仅标题点击可切换，正文点击不收起；hover 只有指示图标颜色变化。",
         },
-        logic: ["ContinuousHover", "ExpandedGeometry", "DisabledBlocker", "OptOut"],
+        logic: ["IndicatorVariant", "TitleOnly"],
     },
 ] as const;

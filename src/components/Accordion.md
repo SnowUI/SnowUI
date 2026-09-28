@@ -16,6 +16,7 @@
 
 - `type="single"` 使用字符串值，`multiple` 使用数组；`bind:value` 同步展开项，`defaultValue` 只提供初始状态。
 - `items` 模式使用索引字符串作为值；显式 children 替换 items，子项自行配置，不读取默认子项的 parts。
+- Accordion 内的 `Icon as="leading"` 在未显式指定 `size` 时继承 Accordion 图标尺寸：sm/md/lg 分别为 16/20/24；未声明 leading 的 Icon 不参与这项继承，显式 `size` 优先。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -65,7 +66,8 @@
 | variant | `AccordionVariant` | `"filled"` | filled 为带背景的独立折叠项；divided 使用项间分割线。两者共享展开状态与交互。 |
 | size | `AccordionSize` | — | 尺寸密度；显式值优先，其次父级尺寸上下文，再回退 md。统一控制标题、正文、间距及子项尺寸。 |
 | disabled | `boolean` | `false` | 禁用整个 Accordion。 |
-| continuousHover | `boolean` | `true` | 是否使用容器级唯一连续 hover 背景；关闭后恢复 title 的普通 hover。 |
+| continuousHover | `boolean` | `false` | 已弃用，仅保留调用兼容；任意值均不再显示 hover 背景。 |
+| indicatorVariant | `"cross" \| "minus"` | `"cross"` | cross 使用同一个加号旋转 45° 成为 ×；minus 保留加号/减号切换与半圈旋转。自定义 trailing 替换默认图标。 |
 | role | `string` | `"presentation"` | 根容器的 ARIA role；默认仅作展示分组，标题触发器与内容 region 的语义仍由 AccordionItem 管理。 |
 | items | `AccordionEntry[]` | `[]` | 默认内置模式的数据；内部 value 使用数组索引字符串。 |
 | children | `Snippet` | — | 显式组合内容；存在时替换内置 items。 |
@@ -87,9 +89,9 @@
 - 支持 `variant="filled" | "divided"` 两种视觉形态。
 - 支持 `size="sm" | "md" | "lg"` 三档密度。
 - 展开正文默认使用主题自适应的 `Black/40%` 次要文字色；标题继续继承宿主前景色。
-- 默认使用唯一的 Continuous Hover Background 在 AccordionItem 之间连续移动；展开项的 hover 覆盖 title 与完整 content 区域。
-- 展开项的非交互内容区域均可点击收起；Link、Button、输入控件等交互后代保留自身行为，不触发收起。
-- 默认 trailing 图标通过包内 `ComponentIcon` 解析 `plus / minus`，无外部 Provider 或 resolver 未命中时使用随包内置的 `+ / -`，展开 / 收起时整颗图标使用 Frame motion bridge 时序旋转半圈；外部提供直系 `as="trailing"` 时会替换默认图标。
+- hover 不显示背景，只改变标题内默认指示图标的颜色。
+- 仅标题可点击展开或收起；正文文字、空白和交互后代均不触发切换。
+- 默认 `indicatorVariant="cross"` 复用同一个 ComponentIcon plus，仅旋转 45° 得到 ×；`indicatorVariant="minus"` 保留旧 plus/minus 切换和半圈旋转。外置 trailing 继续替换默认图标。
 
 ---
 
@@ -127,7 +129,7 @@ padding 归属：`Frame as="title"` 负责可点击区 padding；`Frame as="cont
 gap 归属：Root 通过 `--snowui-accordion-gap` 管理子项间距；Title 与 Content 内部槽位间距由 `--snowui-accordion-trigger-gap` 管理。
 滚动归属：Accordion 自身不创建滚动区。
 
-hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，以直接 AccordionItem 为候选项；收起项匹配 title 高度，展开项匹配 title + content 的实时完整高度。disabled item 是明确阻断区，不参与最近项推断。关闭 `continuousHover` 后不创建共享层，并恢复 title 的普通 hover overlay。
+hover 归属：标题 hover 仅改变默认指示图标的透明度，不创建共享背景层，也不启用 title hover overlay。
 
 设计稿映射：
 
@@ -148,8 +150,8 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 | :--- | :--- | :--- |
 | `--snowui-accordion-font-size` | `var(--text-16)` | md 标题字号；sm/lg 分别映射 `--text-14` / `--text-18` |
 | `--snowui-accordion-line-height` | `var(--leading-16)` | md 标题行高；sm/lg 分别映射 `--leading-14` / `--leading-18` |
-| `--snowui-accordion-content-font-size` | `var(--text-14)` | md 正文字号；sm/lg 分别映射 `--text-12` / `--text-16` |
-| `--snowui-accordion-content-line-height` | `var(--leading-14)` | md 正文行高；sm/lg 分别映射 `--leading-12` / `--leading-16` |
+| `--snowui-accordion-content-font-size` | 标题字号 | sm/md/lg 正文与标题均为 14/16/18px；保留正文显式覆盖入口 |
+| `--snowui-accordion-content-line-height` | 标题行高 | 默认随同尺寸标题行高 |
 | `--snowui-accordion-content-color` | `var(--black-40)` | 正文默认使用 40% 黑色语义 Token；Dark 主题自动映射为 40% 白色 |
 | `--snowui-accordion-content-color-override` | - | 局部覆盖正文文字颜色；不影响标题 |
 | `--snowui-accordion-padding-y` | `var(--padding-3)` | md Title 纵向 padding |
@@ -174,7 +176,7 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 - Title 输出 `aria-expanded`、`aria-controls`。
 - Content 输出 `role="region"` 与 `aria-labelledby`。
 - 禁用 Title 输出 `aria-disabled="true"`，并从 tab 顺序中移除。
-- 键盘 button 语义仍只归属 Title；展开 content 的普通指针点击可收起，但 Link、Button、Input、Label、Select、Textarea、Summary、显式交互 role 与可编辑区域不会触发父项收起。
+- 指针及键盘切换语义只归属 Title；正文文字、空白与交互控件的点击均不改变展开状态。
 
 <a id="使用示例"></a>
 
@@ -229,7 +231,6 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 | 类别 | 关键字 | 描述 |
 | :--- | :--- | :--- |
 | CSS 类名 | `snowui-accordion` | 根元素类名 |
-| CSS 类名 | `snowui-accordion-continuous-hover-layer` | Accordion 唯一连续 hover 背景层 |
 | Context Key | `ACCORDION_CONTEXT_KEY` | Accordion 与 AccordionItem 通信 |
 
 ### 模块索引
@@ -248,7 +249,7 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 | `value` / `defaultValue` | 状态逻辑 | 受控值优先 |
 | `variant` / `size` | CSS 类 | 映射为 `.snowui-accordion-{variant}` 与 `.snowui-accordion-{size}` |
 | `disabled` | Frame + Context | 根禁用并阻断所有 title 交互 |
-| `continuousHover` | ContinuousHoverController | 控制整项连续 hover；disabled item 作为阻断区 |
+| `indicatorVariant` | AccordionContext | 选择默认 cross 或兼容 minus 指示图标 |
 | `items` | 默认内置 | 生成 AccordionItem + Frame title/content |
 | `children` | Snippet | 显式组合内容；存在时替换 items |
 | `...rest` | Frame 透传 | 保留 `as`、事件、状态、动效等 Frame 能力 |
@@ -262,6 +263,8 @@ hover 归属：Root 使用 `ContinuousHoverController` 创建唯一背景层，�
 ---
 
 ## 更新日志
+
+- 2026-09-28：取消 hover 背景与正文点击收起；默认加号旋转为 ×，新增 indicatorVariant="minus" 保留旧模式；各尺寸正文与标题字号一致。continuousHover 保留为无效兼容参数。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

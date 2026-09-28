@@ -31,6 +31,7 @@
     import {
         ICON_CONTEXT_KEY,
         getAvatar,
+        getAccordion,
         getIcon,
         getImage,
         getImageViewer,
@@ -84,6 +85,7 @@
 
     // Contexts
     const avatarCtx = getAvatar();
+    const accordionCtx = getAccordion();
     const iconCtx = getIcon();
     const imageCtx = getImage();
     const imageViewerCtx = getImageViewer();
@@ -114,7 +116,12 @@
     const DOT_SIZE_EM = 0.25;
 
     // Calculate Styles
-    let effectiveSize = $derived(size ?? contextSize ?? childSize ?? 16);
+    const accordionLeadingSize = $derived(
+        accordionCtx && as === "leading"
+            ? "var(--snowui-accordion-icon-size-override, var(--snowui-accordion-icon-size))"
+            : undefined,
+    );
+    let effectiveSize = $derived(size ?? accordionLeadingSize ?? contextSize ?? childSize ?? 16);
     const DEFAULT_ICON_SIZE_TOKEN = DEFAULT_RESOURCE_SIZE_TOKEN;
     let sizeRem = $derived(resolveResourceSizeToken(effectiveSize));
 

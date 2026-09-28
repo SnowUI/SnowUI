@@ -331,6 +331,7 @@ export type AccordionType = "single" | "multiple";
 export type AccordionValue = string | string[];
 
 export interface AccordionContext {
+    readonly indicatorVariant: "cross" | "minus";
     readonly accordionId: string;
     readonly disabled: boolean;
     readonly type: AccordionType;

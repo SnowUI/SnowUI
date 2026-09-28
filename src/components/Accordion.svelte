@@ -20,8 +20,6 @@
     import { getSize, type AccordionValue, type AccordionType } from "../context";
     import { ACCORDION_CONTEXT_KEY } from "../keys";
     import { RESIZE_MOTION_STYLE } from "../motion/presets/resize";
-    import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
-    import { ContinuousHoverController } from "../logic/continuous-hover.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
 
     type AccordionVariant = "filled" | "divided";
@@ -40,8 +38,9 @@
         variant?: AccordionVariant;
         size?: AccordionSize;
         disabled?: boolean;
-        /** AccordionItem 之间是否使用容器级连续 hover 背景。 */
+        /** @deprecated 保留兼容；Accordion 不再显示 hover 背景。 */
         continuousHover?: boolean;
+        indicatorVariant?: "cross" | "minus";
         role?: string;
         items?: AccordionEntry[];
         children?: Snippet;
@@ -61,7 +60,8 @@
         variant = "filled",
         size = undefined,
         disabled = false,
-        continuousHover = true,
+        continuousHover = false,
+        indicatorVariant = "cross",
         role = "presentation",
         items = [],
         children,
@@ -75,20 +75,6 @@
 
     const instanceId = `snowui-accordion-${++accordionIdSeed}`;
     let accordionElement = $state<HTMLElement>();
-    const continuousHoverController = new ContinuousHoverController();
-    $effect(() => {
-        if (!accordionElement) return;
-        return continuousHoverController.attach(accordionElement, {
-            selector: ":scope > .snowui-accordion-item",
-            layerClass:
-                "snowui-accordion-continuous-hover-layer snowui-rounded-rectangle",
-            axis: "y",
-            enabled: continuousHover,
-            blockedSelector:
-                '.snowui-accordion-item[data-disabled="true"]',
-        });
-    });
-    $effect(() => continuousHoverController.setEnabled(continuousHover));
     const contextSize = getSize();
     const resolvedSize = $derived.by<AccordionSize>(() => {
         if (size) return size;
@@ -150,6 +136,9 @@
         get disabled() {
             return disabled;
         },
+        get indicatorVariant() {
+            return indicatorVariant;
+        },
         get type() {
             return type;
         },
@@ -189,7 +178,7 @@
         radius: userRenderHints?.radius ?? "var(--radius-4)",
     }}
     {disabled}
-    style={[RESIZE_MOTION_STYLE, CONTINUOUS_HOVER_MOTION_STYLE, style]
+    style={[RESIZE_MOTION_STYLE, style]
         .filter(Boolean)
         .join("; ")}
     {...rest}
@@ -228,8 +217,8 @@
     :global(:where(.snowui-accordion)) {
         --snowui-accordion-font-size: var(--text-14);
         --snowui-accordion-line-height: var(--leading-14);
-        --snowui-accordion-content-font-size: var(--text-12);
-        --snowui-accordion-content-line-height: var(--leading-12);
+        --snowui-accordion-content-font-size: var(--snowui-accordion-font-size-override, var(--snowui-accordion-font-size));
+        --snowui-accordion-content-line-height: var(--snowui-accordion-line-height-override, var(--snowui-accordion-line-height));
         --snowui-accordion-content-color: var(--black-40, #00000066);
         --snowui-accordion-padding-y: var(--padding-2);
         --snowui-accordion-padding-x: var(--padding-2);
@@ -261,8 +250,8 @@
     :global(:where(.snowui-accordion-sm)) {
         --snowui-accordion-font-size: var(--text-14);
         --snowui-accordion-line-height: var(--leading-14);
-        --snowui-accordion-content-font-size: var(--text-12);
-        --snowui-accordion-content-line-height: var(--leading-12);
+        --snowui-accordion-content-font-size: var(--snowui-accordion-font-size-override, var(--snowui-accordion-font-size));
+        --snowui-accordion-content-line-height: var(--snowui-accordion-line-height-override, var(--snowui-accordion-line-height));
         --snowui-accordion-padding-y: var(--padding-2);
         --snowui-accordion-padding-x: var(--padding-2);
         --snowui-accordion-content-padding-y: var(--padding-2);
@@ -274,8 +263,8 @@
     :global(:where(.snowui-accordion-md)) {
         --snowui-accordion-font-size: var(--text-16);
         --snowui-accordion-line-height: var(--leading-16);
-        --snowui-accordion-content-font-size: var(--text-14);
-        --snowui-accordion-content-line-height: var(--leading-14);
+        --snowui-accordion-content-font-size: var(--snowui-accordion-font-size-override, var(--snowui-accordion-font-size));
+        --snowui-accordion-content-line-height: var(--snowui-accordion-line-height-override, var(--snowui-accordion-line-height));
         --snowui-accordion-padding-y: var(--padding-3);
         --snowui-accordion-padding-x: var(--padding-2);
         --snowui-accordion-content-padding-y: var(--padding-3);
@@ -287,8 +276,8 @@
     :global(:where(.snowui-accordion-lg)) {
         --snowui-accordion-font-size: var(--text-18);
         --snowui-accordion-line-height: var(--leading-18);
-        --snowui-accordion-content-font-size: var(--text-16);
-        --snowui-accordion-content-line-height: var(--leading-16);
+        --snowui-accordion-content-font-size: var(--snowui-accordion-font-size-override, var(--snowui-accordion-font-size));
+        --snowui-accordion-content-line-height: var(--snowui-accordion-line-height-override, var(--snowui-accordion-line-height));
         --snowui-accordion-padding-y: var(--padding-4);
         --snowui-accordion-padding-x: var(--padding-2);
         --snowui-accordion-content-padding-y: var(--padding-4);
