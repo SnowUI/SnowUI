@@ -82,7 +82,7 @@ export const examples = [
         logic: ["SB-Init.2", "SB-Init.7"],
     },
     {
-        name: "SB-04：长列表滚动与覆盖 Footer",
+        name: "SB-04：长列表滚动与固定 Footer",
         code: `SB-04
 <Frame style="width: 220px; height: 28rem; align-items: flex-start;">
     <Sidebar activeItemId="dashboard">
@@ -110,8 +110,8 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "长列表、滚动条与底部用户 Footer 同时可见",
-            layout: "根 padding 左右 12px / 上下 16px，纵向滚动条距 Sidebar 右边框 4px；Logo 区上下间距与渐隐带均为 4px；Footer 不带示例自定义样式，内容整体位于容器左上方，内部横向排列并在同一水平线上居中，gap 与四边 padding 均为 8px",
-            interaction: "向下滚动时 Logo 下方使用通用 scroll mask 渐隐；Footer 保持固定，条目从透明模糊区域下方经过；滚动到底后最后一个 Item 完整停在 Footer 上方并保持固定 12px 间距",
+            layout: "根 padding 左右 12px / 上下 16px，纵向滚动条距 Sidebar 右边框 4px；Logo 区上下 padding 为 4px，渐隐覆盖整个固定区并与 Footer 方向相反；Footer 不带示例自定义样式，内容整体位于容器左上方，内部横向排列并在同一水平线上居中，gap 为 8px；Footer 全宽贴底，padding 上 12px、下 16px、左右 20px",
+            interaction: "向下滚动时列表进入 Logo 区域，采用与 Footer 镜像的 0% / 80% / 100% 遮盖曲线；Footer 保持固定，滚动内容在 Footer 顶部仍清晰，向下 20% 高度保留 20% 可见度，到 40% 完全渐隐；Footer 无圆角，滚动到底后最后一个 Item 完整停在 Footer 上方",
             performance: "Footer 只定位一次，不参与列表滚动与重复渲染",
             responsive: "Sidebar 高度由 28rem 宿主约束，内容溢出仅产生纵向滚动；Footer 内容高度变化时底部安全区自动更新",
         },
@@ -186,7 +186,7 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "刷新后恢复各 Section 的展开 / 折叠状态与最后选中的 active item。",
-            layout: "列表可滚动时，恢复后的 active item 尽量位于扣除 Footer 安全区后的可视中心；首尾按滚动边界夹紧。",
+            layout: "列表可滚动时，恢复后的 active item 尽量位于Body 实际可视中心；首尾按滚动边界夹紧。",
             interaction: "若 active item 所属 Section 上次被折叠，刷新后该 Section 自动展开；hover Section 标题或两个折叠标题之间的空隙时共享 hover 层隐藏，不点亮下方最近 Item；整体折叠后 Item 仍显示连续 hover 背景，直接进入折叠按钮预期位置也会显示按钮。",
             performance: "默认使用 snowui:sidebar:default 命名空间读写 localStorage；恢复后进行即时与动效结束后的两次定位校正。多实例通过不同 persistenceKey 隔离。",
             responsive: "Section 内容折叠时卸载；active item 的 Section 归属由 Sidebar 独立记忆。",

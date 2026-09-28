@@ -192,6 +192,8 @@
     let hasExternalLogo = $state(false);
     let hasExternalFooter = $state(false);
     let resizing = $state(false);
+    let measuredFooterHeight = $state(0);
+    let measuredHeaderHeight = $state(0);
     let footerMeasureFrame = 0;
     let resizeEndFrame = 0;
     let logoPlacementFrame = 0;
@@ -206,6 +208,8 @@
     const rootStyle = $derived(
         [
             `--snowui-sidebar-width: ${resolvedWidth}px`,
+            `--snowui-sidebar-footer-measured-height: ${measuredFooterHeight}px`,
+            `--snowui-sidebar-header-measured-height: ${measuredHeaderHeight}px`,
             `--snowui-sidebar-width-motion-duration: ${enableDefaultMotion ? widthMotionTiming.duration : 0}ms`,
             `--snowui-sidebar-width-motion-easing: ${widthMotionTiming.easing}`,
             userStyle,
@@ -322,16 +326,10 @@
     function syncFooterSafeArea() {
         if (!rootElement || !footerElement) return;
         const footerHeight = footerElement.getBoundingClientRect().height;
-        const nextHeight = `${footerHeight}px`;
-        if (
-            rootElement.style.getPropertyValue(
-                "--snowui-sidebar-footer-measured-height",
-            ) !== nextHeight
-        ) {
-            rootElement.style.setProperty(
-                "--snowui-sidebar-footer-measured-height",
-                nextHeight,
-            );
+        measuredHeaderHeight = headerElement?.getBoundingClientRect().height ?? 0;
+        // 与宽度共用声明式 style，避免拖宽重写根样式时清掉底部预留高度。
+        if (measuredFooterHeight !== footerHeight) {
+            measuredFooterHeight = footerHeight;
             if (persistenceReady && resolvedActiveItemId) {
                 scheduleActiveItemReveal();
             }
@@ -346,8 +344,10 @@
     function syncBodyScrollMask() {
         if (!bodyViewport) return;
         bodyViewport.classList.add("snowui-scroll-mask");
-        if (bodyViewport.scrollTop > 1) {
-            bodyViewport.dataset.scrollMask = "top";
+        const top = bodyViewport.scrollTop > 1;
+        const bottom = hasExternalFooter && !isCollapsed;
+        if (top || bottom) {
+            bodyViewport.dataset.scrollMask = top && bottom ? "both" : top ? "top" : "bottom";
         } else {
             bodyViewport.removeAttribute("data-scroll-mask");
         }
@@ -396,14 +396,8 @@
 
         const viewportRect = bodyViewport.getBoundingClientRect();
         const itemRect = item.getBoundingClientRect();
-        const footerOcclusion =
-            hasExternalFooter && !isCollapsed
-                ? (footerElement?.getBoundingClientRect().height ?? 0) + 12
-                : 0;
-        const visibleHeight = Math.max(
-            itemRect.height,
-            viewportRect.height - footerOcclusion,
-        );
+        const headerOcclusion = parseFloat(getComputedStyle(navigationElement!).paddingTop) || 0;
+        const visibleHeight = Math.max(itemRect.height, viewportRect.height - headerOcclusion - (hasExternalFooter && !isCollapsed ? measuredFooterHeight : 0));
         const itemCenterInContent =
             bodyViewport.scrollTop +
             itemRect.top -
@@ -415,7 +409,7 @@
         );
         bodyViewport.scrollTop = Math.min(
             maxScroll,
-            Math.max(0, itemCenterInContent - visibleHeight / 2),
+            Math.max(0, itemCenterInContent - headerOcclusion - visibleHeight / 2),
         );
         syncBodyScrollMask();
     }
@@ -510,7 +504,7 @@
         if (navigationElement) observer.observe(navigationElement, { childList: true });
         if (headerElement) observer.observe(headerElement, { childList: true });
         if (footerElement) observer.observe(footerElement, { childList: true });
-        const resizeCleanups = [bodyViewport, navigationElement, footerElement]
+        const resizeCleanups = [bodyViewport, navigationElement, footerElement, headerElement]
             .filter((element): element is HTMLElement => Boolean(element))
             .map((element) => resizeManager.watch(element, handleResize));
         scheduleFooterSafeAreaSync();
@@ -619,7 +613,7 @@
 
     <footer
         bind:this={footerElement}
-        class="snowui-sidebar-footer snowui-rounded-rectangle"
+        class="snowui-sidebar-footer"
         data-has-footer={hasExternalFooter ? "true" : undefined}
         aria-hidden={isCollapsed ? "true" : undefined}
         inert={isCollapsed}
@@ -717,6 +711,9 @@
         transition: none;
     }
     :global(:where(.snowui-sidebar-header)) {
+        position: relative;
+        z-index: 1;
+        flex-shrink: 0;
         display: flex;
         width: 100%;
         min-height: 28px;
@@ -807,11 +804,12 @@
         pointer-events: auto;
     }
     :global(:where(.snowui-sidebar-body)) {
-        --snowui-scroll-mask-top-size-override: var(
-            --snowui-sidebar-logo-scroll-mask-size-override,
-            var(--padding-1)
-        );
-        --snowui-scroll-mask-top-solid-ratio-override: 0;
+        --snowui-sidebar-header-region-height: calc(
+            var(--snowui-sidebar-header-measured-height, 0px) +
+            var(--snowui-sidebar-padding-y-override, var(--snowui-sidebar-padding-y)) +
+            var(--snowui-sidebar-gap-override, var(--snowui-sidebar-gap)));
+        margin-top: calc(-1 * var(--snowui-sidebar-header-region-height));
+        isolation: isolate;
         width: 100%;
         flex: 1 1 auto;
         min-height: 0;
@@ -830,6 +828,7 @@
         );
     }
     :global(:where(.snowui-sidebar-navigation)) {
+        padding-top: var(--snowui-sidebar-header-region-height);
         display: flex;
         min-width: 0;
         box-sizing: border-box;
@@ -872,59 +871,48 @@
         border-radius: var(--snowui-sidebar-item-radius-override, var(--radius-3));
         background: var(--snowui-sidebar-item-background-override, var(--black-4, #0000000a));
     }
+    :global(:where(.snowui-sidebar[data-has-footer="true"]:not([data-collapsed="true"]) .snowui-sidebar-body)) {
+        /* 滚动内容延伸至底部，由 alpha 遮罩按 Footer 高度逐渐隐去。 */
+        margin-bottom: calc(-1 * var(--snowui-sidebar-padding-y-override, var(--snowui-sidebar-padding-y)));
+        isolation: isolate;
+    }
     :global(:where(.snowui-sidebar[data-has-footer="true"]:not([data-collapsed="true"]) .snowui-sidebar-navigation)) {
-        padding-bottom: calc(
-            var(--snowui-sidebar-footer-measured-height, 0px) +
-                var(--gap-3)
-        );
+        padding-bottom: calc(var(--snowui-sidebar-footer-measured-height, 0px) + var(--gap-3));
+    }
+    :global(:where(.snowui-sidebar-body > .snowui-scroll-area-viewport)) {
+        --snowui-sidebar-mask-top: var(--snowui-sidebar-logo-scroll-mask-size-override, var(--snowui-sidebar-header-region-height));
+        --snowui-sidebar-mask-bottom: 0px;
+        /* 两端互为镜像：进入固定区 20% 后仅余 20% 可见度，40% 后完全隐藏。 */
+        --snowui-sidebar-edge-mask: linear-gradient(to bottom,
+            transparent calc(var(--snowui-sidebar-mask-top) * 0.6),
+            rgb(0 0 0 / 0.2) calc(var(--snowui-sidebar-mask-top) * 0.8),
+            #000 var(--snowui-sidebar-mask-top),
+            #000 calc(100% - var(--snowui-sidebar-mask-bottom)),
+            rgb(0 0 0 / 0.2) calc(100% - var(--snowui-sidebar-mask-bottom) * 0.8),
+            transparent calc(100% - var(--snowui-sidebar-mask-bottom) * 0.6));
+        mask-image: var(--snowui-sidebar-edge-mask);
+        -webkit-mask-image: var(--snowui-sidebar-edge-mask);
     }
     :global(:where(.snowui-sidebar[data-has-footer="true"]:not([data-collapsed="true"]) .snowui-sidebar-body > .snowui-scroll-area-viewport)) {
-        scroll-padding-bottom: calc(
-            var(--snowui-sidebar-footer-measured-height, 0px) +
-                var(--gap-3)
-        );
+        --snowui-sidebar-mask-bottom: var(--snowui-sidebar-footer-measured-height, 0px);
     }
     :global(:where(.snowui-sidebar-footer)) {
         position: absolute;
         z-index: 1;
         display: flex;
-        bottom: var(--snowui-sidebar-padding-y-override, var(--snowui-sidebar-padding-y));
-        left: var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
-        width: calc(
-            var(--snowui-sidebar-width-override, var(--snowui-sidebar-width)) -
-                var(
-                    --snowui-sidebar-padding-x-override,
-                    var(--snowui-sidebar-padding-x)
-                ) -
-                var(
-                    --snowui-sidebar-padding-x-override,
-                    var(--snowui-sidebar-padding-x)
-                )
-        );
+        bottom: 0;
+        left: 0;
+        width: var(--snowui-sidebar-width-override, var(--snowui-sidebar-width));
         box-sizing: border-box;
         align-items: flex-start;
         justify-content: flex-start;
         gap: var(--snowui-sidebar-footer-gap-override, var(--gap-2));
-        padding: var(
-                --snowui-sidebar-footer-padding-y-override,
-                var(--padding-2)
-            )
-            var(
-                --snowui-sidebar-footer-padding-x-override,
-                var(--padding-2)
-            );
+        padding: var(--snowui-sidebar-footer-padding-y-override, var(--padding-3))
+            var(--snowui-sidebar-footer-padding-x-override, var(--padding-5))
+            var(--snowui-sidebar-footer-padding-y-override, var(--padding-4));
         overflow: hidden;
-        border-radius: var(
-            --snowui-sidebar-footer-radius-override,
-            var(--radius-3)
-        );
+        border-radius: 0;
         background: transparent;
-        -webkit-backdrop-filter: blur(
-            var(--snowui-sidebar-footer-background-blur-override, 20px)
-        );
-        backdrop-filter: blur(
-            var(--snowui-sidebar-footer-background-blur-override, 20px)
-        );
         opacity: 1;
         transition: opacity
             var(--snowui-sidebar-width-motion-duration, 500ms)

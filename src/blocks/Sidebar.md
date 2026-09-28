@@ -3,7 +3,7 @@
 > **版本**: v1.9.0
 > **职责**: 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
 > **包归属**: `@snowui/components-pro`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-09-28
 
 ## 组件介绍
 
@@ -106,14 +106,14 @@
 - 折叠与展开以 Sidebar 根宽度为主时间轴：展开宽度 → 折叠宽度（icon 为 60px，text 为 0px）使用 `SIDE_PANEL_DISAPPEAR_MOTION` 的临界阻尼 spring timing，折叠宽度 → 上次展开宽度使用 `SIDE_PANEL_APPEAR_MOTION` 的同系 timing；该 timing 复用 Frame 默认 move spring。拖拽期间临时关闭宽度 transition，使边缘与指针同步；`enableDefaultMotion={false}` 与系统 reduced motion 均关闭该过渡。
 - 右侧整边调宽命中层仅在 `resizable={true}` 且展开态存在，沿 Sidebar 右侧边框全高铺开，渲染 Indicator 默认短条。命中层与 Sidebar 的可见 overlay scrollbar Thumb 重叠时遵守 Indicator 的 Resize 优先规则，滚动条未被覆盖的区域继续响应。折叠不会覆盖已调整的展开宽度，再次展开时恢复该宽度。
 - 根容器默认 padding 为左右 `12px`（`var(--padding-3)`）、上下 `16px`（`var(--padding-4)`）；这是 Sidebar 组件默认值，不由使用方重复补 class 或 style。
-- Header 固定，`ScrollArea` 独立滚动并延伸到 Sidebar 底部；Footer 固定覆盖在 Body 之上。Sidebar 根的 Header / Body 默认 gap 为 `var(--gap-3)`（12px），即 Logo 区域与下方导航区域之间的默认间距；它与 Body 内相邻导航内容的 4px gap 是两个独立层级。
+- Header 与 Footer 均为非滚动区；Footer 全宽贴底，`ScrollArea` 独立滚动并延伸至底部，在 Footer 区域内按设计渐隐。Sidebar 根的 Header / Body 默认 gap 为 `var(--gap-3)`（12px），即 Logo 区域与下方导航区域之间的默认间距；它与 Body 内相邻导航内容的 4px gap 是两个独立层级。
 - Body 纵向 overlay scrollbar 根据根横向 padding 自动外移，轨道右边缘始终距 Sidebar 右边框 `4px`；默认 12px 横向 padding 时其 `right` 偏移为 `-8px`。
-- Logo 所在 Header 区域使用 `4px` 上下 padding；Body 向下滚动后在 Logo 下方启用通用 `.snowui-scroll-mask` 顶部渐隐，渐隐带同样限制为 `4px` 且不增加布局高度，回到顶部时移除遮罩。
+- Logo 所在 Header 区域使用 `4px` 上下 padding；滚动视口延伸到 Logo 区域背后，并以 Header 实测高度、顶部 padding 和 Header/Body gap 组成的固定区高度实现反向渐隐：从下往上进入区域 20% 时保留 20% 可见度，到 40% 时完全消失。Logo 本身不参与遮罩，列表顶部保留对应空间。
 - Body 导航内容默认使用 `var(--gap-1)`（4px）间距，直接组合的 SidebarItem 与 SidebarSection 内部列表保持一致。
 - `SidebarItemData.depth={1}` 与显式 `SidebarItem depth={1}` 使用同一二级导航视觉：组件在 leading 槽绘制等长双臂、1px Black/40% 密集点线、4px 圆角的 L 形层级连接线，并以该连接线替换普通 Icon。竖线中心与一级 Item Icon 中心同列，横线中心与二级文字中心同轴。
 - Sidebar 内所有横向 Separator 使用同一默认样式，不区分 SidebarSection 自动生成或调用方显式组合：上下与左右 padding 均为 `8px`（`var(--padding-2)`）、`line-height: 0`、分割线本体保持 Separator 默认 `0.5px` 与 Black/10%。节点自身使用 content-box 背景裁切表达 padding，不要求外部 wrapper 或 class；横向与纵向 padding 分别通过 `--snowui-sidebar-separator-padding-x-override`、`--snowui-sidebar-separator-padding-y-override` 覆盖。每个 SidebarSection 的分类内容末尾内置该 Separator，调用方无需为分类手动补分割线。
 - 状态记忆默认开启，未传 `persistenceKey` 时使用 `snowui:sidebar:default` 保存 active item 与各 Section 的折叠状态。刷新后自动恢复标题展开 / 折叠状态与最后 active item；恢复时若 active item 位于已折叠 Section，Sidebar 强制展开该 Section，并将修正后的展开状态重新保存。同一 origin 存在多个 Sidebar 时，宿主必须提供稳定且唯一的 `persistenceKey`；不需要状态记忆时显式设置 `persistence={false}`。
-- 恢复 active item 后，仅当 Body 确实存在纵向溢出时才定位：以“active item 中心 = 扣除 Footer 覆盖安全区后的可视区域中心”为目标，首尾位置按可滚动边界夹紧。恢复后立即定位一次，并在默认 Section 布局动效结束后再次校正，避免折叠布局变化造成偏移。
+- 恢复 active item 后，仅当 Body 确实存在纵向溢出时才定位：以“active item 中心 = Body 实际可视区域中心”为目标，首尾位置按可滚动边界夹紧。恢复后立即定位一次，并在默认 Section 布局动效结束后再次校正，避免折叠布局变化造成偏移。
 - active 视觉状态由 Sidebar 管理；宿主仍通过 `activeItemId` / `onActiveItemChange` 持有实际导航与内容切换。恢复合法的持久化 active item 时，Sidebar 会调用 `onActiveItemChange` 通知宿主。
 - 默认与自定义 `as="logo"` host 均使用 `4px` 左右 padding，使 Logo 图形与 SidebarItem 图标垂直对齐。
 - Header 在展开 / 折叠状态使用同一套起始对齐结构，Logo Icon 保持固定 leading slot；Test 示例以固定宽度左对齐宿主承载 Sidebar，避免居中宿主在根宽度变化时带动整个 Logo 位移。Logo host 强制保持单行，wordmark 通过 host 裁切与透明度收起，不会在窄宽度下换行并撑高 Logo，也不在动效起点直接切换整体 Header 对齐。
@@ -121,8 +121,8 @@
 - 折叠开始时，Sidebar 宽度、Item 文字与 Section 标题同时开始变化：宽度收窄，Item 文字和标题消费 Frame color bridge 渐隐；Item leading Icon 保持原横向位置。标题透明度归零后，标题高度、padding 与 Section gap 才消费 Frame size bridge 收起，Item 随后上移。展开时按同一组 bridge 平滑恢复。
 - 折叠按钮不内置 Tooltip，通过随状态更新的 `aria-label` 保留“展开 / 折叠侧边栏”可访问名称。其余内置 Tooltip（折叠态 Item label、Item action、Section action）统一位于对应元素右侧（`position="right"`）。Section 标题默认可折叠但不显示 Tooltip。
 - 默认不设置背景色。
-- Footer 只内置底部覆盖区域，不内置业务文案；区域默认使用 Figma Auto Layout 的 Align top left：内容整体位于容器左上方，内部横向排列并在同一水平线上垂直居中，内容 gap 与四边 padding 均为 `8px`。区域保持 `12px` 圆角、透明背景与 `backdrop-filter: blur(20px)`。直接子节点 `as="footer"` 提供业务内容。折叠 / 展开期间 Footer 固定使用展开态内容宽度与底部位置，不跟随根宽度收缩或位移，只使用与 Sidebar 宽度时间轴一致的 opacity 渐隐 / 渐显；折叠态通过 `inert`、`aria-hidden` 与 `pointer-events: none` 退出交互。
-- 存在 Footer 时，Sidebar 通过共享 `resizeManager` 跟踪 Footer、Navigation 与滚动区域的实际尺寸，并为 Navigation 的滚动末端增加“Footer 实际高度 + 固定 `12px`”安全区；滚动到底后最后一个 Item 完整停在 Footer 上方。此 `12px` 是 Footer 遮挡保护契约，不跟随外部 `--snowui-sidebar-navigation-gap-override`、Section gap 或 Item gap 改变。服务端不创建 Observer；浏览器能力缺失或初始化失败时仅停止后续自动重测，Sidebar 结构、导航、折叠和现有 Footer 安全区继续可用。
+- Footer 只内置底部覆盖区域，不内置业务文案；区域默认使用 Figma Auto Layout 的 Align top left：内容整体位于容器左上方，内部横向排列并在同一水平线上垂直居中，内容 gap 为 `8px`；区域全宽贴底，内边距上 `12px`、下 `16px`、左右 `20px`。区域无圆角，不绘制背景色，也不使用背景模糊，避免覆盖宿主边框及拖宽时的模糊重绘。直接子节点 `as="footer"` 提供业务内容。折叠 / 展开期间 Footer 固定使用展开态内容宽度与底部位置，不跟随根宽度收缩或位移，只使用与 Sidebar 宽度时间轴一致的 opacity 渐隐 / 渐显；折叠态通过 `inert`、`aria-hidden` 与 `pointer-events: none` 退出交互。
+- 存在 Footer 时，Sidebar 通过共享 `resizeManager` 跟踪 Footer 实际高度；滚动内容延伸至 Sidebar 底部，使用 alpha 遮罩还原 Footer 覆盖渐变：Footer 顶部内容保留 100%，向下 20% 高度时保留 20%，到 40% 时完全不可见。Footer 自身内容不参与遮罩，深浅主题均不需要叠加背景色。导航尾部保留 Footer 高度 + 12px 安全区，保证滚到底时最后一项完整位于 Footer 上方。高度由声明式样式维护，拖宽时不中断；Logo 区域使用同一曲线的垂直镜像。
 
 ---
 
@@ -186,7 +186,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 | `as="logo"` | 稳定 Header host | 替换默认 SnowUILogo |
 | `as="logo-icon"` | 自定义 Logo 的直接子节点 | 折叠后唯一保留的 Logo 图形 |
 | `as="footer"` | 稳定底部覆盖 Footer host | 折叠态自动隐藏 |
-| `.snowui-scroll-mask` | OSS 通用内容渐隐能力 | Body 向下滚动后启用顶部渐隐 |
+| `.snowui-scroll-mask` | OSS 通用内容渐隐能力 | 根据滚动位置启用顶部 / 底部渐隐 |
 | `sections` | 默认生成 | 生成 SidebarSection / SidebarItem |
 
 ### 关联关系
@@ -196,6 +196,10 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/LayoutProtocol.md`、`../../../specs/ComponentGuidelines.md`
 
 ## 更新日志
+
+- 2026-09-28：Footer 实测高度由组件状态与根样式共同维护，拖宽时不再短暂丢失滚动区的底部预留空间。
+
+- 2026-09-28：Footer 全宽贴底，内边距上 12px / 下 16px / 左右 20px；按更新设计在 Footer 高度内使用 0% / 80% / 100% 覆盖透明度渐隐，并移除圆角。
 
 - 2026-09-28：内置 Indicator 使用整边命中，移除透明颜色特化，统一常态与 hover 视觉。
 
