@@ -43,7 +43,7 @@
 </Popover>
 
 <SearchBox data-popover-target="search-box-usage-popup" style="width: 10rem;" placeholder="搜索">
-    <Kbd as="trailing">⌘K</Kbd>
+    <Kbd as="trailing" variant="solid" style="background-color: var(--surface-3);">⌘K</Kbd>
 </SearchBox>
 ```
 <!-- /quick-start:generated -->
@@ -95,7 +95,7 @@
 
 ```svelte
 <SearchBox placeholder="Search">
-  <Kbd as="trailing">/</Kbd>
+  <Kbd as="trailing" variant="solid" style="background-color: var(--surface-3);">/</Kbd>
 </SearchBox>
 ```
 
@@ -112,7 +112,7 @@
 </script>
 
 <SearchBox variant="outline" bind:open>
-  <Kbd as="trailing">⌘K</Kbd>
+  <Kbd as="trailing" variant="solid" style="background-color: var(--surface-3);">⌘K</Kbd>
 </SearchBox>
 ```
 
@@ -163,6 +163,7 @@
 - icon: 16px
 - text: 14px / 20px
 - 外置 `as="trailing"`：默认 `Black/20%`；内建清除 X 继续使用共享清除按钮颜色规则
+- 快捷键 Kbd 由使用方显式传入 `variant="solid"` 与 `style="background-color: var(--surface-3);"`，无边框，背景为 Surface/3；不改变 Kbd 的全局默认样式。
 - 背景模糊：`blur(1.25rem)`（20px，与 Tooltip 一致），可通过 `--snowui-search-box-background-blur-override` 覆盖
 
 颜色与状态参考 `Input` / `Field` CSS 行为，但 `SearchBox` 是搜索浮层触发器，不是文本输入框，因此不显示 Field focus ring，也屏蔽全局 `focus-visible` outline；点击后、按 Escape 关闭后都应保持无焦点外圈。

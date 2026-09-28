@@ -9,7 +9,7 @@ export const examples = [
         name: "SB-01：灰底搜索框 + 外置 Kbd",
         code: `SB-01
 <SearchBox style="width: 10rem;" placeholder="搜索">
-    <Kbd as="trailing">/</Kbd>
+    <Kbd as="trailing" variant="solid" style="background-color: var(--surface-3);">/</Kbd>
 </SearchBox>`,
         logic: ["Variant", "Kbd"],
     },
@@ -17,7 +17,7 @@ export const examples = [
         name: "SB-02：边框搜索框",
         code: `SB-02
 <SearchBox variant="outline" style="width: 10rem;">
-    <Kbd as="trailing">⌘K</Kbd>
+    <Kbd as="trailing" variant="solid" style="background-color: var(--surface-3);">⌘K</Kbd>
 </SearchBox>`,
         logic: ["Variant"],
     },
@@ -49,7 +49,7 @@ export const examples = [
 </Popover>
 
 <SearchBox data-popover-target="sb-05-popup" placeholder="Search" style="width: 14rem;">
-    <Kbd as="trailing">⌘K</Kbd>
+    <Kbd as="trailing" variant="solid" style="background-color: var(--surface-3);">⌘K</Kbd>
 </SearchBox>`,
         expected: {
             render: "点击 SearchBox 后弹出中尺寸 Popover,视觉与 Listbox 一致(padding 16px / radius 24px)",
