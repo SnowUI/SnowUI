@@ -582,15 +582,13 @@
     /* --snowui-sidebar-navigation-gap-override: ; */                /* Body 相邻导航内容间距（默认 var(--gap-1)） */
     /* --snowui-sidebar-logo-padding-x-override: ; */                /* 默认/自定义 Logo host 横向 padding（默认 var(--padding-1)） */
     /* --snowui-sidebar-logo-padding-y-override: ; */                /* Logo 所在 Header 区域纵向 padding（默认 var(--padding-1) = 4px） */
-    /* --snowui-sidebar-logo-scroll-mask-size-override: ; */         /* Body 向下滚动时 Logo 下方顶部渐隐尺寸（默认 var(--padding-1) = 4px，不占布局高度） */
+    /* --snowui-sidebar-logo-scroll-mask-size-override: ; */         /* Logo 区域反向渐隐高度（默认 Header 实测高度 + 顶部 padding + Header/Body gap） */
     /* --snowui-sidebar-collapsed-header-gap-override: ; */          /* 折叠态 Logo host 与折叠按钮间距（默认 var(--gap-1)） */
     /* --snowui-sidebar-collapsed-logo-slot-width-override: ; */     /* icon 变体折叠态 Logo leading slot 宽度（默认 36px） */
     /* --snowui-sidebar-default-logo-gap-override: ; */              /* 默认 Logo icon / wordmark 间距（默认 calc(var(--gap-1) * 1.5)） */
-    /* --snowui-sidebar-footer-padding-y-override: ; */              /* 覆盖 Footer 纵向 padding（默认 var(--padding-2) = 8px） */
-    /* --snowui-sidebar-footer-padding-x-override: ; */              /* 覆盖 Footer 横向 padding（默认 var(--padding-2) = 8px） */
+    /* --snowui-sidebar-footer-padding-y-override: ; */              /* 覆盖 Footer 纵向 padding（默认上 12px、下 16px） */
+    /* --snowui-sidebar-footer-padding-x-override: ; */              /* 覆盖 Footer 横向 padding（默认 var(--padding-5) = 20px） */
     /* --snowui-sidebar-footer-gap-override: ; */                    /* Footer 内容间距（默认 var(--gap-2) = 8px） */
-    /* --snowui-sidebar-footer-radius-override: ; */                 /* 覆盖 Footer 圆角（默认 var(--radius-3) = 12px） */
-    /* --snowui-sidebar-footer-background-blur-override: ; */        /* 透明覆盖 Footer 背景模糊（默认 20px） */
     /* --snowui-sidebar-section-gap-override: ; */                   /* 分类内部间距（默认 var(--gap-1)） */
     /* --snowui-sidebar-separator-padding-x-override: ; */           /* Sidebar 内全部横向 Separator 的横向 padding（默认 var(--padding-2) = 8px） */
     /* --snowui-sidebar-separator-padding-y-override: ; */           /* Sidebar 内全部横向 Separator 的纵向 padding（默认 var(--padding-2) = 8px） */
