@@ -86,7 +86,7 @@
         tabindex = undefined,
         title = undefined,
         id = undefined,
-        resize = "vertical",
+        resize = "both",
         invalid = false,
         parts = undefined,
         onclick: userOnClick = undefined,

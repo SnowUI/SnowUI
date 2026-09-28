@@ -1,9 +1,9 @@
 # Indicator
 
-> **版本**: v1.3.0
+> **版本**: v1.4.0
 > **职责**: 提供可拖动的尺寸调整手柄，支持鼠标与键盘操作，可用于面板和内容区域的大小调整。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-09-28
 
 ## 组件介绍
 
@@ -37,10 +37,10 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| axis | `IndicatorAxis` | line 为 `"width"`；corner 为 `"height"` | 调整宿主宽度、高度或同时调整；`both` 只用于 corner |
+| axis | `IndicatorAxis` | line 为 `"width"`；corner 为 `"both"` | 调整宿主宽度、高度或同时调整；`both` 只用于 corner |
 | edge | `IndicatorEdge` | `根据 axis 推导` | 拖动方向与默认定位边缘 |
 | appearance | `IndicatorAppearance` | `"line"` | 线形或右下角图标视觉 |
-| hitAreaPadding | `number \| string` | — | line 沿边命中范围两端相对视觉条增加的 padding；未传时继续铺满整条边 |
+| hitAreaPadding | `number \| string` | — | 兼容旧输入，已不再收窄命中带；line 始终覆盖所在整条边 |
 | target | `HTMLElement` | `直接父元素` | resize target；可显式关联页面中的任意元素，不要求 Indicator 是其 DOM 后代 |
 | revealTarget | `HTMLElement` | `target` | 控制显隐的 hover 宿主 |
 | value | `number` | `实测 target 尺寸` | 当前受控尺寸基线，并同步为 ARIA 当前值 |
@@ -84,10 +84,10 @@
 - line + width：命中带 = 父级全高 × (pinOffset + 8px)（`top/bottom:0`）；视觉默认 2px × **16px**，hover / focus / dragging 时视觉宽变为 4px；沿边长度可用 `--snowui-indicator-visual-length` 覆盖。
 - line + height：命中带 = 父级全宽 × (pinOffset + 8px)（`left/right:0`）；视觉默认 **16px** × 2px，hover / focus / dragging 时视觉高变为 4px；沿边长度同上变量。
 - line 与 Scrollbar 一致通过实际 width / height 变化而非 transform 缩放，使用 `var(--radius-full, 9999px)`，端点始终为完整胶囊圆角。
-- corner：使用 1rem 视觉盒，通过 ComponentIcon 复用 rounded-corner；图形与外框比例以 raw-assets/icons/snowui/RoundedCorner.svg 为准。显示时为 Black/10，自身 hover / focus-visible / dragging 时为 Black/20；各状态保持原图比例，不额外加粗或缩放。
-- corner 固定在右下角；默认 `axis="height"`，使用 `ns-resize` 上下双箭头并只调整高度。
-- corner 显式 `axis="both"` 时使用 `nwse-resize` 对角双箭头，同时调整宽度和高度。
-- 定位：line 自管 absolute 贴边（不用 pin 居中）；corner 默认 `as="pin-bottom-right"` + `pinOffset="var(--padding-1)"` + `z-index: 4`。
+- corner：使用 1rem 视觉盒，通过 ComponentIcon 复用 rounded-corner；图形与外框比例以 raw-assets/icons/snowui/RoundedCorner.svg 为准。显示时为 Black/10，自身 hover / focus-visible / dragging 时为 Black/20；保留原 path 与 viewBox，按用户确认的指示器特例沿轮廓补描边：常态总笔画 2px，hover / focus / dragging 总笔画 4px，不缩放外框。
+- corner 固定在右下角，仅在角点附近激活；默认 `axis="both"`，同时调整宽度和高度。
+- corner 默认使用 `nwse-resize` 对角双箭头；显式设置单轴时使用对应方向光标。
+- 定位：line 自管 absolute 贴边（不用 pin 居中）；corner 默认 `as="pin-bottom-right"` + `pinOffset="var(--padding-1)"` + `z-index: 6`。
 - 默认隐藏；宿主 hover、focus-visible 或 dragging 时显示；与同一 target 内 overlay scrollbar Thumb 重叠时保持显示及 Pointer、键盘命中。
 - 视觉与命中区分层；line 命中带铺满所在边缘全高/全宽。
 - 动效消费与 overlay scrollbar 相同的 Frame color motion bridge。
@@ -134,7 +134,7 @@
 
 Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一个可交互组件。它默认调整直接父元素，也可以通过 `target` 显式关联任意祖先宿主。鼠标位于 reveal host 的任意普通后代上时，Indicator 都会显示；只有进入 Indicator **命中带**时才会加深、变粗并开始拖动。
 
-**命中带（line）**：视觉条与命中区分层。默认情况下 line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条外缘距宿主边缘 `pinOffset`（默认 `var(--padding-1)`，基准 4px），默认 2×16 / 16×2。消费方可传 `hitAreaPadding`，将沿边命中范围收窄为“视觉长度 + 两端 padding”；例如 Sidebar 传 4px 后，16px 视觉条只有上下各 4px、合计 24px 的纵向激活范围。corner 仍用 `pin-bottom-right` + 局部命中。
+**命中带（line）**：视觉条与命中区分层。默认情况下 line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条外缘距宿主边缘 `pinOffset`（默认 `var(--padding-1)`，基准 4px），默认 2×16 / 16×2。`hitAreaPadding` 只保留兼容输入，不再改变命中范围；任何位置进入所在整条边都会激活并允许拖动。corner 仍用 `pin-bottom-right` + 局部命中。
 
 Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize 命中区优先：手柄继续显示并接收 Pointer 与键盘操作，滚动条在未被手柄覆盖的区域继续响应拖动。组合宿主须保证手柄所在层高于滚动条，不以隐藏手柄或移除焦点来避让。
 
@@ -150,6 +150,11 @@ Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize �
 - 不接入 Skeleton：手柄没有加载占位意义。
 
 ## 更新日志
+
+### v1.4.0 (2026-09-28)
+
+- line 统一整条边缘命中，旧 hitAreaPadding 不再收窄范围；corner 保持角点局部命中，默认双轴调整。
+- corner 与 line 统一 Black/10 → Black/20、2px → 4px 状态视觉，原始资源路径和外框不缩放。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

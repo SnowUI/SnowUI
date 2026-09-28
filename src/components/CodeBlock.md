@@ -3,7 +3,7 @@
 > **版本**: v1.8.1
 > **职责**: 清晰展示可复制的代码，支持语法着色、行号、全屏查看和尺寸调整，适合文档与开发工具。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-09-28
 
 ## 组件介绍
 
@@ -175,7 +175,7 @@
 
 按钮 hover 对齐 Button 的 `bare emphasis="muted"` 模式：关闭背景叠加，默认 `opacity: 0.4`，hover 提升到 `1`，并使用 Frame color motion 变量过渡。
 
-工具栏使用内部 Pin 布局固定到 `pin-top-right`，偏移为 `var(--padding-2)`；右下角尺寸手柄复用 `Indicator axis="height" appearance="corner"`，宿主 hover 时以 1px / Black/20% 显示，自身 hover、focus 或 dragging 时变为 2px / Black/40%。
+工具栏使用内部 Pin 布局固定到 `pin-top-right`，偏移为 `var(--padding-2)`；右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
 
 ---
 
@@ -250,7 +250,7 @@
 | `.snowui-overlay-scrollbar` | 自定义纵向 / 横向轨道，不占布局尺寸；横向溢出时默认常显，可按宿主 hover 显隐 |
 | `.snowui-overlay-scrollbar-thumb` | Thumb 视觉与拖拽逻辑由通用样式 / hook 统一管理 |
 | `.snowui-scroll-mask` + `data-scroll-mask` | 顶部 / 尾部滚动透明渐隐 |
-| `.snowui-indicator-corner` | 右下角通用 Indicator 高度手柄；位置由 Indicator 默认规则统一管理 |
+| `.snowui-indicator-corner` | 右下角通用 Indicator 双轴手柄；位置由 Indicator 默认规则统一管理 |
 
 CodeBlock 的默认态、全屏态和 `singleLine` 都由 `useOverlayScrollbar` 管理横向溢出；默认态和全屏态同时管理纵向溢出。组件只声明轨道定位，滚动条尺寸、显隐、hover 形态与鼠标拖拽由共享样式承接。纵向条随宿主 hover 显隐；横向条默认在内容溢出时始终显示，`horizontalScrollbarVisibility="hover"` 时随宿主 hover 显隐。
 
@@ -354,6 +354,8 @@ pnpm build`}
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 ## 更新日志
+
+- 2026-09-28：同步 Indicator 的统一命中与状态视觉；Corner 默认同时调整宽高，显式单轴配置继续生效。
 
 - 2026-09-27：text/plain/plaintext/txt 独立文本着色，英文标识及数字复用关键字粉色，URL 复用注释灰色；不再把 URL 后正文误判为注释。
 

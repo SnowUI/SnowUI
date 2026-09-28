@@ -6,7 +6,11 @@
 
 33 个功能图标、36 个 weight 变体逐一对照 raw-assets。浏览器测量 viewBox、图形包围盒相对外框的位置、宽度及高度；viewBox 必须完全一致，包围盒误差在 16px 名义尺寸下不得超过 0.1px（允许 SVG 优化的曲线舍入）。生成器另外校验随包 path 内容与 assets 一致，仅允许黑色归一化为 currentColor。包围盒检查不等同于逐像素光栅比较。
 
-## 发现与修复
+## 2026-09-28 Indicator 状态笔画修订
+
+用户明确要求 Corner 与 line 同为 2px / 4px 笔画。原 path 和 32×32 viewBox、16px 外框保持不变；Indicator 沿轮廓增加 2 / 6 SVG 单位描边，对应实际额外 1 / 3px，与原 1px 笔画合计 2 / 4px。填充与描边先以不透明轮廓合成，再由统一颜色滤镜施加一次透明度，避免轮廓重叠处颜色加深。这是 ComponentGuidelines §2.7 的具名例外，不宣称各状态着墨包围盒不变。
+
+## 发现与修复（2026-09-11 历史）
 
 Indicator corner 原先单独绘制中心线，在 32×32 外框中使用 2 单位描边；默认着墨范围为 16×16，和 RoundedCorner 原图一致。但 hover / focus / dragging 将描边增至 4，着墨范围变为 18×18，宽高占比从 50% 变为 56.25%。
 

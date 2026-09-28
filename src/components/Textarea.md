@@ -3,7 +3,7 @@
 > **版本**: v1.0.1
 > **职责**: 提供多行文本输入，可承接原生表单属性并组合字段反馈，适合描述、备注和较长内容的编辑。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-09-28
 
 ## 组件介绍
 
@@ -59,7 +59,7 @@
 | tabindex | `number` | — | 原生 Tab 顺序；0 使用自然顺序，-1 跳过顺序导航但允许主动聚焦，正数指定优先级。普通表单建议保留自然顺序。 |
 | title | `string` | — | 原生提示文本；浏览器决定如何显示，不替代可见标签或错误信息。 |
 | id | `string` | — | 内部原生 textarea 的 id，用于 label for 和 ARIA 引用；同一文档内保持唯一。 |
-| resize | `"none" \| "vertical" \| "horizontal" \| "both"` | `"vertical"` | 缩放方向：none 隐藏手柄，vertical 调整高度，horizontal 调整宽度，both 同时调整两者。readonly / disabled 强制使用 none；手柄默认最小宽 120px、高 60px。手动设置高度后停止自动内容测高。 |
+| resize | `"none" \| "vertical" \| "horizontal" \| "both"` | `"both"` | 缩放方向：none 隐藏手柄，vertical 调整高度，horizontal 调整宽度，both 同时调整两者。readonly / disabled 强制使用 none；手柄默认最小宽 120px、高 60px。手动设置高度后停止自动内容测高。 |
 | invalid | `boolean` | `false` | 与 aria-invalid 合并为组件错误态；不会自动检查 required / minlength / maxCount，也不会自动聚焦。嵌入 Field 后由 Field 汇总视觉反馈。 |
 | parts | `ComponentPartsOf<{ Indicator: typeof Indicator }>` | — | 配置内置 Indicator，例如 step / largeStep 键盘步长、maxWidth / maxHeight 边界和 ariaLabel。只作用于组件生成的手柄；resize=none、readonly 或 disabled 时无手柄可配置。 |
 | onclick | `(event: MouseEvent) => void` | — | 单击内部原生文本域时触发。参数为原生事件，currentTarget 为内部 textarea；返回值被忽略，需要取消可取消的默认行为时调用 event.preventDefault()。 |
@@ -308,6 +308,8 @@
 ---
 
 ## 更新日志
+
+- 2026-09-28：同步 Indicator 的统一命中与状态视觉；Corner 默认同时调整宽高，显式单轴配置继续生效。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

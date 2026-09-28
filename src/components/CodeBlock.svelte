@@ -194,6 +194,7 @@
     let showFullscreenTopFade = $state(false);
     let showFullscreenBottomFade = $state(false);
     let resizeHeight: number | undefined = $state(undefined);
+    let resizeWidth: number | undefined = $state(undefined);
 
     /* ─── 外置 Icon 检测状态 ─── */
     let hasCustomCopyIcon = $state(false);
@@ -253,12 +254,13 @@
         [
             `--snowui-code-block-visible-lines: ${autoVisibleLines};`,
             userStyle,
+            !isSingleLine && resizeWidth !== undefined ? `width:${resizeWidth}px;` : "",
             !isSingleLine && resizeHeight !== undefined
                 ? `height:${resizeHeight}px;`
                 : "",
         ]
             .filter(Boolean)
-            .join(" "),
+            .join("; "),
     );
     const codeScrollbar = useOverlayScrollbar(
         () => (isSingleLine ? undefined : codeViewportElement),
@@ -456,8 +458,9 @@
         return undefined;
     }
 
-    function handleResizeHeight(next: number) {
-        resizeHeight = next;
+    function handleResizeSize(next: number, axis: "width" | "height") {
+        if (axis === "width") resizeWidth = next;
+        else resizeHeight = next;
         updateScrollFade();
     }
 
@@ -532,6 +535,7 @@
     $effect(() => {
         if (!isSingleLine) return;
         resizeHeight = undefined;
+        resizeWidth = undefined;
         isFullscreen = false;
         isExitingFullscreen = false;
     });
@@ -797,13 +801,11 @@
     <Indicator
         target={hostElement}
         revealTarget={hostElement}
-        axis="height"
-        edge="bottom"
         appearance="corner"
-        value={resizeHeight}
+        applySize={false}
         minSize={60}
-        ariaLabel="调整代码块高度"
-        onSizeChange={handleResizeHeight}
+        ariaLabel="调整代码块宽度和高度"
+        onSizeChange={handleResizeSize}
     />
     {/if}
     <div

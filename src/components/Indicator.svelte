@@ -88,7 +88,7 @@
     let resizeActions: ReturnType<typeof resizable>[] = [];
 
     const resolvedAxis = $derived(
-        axis ?? (appearance === "corner" ? "height" : "width"),
+        axis ?? (appearance === "corner" ? "both" : "width"),
     );
 
     const resolvedEdge = $derived(
@@ -140,36 +140,21 @@
         if (resolvedAppearance !== "line" || resolvedAxis === "both") return "";
         const offset = toCssLength(resolvedPinOffset);
         const grab = "var(--size-2, 0.5rem)";
-        const alongPadding =
-            hitAreaPadding === undefined
-                ? undefined
-                : toCssLength(hitAreaPadding);
+        // 保留旧 Prop 的输入兼容；线形始终覆盖所在整条边。
         if (resolvedAxis === "width") {
-            const side = resolvedEdge === "start" ? "left:0" : "right:0";
             return [
-                "position:absolute",
-                alongPadding ? "top:50%" : "top:0",
-                alongPadding ? "bottom:auto" : "bottom:0",
-                alongPadding
-                    ? `height:calc(var(--snowui-indicator-visual-length, var(--size-4)) + ${alongPadding} + ${alongPadding})`
-                    : "height:auto",
+                "position:absolute", "top:0", "bottom:0", "height:auto",
                 `width:calc(${offset} + ${grab})`,
-                side,
-                alongPadding ? "translate:0 -50%" : "translate:none",
+                resolvedEdge === "start" ? "left:0" : "right:0",
+                "translate:none",
                 `--snowui-indicator-visual-inset:${offset}`,
             ].join(";");
         }
-        const side = resolvedEdge === "top" ? "top:0" : "bottom:0";
         return [
-            "position:absolute",
-            alongPadding ? "left:50%" : "left:0",
-            alongPadding ? "right:auto" : "right:0",
-            alongPadding
-                ? `width:calc(var(--snowui-indicator-visual-length, var(--size-4)) + ${alongPadding} + ${alongPadding})`
-                : "width:auto",
+            "position:absolute", "left:0", "right:0", "width:auto",
             `height:calc(${offset} + ${grab})`,
-            side,
-            alongPadding ? "translate:-50% 0" : "translate:none",
+            resolvedEdge === "top" ? "top:0" : "bottom:0",
+            "translate:none",
             `--snowui-indicator-visual-inset:${offset}`,
         ].join(";");
     });
@@ -314,8 +299,16 @@
     enableScaleObserver={enableScaleObserver}
     enableDefaultMotion={enableDefaultMotion}
 >
-    <span class="snowui-indicator-visual" aria-hidden="true">
+    <span class="snowui-indicator-visual" aria-hidden="true" style={`--snowui-indicator-paint: url(#${indicatorId}-paint)`}>
         {#if resolvedAppearance === "corner"}
+            <svg data-indicator-filter aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;">
+                <defs>
+                    <filter id={`${indicatorId}-paint`} x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+                        <feFlood flood-color="currentColor" />
+                        <feComposite in2="SourceAlpha" operator="in" />
+                    </filter>
+                </defs>
+            </svg>
             <ComponentIcon name="rounded-corner" size="var(--size-4)" />
         {/if}
     </span>
@@ -443,7 +436,7 @@
     :global(:where(.snowui-indicator-corner)) {
         width: var(--size-4);
         height: var(--size-4);
-        z-index: 4;
+        z-index: 6;
     }
 
     :global(:where(.snowui-indicator-corner.snowui-indicator-width)) {
@@ -468,10 +461,28 @@
         transform: none;
     }
 
-    :global(:where(.snowui-indicator-corner) > .snowui-indicator-visual svg) {
+    :global(:where(.snowui-indicator-corner) > .snowui-indicator-visual svg:not([data-indicator-filter])) {
         display: block;
         width: 100%;
         height: 100%;
+        /* 先合并不透明的填充与描边，再统一着色，避免透明颜色叠加。 */
+        filter: var(--snowui-indicator-paint);
+        /* 原资源在 16px 外框下为 1px 笔画；沿轮廓扩展至 2px / 4px。 */
+        stroke: rgb(from currentColor r g b / 1);
+        stroke-width: var(--snowui-indicator-corner-stroke, calc(var(--size-3) / 6));
+        stroke-linejoin: round;
+        transition: stroke-width var(--snowui-frame-color-motion-duration, 0.15s)
+            var(--snowui-frame-color-motion-easing, ease-out);
+    }
+
+    :global(:where(.snowui-indicator-corner) > .snowui-indicator-visual svg:not([data-indicator-filter]) path) {
+        fill: rgb(from currentColor r g b / 1);
+    }
+
+    :global(:where(.snowui-indicator-corner:hover)),
+    :global(:where(.snowui-indicator-corner:focus-visible)),
+    :global(:where(.snowui-indicator-corner[data-dragging="true"])) {
+        --snowui-indicator-corner-stroke: calc(var(--size-3) / 2);
     }
 
     :global(:where(.snowui-indicator[data-disabled="true"])) {

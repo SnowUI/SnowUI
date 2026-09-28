@@ -3,7 +3,7 @@
 > **版本**: v2.3.0
 > **职责**: 定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-09-28
 
 ## 组件介绍
 
@@ -173,7 +173,7 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 - DataTable 下 `as="selection"` / `as="actions"` 受 Context `isSelectionEnabled` / `isActionsEnabled` 控制；关闭时整列不渲染。
 - 默认 `font-weight: 400`，字号与行高消费 `--text-12 / --leading-12`。
 - 所有表头单元格与数据行使用相同的响应式左右 padding，范围为 2px 到 12px。
-- `resizable` 使用通用 Indicator；命中带沿用 line 全高协议（表头单元格右缘全高）；常态视觉线为 **1px × 16px**、贴列右缘、垂直居中（TableHead 覆盖 `.snowui-indicator-visual`）；进入命中带时加粗到 2px。
+- `resizable` 使用通用 Indicator；命中带沿用 line 全高协议（表头单元格右缘全高）；统一复用 Indicator 的 2px × 16px 常态与 4px hover 总厚度，整条右边缘均可激活和拖动。
 
 
 
@@ -185,6 +185,8 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 > `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
 
 ## 更新日志
+
+- 2026-09-28：同步 Indicator 的统一命中与状态视觉；列宽手柄复用组件默认视觉和整边命中。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

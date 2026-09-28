@@ -265,28 +265,11 @@
     :global(:where(.snowui-table-head-content)) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     :global(:where(.snowui-table-head-content-static)) { opacity: .4; }
     :global(:where(.snowui-table-sort-icon)) { display: block; flex: 0 0 auto; width: var(--size-4, 1rem); height: var(--size-4, 1rem); color: inherit; }
-    /*
-     * 命中带沿用 Indicator line 全高协议；视觉恢复表头规格：
-     * 1px × 16px、贴列右缘、垂直居中；hover/drag 加粗到 2px（与改前一致）。
-     * 保持 Level 2 :where() 低权重约束；由组件样式加载顺序覆盖 Indicator 默认视觉。
-     */
+    /* 列宽手柄复用 Indicator 的整边命中与统一状态视觉。 */
     :global(:where(.snowui-table-head > .snowui-table-head-indicator)) {
         z-index: 1;
     }
 
-    :global(:where(.snowui-table-head > .snowui-table-head-indicator > .snowui-indicator-visual)) {
-        top: 50%;
-        right: 0;
-        left: auto;
-        width: calc(var(--size-3, 0.75rem) / 12);
-        height: var(--size-4, 1rem);
-        transform: translateY(-50%);
-    }
-
-    :global(:where(.snowui-table-head > .snowui-table-head-indicator:hover > .snowui-indicator-visual)),
-    :global(:where(.snowui-table-head > .snowui-table-head-indicator:focus-visible > .snowui-indicator-visual)) {
-        width: calc(var(--size-3, 0.75rem) / 6);
-    }
     :global(:where(.snowui-table-head[data-table-variant="striped"])) { border-bottom-color: transparent; }
     :global(:where(.snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"]):hover), .snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"])[data-active="true"]), .snowui-table-header:has(+ .snowui-table-body > .snowui-table-row:first-child:not([aria-hidden="true"])[data-force-hover="true"])) .snowui-table-head:not([data-table-variant="striped"])) { border-bottom-color: transparent; }
     /* 表头内容渐隐过渡（mask-image），触发条件见下方规则。 */

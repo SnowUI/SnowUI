@@ -36,14 +36,14 @@ export const examples = [
         code: `IN-02
 <Frame style="position: relative; width: 14rem; height: 8rem;">
     <Text>CodeBlock 风格 Corner</Text>
-    <Indicator axis="height" appearance="corner" minSize={60} maxSize={320} />
+    <Indicator appearance="corner" minSize={60} maxSize={320} />
 </Frame>`,
         expected: {
-            render: "宿主 hover 时显示 16px corner，常规描边为 1px、Black/10。",
+            render: "宿主 hover 时显示 16px corner，常规笔画为 2px、Black/10。",
             layout: "图标固定在宿主右下角，命中区扩展不改变布局。",
-            interaction: "自身 hover、focus 或 dragging 时描边变为 2px、Black/20，图标尺寸不缩放。",
+            interaction: "自身 hover、focus 或 dragging 时笔画变为 4px、Black/20，图标尺寸不缩放。",
             performance: "复用 line 相同的显隐与 resizable 协议。",
-            responsive: "拖动只改变宿主高度。",
+            responsive: "默认拖动同时改变宿主宽度和高度。",
         },
         logic: ["Corner", "HostHover", "Dragging", "Accessibility"],
     },
@@ -55,7 +55,7 @@ export const examples = [
     <Indicator axis="both" appearance="corner" minSize={60} maxSize={320} />
 </Frame>`,
         expected: {
-            render: "显示与默认 corner 一致的 1px / 2px 状态视觉。",
+            render: "显示与默认 corner 一致的 2px / 4px 状态视觉。",
             layout: "固定在宿主右下角。",
             interaction: "使用 nwse-resize 对角双箭头，同时改变宿主宽度和高度。",
             performance: "横纵更新分别通过共享 resizable rAF 合并。",
@@ -64,7 +64,7 @@ export const examples = [
         logic: ["Corner", "BothAxes", "Pointer", "Keyboard"],
     },
     {
-        name: "IN-04: 局部命中与 Resize 优先",
+        name: "IN-04: 整边命中与 Resize 优先",
         code: `IN-04
 <Frame style="position: relative; width: 10rem; height: 6rem;">
     <ScrollArea style="height: 100%;">
@@ -81,7 +81,7 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "鼠标进入宿主任意区域后显示 Indicator；与实际 Thumb 重叠时仍显示 Indicator。",
-            layout: "16px 视觉条的纵向命中范围为上下各 4px，合计 24px。",
+            layout: "短条视觉长度不变，整条右边缘均可激活并拖动。",
             interaction: "重叠区域可拖动 Indicator 并使用键盘调整尺寸，Thumb 其余区域可滚动。",
             performance: "无需观察滚动条几何；拖动复用共享 resizable 的 rAF 合并。",
             responsive: "有无滚动溢出均遵守相同显隐和尺寸边界。",
