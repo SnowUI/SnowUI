@@ -36,13 +36,14 @@ export const examples = [
 <Frame column class="gap-16">
     <Frame row class="gap-16">
         <Button contentScaleOnHover><FourLeafClover />保存修改</Button>
+        <Button variant="filled" contentScaleOnHover><FourLeafClover />保存修改</Button>
         <Button contentScaleOnHover={false}><FourLeafClover />仅背景放大</Button>
         <Button scaleOnHover={false} contentScaleOnHover><FourLeafClover />均不放大</Button>
         <Button bare contentScaleOnHover><FourLeafClover />无外壳</Button>
     </Frame>
 </Frame>`,
         expected: {
-            interaction: "文字、Icon 与间距整体围绕按钮中心缩放，复用背景比例、时长、曲线及点击反馈；放大结束时文字不应再次下移或跳位；内容可单独关闭，背景关闭时不能单独开启内容。",
+            interaction: "文字、Icon 与间距整体围绕按钮中心缩放，复用背景比例、时长、曲线及点击反馈；放大结束时文字不应再次下移或跳位；反复移入 / 移出 Filled 和 Gray 时背景边缘保持连续，文字不逐帧重绘闪动；内容可单独关闭，背景关闭时不能单独开启内容。",
             layout: "hover 前后按钮和父容器布局尺寸不变，切换开关不重建 children。",
             accessibility: "减少动效时立即到达 hover 最终比例，移出立即恢复原尺寸，不播放点击缩放。",
         },

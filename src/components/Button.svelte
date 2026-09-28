@@ -958,6 +958,18 @@
     --snowui-button-background-hover-color-opacity: 10%;
   }
 
+  /* 保持背景图层，避免反复 hover 时提升 / 合并图层引起边缘重绘。 */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(:where(.snowui-button[data-default-hover-scale="true"]).snowui-button-background-scale-surface)::before,
+    :global(:where(.snowui-button[data-default-hover-scale="true"]).snowui-button-embedded-button-group)::before {
+      will-change: transform;
+    }
+
+    :global(:where(.snowui-button[data-default-hover-scale="true"]).snowui-button-background-scale-surface)::after {
+      will-change: transform, opacity;
+    }
+  }
+
   /* 基础背景与 hover 颜色分层；两层只用 transform 放大，不改变布局。 */
   :global(:where(.snowui-button).snowui-button-background-scale-surface)::before,
   :global(:where(.snowui-button).snowui-button-background-scale-surface)::after {
