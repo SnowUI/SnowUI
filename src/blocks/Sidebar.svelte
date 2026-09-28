@@ -634,7 +634,6 @@
             edge="end"
             pinOffset="var(--snowui-sidebar-resize-indicator-offset-override, var(--padding-1))"
             class="snowui-sidebar-resize-indicator"
-            style="--snowui-indicator-color-override: transparent; --snowui-indicator-active-color-override: transparent"
             value={resolvedWidth}
             minSize={minWidth}
             maxSize={maxWidth}

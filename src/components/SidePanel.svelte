@@ -497,7 +497,6 @@
                 edge="start"
                 pinOffset="var(--padding-1)"
                 class="snowui-side-panel-resize-indicator"
-                style="--snowui-indicator-color-override: transparent; --snowui-indicator-active-color-override: transparent"
                 value={resolvedWidth}
                 minSize={minWidth}
                 maxSize={maxWidth}

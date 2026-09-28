@@ -127,7 +127,7 @@
 | onDelete | `() => void \| Promise<void>` | — | 点击默认下工具栏删除操作后回调。 |
 | onClose | `() => void \| Promise<void>` | — | 关闭前回调 |
 | children | `Snippet` | — | 面板滚动内容区，由调用方提供详情或编辑内容。 |
-| parts | `ComponentPartsOf<{ Button: typeof Button; Indicator: typeof Indicator; }>` | — | 内置工具栏 Button 与透明调宽交互层；Indicator 视觉固定隐藏 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Indicator: typeof Indicator; }>` | — | 内置工具栏 Button 与整边调宽交互层；Indicator 复用默认状态视觉 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 
@@ -429,7 +429,7 @@ function download() { /* 接入业务下载 */ }
 - 上、下工具栏的内置 icon-only Button 显式使用 `emphasis="muted"`，并在 hover 时显示自身 `ariaLabel` 的 Tooltip；调用方显式传入的 `bottomLeading` / `bottomTrailing` 不会被改写。可通过 `parts.Button.emphasis` 统一覆盖内置按钮的强调级别。
 - 内置 placement、previous、next、copy、delete、cancel、save、close 文案通过 `LocaleProvider` / `useLocale()` 读取；对应 key 为 `sidePanel.placement.toInline`、`sidePanel.placement.toFloating`、`sidePanel.previous`、`sidePanel.next`、`sidePanel.copy`、`sidePanel.delete`、`sidePanel.cancel`、`sidePanel.save`、`sidePanel.close`。无 Provider 时为 `zh-CN`。`title` 与 actions 数组的 `label` / `ariaLabel` 属于调用方业务文案，保持最高优先级且不翻译。
 - 下栏优先级：Snippet **>** actions 数组 **>** 默认可编辑按钮。
-- 内置 Button 与透明调宽交互层通过 `parts.Button` / `parts.Indicator` 批量配置；组件固定隐藏 Indicator 视觉。
+- 内置 Button 与整边调宽交互层通过 `parts.Button` / `parts.Indicator` 批量配置；Indicator 复用默认状态视觉。
 - 无上工具栏时，顶部内容间距与滚动渐隐范围均为 `var(--padding-4)`（16px）；无下工具栏时底部同样为 16px。有工具栏的一侧按工具栏高度预留。到达对应滚动端点后关闭该侧渐隐，保留内容间距。
 - 内容区滚动渐隐使用 `.snowui-scroll-mask` + `data-scroll-mask`。上/下 solid-ratio **0.8**。
 
@@ -444,6 +444,8 @@ function download() { /* 接入业务下载 */ }
 | `onClick` | 自定义回调 |
 
 ## 更新日志
+
+- 2026-09-28：内置 Indicator 使用整边命中，移除透明颜色特化，统一常态与 hover 视觉。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
