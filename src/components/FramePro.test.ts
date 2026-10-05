@@ -71,7 +71,7 @@ export const examples = [
         tag="button"
         type="button"
         Click={{ target: "chart-bars", action: "play" }}
-        class="h-32 px-12 rounded-8 bg-logo-1 text-white-100 cursor-pointer"
+        class="h-32 px-12 rounded-8 bg-brand text-white-100 cursor-pointer"
     >
         Start
     </FramePro>
@@ -106,7 +106,7 @@ export const examples = [
             tag="button"
             type="button"
             Click={{ target: "grid-demo", action: "play" }}
-            class="h-32 px-12 rounded-8 bg-logo-1 text-white-100 cursor-pointer"
+            class="h-32 px-12 rounded-8 bg-brand text-white-100 cursor-pointer"
         >
             Play
         </FramePro>
