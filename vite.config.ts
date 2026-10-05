@@ -201,7 +201,9 @@ function deleteExampleInFile(filePath: string, exampleName: string) {
 export default defineConfig({
   resolve: {
     alias: {
-      '@snowui-design-system/resource-svelte': path.resolve(__dirname, '../resource-svelte/src/index.ts'),
+      // Test 资源组件和图片均读取同级项目，不读取已安装资源包。
+      '@snowui-design-system/resource-svelte': path.resolve(__dirname, '../resource-svelte/src'),
+      '@snowui-design-system/resource-base': path.resolve(__dirname, '../resource-base'),
       '@snowui-design-system/components-pro': path.resolve(__dirname, '../pro/src/index.ts'),
     }
   },

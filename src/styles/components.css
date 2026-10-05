@@ -478,10 +478,10 @@
     /* --snowui-gradient-avatar-hover-motion-subtract-2-duration-override: ; */ /* Avatar Subtract 2 水波周期（默认 6.8s） */
 
     /* SnowUILogo */
-    /* --snowui-snow-ui-logo-icon-size-override: ; */       /* 图标尺寸（默认 horizontal/icon 28px，vertical 64px） */
-    /* --snowui-snow-ui-logo-wordmark-width-override: ; */  /* 字标宽度（默认 71px） */
-    /* --snowui-snow-ui-logo-wordmark-height-override: ; */ /* 字标高度（默认 12px） */
-    /* --snowui-snow-ui-logo-gap-override: ; */              /* 组合间距（默认 horizontal 6px，vertical 8px） */
+    /* --snowui-snow-ui-logo-icon-size-override: ; */       /* 图标尺寸（默认 horizontal/icon 28px，vertical 60px） */
+    /* --snowui-snow-ui-logo-wordmark-width-override: ; */  /* 字标宽度（默认 71px，vertical 119px） */
+    /* --snowui-snow-ui-logo-wordmark-height-override: ; */ /* 字标高度（默认 12px，vertical 20px） */
+    /* --snowui-snow-ui-logo-gap-override: ; */              /* 组合间距（默认 horizontal 6px，vertical 15px） */
 
     /* AvatarGroup */
     /* --snowui-avatar-group-size-override: ; */       /* 整体尺寸（尺寸 px，默认值见组件源码） */
