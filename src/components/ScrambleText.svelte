@@ -233,6 +233,7 @@
 
 <script lang="ts">
     import { onMount } from "svelte";
+    import { observeAppearanceRelease } from "../lib/chart/appearance-viewport";
     import type { SnowUIColor } from "@snowui-design-system/components/lib/color";
     import type { FrameProps } from "@snowui-design-system/components/logic/frame-types";
     import {
@@ -297,8 +298,11 @@
     });
 
     onMount(() => {
-        hasMounted = true;
-        scrambleElement?.replay();
+        if (!scrambleElement) return;
+        return observeAppearanceRelease(scrambleElement, (controlled) => {
+            hasMounted = true;
+            if (!(controlled && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) scrambleElement?.replay();
+        });
     });
 
     $effect(() => {

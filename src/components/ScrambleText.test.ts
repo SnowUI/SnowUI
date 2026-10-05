@@ -1,6 +1,22 @@
 // motionColor 的全文索引、回落顺序及快速更新由 Playground text-motion-color-sequence 浏览器回归验证。
 export const examples = [
     {
+        name: "文档宿主播放门禁",
+        code: `<script>let released = $state(false);</script>
+<Frame column class="gap-12">
+    <div data-snowui-appearance-gated="true" data-snowui-appearance-ready={String(released)}>
+        <ScrambleText text="Preview ready" />
+    </div>
+    <Button onclick={() => released = true}>Release appearance</Button>
+</Frame>`,
+        expected: {
+            render: "预热期间完整静态内容已挂载，未开始播放。",
+            interaction: "点击 Release appearance 后只放行一次；卸载清理观察。",
+            responsive: "减少动效下保持稳定内容。",
+        },
+    },
+
+    {
         name: "A1: 基础字符集",
         code: `A1
 <Frame column class="gap-12">

@@ -109,6 +109,10 @@
 
 `ScrambleText` 提供字符扰动、循环并归位到目标文字的动效。默认使用 `cascade`，动效速度和字符错峰由组件内部统一维护。
 
+### 文档宿主的出现门禁
+
+页面祖先或同源 iframe 显式设置 `data-snowui-appearance-gated="true"` 时，先完成静态布局，所有祖先门禁的 `data-snowui-appearance-ready="true"` 后才启动首轮动效。首次放行后取消观察，保留人工交互与卸载清理；没有门禁的独立消费保持原行为。协议由 Site `docs/ComponentExampleRuntimeSpec.md` 维护。
+
 ## 更新日志
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。

@@ -32,6 +32,7 @@
 
 <script lang="ts">
     import { onMount } from "svelte";
+    import { observeAppearanceRelease } from "../lib/chart/appearance-viewport";
     import FramePro, {
         type FrameProps,
         type LoopMotionConfig,
@@ -283,7 +284,7 @@ void main() {
         height = undefined,
         radius = "inherit",
         intensity = 1,
-        paused = false,
+        paused: requestedPaused = false,
         decorative = true,
         direction = "ltr",
         bandTight = 14,
@@ -486,6 +487,15 @@ void main() {
         width: userRenderHints?.width ?? resolvedWidth,
         height: userRenderHints?.height ?? resolvedHeight,
         radius: userRenderHints?.radius ?? resolvedRadius,
+    });
+
+    let appearanceReady = $state(false);
+    const paused = $derived(requestedPaused || !appearanceReady);
+    onMount(() => {
+        if (!canvasElement) return;
+        return observeAppearanceRelease(canvasElement, (controlled) => {
+            appearanceReady = !(controlled && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+        });
     });
 
     onMount(() => {

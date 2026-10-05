@@ -6,6 +6,22 @@
  */
 export const examples = [
     {
+        name: "文档宿主播放门禁",
+        code: `<script>let released = $state(false);</script>
+<Frame column class="gap-12">
+    <div data-snowui-appearance-gated="true" data-snowui-appearance-ready={String(released)}>
+        <GradientMotion size={160} />
+    </div>
+    <Button onclick={() => released = true}>Release appearance</Button>
+</Frame>`,
+        expected: {
+            render: "预热期间完整静态内容已挂载，未开始播放。",
+            interaction: "点击 Release appearance 后只放行一次；卸载清理观察。",
+            responsive: "减少动效下保持稳定内容。",
+        },
+    },
+
+    {
         name: "A1: glimm 六种 palette",
         code: `A1
 <Frame row class="gap-12 items-center" style="flex-wrap: wrap;">
