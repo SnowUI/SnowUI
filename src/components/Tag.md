@@ -41,8 +41,8 @@
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
 | parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置组件生成的关闭 Button；不影响显式 children 内的按钮。 |
-| variant | `"default" \| "active"` | `"default"` | 视觉变体。`default` = Black/4% 背景；`active` = Secondary/Indigo 10% 背景 + Indigo 文字 |
-| toggle | `boolean` | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态由 Frame 输出的 `data-state="Active"` 触发 Indigo 激活态；`aria-pressed` 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
+| variant | `"default" \| "active"` | `"default"` | 视觉变体。`default` = Black/4% 背景；`active` = Brand 10% 背景 + Brand 文字 |
+| toggle | `boolean` | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态由 Frame 输出的 `data-state="Active"` 触发 Brand 激活态；`aria-pressed` 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
 | closable | `boolean` | `false` | 是否显示内置删除 X（hover Tag 时显形） |
 | shape | `"default" \| "left-arrow" \| "right-arrow"` | `"default"` | 外壳形状，用于路径 / 面包屑片段 |
 | onClose | `(event: MouseEvent) => void` | — | 点击 X 时回调（不直接销毁 Tag，移除逻辑由消费方决定） |
@@ -64,7 +64,7 @@
 | `Tag ×` | `<Tag closable>Label</Tag>` | 文字 + 内置关闭 X |
 | `● Tag` | 外部 `<Icon as="leading">` + Tag | 左侧 Dot 不内置，由消费方显式传入 |
 | `● Tag ×` | 外部 leading Icon + `closable` | Icon、文字、X 走同一内联外壳布局 |
-| 紫色 `● Tag ×` | `variant="active"` 或 `toggle` 切到 Active | Secondary/Indigo 激活态 |
+| 品牌色 `● Tag ×` | `variant="active"` 或 `toggle` 切到 Active | Brand 激活态 |
 | `< Tag` | `shape="left-arrow"` | 路径 / 面包屑片段 |
 | `Tag >` | `shape="right-arrow"` | 路径 / 面包屑片段 |
 
@@ -106,7 +106,7 @@
 
 - 子元素通过 `gap` 自然排列；外部覆盖 `--snowui-tag-gap` 或传 `gap` 即可同步影响所有子元素间距（包括内置 X 与文字、外部 Icon 与文字）。
 - **不内置 leading Icon**；需要 Dot 由消费方显式传入 `<Icon as="leading">`。
-- 删除 X 由 `closable={true}` 自动渲染在末尾；视觉与 hover 复用 `Button bare emphasis="muted"`（默认图标为 Components 自有语义 `close`，其包内形状快照来源为 `close-regular.svg`）；默认 `width: 0`、`min-width: 0` 不占位，hover Tag 时显形，hover X 自身时透明度提升到 1。激活态下 X 颜色源切到 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%。
+- 删除 X 由 `closable={true}` 自动渲染在末尾；视觉与 hover 复用 `Button bare emphasis="muted"`（默认图标为 Components 自有语义 `close`，其包内形状快照来源为 `close-regular.svg`）；默认 `width: 0`、`min-width: 0` 不占位，hover Tag 时显形，hover X 自身时透明度提升到 1。激活态下 X 颜色源切到 Brand：未 hover X 时 40%，hover X 时 100%。
 - **边距按元素类型决定**（与 Figma 对齐）：文字与边的间距 8px、Icon / X 与边的间距 4px。组件通过 MutationObserver 检测**真实**首/末位节点（包含文本节点），按节点类型写到 `data-edge-left` / `data-edge-right`（`"icon"` / `"text"`），CSS `[data-edge-*="icon"]` 把对应侧 padding 从 8px 收紧到 4px。**纯 CSS `:first-child` / `:last-child` 只看元素节点，无法识别"末位文字"的情况**，因此走 JS。closable 的 X 不计入边距检测（X 由 `[data-closable]:hover` 单独管理右 padding）。
 - 箭头形状（`left-arrow` / `right-arrow`）由内部 SVG 背景路径实现，不进入子元素布局；组件用 ResizeObserver 获取当前宽高并生成完整外轮廓，所有拐点都通过二次贝塞尔圆角化，尽量复原 Workshop `node-id=11951-40471`。
 
@@ -200,7 +200,7 @@
 > **更新日志 (2026-09-20)**: 内置关闭按钮清除最小内容宽度，常态不占位；离开后先淡出 X，再收回宽度和 padding。键盘焦点位于 Tag 内时保持展开。
 > **更新日志 (2026-08-30)**: 收起态内置 X 通过 Tag 直属规则完整覆盖共享按钮的 `flex` shorthand，确保视觉隐藏时不保留 12px 布局占位。
 > **更新日志 (2026-05-22)**: `shape="left-arrow" / "right-arrow"` 改为内部 SVG 背景路径，根据当前 Tag 宽高生成完整圆角箭头轮廓；所有外角均圆角化，尽量复原 Workshop `node-id=11951-40471` 中的箭头 Tag。
-> **更新日志 (2026-05-21)**: 激活态内置 X 颜色改为 Secondary/Indigo：未 hover X 时 40%，hover X 时 100%，不再使用黑色。
+> **更新日志 (2026-05-21)**: 激活态内置 X 颜色改为 Brand：未 hover X 时 40%，hover X 时 100%，不再使用黑色。
 > **更新日志 (2026-08-16)**: 内置 X 改由 Components 自有 `ComponentIcon name="close"` 解析；无外部资源包时保持相同默认形状，应用级 `IconProvider` 可统一替换。
 > **更新日志 (2026-08-16)**: Tag 自有颜色、padding 与 hover overlay 过渡稳定覆盖 Level 1 共享行为，不依赖 CSS 注入顺序。
 > **更新日志 (2026-05-21)**: 新增 `toggle` 语法糖，与 Button 一致自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；点击进入激活态，再次点击回到常态。
@@ -236,17 +236,17 @@
 | :--- | :--- |
 | 行为类 | 根节点始终挂 `.snowui-hoverable`，与 Button 共享 hover overlay 与 `cursor: pointer` 协议 |
 | 默认态 hover | 在 `--black-4` 背景上额外叠加 currentColor hover overlay（浅色 4%，暗色 10%） |
-| 激活态 hover | 在 Indigo 10% 背景上额外叠加 currentColor hover overlay |
+| 激活态 hover | 在 Brand 10% 背景上额外叠加 currentColor hover overlay |
 | X 显形 | hover 整个 Tag 时 X 从 `width: 0; opacity: 0` 展开到 `width: var(--snowui-button-icon-size); opacity: 0.4`，同时右侧 padding 从 8px 收紧到 4px |
 
 ### 2. 激活态 (variant=active)
 
 | 属性 | 值 |
 | :--- | :--- |
-| Background | `color-mix(in srgb, var(--secondary-indigo) 10%, transparent)` |
-| Color | `var(--secondary-indigo)` |
-| Icon 颜色 | `currentColor`（自动继承 Indigo） |
-| X 颜色 | `var(--secondary-indigo)` × opacity：未 hover X 时 40%，hover X 时 100% |
+| Background | `color-mix(in srgb, var(--brand) 10%, transparent)` |
+| Color | `var(--brand)` |
+| Icon 颜色 | `currentColor`（自动继承 Brand） |
+| X 颜色 | `var(--brand)` × opacity：未 hover X 时 40%，hover X 时 100% |
 
 ### 3. 箭头形状（SVG 圆角箭头）
 
@@ -254,7 +254,7 @@
 | :--- | :--- |
 | 实现 | 内部 SVG 背景层：ResizeObserver 获取 Tag 当前宽高，按 `left-arrow` / `right-arrow` 生成一条完整 path；内容仍走原 inline-flex 布局 |
 | 圆角来源 | Workshop `node-id=11951-40471`；主体四角为 8px，箭头尖端为 4px，均通过 path 的 `Q` 曲线处理 |
-| 填充色 | SVG 主 path 填充 `--snowui-tag-bg` / `--snowui-tag-bg-override`；激活态切到 Indigo 同步 |
+| 填充色 | SVG 主 path 填充 `--snowui-tag-bg` / `--snowui-tag-bg-override`；激活态切到 Brand 同步 |
 | Hover | SVG 叠加一条同轮廓 overlay path，opacity 消费 `.snowui-hoverable` 同款 `--snowui-hover-opacity` / `--snowui-frame-hover-opacity` |
 | 接缝 | 单条完整 path 覆盖整个箭头外壳，不再由 body + 伪元素拼接，因此没有直边接缝 |
 | 内容间距 | 箭头尖端侧显式保持 `var(--padding-1)`（= 4px），加上 8px 尖端长度后，文字到尖端约 12px；非尖端侧保持 `var(--padding-2)`（= 8px）。Icon / X 边距收紧规则不再覆盖箭头形态，避免第一个 `left-arrow` 示例右侧间距丢失 |
@@ -268,7 +268,7 @@
 | :--- | :--- |
 | 实现 | 复用 `Button bare emphasis="muted"`；内部图标为 Components `ComponentIcon name="close"`（包内默认 regular 快照来自 `close-regular.svg` 与 Workshop 12×12 X） |
 | Size | `1rem`（标准根字号16px） |
-| Color | 默认态：`var(--black-100)` × opacity；激活态：`var(--secondary-indigo)` × opacity |
+| Color | 默认态：`var(--black-100)` × opacity；激活态：`var(--brand)` × opacity |
 | Opacity（默认） | `0.4` |
 | Opacity（hover X 自身） | `1` |
 | Width（默认） | `0` + `overflow: hidden` — 不占位，Tag 宽度等同于不含 X 的同内容 Tag |
@@ -300,6 +300,9 @@
 ---
 
 ## 更新日志
+
+- 2026-10-05：原 Indigo 默认配色改为 Brand（`--brand`），保留原有透明度、状态与覆盖机制。
+
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

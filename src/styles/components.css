@@ -74,7 +74,7 @@
     /* ─────────────────────────────────────────
        Link
        font=14px/20px gap=2px；默认无下划线。
-       default 默认 Indigo；arrow / external 默认 Black/100。
+       所有变体默认 Black40；通过 color="Brand" 使用品牌色。
        trailing 箭头 / Icon 继承文字色，opacity: 0.4 -> 1。
     ───────────────────────────────────────── */
     /* --snowui-link-font-size-override: ; */   /* font-size（默认 var(--text-14) = 14px） */
@@ -130,7 +130,7 @@
        Tag
        单一尺寸；含 X 时右 padding、含 leading 时左 padding 自动收紧。
        默认 padding=2px 8px；含 X / leading 时对应一侧改为 4px。
-       default 背景: var(--black-4)；active 背景: var(--secondary-indigo) 10%。
+       default 背景: var(--black-4)；active 背景: var(--brand) 10%。
        箭头形状 (shape=left-arrow / right-arrow) 由内部 SVG path 生成完整圆角轮廓；箭头尖端长度 8px，箭头侧内容间距 8px。
     ───────────────────────────────────────── */
     /* --snowui-tag-padding-override: ; */       /* padding y+x（默认 calc(--padding-1 / 2) var(--padding-2) = 2px 8px） */
@@ -138,8 +138,8 @@
     /* --snowui-tag-radius-override: ; */        /* border-radius（默认 var(--radius-3)=8px；箭头形状 4px） */
     /* --snowui-tag-font-size-override: ; */     /* font-size（默认 var(--text-12)） */
     /* --snowui-tag-line-height-override: ; */   /* line-height（默认 var(--leading-12)） */
-    /* --snowui-tag-bg-override: ; */            /* 背景（默认 var(--black-4)；active 时 var(--secondary-indigo) 10%） */
-    /* --snowui-tag-color-override: ; */         /* color（默认 inherit；active 时 var(--secondary-indigo)） */
+    /* --snowui-tag-bg-override: ; */            /* 背景（默认 var(--black-4)；active 时 var(--brand) 10%） */
+    /* --snowui-tag-color-override: ; */         /* color（默认 inherit；active 时 var(--brand)） */
 
 
     /* ─────────────────────────────────────────

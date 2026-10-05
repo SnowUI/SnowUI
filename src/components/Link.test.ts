@@ -29,7 +29,7 @@ export const examples = [
 </div>`,
         expected: {
             render: "所有变体默认 Black40，hover Black100；arrow 显示 12px ArrowUpRight；external 显示 12px ArrowSquareOut",
-            interaction: "hover 时默认 Link 进入深色混色，arrow / external 文字进入 Indigo；trailing 箭头 / Icon 继承文字颜色并由 opacity 0.4 提升到 1",
+            interaction: "hover 时所有默认变体文字进入 Black100；trailing 箭头 / Icon 继承文字颜色并由 opacity 0.4 提升到 1",
         },
         logic: ["LINK-Init.1", "LINK-Variant.1"],
     },

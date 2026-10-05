@@ -48,7 +48,7 @@
 | dot | `boolean` | — | true 强制圆点，false 使用内容模式；未传时仅在解析后的 count 为 undefined 且没有 children 时自动显示圆点。 |
 | max | `number` | `99` | 数字模式的最大值 (超过显示 max+) |
 | showZero | `boolean` | `false` | false 时隐藏数值 0、字符串 "0" 及无内容的非圆点徽标；true 保留。圆点与 loading 显示不受零值隐藏控制。 |
-| color | `SnowUIColor \| string` | `"Indigo"` | filled 与 dot 的填充颜色，支持 PascalCase 语义色及 CSS 颜色值；filled 文字保持白色，border 内容模式仍使用透明背景与继承文字色。 |
+| color | `SnowUIColor \| string` | `"Brand"` | filled 与 dot 的填充颜色，支持 PascalCase 语义色及 CSS 颜色值；filled 文字保持白色，border 内容模式仍使用透明背景与继承文字色。 |
 | size | `ResourceSize` | — | 12/16/20/24/28/32/40/48/80；未指定时读取父级尺寸上下文。border 内容模式保持文字 Hug；作为 Avatar/Icon 角标时尺寸由宿主角标协议解析。 |
 | children | `Snippet` | — | 自定义徽标内容，显示优先于 count；有 children 且未指定 dot 时使用内容模式，dot=true 时不渲染这些内容。 |
 
@@ -186,7 +186,7 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 |:---|:---|:---|
 | **Display** | `inline-flex` | 内联弹性布局 |
 | **Align** | `center`, `justify-content: center` | 水平垂直居中 |
-| **Background** | `var(--secondary-indigo, #adadfbff)` | 默认紫色背景 |
+| **Background** | `var(--brand, #33D1FFFF)` | 默认品牌色背景 |
 | **Color** | `var(--static-white-100, #ffffffff)` | **固定白色** |
 | **Padding** | `--snowui-badge-padding` → `calc(var(--padding-1) * 0.75) calc(var(--padding-1) * 1.5)` | 3px 6px |
 | **Font Size** | `--snowui-badge-font-size` → `var(--text-12)` | 12px |
@@ -209,7 +209,7 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 | **Padding** | `0` |
 | **External Spacing** | 由父级 `gap` / `padding` 管理，组件内部不输出 `margin` |
 | **Border Radius** | `var(--radius-full, 50%)` |
-| **Background** | `currentColor` (继承 `--secondary-indigo`) |
+| **Background** | `currentColor` (继承 `--brand`) |
 
 ### 3. 布局架构 (Internal Layout)
 
@@ -237,6 +237,9 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 ---
 
 ## 更新日志
+
+- 2026-10-05：原 Indigo 默认配色改为 Brand（`--brand`），保留原有透明度、状态与覆盖机制。
+
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

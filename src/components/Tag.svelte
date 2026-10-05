@@ -7,7 +7,7 @@
 
   视觉变体：
     - default：Black/4% 背景；
-    - active：Secondary/Indigo 10% 背景 + Indigo 文字；X 使用 Indigo 40%，hover X 时 Indigo 100%。
+    - active：Brand 10% 背景 + Brand 文字；X 使用 Brand 40%，hover X 时 Brand 100%。
       → 通过映射到 Frame 状态机 currentState="Active"，自动获得 aria-pressed="true"。
     - toggle：Button 同款语法糖，点击在 Idle / Active 间切换。
 
@@ -363,11 +363,11 @@
     :global(:where(.snowui-tag)[data-state="Active"]) {
         --snowui-tag-bg: color-mix(
             in srgb,
-            var(--secondary-indigo, #adadfb) 10%,
+            var(--brand, #33D1FFFF) 10%,
             transparent
         );
-        --snowui-tag-color: var(--secondary-indigo, #adadfb);
-        --snowui-tag-close-color: var(--secondary-indigo, #adadfb);
+        --snowui-tag-color: var(--brand, #33D1FFFF);
+        --snowui-tag-close-color: var(--brand, #33D1FFFF);
     }
 
     /* Level 4: 箭头形状（SVG 圆角箭头）

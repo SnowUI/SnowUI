@@ -446,14 +446,14 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 ### 5. Placeholder 颜色修复方法
 
 - `layout.css` 中统一定义全局与字段高亮变量：
-  `--snowui-selection-bg = Black/4%`
+  `--snowui-selection-bg = Brand 40%（var(--brand)）`
   `--snowui-selection-color = Black/100%`
   `--snowui-selection-radius = 8px`
 - 普通页面文字（非原生表单控件内部文本）走全局 `::selection`
 - `text` 输入框直接使用原生 `<input>`，由浏览器原生输入层消费 placeholder 与选中文本样式
 - `date` 输入框走自定义分段编辑层（年 / 月 / 日），分段选区同样消费同一组高亮变量
 - 字段宿主层继续暴露：
-  `--snowui-field-selection-bg = Black/4%`
+  `--snowui-field-selection-bg = var(--snowui-selection-bg)`（默认 Brand 40%）
   `--snowui-field-selection-color = Black/100%`
   `--snowui-field-selection-radius = 8px`
 - 普通输入的 placeholder 颜色采用双层兜底：
@@ -624,6 +624,8 @@ invalid=true + !hasCustomTrailing
 - **Input 组件**: [./Input.svelte](./Input.svelte)
 
 ## 更新日志
+
+- 2026-10-05：日期分段聚焦与选中背景、全局文字与输入选区统一使用 Brand 40%，保留原有前景色与交互。
 
 ### v1.1.5 (2026-09-27)
 

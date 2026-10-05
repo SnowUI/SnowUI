@@ -9,7 +9,7 @@
 /* Log (2026-02-22): 收敛 Surface hover 覆写能力，仅保留 --snowui-frame-hover-image-override 作为声明式覆盖入口。 */
 /* Log (2026-03-10): Avatar / Image 的 hover 回收至组件内，layout.css 不再承接媒体类组件的专用 hover 细节。 */
 /* Log (2026-03-16): 新增 Field 文本高亮变量，供日期字段分段焦点样式等输入型场景复用。 */
-/* Log (2026-03-17): 按最新交互需求将全局文字与输入选中背景统一调整为 Secondary/Indigo 40%。 */
+/* Log (2026-10-05): 全局文字与输入选区背景使用 Brand 40%。 */
 /* Log (2026-06-18): 新增通用错误反馈 shake 类，供 Frame stateClass 在 Input / Field 等表单场景复用。 */
 
 /* 共享结构与行为层按依赖顺序集中登记。未分层的组件基类与消费方样式稳定高于这些默认。 */
@@ -62,7 +62,7 @@
 :where(html) {
     --snowui-selection-bg: color-mix(
         in srgb,
-        var(--secondary-indigo, #5856d6ff) 40%,
+        var(--brand, #33D1FFFF) 40%,
         transparent
     );
     --snowui-selection-color: var(--black-100, #000000);

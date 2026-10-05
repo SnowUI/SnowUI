@@ -58,7 +58,7 @@
     contentScaleOnHover?: boolean;
     /**
      * Toggle 模式：内部自动注入 `Click={{Idle:"Active",Active:"Idle"}}` 与 `whileClick=false` 默认值，
-     * 配合 Frame 自动暴露的 `data-state="Active"` 让根节点在激活态自动套用 Secondary/Indigo 配色。
+     * 配合 Frame 自动暴露的 `data-state="Active"` 让根节点在激活态自动套用 Brand 配色。
      * `aria-pressed` 也由 Frame 自动输出。
      * 消费方可继续传 `Click` / `whileClick` 覆盖默认行为。
      */
@@ -1090,14 +1090,14 @@
   }
 
   /* Toggle / 瞬时反馈：Active 状态由 Frame 自动暴露的 data-state="Active" 触发，
-     无需消费方手写 stateClass，配色与 Tag variant="active" 一致（Secondary/Indigo）。 */
+     无需消费方手写 stateClass，配色与 Tag variant="active" 一致（Brand）。 */
   :global(:where(.snowui-button)[data-state="Active"]:not([data-variant="filled"])) {
     --snowui-button-background: color-mix(
       in srgb,
-      var(--secondary-indigo, #adadfb) 10%,
+      var(--brand, #33D1FFFF) 10%,
       transparent
     );
-    --snowui-button-color: var(--secondary-indigo, #adadfb);
+    --snowui-button-color: var(--brand, #33D1FFFF);
     --snowui-button-border-color: transparent;
   }
 

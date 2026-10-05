@@ -93,7 +93,7 @@
         dot = undefined,
         max = 99,
         showZero = false,
-        color = "Indigo",
+        color = "Brand",
         size = undefined, // Default undefined
         class: className = "",
         style: userStyle = "",
@@ -537,7 +537,7 @@
         box-sizing: border-box;
         background-color: var(
             --snowui-badge-background,
-            var(--secondary-indigo, #adadfbff)
+            var(--brand, #33D1FFFF)
         );
         color: var(--snowui-badge-foreground);
         width: fit-content;
@@ -664,7 +664,7 @@
         border-radius: var(--radius-full, 9999px);
         color: var(
             --snowui-badge-background,
-            var(--secondary-indigo, #adadfbff)
+            var(--brand, #33D1FFFF)
         );
         background-color: currentColor;
     }

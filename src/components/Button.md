@@ -49,7 +49,7 @@
 | backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
 | scaleOnHover | `boolean` | — | 是否同时启用 Button 内置背景层 hover 放大及配套点击缩回 / 恢复动效。独立动作默认开启；内容默认跟随缩放，命中区和布局不变。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
 | contentScaleOnHover | `boolean` | 跟随背景缩放 | 是否让文字、Icon、Spinner 等内容作为整体跟随内置背景 hover 与点击缩放。`false` 仅关闭内容缩放；`true` 仍要求背景缩放生效，不能绕过 scaleOnHover=false、bare、disabled 或显式 whileHover 接管。 |
-| toggle | `boolean` | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 Secondary/Indigo 配色（gray / outline / borderless 生效，filled 排除）；`aria-pressed` 由 Frame 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
+| toggle | `boolean` | `false` | Toggle 模式语法糖。内部自动注入 `Click={{ Idle: "Active", Active: "Idle" }}` 与 `whileClick=false`；Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 Brand 配色（gray / outline / borderless 生效，filled 排除）；`aria-pressed` 由 Frame 自动输出。消费方可继续传 `Click` / `whileClick` 显式覆盖。 |
 | holdRepeat | `boolean` | `false` | 开启指针按住连发；仅对未禁用的 button 宿主主按钮按压生效。按下立即触发一次 click，等待后周期触发，松开或取消停止；不为链接或键盘增加连发。 |
 | holdRepeatDelay | `number` | `260` | 开始周期连发前的等待时间，单位 ms，负值按 0 处理；仅 holdRepeat=true 生效，第一次周期点击还需等待 holdRepeatInterval。 |
 | holdRepeatInterval | `number` | `80` | 按住期间相邻周期 click 的间隔，单位 ms，最小按 1 处理；仅 holdRepeat=true 生效。 |
@@ -229,7 +229,7 @@ Button 放入 ButtonGroup 后不需要写额外 prop，ButtonGroup 默认在相�
 - `Click={{ Idle: "Active", Active: "Idle" }}`
 - `whileClick=false`
 
-Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 **Secondary/Indigo 配色**（背景 10% + 文字 / Icon `--secondary-indigo`），`aria-pressed` 由 Frame 自动输出。消费方零样板。
+Active 状态下由 Frame 自动暴露的 `data-state="Active"` 触发 **Brand 配色**（背景 10% + 文字 / Icon `--brand`），`aria-pressed` 由 Frame 自动输出。消费方零样板。
 
 **等价完整写法 — 适合需要自定义状态机的场景**：
 
@@ -247,7 +247,7 @@ Active 配色仍由 `data-state="Active"` 自动生效，与 `toggle` 完全一�
 
 **自定义 Active 视觉**：
 
-如需 Indigo 之外的配色，消费方通过 `stateClass` / `stateStyle` 覆盖，`data-state` 的默认 Indigo 选择器在样式优先级上可被普通 class / inline style 覆盖：
+如需 Brand 之外的配色，消费方通过 `stateClass` / `stateStyle` 覆盖，`data-state` 的默认 Brand 选择器在样式优先级上可被普通 class / inline style 覆盖：
 
 ```svelte
 <Button
@@ -261,7 +261,7 @@ Active 配色仍由 `data-state="Active"` 自动生效，与 `toggle` 完全一�
 
 > **激活态配色统一规则(v1.5.0)**：Button 与 Tag 共用一套激活态规则：
 > - 路径：Frame `currentState === "Active"` → DOM 注入 `data-state="Active"` → 组件 CSS `[data-state="Active"]` 套色
-> - 配色：背景 `color-mix(var(--secondary-indigo) 10%, transparent)` + 文字 `var(--secondary-indigo)`
+> - 配色：背景 `color-mix(var(--brand) 10%, transparent)` + 文字 `var(--brand)`
 > - 范围：Button 对 gray / outline / borderless 生效，filled / link 排除避免冲突；Tag 单一变体全适用
 > - 消费方**无需引用任何内部 class**
 
@@ -283,7 +283,7 @@ Active 配色仍由 `data-state="Active"` 自动生效，与 `toggle` 完全一�
 - `Active={["Idle", "auto"]}` 自动回弹至 Idle
 - `whileActive={{ duration: 2000 }}` **只用作 Active 停留时长**(未声明任何动效属性)
 - 副作用(如剪贴板写入)挂在 `onclick`;状态切换与回弹由 Frame 统一接管
-- Active 期间配色由 `data-state="Active"` 自动套 Indigo，无需手写 stateClass
+- Active 期间配色由 `data-state="Active"` 自动套 Brand，无需手写 stateClass
 
 ### 与 `aria-pressed` / `aria-selected`(v1.5.0)
 
@@ -395,7 +395,7 @@ Button 放入 Pagination 时使用角色模板：
 > **更新日志 (2026-07-08)**: Button 默认最小宽度改为 `max-content`，保留“文字 + gap + padding”的自然下限，避免 fill 布局吞掉默认 padding。
 > **更新日志 (2026-07-08)**: 文字型 Button 默认 `white-space: nowrap`，避免在 Pagination 等压缩布局中被中文逐字换行。
 > **更新日志 (2026-06-01)**: 移除 `variant="link"`；文字链接统一迁移到独立 [Link.svelte](./Link.svelte)。
-> **更新日志 (2026-05-21)**: 自动输出 `aria-pressed`；Toggle 激活态配色统一为 Secondary/Indigo（`.snowui-button-active`），与 Tag `variant="active"` 一致。
+> **更新日志 (2026-05-21)**: 自动输出 `aria-pressed`；Toggle 激活态配色统一为 Brand（`.snowui-button-active`），与 Tag `variant="active"` 一致。
 
 
 **继承**: 复用 Frame.svelte 的所有通用能力 (交互、动效、响应式)。
@@ -483,6 +483,9 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志
+
+- 2026-10-05：原 Indigo 默认配色改为 Brand（`--brand`），保留原有透明度、状态与覆盖机制。
+
 
 ### 2026-09-28
 

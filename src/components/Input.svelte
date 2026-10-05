@@ -2345,7 +2345,7 @@
             --snowui-field-selection-bg,
             color-mix(
                 in srgb,
-                var(--secondary-indigo, #5856d6ff) 40%,
+                var(--brand, #33D1FFFF) 40%,
                 transparent
             )
         );
@@ -2356,7 +2356,7 @@
             --snowui-field-selection-bg,
             color-mix(
                 in srgb,
-                var(--secondary-indigo, #5856d6ff) 40%,
+                var(--brand, #33D1FFFF) 40%,
                 transparent
             )
         );

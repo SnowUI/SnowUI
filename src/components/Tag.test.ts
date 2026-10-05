@@ -44,7 +44,7 @@ export const examples = [
 
     // === B: 激活态 ===
     {
-        name: "B1: 激活态 — 文字、Icon、X 统一渲染为 Indigo；aria-pressed=true",
+        name: "B1: 激活态 — 文字、Icon、X 统一渲染为 Brand；aria-pressed=true",
         code: `B1
 <div class="flex-row gap-8 items-center">
     <Tag variant="active">Filtered</Tag>

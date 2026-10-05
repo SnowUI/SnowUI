@@ -323,7 +323,7 @@ export const examples = [
         </Button>
     </div>
     <div class="text-12 text-black-40">
-        说明:Toggle 由 Frame 状态机驱动。&lt;Button toggle&gt; 是语法糖,内部自动注入 Click={"{ Idle: 'Active', Active: 'Idle' }"} 与 whileClick=false;Active 状态由 Frame 自动暴露的 data-state=&quot;Active&quot; 触发 Secondary/Indigo 配色(与 Tag variant=&quot;active&quot; 一致);aria-pressed 由 Frame 自动输出。消费方需要复杂状态机时绕过 toggle 直接写 Click 字典即可。
+        说明:Toggle 由 Frame 状态机驱动。&lt;Button toggle&gt; 是语法糖,内部自动注入 Click={"{ Idle: 'Active', Active: 'Idle' }"} 与 whileClick=false;Active 状态由 Frame 自动暴露的 data-state=&quot;Active&quot; 触发 Brand 配色(与 Tag variant=&quot;active&quot; 一致);aria-pressed 由 Frame 自动输出。消费方需要复杂状态机时绕过 toggle 直接写 Click 字典即可。
     </div>
 </div>`,
 
@@ -357,7 +357,7 @@ export const examples = [
         </Button>
     </div>
     <div class="text-12 text-black-40">
-        说明:Click="Active" 进入 Active;Active={"[\\"Idle\\", \\"auto\\"]"} 自动回弹到 Idle;whileActive.duration 只用作 Active 停留时长。复制按钮 variant=&quot;outline&quot;,在 Active 期间由 Frame 自动暴露的 data-state=&quot;Active&quot; 触发 Indigo 配色,无需手写 stateClass;发送按钮 variant=&quot;filled&quot; 被默认 Indigo 规则排除,通过 stateClass={"{ Active: 'opacity-40' }"} 自定义反馈(说明消费方仍可通过 stateClass / stateStyle 完全自定义 Active 视觉)。
+        说明:Click="Active" 进入 Active;Active={"[\\"Idle\\", \\"auto\\"]"} 自动回弹到 Idle;whileActive.duration 只用作 Active 停留时长。复制按钮 variant=&quot;outline&quot;,在 Active 期间由 Frame 自动暴露的 data-state=&quot;Active&quot; 触发 Brand 配色,无需手写 stateClass;发送按钮 variant=&quot;filled&quot; 被默认 Brand 规则排除,通过 stateClass={"{ Active: 'opacity-40' }"} 自定义反馈(说明消费方仍可通过 stateClass / stateStyle 完全自定义 Active 视觉)。
     </div>
 </div>`,
 
