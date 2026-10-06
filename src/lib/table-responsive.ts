@@ -1,3 +1,4 @@
+import { createTableColumnMotion } from "./table-column-motion";
 import { resizeManager } from "../logic/observer.svelte";
 import type { TableRoleLayout } from "./table-context.svelte";
 
@@ -17,11 +18,14 @@ interface Column {
 /** 表格私有响应式控制器；每表统一测量，不为各 Cell 创建 Observer。 */
 export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLElement, initial: Options) {
     let options = initial;
+    const columnMotion = createTableColumnMotion(table);
+    let previousHidden: string | undefined;
     let frame = 0;
     let disposed = false;
     let columns: Column[] | undefined;
     let preferredPadding = 0;
     let minimumPadding = 0;
+    let fadeDistance = 0;
     let measuredActionsWidth = 0;
     let complexGrid = false;
     const originalSpans = new WeakMap<HTMLTableCellElement, number>();
@@ -62,9 +66,12 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
         const probe = document.createElement('span');
         probe.style.paddingLeft = 'var(--padding-3)';
         probe.style.paddingRight = 'var(--padding-1)';
+        probe.style.width = 'var(--size-5)';
+        probe.style.display = 'block';
         copy.append(probe);
         preferredPadding = parseFloat(getComputedStyle(probe).paddingLeft);
         minimumPadding = parseFloat(getComputedStyle(probe).paddingRight);
+        fadeDistance = parseFloat(getComputedStyle(probe).width);
         probe.remove();
         const heads = Array.from(copy.tHead?.rows[0]?.cells ?? copy.rows[0]?.cells ?? []);
         copy.style.setProperty('--snowui-table-responsive-cell-padding-inline', `${preferredPadding}px`);
@@ -119,6 +126,18 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
                 if (index === measured.length - 1 && !measured[index].role) required += minimumPadding;
             }
         }
+        // 宽度直接驱动下一待收列的透明度；不启动时间动画，快速反向拖动也不会排队。
+        let fadingIndex = -1;
+        let fadeOpacity = 1;
+        if (!options.horizontalScroll && !complexGrid) {
+            for (let index = measured.length - 1; index >= 0; index--) {
+                if (!hidden.has(index) && measured[index].hideable) {
+                    fadingIndex = index;
+                    fadeOpacity = Math.max(0, Math.min(1, (available + 0.5 - required) / Math.max(1, fadeDistance)));
+                    break;
+                }
+            }
+        }
         const remainingData = measured.map((column, index) => ({column, index})).filter(({column, index}) => !column.role && !hidden.has(index));
         // 只对最终单列的文本布局收缩。保护列、硬尺寸、合并网格和控件仍滚动兜底，不能裁掉操作。
         const lastIndex = remainingData[0]?.index;
@@ -128,6 +147,12 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
             && textCells.length > 0 && textCells.every(cell => cell.colSpan === 1 && cell.rowSpan === 1
                 && !cell.style.width && !cell.style.minWidth
                 && (cell.tagName === 'TH' || !cell.querySelector('button, input, select, textarea, img, svg, canvas, video, iframe, [role="button"], [contenteditable="true"]')));
+        const hiddenKey = [...hidden].join(',');
+        const animate = previousHidden !== undefined && hiddenKey !== previousHidden;
+        const before = animate ? columnMotion.capture() : undefined;
+        // 同一可见列集合内继续拖动时保留正在播放的插值，不逐帧重启 easing。
+        if (animate) columnMotion.finish();
+        previousHidden = hiddenKey;
         table.classList.toggle('snowui-table-responsive-text-fit', textFit);
         table.style.setProperty('--snowui-table-responsive-cell-padding-inline', `${minimumPadding + (preferredPadding - minimumPadding) * ratio}px`);
         table.dataset.responsiveLayout = layout;
@@ -142,6 +167,13 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
                 const hide = remaining === 0;
                 if (hide && cell.contains(document.activeElement)) viewport.focus({ preventScroll: true });
                 cell.classList.toggle('snowui-table-responsive-hidden', hide);
+                // 合并单元格不随其中某一列淡出；只同步一一对应的表头和数据 Cell。
+                const opacity = span === 1 && index === fadingIndex ? fadeOpacity : 1;
+                const property = '--snowui-table-responsive-column-opacity';
+                if (opacity < 1) {
+                    const value = opacity.toFixed(4);
+                    if (cell.style.getPropertyValue(property) !== value) cell.style.setProperty(property, value);
+                } else if (cell.style.getPropertyValue(property)) cell.style.removeProperty(property);
                 if (span > 1) cell.colSpan = Math.max(1, remaining);
                 renderedSpans.set(cell, cell.colSpan);
                 cell.classList.remove('snowui-table-cell-visible-first');
@@ -152,6 +184,7 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
             visible[0]?.classList.add('snowui-table-cell-visible-first');
             visible.at(-1)?.classList.add('snowui-table-cell-visible-last');
         }
+        if (before) columnMotion.play(before);
     }
     function schedule() {
         if (!disposed && !frame) frame = requestAnimationFrame(flush);
@@ -171,7 +204,11 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
                 // 组件动态 class 更新可能重写 className；恢复布局标记，但忽略自己的写入。
                 return authored(record.oldValue) !== authored(record.target.getAttribute('class'));
             }
-            if (record.attributeName === 'colspan' && record.target instanceof HTMLTableCellElement) {
+            if (record.attributeName === 'style' && record.target instanceof HTMLTableCellElement) {
+                const authored = (value: string | null) => (value ?? '').replace(/--snowui-table-responsive-column-opacity\s*:[^;]*(;|$)/g, '').replace(/\s/g, '');
+                return authored(record.oldValue) !== authored(record.target.getAttribute('style'));
+            }
+            if (record.attributeName === 'colspan'  && record.target instanceof HTMLTableCellElement) {
                 if (renderedSpans.get(record.target) === record.target.colSpan) return false;
                 originalSpans.set(record.target, record.target.colSpan);
                 return true;
@@ -190,6 +227,7 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
             disposed = true;
             if (frame) cancelAnimationFrame(frame);
             observer.disconnect();
+            columnMotion.destroy();
             unwatch();
             unwatchTokens();
             tokenProbe.remove();
@@ -200,6 +238,7 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
                 const span = originalSpans.get(cell);
                 if (span !== undefined) cell.colSpan = span;
                 cell.classList.remove('snowui-table-responsive-hidden', 'snowui-table-cell-visible-first', 'snowui-table-cell-visible-last');
+                cell.style.removeProperty('--snowui-table-responsive-column-opacity');
             }
             table.style.removeProperty('--snowui-table-responsive-cell-padding-inline');
             delete table.dataset.responsiveLayout;

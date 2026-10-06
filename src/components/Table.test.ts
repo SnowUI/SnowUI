@@ -73,7 +73,7 @@ export const examples = [{
 }    {
         name: "最后一列长文本",
         code: `<Table horizontalScroll={false}><TableHeader><TableRow><TableHead>订阅</TableHead><TableHead>备注</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell nowrap lines={false}>SnowUIProfessionalAnnualSubscriptionRenewal</TableCell><TableCell>Annual renewal</TableCell></TableRow></TableBody></Table>`,
-        expected: { responsive: "先隐藏备注；只剩订阅仍放不下时省略显示，hover 查看全文。表格外缘至少 8px，相邻列内容间至少 8px。" },
+        expected: { responsive: "备注随宽度逐渐淡出再隐藏；只剩订阅仍放不下时省略显示，hover 查看全文。表格外缘至少 8px，相邻列内容间至少 8px。" },
         logic: ["Responsive", "Truncation"],
     },
 ];

@@ -264,12 +264,12 @@
        Checkbox 浮层时继续保持显示，避免指针从标题移入控件时闪退。 */
     :global(:where(.snowui-table-header .snowui-table-row:has(> .snowui-table-head[data-role-layout="overlay"][data-as="selection"] + .snowui-table-head:hover)) .snowui-table-head[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control > :not(.snowui-table-role-blur-layer)),
     :global(:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"]:hover, .snowui-table-head[data-role-layout="overlay"][data-as="selection"]:has(:focus-visible)) .snowui-table-selection-control > :not(.snowui-table-role-blur-layer)) { opacity: 1; pointer-events: auto; }
-    :global(:where(.snowui-table-sort)) { display: flex; width: 100%; min-width: 0; align-items: center; justify-content: inherit; gap: 0; padding: 0; border: 0; color: inherit; font: inherit; text-align: inherit; background: transparent; opacity: .4; cursor: pointer; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
+    :global(:where(.snowui-table-sort)) { display: flex; width: 100%; min-width: 0; align-items: center; justify-content: inherit; gap: 0; padding: 0; border: 0; color: inherit; font: inherit; text-align: inherit; background: transparent; opacity: calc(.4 * var(--snowui-table-responsive-column-opacity, 1)); cursor: pointer; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
     :global(:where(.snowui-table-sort:hover)),
     :global(:where(.snowui-table-sort:focus-visible)),
-    :global(:where(.snowui-table-sort[data-active="true"])) { opacity: 1; }
+    :global(:where(.snowui-table-sort[data-active="true"])) { opacity: var(--snowui-table-responsive-column-opacity, 1); }
     :global(:where(.snowui-table-head-content)) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    :global(:where(.snowui-table-head-content-static)) { opacity: .4; }
+    :global(:where(.snowui-table-head-content-static)) { opacity: calc(.4 * var(--snowui-table-responsive-column-opacity, 1)); }
     :global(:where(.snowui-table-sort-icon)) { display: block; flex: 0 0 auto; width: var(--size-4, 1rem); height: var(--size-4, 1rem); color: inherit; }
     /* 列宽手柄复用 Indicator 的整边命中与统一状态视觉。 */
     :global(:where(.snowui-table-head > .snowui-table-head-indicator)) {
@@ -296,4 +296,8 @@
     :global(:where(.snowui-table-header:not(:hover)) .snowui-table-head-selection-blur-proxy) { transition: none; }
 
     :global(:where(.snowui-table-head[data-role-layout="column"]) .snowui-table-selection-control) { opacity: 1; pointer-events: auto; }
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-table-head-content-static, .snowui-table-sort)) { opacity: .4; }
+        :global(:where(.snowui-table-sort:hover, .snowui-table-sort:focus-visible, .snowui-table-sort[data-active="true"])) { opacity: 1; }
+    }
 </style>

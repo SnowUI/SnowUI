@@ -462,4 +462,8 @@
     :global(:where(.snowui-table-cell[data-role-layout="column"]) .snowui-table-cell-content[data-actions="true"]) { opacity: 1; pointer-events: auto; }
     :global(:where(.snowui-table-responsive-text-fit .snowui-table-cell-content[data-nowrap="true"]:not([data-actions="true"]))) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     :global(:where(.snowui-table-responsive-text-fit .snowui-table-cell-content[data-nowrap="false"])) { overflow-wrap: anywhere; }
+    :global(:where(.snowui-table-cell:not([data-as]) > .snowui-table-cell-content)) { opacity: var(--snowui-table-responsive-column-opacity, 1); }
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-table-cell:not([data-as]) > .snowui-table-cell-content)) { opacity: 1; }
+    }
 </style>
