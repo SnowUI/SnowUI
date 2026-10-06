@@ -1,6 +1,6 @@
 <!--
   SnowUILogo 组件
-  v1.18.1
+  v1.18.2
 
   职责：按 Workshop 品牌设计稿渲染 SnowUI 图标、字标及其横向/纵向组合。
   文档：./SnowUILogo.md
@@ -182,7 +182,7 @@
     cycleTimer = setTimeout(() => {
       cycleTimer = undefined;
       if (hovered && !transitioning) void moveToNode((lastNode + 1) % greetings.length);
-    }, Math.max(0, 1200 - (performance.now() - nodeStartedAt)));
+    }, Math.max(0, 1000 - (performance.now() - nodeStartedAt)));
   }
 
   function handleMouseEnter(event: MouseEvent) {

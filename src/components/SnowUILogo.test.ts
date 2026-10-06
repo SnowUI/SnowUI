@@ -1,6 +1,6 @@
 /**
  * SnowUILogo.test.ts
- * v1.18.1
+ * v1.18.2
  */
 export const examples = [
   {
@@ -35,7 +35,7 @@ export const examples = [
     name: "3: Hover 表情与多语言问候",
     code: `3
 <SnowUILogo variant="horizontal" scale={2} />`,
-    expected: { render: "默认闲置时 icon 静止，不旋转、不飘浮；横版 hover 时 icon 与文字同步变为 Emoji 和问候，品牌字标及变化后的问候均固定左对齐、保持图文间距，长词向右延伸，阿拉伯文保留 RTL 字序；hover 后表情和多语言 Hello 每 1200ms 同步轮换，外框及命中范围保持固定；溢出文字和过渡不重复触发悬停，繁忙帧不补播；移出恢复品牌，减少动效不循环。连续快速移入移出只在稳定节点处理；B → Logo 后十秒内再进入应为 C，恢复过程中再次进入也先完成品牌恢复；超过十秒从 A 开始。" },
+    expected: { render: "默认闲置时 icon 静止，不旋转、不飘浮；横版 hover 时 icon 与文字同步变为 Emoji 和问候，品牌字标及变化后的问候均固定左对齐、保持图文间距，长词向右延伸，阿拉伯文保留 RTL 字序；hover 后表情和多语言 Hello 每 1000ms 同步轮换，外框及命中范围保持固定；溢出文字和过渡不重复触发悬停，繁忙帧不补播；移出恢复品牌，减少动效不循环。连续快速移入移出只在稳定节点处理；B → Logo 后十秒内再进入应为 C，恢复过程中再次进入也先完成品牌恢复；超过十秒从 A 开始。" },
     logic: ["HoverGreeting", "StableGeometry", "ReducedMotion", "NodeBoundary", "ResumeNextNode"],
   },
   {
