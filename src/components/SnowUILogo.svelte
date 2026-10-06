@@ -1,6 +1,6 @@
 <!--
   SnowUILogo 组件
-  v1.16.1
+  v1.17.0
 
   职责：按 Workshop 品牌设计稿渲染 SnowUI 图标、字标及其横向/纵向组合。
   文档：./SnowUILogo.md
@@ -237,6 +237,8 @@
       {#key iconIndex}
       <g class="snowui-logo-icon-face" transition:iconTransition onintrostart={motionStarted} onoutrostart={motionStarted} onintroend={motionEnded} onoutroend={motionEnded}>
       {#if iconIndex === -1}
+      <g class="snowui-logo-idle-float">
+      <g class="snowui-logo-idle-spin">
       <!-- 来自 resource-base/assets/logos/snow-logo.svg 的品牌矢量快照；非 hover 时保留原始图形。 -->
       <g class="snowui-snow-ui-logo-color">
         <path
@@ -489,6 +491,8 @@
           <stop offset="1" stop-color="#7482FF" />
         </linearGradient>
       </defs>
+      </g>
+      </g>
       {:else}
         <text x={emojiMetrics[iconIndex].x} y={emojiMetrics[iconIndex].y} font-family={LOGO_EMOJI_FONT} font-size={emojiMetrics[iconIndex].size} fill="currentColor">{greetings[iconIndex][0]}</text>
       {/if}
@@ -592,6 +596,31 @@
   /* 动态字形只负责绘制，溢出和缩放不能改变根节点的悬停命中范围。 */
   :global(:where(.snowui-snow-ui-logo-icon)),
   :global(:where(.snowui-snow-ui-logo-wordmark)) { pointer-events: none; }
+
+  /* 品牌闲置动效：命中框与字标不动，旋转和飘浮分别由内层承接。 */
+  :global(:where(.snowui-logo-idle-float)) {
+    animation: snowui-logo-idle-float 5.8s cubic-bezier(.45, 0, .55, 1) infinite;
+  }
+  :global(:where(.snowui-logo-idle-spin)) {
+    transform-origin: 16px 16px;
+    animation: snowui-logo-idle-spin 16s linear infinite;
+  }
+  :global(:where(.snowui-snow-ui-logo[data-snow-ui-logo-cycle="active"]) .snowui-logo-idle-float),
+  :global(:where(.snowui-snow-ui-logo[data-snow-ui-logo-cycle="active"]) .snowui-logo-idle-spin) {
+    animation-play-state: paused;
+  }
+  @keyframes -global-snowui-logo-idle-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4.5714px); }
+  }
+  @keyframes -global-snowui-logo-idle-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(:where(.snowui-logo-idle-float)),
+    :global(:where(.snowui-logo-idle-spin)) { animation: none; }
+  }
 
   :global(:where(.snowui-logo-icon-face)) { transform-origin: 16px 16px; }
 </style>

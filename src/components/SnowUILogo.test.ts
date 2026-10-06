@@ -35,7 +35,7 @@ export const examples = [
     name: "3: Hover 表情与多语言问候",
     code: `3
 <SnowUILogo variant="horizontal" scale={2} />`,
-    expected: { render: "hover 后表情和多语言 Hello 每 1200ms 同步轮换，外框及命中范围保持固定；溢出文字和过渡不重复触发悬停，繁忙帧不补播；移出恢复品牌，减少动效不循环。连续快速移入移出只在稳定节点处理；B → Logo 后十秒内再进入应为 C，恢复过程中再次进入也先完成品牌恢复；超过十秒从 A 开始。" },
+    expected: { render: "闲置时 icon 整体 16 秒一圈、5.8 秒上下飘浮，字标及命中框静止；减少动效下停止；hover 后表情和多语言 Hello 每 1200ms 同步轮换，外框及命中范围保持固定；溢出文字和过渡不重复触发悬停，繁忙帧不补播；移出恢复品牌，减少动效不循环。连续快速移入移出只在稳定节点处理；B → Logo 后十秒内再进入应为 C，恢复过程中再次进入也先完成品牌恢复；超过十秒从 A 开始。" },
     logic: ["HoverGreeting", "StableGeometry", "ReducedMotion", "NodeBoundary", "ResumeNextNode"],
   },
   {
