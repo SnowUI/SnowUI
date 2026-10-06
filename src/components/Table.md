@@ -242,7 +242,7 @@ DataTable 的配置由 Context 下发；显式 Table 配置优先。普通 OSS T
 
 ## AI Zone
 
-响应式由私有 `lib/table-responsive.ts` 批处理。只观察每表 viewport 和 Token 探针；内容、显式列宽、字体 / 资源变化使完整列测量缓存失效。隐形且 inert 的原生 DOM 副本只在测量帧存在，恢复隐藏列及原始 colspan 后测量首选 / 最小间距；不创建第二套 Svelte 组件，也不为每个 Cell 创建 Observer。正常容器 resize 复用缓存，只提交角色布局、padding、隐藏状态及可见边缘。
+响应式由私有 `lib/table-responsive.ts` 批处理。只观察每表 viewport 和 Token 探针；内容、显式列宽、字体 / 资源变化使完整列测量缓存失效。隐形且 inert 的原生 DOM 副本只在测量帧存在，恢复隐藏列及原始 colspan 后测量首选 / 最小间距；不创建第二套 Svelte 组件，也不为每个 Cell 创建 Observer。正常容器 resize 复用缓存，在共享尺寸观察器的帧交付中直接计算，不再额外排队一帧；使用未取整的 CSS 内容宽度，避免慢速拖动时 padding 与渐隐阶梯式跳变。只提交角色布局、padding、隐藏状态及可见边缘。
 
 
 以下章节保留源码维护约束，不属于应用接入步骤。

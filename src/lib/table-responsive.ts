@@ -102,7 +102,9 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
         if (disposed || !table.isConnected || viewport.clientWidth <= 0) return;
         if (!columns) measureColumns();
         const measured = columns!;
-        const available = viewport.clientWidth;
+        // clientWidth 会取整；慢速拖动时会让 padding 与渐隐每隔 1px 才跳一次。
+        // 内部 viewport 无边框及 padding，计算样式保留未受 transform 影响的 CSS 小数宽度。
+        const available = parseFloat(getComputedStyle(viewport).width) || viewport.clientWidth;
         const full = measured.reduce((sum, column) => sum + column.preferred, 0);
         const layout = options.roleLayout === 'auto' ? (full <= available + 0.5 ? 'column' : 'overlay') : options.roleLayout;
         const included = measured.filter(column => layout === 'column' || !column.role);
@@ -111,7 +113,7 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
         const edgeExtra = layout === 'overlay'
             ? [measured[0], measured.at(-1)].filter(column => column?.role).length * minimumPadding : 0;
         const minimum = included.reduce((sum, column) => sum + column.minimum, 0) + edgeExtra;
-        // clientWidth 会取整，锁定列宽保留小数；与常驻 / 收列判断共用半像素容限。
+        // 与常驻 / 收列判断共用半像素容限，容纳原生布局的亚像素误差。
         // 否则恰好放下的固定列会因极小误差把 padding 直接压到最小值。
         const ratio = preferred <= available + 0.5 ? 1
             : preferred > minimum ? Math.max(0, Math.min(1, (available - minimum) / (preferred - minimum))) : 0;
@@ -190,7 +192,11 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
         if (!disposed && !frame) frame = requestAnimationFrame(flush);
     }
     function refresh() { columns = undefined; schedule(); }
-    const unwatch = resizeManager.watch(viewport, schedule);
+    const unwatch = resizeManager.watch(viewport, () => {
+        // 共享观察器已在动画帧批量交付；直接计算，避免再排一帧让间距落后于布局。
+        if (frame) cancelAnimationFrame(frame);
+        flush();
+    });
     const tokenProbe = document.createElement('span');
     tokenProbe.setAttribute('aria-hidden', 'true');
     Object.assign(tokenProbe.style, { position: 'fixed', visibility: 'hidden', pointerEvents: 'none', width: 'var(--size-10)', height: '0' });
