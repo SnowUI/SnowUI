@@ -156,7 +156,13 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
         if (animate) columnMotion.finish();
         previousHidden = hiddenKey;
         table.classList.toggle('snowui-table-responsive-text-fit', textFit);
-        table.style.setProperty('--snowui-table-responsive-cell-padding-inline', `${minimumPadding + (preferredPadding - minimumPadding) * ratio}px`);
+        // 容器改变时由同一次 CSS 布局同步调整 padding，不能等尺寸回调再补一次位移。
+        // 显式固定列宽可能使首选与最小宽度相等，此时保留原来的边界选择。
+        const padding = preferred > minimum
+            ? `clamp(${minimumPadding}px, calc(${minimumPadding}px + (100cqw - ${minimum}px) * ${(preferredPadding - minimumPadding) / (preferred - minimum)}), ${preferredPadding}px)`
+            : `${minimumPadding + (preferredPadding - minimumPadding) * ratio}px`;
+        const paddingProperty = '--snowui-table-responsive-cell-padding-inline';
+        if (table.style.getPropertyValue(paddingProperty) !== padding) table.style.setProperty(paddingProperty, padding);
         table.dataset.responsiveLayout = layout;
         options.onLayout(layout, measuredActionsWidth);
         for (const row of rows()) {
