@@ -117,7 +117,7 @@
             ? undefined
             : width,
     );
-    const finalStyle = $derived(`${runtimeWidth ? `--snowui-table-head-width-runtime:${runtimeWidth}px;width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));min-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));max-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime))` : ""};${hasActionsOverlay ? `--snowui-table-role-overlay-width-override:${(isActionsRole ? width : undefined) ?? table.getActionsColumnWidth()}px;` : ""}text-align:${align};${userStyle}`);
+    const finalStyle = $derived(`${runtimeWidth ? `--snowui-table-head-width-runtime:${runtimeWidth}px;width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));min-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime));max-width:var(--snowui-table-head-width-override,var(--snowui-table-head-width-runtime))` : ""};${hasActionsOverlay ? `--snowui-table-role-overlay-width-override:${(isActionsRole ? width : undefined) ?? table.getActionsColumnWidth()}px;` : ""}text-align:${align};justify-content:${align};${userStyle}`);
     $effect(() => {
         const declaredDefaultSort = defaultSort;
         const declaredColumnId = columnId;
@@ -269,6 +269,7 @@
     :global(:where(.snowui-table-sort:focus-visible)),
     :global(:where(.snowui-table-sort[data-active="true"])) { opacity: var(--snowui-table-responsive-column-opacity, 1); }
     :global(:where(.snowui-table-head-content)) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    :global(:where(.snowui-table-head:not([data-as]) > .snowui-table-head-content-static:has(> *))) { display: inline-block; max-width: 100%; vertical-align: middle; }
     :global(:where(.snowui-table-head-content-static)) { opacity: calc(.4 * var(--snowui-table-responsive-column-opacity, 1)); }
     :global(:where(.snowui-table-sort-icon)) { display: block; flex: 0 0 auto; width: var(--size-4, 1rem); height: var(--size-4, 1rem); color: inherit; }
     /* 列宽手柄复用 Indicator 的整边命中与统一状态视觉。 */

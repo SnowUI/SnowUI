@@ -64,4 +64,10 @@ export const examples = [
         expected: { render: "全选与行内 Checkbox 保留渐显，退出与内容遮罩同步，无残影。", interaction: "可通过键盘 Tab 聚焦；行勾选后移出保持显示，取消后正常隐藏。", responsive: "显式 overlay 的宽窄表格均保持相同退出规则；两处渐隐从 Checkbox 实际右边缘向右延伸固定名义 20px。" },
         logic: ["Selection", "OverlayRoleLayout", "Focus"],
     },
+    {
+        name: "图标和组件标题",
+        code: `<Table ariaLabel="发票"><TableHeader><TableRow><TableHead columnId="invoice">发票</TableHead><TableHead columnId="status" label="付款状态"><Chip>付款状态</Chip></TableHead><TableHead columnId="amount" label="美元金额" align="end"><Resource.CurrencyDollar size={16} role="img" aria-label="美元金额" /></TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell>INV-1048</TableCell><TableCell>已付款</TableCell><TableCell align="end">$240.00</TableCell></TableRow></TableBody></Table>`,
+        expected: { render: "同一标题插槽显示文本、Chip 组件与美元图标。", interaction: "图标具有美元金额的可访问名称。", responsive: "内容参与原生列宽与对齐。" },
+        logic: ["Children", "Icon", "Composition"],
+    },
 ];

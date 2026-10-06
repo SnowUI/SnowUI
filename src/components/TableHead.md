@@ -58,12 +58,31 @@
 | minWidth | `number` | `64` | 列宽调节的下限，单位 CSS px；仅在列宽调节能力启用时参与夹取。 |
 | maxWidth | `number` | `Infinity` | 列宽调节的上限，单位 CSS px；默认 Infinity 表示不额外限制。 |
 | align | `"start" \| "center" \| "end"` | `"start"` | 表头内容对齐：start 为起始侧，center 居中，end 为末端；不改变数据排序。 |
-| children | `Snippet` | — | 表头标题内容，无参数；可排序时放入内置排序按钮，selection 角色由内置全选控件承担。 |
+| children | `Snippet` | — | 表头标题内容，无参数；支持文字、Icon、资源图标及组件组合；可排序时放入内置排序按钮，selection 角色由内置全选控件承担。 |
 | parts | `ComponentPartsOf<{ Indicator: typeof Indicator; Checkbox: typeof Checkbox; }>` | — | 配置内置列宽 Indicator 与全选 Checkbox；不配置显式子内容。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 
 ## 使用边界与详细说明
+
+### 图标与组件标题
+
+Table 与 DataTable 共用 TableHead，`children` 本身就是标题插槽，无需额外的 icon 或 header 属性。可直接传入资源图标、Icon、Chip 或自定义展示组件；内容参与原生列宽测量、对齐和响应式收列；静态标题使用内联内容盒，块级图标／组件同样遵循 align，排序按钮也继承该列的对齐方式。
+
+```svelte
+<script lang="ts">
+    import { TableHead, Chip } from '@snowui-design-system/components';
+    import { CurrencyDollar } from '@snowui-design-system/resource-svelte';
+</script>
+
+<TableHead columnId="amount" label="Amount in USD" align="end" title="Amount in USD">
+    <CurrencyDollar size={16} role="img" aria-label="Amount in USD" />
+</TableHead>
+<TableHead columnId="status" label="Payment status"><Chip>Payment status</Chip></TableHead>
+```
+
+纯图标标题必须提供可访问名称。`label` 用于 TableToolbar 排序列表的可读列名，不会自动成为标题或排序按钮的可访问名称；图标本身提供 `role="img"` 与 `aria-label` 后，静态标题和内置排序按钮都能获得含义。可排序列会把 children 放入内置 button，因此只组合非交互展示组件，避免嵌套 Button、链接、输入控件。selection 角色仍由内置全选 Checkbox 承担。
+
 
 <a id="内置组件双模式"></a>
 
@@ -187,6 +206,8 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 > `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
 
 ## 更新日志
+
+- 2026-10-07：明确图标与组件标题插槽；修复块级图标标题及排序内容的列对齐，保持纯图标可访问名称。
 
 - 2026-10-07：关闭横向滚动时，待隐藏列按容器宽度同步渐隐；完整规则由 [Table 响应式](./Table.md#响应式收缩与恢复) 统一定义。
 
