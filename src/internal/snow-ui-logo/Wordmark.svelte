@@ -2,8 +2,9 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { TransitionConfig } from "svelte/transition";
-  let { greeting = null, id, onmotionstart, onmotionend }: {
+  let { greeting = null, align = "center", id, onmotionstart, onmotionend }: {
     greeting?: string | null;
+    align?: "left" | "center";
     id: string;
     onmotionstart?: () => void;
     onmotionend?: () => void;
@@ -112,7 +113,8 @@
     );
     const total = widths.reduce((sum, width) => sum + width, 0);
     const rtl = greeting !== null && /[\u0600-\u06ff]/u.test(greeting);
-    let cursor = rtl ? total / 2 : -total / 2;
+    const start = align === "left" ? 0 : -total / 2;
+    let cursor = rtl ? start + total : start;
     return letters.map((letter, index) => {
       if (rtl) cursor -= widths[index];
       const left = cursor;
@@ -211,7 +213,7 @@
       onoutrostart={onmotionstart}
       onintroend={onmotionend}
       onoutroend={onmotionend}
-      style:left={`calc(50% + ${letter.left}em)`}
+      style:left={`calc(${align === "left" ? "0%" : "50%"} + ${letter.left}em)`}
       style:width={`${letter.width}em`}
     >
       {#if letter.glyph}

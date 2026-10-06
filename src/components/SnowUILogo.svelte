@@ -1,6 +1,6 @@
 <!--
   SnowUILogo 组件
-  v1.17.1
+  v1.18.1
 
   职责：按 Workshop 品牌设计稿渲染 SnowUI 图标、字标及其横向/纵向组合。
   文档：./SnowUILogo.md
@@ -21,6 +21,7 @@
     variant?: SnowUILogoVariant;
     scale?: number;
     compactProgress?: number;
+    idleMotion?: boolean;
     decorative?: boolean;
     [key: string]: any;
   }
@@ -29,6 +30,7 @@
     variant = "horizontal",
     scale = 1,
     compactProgress = 0,
+    idleMotion = false,
     decorative = false,
     role = undefined,
     "aria-label": ariaLabel = "SnowUI",
@@ -66,7 +68,7 @@
   }
   $effect(() => {
     if (!iconSvg) return;
-    if (reducedMotion || !pageVisible || greetingIndex !== -1) iconSvg.pauseAnimations();
+    if (!idleMotion || reducedMotion || !pageVisible || greetingIndex !== -1) iconSvg.pauseAnimations();
     else iconSvg.unpauseAnimations();
   });
   const iconIndex = $derived(greetingIndex);
@@ -254,11 +256,11 @@
       <g class="snowui-logo-icon-face" transition:iconTransition onintrostart={motionStarted} onoutrostart={motionStarted} onintroend={motionEnded} onoutroend={motionEnded}>
       {#if iconIndex === -1}
       <g class="snowui-logo-idle-float">
-      {#if !reducedMotion}
+      {#if idleMotion && !reducedMotion}
         <animateTransform use:startIdleMotion attributeName="transform" type="translate" values="0 0; 0 -4.5714; 0 0" keyTimes="0; .5; 1" keySplines=".45 0 .55 1; .45 0 .55 1" calcMode="spline" dur="5.8s" repeatCount="indefinite" begin="indefinite" />
       {/if}
       <g class="snowui-logo-idle-spin">
-      {#if !reducedMotion}
+      {#if idleMotion && !reducedMotion}
         <animateTransform use:startIdleMotion attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="16s" repeatCount="indefinite" begin="indefinite" />
       {/if}
       <!-- 来自 resource-base/assets/logos/snow-logo.svg 的品牌矢量快照；非 hover 时保留原始图形。 -->
@@ -525,7 +527,7 @@
 
   {#if variant !== "icon"}
     <span class="snowui-snow-ui-logo-wordmark" aria-hidden="true">
-      <LogoWordmark {greeting} id={logoId} onmotionstart={motionStarted} onmotionend={motionEnded} />
+      <LogoWordmark {greeting} align={variant === "horizontal" ? "left" : "center"} id={logoId} onmotionstart={motionStarted} onmotionend={motionEnded} />
     </span>
   {/if}
 </Frame>
