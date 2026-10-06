@@ -233,6 +233,8 @@
 
 ## 使用边界与详细说明
 
+列标题通过 TableHead 的 children 插槽传入，支持文字、图标及非交互组件组合。纯图标标题需提供可访问名称；可排序列不要在标题内嵌套交互控件。详见 [TableHead 图标与组件标题](../../../components/src/components/TableHead.md#图标与组件标题)。
+
 <a id="布局模型"></a>
 
 ### 布局模型
