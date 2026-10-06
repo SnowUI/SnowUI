@@ -1,6 +1,6 @@
 <!--
   SnowUILogo 组件
-  v1.17.0
+  v1.17.1
 
   职责：按 Workshop 品牌设计稿渲染 SnowUI 图标、字标及其横向/纵向组合。
   文档：./SnowUILogo.md
@@ -57,6 +57,18 @@
     ["😋", "Olá"], ["😺", "Привет"], ["🥳", "नमस्ते"], ["🙂", "مرحبا"],
   ] as const;
   let greetingIndex = $state(-1);
+  let iconSvg = $state<SVGSVGElement>();
+  let reducedMotion = $state(true);
+  let pageVisible = $state(true);
+
+  function startIdleMotion(node: SVGAnimateTransformElement) {
+    node.beginElement();
+  }
+  $effect(() => {
+    if (!iconSvg) return;
+    if (reducedMotion || !pageVisible || greetingIndex !== -1) iconSvg.pauseAnimations();
+    else iconSvg.unpauseAnimations();
+  });
   const iconIndex = $derived(greetingIndex);
   let emojiMetrics = $state(greetings.map(() => ({ size: 32, x: 0, y: 28 })));
   let cycleTimer: ReturnType<typeof setTimeout> | undefined;
@@ -191,11 +203,14 @@
   onMount(() => {
     emojiMetrics = greetings.map(([emoji]) => measureLogoEmoji(emoji));
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const stopWhenHidden = () => { if (document.hidden) stopCycle(); };
-    preference.addEventListener("change", stopCycle);
+    reducedMotion = preference.matches;
+    const syncPreference = () => { reducedMotion = preference.matches; stopCycle(); };
+    const stopWhenHidden = () => { pageVisible = !document.hidden; if (!pageVisible) stopCycle(); };
+    stopWhenHidden();
+    preference.addEventListener("change", syncPreference);
     document.addEventListener("visibilitychange", stopWhenHidden);
     return () => {
-      preference.removeEventListener("change", stopCycle);
+      preference.removeEventListener("change", syncPreference);
       document.removeEventListener("visibilitychange", stopWhenHidden);
     };
   });
@@ -228,6 +243,7 @@
 >
   {#if variant !== "text"}
     <svg
+      bind:this={iconSvg}
       class="snowui-snow-ui-logo-icon"
       viewBox="0 0 32 32"
       fill="none"
@@ -238,7 +254,13 @@
       <g class="snowui-logo-icon-face" transition:iconTransition onintrostart={motionStarted} onoutrostart={motionStarted} onintroend={motionEnded} onoutroend={motionEnded}>
       {#if iconIndex === -1}
       <g class="snowui-logo-idle-float">
+      {#if !reducedMotion}
+        <animateTransform use:startIdleMotion attributeName="transform" type="translate" values="0 0; 0 -4.5714; 0 0" keyTimes="0; .5; 1" keySplines=".45 0 .55 1; .45 0 .55 1" calcMode="spline" dur="5.8s" repeatCount="indefinite" begin="indefinite" />
+      {/if}
       <g class="snowui-logo-idle-spin">
+      {#if !reducedMotion}
+        <animateTransform use:startIdleMotion attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="16s" repeatCount="indefinite" begin="indefinite" />
+      {/if}
       <!-- 来自 resource-base/assets/logos/snow-logo.svg 的品牌矢量快照；非 hover 时保留原始图形。 -->
       <g class="snowui-snow-ui-logo-color">
         <path
@@ -596,31 +618,6 @@
   /* 动态字形只负责绘制，溢出和缩放不能改变根节点的悬停命中范围。 */
   :global(:where(.snowui-snow-ui-logo-icon)),
   :global(:where(.snowui-snow-ui-logo-wordmark)) { pointer-events: none; }
-
-  /* 品牌闲置动效：命中框与字标不动，旋转和飘浮分别由内层承接。 */
-  :global(:where(.snowui-logo-idle-float)) {
-    animation: snowui-logo-idle-float 5.8s cubic-bezier(.45, 0, .55, 1) infinite;
-  }
-  :global(:where(.snowui-logo-idle-spin)) {
-    transform-origin: 16px 16px;
-    animation: snowui-logo-idle-spin 16s linear infinite;
-  }
-  :global(:where(.snowui-snow-ui-logo[data-snow-ui-logo-cycle="active"]) .snowui-logo-idle-float),
-  :global(:where(.snowui-snow-ui-logo[data-snow-ui-logo-cycle="active"]) .snowui-logo-idle-spin) {
-    animation-play-state: paused;
-  }
-  @keyframes -global-snowui-logo-idle-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4.5714px); }
-  }
-  @keyframes -global-snowui-logo-idle-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    :global(:where(.snowui-logo-idle-float)),
-    :global(:where(.snowui-logo-idle-spin)) { animation: none; }
-  }
 
   :global(:where(.snowui-logo-icon-face)) { transform-origin: 16px 16px; }
 </style>
