@@ -19,6 +19,7 @@
     import { getTableContext, type TableRoleLayout } from "../lib/table-context.svelte";
     import { getTableRowContext } from "../lib/table-row-context.svelte";
     import { SKELETON_CONTEXT_KEY } from "../keys";
+    import { tableSelectionFade } from "../lib/table-selection-fade";
     import { getTableRoleBlurStyles } from "../lib/table-role-blur";
     import {
         mergeComponentPartProps,
@@ -296,6 +297,7 @@
         <span
             bind:this={roleOverlayElement}
             class="snowui-table-selection-control"
+            use:tableSelectionFade={{ enabled: resolvedRoleLayout === "overlay", selected: isSelected }}
             data-selected={isSelected ? "true" : undefined}
             style={selectionCheckboxSizeStyle}
         >
@@ -427,9 +429,9 @@
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row:hover) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }
     /* overlay 模式 hover 边缘渐进式透明（复用 OSS edge-fade 通用能力 ../lib/edge-fade.ts；详见 Table.md）。
-       selection mask 由 Table 根生成；actions mask 依赖行级实测宽度，由内容 TableCell 在自身作用域生成，并按内容右边缘到可见行右边缘的实测距离平移。
+       selection mask 按 Checkbox 实际右边缘在内容节点生成；actions mask 依赖行级实测宽度，由内容 TableCell 在自身作用域生成，并按内容右边缘到可见行右边缘的实测距离平移。
        此处状态规则只消费对应 CSS 变量，未触发时无 mask。selection 的内容遮罩与 Checkbox 可见条件一致（hover、键盘 focus、选中或 force-hover）；actions 保持行 hover 时触发。相邻内容从靠控件一侧渐隐到清晰：
-       - checkbox 侧（to right）：Fade start / end 使用固定宽度（默认约 16px → 60px），不随内容单元格宽度变化；
+       - checkbox 侧（to right）：透明区覆盖到 Checkbox 实际右边缘，再向右使用固定 --size-5（名义 20px）过渡；
        - actions 侧（to left）：透明区默认覆盖到最左按钮实际左边缘，向左以 --size-5（名义 20px）固定长度过渡到清晰，不随按钮组宽度或响应式间距变化。
        coverage 默认 1；显式旧 feather override 仍按倍数计算尾巴，未设置时旧表达式无效，自动回退固定 Token 长度。
        这些变量与表头渐隐（--snowui-table-head-fade-*-override）相互独立，可在 Table / 容器上单独设置覆盖。

@@ -84,13 +84,13 @@ createEdgeFadeMaskStyle(options): string   // 返回 "-webkit-mask-image:...;mas
 
 | 组件 | 渐隐 | 悬浮 |
 | :--- | :--- | :--- |
-| Table overlay 角色列 | `edge-fade.ts`（checkbox / 表头 % 固定，actions 按实测宽度） | 随行 fixed 跟踪（组件自管） |
+| Table overlay 角色列 | `edge-fade.ts`（checkbox / 表头与 actions 均按控件实测边缘定位，默认固定 20px 过渡） | 随行 fixed 跟踪（组件自管） |
 | Textarea | `.snowui-scroll-mask`（top/bottom/both 滚动渐隐） | — |
 | Text（`lines={0}`） | `.snowui-scroll-mask`（内置展开按钮启用时为 bottom 截断渐隐；未启用时按滚动位置切换 top/bottom/both） | — |
 | CodeBlock | `.snowui-scroll-mask`（top/bottom 滚动渐隐） | — |
 | SidePanel | `.snowui-scroll-mask`（内容区 top/bottom 滚动渐隐） | — |
 | Sidebar | `.snowui-scroll-mask`（Body 向下滚动后在 Logo 下方显示 top 渐隐） | — |
-| Input / Listbox 搜索 Input / SearchInput | `.snowui-horizontal-scroll-mask`；发生横向溢出后持续显示左右渐隐。清除 X 以 overlay 覆盖文字，并从 X 最右边缘复用 Table 表头 checkbox 的 14px → 26px 参数 | X 为 Input trailing overlay 控件 |
+| Input / Listbox 搜索 Input / SearchInput | `.snowui-horizontal-scroll-mask`；发生横向溢出后持续显示左右渐隐。清除 X 以 overlay 覆盖文字，并从 X 最右边缘保留原有的 14px → 26px 参数 | X 为 Input trailing overlay 控件 |
 | Tag（删除 X，规划中） | 可选：删除 X 浮起后内容右侧渐隐 | `.snowui-overlay-action` 就地浮动 |
 
 > 以上组件除 Table 外当前**未接入本统一能力封装**（仍各自直接用 `.snowui-scroll-mask`）；本能力已就绪，可按需逐步接入，渐隐部分接入为零性能差异。

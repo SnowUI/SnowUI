@@ -4,7 +4,6 @@
     import Frame, { type FrameProps } from "./Frame.svelte";
     import type { ResourceSize } from "../context";
     import { getTableContext, provideTableContext, type TableColumnRegistration } from "../lib/table-context.svelte";
-    import { createEdgeFadeMaskImage } from "../lib/edge-fade";
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
     import { TableTruncationManager } from "../lib/table-truncation";
     interface Props extends Omit<FrameProps, "children"> {
@@ -155,22 +154,6 @@
         `${minWidth !== undefined ? `min-width:${typeof minWidth === "number" ? `${minWidth}px` : minWidth}` : ""};${userStyle}`,
     );
 
-    // 内容边缘渐隐遮罩（overlay 角色列）：复用 OSS edge-fade 通用能力生成固定参数的
-    // selection / head mask，存到表格根供 TableCell / TableHead 消费。依赖行级实测宽度的
-    // actions mask 必须在 TableCell 自身作用域生成（详见 ./Table.md、../lib/edge-fade.md）。
-    const selectionFadeMask = createEdgeFadeMaskImage({
-        direction: "to right",
-        fadeStart: "var(--snowui-table-selection-fade-start-override, var(--size-4, 1rem))",
-        fadeEnd: "var(--snowui-table-selection-fade-end-override, calc((var(--size-14, 3.5rem) + var(--size-16, 4rem)) / 2))",
-    });
-    const headFadeMask = createEdgeFadeMaskImage({
-        direction: "to right",
-        fadeStart: "var(--snowui-table-head-fade-start-override, calc((var(--size-3, .75rem) + var(--size-4, 1rem)) / 2))",
-        fadeEnd: "var(--snowui-table-head-fade-end-override, calc((var(--size-6, 1.5rem) + var(--size-7, 1.75rem)) / 2))",
-    });
-    const fadeMaskVars =
-        `--snowui-table-selection-fade-mask:${selectionFadeMask};` +
-        `--snowui-table-head-fade-mask:${headFadeMask};`;
 
 </script>
 
@@ -179,7 +162,6 @@
     data-role-layout={parentTable.isDataTable() ? parentTable.getRoleLayout() : undefined}
     data-axis="horizontal"
     data-horizontal-track-position={horizontalScrollbar.hasOverflow ? "viewport" : undefined}
-    style={fadeMaskVars}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}

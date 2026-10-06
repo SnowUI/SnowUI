@@ -839,10 +839,10 @@
     /* --snowui-table-cell-selection-padding-override: ; */ /* default: --padding-2 --padding-3 */
     /* --snowui-table-cell-actions-padding-override: ; */ /* default: --padding-2 --padding-3 */
     /* --snowui-table-cell-actions-gap-override: ; */ /* default: --gap-2 */
-    /* --snowui-table-head-fade-start-override: ; */ /* default: ~14px fixed (表头第一列渐隐起点) */
-    /* --snowui-table-head-fade-end-override: ; */ /* default: ~26px fixed (表头第一列渐隐终点) */
-    /* --snowui-table-selection-fade-start-override: ; */ /* default: 16px fixed (checkbox 侧内容渐隐起点) */
-    /* --snowui-table-selection-fade-end-override: ; */ /* default: 60px fixed (checkbox 侧内容渐隐终点) */
+    /* --snowui-table-head-fade-start-override: ; */ /* default: 实际 Checkbox 右边缘 (表头第一列渐隐起点) */
+    /* --snowui-table-head-fade-end-override: ; */ /* default: 实际 Checkbox 右边缘 + --size-5 (固定过渡) */
+    /* --snowui-table-selection-fade-start-override: ; */ /* default: 实际 Checkbox 右边缘 (行内渐隐起点) */
+    /* --snowui-table-selection-fade-end-override: ; */ /* default: 实际 Checkbox 右边缘 + --size-5 (固定过渡) */
     /* --snowui-table-actions-fade-coverage-override: ; */ /* default: 1 (透明区覆盖实际按钮组及右侧内边距，过渡默认向左延伸 --size-5) */
     /* --snowui-table-actions-fade-feather-override: ; */ /* default: unset (默认固定 --size-5 过渡；仅兼容显式旧倍数，设置后终点 = 透明区宽度 × 该倍数) */
     /* --snowui-table-head-width-override: ; */ /* default: runtime column width */

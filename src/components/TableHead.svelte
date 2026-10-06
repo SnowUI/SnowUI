@@ -6,6 +6,7 @@
     import Indicator from "./Indicator.svelte";
     import Checkbox from "./Checkbox.svelte";
     import { getTableContext, type TableColumnRegistration, type TableRoleLayout } from "../lib/table-context.svelte";
+    import { tableSelectionFade } from "../lib/table-selection-fade";
     import { getTableRoleBlurStyles } from "../lib/table-role-blur";
     import {
         type ComponentPartsOf,
@@ -153,6 +154,7 @@
     {#if isSelectionRole}
         <span
             class="snowui-table-selection-control"
+            use:tableSelectionFade={{ enabled: resolvedRoleLayout === "overlay", selected: selectionState.some || selectionState.all }}
             style={selectionCheckboxSizeStyle}
         >
             <span class="snowui-table-role-blur-layer" style={selectionBlur.containerStyle} aria-hidden="true">
