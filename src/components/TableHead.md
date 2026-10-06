@@ -1,9 +1,9 @@
 # TableHead
 
-> **版本**: v2.3.0
+> **版本**: v2.3.1
 > **职责**: 定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-28
+> **文档修订**: 2026-10-07
 
 ## 组件介绍
 
@@ -72,7 +72,7 @@
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v2.3.0
+> **版本**: v2.3.1
 > **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -114,6 +114,7 @@
 - `as="actions"`：默认无标题且不渲染任何业务按钮；传入 children 时可显示自定义标题。该列 padding 为 `8px 8px 8px 0`。
 - `roleLayout="overlay"`：角色表头自身宽度归零并 sticky 到左右边缘。selection 的 Checkbox 仍距左边缘 8px；actions 标题（如声明）距右边缘 8px。表头真实首尾单元格保持直角；overlay 浮动控件块可继续使用 12px 圆角。控件覆盖块默认宽度为原 overlay 宽度的三分之一；blur layer 默认隐藏，仅在表头区域 hover 时渐显；内部复用 `components/src/lib/progressive-blur.ts` 的通用 Progressive Blur，全覆盖层通过连续 mask 分段实现渐进强度。selection 左强右清，actions 右强左清。
 - overlay selection 后方的首个真实标题内容使用固定约 14px → 26px 渐隐遮罩，不再按标题或列宽百分比缩放；可通过 `--snowui-table-head-fade-start-override / --snowui-table-head-fade-end-override` 覆盖。
+- overlay 全选 Checkbox 进入时保留渐显；离开标题与控件且没有键盘可见焦点时，与标题遮罩同帧撤去，避免淡出残影。保留可聚焦 DOM，不用 visibility 隐藏键盘入口。
 - 两种角色都采用显式组合契约，不通过 DOM 扫描猜测列身份。
 
 每个 TableHead 会向最近的 Table Context 注册自身列结构（`columnId`、selection/actions 角色与对齐方式），供 TableBody 首次加载时按真实列顺序生成 Skeleton rows。该注册只传递公开列语义，不暴露或扫描 TableHead 内部 DOM。
@@ -185,6 +186,8 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 > `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
 
 ## 更新日志
+
+- 2026-10-07：v2.3.1，修复 overlay 全选 Checkbox 与首列遮罩退出时序不一致的残影；保留进入渐显与键盘聚焦。
 
 - 2026-09-28：同步 Indicator 的统一命中与状态视觉；列宽手柄复用组件默认视觉和整边命中。
 

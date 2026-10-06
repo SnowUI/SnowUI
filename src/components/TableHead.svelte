@@ -284,4 +284,8 @@
         -webkit-mask-image: var(--snowui-table-head-fade-mask);
         mask-image: var(--snowui-table-head-fade-mask);
     }
+
+    /* 与首列标题遮罩同步退出，保留进入渐显与键盘聚焦入口。 */
+    :global(:where(.snowui-table-header .snowui-table-row:not(:has(> .snowui-table-head[data-role-layout="overlay"][data-as="selection"] + .snowui-table-head:hover)):not(:has(> .snowui-table-head[data-role-layout="overlay"][data-as="selection"]:hover)):not(:has(> .snowui-table-head[data-role-layout="overlay"][data-as="selection"] :focus-visible))) > .snowui-table-head[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control > *) { transition: none; }
+    :global(:where(.snowui-table-header:not(:hover)) .snowui-table-head-selection-blur-proxy) { transition: none; }
 </style>

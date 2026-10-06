@@ -1,9 +1,9 @@
 # TableCell
 
-> **版本**: v1.10.1
+> **版本**: v1.10.2
 > **职责**: 在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-07
 
 ## 组件介绍
 
@@ -66,7 +66,7 @@
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
 - Skeleton 是加载基础设施，不作为公开 part。
 
-> **版本**: v1.10.1
+> **版本**: v1.10.2
 > **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。需要换行时显式传入 `nowrap={false} lines={false}`；声明 `lines={2}` / `lines={3}` 也视为显式开启多行，未指定 nowrap 时自动允许换行；横向图标与文字默认不换行。
 
 默认单元格高度为 40px，内边距上下保持 8px；左右 padding 根据最近 Table 容器宽度在 2px 到 12px 之间流动，常见窄屏宽度即收敛到每侧 2px，宽表恢复为 12px，首尾单元格沿用相同规则。Table 使用原生相邻列布局，列与列之间没有额外 gap；相邻单元格 padding 相加后的最小视觉间距为 4px。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。横向内容在单元格内垂直居中，不保留行内文字基线的下行空间。
@@ -91,13 +91,15 @@
 
 `as="actions"` 不内置默认按钮，children 可放任意行动按钮。内容距角色列右边缘 8px，并与数据行水平中线垂直居中对齐；只在行 hover 时显示。内部横向排列、gap 为 8px，padding 为 `8px 8px 8px 0`。
 
-`roleLayout="overlay"` 时，selection/actions 单元格自身宽度归零并 sticky 到表格左右边缘。selection 的真实 `<td>` 只保留 table 语义和定位锚点；Checkbox 与渐进式模糊层都放在 `.snowui-table-selection-control` 中，并由运行时同步为 `position: fixed`，固定到当前行左上角。Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`（17px），在当前奇数像素行高内上下各留 16px；固定增量已登记为 Table selection 特例，不借用边框 Token，也不改变独立 Checkbox 的 16px 默认值。覆盖块不推开第一列内容，而是直接压在第一列之上。取消选择时保留覆盖块的定位，仅淡出，不产生横向位移。第一数据列的渐隐遮罩与 Checkbox 可见状态同步：行 hover、键盘 focus、已选中或 force-hover 时均生效；选中后移开鼠标也保持遮罩。
+`roleLayout="overlay"` 时，selection/actions 单元格自身宽度归零并 sticky 到表格左右边缘。selection 的真实 `<td>` 只保留 table 语义和定位锚点；Checkbox 与渐进式模糊层都放在 `.snowui-table-selection-control` 中，并由运行时同步为 `position: fixed`，固定到当前行左上角。Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`（17px），在当前奇数像素行高内上下各留 16px；固定增量已登记为 Table selection 特例，不借用边框 Token，也不改变独立 Checkbox 的 16px 默认值。覆盖块不推开第一列内容，而是直接压在第一列之上。取消选择时保留覆盖块的定位；不再满足可见条件时与遮罩同步隐藏，不产生横向位移。第一数据列的渐隐遮罩与 Checkbox 可见状态同步：行 hover、键盘 focus、已选中或 force-hover 时均生效；选中后移开鼠标也保持遮罩。未选中且没有键盘可见焦点时，离开 hover 后 Checkbox 与遮罩同帧撤去，不保留淡出残影；进入渐显与键盘可聚焦性不变。
 
 selection 覆盖块的层级必须高于第一列内容：它使用最高 `z-index`，并要求使用方不要再给第一列链接或图标额外提升 `z-index`。Checkbox 本体是真实交互控件，`onCheckedChange` 直接写入 Table 选择状态并停止冒泡；TableRow 同时对行左侧 32px 点击做兜底，确保浏览器即使命中到底下第一列内容，也会优先切换行选中并阻止底层链接跳转。
 
 selection 的 `.snowui-table-role-blur-layer` 与 Checkbox 同容器渲染，复用 `components/src/lib/progressive-blur.ts` 的通用 Progressive Blur。`width` 控制可见渐进模糊宽度，`sampleExtension` 提供透明采样区，`maxBlur` 使用 `--snowui-table-role-overlay-blur-override`。selection 左侧强模糊并向右清晰；actions 方向相反。blur layer 自身 `pointer-events: none` 且 `aria-hidden`，只在行 hover、focus-within 或已选中时显示。
 
-actions 仍在右侧以 overlay 内容块显示。actions 覆盖容器默认不接收 pointer event，只有内部按钮在 hover 时恢复可见和可点，避免右侧整行 fixed 容器拦截左侧 Checkbox 或中间链接。
+actions 以当前可见行的右边缘定位，横向滚动时保持在 Table 视口内。内容渐隐按实际按钮组宽度和各内容块距该边缘的距离连续计算；按钮跨越多列时，所有被覆盖的普通内容同步渐隐，不只遮住最后一列。默认透明区覆盖到最左按钮实际左边缘，向左使用固定 `--size-5`（名义 20px）柔和过渡；不随按钮组宽度或响应式 padding 改变，仅跟随全局 Token 缩放。selection 与 actions 遮罩相交时同时生效，不遮住控件自身。
+
+actions 仍在右侧以 overlay 内容块显示。actions 覆盖容器默认不接收 pointer event，只有内部按钮在 hover 时恢复可见和可点，避免右侧整行 fixed 容器拦截左侧 Checkbox 或中间链接。退出 hover（且没有展开的操作菜单）时，整个 actions 浮层立即隐藏，与内容遮罩撤销同步，避免按钮及模糊层的淡出残影叠在已恢复的文字上；进入仍保留渐显，selection 的选中显示保持独立。
 
 DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据单元格同步执行 opacity 渐显，selection / actions 角色单元格保持完整 opacity。这样 hover 控件不会再与整行 opacity 相乘；使用方显式传给 TableCell 的 `whileAppear / currentState` 优先于内部配置。
 
@@ -123,6 +125,10 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 > `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
 
 ## 更新日志
+
+- 2026-10-07：修复 overlay 操作层移出 hover 后的淡出残影，隐藏时与内容遮罩同步撤去；保留进入渐显及固定过渡范围。
+
+- 2026-10-07：v1.10.2，修复 overlay 操作按钮跨列时内容未渐隐，以及窄表横向滚动时 fixed 操作层越出视口的问题；按可见行边缘统一遮罩坐标，保留 selection 遮罩；默认覆盖实际按钮左边缘，向左使用固定 20px Token 过渡，保证不同按钮组宽度的渐隐一致。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

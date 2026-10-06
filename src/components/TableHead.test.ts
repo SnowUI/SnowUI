@@ -54,4 +54,14 @@ export const examples = [
         },
         logic: ["Resize", "AutoFit", "Wrap"],
     },
+    {
+        name: "A8: 全选与行 Checkbox 退出无残影",
+        code: `A8
+<DataTable rows={[{id: 'one'}]} rowKey={(row) => row.id} selection roleLayout="overlay">
+<Table><TableHeader><TableRow><TableHead as="selection"/><TableHead columnId="name">订阅</TableHead></TableRow></TableHeader>
+<TableBody><TableRow rowId="one"><TableCell as="selection"/><TableCell columnId="name">SnowUI Pro</TableCell></TableRow></TableBody></Table>
+</DataTable>`,
+        expected: { render: "全选与行内 Checkbox 保留渐显，退出与内容遮罩同步，无残影。", interaction: "可通过键盘 Tab 聚焦；行勾选后移出保持显示，取消后正常隐藏。", responsive: "宽窄表格均保持相同退出规则。" },
+        logic: ["Selection", "OverlayRoleLayout", "Focus"],
+    },
 ];

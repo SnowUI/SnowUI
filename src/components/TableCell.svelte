@@ -4,8 +4,8 @@
 
     const actionsFadeMask = createEdgeFadeMaskImage({
         direction: "to left",
-        fadeStart: "var(--snowui-table-cell-actions-fade-width)",
-        fadeEnd: "calc(var(--snowui-table-cell-actions-fade-width) * var(--snowui-table-actions-fade-feather-override, 3))",
+        fadeStart: "calc(var(--snowui-table-cell-actions-fade-width) - var(--snowui-table-cell-actions-edge-offset, 0px))",
+        fadeEnd: "calc(var(--snowui-table-cell-actions-fade-width) + var(--snowui-table-cell-actions-legacy-tail, var(--size-5)) - var(--snowui-table-cell-actions-edge-offset, 0px))",
     });
 </script>
 <script lang="ts">
@@ -161,21 +161,32 @@
                 return;
             }
             const rowRect = rowElement.getBoundingClientRect();
+            const viewportRect = rowElement.closest<HTMLElement>(".snowui-table-scroll-viewport")?.getBoundingClientRect();
+            // fixed 浮层不会被滚动视口裁切，操作区必须锚定当前可见的行边缘。
+            const overlayLeft = isActionsRole && viewportRect ? Math.max(rowRect.left, viewportRect.left) : rowRect.left;
+            const overlayRight = isActionsRole && viewportRect ? Math.min(rowRect.right, viewportRect.right) : rowRect.right;
             node.style.position = "fixed";
             node.style.top = `${rowRect.top}px`;
-            node.style.left = `${rowRect.left}px`;
+            node.style.left = `${overlayLeft}px`;
             node.style.right = "";
-            node.style.width = isSelectionRole ? "var(--size-10, 2.5rem)" : `${rowRect.width}px`;
+            node.style.width = isSelectionRole ? "var(--size-10, 2.5rem)" : `${Math.max(0, overlayRight - overlayLeft)}px`;
             node.style.height = `${rowRect.height}px`;
             node.style.zIndex = isSelectionRole ? "2147483647" : "20";
             if (isActionsRole) {
-                // 测量实际按钮组的占用宽度（从行右边缘到最左按钮左边缘 = 按钮 + 左右内边距），
-                // 写到行级 CSS 变量，供相邻内容单元格的边缘渐隐按真实按钮宽度收缩（无需逐表设置列宽）。
+                // 所有普通内容共用可见右边缘；先批量读取坐标，再写入各自的渐隐偏移。
+                // 这样窄列、横向滚动或按钮跨列时不会在单元格边界重新开始渐隐。
                 const controls = node.querySelector<HTMLElement>(".snowui-table-role-overlay-controls");
                 if (controls) {
                     const controlsRect = controls.getBoundingClientRect();
-                    const extent = Math.max(0, rowRect.right - controlsRect.left);
+                    const extent = Math.max(0, overlayRight - controlsRect.left);
+                    const contents = Array.from(rowElement.querySelectorAll<HTMLElement>(
+                        ':scope > .snowui-table-cell:not([data-as="selection"]):not([data-as="actions"]) > .snowui-table-cell-content',
+                    ));
+                    const offsets = contents.map(content => overlayRight - content.getBoundingClientRect().right);
                     rowElement.style.setProperty("--snowui-table-role-overlay-content-width", `${extent}px`);
+                    contents.forEach((content, index) => {
+                        content.style.setProperty("--snowui-table-cell-actions-edge-offset", `${offsets[index]}px`);
+                    });
                 }
             }
         };
@@ -371,13 +382,15 @@
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="selection"])) { left: 0; }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="actions"])) { right: 0; }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-selection-control)) { position: absolute; inset-block: 0 calc(-1 * var(--border-1, .5px)); inset-inline-start: 0; box-sizing: border-box; display: flex; width: var(--size-10, 2.5rem); align-items: center; justify-content: center; overflow: visible; padding-block: var(--padding-2); padding-inline: var(--snowui-table-responsive-cell-padding-inline, var(--padding-3)); border-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)); background: transparent; z-index: 2147483647; pointer-events: auto; }
-    :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"])) { opacity: 1; pointer-events: none; transition: none; }
+    /* 内容 mask 退出是离散切换；同步撤去整个操作浮层，避免淡出按钮叠在已恢复的文字上。 */
+    :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"])) { opacity: 1; visibility: hidden; pointer-events: none; transition: none; }
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"]) { visibility: visible; }
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell) { border-radius: var(--snowui-table-row-active-leading-radius, 0); }
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell:has(+ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"])) { border-radius: var(--snowui-table-row-active-trailing-radius, 0); }
     :global(:where(.snowui-table-body .snowui-table-row:hover, .snowui-table-body .snowui-table-row[data-force-hover="true"]) > .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell) { border-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)); }
     :global(:where(.snowui-table-body .snowui-table-row:hover, .snowui-table-body .snowui-table-row[data-force-hover="true"]) > .snowui-table-cell:has(+ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"])) { border-radius: 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0; }
     :global(:where(.snowui-table-body .snowui-table-row:last-child) > .snowui-table-cell) { border-bottom-color: transparent; }
-    :global(:where(.snowui-table-cell-content)) { position: relative; display: block; min-width: 0; max-width: 100%; overflow: hidden; --snowui-table-cell-actions-fade-width: calc(var(--snowui-table-role-overlay-content-width, var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3))) * var(--snowui-table-actions-fade-coverage-override, 0.9)); }
+    :global(:where(.snowui-table-cell-content)) { position: relative; display: block; min-width: 0; max-width: 100%; overflow: hidden; --snowui-table-cell-actions-legacy-tail: calc(var(--snowui-table-cell-actions-fade-width) * (var(--snowui-table-actions-fade-feather-override) - 1)); --snowui-table-cell-actions-fade-width: calc(var(--snowui-table-role-overlay-content-width, var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3))) * var(--snowui-table-actions-fade-coverage-override, 1)); }
     /* 关闭截断的普通内容保留子组件外扩；角色浮层和 Skeleton 仍使用各自裁切。 */
     :global(:where(.snowui-table-cell-content[data-lines="none"])) { overflow: visible; }
     :global(:where(.snowui-table-cell-content.snowui-line-clamp-1)) { white-space: nowrap; text-overflow: ellipsis; }
@@ -414,10 +427,11 @@
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row:hover) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }
     /* overlay 模式 hover 边缘渐进式透明（复用 OSS edge-fade 通用能力 ../lib/edge-fade.ts；详见 Table.md）。
-       selection mask 由 Table 根生成；actions mask 依赖行级实测宽度，由内容 TableCell 在自身作用域生成。
+       selection mask 由 Table 根生成；actions mask 依赖行级实测宽度，由内容 TableCell 在自身作用域生成，并按内容右边缘到可见行右边缘的实测距离平移。
        此处状态规则只消费对应 CSS 变量，未触发时无 mask。selection 的内容遮罩与 Checkbox 可见条件一致（hover、键盘 focus、选中或 force-hover）；actions 保持行 hover 时触发。相邻内容从靠控件一侧渐隐到清晰：
        - checkbox 侧（to right）：Fade start / end 使用固定宽度（默认约 16px → 60px），不随内容单元格宽度变化；
-       - actions 侧（to left）：完全透明（遮住按钮）区域宽度 = 实测按钮组宽度（含右侧内边距，由 JS 写入行级变量 `--snowui-table-role-overlay-content-width`）× `--snowui-table-actions-fade-coverage-override`（默认 0.9）；柔和尾巴终点 = 该宽度 × `--snowui-table-actions-fade-feather-override`（默认 3，尾巴长度 = 透明区的两倍）。coverage 越小整条遮罩越窄、feather 越大过渡越缓；coverage 低于按钮实际占比时宽按钮如 Edit 会透出内容。中间量 `--snowui-table-cell-actions-fade-width`（= 实测宽度 × coverage）让宽度只写一处。
+       - actions 侧（to left）：透明区默认覆盖到最左按钮实际左边缘，向左以 --size-5（名义 20px）固定长度过渡到清晰，不随按钮组宽度或响应式间距变化。
+       coverage 默认 1；显式旧 feather override 仍按倍数计算尾巴，未设置时旧表达式无效，自动回退固定 Token 长度。
        这些变量与表头渐隐（--snowui-table-head-fade-*-override）相互独立，可在 Table / 容器上单独设置覆盖。
        mask 只改变视觉，不影响指针事件，单元格内链接/按钮点击不受影响。
        data-force-hover="true" 可让某一行静态呈现 hover 态（用于演示 / 视觉走查）。 */
@@ -426,12 +440,20 @@
             -webkit-mask-image var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out),
             mask-image var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out);
     }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell .snowui-table-cell-content) {
-        -webkit-mask-image: var(--snowui-table-selection-fade-mask);
-        mask-image: var(--snowui-table-selection-fade-mask);
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) > .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell > .snowui-table-cell-content) {
+        --snowui-table-cell-active-selection-mask: var(--snowui-table-selection-fade-mask);
+        -webkit-mask-image: var(--snowui-table-cell-active-selection-mask), var(--snowui-table-cell-active-actions-mask, linear-gradient(#000, #000));
+        mask-image: var(--snowui-table-cell-active-selection-mask), var(--snowui-table-cell-active-actions-mask, linear-gradient(#000, #000));
+        mask-composite: intersect;
     }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"]) .snowui-table-cell:has(+ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"]) .snowui-table-cell-content) {
-        -webkit-mask-image: var(--snowui-table-cell-actions-fade-mask);
-        mask-image: var(--snowui-table-cell-actions-fade-mask);
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"]) > .snowui-table-cell:not([data-as="selection"]):has(~ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"]) > .snowui-table-cell-content) {
+        --snowui-table-cell-active-actions-mask: var(--snowui-table-cell-actions-fade-mask);
+        -webkit-mask-image: var(--snowui-table-cell-active-selection-mask, linear-gradient(#000, #000)), var(--snowui-table-cell-active-actions-mask);
+        mask-image: var(--snowui-table-cell-active-selection-mask, linear-gradient(#000, #000)), var(--snowui-table-cell-active-actions-mask);
+        mask-composite: intersect;
     }
+
+    /* 遮罩退出时 Checkbox 同帧消失；不隐藏 DOM，保留键盘聚焦入口。 */
+    :global(:where(.snowui-table-row:not(:hover):not([data-force-hover="true"]):not(:has(:focus-visible)):not([data-selected="true"])) > .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control:not([data-selected="true"])),
+    :global(:where(.snowui-table-row:not(:hover):not([data-force-hover="true"]):not(:has(:focus-visible)):not([data-selected="true"])) > .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control:not([data-selected="true"]) > *) { transition: none; }
 </style>

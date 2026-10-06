@@ -48,4 +48,16 @@ export const examples = [
         expected: { render: "selection 单元格使用内置 Checkbox。", layout: "Checkbox 使用 parts 指定尺寸。", interaction: "选择行为仍由 Table 管理。", performance: "不复制 Checkbox 实现。", responsive: "角色列保持原布局。" },
         logic: ["Parts", "Checkbox"],
     },
+    {
+        name: "A8: 窄表操作浮层跨列渐隐",
+        code: `A8
+<div style="width: 100%; max-width: 400px;">
+<DataTable rows={[{ id: "one" }]} rowKey={(row) => row.id} selection actions roleLayout="overlay">
+<Table columnWidths={{ name: 240, status: 120, note: 64 }}>
+<TableHeader><TableRow><TableHead as="selection" /><TableHead columnId="name">订阅</TableHead><TableHead columnId="status">状态</TableHead><TableHead columnId="note">备注</TableHead><TableHead as="actions" /></TableRow></TableHeader>
+<TableBody><TableRow rowId="one"><TableCell as="selection" /><TableCell columnId="name">SnowUI Pro</TableCell><TableCell columnId="status"><Chip>Active</Chip></TableCell><TableCell columnId="note">New</TableCell><TableCell as="actions"><Button size="sm">Edit</Button><Button size="sm">Help</Button><Button size="sm">More</Button></TableCell></TableRow></TableBody>
+</Table></DataTable></div>`,
+        expected: { render: "操作按钮覆盖到 Status 时，Status 与 Note 连续渐隐，按钮下方完全隐藏，左侧保留固定 20px Token 柔和过渡。", layout: "浮层固定到可见表格右边缘，不越过横向滚动视口。", interaction: "hover 显示操作，移出后操作浮层立即隐藏、内容恢复且无残影；已选行保留左侧遮罩。", performance: "只在已激活行批量读取各内容坐标，不增加逐 Cell Observer。", responsive: "横向滚动及宽窄变化后，渐隐仍与按钮对齐。" },
+        logic: ["Actions", "OverlayRoleLayout", "EdgeFade"],
+    },
 ];

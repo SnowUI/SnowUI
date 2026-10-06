@@ -3,7 +3,7 @@
 > **版本**: v2.5.2
 > **职责**: 以语义化表格展示结构化数据，支持自适应列宽、局部横向滚动与加载状态，可自由组合表头和单元格。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-07
 
 ## 组件介绍
 
@@ -172,61 +172,20 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 - **触发时机**：数据行内容在**该行 hover**（`.snowui-table-row:hover`）时渐隐；表头**仅第一列标题**（紧邻 selection 覆盖块的 Date 列）的渐隐与**全选 Checkbox 的出现时机完全一致**——即 hover 任意数据行、hover 该列表头、hover / 聚焦全选浮层自身、或存在选中态时才渐隐；全选 Checkbox 不出现时表头也不渐隐。其余表头列（含 actions 一侧）不渐隐。
 - **作用对象**：
   - checkbox 一侧 = 紧邻 selection 覆盖块的那一个内容单元格（`[data-as="selection"] + .snowui-table-cell` 的 `.snowui-table-cell-content`），方向 `to right`。
-  - actions 一侧 = 紧邻 actions 覆盖块前的那一个内容单元格（`:has(+ [data-as="actions"])` 的 `.snowui-table-cell-content`），方向 `to left`。
+  - actions 一侧 = actions 覆盖块之前的普通内容单元格，方向 `to left`。所有内容以当前可见行右边缘为同一坐标原点，跨列保持连续渐隐；横向滚动后浮层仍限制在 Table 视口内。selection 与 actions 同时作用于一个内容块时，使用交集保留两侧遮罩。
 - **参数（可分别覆盖，三套相互独立）**：每套 Fade start / Fade end 都暴露成 CSS 覆盖变量，默认值与下方一致；可在 `<Table>` 或任意祖先容器的 `style` 上单独设置。
   - 表头第一列：`--snowui-table-head-fade-start-override`（默认约 `14px`）→ `--snowui-table-head-fade-end-override`（默认约 `26px`），使用固定尺寸，不随标题或列宽变化。
   - checkbox 一侧：`--snowui-table-selection-fade-start-override`（默认 `16px`）→ `--snowui-table-selection-fade-end-override`（默认 `60px`），使用固定尺寸，不随内容单元格宽度变化。
-  - actions 一侧：完全透明（遮住按钮）区域宽度 = **实测按钮组宽度**（含右侧内边距，运行时由 JS 写入行级 `--snowui-table-role-overlay-content-width`）× `--snowui-table-actions-fade-coverage-override`（默认 `0.9`，即遮罩宽度占按钮实际宽度的百分比；越小整条遮罩按比例越窄、尾巴随之右移、不断层）；该透明区**之外**再做柔和渐隐到清晰，终点 = 该宽度 × `--snowui-table-actions-fade-feather-override`（默认 `3`，柔和尾巴长度 = 透明区的两倍，过渡很缓）。要更柔和把 feather 调大、要更锐利把它调小；要整体更窄就调小 coverage（低于按钮实际占比时，Edit 等宽按钮下方会透出内容）。
+  - actions 一侧：完全透明区默认覆盖到最左侧按钮的实际左边缘（实测按钮组宽度含右侧内边距，coverage 默认 `1`）。从该边缘向左用 `--size-5`（名义 20px）固定长度过渡到清晰，不随按钮组宽度、按钮数量或响应式 padding 变化；随全局 Token 缩放。`--snowui-table-actions-fade-coverage-override` 仍可显式调整覆盖比例；`--snowui-table-actions-fade-feather-override` 默认不设置，仅兼容旧调用方显式设置的倍数语义，此时过渡终点仍为透明区宽度乘该倍数。
 
-> 三处渐隐的 `mask-image` 均复用 OSS 通用能力 [`edge-fade`](../lib/edge-fade.md)（`createEdgeFadeMaskImage`）生成并存到 CSS 变量，TableCell / TableHead 的 hover 状态规则只 `mask-image: var(...)` 消费。selection / head 的固定参数遮罩由 Table 根生成；actions 遮罩依赖每行实测按钮宽度，因此由相邻内容 TableCell 在自身作用域生成，确保能够读取行级 `--snowui-table-role-overlay-content-width`。上面这些 `*-override` 变量即该能力对表格暴露的可配置参数。「悬浮操作层」本身的定位（sticky / fixed + JS 测量）属于表格布局职责，不在通用能力范围内。
+> 三处渐隐的 `mask-image` 均复用 OSS 通用能力 [`edge-fade`](../lib/edge-fade.md)（`createEdgeFadeMaskImage`）生成并存到 CSS 变量，TableCell / TableHead 的 hover 状态规则只 `mask-image: var(...)` 消费。selection / head 的固定参数遮罩由 Table 根生成；actions 遮罩依赖每行实测按钮宽度，因此由各普通内容 TableCell 在自身作用域生成，并减去该内容块右边缘距可见行右边缘的偏移，确保能够读取行级 `--snowui-table-role-overlay-content-width`。上面这些 `*-override` 变量即该能力对表格暴露的可配置参数。「悬浮操作层」本身的定位（sticky / fixed + JS 测量）属于表格布局职责，不在通用能力范围内。
+- **退出同步**：hover 结束且没有展开的操作菜单时，actions 整个浮层立即隐藏，与内容遮罩撤销同步，避免淡出按钮或模糊层留下残影；进入渐显保持不变。
 - **不影响点击**：`mask` 只改变可见度，不改变命中测试；被渐隐内容里的链接、按钮等仍可正常点击。
 - **与 blur 的关系**：边缘渐隐与 `.snowui-table-role-blur-layer` 背景模糊是两套独立机制。需要只保留渐隐时，把 `--snowui-table-role-overlay-blur-override` 设为 `0rem` 关闭背景模糊即可。
 - **激活行**：`<TableRow active>` 由使用方或外部条件持续写入，默认绘制 `--black-4` 背景。它不是 hover 或 selected，不会改变 Checkbox 的选中状态；真实 hover 到激活行时，连续 hover 移动层与激活背景叠加。
 - **静态 hover 预览**：在某个 `<TableRow>` 上加 `data-force-hover="true"`，可让该行在不实际 hover 的情况下恒定呈现 hover 态（背景 / 行 checkbox / 行动按钮 / 两侧渐隐 / 表头全选与表头渐隐均会按该行触发），用于文档截图与视觉走查；业务持久态应使用 `active` Prop。
 
-关键代码（落地于 `TableCell.svelte` / `TableHead.svelte`，均为 `:global(:where(...))` 0 权重选择器）：
-
-```css
-/* 数据行 · checkbox 一侧（to right，固定宽度） */
-:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"])
-  .snowui-table-cell[data-role-layout="overlay"][data-as="selection"]
-  + .snowui-table-cell .snowui-table-cell-content {
-    mask-image: linear-gradient(to right, transparent var(--snowui-table-selection-fade-start-override, 16px), #000 var(--snowui-table-selection-fade-end-override, 60px));
-}
-
-/* fade-width = 实测按钮宽度 × coverage(默认 0.9)；--snowui-table-role-overlay-content-width 由 JS 每行测量后写入 */
-.snowui-table-cell-content {
-    --snowui-table-cell-actions-fade-width: calc(
-        var(--snowui-table-role-overlay-content-width, /* 回退：覆盖列宽 */) *
-        var(--snowui-table-actions-fade-coverage-override, 0.9)
-    );
-}
-/* 数据行 · actions 一侧（to left）：透明区 = fade-width，尾巴渐隐到 ×feather（默认 3，很缓，参考 checkbox 的长过渡） */
-:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"])
-  .snowui-table-cell:has(+ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"])
-  .snowui-table-cell-content {
-    mask-image: linear-gradient(
-        to left,
-        transparent var(--snowui-table-cell-actions-fade-width),
-        #000 calc(var(--snowui-table-cell-actions-fade-width) * var(--snowui-table-actions-fade-feather-override, 3))
-    );
-}
-
-/* 表头 · 仅第一列标题，渐隐触发条件与全选 Checkbox 出现条件一致（hover 数据行 / hover 该列表头 / hover|聚焦全选浮层 / 选中态），to right、参数独立于 checkbox 列 */
-:where(.snowui-table-viewport:has(.snowui-table-body .snowui-table-row:hover))
-  .snowui-table-head[data-role-layout="overlay"][data-as="selection"]
-  + .snowui-table-head .snowui-table-head-content,
-:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"] + .snowui-table-head:hover)
-  .snowui-table-head-content,
-:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"]:hover)
-  + .snowui-table-head .snowui-table-head-content,
-:where(.snowui-table-head[data-role-layout="overlay"][data-as="selection"][data-selected="true"])
-  + .snowui-table-head .snowui-table-head-content {
-    mask-image: linear-gradient(to right, transparent var(--snowui-table-head-fade-start-override, 14px), #000 var(--snowui-table-head-fade-end-override, 26px));
-}
-```
-
-> `mask-image` 需同时写 `-webkit-mask-image`；`.snowui-table-cell-content` / `.snowui-table-head-content` 上加 `transition: mask-image ...` 让渐隐随 hover 平滑出现。
+实现入口为 [TableCell.svelte](./TableCell.svelte) 与 [TableHead.svelte](./TableHead.svelte)。TableCell 在已激活行的现有定位批次中读取内容坐标，不为各内容列新建 Observer。对每个普通内容块，actions 遮罩的两个色标分别是 `fade-width − edge-offset` 与 `fade-width + 固定过渡长度 − edge-offset`；允许负色标，使远离操作区的列保持清晰。TableCell 将 selection 与 actions 两层 mask 以 `mask-composite: intersect` 合成，角色控件自身不参与内容遮罩。
 
 滚动归属：Table **自己创建唯一的局部横向 viewport**，并通过共享 `useOverlayScrollbar` 将同一条横向轨道 sticky 到当前页面视口底部。轨道只在表格固有最小宽度超过宿主时显示，表格离开视口或到达底端后收回表格边界。不把宽表宽度传播为页面最小宽度，不应再用外层 ScrollArea 包裹 Table，也不得创建第二条同步滚动条。`minWidth` 仍可进一步扩大表格的固有宽度。Table / DataTable 仍不创建纵向滚动容器。吸底轨道必须高于 table 内容层；即使 `TableBody` 默认连续 Hover 将 table 提升为内容层，轨道仍完整接收 hover、pointer down 与拖动，不得由其下方的数据行截获。连续 Hover 层由局部横向 viewport 承载，其背景只绘制在当前可见的表格范围内，不得把隐藏列对应的背景泄露到 viewport 外。
 
@@ -283,6 +242,8 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
 
 ## 更新日志
+
+- 2026-10-07：同步 TableCell v1.10.2 的跨列渐隐与可见视口定位说明，默认透明区贴合实际按钮左边缘，向左使用固定 20px Token 过渡；Table 公开 API 不变。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
