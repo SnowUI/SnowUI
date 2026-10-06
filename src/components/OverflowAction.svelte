@@ -142,28 +142,31 @@
     enableDefaultMotion={false}
     {...frameRestProps}
 >
-    {#if mode === "compact"}
-        <Button
-            {...resolvedButtonProps}
-            iconOnly
-            aria-label={label}
-            title={label}
-            disabled={resolvedDisabled}
-            {href}
-            onclick={execute}
-        >
-            {@render renderIcon()}
-        </Button>
-    {:else}
-        <Button
-            {...resolvedButtonProps}
-            disabled={resolvedDisabled}
-            {href}
-            onclick={execute}
-        >
-            {@render renderFull()}
-        </Button>
-    {/if}
+    <span class="snowui-overflow-action-visual">
+        {#if mode === "compact"}
+            <Button
+                {...resolvedButtonProps}
+                iconOnly
+                aria-label={label}
+                title={label}
+                disabled={resolvedDisabled}
+                {href}
+                onclick={execute}
+            >
+                {@render renderIcon()}
+            </Button>
+        {:else}
+            <Button
+                {...resolvedButtonProps}
+                disabled={resolvedDisabled}
+                {href}
+                onclick={execute}
+            >
+                {@render renderFull()}
+            </Button>
+        {/if}
+
+    </span>
 
     <span class="snowui-overflow-action-measure" aria-hidden="true" inert>
         <span bind:this={fullMeasureElement}>
@@ -182,6 +185,14 @@
 </Frame>
 
 <style>
+    :global(:where(.snowui-overflow-action-visual)) {
+        display: inline-flex;
+        opacity: var(--snowui-responsive-exit-opacity, 1);
+    }
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-overflow-action-visual)) { opacity: 1; }
+    }
+
     :global(:where(.snowui-overflow-action)) {
         position: relative;
         display: inline-flex;

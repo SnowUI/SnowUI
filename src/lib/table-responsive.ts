@@ -1,3 +1,4 @@
+import { createResponsiveExit } from "./responsive-exit";
 import { createTableColumnMotion } from "./table-column-motion";
 import { resizeManager } from "../logic/observer.svelte";
 import type { TableRoleLayout } from "./table-context.svelte";
@@ -26,6 +27,13 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
     let preferredPadding = 0;
     let minimumPadding = 0;
     let fadeDistance = 0;
+    let fadedCells: HTMLTableCellElement[] = [];
+    const exit = createResponsiveExit(opacity => {
+        for (const cell of fadedCells) {
+            if (opacity < 1) cell.style.setProperty('--snowui-table-responsive-column-opacity', opacity.toFixed(4));
+            else cell.style.removeProperty('--snowui-table-responsive-column-opacity');
+        }
+    });
     let measuredActionsWidth = 0;
     let complexGrid = false;
     const originalSpans = new WeakMap<HTMLTableCellElement, number>();
@@ -128,18 +136,19 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
                 if (index === measured.length - 1 && !measured[index].role) required += minimumPadding;
             }
         }
-        // 宽度直接驱动下一待收列的透明度；不启动时间动画，快速反向拖动也不会排队。
+        // 拖动时宽度驱动渐隐；停留时恢复，重新拖动从当前透明度接续。
         let fadingIndex = -1;
         let fadeOpacity = 1;
         if (!options.horizontalScroll && !complexGrid) {
             for (let index = measured.length - 1; index >= 0; index--) {
                 if (!hidden.has(index) && measured[index].hideable) {
                     fadingIndex = index;
-                    fadeOpacity = Math.max(0, Math.min(1, (available + 0.5 - required) / Math.max(1, fadeDistance)));
                     break;
                 }
             }
         }
+        fadeOpacity = exit.update(available + 0.5, required, fadeDistance, fadingIndex < 0 ? '' : String(fadingIndex));
+        fadedCells = [];
         const remainingData = measured.map((column, index) => ({column, index})).filter(({column, index}) => !column.role && !hidden.has(index));
         // 只对最终单列的文本布局收缩。保护列、硬尺寸、合并网格和控件仍滚动兜底，不能裁掉操作。
         const lastIndex = remainingData[0]?.index;
@@ -176,6 +185,7 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
                 if (hide && cell.contains(document.activeElement)) viewport.focus({ preventScroll: true });
                 cell.classList.toggle('snowui-table-responsive-hidden', hide);
                 // 合并单元格不随其中某一列淡出；只同步一一对应的表头和数据 Cell。
+                if (span === 1 && index === fadingIndex) fadedCells.push(cell);
                 const opacity = span === 1 && index === fadingIndex ? fadeOpacity : 1;
                 const property = '--snowui-table-responsive-column-opacity';
                 if (opacity < 1) {
@@ -237,6 +247,7 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
         update(next: Options) { options = next; refresh(); },
         destroy() {
             disposed = true;
+            exit.destroy();
             if (frame) cancelAnimationFrame(frame);
             observer.disconnect();
             columnMotion.destroy();

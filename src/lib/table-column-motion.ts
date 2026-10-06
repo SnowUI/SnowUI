@@ -43,7 +43,7 @@ export function createTableColumnMotion(table: HTMLTableElement) {
             const x = from.x - to.x;
             const clipped = Math.max(0, to.width - from.visibleWidth);
             if (Math.abs(x) < .01 && clipped < .01) continue;
-            // 透明度仅由响应宽度驱动；换行造成的纵向布局不叠加平移动画。
+            // 透明度由响应式控制器管理；换行造成的纵向布局不叠加平移动画。
             // 不动画 td/th、圆角或 table-layout，不让视觉插值反馈到原生列宽算法。
             // 裁切只限制尚未展开的内容区域；结束后移除，恢复消费者原有溢出规则。
             const frames: Keyframe[] = [

@@ -55,7 +55,7 @@ export const examples = [
         { id: "delete", label: "删除", icon: "trash" },
     ]}
 />`,
-        expected: { render: "初始完整显示三个按钮；宽度不足时按删除、复制、编辑的顺序从右向左转入 More。", layout: "剩余操作保持原有视觉顺序。", interaction: "More 菜单按原始数据顺序显示被隐藏操作。", performance: "只复用既有测量结果。", responsive: "跟随效果区域实际宽度响应，overflowFrom=end 从右侧开始逐个隐藏。" },
+        expected: { render: "初始完整显示三个按钮；宽度不足时按删除、复制、编辑的顺序从右向左转入 More。", layout: "剩余操作保持原有视觉顺序。", interaction: "More 菜单按原始数据顺序显示被隐藏操作。", performance: "只复用既有测量结果。", responsive: "跟随效果区域实际宽度响应，overflowFrom=end 从右侧开始逐个渐隐后收纳；连续反向拖动按宽度恢复，停留 1s 后保留按钮恢复原透明度，再次缩窄从当前透明度接续；背景与 More 不渐隐。" },
         logic: ["Progressive", "End", "NoCompact"],
     },
     {

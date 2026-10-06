@@ -16,6 +16,8 @@
     import MenuItem from "./MenuItem.svelte";
     import Separator from "./Separator.svelte";
     import OverflowAction from "./OverflowAction.svelte";
+    import { createOverflowActionsMotion } from "../lib/overflow-actions-motion";
+    import { createResponsiveExit } from "../lib/responsive-exit";
     import { resizeManager } from "../logic/observer.svelte";
     import {
         OVERFLOW_ACTIONS_CONTEXT_KEY,
@@ -110,10 +112,19 @@
 
     let rootElement = $state<HTMLElement | undefined>(undefined);
     let moreMeasureElement = $state<HTMLElement | undefined>(undefined);
+    let fadeMeasureElement: HTMLElement | undefined;
+    const separatorWidths = new Map<HTMLElement, number>();
     let modes = $state<Record<string, OverflowActionMode>>({});
     let menuEntries = $state<Extract<LayoutEntry, { type: "action" }>[]>([]);
     let hasOverflow = $state(false);
     let layoutFrame = 0;
+    let fadingElements: HTMLElement[] = [];
+    const exit = createResponsiveExit(opacity => {
+        for (const element of fadingElements) element.style.setProperty('--snowui-responsive-exit-opacity', String(opacity));
+    });
+    let movement: ReturnType<typeof createOverflowActionsMotion> | undefined;
+    let layoutKey: string | undefined;
+    let layoutRevision = 0;
     let isMounted = false;
     const registrations = new Map<string, OverflowActionRegistration>();
 
@@ -183,11 +194,14 @@
 
     function requestLayout() {
         if (!isMounted || layoutFrame) return;
-        layoutFrame = requestAnimationFrame(async () => {
-            layoutFrame = 0;
-            await tick();
-            updateLayout();
-        });
+        layoutFrame = requestAnimationFrame(() => { void flushLayout(); });
+    }
+
+    async function flushLayout() {
+        if (layoutFrame) cancelAnimationFrame(layoutFrame);
+        layoutFrame = 0;
+        await tick();
+        if (isMounted) updateLayout();
     }
 
     function directEntries(): LayoutEntry[] {
@@ -239,7 +253,7 @@
 
     function entryWidth(entry: LayoutEntry, mode: "full" | "compact") {
         if (entry.type === "separator") {
-            return entry.element.getBoundingClientRect().width;
+            return separatorWidths.get(entry.element) ?? 0;
         }
         const element = mode === "compact"
             ? entry.action.getCompactMeasureElement()
@@ -282,48 +296,83 @@
         const canCompact = compact === "auto" && actions.length > 0 &&
             actions.every(action => !!action.icon);
 
-        let nextModes: Record<string, OverflowActionMode> = Object.fromEntries(
-            actions.map(action => [action.id, "full" as OverflowActionMode]),
-        );
-        let nextMenuEntries: LayoutEntry[] = [];
-        let visibleEntries = normalizedAll;
-
-        if (totalWidth(normalizedAll, "full", false, gap) <= width) {
-            // Full is the preferred stable state.
-        } else if (
-            canCompact &&
-            totalWidth(normalizedAll, "compact", false, gap) <= width
-        ) {
-            nextModes = Object.fromEntries(
-                actions.map(action => [action.id, "compact" as OverflowActionMode]),
-            );
-        } else if (overflow === "all") {
-            nextModes = Object.fromEntries(
-                actions.map(action => [action.id, "hidden" as OverflowActionMode]),
-            );
-            visibleEntries = [];
-            nextMenuEntries = normalizedAll;
-        } else {
-            const baseMode = canCompact ? "compact" : "full";
-            const visibleIds = new Set(allIds);
-            const candidates = overflowFrom === "start" ? actions : [...actions].reverse();
-            for (const candidate of candidates) {
-                const normalizedVisible = normalizeEntries(entries, visibleIds);
-                if (totalWidth(normalizedVisible, baseMode, true, gap) <= width) break;
-                visibleIds.delete(candidate.id);
-            }
-            visibleEntries = normalizeEntries(entries, visibleIds);
-            const hiddenIds = new Set(
-                actions.filter(action => !visibleIds.has(action.id)).map(action => action.id),
-            );
-            nextMenuEntries = normalizeEntries(entries, hiddenIds);
-            nextModes = Object.fromEntries(
-                actions.map(action => [
-                    action.id,
-                    visibleIds.has(action.id) ? baseMode : "hidden",
-                ]),
-            );
+        // 隐藏的 Separator 仍参与未来布局预算；同帧恢复测量后还原，不改变绘制状态。
+        separatorWidths.clear();
+        for (const entry of entries) {
+            if (entry.type !== "separator") continue;
+            const hidden = entry.element.hidden;
+            entry.element.hidden = false;
+            separatorWidths.set(entry.element, entry.element.getBoundingClientRect().width);
+            entry.element.hidden = hidden;
         }
+        function resolveLayout(budget: number) {
+            let nextModes: Record<string, OverflowActionMode> = Object.fromEntries(
+                actions.map(action => [action.id, "full" as OverflowActionMode]),
+            );
+            let nextMenuEntries: LayoutEntry[] = [];
+            let visibleEntries = normalizedAll;
+
+            if (totalWidth(normalizedAll, "full", false, gap) <= budget) {
+                // Full is the preferred stable state.
+            } else if (
+                canCompact &&
+                totalWidth(normalizedAll, "compact", false, gap) <= budget
+            ) {
+                nextModes = Object.fromEntries(
+                    actions.map(action => [action.id, "compact" as OverflowActionMode]),
+                );
+            } else if (overflow === "all") {
+                nextModes = Object.fromEntries(
+                    actions.map(action => [action.id, "hidden" as OverflowActionMode]),
+                );
+                visibleEntries = [];
+                nextMenuEntries = normalizedAll;
+            } else {
+                const baseMode = canCompact ? "compact" : "full";
+                const visibleIds = new Set(allIds);
+                const candidates = overflowFrom === "start" ? actions : [...actions].reverse();
+                for (const candidate of candidates) {
+                    const normalizedVisible = normalizeEntries(entries, visibleIds);
+                    if (totalWidth(normalizedVisible, baseMode, true, gap) <= budget) break;
+                    visibleIds.delete(candidate.id);
+                }
+                visibleEntries = normalizeEntries(entries, visibleIds);
+                const hiddenIds = new Set(
+                    actions.filter(action => !visibleIds.has(action.id)).map(action => action.id),
+                );
+                nextMenuEntries = normalizeEntries(entries, hiddenIds);
+                nextModes = Object.fromEntries(
+                    actions.map(action => [
+                        action.id,
+                        visibleIds.has(action.id) ? baseMode : "hidden",
+                    ]),
+                );
+            }
+
+            return { nextModes, nextMenuEntries, visibleEntries };
+        }
+        const { nextModes, nextMenuEntries, visibleEntries } = resolveLayout(width);
+        const visibleAction = actions.find(action => nextModes[action.id] !== "hidden");
+        if (visibleAction) {
+            const mode = nextModes[visibleAction.id] as "full" | "compact";
+            const required = totalWidth(visibleEntries, mode, nextMenuEntries.length > 0, gap);
+            // 预算必须包含首次出现的 More；一次可能收起多个按钮，不能只淡出最末一个。
+            const upcoming = resolveLayout(Math.max(0, required - 0.01));
+            const fadingActions = actions.filter(action => nextModes[action.id] !== "hidden" && upcoming.nextModes[action.id] === "hidden");
+            const opacity = exit.update(width, required, fadeMeasureElement?.getBoundingClientRect().width ?? 0, fadingActions.length ? JSON.stringify(fadingActions.map(action => action.id)) : '');
+            fadingElements = fadingActions.map(action => action.getElement()).filter((element): element is HTMLElement => !!element);
+            for (const action of actions) {
+                const element = action.getElement();
+                const fading = nextModes[action.id] !== "hidden" && upcoming.nextModes[action.id] === "hidden";
+                element?.style.setProperty('--snowui-responsive-exit-opacity', String(fading ? opacity : 1));
+            }
+        } else {
+            fadingElements = [];
+            exit.update(width, 0, 1, '');
+            for (const action of actions) action.getElement()?.style.removeProperty('--snowui-responsive-exit-opacity');
+        }
+        const focused = actions.find(action => action.getElement()?.contains(document.activeElement));
+        const moveFocus = focused && nextModes[focused.id] === "hidden";
 
         const visibleSeparators = new Set(
             visibleEntries
@@ -332,6 +381,13 @@
                 )
                 .map(entry => entry.element),
         );
+        const nextKey = JSON.stringify(actions.map(action => [action.id, nextModes[action.id]]));
+        const changed = layoutKey !== undefined && layoutKey !== nextKey;
+        const before = changed ? movement?.capture() : undefined;
+        if (changed) movement?.finish();
+        layoutKey = nextKey;
+        if (changed) layoutRevision += 1;
+        const revision = layoutRevision;
         for (const entry of entries) {
             if (entry.type === "separator") {
                 entry.element.hidden = !visibleSeparators.has(entry.element);
@@ -344,6 +400,11 @@
                 entry.type === "action",
         );
         hasOverflow = menuEntries.length > 0;
+        if (before || moveFocus) void tick().then(() => {
+            if (!isMounted || revision !== layoutRevision) return;
+            if (before) movement?.play(before);
+            if (moveFocus) rootElement?.querySelector<HTMLElement>('.snowui-select-button-trigger')?.focus({preventScroll:true});
+        });
     }
 
     function handleMenuAction(id: string) {
@@ -357,18 +418,21 @@
 
     onMount(() => {
         isMounted = true;
+        if (rootElement) movement = createOverflowActionsMotion(rootElement);
         requestLayout();
     });
 
     onDestroy(() => {
         isMounted = false;
+        movement?.destroy();
+        exit.destroy();
         if (layoutFrame) cancelAnimationFrame(layoutFrame);
     });
 
     $effect(() => {
         const node = rootElement;
         if (availableWidth !== undefined || !node) return;
-        return resizeManager.watch(node, requestLayout);
+        return resizeManager.watch(node, () => { void flushLayout(); });
     });
 
     $effect(() => {
@@ -428,6 +492,7 @@
     {/if}
 
     {#if hasOverflow}
+        <span class="snowui-overflow-actions-more-visual">
         <SelectButton
             {...resolvedMoreButtonProps}
             iconOnly
@@ -461,8 +526,10 @@
                 {/each}
             </Listbox>
         </SelectButton>
+        </span>
     {/if}
 
+    <span bind:this={fadeMeasureElement} class="snowui-overflow-actions-fade-measure" aria-hidden="true" inert></span>
     <span class="snowui-overflow-actions-more-measure" aria-hidden="true" inert>
         <span bind:this={moreMeasureElement}>
             <SelectButton
@@ -483,6 +550,19 @@
 </Frame>
 
 <style>
+    :global(:where(.snowui-overflow-actions-more-visual)) {
+        display: inline-flex;
+        flex: 0 0 auto;
+    }
+
+    :global(:where(.snowui-overflow-actions-fade-measure)) {
+        position: absolute;
+        width: var(--size-5);
+        height: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
     :global(:where(.snowui-overflow-actions)) {
         position: relative;
         display: inline-flex;

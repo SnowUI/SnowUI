@@ -70,10 +70,10 @@ export const examples = [{
 </Table>`,
     expected: { render: "纯 OSS Table 根据自身容器宽度响应。", responsive: "先缩左右间距，再隐藏备注和负责人；名称与状态保留。仍超宽时局部滚动，变宽恢复全部列。", interaction: "隐藏列退出焦点顺序，hover 圆角跟随可见首尾。" },
     logic: ["Responsive", "ColumnVisibility", "ScrollFallback"],
-}    {
+}, {
         name: "最后一列长文本",
         code: `<Table horizontalScroll={false}><TableHeader><TableRow><TableHead>订阅</TableHead><TableHead>备注</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell nowrap lines={false}>SnowUIProfessionalAnnualSubscriptionRenewal</TableCell><TableCell>Annual renewal</TableCell></TableRow></TableBody></Table>`,
-        expected: { responsive: "备注随宽度逐渐淡出再隐藏；只剩订阅仍放不下时省略显示，hover 查看全文。表格外缘至少 8px，相邻列内容间至少 8px。" },
+        expected: { responsive: "备注随宽度逐渐淡出再隐藏；停留 1s 后保留列恢复原透明度，再次缩窄从当前透明度接续；只剩订阅仍放不下时省略显示，hover 查看全文。表格外缘至少 8px，相邻列内容间至少 8px。" },
         logic: ["Responsive", "Truncation"],
     },
 ];

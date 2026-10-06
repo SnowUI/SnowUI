@@ -82,6 +82,7 @@ OverflowAction 只能作为 `OverflowActions` 的直系子项使用。组件保�
 - 组合身份：OverflowActions 的专用显式子项。
 - `as="item"` 时向最近的 OverflowActions Context 注册；缺少父级时开发环境输出警告，但仍渲染普通 Button。
 - 测量副本必须不可聚焦、不可命中、不可进入无障碍树。
+- 真实按钮使用独立视觉壳消费父级渐隐值，不干扰 Button 自身 hover、点击或 Frame 根视觉通道；减少动效时保持完全可见直到收纳。
 
 ## 更新日志
 

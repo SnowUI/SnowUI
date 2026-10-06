@@ -106,6 +106,10 @@
    - `all`：全部操作转入菜单。
    - `progressive`：按 `overflowFrom="start" | "end"` 从一侧逐个转入菜单。
 
+宽度接近按钮收纳阈值时，即将进入 More 的按钮在 `--size-5` 的固定宽度区间内渐隐；连续拖动时反向拖宽按当前宽度恢复，更多按钮和整组背景不参与渐隐。首次出现 More 可能同时收起多个按钮，它们同步渐隐。 有效宽度（优先 availableWidth）停止变化 1s 后，保留按钮使用共享恢复控制器恢复原透明度；恢复中或恢复后再次缩窄从当前透明度接续。已收纳按钮保持隐藏，More 与保留按钮的位移自然完成。菜单展开只冻结收纳布局，不阻止透明度恢复。仅 full → compact 时不淡出整颗按钮。减少动效设置下直接切换。规则与 Table 共用 [响应式项目收起](../../../specs/MotionPresetSpec.md#23-响应式项目收起)。
+
+响应式收纳改变可见按钮集合时，保留按钮与 More 以原生 Flex 对齐位置为终点，使用 `RESIZE_MOTION` 做水平平移；连续宽度变化不重复启动，反向收纳从当前视觉位置接续。私有适配器位于 `src/lib/overflow-actions-motion.ts`，不缩放按钮内容；减少动效时直接完成布局。
+
 结构项不作为独立的溢出候选。Separator 仅在主操作区域两侧都仍有可见操作时保留；首尾 Separator、连续重复 Separator 自动隐藏。操作转入 More/Listbox 后只生成连续 MenuItem，即使来源结构中存在 Separator，菜单内也一律不显示分割线。Separator 的宽度仍计入主操作区域布局计算。
 
 More 按钮使用 `SelectButton selectionMode="action"`，内部直接组合 `Listbox + MenuItem`，不引入 Popover。菜单展开期间冻结当前布局，避免触发器因列宽或容器宽度变化而消失。
@@ -163,6 +167,8 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - [MenuItem.svelte](./MenuItem.svelte)
 
 ## 更新日志
+
+- 2026-10-07：接入共享宽度驱动渐隐与 1s 停留恢复；保留 compact、双向 progressive、all、菜单冻结及操作语义，焦点所在按钮收纳后移到 More。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
