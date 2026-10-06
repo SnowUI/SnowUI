@@ -32,36 +32,18 @@ export const examples = [
     logic: ["ProportionalScale", "BrandGeometry"],
   },
   {
-    name: "3: Hover 分层旋转",
+    name: "3: Hover 表情与多语言问候",
     code: `3
 <SnowUILogo variant="horizontal" scale={2} />`,
-    expected: {
-      render:
-        "hover 后白色米字 0.20x、完整彩色图形 0.10x 顺时针匀速连续旋转。移出后米字停靠 45°、彩色图形停靠 90° 对齐点，再次 hover 从停止角度继续；字标保持静态。减少动效时两个图层静止，品牌完整可见。",
-    },
-    logic: [
-      "HoverMotion",
-      "ClockwiseRotation",
-      "TwoLayerSpeeds",
-      "ContinuousHover",
-      "ColorLayerSettlement",
-      "ContinuousRestart",
-      "ReducedMotion",
-    ],
+    expected: { render: "hover 后表情和多语言 Hello 同步轮换，外框保持固定；移出恢复品牌，减少动效不循环。" },
+    logic: ["HoverGreeting", "StableGeometry", "ReducedMotion"],
   },
   {
-    name: "4: Hover 动效调节器",
+    name: "4: 连续收拢",
     code: `4
 <SnowUILogoHoverController />`,
-    expected: {
-      render:
-        "显示白色米字和彩色图形两个调节组，默认分别为 0.20x 和 0.10x 顺时针；可调整两层速度和方向，调试设置不属于组件公开 API。",
-    },
-    logic: [
-      "HoverMotionController",
-      "GroupedLayerSpeed",
-      "GroupedLayerDirection",
-    ],
+    expected: { render: "纵向 Logo 连续收拢成图标并可反向展开，只有同一份品牌图形；非 vertical 不受 compactProgress 影响。" },
+    logic: ["CompactProgress", "ContinuousReverse"],
   },
   {
     name: "5: 返回主页链接",
