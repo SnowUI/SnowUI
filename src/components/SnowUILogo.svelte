@@ -1,13 +1,13 @@
 <!--
   SnowUILogo 组件
-  v1.15.2
+  v1.16.1
 
   职责：按 Workshop 品牌设计稿渲染 SnowUI 图标、字标及其横向/纵向组合。
   文档：./SnowUILogo.md
 -->
 
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy, tick } from "svelte";
   import { LOGO_EMOJI_FONT, measureLogoEmoji } from "../internal/snow-ui-logo/emoji-metrics";
   import LogoWordmark from "../internal/snow-ui-logo/Wordmark.svelte";
   import Frame, { type FrameProps } from "./Frame.svelte";
@@ -59,7 +59,18 @@
   let greetingIndex = $state(-1);
   const iconIndex = $derived(greetingIndex);
   let emojiMetrics = $state(greetings.map(() => ({ size: 32, x: 0, y: 28 })));
-  let cycleTimer: ReturnType<typeof setInterval> | undefined;
+  let cycleTimer: ReturnType<typeof setTimeout> | undefined;
+  let hovered = false;
+  let transitioning = $state(false);
+  let activeTransitions = 0;
+  let armed = false;
+  let generation = 0;
+  let disposed = false;
+  let lastNode = -1;
+  let resumeUntil = 0;
+  let resumeRequested = false;
+  let nodeStartedAt = 0;
+  let settleFrame = 0;
   const compact = $derived(variant === "vertical" && Number.isFinite(compactProgress) ? Math.max(0, Math.min(1, compactProgress)) : 0);
   const greeting = $derived(greetingIndex === -1 ? null : greetings[greetingIndex][1]);
 
@@ -90,22 +101,90 @@
     );
   }
 
-  function stopCycle() {
-    if (cycleTimer !== undefined) clearInterval(cycleTimer);
+  function clearCycleTimer() {
+    if (cycleTimer !== undefined) clearTimeout(cycleTimer);
     cycleTimer = undefined;
+  }
+
+  // 减少动效、页面隐藏和卸载属于生命周期终止，不受 hover 的排队规则限制。
+  function stopCycle() {
+    generation++;
+    hovered = false;
+    transitioning = false;
+    armed = false;
+    activeTransitions = 0;
+    lastNode = -1;
+    resumeUntil = 0;
+    resumeRequested = false;
+    clearCycleTimer();
+    if (typeof window !== "undefined") cancelAnimationFrame(settleFrame);
     greetingIndex = -1;
   }
 
+  function motionStarted() { activeTransitions++; }
+  function motionEnded() {
+    activeTransitions = Math.max(0, activeTransitions - 1);
+    settleIfComplete();
+  }
+  function settleIfComplete() {
+    if (disposed || !transitioning || !armed || activeTransitions !== 0) return;
+    transitioning = false;
+    if (greetingIndex !== -1) lastNode = greetingIndex;
+    // 保留一个真正完成的静态帧，再消费最后一次 hover 意图。
+    settleFrame = requestAnimationFrame(reconcileHover);
+  }
+
+  async function moveToNode(index: number) {
+    if (disposed || transitioning || greetingIndex === index) return;
+    clearCycleTimer();
+    if (typeof window !== "undefined") cancelAnimationFrame(settleFrame);
+    transitioning = true;
+    armed = false;
+    const run = ++generation;
+    nodeStartedAt = performance.now();
+    greetingIndex = index;
+    // 等 Svelte 提交所有字母和图标后，再由实际 transition end 判断完成。
+    await tick();
+    // transition start 由渲染帧派发，不能把 DOM 提交误判为动画完成。
+    await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+    if (disposed || run !== generation) return;
+    armed = true;
+    settleIfComplete();
+  }
+
+  function reconcileHover() {
+    if (disposed || transitioning) return;
+    clearCycleTimer();
+    if (!hovered) {
+      if (greetingIndex !== -1) void moveToNode(-1);
+      return;
+    }
+    if (greetingIndex === -1) {
+      const next = resumeRequested ? (lastNode + 1) % greetings.length : 0;
+      void moveToNode(next);
+      return;
+    }
+    // 不积累补播：稳定节点至少停留一个绘制帧，再进入下一个节点。
+    cycleTimer = setTimeout(() => {
+      cycleTimer = undefined;
+      if (hovered && !transitioning) void moveToNode((lastNode + 1) % greetings.length);
+    }, Math.max(0, 1200 - (performance.now() - nodeStartedAt)));
+  }
+
   function handleMouseEnter(event: MouseEvent) {
-    if (!prefersReducedMotion() && cycleTimer === undefined) {
-      greetingIndex = 0;
-      cycleTimer = setInterval(() => { greetingIndex = (greetingIndex + 1) % greetings.length; }, 1800);
+    if (!prefersReducedMotion()) {
+      hovered = true;
+      resumeRequested = performance.now() <= resumeUntil;
+      reconcileHover();
     }
     userOnMouseEnter?.(event);
   }
 
   function handleMouseLeave(event: MouseEvent) {
-    stopCycle();
+    hovered = false;
+    resumeUntil = performance.now() + 10000;
+    clearCycleTimer();
+    reconcileHover();
     userOnMouseLeave?.(event);
   }
 
@@ -120,7 +199,7 @@
       document.removeEventListener("visibilitychange", stopWhenHidden);
     };
   });
-  onDestroy(stopCycle);
+  onDestroy(() => { disposed = true; stopCycle(); });
 
 </script>
 
@@ -135,6 +214,8 @@
     .join(" ")}
   data-variant={variant}
   data-snow-ui-logo-cycle={greetingIndex !== -1 ? "active" : "idle"}
+  data-logo-motion={transitioning ? "transitioning" : "settled"}
+  data-logo-node={greetingIndex}
   data-compact-progress={compact}
   style={snowUILogoStyle}
   role={decorative ? undefined : (role ?? "img")}
@@ -154,7 +235,7 @@
       aria-hidden="true"
     >
       {#key iconIndex}
-      <g class="snowui-logo-icon-face" transition:iconTransition>
+      <g class="snowui-logo-icon-face" transition:iconTransition onintrostart={motionStarted} onoutrostart={motionStarted} onintroend={motionEnded} onoutroend={motionEnded}>
       {#if iconIndex === -1}
       <!-- 来自 resource-base/assets/logos/snow-logo.svg 的品牌矢量快照；非 hover 时保留原始图形。 -->
       <g class="snowui-snow-ui-logo-color">
@@ -418,7 +499,7 @@
 
   {#if variant !== "icon"}
     <span class="snowui-snow-ui-logo-wordmark" aria-hidden="true">
-      <LogoWordmark {greeting} id={logoId} />
+      <LogoWordmark {greeting} id={logoId} onmotionstart={motionStarted} onmotionend={motionEnded} />
     </span>
   {/if}
 </Frame>
@@ -507,6 +588,10 @@
       calc(var(--size-5) * (1 - var(--snowui-snow-ui-logo-compact)) * var(--snowui-snow-ui-logo-scale))
     );
   }
+
+  /* 动态字形只负责绘制，溢出和缩放不能改变根节点的悬停命中范围。 */
+  :global(:where(.snowui-snow-ui-logo-icon)),
+  :global(:where(.snowui-snow-ui-logo-wordmark)) { pointer-events: none; }
 
   :global(:where(.snowui-logo-icon-face)) { transform-origin: 16px 16px; }
 </style>

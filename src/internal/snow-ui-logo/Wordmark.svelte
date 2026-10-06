@@ -2,8 +2,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { TransitionConfig } from "svelte/transition";
-  let { greeting = null, id }: { greeting?: string | null; id: string } =
-    $props();
+  let { greeting = null, id, onmotionstart, onmotionend }: {
+    greeting?: string | null;
+    id: string;
+    onmotionstart?: () => void;
+    onmotionend?: () => void;
+  } = $props();
   const brand = [
     {
       label: "s",
@@ -203,6 +207,10 @@
       data-letter-key={letter.key}
       in:character
       out:character
+      onintrostart={onmotionstart}
+      onoutrostart={onmotionstart}
+      onintroend={onmotionend}
+      onoutroend={onmotionend}
       style:left={`calc(50% + ${letter.left}em)`}
       style:width={`${letter.width}em`}
     >
