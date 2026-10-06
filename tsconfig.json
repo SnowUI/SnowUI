@@ -33,6 +33,10 @@
       "@snowui-design-system/components/lib/backdrop": [
         "../components/src/lib/backdrop.ts",
         "./node_modules/@snowui-design-system/components/src/lib/backdrop.ts"
+      ],
+      "@snowui-design-system/components/lib/table-context.svelte": [
+        "../components/src/lib/table-context.svelte.ts",
+        "./node_modules/@snowui-design-system/components/src/lib/table-context.svelte.ts"
       ]
     }
   },

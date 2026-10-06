@@ -8,7 +8,7 @@
         type TableRoleLayout,
         type TableRoleOverlayBlurMode,
         type TableSortState,
-    } from "@snowui-design-system/components";
+    } from "@snowui-design-system/components/lib/table-context.svelte";
     import type { FrameProps } from "@snowui-design-system/components/logic/frame-types";
     import FramePro from "./FramePro.svelte";
     import {
@@ -145,6 +145,7 @@
         selection?: boolean;
         /** 是否显示操作按钮列，默认 false */
         actions?: boolean | DataTableActionsConfig<T>;
+        horizontalScroll?: boolean;
         roleLayout?: TableRoleLayout;
         roleOverlayLayers?: number;
         roleOverlayBlurMode?: TableRoleOverlayBlurMode;
@@ -189,7 +190,8 @@
         selectedRowIds = $bindable([]),
         selection = false,
         actions = false,
-        roleLayout = "column",
+        horizontalScroll = true,
+        roleLayout = "auto",
         roleOverlayLayers = 4,
         roleOverlayBlurMode = "progressive",
         roleOverlayUniformFeather = 0.3,
@@ -532,6 +534,7 @@
     const tableContext: Partial<TableContext> & DataTableActionsContextExtension = {
         isDataTable: () => true,
         getRoleLayout: () => roleLayout,
+        getHorizontalScroll: () => horizontalScroll,
         getRoleOverlayLayers: () => roleOverlayLayers,
         getRoleOverlayBlurMode: () => roleOverlayBlurMode,
         getRoleOverlayUniformFeather: () => roleOverlayUniformFeather,

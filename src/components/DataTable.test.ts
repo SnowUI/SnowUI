@@ -20,7 +20,7 @@ export const examples = [
         <Pagination page={state.page} total={state.totalPages} />
     {/snippet}
 </DataTable>`,
-        expected: { render: "渲染排序并分页后的数据。", layout: "Table 与 Pagination 可自由组合。", interaction: "表头循环升序、降序、无排序。", performance: "稳定排序 rows 副本，不修改原数组。", responsive: "Table 自行处理横向溢出；表头与数据 Cell 左右 padding 按内部 Table 容器宽度在 2px 到 12px 之间响应。" },
+        expected: { render: "渲染排序并分页后的数据。", layout: "Table 与 Pagination 可自由组合。", interaction: "表头循环升序、降序、无排序。", performance: "稳定排序 rows 副本，不修改原数组。", responsive: "Table 自行处理横向溢出；表头与数据 Cell 左右 padding 按内部 Table 容器宽度在 4px 到 12px 之间响应。" },
         logic: ["ClientSort", "DefaultFieldSorter", "Stable", "Pagination"],
     },
     {
@@ -130,5 +130,15 @@ export const examples = [
 </DataTable>`,
         expected: { render: "actions 配置自动在空 actions Cell 中渲染 OverflowActions。", layout: "column 模式使用 120px 初始列宽，拖动后通过共享列宽上下文更新。", interaction: "可见 Button 与 More 菜单都通过 DataTable onAction 返回 row 与 actionId；菜单展开期间行操作保持可见。", performance: "DataTable 直接下发列宽，不为每个操作单元格新增 ResizeObserver。", responsive: "先统一 Icon-only，再从末端逐项进入菜单；Separator 不会单独留在首尾。" },
         logic: ["Actions", "OverflowActions", "ResizableColumn", "RowAction", "NoCellObserver"],
+    },
+    {
+        name: "响应式：常驻角色列、浮层与收列",
+        code: `
+<DataTable rows={[{id:'one'}]} rowKey={(row) => row.id} selection actions horizontalScroll={false} variant="striped">
+<Table ariaLabel="响应式订阅记录"><TableHeader><TableRow><TableHead as="selection"/><TableHead columnId="name">订阅</TableHead><TableHead columnId="owner">负责人</TableHead><TableHead columnId="note">备注</TableHead><TableHead as="actions"/></TableRow></TableHeader>
+<TableBody><TableRow rowId="one"><TableCell as="selection"/><TableCell columnId="name">SnowUI Professional</TableCell><TableCell columnId="owner">Natali Craig</TableCell><TableCell columnId="note">Annual subscription renewal</TableCell><TableCell as="actions"><Button>编辑订阅</Button></TableCell></TableRow></TableBody></Table>
+</DataTable>`,
+        expected: { render: "宽容器常驻显示 Checkbox 与操作。", responsive: "缩窄先转 hover 浮层，再缩左右间距，再从右向左收列；第一普通列和角色功能始终保留。", interaction: "宽窄切换保留选择与键盘操作；当前可见末列接管圆角。" },
+        logic: ["Responsive", "Selection", "OverlayRoleLayout"],
     },
 ];

@@ -1,9 +1,9 @@
 # DataTable
 
-> **版本**: v1.13.0
+> **版本**: v1.14.0
 > **职责**: 统一管理数据的查询、排序与分页状态，可自由组合工具栏、表格和分页器，构建完整的数据浏览界面。
 > **包归属**: `@snowui/components-pro`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-07
 
 ## 组件介绍
 
@@ -220,7 +220,8 @@
 | selectedRowIds | `Array<string \| number>` | `[]` | 已选行 id；选择状态由 DataTable 持有 |
 | selection | `boolean` | `false` | 是否显示 checkbox 选择列；为 false 时 `as="selection"` 的 Head/Cell 不渲染 |
 | actions | `boolean \| DataTableActionsConfig<T>` | `false` | 是否显示操作列；配置对象会在空 actions Cell 中默认生成 OverflowActions |
-| roleLayout | `TableRoleLayout` | `"column"` | checkbox / actions 角色列布局（仅在对应列开启时生效） 默认行为：column。 |
+| horizontalScroll | `boolean` | `true` | 向 Table 下发横向滚动策略；false 时从右向左收起允许隐藏的普通列，保护列仍超宽时滚动兜底。 |
+| roleLayout | `TableRoleLayout` | `"auto"` | 宽时角色列常驻，空间不足先转 hover 浮层；column / overlay 固定指定布局。 |
 | roleOverlayLayers | `number` | `4` | overlay 渐进模糊层数 |
 | roleOverlayBlurMode | `TableRoleOverlayBlurMode` | `"progressive"` | overlay 模糊算法 默认行为：progressive。 |
 | roleOverlayUniformFeather | `number` | `0.3` | uniform 模式内侧羽化比例 |
@@ -248,7 +249,7 @@
 
 局部布局来源：Root FramePro 使用 `column + contentFill` 管理直系区域；TableToolbar 保持自身的 row 槽位宿主布局，Table 保持原生表格布局，Pagination 保持内联外壳布局。DataTable 只协调区域排列和数据状态，不改写子组件的主布局模型。
 
-padding 归属：DataTable 根层不制造 padding；工具栏、表格 Cell、分页和自定义状态区分别由各自组件负责。内部 Table 的表头与数据 Cell 左右 padding 按 Table 容器宽度在 2px 到 12px 之间响应，上下保持 8px；DataTable 不复制单元格 padding 实现。
+padding 归属：DataTable 根层不制造 padding；工具栏、表格 Cell、分页和自定义状态区分别由各自组件负责。内部 Table 的表头与数据 Cell 左右 padding 按 Table 容器宽度在 4px 到 12px 之间响应，上下保持 8px，表格外缘最小 8px、相邻列内容间最小 8px；DataTable 不复制单元格 padding 实现。
 
 gap 归属：Root FramePro 统一控制直系区域间距，默认为 `var(--gap-3)`（12px）；子组件内部 gap 由子组件自身控制。
 
@@ -290,6 +291,10 @@ TableHead `defaultSort` 同时定义默认列与默认方向，优先于 DataTab
 DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`striped` 从第一行开始使用 Surface/3 作为奇数行背景，不显示分割线，所有数据行始终保持 12px 外缘圆角；`divided` 的表头与静态数据行两端保持直角，表头下边线为 Black/20% 0.5px，数据行分割线为 Black/10% 0.5px，末行无分割线。分割线模式下，hover 行首尾形成 12px 圆角，且上下相邻分割线同时隐藏；鼠标移出时背景立即退场，不显示圆角恢复直角的背景残影。
 
 <a id="选择列与操作列"></a>
+
+### 响应式
+
+与 OSS Table 共用[完整响应式规则](../../../components/src/components/Table.md#响应式收缩与恢复)：先角色列转浮层，再压缩间距，最后滚动或从右向左隐藏普通列。`horizontalScroll` 默认 true；设为 false 时允许隐藏，`TableHead responsiveHide={false}` 保护指定列，第一普通列始终保留。最终单列的纯文本可收缩，不换行内容省略并默认提供 Tooltip 全文；硬尺寸或不可压缩控件仍滚动兜底。Table 的显式配置优先；DataTable 不另建测量或滚动层。
 
 ### 选择列与操作列
 
@@ -383,6 +388,10 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 DataTable 不发起请求，也不格式化业务字段。预取、缓存和无延迟切换属于页面数据层；日期显示统一使用 OSS `formatDate()`。
 
 ## 更新日志
+
+- 2026-10-07：响应式单元格每侧最小 padding 从 2px 调整为 4px，相邻列最小内容间距为 8px。
+
+- 2026-10-07：v1.14.0，新增 horizontalScroll 策略，roleLayout 默认 auto；所有响应式布局交由 OSS Table 统一计算，保留显式 column / overlay。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
