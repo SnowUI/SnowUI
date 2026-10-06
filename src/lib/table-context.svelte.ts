@@ -5,7 +5,7 @@ import type { TableTruncationResult } from "./table-truncation";
 import type { OverflowActionsItem } from "../components/OverflowActions.svelte";
 
 export type TableSortDirection = "ascending" | "descending";
-export type TableRoleLayout = "column" | "overlay";
+export type TableRoleLayout = "auto" | "column" | "overlay";
 export type TableRoleOverlayBlurMode = "progressive" | "uniform";
 export interface TableSortState {
     columnId: string;
@@ -40,6 +40,7 @@ export interface TableContext {
     getDefaultSort: () => TableSortState | undefined;
     getDefaultSortActive: () => boolean;
     getRoleLayout: () => TableRoleLayout;
+    getHorizontalScroll: () => boolean;
     getRoleOverlayLayers: () => number;
     getRoleOverlayBlurMode: () => TableRoleOverlayBlurMode;
     getRoleOverlayUniformFeather: () => number;
@@ -109,7 +110,8 @@ const fallback: TableContext = {
     getSort: () => undefined,
     getDefaultSort: () => undefined,
     getDefaultSortActive: () => false,
-    getRoleLayout: () => "column",
+    getRoleLayout: () => "auto",
+    getHorizontalScroll: () => true,
     getRoleOverlayLayers: () => 4,
     getRoleOverlayBlurMode: () => "progressive",
     getRoleOverlayUniformFeather: () => 0.3,

@@ -1,6 +1,6 @@
 # TableCell
 
-> **版本**: v1.10.3
+> **版本**: v1.11.0
 > **职责**: 在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-07
@@ -66,10 +66,10 @@
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
 - Skeleton 是加载基础设施，不作为公开 part。
 
-> **版本**: v1.10.3
+> **版本**: v1.11.0
 > **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。需要换行时显式传入 `nowrap={false} lines={false}`；声明 `lines={2}` / `lines={3}` 也视为显式开启多行，未指定 nowrap 时自动允许换行；横向图标与文字默认不换行。
 
-默认单元格高度为 40px，内边距上下保持 8px；左右 padding 根据最近 Table 容器宽度在 2px 到 12px 之间流动，常见窄屏宽度即收敛到每侧 2px，宽表恢复为 12px，首尾单元格沿用相同规则。Table 使用原生相邻列布局，列与列之间没有额外 gap；相邻单元格 padding 相加后的最小视觉间距为 4px。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。横向内容在单元格内垂直居中，不保留行内文字基线的下行空间。
+默认单元格高度为 40px，内边距上下保持 8px；左右 padding 根据最近 Table 容器宽度在 4px 到 12px 之间流动，常见窄屏宽度即收敛到每侧 4px，宽表恢复为 12px，首尾可见单元格朝向表格外缘的一侧至少 8px。Table 使用原生相邻列布局，列与列之间没有额外 gap；相邻单元格 padding 相加后的最小视觉间距为 8px。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。横向内容在单元格内垂直居中，不保留行内文字基线的下行空间。
 
 未显式固定列宽时，单元格的固有 min-content 会参与 Table 自动列宽：可换行内容保留最长不可断单词 / 片段，`lines={1}` 或 `nowrap` 保留整行。显式 `columnWidths`、拖动列宽或其他固定宽度优先，此时仍按 `lines` / tooltip 规则截断。
 
@@ -87,9 +87,9 @@
 <TableCell as="actions"><Button bare>更多</Button></TableCell>
 ```
 
-`as="selection"` 内置行 Checkbox，需要父 TableRow 提供稳定 `rowId`。普通列布局中 Checkbox 距角色列左边缘 8px，并在行 hover、键盘 focus 或已选中时显示；padding 为 `8px 0 8px 8px`。
+`as="selection"` 内置行 Checkbox，需要父 TableRow 提供稳定 `rowId`。常驻 column 布局中 Checkbox 一直显示，左右 padding 遵循 Table 响应式计算；overlay 时才按 hover、键盘 focus 或选中状态显示。
 
-`as="actions"` 不内置默认按钮，children 可放任意行动按钮。内容距角色列右边缘 8px，并与数据行水平中线垂直居中对齐；只在行 hover 时显示。内部横向排列、gap 为 8px，padding 为 `8px 8px 8px 0`。
+`as="actions"` 不内置默认按钮，children 可放任意行动按钮。常驻 column 布局中操作一直显示；overlay 时按行 hover、键盘焦点或展开菜单显示。内部横向排列、gap 为 8px，左右 padding 遵循 Table 响应式计算。
 
 `roleLayout="overlay"` 时，selection/actions 单元格自身宽度归零并 sticky 到表格左右边缘。selection 的真实 `<td>` 只保留 table 语义和定位锚点；Checkbox 与渐进式模糊层都放在 `.snowui-table-selection-control` 中，并由运行时同步为 `position: fixed`，固定到当前行左上角。Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`（17px），在当前奇数像素行高内上下各留 16px；固定增量已登记为 Table selection 特例，不借用边框 Token，也不改变独立 Checkbox 的 16px 默认值。覆盖块不推开第一列内容，而是直接压在第一列之上。取消选择时保留覆盖块的定位；不再满足可见条件时与遮罩同步隐藏，不产生横向位移。第一数据列的透明区覆盖到 Checkbox 实际右边缘，向右使用固定 `--size-5`（名义 20px）过渡；根据实际控件尺寸和响应式间距定位，不按列宽缩放。渐隐遮罩与 Checkbox 可见状态同步：行 hover、键盘 focus、已选中或 force-hover 时均生效；选中后移开鼠标也保持遮罩。未选中且没有键盘可见焦点时，离开 hover 后 Checkbox 与遮罩同帧撤去，不保留淡出残影；进入渐显与键盘可聚焦性不变。
 
@@ -125,6 +125,14 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 > `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
 
 ## 更新日志
+
+- 2026-10-07：统一表格外缘最小 8px，相邻列内容间最小 8px（内部两侧各 4px），收列后重新分配外缘。
+
+- 2026-10-07：常驻操作列允许按钮 hover 背景溢出内容盒，避免动效被文本截断容器裁切；overlay 保留整行范围的裁切。
+
+- 2026-10-07：响应式单元格每侧最小 padding 从 2px 调整为 4px，相邻列最小内容间距为 8px。
+
+- 2026-10-07：v1.11.0，配合 Table 自动角色布局与响应式隐藏，常驻控件一直显示；圆角跟随可见首尾，浮层保留固定渐隐与键盘入口。
 
 - 2026-10-07：v1.10.3，行内与表头 Checkbox 统一按实际右边缘定位透明区，向右使用固定 `--size-5`（名义 20px）柔和过渡；跟随控件尺寸和响应式间距，不随列宽拉长。保留显式起止点覆盖。
 

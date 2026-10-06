@@ -1,13 +1,16 @@
 <!-- OSS 语义表格根。宽表参与页面固有宽度计算，角色列支持列内/覆盖两种布局。文档: ./Table.md -->
 <script lang="ts">
-    import type { Snippet } from "svelte";
+    import { untrack, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import type { ResourceSize } from "../context";
-    import { getTableContext, provideTableContext, type TableColumnRegistration } from "../lib/table-context.svelte";
+    import { getTableContext, provideTableContext, type TableColumnRegistration, type TableRoleLayout } from "../lib/table-context.svelte";
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
     import { TableTruncationManager } from "../lib/table-truncation";
+    import { observeTableResponsive } from "../lib/table-responsive";
     interface Props extends Omit<FrameProps, "children"> {
         columnWidths?: Record<string, number>;
+        horizontalScroll?: boolean;
+        roleLayout?: TableRoleLayout;
         minWidth?: number | string;
         ariaLabel?: string;
         loadingSpinnerSize?: ResourceSize;
@@ -18,6 +21,8 @@
     let {
         columnWidths = $bindable({}),
         minWidth = undefined,
+        horizontalScroll = undefined,
+        roleLayout = undefined,
         ariaLabel = undefined,
         loadingSpinnerSize = 16,
         onColumnWidthsChange,
@@ -40,6 +45,33 @@
     let autoLockedColumnWidths = $state<Record<string, number>>({});
     let hasAutoLockedColumnWidths = $state(false);
     const parentTable = getTableContext();
+    let measuredActionsWidth = $state(0);
+    let resolvedRoleLayout = $state<"column" | "overlay">("overlay");
+    const requestedRoleLayout = $derived(roleLayout ?? parentTable.getRoleLayout());
+    const resolvedHorizontalScroll = $derived(horizontalScroll ?? parentTable.getHorizontalScroll());
+    let responsiveController: ReturnType<typeof observeTableResponsive> | undefined;
+    $effect(() => {
+        if (!tableElement || !viewportElement) return;
+        const controller = untrack(() => observeTableResponsive(tableElement as HTMLTableElement, viewportElement!, {
+            horizontalScroll: resolvedHorizontalScroll,
+            roleLayout: requestedRoleLayout,
+            actionsWidth: columnWidths.__actions ?? parentTable.getActionsColumnWidth(),
+            onLayout: (layout, width) => { resolvedRoleLayout = layout; measuredActionsWidth = width; },
+        }));
+        responsiveController = controller;
+        return () => { controller.destroy(); responsiveController = undefined; };
+    });
+    $effect(() => {
+        columnWidths; autoLockedColumnWidths; userStyle;
+        // 列宽变化触发统一重测，不增加逐列观察器。
+        const options = {
+            horizontalScroll: resolvedHorizontalScroll,
+            roleLayout: requestedRoleLayout,
+            actionsWidth: columnWidths.__actions ?? parentTable.getActionsColumnWidth(),
+            onLayout: (layout: "column" | "overlay", width: number) => { resolvedRoleLayout = layout; measuredActionsWidth = width; },
+        };
+        untrack(() => responsiveController?.update(options));
+    });
     const defaultColumnWidths = new Map<string, number>();
     const truncationManager = new TableTruncationManager();
     const horizontalScrollbar = useOverlayScrollbar(
@@ -106,10 +138,14 @@
     }
 
     provideTableContext({
+        getRoleLayout: () => requestedRoleLayout === "auto" ? resolvedRoleLayout : requestedRoleLayout,
+        getHorizontalScroll: () => resolvedHorizontalScroll,
         getColumnWidth: (columnId) =>
             columnWidths[columnId]
             ?? autoLockedColumnWidths[columnId]
-            ?? parentTable.getColumnWidth(columnId),
+            ?? (columnId === "__actions" && (requestedRoleLayout === "column" || (requestedRoleLayout === "auto" && resolvedRoleLayout === "column"))
+                ? Math.max(measuredActionsWidth, parentTable.getActionsColumnWidth())
+                : parentTable.getColumnWidth(columnId)),
         setColumnWidth,
         fitColumnWidth,
         getLoadingSpinnerSize: () => loadingSpinnerSize,
@@ -159,7 +195,7 @@
 
 <Frame
     class={`snowui-table-viewport snowui-overlay-scrollbar-host ${userClass}`}
-    data-role-layout={parentTable.isDataTable() ? parentTable.getRoleLayout() : undefined}
+    data-role-layout={requestedRoleLayout === "auto" ? resolvedRoleLayout : requestedRoleLayout}
     data-axis="horizontal"
     data-horizontal-track-position={horizontalScrollbar.hasOverflow ? "viewport" : undefined}
     enableResponsive={enableResponsive}
@@ -202,17 +238,14 @@
 </Frame>
 
 <style>
+    :global(:where(.snowui-table .snowui-table-responsive-hidden)) { display: none; }
     :global(:where(.snowui-table-viewport)) {
         width: 100%;
         min-width: 0;
         position: relative;
         overflow: visible;
         container-type: inline-size;
-        --snowui-table-responsive-cell-padding-inline: clamp(
-            calc(var(--padding-1) / 2),
-            calc((100cqi - (var(--size-16) * 7)) / 16),
-            var(--padding-3)
-        );
+        --snowui-table-responsive-cell-padding-inline: var(--padding-3);
     }
     :global(:where(.snowui-table-scroll-viewport)) {
         width: 100%;
@@ -239,4 +272,6 @@
         font-size: var(--snowui-table-font-size-override, var(--text-12, 0.75rem));
         line-height: var(--snowui-table-line-height-override, var(--leading-12, 1rem));
     }
+    /* 仅剩一列纯文本时解除 min-content 撑宽；显式尺寸及不可压缩控件由控制器排除。 */
+    :global(:where(.snowui-table.snowui-table-responsive-text-fit)) { table-layout: fixed; min-width: 0; }
 </style>

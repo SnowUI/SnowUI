@@ -1,6 +1,6 @@
 # TableHead
 
-> **版本**: v2.3.2
+> **版本**: v2.4.0
 > **职责**: 定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-07
@@ -46,6 +46,7 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
+| responsiveHide | `boolean` | `true` | 关闭横向滚动时允许该普通列自动隐藏；false 始终保留。第一普通列和角色列不隐藏。 |
 | columnId | `string` | — | 稳定列标识；角色列使用内置标识 默认行为：普通列必填。 |
 | label | `string` | — | 注册给 TableToolbar 排序 Listbox 的可读列名 默认行为：columnId。 |
 | sortDirection | `"ascending" \| "descending"` | — | 独立受控排序方向 默认行为：context 推导。 |
@@ -72,7 +73,7 @@
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v2.3.2
+> **版本**: v2.4.0
 > **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -91,7 +92,7 @@
 
 不需要 `sortable` prop。DataTable 根据同名原始字段或 `sorters[columnId]` 自动判断列是否可排序；独立 TableHead 在声明 `sortDirection` / `onSortChange` 时也自动启用交互。没有任何排序规则的列不渲染按钮。
 
-普通 Table 的数据列默认不可拖动；需要调整列宽时，在 TableHead 显式传入 `resizable`。DataTable 中声明 `columnId` 的普通数据列默认可拖动，显式 `resizable={false}` 可关闭。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。普通与角色表头的左右 padding 与 TableCell 使用同一容器响应规则，在 2px 到 12px 之间流动；常见窄屏宽度使用每侧 2px，使相邻列最小视觉间距为 4px，上下保持 8px。
+普通 Table 的数据列默认不可拖动；需要调整列宽时，在 TableHead 显式传入 `resizable`。DataTable 中声明 `columnId` 的普通数据列默认可拖动，显式 `resizable={false}` 可关闭。`as="selection"` / `as="actions"` 角色列始终不参与列宽拖动。某一列需要固定宽度时，显式传入 `resizable={false}`。普通与角色表头的左右 padding 与 TableCell 使用同一容器响应规则，在 4px 到 12px 之间流动；常见窄屏宽度使用每侧 4px，使相邻列最小视觉间距为 8px，上下保持 8px；首尾可见单元格及角色浮层朝向外缘的一侧至少 8px。
 
 未显式固定列宽时，表头的不换行 min-content 与同列 TableCell 共同参与 Table 自动列宽；因此列标题不会因窄宿主被逐字压缩。显式 `columnWidths`、拖动列宽或其他固定宽度优先，宽度不足时仍使用表头省略规则。
 
@@ -110,9 +111,9 @@
 
 ### 角色列
 
-- `as="selection"`：渲染内置全选 Checkbox。Checkbox 距角色列左边缘 8px，仅在鼠标进入 Table 区域或键盘焦点进入 Table 时显示；部分选中时使用 indeterminate。该列 padding 为 `8px 0 8px 8px`。
-- `as="actions"`：默认无标题且不渲染任何业务按钮；传入 children 时可显示自定义标题。该列 padding 为 `8px 8px 8px 0`。
-- `roleLayout="overlay"`：角色表头自身宽度归零并 sticky 到左右边缘。selection 的 Checkbox 仍距左边缘 8px；actions 标题（如声明）距右边缘 8px。表头真实首尾单元格保持直角；overlay 浮动控件块可继续使用 12px 圆角。控件覆盖块默认宽度为原 overlay 宽度的三分之一；blur layer 默认隐藏，仅在表头区域 hover 时渐显；内部复用 `components/src/lib/progressive-blur.ts` 的通用 Progressive Blur，全覆盖层通过连续 mask 分段实现渐进强度。selection 左强右清，actions 右强左清。
+- `as="selection"`：渲染内置全选 Checkbox。常驻 column 布局一直显示，overlay 时按首个标题 hover、直接 hover / 键盘焦点显示；部分选中时使用 indeterminate。左右 padding 由 Table 响应式计算。
+- `as="actions"`：默认无标题且不渲染任何业务按钮；传入 children 时可显示自定义标题。左右 padding 由 Table 响应式计算。
+- `roleLayout="overlay"`：角色表头自身宽度归零并 sticky 到左右边缘。selection 的 Checkbox 与 actions 标题（如声明）使用响应式左右 padding。表头真实首尾单元格保持直角；overlay 浮动控件块可继续使用 12px 圆角。控件覆盖块默认宽度为原 overlay 宽度的三分之一；blur layer 默认隐藏，仅在表头区域 hover 时渐显；内部复用 `components/src/lib/progressive-blur.ts` 的通用 Progressive Blur，全覆盖层通过连续 mask 分段实现渐进强度。selection 左强右清，actions 右强左清。
 - overlay selection 后方的首个真实标题内容以 Checkbox 实际右边缘作为透明区终点，向右使用固定 `--size-5`（名义 20px）过渡，与行内 Checkbox 和按钮列一致；可通过 `--snowui-table-head-fade-start-override / --snowui-table-head-fade-end-override` 覆盖。
 - overlay 全选 Checkbox 进入时保留渐显；离开标题与控件且没有键盘可见焦点时，与标题遮罩同帧撤去，避免淡出残影。保留可聚焦 DOM，不用 visibility 隐藏键盘入口。
 - 两种角色都采用显式组合契约，不通过 DOM 扫描猜测列身份。
@@ -173,7 +174,7 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 - 排序与列宽都通过 Table context 协调，不在组件内保存业务 Store。
 - DataTable 下 `as="selection"` / `as="actions"` 受 Context `isSelectionEnabled` / `isActionsEnabled` 控制；关闭时整列不渲染。
 - 默认 `font-weight: 400`，字号与行高消费 `--text-12 / --leading-12`。
-- 所有表头单元格与数据行使用相同的响应式左右 padding，范围为 2px 到 12px。
+- 所有表头单元格与数据行使用相同的响应式左右 padding，范围为 4px 到 12px。
 - `resizable` 使用通用 Indicator；命中带沿用 line 全高协议（表头单元格右缘全高）；统一复用 Indicator 的 2px × 16px 常态与 4px hover 总厚度，整条右边缘均可激活和拖动。
 
 
@@ -186,6 +187,12 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 > `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
 
 ## 更新日志
+
+- 2026-10-07：统一表格外缘最小 8px，相邻列内容间最小 8px（内部两侧各 4px），收列后重新分配外缘。
+
+- 2026-10-07：响应式单元格每侧最小 padding 从 2px 调整为 4px，相邻列最小内容间距为 8px。
+
+- 2026-10-07：v2.4.0，新增 responsiveHide 列保护；常驻角色表头一直显示，自动布局复用 Table 实测结果。
 
 - 2026-10-07：v2.3.2，行内与表头 Checkbox 统一按实际右边缘定位透明区，向右使用固定 `--size-5`（名义 20px）柔和过渡；跟随控件尺寸和响应式间距，不随列宽拉长。保留显式起止点覆盖。
 

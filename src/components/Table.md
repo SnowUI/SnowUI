@@ -1,6 +1,6 @@
 # Table
 
-> **版本**: v2.5.3
+> **版本**: v2.6.0
 > **职责**: 以语义化表格展示结构化数据，支持自适应列宽、局部横向滚动与加载状态，可自由组合表头和单元格。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-07
@@ -63,6 +63,8 @@
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
 | columnWidths | `Record<string, number>` | `{}` | 受控列宽，可 `bind:` |
+| horizontalScroll | `boolean` | `true`（继承 DataTable） | 默认保留全部列并横向滚动；false 时先从右向左隐藏可隐藏列，保留列仍超宽时滚动兜底。 |
+| roleLayout | `TableRoleLayout` | DataTable 配置或 `"auto"` | auto 根据空间在常驻 column 和 hover overlay 之间切换；显式 column / overlay 固定布局。 |
 | minWidth | `number \| string` | — | 显式扩大表格最小宽度；未设置时由各列 min-content + Cell padding 自动汇总，溢出由 Table 内置局部横向 viewport 承接 |
 | ariaLabel | `string` | — | 表格无障碍名称 |
 | loadingSpinnerSize | `ResourceSize` | `16` | 已有数据继续加载时，表体末尾居中 Spinner 的尺寸 |
@@ -110,7 +112,7 @@
 
 局部布局来源：Root Frame 不声明 `row` / `column`，不启用通用槽位排列；`table` 及各语义子项显式关闭 Auto Layout，保持浏览器原生表格布局。TableHead 内部的排序按钮和 Indicator、TableCell 的可选内容 row 属于各子组件的局部布局。
 
-padding 归属：Table 根层和原生 table 不制造 padding；表头与数据单元格分别由 TableHead / TableCell 负责 padding。普通、selection 与 actions 单元格的左右 padding 按 Table 自身容器宽度在 `2px → 12px` 之间流动：窄容器优先收敛到每侧 2px，使相邻列的最小视觉间距为 4px；宽容器恢复每侧 12px。上下 padding 保持 8px；已登记的 Head/Cell padding override 仍可整体接管。
+padding 归属：Table 根层和原生 table 不制造 padding；表头与数据单元格分别由 TableHead / TableCell 负责 padding。普通、selection 与 actions 单元格的左右 padding 按 Table 自身可用宽度与内容需求在 `4px → 12px` 之间流动：窄容器优先收敛到每侧 4px，使相邻列的最小视觉间距为 8px；宽容器恢复每侧 12px；表格外缘与角色浮层的左右留白至少 8px。上下 padding 保持 8px；已登记的 Head/Cell padding override 仍可整体接管。
 
 gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell padding；TableCell 复合内容的 gap 由 TableCell 自身控制。
 
@@ -122,7 +124,7 @@ gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell paddin
 
 DataTable selection 角色中，TableHead 的全选 Checkbox 与 TableCell 的行 Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`，即 17×17px。额外的 `0.0625rem` 是 [StyleSpec.md §2.2.2](../../../specs/StyleSpec.md) 登记的 Table 视觉居中特例，不借用任何边框 Token，也不改变 Checkbox 组件自身的 16px 默认值；可通过 `--snowui-table-selection-checkbox-size-override` 覆盖。
 
-首次加载列协议：TableHead 通过 Table Context 显式注册列结构；TableBody 在 `loading` 生效时按该结构生成真实 `tr / td` Skeleton rows。Table 只协调同一语义表格内部的列注册，不读取子组件私有 class 或内部 DOM。DataTable 可通过继承的同一 Context 提供“首次加载且 rows 为空”状态与规范化后的 `pageSize`；独立 Table 也可由 TableBody 显式启用；已知数据数量时传入 `rowCount`，未知时按外部容器可见高度估算，详见 TableBody 文档。
+首次加载列协议：TableHead 通过 Table Context 显式注册列结构；TableBody 在 `loading` 生效时按该结构生成真实 `tr / td` Skeleton rows。首次加载只消费同一语义表格内部的列注册；响应式布局另由 Table 私有控制器测量所拥有的原生表格网格。DataTable 可通过继承的同一 Context 提供“首次加载且 rows 为空”状态与规范化后的 `pageSize`；独立 Table 也可由 TableBody 显式启用；已知数据数量时传入 `rowCount`，未知时按外部容器可见高度估算，详见 TableBody 文档。
 
 已有数据加载协议：`loading` 或 `refreshing` 生效且当前存在可见数据行时，TableBody 保留业务行并在末尾追加一个真实 `tr / td` 加载行；单元格通过 `colspan` 跨越已注册表头列，内部复用 SnowUI 通用 `<Spinner size={16} />` 并在 40px 行内水平、垂直居中。表格加载 Spinner 默认 16×16px，可通过 Table 的 `loadingSpinnerSize` 统一设置。
 
@@ -134,11 +136,11 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 增量加载首次开始时，Table 会在请求数据提交前测量当前表头普通数据列的自然宽度，并把尚未由 `columnWidths` 显式设置的列锁定到该宽度。后续新行中的更宽内容只在既有列宽内截断，不再让原生 `table-layout:auto` 重新分配全部列宽、带动已有行左右移动。自动锁定只执行一次并保持到当前 Table 销毁；外部 `columnWidths` 与用户拖动列宽始终优先。
 
-角色列布局：默认 `roleLayout="column"` 时，selection/actions 作为普通窄列参与表格列宽；`roleLayout="overlay"` 时，角色单元格仍保留合法 table DOM，但自身宽度归零并 sticky 到表格左右边缘，内容以覆盖块浮在表格行之上。覆盖块使用左右方向相反的横向交叠 blur strip 柔化后方内容：selection 从左向右透明，actions 从右向左透明；blur layer 常驻，控件自身独立淡入淡出，避免 hover 时重建模糊层。
+角色列布局：默认 `roleLayout="auto"` 根据宽度决定常驻或浮层。显式 `roleLayout="column"` 时，selection/actions 作为普通窄列参与表格列宽；`roleLayout="overlay"` 时，角色单元格仍保留合法 table DOM，但自身宽度归零并 sticky 到表格左右边缘，内容以覆盖块浮在表格行之上。覆盖块使用左右方向相反的横向交叠 blur strip 柔化后方内容：selection 从左向右透明，actions 从右向左透明；blur layer 常驻，控件自身独立淡入淡出，避免 hover 时重建模糊层。
 
 ### 在 DataTable 中的选择与覆盖布局
 
-本节描述 DataTable 协调下的组合行为。`roleLayout`、`roleOverlayLayers`、`roleOverlayBlurMode`、`roleOverlayUniformFeather` 与 `selectedRowIds` 均传给外层 DataTable，不能传给 OSS Table。
+本节描述 DataTable 协调下的组合行为。`roleOverlayLayers`、`roleOverlayBlurMode`、`roleOverlayUniformFeather` 与 `selectedRowIds` 传给外层 DataTable；`roleLayout` 与 `horizontalScroll` 可由 Table 显式覆盖。
 
 `roleLayout="overlay"` 的数据行 selection 采用“合法 table 单元格 + fixed 覆盖块”的两层结构：
 
@@ -161,7 +163,7 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 
 选择归属：DataTable 持有 `selectedRowIds`，TableRow 以 `rowId` 注册当前渲染行。表头全选只作用于当前已渲染的行（分页场景即当前页），跨页已选 id 会保留。
 
-表头全选 Checkbox 的可见规则：仅在以下情况显示——①**hover 任意数据行**（`.snowui-table-viewport:has(.snowui-table-body .snowui-table-row:hover)`，与行内 Checkbox 同步出现）；②**hover 紧邻 selection 覆盖块的首个数据列表头**（overlay 下即 Date 列表头，`.snowui-table-head[data-as="selection"] + .snowui-table-head:hover`）；③**直接 hover / 键盘聚焦全选浮层自身**（保证指针从数据行上移到全选框时其仍可见、可点击）；④表格存在**选中态**（`data-selected="true"`）。hover 其他表头列（Stores、Subscriber 等）不会显示全选框。overlay 下全选容器恒为 `pointer-events:none`，仅其中的 Checkbox 子元素在触发时 `pointer-events:auto`。
+表头全选 Checkbox 在常驻 column 布局一直显示；overlay 的可见规则：仅在以下情况显示——①**hover 任意数据行**（`.snowui-table-viewport:has(.snowui-table-body .snowui-table-row:hover)`，与行内 Checkbox 同步出现）；②**hover 紧邻 selection 覆盖块的首个数据列表头**（overlay 下即 Date 列表头，`.snowui-table-head[data-as="selection"] + .snowui-table-head:hover`）；③**直接 hover / 键盘聚焦全选浮层自身**（保证指针从数据行上移到全选框时其仍可见、可点击）；④表格存在**选中态**（`data-selected="true"`）。hover 其他表头列（Stores、Subscriber 等）不会显示全选框。overlay 下全选容器恒为 `pointer-events:none`，仅其中的 Checkbox 子元素在触发时 `pointer-events:auto`。
 
 ### Overlay hover 边缘渐进式透明（内置能力）
 
@@ -221,7 +223,27 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 - 列宽持久化属于页面层，Table 只发出变化。
 
 
+### 响应式收缩与恢复
+
+Table 是 Table / DataTable 的唯一布局计算入口，依据自身容器可用宽度和实际列内容，不使用设备断点。
+
+1. `roleLayout="auto"`：全部内容和首选间距放得下时，Checkbox / actions 占据常驻列并一直显示；首先收为 hover / 键盘焦点浮层，不删除角色列。已选 Checkbox、已展开操作菜单继续可见。
+2. 再压缩单元格左右 padding：默认每侧从 `--padding-3`（12px）收至 `--padding-1`（4px），相邻列最小视觉间距 8px；最左／最右可见单元格及角色浮层的外侧 padding 不低于 `--padding-2`（8px）。字号、图标、行高和单元格内部 gap 不跟着缩小。显式 padding override 保留。常驻操作列会为实际按钮内容预留宽度；显式 `columnWidths.__actions` 仍优先，自动测量不回写调用方列宽。
+3. `horizontalScroll` 默认 true：空间仍不足时保留所有普通列，使用 Table 局部横向滚动。
+4. `horizontalScroll={false}`：普通列默认允许隐藏，按当前 DOM 顺序从右向左收起；`TableHead responsiveHide={false}` 的列及第一普通列始终保留。角色列不参与隐藏。
+5. 收到最后一列仍放不下时，若是没有硬尺寸的普通文本列，则限制为容器宽度：`nowrap` 内容保持不换行并显示省略号，默认 Tooltip 提供全文（包括 `lines={false} nowrap`）；允许换行的内容折行，长连续字符串也可断行。原始文本和数据不变，变宽后恢复自然布局。显式 `tooltip={false}` 仍可关闭 Tooltip。
+   多个保护列、显式列宽 / `minWidth`、复杂合并网格或单列中的按钮、输入、图片等不可压缩控件仍使用横向滚动兜底，不截掉操作。容器窄至无法容纳两侧 8px 留白时也保留滚动。关闭横向滚动代表优先收列与文本适配，不强制隐藏不可避免的溢出。
+6. 隐藏列的 Head / Cell 一起退出布局、键盘顺序和辅助技术读取，但数据、排序和选择状态不变。最后可见普通列接管右侧圆角；仅一列时同时拥有左右圆角。
+多行或跨列表头、跨行数据单元格保持横向滚动，不猜测合并网格的列对应关系；普通表体的跨列 empty / Spinner 单元格跟随可见列数更新跨度。
+
+7. 变宽时先恢复数据列，再恢复 padding，最后角色列回到常驻；隐藏列恢复基于未隐藏的原始内容测量，避免振荡。动态数据、列宽调整、字体加载和 Token 缩放会重新计算。
+
+DataTable 的配置由 Context 下发；显式 Table 配置优先。普通 OSS Table 复用间距、隐藏和滚动规则，不新增 PRO 选择 / 操作状态。旧显式 `roleLayout="column"` / `"overlay"` 保留固定布局含义；column 现在常驻显示角色控件。
+
 ## AI Zone
+
+响应式由私有 `lib/table-responsive.ts` 批处理。只观察每表 viewport 和 Token 探针；内容、显式列宽、字体 / 资源变化使完整列测量缓存失效。隐形且 inert 的原生 DOM 副本只在测量帧存在，恢复隐藏列及原始 colspan 后测量首选 / 最小间距；不创建第二套 Svelte 组件，也不为每个 Cell 创建 Observer。正常容器 resize 复用缓存，只提交角色布局、padding、隐藏状态及可见边缘。
+
 
 以下章节保留源码维护约束，不属于应用接入步骤。
 
@@ -242,6 +264,14 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
 
 ## 更新日志
+
+- 2026-10-07：统一表格外缘最小 8px，相邻列内容间最小 8px（内部两侧各 4px），收列后重新分配外缘。
+
+- 2026-10-07：固定／自动锁定的小数列宽与整数视口宽度使用一致的半像素容限，避免宽度足够时误将单元格和操作浮层 padding 压至最小值。
+
+- 2026-10-07：响应式单元格每侧最小 padding 从 2px 调整为 4px，相邻列最小内容间距为 8px。
+
+- 2026-10-07：v2.6.0，新增 horizontalScroll 和 auto 角色布局；统一角色收起、间距压缩、右到左隐藏与滚动兜底，恢复原始列宽并更新可见边缘。
 
 - 2026-10-07：v2.5.3，行内与表头 Checkbox 统一按实际右边缘定位透明区，向右使用固定 `--size-5`（名义 20px）柔和过渡；跟随控件尺寸和响应式间距，不随列宽拉长。保留显式起止点覆盖。
 

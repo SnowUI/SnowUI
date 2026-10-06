@@ -24,7 +24,7 @@ export const examples = [
         name: "A4: 选择与行动表头角色",
         code: `A4
 <Table><TableHeader><TableRow><TableHead as="selection" /><TableHead as="actions">操作</TableHead></TableRow></TableHeader></Table>`,
-        expected: { render: "selection 渲染内置全选 Checkbox；actions 可选渲染标题。", layout: "全选 Checkbox 默认 17px，与行 Checkbox 一致；角色列使用各自定向 padding。", interaction: "全选仅在 Table hover/focus-within 时显示；两列均无排序态。", performance: "选择状态来自 Table Context。", responsive: "保持窄角色列。" },
+        expected: { render: "selection 渲染内置全选 Checkbox；actions 可选渲染标题。", layout: "全选 Checkbox 默认 17px，与行 Checkbox 一致；角色列使用各自定向 padding。", interaction: "宽时 column 全选常驻；overlay 时按 hover/focus 显示；两列均无排序态。", performance: "选择状态来自 Table Context。", responsive: "保持窄角色列。" },
         logic: ["Selection", "Actions"],
     },
     {
@@ -61,7 +61,7 @@ export const examples = [
 <Table><TableHeader><TableRow><TableHead as="selection"/><TableHead columnId="name">订阅</TableHead></TableRow></TableHeader>
 <TableBody><TableRow rowId="one"><TableCell as="selection"/><TableCell columnId="name">SnowUI Pro</TableCell></TableRow></TableBody></Table>
 </DataTable>`,
-        expected: { render: "全选与行内 Checkbox 保留渐显，退出与内容遮罩同步，无残影。", interaction: "可通过键盘 Tab 聚焦；行勾选后移出保持显示，取消后正常隐藏。", responsive: "宽窄表格均保持相同退出规则；两处渐隐从 Checkbox 实际右边缘向右延伸固定名义 20px。" },
+        expected: { render: "全选与行内 Checkbox 保留渐显，退出与内容遮罩同步，无残影。", interaction: "可通过键盘 Tab 聚焦；行勾选后移出保持显示，取消后正常隐藏。", responsive: "显式 overlay 的宽窄表格均保持相同退出规则；两处渐隐从 Checkbox 实际右边缘向右延伸固定名义 20px。" },
         logic: ["Selection", "OverlayRoleLayout", "Focus"],
     },
 ];

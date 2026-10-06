@@ -3,7 +3,7 @@ export const examples = [
         name: "A1: 默认单行截断",
         code: `A1
 <Table><TableBody><TableRow><TableCell>未知长度的原始文字内容</TableCell></TableRow></TableBody></Table>`,
-        expected: { render: "溢出时显示省略号和 Tooltip。", layout: "默认 lines=1；上下 padding 8px。", interaction: "hover 后可查看完整文本。", performance: "共享 ResizeObserver。", responsive: "列宽变化后重测；左右 padding 按 Table 容器宽度在 2px 到 12px 之间响应。" },
+        expected: { render: "溢出时显示省略号和 Tooltip。", layout: "默认 lines=1；上下 padding 8px。", interaction: "hover 后可查看完整文本。", performance: "共享 ResizeObserver。", responsive: "列宽变化后重测；左右 padding 按 Table 容器宽度在 4px 到 12px 之间响应。" },
         logic: ["Truncate", "Tooltip"],
     },
     {

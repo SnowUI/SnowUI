@@ -90,12 +90,9 @@
     :global(:where(.snowui-table-row[data-loading-spinner="true"])) { pointer-events: none; }
     :global(:where(.snowui-table-row[data-active="true"])) {
         --snowui-table-row-active-background: var(--snowui-table-row-hover-background-override, var(--black-4, #0000000a));
-        --snowui-table-row-active-leading-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem));
-        --snowui-table-row-active-trailing-radius: 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0;
     }
     :global(:where(.snowui-table-row) > :is(.snowui-table-cell, .snowui-table-head)) { transition: none; }
-    :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"]):not([data-loading-spinner="true"])):is(:hover, [data-active="true"], [data-force-hover="true"]) > .snowui-table-cell:first-child) { border-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)); }
-    :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"]):not([data-loading-spinner="true"])):is(:hover, [data-active="true"], [data-force-hover="true"]) > .snowui-table-cell:last-child) { border-radius: 0 var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)) 0; }
     :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"])[data-active="true"]) > .snowui-table-cell) { border-bottom-color: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row:has(+ .snowui-table-row:not([data-skeleton="true"])[data-active="true"])) > .snowui-table-cell) { border-bottom-color: transparent; }
+    :global(:where(.snowui-table-body .snowui-table-row:not([data-skeleton="true"]):not([data-loading-spinner="true"]):is(:hover, [data-active="true"], [data-force-hover="true"]))) { --snowui-table-row-corner-radius: var(--snowui-table-row-radius-override, var(--radius-3)); }
 </style>

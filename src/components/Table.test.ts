@@ -52,7 +52,7 @@ export const examples = [{
         layout: "八个普通数据列展示 Table-Demo 表格一的订阅内容，不含 checkbox 列和按钮列。",
         interaction: "仅保留普通数据行的默认 hover；没有搜索、排序、筛选、分页或加载更多交互。",
         performance: "静态数据直接由 OSS Table 语义组件渲染，不创建 PRO 数据状态。",
-        responsive: "显式最小宽度为 960px，超出窄容器时由 Table 内置局部横向 viewport 承接，同一轨道贴近视口底部；未声明 minWidth / columnWidths 时由各列 min-content 与 Cell padding 自动汇总整表最小宽度。表头与数据 Cell 左右 padding 按 Table 容器宽度在 2px 到 12px 之间响应，窄容器收敛到每侧 2px，使相邻列最小间距为 4px。",
+        responsive: "显式最小宽度为 960px，超出窄容器时由 Table 内置局部横向 viewport 承接，同一轨道贴近视口底部；未声明 minWidth / columnWidths 时由各列 min-content 与 Cell padding 自动汇总整表最小宽度。表头与数据 Cell 左右 padding 按 Table 容器宽度在 4px 到 12px 之间响应，窄容器收敛到每侧 4px，使相邻列最小间距为 8px。",
     },
     logic: ["Semantic", "DisplayOnly", "OSSBoundary"],
 }, {
@@ -61,4 +61,19 @@ export const examples = [{
 <Table loadingSpinnerSize={24}><TableHeader><TableRow><TableHead>名称</TableHead></TableRow></TableHeader><TableBody loadingSpinner><TableRow><TableCell>SnowUI</TableCell></TableRow></TableBody></Table>`,
     expected: { render: "数据行后追加一个跨越全部列的 Spinner 状态行。", layout: "Spinner 在 40px 行内水平、垂直居中，尺寸为 24px。", interaction: "加载行不可 hover 或选择。", performance: "复用通用 Spinner，不创建独立动画实现。", responsive: "colspan 跟随已注册表头列数。" },
     logic: ["LoadingSpinner", "ColumnSpan", "SpinnerSize"],
-}];
+}, {
+    name: "A5: 响应式收列与保留列",
+    code: `A5
+<Table horizontalScroll={false} ariaLabel="订阅列表">
+<TableHeader><TableRow><TableHead columnId="name">订阅</TableHead><TableHead columnId="owner">负责人</TableHead><TableHead columnId="status" responsiveHide={false}>状态</TableHead><TableHead columnId="note">备注</TableHead></TableRow></TableHeader>
+<TableBody><TableRow><TableCell columnId="name">SnowUI Professional</TableCell><TableCell columnId="owner">Natali Craig</TableCell><TableCell columnId="status">Active</TableCell><TableCell columnId="note">Annual subscription renewal</TableCell></TableRow></TableBody>
+</Table>`,
+    expected: { render: "纯 OSS Table 根据自身容器宽度响应。", responsive: "先缩左右间距，再隐藏备注和负责人；名称与状态保留。仍超宽时局部滚动，变宽恢复全部列。", interaction: "隐藏列退出焦点顺序，hover 圆角跟随可见首尾。" },
+    logic: ["Responsive", "ColumnVisibility", "ScrollFallback"],
+}    {
+        name: "最后一列长文本",
+        code: `<Table horizontalScroll={false}><TableHeader><TableRow><TableHead>订阅</TableHead><TableHead>备注</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell nowrap lines={false}>SnowUIProfessionalAnnualSubscriptionRenewal</TableCell><TableCell>Annual renewal</TableCell></TableRow></TableBody></Table>`,
+        expected: { responsive: "先隐藏备注；只剩订阅仍放不下时省略显示，hover 查看全文。表格外缘至少 8px，相邻列内容间至少 8px。" },
+        logic: ["Responsive", "Truncation"],
+    },
+];
