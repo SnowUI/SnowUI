@@ -215,6 +215,24 @@
         "CircularChart",
         "Progress"
       ]
+    },
+    "SearchPopup": {
+      "intents": [
+        "搜索面板",
+        "搜索结果分组"
+      ],
+      "aliases": [
+        "搜索弹窗"
+      ],
+      "whenToUse": "需要统一搜索输入、分组标题和结果间距的产品区块。",
+      "avoidWhen": "纯浮层容器用 Popover；网站历史与热度由宿主提供。",
+      "related": [
+        "SearchBox",
+        "SearchInput",
+        "Popover",
+        "Dialog",
+        "MenuItem"
+      ]
     }
   }
 }

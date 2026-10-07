@@ -370,6 +370,34 @@
       "deprecated": false
     },
     {
+      "name": "SearchPopup",
+      "canonical": "SearchPopup",
+      "package": "@snowui/components-pro",
+      "import": "import { SearchPopup } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/blocks/SearchPopup.svelte",
+      "documentation": "src/blocks/SearchPopup.md",
+      "description": "可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容。运行时依赖 @snowui/components-pro 和 Components；不包含搜索算法、最近浏览、热度或业务路由规则。",
+      "intents": [
+        "搜索面板",
+        "搜索结果分组"
+      ],
+      "aliases": [
+        "搜索弹窗"
+      ],
+      "whenToUse": "需要统一搜索输入、分组标题和结果间距的产品区块。",
+      "avoidWhen": "纯浮层容器用 Popover；网站历史与热度由宿主提供。",
+      "related": [
+        "SearchBox",
+        "SearchInput",
+        "Popover",
+        "Dialog",
+        "MenuItem"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Segmented",
       "canonical": "Segmented",
       "package": "@snowui/components-pro",
