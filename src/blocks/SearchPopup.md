@@ -49,7 +49,7 @@
 
 默认内置模式生成 SearchInput、Text、MenuItem。parts 不改写显式 children。Input 可通过 parts.SearchInput 配置 placeholder、ARIA 与 autofocus；内置文字沿用 SearchInput 的 locale 默认值，本组件不新增固定业务文案。默认结果 href 使用原生链接；默认数据结果必须提供 href；命令操作等非导航内容使用 children 显式组合具备键盘语义的 Button。
 
-结果区域距输入分隔线 8px；结果按单列排列，标题与 item、相邻 item 之间统一增加 gap-1（名义 4px）。第一个标题不重复叠加，后续分组标题保留额外 8px 上间距，与行间距合计 12px；无标题时第一项仍距分隔线 8px。标题自身沿用 4px 垂直、8px 水平 padding。公开角色 group-title 是多项角色，允许 Text 或原生 data-as；仅控制标题的颜色与间距，不改写业务内容。as=item 保留 MenuItem 自身语义，不创建 Listbox 选择 owner。
+按 [Figma SearchPopup](https://www.figma.com/design/eDqeDtsitne9fCi9yA0ltz/SnowUI-Design-System?node-id=35426-172964) 的垂直间距：默认 md 面板上下 padding 为 16px，搜索区上 4px、下 16px；结果区域距输入分隔线 16px。结果按单列排列，标题与 item、相邻 item 之间为 gap-1（4px）；后续分组标题增加 gap-3（12px）上间距，与行间距合计 16px。首个标题不额外叠加 margin；无标题时首项同样距分隔线 16px。标题垂直 padding 为 0、水平 8px，item 上下 padding 为 8px。公开角色 group-title 是多项角色，允许 Text 或原生 data-as；仅控制标题的颜色与间距，不改写业务内容。as=item 保留 MenuItem 自身语义，不创建 Listbox 选择 owner。
 
 标题和分组可省略；显式复杂内容可以组合 Avatar、Icon、MenuItem。设置 backdrop 时由内部 Dialog 管理共享遮罩、渐入渐出、反向接续、减少动效、焦点圈定与恢复、背景滚动锁定。closeOnEscape 控制 Escape 关闭，closeOnOutside 控制遮罩关闭。使用 bind:open 控制显隐；template/id 模式使用 data-dialog-target、data-dialog-close 或 showDialog/hideDialog；as="popover" 在此模式下使用 Dialog 内联触发。不要再包外层 Dialog，避免双重遮罩。模态时内部 Popover 不自行关闭；closeOn/closeOnSelect 仅用于无遮罩模式。默认链接结果会关闭 Dialog；显式结果可使用 data-dialog-close。静态面板 SSR 不访问浏览器全局，动效及 reduced-motion 继承 Popover。不开启定位模式时不新增定位监听器。
 
@@ -57,7 +57,7 @@
 
 主布局为复合管理布局，主要宿主为真实 Popover（内部 Frame），启用 backdrop 时组合 Dialog，不额外包装 FramePro。输入与结果共同使用 Popover 的滚动 body，显式 as="content" 不进入固定搜索 header。results wrapper 拥有分隔线下方间距，group-title 拥有组间间距。根 class snowui-search-popup；私有结果 class 不作为外部接口，显式组合只按公开 as 角色识别。
 
-公开 override：--snowui-search-popup-results-gap-override、--snowui-search-popup-group-gap-override；默认均为 gap-2。根几何继承 Popover 的覆盖入口，不复制。输入与项的默认视觉只通过公开组件 class 传入自有样式，不穿透其私有 DOM。
+公开 override：--snowui-search-popup-results-gap-override、--snowui-search-popup-group-gap-override；默认分别为 gap-4 与 gap-3（后者加行间距 gap-1 后形成 16px 组间距）。根几何继承 Popover 的覆盖入口，不复制。输入与项的默认视觉只通过公开组件 class 传入自有样式，不穿透其私有 DOM。
 
 ## 更新日志
 

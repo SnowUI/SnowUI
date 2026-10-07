@@ -4,7 +4,7 @@ export const examples = [
         name: "SP-01:默认数据与无分组",
         code: `SP-01
 <SearchPopup showGroupTitles={false} items={[{ value: "button", label: "Button", href: "/test/Button" }, { value: "input", label: "Input", href: "/test/Input" }]} parts={{ SearchInput: { placeholder: "Search", "aria-label": "Search components" } }} />`,
-        expected: { layout: "分隔线下方至首项为 8px，相邻 item 间距为 4px，无分组标题。", interaction: "原生链接支持键盘与新标签页。" },
+        expected: { layout: "分隔线下方至首项为 16px，相邻 item 间距为 4px，无分组标题。", interaction: "原生链接支持键盘与新标签页。" },
         logic: ["BuiltIn", "Parts", "Keyboard"],
     },
     {
