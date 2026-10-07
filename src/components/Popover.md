@@ -291,6 +291,8 @@ togglePopover("pop-01", buttonEl); // 切换
 
 QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中保留为搜索浮层组合参考。
 
+2026-10-07 新增的 [PRO Block SearchPopup](../../../pro/src/blocks/SearchPopup.md) 是基于 Popover 的搜索输入与分组结果组合，不恢复旧 SearchPopup 浮层实现；SP-02 现在消费该区块。
+
 <a id="规范-spec"></a>
 
 

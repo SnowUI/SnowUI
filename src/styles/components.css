@@ -864,3 +864,8 @@
 */
 
 /* CopyLink: --snowui-copy-link-padding-x-override (padding-4), --snowui-copy-link-padding-y-override (padding-3), --snowui-copy-link-radius-override (radius-4). */
+
+/* SearchPopup PRO Block：结果与分组间距，默认 gap-2。
+   --snowui-search-popup-results-gap-override
+   --snowui-search-popup-group-gap-override
+*/
