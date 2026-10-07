@@ -13,7 +13,7 @@
 ## 使用选择
 
 <!-- usage-guide:start -->
-用于复用搜索输入与结果的标准布局。SearchBox 是打开入口；SearchPopup 是面板，默认静态呈现。需要遮罩时由 Dialog 包裹，锚定触发器时使用继承的 Popover 模版或内嵌模式。
+用于复用搜索输入与结果的标准布局。SearchBox 是打开入口；SearchPopup 是面板，默认静态呈现。设置 backdrop 可启用共享模态遮罩；无遮罩时，锚定触发器使用继承的 Popover 模版或内嵌模式。
 
 - items 生成文字或链接结果，group 可选；showGroupTitles 控制分组标题。
 - children 替换全部内置结果；显式标题用 Text as="group-title"，项用 MenuItem as="item"。
@@ -33,6 +33,8 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
+| backdrop | `BackdropVariant \| false` | `false` | false 保持原静态或锚定模式；opaque、blur、transparent 启用 Dialog 共享模态遮罩。 |
+| closeOnOutside | `boolean` | `true` | 模态模式点击遮罩关闭；与遮罩视觉独立。 |
 | value | `string \| number` | `''` | 搜索输入值，支持 bind:value；过滤由消费方负责。 |
 | search | `boolean` | `true` | 是否生成默认 SearchInput；显式输入时关闭。 |
 | title | `string` | — | 可选面板标题，位于结果区顶部；children 模式由显式内容接管。 |
@@ -41,7 +43,7 @@
 | children | `Snippet` | — | 替换全部默认结果与标题；不再读取 items / title / showGroupTitles。 |
 | parts | `ComponentPartsOf<{ SearchInput: typeof SearchInput; MenuItem: typeof MenuItem; Text: typeof Text }>` | — | 配置实际生成的输入、结果和标题；value、children、身份、disabled 由所属数据控制。 |
 
-兼容属性继承 Popover；默认 size=md、closeOn=manual，标准静态搜索面板宽度名义 480px。显式使用浮层时设置 template/id 或 as="popover"，并按需要设置 closeOn。外层 class 和 style 透传真实 Popover 宿主。没有新增模态、定位、滚动和动效系统。
+兼容属性继承 Popover；默认 size=md、closeOn=manual，标准静态搜索面板宽度名义 480px。显式使用浮层时设置 template/id 或 as="popover"，并按需要设置 closeOn。外层 class 和 style 透传真实 Popover 宿主。模态模式复用 Dialog，不新增模态、定位、滚动和动效系统；class/style 与 parts 仍作用于内部搜索面板，模态外壳使用面板默认宽度。
 
 ## 使用边界与详细说明
 
@@ -49,11 +51,11 @@
 
 结果区域距输入分隔线 8px；结果按单列排列，标题与 item、相邻 item 之间统一增加 gap-1（名义 4px）。第一个标题不重复叠加，后续分组标题保留额外 8px 上间距，与行间距合计 12px；无标题时第一项仍距分隔线 8px。标题自身沿用 4px 垂直、8px 水平 padding。公开角色 group-title 是多项角色，允许 Text 或原生 data-as；仅控制标题的颜色与间距，不改写业务内容。as=item 保留 MenuItem 自身语义，不创建 Listbox 选择 owner。
 
-标题和分组可省略；显式复杂内容可以组合 Avatar、Icon、MenuItem。模态场景放入 Dialog，Dialog 管理 opaque 遮罩、焦点圈定、关闭与恢复；SearchPopup 不管理这些行为。静态面板 SSR 不访问浏览器全局，动效及 reduced-motion 继承 Popover。不开启定位模式时不新增定位监听器。
+标题和分组可省略；显式复杂内容可以组合 Avatar、Icon、MenuItem。设置 backdrop 时由内部 Dialog 管理共享遮罩、渐入渐出、反向接续、减少动效、焦点圈定与恢复、背景滚动锁定。closeOnEscape 控制 Escape 关闭，closeOnOutside 控制遮罩关闭。使用 bind:open 控制显隐；template/id 模式使用 data-dialog-target、data-dialog-close 或 showDialog/hideDialog；as="popover" 在此模式下使用 Dialog 内联触发。不要再包外层 Dialog，避免双重遮罩。模态时内部 Popover 不自行关闭；closeOn/closeOnSelect 仅用于无遮罩模式。默认链接结果会关闭 Dialog；显式结果可使用 data-dialog-close。静态面板 SSR 不访问浏览器全局，动效及 reduced-motion 继承 Popover。不开启定位模式时不新增定位监听器。
 
 ## AI Zone
 
-主布局为复合管理布局，主要宿主为真实 Popover（内部 Frame），不额外包装 FramePro。输入与结果共同使用 Popover 的滚动 body，显式 as="content" 不进入固定搜索 header。results wrapper 拥有分隔线下方间距，group-title 拥有组间间距。根 class snowui-search-popup；私有结果 class 不作为外部接口，显式组合只按公开 as 角色识别。
+主布局为复合管理布局，主要宿主为真实 Popover（内部 Frame），启用 backdrop 时组合 Dialog，不额外包装 FramePro。输入与结果共同使用 Popover 的滚动 body，显式 as="content" 不进入固定搜索 header。results wrapper 拥有分隔线下方间距，group-title 拥有组间间距。根 class snowui-search-popup；私有结果 class 不作为外部接口，显式组合只按公开 as 角色识别。
 
 公开 override：--snowui-search-popup-results-gap-override、--snowui-search-popup-group-gap-override；默认均为 gap-2。根几何继承 Popover 的覆盖入口，不复制。输入与项的默认视觉只通过公开组件 class 传入自有样式，不穿透其私有 DOM。
 

@@ -202,7 +202,7 @@
 13. **资源图片接入**: `resource-svelte` 图片组件会把 `data-snowui-image-viewer-mode="viewer"` 透传到根 `<img>`，因此也能直接接入页面级 Viewer。
 14. **DOM 分组**: 当原生 `<img>` 或 `resource-svelte` 图片位于 `[data-snowui-image-viewer-scope]` 容器内时，Viewer 会按该作用域内 DOM 顺序建立上一张 / 下一张列表；没有 scope 时按单图打开。
 15. **Window DOM 链路**: 自动模式下，原生 `<img data-snowui-image-viewer-mode="window" />` 会直接在新窗口打开，不进入 Viewer。
-16. **无动效**: 打开、切换、关闭均不注入额外动效。
+16. **遮罩淡入**: opaque / blur 从透明渐显，复用 Dialog backdrop preset；减少动效时立即显示。媒体本身、切换与关闭仍立即完成。
 17. **前后项轻量预取**: 打开 Viewer 后，会对上一张和下一张字符串图片做轻量预取，降低切换等待感；视频不参与这条预取链。
 18. **预取去重**: 同一轮打开周期内，相同字符串图片 URL 只预取一次，避免切换时反复创建加载器。
 19. **轻量事件总线**: 自动模式不依赖全局 Svelte store，而是通过浏览器自定义事件 + Viewer 本地状态接收打开请求，降低运行时耦合与崩溃风险。

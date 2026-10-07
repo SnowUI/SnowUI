@@ -535,19 +535,6 @@
         inset: 0;
         z-index: -1;
         pointer-events: auto;
-        opacity: 1;
-        transition: opacity var(--snowui-dialog-backdrop-appear-duration) var(--snowui-dialog-backdrop-appear-easing);
-    }
-    @starting-style {
-        :global(:where(.snowui-side-panel-backdrop)) { opacity: 0; }
-    }
-    :global(:where(.snowui-side-panel-backdrop[data-closing="true"])) {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity var(--snowui-dialog-backdrop-disappear-duration) var(--snowui-dialog-backdrop-disappear-easing);
-    }
-    @media (prefers-reduced-motion: reduce) {
-        :global(:where(.snowui-side-panel-backdrop)) { transition: none; }
     }
 
     :global(:where(.snowui-side-panel-layer)) {

@@ -4,10 +4,13 @@
 </script>
 <script lang="ts">
     import type { ComponentProps, Snippet } from "svelte";
-    import { Popover, SearchInput, MenuItem, Text } from "@snowui-design-system/components";
+    import { Dialog, Popover, SearchInput, MenuItem, Text } from "@snowui-design-system/components";
     import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
     import type { ComponentPartsOf } from "@snowui-design-system/components/logic/component-parts.svelte";
+    import type { BackdropVariant } from "@snowui-design-system/components/lib/backdrop";
     interface Props extends Omit<ComponentProps<typeof Popover>, "children" | "title" | "value" | "parts"> {
+        backdrop?: BackdropVariant | false;
+        closeOnOutside?: boolean;
         value?: string | number;
         search?: boolean;
         title?: string;
@@ -16,10 +19,15 @@
         children?: Snippet;
         parts?: ComponentPartsOf<{ SearchInput: typeof SearchInput; MenuItem: typeof MenuItem; Text: typeof Text }>;
     }
-    let { value = $bindable(''), search = true, title = undefined, showGroupTitles = true, items = [], children, parts = undefined, size = 'md', closeOn = 'manual', class: userClass = '', ...rest }: Props = $props();
+    let { backdrop = false, closeOnOutside = true, open = $bindable(true), onOpenChange, template = false, id, as, closeOnEscape = true, value = $bindable(''), search = true, title = undefined, showGroupTitles = true, items = [], children, parts = undefined, size = 'md', closeOn = 'manual', class: userClass = '', ...rest }: Props = $props();
+    function handleOpenChange(next: boolean) {
+        open = next;
+        onOpenChange?.(next);
+    }
 </script>
 
-<Popover {...rest} {size} {closeOn} class={`snowui-search-popup${userClass ? ` ${userClass}` : ''}`}>
+{#snippet panel(modal: boolean)}
+<Popover {...rest} {size} closeOn={modal ? "manual" : closeOn} closeOnSelect={modal ? false : rest.closeOnSelect} open={modal ? true : open} template={modal ? false : template} id={modal ? undefined : id} as={modal ? undefined : as} closeOnEscape={modal ? false : closeOnEscape} onOpenChange={modal ? undefined : handleOpenChange} class={`snowui-search-popup${userClass ? ` ${userClass}` : ''}`}>
     {#if search}
         <SearchInput {...parts?.SearchInput} as="content" showSearchIcon={false} bind:value class={`snowui-search-popup-input${parts?.SearchInput?.class ? ` ${parts.SearchInput.class}` : ''}`}><ComponentIcon as="leading" name="search" size={24} /></SearchInput>
     {/if}
@@ -33,7 +41,7 @@
                     <Text {...parts?.Text} as="group-title">{item.group}</Text>
                 {/if}
                 {#if item.href && !item.disabled}
-                    <a href={item.href} class="snowui-search-popup-link">
+                    <a href={item.href} data-dialog-close={modal ? "" : undefined} class="snowui-search-popup-link">
                         <MenuItem {...parts?.MenuItem} value={item.value} as="item">{item.label}</MenuItem>
                     </a>
                 {:else}
@@ -43,8 +51,25 @@
         {/if}
     </div>
 </Popover>
+{/snippet}
+
+{#if backdrop}
+    <Dialog {id} {template} as={as === 'popover' ? 'dialog' : undefined} bind:open {onOpenChange} {size} {backdrop} {closeOnOutside} {closeOnEscape} showCloseButton={false} aria-label={rest['aria-label'] ?? parts?.SearchInput?.['aria-label']} class="snowui-search-popup-dialog">
+        {@render panel(true)}
+    </Dialog>
+{:else}
+    {@render panel(false)}
+{/if}
 
 <style>
+    :global(:where(.snowui-search-popup-dialog)) {
+        width: calc(var(--size-20) * 6);
+        max-width: 100%;
+        padding: var(--padding-0);
+        gap: var(--gap-0);
+    }
+    :global(:where(.snowui-search-popup-dialog .snowui-search-popup)) { box-shadow: none; }
+
     :global(:where(.snowui-search-popup)) { width: calc(var(--size-20) * 6); max-width: 100%; }
     :global(:where(.snowui-search-popup-input)) {
         padding: var(--padding-1) var(--padding-2) var(--padding-4);

@@ -57,4 +57,10 @@ export const examples = [
 </SearchPopup>`,
         logic: ["Composition", "MenuItem", "Avatar", "Icon", "MediumSize"],
     },
+    ...["opaque", "blur", "transparent"].map((backdrop) => ({
+        name: `共享遮罩: ${backdrop}`,
+        code: `<Button data-dialog-target="search-${backdrop}">搜索</Button>
+<SearchPopup template id="search-${backdrop}" backdrop="${backdrop}" aria-label="搜索组件" items={[{value:"button",label:"Button",href:"#button"}]} />`,
+        logic: ["Backdrop", "Dialog", "Keyboard"],
+    })),
 ] as const;

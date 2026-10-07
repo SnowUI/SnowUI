@@ -383,6 +383,8 @@ function download() { /* 接入业务下载 */ }
 
 默认无遮罩，保留背景记录切换。设置 `backdrop="opaque"` 使用 10% 黑色遮罩；`"blur"` 在同一遮罩上增加 `var(--size-5)`（20px）背景模糊；`"transparent"` 仅阻挡背景交互。视觉复用 OSS 的 `.snowui-backdrop`，淡入淡出复用 Dialog motion token，随 SidePanel presence 卸载。内嵌模式不显示遮罩。点击遮罩遵循 `closeOnOutside`，关闭按钮和 Escape 行为不变。
 
+遮罩渐隐实现复用 [共享 Backdrop](../../../components/src/lib/backdrop.md)，与 Dialog、ImageViewer 使用同一透明起点和减少动效规则。
+
 
 ## AI Zone
 

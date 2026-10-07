@@ -25,6 +25,7 @@
     } from "@snowui-design-system/components/logic/image-preview";
     import { ComponentIcon } from "@snowui-design-system/components/internal/component-icon";
 
+    import { DIALOG_BACKDROP_MOTION_STYLE } from "@snowui-design-system/components/motion/presets/dialog";
     import type { BackdropVariant } from "@snowui-design-system/components/lib/backdrop";
 
     interface ImageViewerItem {
@@ -382,7 +383,7 @@
         role="dialog"
         aria-modal="true"
         data-backdrop={backdrop}
-        class={["snowui-image-viewer", "snowui-backdrop", className].filter(Boolean).join(" ")}
+        class={["snowui-image-viewer", className].filter(Boolean).join(" ")}
         style={userStyle || undefined}
         onclick={handleRootClick}
         {...rest}
@@ -394,6 +395,12 @@
             rows: userRenderHints?.rows,
         }}
     >
+        <div
+            class="snowui-image-viewer-backdrop snowui-backdrop"
+            data-backdrop={backdrop}
+            style={DIALOG_BACKDROP_MOTION_STYLE}
+            aria-hidden="true"
+        ></div>
         <div class="snowui-image-viewer-viewport">
             <div class="snowui-image-viewer-media-shell">
                 <div class="snowui-image-viewer-media-hitbox">
@@ -511,6 +518,12 @@
         --snowui-image-viewer-background: var(--snowui-backdrop-background);
         --snowui-backdrop-background-override: var(--snowui-image-viewer-background-override);
 
+    }
+
+    :global(:where(.snowui-image-viewer-backdrop)) {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
     }
 
     :global(:where(.snowui-image-viewer-viewport)) {
