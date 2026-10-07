@@ -1,6 +1,6 @@
 <!--
   SnowUILogo 组件
-  v1.18.2
+  v1.19.1
 
   职责：按 Workshop 品牌设计稿渲染 SnowUI 图标、字标及其横向/纵向组合。
   文档：./SnowUILogo.md
@@ -22,6 +22,7 @@
     scale?: number;
     compactProgress?: number;
     idleMotion?: boolean;
+    textMotion?: "greetings" | "variants";
     decorative?: boolean;
     [key: string]: any;
   }
@@ -31,6 +32,7 @@
     scale = 1,
     compactProgress = 0,
     idleMotion = false,
+    textMotion = "greetings",
     decorative = false,
     role = undefined,
     "aria-label": ariaLabel = "SnowUI",
@@ -135,6 +137,11 @@
     greetingIndex = -1;
   }
 
+  $effect(() => {
+    textMotion;
+    stopCycle();
+  });
+
   function motionStarted() { activeTransitions++; }
   function motionEnded() {
     activeTransitions = Math.max(0, activeTransitions - 1);
@@ -233,6 +240,7 @@
   data-snow-ui-logo-cycle={greetingIndex !== -1 ? "active" : "idle"}
   data-logo-motion={transitioning ? "transitioning" : "settled"}
   data-logo-node={greetingIndex}
+  data-text-motion={textMotion}
   data-compact-progress={compact}
   style={snowUILogoStyle}
   role={decorative ? undefined : (role ?? "img")}
@@ -527,7 +535,7 @@
 
   {#if variant !== "icon"}
     <span class="snowui-snow-ui-logo-wordmark" aria-hidden="true">
-      <LogoWordmark {greeting} align={variant === "horizontal" ? "left" : "center"} id={logoId} onmotionstart={motionStarted} onmotionend={motionEnded} />
+      <LogoWordmark greeting={textMotion === "variants" ? null : greeting} formIndex={textMotion === "variants" ? greetingIndex : -1} variantMotion={textMotion === "variants"} align={variant === "horizontal" ? "left" : "center"} id={logoId} onmotionstart={motionStarted} onmotionend={motionEnded} />
     </span>
   {/if}
 </Frame>

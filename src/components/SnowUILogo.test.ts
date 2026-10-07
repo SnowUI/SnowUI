@@ -1,6 +1,6 @@
 /**
  * SnowUILogo.test.ts
- * v1.18.2
+ * v1.19.1
  */
 export const examples = [
   {
@@ -60,5 +60,34 @@ export const examples = [
       "SemanticAnchor",
       "SingleResponsibility",
     ],
+  },
+  {
+    name: "6: 两版文字动效对比",
+    code: `6
+<div class="flex flex-col items-start gap-40">
+    <SnowUILogo textMotion="greetings" scale={3} />
+    <SnowUILogo textMotion="variants" scale={3} />
+</div>`,
+    expected: { render: "上方保留多语言问候，下方始终轮换 SnowUI 的圆线、像素、轮廓、斜体、条纹和加粗矢量字形；图标同步轮换 Emoji。移出完成当前过渡后恢复原字标，十秒内再移入从下一节点续播；两版外框稳定。减少动效时均保持静态品牌和 SnowUI 可访问名称。" },
+    logic: ["TextMotionVariants", "DefaultCompatibility", "NodeBoundary", "ReducedMotion"],
+  },
+  {
+    name: "7: 第二版组合与收拢",
+    code: `7
+<div class="flex items-center gap-40 flex-wrap">
+    <SnowUILogo variant="text" textMotion="variants" scale={3} />
+    <SnowUILogo variant="vertical" textMotion="variants" scale={2} />
+    <SnowUILogo variant="vertical" textMotion="variants" compactProgress={0.5} scale={2} />
+    <SnowUILogo variant="icon" textMotion="variants" scale={2} />
+</div>`,
+    expected: { render: "纯字标与纵向组合居中轮换矢量字形，收拢同步缩放字标；纯图标维持 Emoji 轮换。不同实例渐变 ID 不冲突，深浅主题中 Snow 与 UI 保持既有颜色语义。" },
+    logic: ["TextMotionVariants", "CompactProgress", "InstanceIsolation", "Theme"],
+  },
+  {
+    name: "8: 可选字形动效 V2",
+    code: `8
+<SnowUILogo textMotion="variants" scale={3} />`,
+    expected: { render: "显式选择第二版，hover 轮换 SnowUI 六种矢量字形；圆线 I 与 U 竖笔等粗。不传 textMotion 时仍为原版 greetings，Site 与 Test 默认 Logo 不切换方案。" },
+    logic: ["OptInTextMotion", "BrandStrokeConsistency", "DefaultCompatibility"],
   },
 ] as const;

@@ -2,8 +2,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { TransitionConfig } from "svelte/transition";
-  let { greeting = null, align = "center", id, onmotionstart, onmotionend }: {
+  let { greeting = null, formIndex = -1, variantMotion = false, align = "center", id, onmotionstart, onmotionend }: {
     greeting?: string | null;
+    formIndex?: number;
+    variantMotion?: boolean;
     align?: "left" | "center";
     id: string;
     onmotionstart?: () => void;
@@ -59,12 +61,35 @@
       brand: true,
     },
   ];
-  type Letter = { key: number; label: string; glyph?: (typeof brand)[number] };
+  // 品牌专用几何：六个字母与原字标使用同一画布，不依赖系统字形。
+  const forms = ["round", "pixel", "outline", "italic", "stripe", "bold"] as const;
+  const roundPaths = [
+    "M88 15 C65 0 12 0 12 28 C12 50 88 48 88 72 C88 100 35 100 12 85",
+    "M12 92 V40 C12 0 88 0 88 40 V92",
+    "M50 8 C-6 8 -6 92 50 92 C106 92 106 8 50 8 Z",
+    "M8 8 L26 92 L50 30 L74 92 L92 8",
+    "M12 8 V62 C12 104 88 104 88 62 V8",
+    "M50 8 V92",
+  ];
+  const pixels = [
+    ["01111","10000","10000","01110","00001","00001","11110"],
+    ["00000","00000","11110","10001","10001","10001","10001"],
+    ["00000","00000","01110","10001","10001","10001","01110"],
+    ["00000","00000","10001","10001","10101","10101","01010"],
+    ["10001","10001","10001","10001","10001","10001","01110"],
+    ["11111","00100","00100","00100","00100","00100","11111"],
+  ];
+  function pixelPath(index: number) {
+    return pixels[index].flatMap((row, y) => Array.from(row, (cell, x) =>
+      cell === "1" ? `M${x * 20} ${y * 14}h17v12h-17Z` : "")).join("");
+  }
+  type Letter = { key: number; label: string; glyph?: (typeof brand)[number]; form?: typeof forms[number] };
   let serial = 6;
   let letters = $state<Letter[]>(
     brand.map((glyph, key) => ({ key, label: glyph.label, glyph })),
   );
   let previous: string | null = null;
+  let previousForm = -1;
   let host = $state<HTMLSpanElement>();
   // 用实际字形高度校准，所有几何用字标高度的 em 比例保存。
   let metrics = $state({
@@ -141,15 +166,15 @@
     );
   }
   $effect(() => {
-    if (greeting === previous) return;
+    if (greeting === previous && formIndex === previousForm) return;
     const next: Omit<Letter, "key">[] =
       greeting === null
-        ? brand.map((glyph) => ({ label: glyph.label, glyph }))
+        ? brand.map((glyph) => ({ label: glyph.label, glyph, form: formIndex < 0 ? undefined : forms[formIndex % forms.length] }))
         : Array.from(segmenter.segment(greeting), (part) => ({
             label: part.segment,
           }));
     const same = (a: Letter, b: Omit<Letter, "key">) =>
-      a.label === b.label && Boolean(a.glyph) === Boolean(b.glyph);
+      a.label === b.label && Boolean(a.glyph) === Boolean(b.glyph) && a.form === b.form;
     prefix = 0;
     while (
       prefix < Math.min(letters.length, next.length) &&
@@ -177,6 +202,7 @@
             : serial++,
     }));
     previous = greeting;
+    previousForm = formIndex;
   });
   function character(
     node: HTMLElement,
@@ -184,6 +210,12 @@
     { direction }: { direction: "in" | "out" | "both" },
   ): TransitionConfig {
     const rank = Math.max(0, Number(node.dataset.index) - prefix);
+    if (variantMotion) return {
+      duration: reduced() ? 0 : 220,
+      delay: reduced() ? 0 : rank * 24,
+      easing: (t) => 1 - Math.pow(1 - t, 3),
+      css: (t, u) => `opacity:${t};transform:scaleX(${1 - .3 * u}) scaleY(${1 - .12 * u});filter:blur(${.045 * u}em)`,
+    };
     return {
       duration: reduced() ? 0 : 550,
       delay: reduced() ? 0 : (rank * 550 * 0.3) / changedCount,
@@ -206,6 +238,7 @@
       data-index={index}
       data-letter={letter.label}
       data-brand={Boolean(letter.glyph)}
+      data-form={letter.form ?? "brand"}
       data-letter-key={letter.key}
       in:character
       out:character
@@ -226,7 +259,7 @@
         >
           <defs>
             <linearGradient
-              id={`${id}-letter-${index}`}
+              id={`${id}-letter-${letter.key}`}
               x1="0%"
               y1="0%"
               x2={letter.glyph.brand ? "0%" : "100%"}
@@ -245,18 +278,38 @@
               />
             </linearGradient>
           </defs>
-          <path
-            d={letter.glyph.path}
-            fill={letter.glyph.brand
-              ? "var(--brand, #33D1FF)"
-              : "var(--black-100, #000000)"}
-            fill-rule="evenodd"
-          />
-          <path
-            d={letter.glyph.path}
-            fill={`url(#${id}-letter-${index})`}
-            fill-rule="evenodd"
-          />
+          {#if letter.form === "round" && letter.label === "I"}
+            <!-- I 画布较窄，直接在品牌坐标中绘制，避免笔画随字宽压缩。 -->
+            <path d={`M${letter.glyph.x + letter.glyph.width / 2} 7.84V90.16`}
+              fill="none" stroke="var(--brand, #33D1FF)"
+              stroke-width={12 * brand[4].width / 100} stroke-linecap="round" />
+          {:else if letter.form === "round" || letter.form === "pixel"}
+            <svg x={letter.glyph.x} y="0" width={letter.glyph.width} height="98" viewBox="0 0 100 100" preserveAspectRatio="none" overflow="visible">
+              <path d={letter.form === "round" ? roundPaths[index] : pixelPath(index)}
+                fill={letter.form === "round" ? "none" : (letter.glyph.brand ? "var(--brand, #33D1FF)" : "var(--black-100, #000000)")}
+                stroke={letter.form === "round" ? (letter.glyph.brand ? "var(--brand, #33D1FF)" : "var(--black-100, #000000)") : "none"}
+                stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          {:else}
+            {#if letter.form === "stripe"}
+              <defs><pattern id={`${id}-stripe-${letter.key}`} width="1" height="12" patternUnits="userSpaceOnUse">
+                <rect width="1" height="7" fill={letter.glyph.brand ? "var(--brand, #33D1FF)" : "var(--black-100, #000000)"} />
+              </pattern></defs>
+            {/if}
+            <g transform={letter.form === "italic" ? `translate(10 0) skewX(-12)` : undefined}>
+              <path
+                d={letter.glyph.path}
+                fill={letter.form === "outline" ? "none" : letter.form === "stripe" ? `url(#${id}-stripe-${letter.key})` : letter.glyph.brand ? "var(--brand, #33D1FF)" : "var(--black-100, #000000)"}
+                stroke={letter.form === "outline" || letter.form === "bold" ? (letter.glyph.brand ? "var(--brand, #33D1FF)" : "var(--black-100, #000000)") : "none"}
+                stroke-width={letter.form === "outline" ? 3 : 6}
+                stroke-linejoin="round"
+                fill-rule="evenodd"
+              />
+              {#if !letter.form || letter.form === "italic" || letter.form === "bold"}
+                <path d={letter.glyph.path} fill={`url(#${id}-letter-${letter.key})`} fill-rule="evenodd" />
+              {/if}
+            </g>
+          {/if}
         </svg>
       {:else}
         <svg
