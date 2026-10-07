@@ -85,11 +85,11 @@
         display: flex;
         flex-direction: column;
         gap: var(--gap-1);
-        --snowui-search-popup-results-gap: var(--gap-4);
+        --snowui-search-popup-results-gap: var(--gap-3);
         padding-top: var(--snowui-search-popup-results-gap-override, var(--snowui-search-popup-results-gap));
     }
     :global(:where(.snowui-search-popup-results [data-as="group-title"])) {
-        --snowui-search-popup-group-gap: var(--gap-3);
+        --snowui-search-popup-group-gap: var(--gap-2);
         margin-top: var(--snowui-search-popup-group-gap-override, var(--snowui-search-popup-group-gap));
         padding: var(--padding-0) var(--padding-2);
         color: var(--black-40, #00000066);
