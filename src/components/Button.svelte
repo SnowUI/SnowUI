@@ -750,7 +750,7 @@
     --snowui-button-line-height: var(--leading-12);
     --snowui-button-min-width: max-content;
     --snowui-button-min-height: 0;
-    --snowui-button-width: auto;
+    --snowui-button-width: max-content;
     --snowui-button-height: auto;
     --snowui-button-opacity: var(
       --snowui-state-opacity,

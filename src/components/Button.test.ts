@@ -31,6 +31,16 @@
  */
 export const examples = [
     {
+        name: "BTN-Hug：默认内容宽度",
+        code: `BTN-Hug
+<div style="display: flex; flex-direction: column; width: 320px; gap: var(--gap-4);">
+    <Button>Hug by default</Button>
+    <Button style="width: 100%;">Explicit full width</Button>
+</div>`,
+        expected: { layout: "纵向 Flex 默认 stretch 下按钮仍为 Hug；显式 width: 100% 保留全宽。" },
+        logic: ["Hug", "ExplicitWidth"],
+    },
+    {
         name: "BTN-Content：内容整体缩放开关",
         code: `BTN-Content
 <Frame column class="gap-16">

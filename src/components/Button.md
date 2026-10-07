@@ -88,7 +88,7 @@ Button 的内部布局不接入三槽位模型：
 - 根节点保持 inline-level 外壳，内容整体 Hug。
 - 内部图标、文本、Spinner 等轻量内容通过 `gap` 自然排列。
 - 文字型 Button 默认 `white-space: nowrap`，保证按钮文案作为一个操作短语保持单行；特殊长文案可由使用方通过外部 style / class 显式覆盖。
-- 默认最小宽度为 `max-content`，即“内容 + gap + padding”的自然下限；外层 fill 布局可以把 Button 拉宽，但不能把 Button 压到吞掉默认 padding。
+- 默认宽度及最小宽度为 `max-content`，即“内容 + gap + padding”的 Hug 宽度；纵向 Flex / Grid 的默认 stretch 不会把 Button 拉满。只有显式 width / Fill 或组件声明的专属组合布局可以拉宽，不能把 Button 压到吞掉默认 padding。
 - Button 自身负责 padding / gap / radius / font-size / line-height，并通过 `--snowui-button-*-override` 变量允许外部覆盖。
 - gray / filled / outline / borderless 通过共享 `.snowui-rounded-rectangle` 消费 `--corner-shape-rounded-rectangle: superellipse(1.1)`；该曲线只比普通 `round` 略微平滑，同时不改变 `--snowui-button-radius` 或 `--snowui-button-radius-override` 解析出的根 corner area。独立 hover 背景伪元素显式继承同一 `border-radius` 与 `corner-shape`，并随背景 transform 等比放大；根 Button 的圆角和布局尺寸保持不变。`iconOnly` 只是内容布局，不建立圆形语义或圆角特例。不支持 `corner-shape` 时自然回退为现有 `border-radius`。bare 与 ButtonGroup 嵌入态的半径仍为 `0`，外壳所有权不变。
 - `iconOnly` 是单视觉内容布局的唯一开关，默认 `false`；Button 不读取 children 的 DOM 类型推断该状态。内容可以是 Icon、Logo 或其他单一视觉原子。
