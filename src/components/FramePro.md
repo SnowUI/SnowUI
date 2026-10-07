@@ -1,9 +1,9 @@
 # FramePro
 
-> **版本**: v4.0.3（Skeleton 自注册协议，2026-08-15）
+> **版本**: v4.0.4（共享首行对齐布局，2026-10-08）
 > **职责**: 在 Frame 的布局、状态与动效能力之上，协调多个组件的联动、动效编排与样式变化。
 > **包归属**: `@snowui/components-pro`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-08
 
 ## 组件介绍
 
@@ -54,7 +54,7 @@
 | enableContext | `boolean` | `true` | 上下文提供能力。控制 FramePerception Context。 |
 | enableScaleObserver | `boolean` | `false` | 尺寸比例监听能力。开启后向 CSS 变量写入运行时宽高、高宽比与统一尺寸。 |
 | enableDefaultMotion | `boolean` | `true` | **New in v3.6.0** 默认动效开关。设为 `false` 时，该 Frame 的所有 `while*` 不自动注入系统默认动效。用户显式传入的 `while*` 配置不受影响。 |
-| enableAutoLayout | `boolean` | `true` | 自动布局协议开关。当 Frame 声明了 `row` / `column` 方向时默认激活，在根 DOM 上输出 `data-auto-layout` 属性，继承 `auto-layout.css` 的三槽位感知、Wrap、Gap 等规则。设为 `false` 可关闭。详见 [LayoutProtocol.md](../../../specs/LayoutProtocol.md)。 |
+| enableAutoLayout | `boolean` | `true` | 自动布局协议开关。当 Frame 声明了 `row` / `column` 方向时默认激活，在根 DOM 上输出 `data-auto-layout` 属性，继承 `auto-layout.css` 的三槽位感知、首行对齐、Wrap、Gap 等规则。设为 `false` 可关闭。详见 [LayoutProtocol.md](../../../specs/LayoutProtocol.md)。 |
 | contentFill | `boolean` | `false` | 普通内容子项宽度填满 Frame 内容区；优先级高于 `contentHug`。 |
 | contentHug | `boolean` | `false` | 普通内容子项宽度按内容收缩。 |
 | pinOffset | `number \| string` | — | Pin 布局两个方向的偏移；数字按 px，字符串原样输出；新用法使用对应 Token 字符串。 |
@@ -118,6 +118,7 @@
 | lg | `"row" \| "column" \| "grid" \| "row-reverse" \| "column-reverse"` | — | 兼容断点方向 lg，启用 enableResponsive 时按 mobile-first 级联；新页面优先页面 responsive utilities。 |
 | xl | `"row" \| "column" \| "grid" \| "row-reverse" \| "column-reverse"` | — | 兼容断点方向 xl，启用 enableResponsive 时按 mobile-first 级联；新页面优先页面 responsive utilities。 |
 | 2xl | `"row" \| "column" \| "grid" \| "row-reverse" \| "column-reverse"` | — | 兼容断点方向 2xl，启用 enableResponsive 时按 mobile-first 级联；新页面优先页面 responsive utilities。 |
+| firstLine | `boolean` | `false` | Icon＋文字组合的默认设计方式，组合时显式声明；通用 Frame 不自动识别内容。在 row / row-reverse 三槽布局中，将 leading / trailing 附件与正文第一行行框居中；正文须继承宿主行高。非 row、无附件或 enableAutoLayout=false 时不增强；与 Pin 兼容。 |
 | row | `boolean` | — | 设置横向布局；同时声明 column 或 grid 时 row 优先。 |
 | column | `boolean` | — | 设置纵向布局；未启用 row 时生效，配合 reverse 改变方向。 |
 | grid | `boolean` | — | 设置网格基础布局；row、column 均未启用时生效，网格列由公开 class/style 配置。 |
@@ -241,7 +242,7 @@ Toast 是当前的直接例子：
 | **状态触发** | `Click`, `Drag`, `Hover`, `Focus`, `Key`, `Scroll` |
 | **形态** | `collapsed`, `expanded` |
 | **响应式** | `responsive` 内容适配；`xs`–`2xl` 仅作旧断点兼容 |
-| **布局** | `row`, `column`, `grid`, `reverse`, `morph`, `contentFill`, `contentHug`, `pinOffset`, `pinOffsetX`, `pinOffsetY` |
+| **布局** | `row`, `column`, `grid`, `reverse`, `firstLine`, `morph`, `contentFill`, `contentHug`, `pinOffset`, `pinOffsetX`, `pinOffsetY` |
 | **动效触发** | `whileLoad`, `whileReload`, `whileAppear`, `whileDisappear`, `whileIdle`, `whileActive`, `whileDisabled`, `whileClick`, `whileDrag`, `whileHover`, `whileFocus`, `whileKey`, `whileScroll`, `whileValidating`, `whileUploading`, `whileEditing` |
 | **形态动效** | `whileCollapsed`, `whileExpanded` |
 | **响应式动效** | `whileXs`, `whileSm`, `whileMd`, `whileLg`, `whileXl`, `while2xl` |
@@ -269,6 +270,7 @@ Toast 是当前的直接例子：
 
 - 当声明 `row` / `column`，或显式传入 `enableAutoLayout={true}` 时，根节点输出 `data-auto-layout="true"`。
 - `as="leading"` / `as="trailing"` 会透出为 `data-as`，由 `auto-layout.css` 统一处理 Leading / Content / Trailing 三段。
+- Icon＋文字组合默认使用 `row firstLine` 开启首行对齐，输出 `data-first-line="true"`；正文继承宿主行高，附件与单行或多行正文的第一行居中，详见 [LayoutProtocol §4.4](../../../specs/LayoutProtocol.md#44-首行对齐first-line-alignment)。
 - `as="pin-*"` 会透出为 `data-as="pin-*"`，由 `auto-layout.css` 统一处理九方位绝对定位；`pinOffsetX` / `pinOffsetY` 优先于 `pinOffset`。
 - `leading` 与 `trailing` 始终按 Hug 子项处理；普通直系子项作为 Content，必须允许 `min-width: 0`。
 - 普通内容宽度默认自动判断：Frame 有显式宽度（`width` prop、`style="width:..."`、`w-full` / `size-full` 等宽度 class）时为 Fill；Frame 为 Hug 宽度时为 Hug。可用 `contentFill` / `contentHug` 强制覆盖，二者同时出现时 `contentFill` 优先。
@@ -580,6 +582,8 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 
 当 `enableAutoLayout={true}`（默认）且 Frame 声明了 `row` / `column` 时，Frame 会在根 DOM 输出 `data-auto-layout` 属性，自动继承 `auto-layout.css` 提供的 Level 1 结构化规则：
 
+- 首行对齐：Icon＋文字组合默认使用 `row firstLine`，沿用三槽角色；完整规则见 [LayoutProtocol §4.4](../../../specs/LayoutProtocol.md#44-首行对齐first-line-alignment)。
+- Pin：通过 `as="pin-*"` 定位，不占三槽及首行轨道，可与首行对齐共用。
 - 三槽位感知：子元素通过 `data-as="leading"` / `data-as="trailing"` 声明角色，CSS `:has()` 自动切换 Flex ↔ Grid
 - Wrap 默认开启，Grid 模式下自动抑制
 - Gap 默认 `var(--gap-2)`
@@ -1182,6 +1186,8 @@ import { Frame } from '@snowui-design-system/components';
 
 Use column for stacked content and row for horizontal content. Padding, gap, and radius use SnowUI token steps. contentFill lets ordinary content children fill the available width.
 
+Three-slot composition, first-line alignment and Pin positioning are shared Frame layouts. Use leading and trailing for attachments around content, row firstLine by default for icon-and-text compositions, and pin-* for overlays outside the content flow. FramePro inherits all three.
+
 Keep the container flexible with a maximum reading width. Use tag to choose the semantic HTML element; as declares a composition role.
 
 ```svelte
@@ -1193,6 +1199,22 @@ Keep the container flexible with a maximum reading width. Use tag to choose the 
     <a href="/components/quick-start">Quick Start</a>
     <a href="/components/button">Explore components</a>
   </Frame>
+</Frame>
+```
+
+### Align an icon with the first line {#first-line}
+
+Use row firstLine by default for icon-and-text compositions: center the icon beside a single line, or beside the first line when text wraps. Declare firstLine explicitly; its prop default remains false for general-purpose Frames. Leading and trailing roles keep their natural size; the text uses the remaining width. The text should inherit the Frame line height. First-line alignment, three-slot composition and Pin positioning share the same Frame layout protocol.
+
+```svelte
+<script>
+  import { Frame, Icon } from '@snowui-design-system/components';
+  import { Check } from '@snowui-design-system/resource-svelte';
+</script>
+
+<Frame row firstLine class="text-18 gap-8" style="width: min(100%, 20rem);">
+  <Icon as="leading" size={24} icon={Check} />
+  <span>All PRO components and blocks for your next project</span>
 </Frame>
 ```
 
@@ -1449,7 +1471,7 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 | **事件** | `Click`, `Drag`, `Hover`, `Focus`, `Key`, `Scroll` |
 | **形态** | `collapsed`, `expanded` |
 | **响应式** | `breakpoint`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl` |
-| **布局** | `row`, `column`, `grid`, `reverse`, `morph` |
+| **布局** | `row`, `column`, `grid`, `reverse`, `firstLine`, `morph` |
 | **动效** | `whileLoad`, `whileReload`, `whileAppear`, `whileDisappear`, `whileIdle`, `whileActive`, `whileDisabled`, `whileClick`, `whileDrag`, `whileHover`, `whileFocus`, `whileKey`, `whileScroll`, `whileValidating`, `whileUploading`, `whileEditing`, `whileCollapsed`, `whileExpanded`, `whileXs`, `whileSm`, `whileMd`, `whileLg`, `whileXl`, `while2xl` |
 | **编排** | `orchestrate`, `orchestrateMode`, `orchestrateDelay`, `orchestrateOrder`, `orchestrateGroup`, `orchestrateTrigger`, `orchestrateTarget` |
 | **链式继承** | `parent` (访问祖父组件上下文) |
@@ -1587,6 +1609,10 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 ## 更新日志
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
+
+### v4.0.4 (2026-10-08)
+
+- 复用 OSS 的 `row firstLine` 首行对齐；共享 Props、DOM 过滤和 CSS 协议，不增加 PRO 专属实现。
 
 ### v4.0.3 (2026-08-15)
 
