@@ -1,4 +1,4 @@
-/* 共享遮罩视觉；打开、关闭、布局和动效由消费组件拥有。 */
+/* 共享遮罩视觉与渐隐；挂载、关闭时机和布局由消费组件拥有。 */
 :where(.snowui-backdrop) {
     --snowui-backdrop-background: rgb(0 0 0 / 10%);
     --snowui-backdrop-filter: none;
@@ -13,4 +13,26 @@
 
 :where(.snowui-backdrop[data-backdrop="transparent"]) {
     --snowui-backdrop-background: transparent;
+}
+
+/* 消费方注入 Dialog backdrop preset 的时长与曲线。 */
+:where(.snowui-backdrop) {
+    opacity: 1;
+    transition: opacity var(--snowui-dialog-backdrop-appear-duration)
+        var(--snowui-dialog-backdrop-appear-easing);
+}
+
+@starting-style {
+    :where(.snowui-backdrop) { opacity: 0; }
+}
+
+:where(.snowui-backdrop[data-closing="true"]) {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--snowui-dialog-backdrop-disappear-duration)
+        var(--snowui-dialog-backdrop-disappear-easing);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :where(.snowui-backdrop) { transition: none; }
 }

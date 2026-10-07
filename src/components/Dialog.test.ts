@@ -156,7 +156,7 @@ export const examples = [
 <Button data-dialog-target="dialog-transparent">transparent</Button>
 </Frame>`,
         "expected": {
-            "render": "三种 backdrop 均可用，默认点击遮罩可关闭",
+            "render": "三种 backdrop 均可用，opaque / blur 从透明渐入，默认点击遮罩可关闭",
             "interaction": "关闭请求沿用 Dialog 原有状态、焦点与键盘协议"
         },
         "logic": [

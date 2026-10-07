@@ -248,7 +248,11 @@
     onMount(() => {
         if (mode !== "inline") return;
         if (!placeholderRef) return;
-        inlineTrigger = placeholderRef.parentElement;
+        // Button 的内容包装层不可聚焦，触发和焦点恢复使用实际交互宿主。
+        const parent = placeholderRef.parentElement;
+        inlineTrigger = parent?.closest<HTMLElement>(
+            'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+        ) ?? parent;
         if (!inlineTrigger) return;
         originalCursor = inlineTrigger.style.cursor;
         inlineTrigger.style.cursor = "pointer";
@@ -457,16 +461,6 @@
         justify-content: center;
         box-sizing: border-box;
         padding: var(--padding-4);
-        opacity: 1;
-        transition: opacity var(--snowui-dialog-backdrop-appear-duration)
-            var(--snowui-dialog-backdrop-appear-easing);
-    }
-
-    :global(:where(.snowui-dialog-backdrop[data-closing="true"])) {
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity var(--snowui-dialog-backdrop-disappear-duration)
-            var(--snowui-dialog-backdrop-disappear-easing);
     }
 
     :global(:where(.snowui-dialog-container)) {
@@ -521,7 +515,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-        :global(:where(.snowui-dialog-backdrop, .snowui-dialog)) {
+        :global(:where(.snowui-dialog)) {
             transition: none;
         }
     }
