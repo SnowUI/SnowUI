@@ -1,6 +1,6 @@
 # Frame.svelte（OSS）
 
-> **版本**: v1.3.1（共享尺寸观察边界，2026-08-17）
+> **版本**: v1.4.0（首行对齐布局，2026-10-08）
 > **职责**: OSS 版基础容器。承载所有**自包含**的组件能力——布局、状态机、JS 动效执行、FLIP、Scale 观察、Perception、Skeleton 协议。
 > **边界**: 不包含**跨组件协调**能力（编排模式 / 联动控制 / 样式编排）。这三类能力由 `FramePro.svelte` 提供。
 > **包归属**: `@snowui-design-system/components`（OSS，公开）
@@ -16,6 +16,7 @@
 用于需要 SnowUI 布局、状态与动效能力的容器；普通页面结构可以使用语义 HTML。
 
 - 通过 row / column / grid 选择布局；as 声明组合角色，bind:element 获取根元素。
+- Icon＋文字组合默认使用 `row firstLine`，将 leading / trailing 附件与正文首行居中；单行与多行使用同一对齐方式，正文继承 Frame 行高。三槽、首行对齐与 Pin 都由 Frame 公共布局协议承接。
 - loading 表示状态，具体加载视觉由内容组件提供；颜色、间距和圆角优先使用 Token。
 - orchestrate*、styles 和跨 Frame 联动属于 FramePro。共享 API 在 [FramePro.md](../../../pro/src/components/FramePro.md)，本文其余部分是实现架构。
 <!-- usage-guide:end -->
@@ -210,6 +211,8 @@ v1.0.0 的动机：v0.x 把 CodeBlock 这类只是想做"自身状态切换 + �
 
 ## 3. OSS Frame 关键能力
 
+三槽、首行对齐与 Pin 统一归 OSS Frame 布局协议，FramePro 继承；Icon＋文字组合默认使用首行对齐。公开用法与参数只维护于 [共享 Frame API](../../../pro/src/components/FramePro.md)，完整契约见 [LayoutProtocol §4.4](../../../specs/LayoutProtocol.md#44-首行对齐first-line-alignment)。
+
 | 关键字 / 能力 | 说明 |
 |:---|:---|
 | `enableResponsive` | 容器内容适配监听；显式设为 `false` 时关闭 |
@@ -261,6 +264,8 @@ Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级�
 - 切割线更新日志：本文档 §1.6
 
 ## 更新日志
+
+- v1.4.0 (2026-10-08): 新增 `row firstLine` 首行对齐；由共享 DOM 属性与 CSS 协议实现，无额外观察器，FramePro 同步继承。
 
 - 2026-09-21（文档）：整理阅读入口，修正共享 API 路径，明确架构正文与使用文档的边界。
 

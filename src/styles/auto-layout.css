@@ -109,6 +109,24 @@
     direction: ltr;
 }
 
+/* === 首行对齐：沿用三槽列，仅让附件对齐正文第一行行框 === */
+:where([data-auto-layout][data-first-line="true"]:is(.snowui-direction-row, .snowui-direction-row-reverse):has(> :is([data-as="leading"], [data-as="trailing"]))) {
+    grid-template-rows: 1lh auto;
+    row-gap: 0;
+    align-items: start;
+    align-content: start;
+}
+
+:where([data-auto-layout][data-first-line="true"]:is(.snowui-direction-row, .snowui-direction-row-reverse):has(> :is([data-as="leading"], [data-as="trailing"])) > :not([data-as])) {
+    grid-row: 1 / span 2;
+    align-self: start;
+}
+
+:where([data-auto-layout][data-first-line="true"]:is(.snowui-direction-row, .snowui-direction-row-reverse) > :is([data-as="leading"], [data-as="trailing"])) {
+    grid-row: 1;
+    align-self: center;
+}
+
 /* === Wrap 控制 === */
 :where([data-auto-layout][data-wrap="false"]) {
     flex-wrap: nowrap;

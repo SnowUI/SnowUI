@@ -401,6 +401,8 @@ export interface FrameProps {
 
     // === 4.1 内部布局控制 ===
     row?: boolean;
+    /** Row 附件与正文首行行框居中；正文继承宿主行高，默认关闭。 */
+    firstLine?: boolean;
     column?: boolean;
     grid?: boolean;
     reverse?: boolean;

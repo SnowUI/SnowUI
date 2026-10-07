@@ -314,6 +314,7 @@ export function createFrameDomRuntime(options: FrameDomRuntimeOptions) {
             // 暴露 currentState 供组件 CSS 与消费方按状态着色（如 [data-state="Active"]）。
             // 命名沿用 FrameState 的 PascalCase（"Idle" / "Active" / "Hover" / "Pending" / "Load" / "StartLoad" / "Disabled"）。
             "data-state": options.frameState.currentState || undefined,
+            "data-first-line": frameProps.firstLine === true ? "true" : undefined,
             "data-auto-layout":
                 (frameProps.row || frameProps.column || frameProps.enableAutoLayout === true) &&
                 frameProps.enableAutoLayout !== false

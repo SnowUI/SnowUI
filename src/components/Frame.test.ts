@@ -6,6 +6,28 @@
  */
 export const examples = [
     {
+        name: "F-first-line: 首行对齐与 Pin",
+        code: `F-first-line
+<Frame column class="gap-16">
+    <Frame row firstLine class="text-18 gap-8" style="width: 18rem;">
+        <Icon as="leading" size={24} icon={Resource.Check} />
+        <span>All PRO components and blocks for your next project</span>
+    </Frame>
+    <Frame row firstLine class="text-18 gap-8" style="width: 18rem;">
+        <Icon as="leading" size={24} icon={Resource.Check} />
+        <span>1 developer seat</span>
+        <Badge as="pin-top-right">New</Badge>
+    </Frame>
+</Frame>`,
+        expected: {
+            render: "单行与多行使用同一首行居中方式，附件保持原尺寸。",
+            layout: "三槽列与首行行框复用共享布局，Pin 脱离文档流。",
+            interaction: "无新增交互或尺寸观察器。",
+            responsive: "宽度变化只使正文换行，附件仍与首行居中。",
+        },
+        logic: ["firstLine", "row", "as", "pin"],
+    },
+    {
         name: "F1: 显式类与布局",
         code: `F1
 <Frame class="flex flex-col gap-8 p-16 rounded-12 bg-background-2">
