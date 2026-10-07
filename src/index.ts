@@ -118,3 +118,5 @@ export * from './lib/overlay-scrollbar.svelte'
 export * from './lib/split-pane'
 
 export { default as SearchPopup, type SearchPopupItem } from "./blocks/SearchPopup.svelte";
+
+export { default as BlurText } from "./components/BlurText.svelte";

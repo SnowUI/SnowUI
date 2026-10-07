@@ -33,6 +33,23 @@
       "deprecated": false
     },
     {
+      "name": "BlurText",
+      "canonical": "BlurText",
+      "package": "@snowui/components-pro",
+      "import": "import { BlurText } from '@snowui/components-pro';",
+      "tier": "pro",
+      "kind": "component",
+      "source": "src/components/BlurText.svelte",
+      "documentation": "src/components/BlurText.md",
+      "description": "通过逐字变清晰、淡入与轻微上移呈现标题和短段落，保持自然换行、字号、行高与文字基线，适合欢迎语、介绍文案和内容揭示。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "ChartGroup",
       "canonical": "ChartGroup",
       "package": "@snowui/components-pro",
