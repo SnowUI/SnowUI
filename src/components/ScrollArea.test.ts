@@ -37,7 +37,7 @@ export const examples = [
         expected: {
             render: "高度受限时显示 SnowUI 纵向自建滚动条。",
             layout: "viewport 填满 ScrollArea，内容自然纵向溢出。",
-            interaction: "支持滚轮、键盘、触控和 Thumb 拖动；纵向 Thumb 常态视觉宽 4px、hover 命中宽 8px，hover 后视觉展宽到 8px。",
+            interaction: "支持滚轮、键盘、触控和 Thumb 拖动；纵向 Thumb 常态视觉宽 4px、轨道热区宽 16px（含两侧各 4px），鼠标进入轨道任意位置后视觉展宽到 8px；点击轨道空白处按滑块中心定位并可继续拖动。",
             performance: "复用 useOverlayScrollbar 与共享 resizeManager。",
             responsive: "容器尺寸改变后自动重算 Thumb。",
         },
@@ -55,7 +55,7 @@ export const examples = [
         expected: {
             render: "宽内容显示固定 8px 的横向自建滚动条。",
             layout: "纵向溢出关闭，横向 viewport 保持原生滚动语义。",
-            interaction: "横向 Thumb 可拖动，hover 只改变颜色。",
+            interaction: "横向 Thumb 可拖动；轨道任意位置 hover 只改变颜色；点击轨道空白处按滑块中心定位。",
             performance: "只实例化横向轨道状态。",
             responsive: "容器或内容宽度变化时自动重算。",
         },

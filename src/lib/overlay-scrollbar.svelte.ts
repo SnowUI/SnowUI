@@ -112,42 +112,56 @@ export function useOverlayScrollbar(
             return;
         }
 
+        const track = scrollbar!;
+        const dragThumb = boundThumb;
+        let activePointer: number | undefined;
+        let grabOffset = 0;
+
+        const endDrag = () => {
+            const pointer = activePointer;
+            activePointer = undefined;
+            delete dragThumb.dataset.dragging;
+            if (pointer !== undefined && track.hasPointerCapture(pointer)) {
+                track.releasePointerCapture(pointer);
+            }
+        };
         const handlePointerDown = (event: PointerEvent) => {
-            if (event.button !== 0 || !hasOverflow) return;
+            if (event.button !== 0 || !event.isPrimary || !hasOverflow || activePointer !== undefined) return;
             event.preventDefault();
             event.stopPropagation();
-
-            const thumbRect = boundThumb!.getBoundingClientRect();
-            const thumbGrabOffset = axis === "vertical"
-                ? event.clientY - thumbRect.top
-                : event.clientX - thumbRect.left;
-            boundThumb!.setPointerCapture(event.pointerId);
-            boundThumb!.dataset.dragging = "true";
-
-            const handlePointerMove = (moveEvent: PointerEvent) => {
-                moveEvent.preventDefault();
-                scrollToThumbClientPosition(
-                    axis === "vertical" ? moveEvent.clientY : moveEvent.clientX,
-                    thumbGrabOffset,
-                );
-            };
-
-            const handlePointerEnd = (endEvent: PointerEvent) => {
-                boundThumb?.releasePointerCapture(endEvent.pointerId);
-                if (boundThumb) delete boundThumb.dataset.dragging;
-                boundThumb?.removeEventListener("pointermove", handlePointerMove);
-                boundThumb?.removeEventListener("pointerup", handlePointerEnd);
-                boundThumb?.removeEventListener("pointercancel", handlePointerEnd);
-            };
-
-            boundThumb!.addEventListener("pointermove", handlePointerMove);
-            boundThumb!.addEventListener("pointerup", handlePointerEnd);
-            boundThumb!.addEventListener("pointercancel", handlePointerEnd);
+            compute();
+            const thumbRect = dragThumb.getBoundingClientRect();
+            const onThumb = event.target instanceof Node && dragThumb.contains(event.target);
+            grabOffset = onThumb
+                ? (axis === "vertical" ? event.clientY - thumbRect.top : event.clientX - thumbRect.left)
+                : (axis === "vertical" ? thumbRect.height : thumbRect.width) / 2;
+            activePointer = event.pointerId;
+            track.setPointerCapture(event.pointerId);
+            dragThumb.dataset.dragging = "true";
+            if (!onThumb) {
+                scrollToThumbClientPosition(axis === "vertical" ? event.clientY : event.clientX, grabOffset);
+            }
         };
-
-        boundThumb.addEventListener("pointerdown", handlePointerDown);
+        const handlePointerMove = (event: PointerEvent) => {
+            if (event.pointerId !== activePointer) return;
+            event.preventDefault();
+            scrollToThumbClientPosition(axis === "vertical" ? event.clientY : event.clientX, grabOffset);
+        };
+        const handlePointerEnd = (event: PointerEvent) => {
+            if (event.pointerId === activePointer) endDrag();
+        };
+        track.addEventListener("pointerdown", handlePointerDown);
+        track.addEventListener("pointermove", handlePointerMove);
+        track.addEventListener("pointerup", handlePointerEnd);
+        track.addEventListener("pointercancel", handlePointerEnd);
+        track.addEventListener("lostpointercapture", handlePointerEnd);
         cleanupThumbDrag = () => {
-            boundThumb?.removeEventListener("pointerdown", handlePointerDown);
+            endDrag();
+            track.removeEventListener("pointerdown", handlePointerDown);
+            track.removeEventListener("pointermove", handlePointerMove);
+            track.removeEventListener("pointerup", handlePointerEnd);
+            track.removeEventListener("pointercancel", handlePointerEnd);
+            track.removeEventListener("lostpointercapture", handlePointerEnd);
         };
     }
 

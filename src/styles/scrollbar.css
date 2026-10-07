@@ -34,7 +34,7 @@
  * Viewport 挂 .snowui-overlay-scrollbar-viewport 隐藏原生滚动条。
  * 自定义轨道挂 .snowui-overlay-scrollbar，Thumb 挂 .snowui-overlay-scrollbar-thumb。
  * 轨道绝对定位，不占布局宽度；具体 top/bottom/right/z-index 由组件按容器结构声明。
- * 纵向 Thumb 默认右对齐且视觉宽 4px；透明 hover 命中区保持 8px，命中后从右向左展宽到 8px，右边缘不移动。
+ * 纵向 Thumb 默认右对齐且视觉宽 4px；整条轨道热区覆盖展开后的 8px 及两侧各 4px，命中后从右向左展宽到 8px，右边缘不移动。
  * 横向 Thumb 始终为 8px，hover 只改变颜色。
  * 轨道默认距容器右侧/底部 4px；双轴时横向轨道为纵向轨道预留交叉区域。
  */
@@ -175,6 +175,7 @@
         right: var(--snowui-scrollbar-edge-gap);
         width: var(--snowui-overlay-scrollbar-size);
         background: transparent;
+        touch-action: none;
         pointer-events: none;
         opacity: 0;
         transition: opacity var(--snowui-frame-color-motion-duration, 0.15s)
@@ -209,13 +210,32 @@
     ),
 .snowui-overlay-scrollbar-host:hover
     > .snowui-overlay-scrollbar[data-axis="horizontal"][data-visibility="hover"][data-visible="true"],
-.snowui-overlay-scrollbar[data-axis="horizontal"][data-visibility="hover"]:has(
+.snowui-overlay-scrollbar[data-visible="true"]:has(
         > .snowui-overlay-scrollbar-thumb[data-dragging="true"]
     ),
 .snowui-overlay-scrollbar-host:hover
     > .snowui-overlay-scrollbar:not([data-axis="horizontal"])[data-visible="true"] {
     opacity: 1;
     pointer-events: auto;
+}
+
+/* 仅扩展命中区域，不改变轨道测量、滑块位置或内容布局。
+ * 纵向覆盖 8px 展开宽度 + 内侧 4px + 外侧边距 4px；横向同理。
+ */
+.snowui-overlay-scrollbar[data-visible="true"]::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(-1 * var(--snowui-scrollbar-edge-gap));
+    right: calc(-1 * var(--snowui-scrollbar-edge-gap));
+}
+
+.snowui-overlay-scrollbar[data-axis="horizontal"][data-visible="true"]::before {
+    top: calc(-1 * var(--snowui-scrollbar-edge-gap));
+    bottom: calc(-1 * var(--snowui-scrollbar-edge-gap));
+    left: 0;
+    right: 0;
 }
 
 .snowui-overlay-scrollbar-thumb {
@@ -250,8 +270,8 @@
             var(--snowui-frame-color-motion-easing, ease-out);
 }
 
-.snowui-overlay-scrollbar:not([data-axis="horizontal"])
-    > .snowui-overlay-scrollbar-thumb:hover::before,
+.snowui-overlay-scrollbar:not([data-axis="horizontal"]):hover
+    > .snowui-overlay-scrollbar-thumb::before,
 .snowui-overlay-scrollbar:not([data-axis="horizontal"])
     > .snowui-overlay-scrollbar-thumb[data-dragging="true"]::before {
     width: var(--snowui-overlay-scrollbar-thumb-hover-width);
@@ -284,8 +304,10 @@
             var(--snowui-frame-color-motion-easing, ease-out);
 }
 
+.snowui-overlay-scrollbar[data-axis="horizontal"]:hover
+    > .snowui-overlay-scrollbar-thumb,
 .snowui-overlay-scrollbar[data-axis="horizontal"]
-    .snowui-overlay-scrollbar-thumb:hover {
+    > .snowui-overlay-scrollbar-thumb[data-dragging="true"] {
     width: auto;
     height: var(--snowui-overlay-scrollbar-size);
     background-color: var(--black-20, rgba(0, 0, 0, 0.2));
