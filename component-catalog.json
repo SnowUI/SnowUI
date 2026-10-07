@@ -365,7 +365,9 @@
       "whenToUse": null,
       "avoidWhen": null,
       "related": [
-        "SearchInput"
+        "SearchInput",
+        "SearchPopup",
+        "Dialog"
       ],
       "deprecated": false
     },
@@ -391,9 +393,10 @@
       "related": [
         "SearchBox",
         "SearchInput",
-        "Popover",
         "Dialog",
-        "MenuItem"
+        "Popover",
+        "MenuItem",
+        "Kbd"
       ],
       "deprecated": false
     },

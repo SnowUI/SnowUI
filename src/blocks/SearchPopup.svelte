@@ -57,6 +57,9 @@
     }
     /* 输入与结果一起滚动，不使用 Popover 的固定搜索 header，避免其 4px 间距叠加。 */
     .snowui-search-popup-results {
+        display: flex;
+        flex-direction: column;
+        gap: var(--gap-1);
         --snowui-search-popup-results-gap: var(--gap-2);
         padding-top: var(--snowui-search-popup-results-gap-override, var(--snowui-search-popup-results-gap));
     }

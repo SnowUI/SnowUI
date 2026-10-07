@@ -47,7 +47,7 @@
 
 默认内置模式生成 SearchInput、Text、MenuItem。parts 不改写显式 children。Input 可通过 parts.SearchInput 配置 placeholder、ARIA 与 autofocus；内置文字沿用 SearchInput 的 locale 默认值，本组件不新增固定业务文案。默认结果 href 使用原生链接；默认数据结果必须提供 href；命令操作等非导航内容使用 children 显式组合具备键盘语义的 Button。
 
-结果区域距输入分隔线 8px；第一个标题不重复叠加，后续分组标题前增加 8px；无标题时第一项仍距分隔线 8px。标题自身沿用 4px 垂直、8px 水平 padding。公开角色 group-title 是多项角色，允许 Text 或原生 data-as；仅控制标题的颜色与间距，不改写业务内容。as=item 保留 MenuItem 自身语义，不创建 Listbox 选择 owner。
+结果区域距输入分隔线 8px；结果按单列排列，标题与 item、相邻 item 之间统一增加 gap-1（名义 4px）。第一个标题不重复叠加，后续分组标题保留额外 8px 上间距，与行间距合计 12px；无标题时第一项仍距分隔线 8px。标题自身沿用 4px 垂直、8px 水平 padding。公开角色 group-title 是多项角色，允许 Text 或原生 data-as；仅控制标题的颜色与间距，不改写业务内容。as=item 保留 MenuItem 自身语义，不创建 Listbox 选择 owner。
 
 标题和分组可省略；显式复杂内容可以组合 Avatar、Icon、MenuItem。模态场景放入 Dialog，Dialog 管理 opaque 遮罩、焦点圈定、关闭与恢复；SearchPopup 不管理这些行为。静态面板 SSR 不访问浏览器全局，动效及 reduced-motion 继承 Popover。不开启定位模式时不新增定位监听器。
 

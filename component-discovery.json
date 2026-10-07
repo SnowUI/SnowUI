@@ -62,7 +62,9 @@
         "窄屏搜索按钮"
       ],
       "related": [
-        "SearchInput"
+        "SearchInput",
+        "SearchPopup",
+        "Dialog"
       ]
     },
     "DataTable": {
@@ -229,9 +231,10 @@
       "related": [
         "SearchBox",
         "SearchInput",
-        "Popover",
         "Dialog",
-        "MenuItem"
+        "Popover",
+        "MenuItem",
+        "Kbd"
       ]
     }
   }
