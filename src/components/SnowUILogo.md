@@ -171,9 +171,9 @@ SnowUILogo 是 SnowUI 的品牌视觉原子组件。图标与字标均使用设�
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| SnowUILogo | [SnowUILogo.svelte](./SnowUILogo.svelte) | 品牌图形、连续收拢与 hover 问候 |
+| SnowUILogo | [SnowUILogo.svelte](SnowUILogo.svelte) | 品牌图形、连续收拢与 hover 问候 |
 | 专用字标 | [Wordmark.svelte](../internal/snow-ui-logo/Wordmark.svelte) | 设计稿独立字形与品牌专用逐字动画 |
-| Test 示例 | [SnowUILogo.test.ts](./SnowUILogo.test.ts) | 四种组合、比例缩放、hover 问候、连续收拢与外部链接组合 |
+| Test 示例 | [SnowUILogo.test.ts](SnowUILogo.test.ts) | 四种组合、比例缩放、hover 问候、连续收拢与外部链接组合 |
 
 ### 组合模式
 

@@ -21,11 +21,13 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Verify self-contained styles
         run: pnpm verify:styles
-      - name: Check OSS boundary
+      - name: Check unified runtime boundary
         run: pnpm check:oss
       - name: Check component catalog
         run: pnpm catalog:check
       - name: Build
         run: pnpm build
+      - name: Verify isolated runtime consumption
+        run: pnpm test:runtime
       - name: Verify npm package contents
-        run: npm pack --dry-run
+        run: pnpm pack:check

@@ -31,7 +31,7 @@ const autoId = `snowui-auto-${++idCounter}`;
 
 ## 联动控制
 
-所有关键字都支持 `{ target, action }` 语法控制其他组件。详见 [frame-perception.md](./frame-perception.md)。
+所有关键字都支持 `{ target, action }` 语法控制其他组件。详见 [frame-perception.md](frame-perception.md)。
 
 ## Svelte 原生能力
 

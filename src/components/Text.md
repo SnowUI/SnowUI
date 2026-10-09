@@ -259,13 +259,13 @@ opacity: var(
 
 ### 开发者指南 (AI)
 
-- **Implementation**: [Text.svelte](./Text.svelte)
+- **Implementation**: [Text.svelte](Text.svelte)
 - **Core Logic**:
-    - [frame-truncation.svelte.ts](./../logic/frame-truncation.svelte.ts) (TextTruncation 核心截断逻辑)
-    - [text-collapse.svelte.ts](./../logic/text-collapse.svelte.ts) (多行截断与可展开计算)
-- **Frame Integration**: [Frame.svelte](./Frame.svelte)（承载通用能力：状态、响应式、动效、上下文）
+    - [frame-truncation.svelte.ts](../logic/frame-truncation.svelte.ts) (TextTruncation 核心截断逻辑)
+    - [text-collapse.svelte.ts](../logic/text-collapse.svelte.ts) (多行截断与可展开计算)
+- **Frame Integration**: [Frame.svelte](Frame.svelte)（承载通用能力：状态、响应式、动效、上下文）
 - **Styles**:
-    - [Text.svelte](./Text.svelte)（主样式：hover、渐隐、more 定位、多行截断兜底）
+    - [Text.svelte](Text.svelte)（主样式：hover、渐隐、more 定位、多行截断兜底）
     - [layout.css](../styles/layout.css)（全局截断基础规则与按钮基础样式）
 
 ### 3.1 关键字映射 (Keyword Mapping)

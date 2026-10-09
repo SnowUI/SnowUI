@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Image } from '@snowui-design-system/components';
-	import { ImageViewer } from '@snowui/components-pro';
+	import { ImageViewer } from '@snowui-design-system/components/compat';
 	import cover01 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-01-1024.jpg';
 </script>
 
@@ -195,7 +195,7 @@
 
 ### 模块索引 (Module Index)
 
-- **Image 组件**: [./Image.svelte](./Image.svelte)
+- **Image 组件**: [./Image.svelte](Image.svelte)
 - **页面级预览总线**: [../logic/image-preview.ts](../logic/image-preview.ts)
 
 ### 关键字映射 (Keyword Handling)
@@ -210,9 +210,9 @@
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
-- **组合组件**: [ImageGroup.svelte](./ImageGroup.svelte), [ImageViewer.svelte](./ImageViewer.svelte)
-- **典型子组件**: [Icon.svelte](./Icon.svelte), [Radio.svelte](./Radio.svelte), [Button.svelte](./Button.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
+- **组合组件**: [ImageGroup.svelte](ImageGroup.svelte), [ImageViewer.svelte](ImageViewer.svelte)
+- **典型子组件**: [Icon.svelte](Icon.svelte), [Radio.svelte](Radio.svelte), [Button.svelte](Button.svelte)
 - **预览状态**: [../logic/image-preview.ts](../logic/image-preview.ts)
 
 ---

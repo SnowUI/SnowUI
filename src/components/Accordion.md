@@ -239,9 +239,9 @@ hover 归属：标题 hover 仅改变默认指示图标的透明度，不创建�
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| Accordion | [Accordion.svelte](./Accordion.svelte) | 分组容器与状态上下文 |
-| AccordionItem | [AccordionItem.svelte](./AccordionItem.svelte) | 单项容器 |
-| Accordion 示例 | [Accordion.test.ts](./Accordion.test.ts) | Test 项目示例 |
+| Accordion | [Accordion.svelte](Accordion.svelte) | 分组容器与状态上下文 |
+| AccordionItem | [AccordionItem.svelte](AccordionItem.svelte) | 单项容器 |
+| Accordion 示例 | [Accordion.test.ts](Accordion.test.ts) | Test 项目示例 |
 
 ### 关键字映射
 
@@ -258,7 +258,7 @@ hover 归属：标题 hover 仅改变默认指示图标的透明度，不创建�
 
 ### 关联关系
 
-- **子组件**: [AccordionItem.svelte](./AccordionItem.svelte)
+- **子组件**: [AccordionItem.svelte](AccordionItem.svelte)
 - **依赖**: Frame、`ACCORDION_CONTEXT_KEY`
 - **规范**: [../../../specs/LayoutProtocol.md §12.6](../../../specs/LayoutProtocol.md)、[../../../specs/ComponentGuidelines.md](../../../specs/ComponentGuidelines.md)
 

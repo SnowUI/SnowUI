@@ -208,8 +208,8 @@ Gradient 使用六种 SVG 矢量渐变。六种配色共用同一套 `360 × 360
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| Gradient | [Gradient.svelte](./Gradient.svelte) | 六种 SVG 矢量图源、模块级预栅格缓存、视口调度与四层独立合成 transform |
-| Test 示例 | [Gradient.test.ts](./Gradient.test.ts) | 六种配色、模糊缩放、持续动效、非正方形和裁切组合验证 |
+| Gradient | [Gradient.svelte](Gradient.svelte) | 六种 SVG 矢量图源、模块级预栅格缓存、视口调度与四层独立合成 transform |
+| Test 示例 | [Gradient.test.ts](Gradient.test.ts) | 六种配色、模糊缩放、持续动效、非正方形和裁切组合验证 |
 | Test 调参器 | [GradientMotionController.svelte](../test/GradientMotionController.svelte) | 在 Test 沙箱内保存 19 项调参状态并实时写入 Gradient CSS override；四列排列于图形下方，不属于公开组件 |
 
 ### 组合模式

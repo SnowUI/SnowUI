@@ -223,7 +223,7 @@
 
 ### 模块索引
 
-- **Chip 组件**: [./Chip.svelte](./Chip.svelte)
+- **Chip 组件**: [./Chip.svelte](Chip.svelte)
 
 ### 关联关系
 

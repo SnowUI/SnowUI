@@ -11,13 +11,13 @@
 
 | 文件 | 用途 |
 | :--- | :--- |
-| [layout.css](./layout.css) | 布局工具类 (morph-container, direction) |
-| [themes.css](./themes.css) | Components 包内主题变量；只允许项目所有者与 `styles/snowui-themes.css` 手工同步 |
-| [components.css](./components.css) | 组件公开 override 变量入口 |
-| [tokens.css](./tokens.css) | 核心 Token（`--text-*` / `--leading-*` + 几何基准变量） |
-| [scale.css](./scale.css) | 统一尺寸比例计算（height/width/mixed/aspect） |
-| [scale.md](./scale.md) | `scale.css` 规则与覆盖优先级文档 |
-| [auto-layout.css](./auto-layout.css) | `snowui-auto-layout` 低优先级 layer 中的三槽位、Wrap、Gap、镜像与 Pin 原语 |
+| [layout.css](layout.css) | 布局工具类 (morph-container, direction) |
+| [themes.css](themes.css) | Components 包内主题变量；只允许项目所有者与 `styles/snowui-themes.css` 手工同步 |
+| [components.css](components.css) | 组件公开 override 变量入口 |
+| [tokens.css](tokens.css) | 核心 Token（`--text-*` / `--leading-*` + 几何基准变量） |
+| [scale.css](scale.css) | 统一尺寸比例计算（height/width/mixed/aspect） |
+| [scale.md](scale.md) | `scale.css` 规则与覆盖优先级文档 |
+| [auto-layout.css](auto-layout.css) | `snowui-auto-layout` 低优先级 layer 中的三槽位、Wrap、Gap、镜像与 Pin 原语 |
 
 `layout.css` 集中登记 `snowui-host-baseline → snowui-frame-direction → snowui-auto-layout → snowui-frame-motion-fallback → snowui-shared-behavior`。方向基座低于 Auto Layout，因此三槽 Host 可从 flex 切换为 Grid；组件未分层的低权重基类、公开 class/style 与 Frame inline 输入仍稳定高于全部共享 layer。组件自有 gap、wrap 或 alignment 不得依赖模块加载顺序。
 

@@ -548,12 +548,12 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 
 ### 模块索引 (Module Index)
 
-- **Select 组件**: [./Select.svelte](./Select.svelte)
+- **Select 组件**: [./Select.svelte](Select.svelte)
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
-- **子组件**: [Listbox.svelte](./Listbox.svelte)、[MenuItem.svelte](./MenuItem.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
+- **子组件**: [Listbox.svelte](Listbox.svelte)、[MenuItem.svelte](MenuItem.svelte)
 - **共享逻辑**: [../logic/frame-field-control.ts](../logic/frame-field-control.ts)
 - **Props 分发**: [../logic/frame-prop-filter.ts](../logic/frame-prop-filter.ts)
 - **字段上下文**: [../context.ts](../context.ts) — `ListboxOwnerContext`

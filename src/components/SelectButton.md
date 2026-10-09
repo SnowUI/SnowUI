@@ -110,7 +110,7 @@ SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默
 
 `SelectButtonLabelContext` 为 `{ value: SelectValue; option: SelectOption | undefined; label: string; placeholder: string | undefined }`；`label` 已按选项文字 → placeholder → 空字符串解析。`SelectButtonIndicatorContext` 为 `{ open: boolean; disabled: boolean }`。
 
-表单提交和选择行为复用 [Select](./Select.md)，按钮视觉 Props 参见 [Button](./Button.md)。`required` 与 `invalid` 的当前限制见各自属性说明，不能据字段名推断已实现原生校验。
+表单提交和选择行为复用 [Select](Select.md)，按钮视觉 Props 参见 [Button](Button.md)。`required` 与 `invalid` 的当前限制见各自属性说明，不能据字段名推断已实现原生校验。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 

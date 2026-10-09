@@ -1,0 +1,22 @@
+{
+  "name": "snowui-runtime-consumer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "build": "vite build",
+    "dev": "vite --host 127.0.0.1 --port 5199"
+  },
+  "dependencies": {
+    "svelte": "5.56.4"
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "2.69.2",
+    "@sveltejs/adapter-auto": "7.0.1",
+    "@sveltejs/vite-plugin-svelte": "7.2.0",
+    "svelte-check": "4.4.6",
+    "typescript": "6.0.2",
+    "vite": "8.1.4",
+    "playwright": "1.62.1"
+  }
+}

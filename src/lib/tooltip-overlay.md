@@ -26,15 +26,15 @@
 ## 职责边界
 
 - 本模块只管理“同一个外框是否复用”和 active Tooltip 的渲染参数。
-- 首次延迟、快速切换窗口与冷却恢复仍由 [`tooltip-delay.ts`](./tooltip-delay.md) 管理。
+- 首次延迟、快速切换窗口与冷却恢复仍由 [`tooltip-delay.ts`](tooltip-delay.md) 管理。
 - 视觉样式与 Frame 动效仍在 [`Tooltip.svelte`](../components/Tooltip.svelte) 内消费。
-- 本模块不读取指针速度，不拥有视觉收敛策略。速度适配由共享 Tooltip 宿主和 [tooltip-pointer-speed](./tooltip-pointer-speed.md) 拥有，仅显示期间监听；不得在本模块新增采样、逐实例监听或逐帧布局测量。
+- 本模块不读取指针速度，不拥有视觉收敛策略。速度适配由共享 Tooltip 宿主和 [tooltip-pointer-speed](tooltip-pointer-speed.md) 拥有，仅显示期间监听；不得在本模块新增采样、逐实例监听或逐帧布局测量。
 
 ## 问题与修复记录
 
 ### 2026-08-12：Test Footer 相邻按钮间 Tooltip 偶发先消失再出现
 
-- **问题位置**：Playground Test Sidebar Footer 的 StyleButton、ColorSchemeButton、刷新 Button；共享实现 `tooltip-overlay.ts` 与 PRO 注册入口 `pro/src/lib/tooltip-enhancement.ts`。
+- **问题位置**：Playground Test Sidebar Footer 的 StyleButton、ColorSchemeButton、刷新 Button；共享实现 `tooltip-overlay.ts` 与 PRO 注册入口 `components/src/lib/tooltip-enhancement.ts`。
 - **触发条件**：第一个 Tooltip 已显示后，指针从按钮移入 12px 间隙并停留超过约 130ms，再进入相邻按钮。
 - **现象与证据**：快速移动能复用 Portal；在 gap 停留 150ms 时 Portal 已完全卸载，进入下一按钮 20ms 后 Foreground 从 opacity 约 `0.18` 重新出现。行为取决于移动速度。
 - **根因**：PRO 外框只保留 80ms，短于已定义的 300ms skip-delay；加上 50ms退出后，约 130ms 即卸载。另有实现错误：`scheduleTooltipOverlayHide(id, delayMs)` 对任意正值都忽略实参，固定使用 80ms。

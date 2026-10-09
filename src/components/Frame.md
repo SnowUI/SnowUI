@@ -20,7 +20,7 @@
 - 通过 row / column / grid 选择布局；as 声明组合角色，bind:element 获取根元素。
 - Icon＋文字组合默认使用 `row firstLine`，将 leading / trailing 附件与正文首行居中；单行与多行使用同一对齐方式，正文继承 Frame 行高。三槽、首行对齐与 Pin 都由 Frame 公共布局协议承接。
 - loading 表示状态，具体加载视觉由内容组件提供；颜色、间距和圆角优先使用 Token。
-- orchestrate*、styles 和跨 Frame 联动属于 FramePro。共享 API 在 [FramePro.md](../../../pro/src/components/FramePro.md)，本文其余部分是实现架构。
+- orchestrate*、styles 和跨 Frame 联动属于 FramePro。共享 API 在 [FramePro.md](FramePro.md)，本文其余部分是实现架构。
 <!-- usage-guide:end -->
 
 
@@ -36,7 +36,7 @@
 >
 > 本文档章节 §1–§5 是**架构与切割原则**。
 >
-> **OSS Frame 实际支持的全部关键字、参数、示例**见仓库根 [FramePro.md](../../../pro/src/components/FramePro.md)，章节标题加 `[OSS]` 标签的部分即 OSS 版完整支持的能力：
+> **OSS Frame 实际支持的全部关键字、参数、示例**见仓库根 [FramePro.md](FramePro.md)，章节标题加 `[OSS]` 标签的部分即 OSS 版完整支持的能力：
 >
 > - **[OSS] §1** 能力开关 (`enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion` / `enableAutoLayout`)
 > - **[OSS] 布局模型** + **§1.1 动效时序桥接变量**
@@ -110,7 +110,7 @@ FramePro 在 OSS Frame 之上只增加三类跨组件协调能力：
 | **形态过渡 morph** | ✅ OSS | 1 | `morph.ts`（迁入） |
 | **滚动联动 `whileScroll`** | ✅ OSS | 1 | `frame-motion.svelte.ts`（迁入） |
 | **FrameActions（声明式事件 → 自身状态变更）** | ✅ OSS | 1 | `frame-actions.svelte.ts` 自身向部分（迁入） |
-| **Timeline（跨 Frame 时间线编排）** | ❌ PRO | N | `pro/src/logic/timeline.svelte.ts`（保持 PRO） |
+| **Timeline（跨 Frame 时间线编排）** | ❌ PRO | N | `components/src/logic/timeline.svelte.ts`（保持 PRO） |
 | **§7.7 编排模式**（`orchestrate*`：父 → 多个子 Frame 的启动时机） | ❌ PRO | N | `frame-orchestrator.svelte.ts`、`motion-orchestration.ts` |
 | **§8 联动控制**（`Click={target, action}`：A Frame → B Frame 的动效） | ❌ PRO | N | `frame-actions.svelte.ts` 跨组件部分 |
 | **§10 样式编排**（`styles={{ "#id": {...} }}`：远程改深层 Target） | ❌ PRO | N | `frame-orchestrator.svelte.ts`、`frame-inline-style.svelte.ts` 跨组件部分 |
@@ -129,7 +129,7 @@ FramePro 在 OSS Frame 之上只增加三类跨组件协调能力：
   │
   ├─ 不会（只影响自己） → OSS Frame.svelte + components/src/logic/
   │
-  └─ 会（要伸手到别的 Frame）→ FramePro.svelte + pro/src/logic/
+  └─ 会（要伸手到别的 Frame）→ FramePro.svelte + components/src/logic/
         典型信号：
           • 父组件控制多个子组件的启动顺序 / 时机 → §7.7
           • 一个组件的事件去触发另一个组件的动效 → §8
@@ -213,7 +213,7 @@ v1.0.0 的动机：v0.x 把 CodeBlock 这类只是想做"自身状态切换 + �
 
 ## 3. OSS Frame 关键能力
 
-三槽、首行对齐与 Pin 统一归 OSS Frame 布局协议，FramePro 继承；Icon＋文字组合默认使用首行对齐。公开用法与参数只维护于 [共享 Frame API](../../../pro/src/components/FramePro.md)，完整契约见 [LayoutProtocol §4.4](../../../specs/LayoutProtocol.md#44-首行对齐first-line-alignment)。
+三槽、首行对齐与 Pin 统一归 OSS Frame 布局协议，FramePro 继承；Icon＋文字组合默认使用首行对齐。公开用法与参数只维护于 [共享 Frame API](FramePro.md)，完整契约见 [LayoutProtocol §4.4](../../../specs/LayoutProtocol.md#44-首行对齐first-line-alignment)。
 
 | 关键字 / 能力 | 说明 |
 |:---|:---|
@@ -243,7 +243,7 @@ Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级�
 ## 4. 使用建议
 
 - **OSS 组件**（`components/src/components/`）：使用 `import Frame from "./Frame.svelte"`。绝大多数组件都属于此类——只要它的能力是"修改自己"，无论多复杂（状态机、JS 动效、FLIP 转场、Scale 响应），都用 OSS Frame。
-- **PRO 组件**（`pro/src/components/`）：使用 `import FramePro from "./FramePro.svelte"`。仅当组件**必须**做以下任一时才属于 PRO：
+- **PRO 组件**（`components/src/components/`）：使用 `import FramePro from "./FramePro.svelte"`。仅当组件**必须**做以下任一时才属于 PRO：
   1. 父 Frame 编排子 Frame 们的动效启动时机（`orchestrate*`）
   2. 一个 Frame 的事件触发另一个 Frame 的动效（`Click={{ target, action }}`）
   3. 容器通过 ID 寻址跨层修改深层 Target 的样式（`styles={{...}}`）
@@ -259,9 +259,9 @@ Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级�
 ## 5. 关联文件
 
 - OSS 实现：`./Frame.svelte`
-- PRO 超集：`../../../pro/src/components/FramePro.svelte`（薄层：仅挂载 §7.7 / §8 / §10 的跨组件协调器）
-- PRO 文档：`../../../pro/src/components/FramePro.md`
-- 全量关键字 API 速查：`../../../pro/src/components/FramePro.md`（共享 API 权威，按章节列出所有 `while*` / `state*` / `orchestrate*` 等）
+- PRO 超集：`../../../components/src/components/FramePro.svelte`（薄层：仅挂载 §7.7 / §8 / §10 的跨组件协调器）
+- PRO 文档：`../../../components/src/components/FramePro.md`
+- 全量关键字 API 速查：`../../../components/src/components/FramePro.md`（共享 API 权威，按章节列出所有 `while*` / `state*` / `orchestrate*` 等）
 - 组件开发规范：`../../../specs/ComponentGuidelines.md`（含 OSS vs PRO 判断流程 §0.5）
 - 切割线更新日志：本文档 §1.6
 
@@ -283,4 +283,4 @@ Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级�
 
 ## Site 文档同步
 
-官网 Frame 与 FramePro 指南正文均维护于共享 API 权威 [FramePro.md](../../../pro/src/components/FramePro.md) 的 Site guide 标记区。修改本文件的 OSS / PRO 边界时，同任务核对两个指南；同步流程见 [DocGuidelines §1.3](../../../specs/DocGuidelines.md#13-严格同步)。
+官网 Frame 与 FramePro 指南正文均维护于共享 API 权威 [FramePro.md](FramePro.md) 的 Site guide 标记区。修改本文件的 OSS / PRO 边界时，同任务核对两个指南；同步流程见 [DocGuidelines §1.3](../../../specs/DocGuidelines.md#13-严格同步)。

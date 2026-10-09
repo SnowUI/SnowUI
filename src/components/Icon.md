@@ -224,12 +224,12 @@ Icon 为子组件 (如 Badge 或 另一个 Icon) 提供自适应定位上下文�
 
 ### 模块索引 (Module Index)
 
-- **Icon 组件**: [./Icon.svelte](./Icon.svelte)
+- **Icon 组件**: [./Icon.svelte](Icon.svelte)
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
-- **子组件**: [Badge.svelte](./Badge.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
+- **子组件**: [Badge.svelte](Badge.svelte)
 
 ---
 
@@ -243,12 +243,12 @@ Icon 为子组件 (如 Badge 或 另一个 Icon) 提供自适应定位上下文�
 
 ### 模块索引 (Module Index)
 
-- **Icon 组件**: [./Icon.svelte](./Icon.svelte)
+- **Icon 组件**: [./Icon.svelte](Icon.svelte)
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
-- **子组件**: [Badge.svelte](./Badge.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
+- **子组件**: [Badge.svelte](Badge.svelte)
 
 ---
 

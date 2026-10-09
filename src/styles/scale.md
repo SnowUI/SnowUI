@@ -140,9 +140,9 @@
 
 ### 模块索引 (Module Index)
 
-- 样式实现: [./scale.css](./scale.css)
-- 样式入口: [./index.css](./index.css)
-- 样式目录说明: [./README.md](./README.md)
+- 样式实现: [./scale.css](scale.css)
+- 样式入口: [./index.css](index.css)
+- 样式目录说明: [./README.md](README.md)
 
 ### 关键字映射 (Keyword Handling)
 

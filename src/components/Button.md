@@ -295,7 +295,7 @@ OSS Button **自动输出 `aria-pressed`**:
 - 仅在状态机声明里出现 `Idle` ↔ `Active` 的 toggle 字典(如 `Click={{ Idle:"Active", Active:"Idle" }}`)时启用;无 toggle 语义的普通 Button 不输出。
 - 消费方显式传入 `aria-pressed` 或 `aria-selected` 时,**外部值优先**,组件不再覆盖(用于 Button 处于 listbox / tab 等列表选择语境)。
 
-> 同一规则同步落地于 Tag,详见 [Tag.md 无障碍](./Tag.md)。
+> 同一规则同步落地于 Tag,详见 [Tag.md 无障碍](Tag.md)。
 
 <a id="与-field-date-input-的组合"></a>
 
@@ -396,7 +396,7 @@ Button 放入 Pagination 时使用角色模板：
 > **更新日志 (2026-08-09)**: `bare` 默认改为 100% 不透明；新增 `emphasis="muted"` 显式启用 40% → hover 100% 的弱化交互。
 > **更新日志 (2026-07-08)**: Button 默认最小宽度改为 `max-content`，保留“文字 + gap + padding”的自然下限，避免 fill 布局吞掉默认 padding。
 > **更新日志 (2026-07-08)**: 文字型 Button 默认 `white-space: nowrap`，避免在 Pagination 等压缩布局中被中文逐字换行。
-> **更新日志 (2026-06-01)**: 移除 `variant="link"`；文字链接统一迁移到独立 [Link.svelte](./Link.svelte)。
+> **更新日志 (2026-06-01)**: 移除 `variant="link"`；文字链接统一迁移到独立 [Link.svelte](Link.svelte)。
 > **更新日志 (2026-05-21)**: 自动输出 `aria-pressed`；Toggle 激活态配色统一为 Brand（`.snowui-button-active`），与 Tag `variant="active"` 一致。
 
 
@@ -475,12 +475,12 @@ Button 放入 Pagination 时使用角色模板：
 
 ### 模块索引 (Module Index)
 
-- **Button 组件**: [./Button.svelte](./Button.svelte)
+- **Button 组件**: [./Button.svelte](Button.svelte)
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
-- **组合角色**: `more` (用于 [Text.svelte](./Text.svelte) 的展开)、`item` (用于 [Breadcrumb.svelte](./Breadcrumb.svelte) 的路径片段)、`current/page/prev/next` (用于 [Pagination.svelte](./Pagination.svelte) 的角色模板)
+- **父组件**: [Frame.svelte](Frame.svelte)
+- **组合角色**: `more` (用于 [Text.svelte](Text.svelte) 的展开)、`item` (用于 [Breadcrumb.svelte](Breadcrumb.svelte) 的路径片段)、`current/page/prev/next` (用于 [Pagination.svelte](Pagination.svelte) 的角色模板)
 
 ---
 

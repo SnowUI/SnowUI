@@ -293,7 +293,7 @@ togglePopover("pop-01", buttonEl); // 切换
 
 QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中保留为搜索浮层组合参考。
 
-2026-10-07 新增的 [PRO Block SearchPopup](../../../pro/src/blocks/SearchPopup.md) 是基于 Popover 的搜索输入与分组结果组合，不恢复旧 SearchPopup 浮层实现；SP-02 现在消费该区块。
+2026-10-07 新增的 [PRO Block SearchPopup](../blocks/SearchPopup.md) 是基于 Popover 的搜索输入与分组结果组合，不恢复旧 SearchPopup 浮层实现；SP-02 现在消费该区块。
 
 <a id="规范-spec"></a>
 
@@ -345,7 +345,7 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中�
 
 ### 模块索引 (Module Index)
 
-- **Popover 组件**: [./Popover.svelte](./Popover.svelte)
+- **Popover 组件**: [./Popover.svelte](Popover.svelte)
 - **命令式 API + 模版注册**: [../logic/popover.svelte.ts](../logic/popover.svelte.ts) · 文档 [../logic/popover.md](../logic/popover.md)
 - **共享浮层基类**: [../styles/layout.css](../styles/layout.css) `.snowui-quick-action-panel`
 

@@ -44,8 +44,8 @@
 | size | `ResourceSize \| number` | — | 可见轨道高度，数字按根字号为 16px 时的名义 px 解析，外侧留白另计。支持 12 / 16 / 20 / 24 / 28 / 32 / 40 / 48 / 80 及其它有限正数；未传时依次读取父级尺寸 Context 的 `iconSize`、`size`，最后回退到 16。非法数字回退到默认尺寸 Token。显式值优先，随根字号缩放。 |
 | disabled | `boolean` | `false` | 禁用原生输入及用户切换，保留当前开关值和标签，退出 Tab 顺序。外部仍可更新 `checked`。 |
 | children | `Snippet` | — | 无参数标签内容，显示在轨道后；省略时不显示标签。标签文字同时为内部开关提供可访问名称，可通过内容 Snippet 组合文本。 |
-| enableResponsive | `boolean` | `false` | 传给根 Frame，启用其容器内容适配监听；不改变 Switch 的标准尺寸值域。通用行为见 [Frame 能力开关](./Frame.md)。 |
-| enableContext | `boolean` | `false` | 传给根 Frame，控制向子组件提供状态、加载与动效等 Context；不控制 Switch 读取父级尺寸 Context。通用行为见 [Frame 能力开关](./Frame.md)。 |
+| enableResponsive | `boolean` | `false` | 传给根 Frame，启用其容器内容适配监听；不改变 Switch 的标准尺寸值域。通用行为见 [Frame 能力开关](Frame.md)。 |
+| enableContext | `boolean` | `false` | 传给根 Frame，控制向子组件提供状态、加载与动效等 Context；不控制 Switch 读取父级尺寸 Context。通用行为见 [Frame 能力开关](Frame.md)。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 
@@ -118,11 +118,11 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 
 ### 模块索引 (Module Index)
 
-- **Switch 组件**: [./Switch.svelte](./Switch.svelte)
+- **Switch 组件**: [./Switch.svelte](Switch.svelte)
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
 
 ---
 

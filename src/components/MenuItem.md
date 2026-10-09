@@ -230,7 +230,7 @@ Frame row (.snowui-menu-item)
 
 ### 关联关系
 
-- **父组件（Listbox 场景）**: [Listbox.svelte](./Listbox.svelte) → [Select.svelte](./Select.svelte)
+- **父组件（Listbox 场景）**: [Listbox.svelte](Listbox.svelte) → [Select.svelte](Select.svelte)
 - **父组件（QuickAction 场景）**: [QuickAction.svelte](./QuickAction.svelte)
 - **取代组件**: 原 `MenuItem.svelte`（已删除）、原 `QuickActionItem.svelte`（已删除）
 

@@ -162,7 +162,7 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| ScrollArea | [ScrollArea.svelte](./ScrollArea.svelte) | 声明式组件结构与双轴轨道布局 |
+| ScrollArea | [ScrollArea.svelte](ScrollArea.svelte) | 声明式组件结构与双轴轨道布局 |
 | Overlay scrollbar | [overlay-scrollbar.svelte.ts](../lib/overlay-scrollbar.svelte.ts) | 跨组件共享滚动逻辑 |
 | Scrollbar styles | [scrollbar.css](../styles/scrollbar.css) | 跨组件共享视觉 |
 

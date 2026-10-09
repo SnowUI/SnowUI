@@ -1,42 +1,93 @@
 {
   "license": "SEE LICENSE IN LICENSE",
   "name": "@snowui-design-system/components",
-  "version": "0.2.0-alpha.9",
+  "version": "0.3.0-alpha.0",
   "private": false,
   "type": "module",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "svelte": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/client/index.d.ts",
+      "browser": "./dist/client/index.js",
+      "default": "./dist/server/index.js"
     },
-    "./keys": "./src/keys.ts",
-    "./context": "./src/context.ts",
-    "./lib/floating-position": "./src/lib/floating-position.ts",
-    "./lib/tooltip-behavior": "./src/lib/tooltip-behavior.ts",
-    "./lib/*.svelte": "./src/lib/*.svelte.ts",
-    "./lib/*": "./src/lib/*.ts",
-    "./internal/table-toolbar": "./src/components/TableToolbar.svelte",
-    "./internal/component-icon": "./src/internal/component-icon/index.ts",
-    "./logic/*.svelte": "./src/logic/*.svelte.ts",
-    "./logic/*": "./src/logic/*.ts",
-    "./motion/*.css": "./src/motion/*.css",
-    "./motion/*": "./src/motion/*.ts",
+    "./keys": {
+      "types": "./dist/client/keys.d.ts",
+      "browser": "./dist/client/keys.js",
+      "default": "./dist/server/keys.js"
+    },
+    "./context": {
+      "types": "./dist/client/context.d.ts",
+      "browser": "./dist/client/context.js",
+      "default": "./dist/server/context.js"
+    },
+    "./lib/floating-position": {
+      "types": "./dist/client/lib/floating-position.d.ts",
+      "browser": "./dist/client/lib/floating-position.js",
+      "default": "./dist/server/lib/floating-position.js"
+    },
+    "./lib/tooltip-behavior": {
+      "types": "./dist/client/lib/tooltip-behavior.d.ts",
+      "browser": "./dist/client/lib/tooltip-behavior.js",
+      "default": "./dist/server/lib/tooltip-behavior.js"
+    },
+    "./lib/*.svelte": {
+      "types": "./dist/client/lib/*.d.ts",
+      "browser": "./dist/client/lib/*.js",
+      "default": "./dist/server/lib/*.js"
+    },
+    "./lib/*": {
+      "types": "./dist/client/lib/*.d.ts",
+      "browser": "./dist/client/lib/*.js",
+      "default": "./dist/server/lib/*.js"
+    },
+    "./internal/table-toolbar": {
+      "types": "./dist/client/components/TableToolbar.d.ts",
+      "browser": "./dist/client/components/TableToolbar.js",
+      "default": "./dist/server/components/TableToolbar.js"
+    },
+    "./internal/component-icon": {
+      "types": "./dist/client/internal/component-icon/index.d.ts",
+      "browser": "./dist/client/internal/component-icon/index.js",
+      "default": "./dist/server/internal/component-icon/index.js"
+    },
+    "./logic/*.svelte": {
+      "types": "./dist/client/logic/*.d.ts",
+      "browser": "./dist/client/logic/*.js",
+      "default": "./dist/server/logic/*.js"
+    },
+    "./logic/*": {
+      "types": "./dist/client/logic/*.d.ts",
+      "browser": "./dist/client/logic/*.js",
+      "default": "./dist/server/logic/*.js"
+    },
+    "./motion/*.css": "./dist/client/motion/*.css",
+    "./motion/*": {
+      "types": "./dist/client/motion/*.d.ts",
+      "browser": "./dist/client/motion/*.js",
+      "default": "./dist/server/motion/*.js"
+    },
     "./component-catalog.json": "./component-catalog.json",
-    "./styles": "./src/styles/index.css",
-    "./styles/*": "./src/styles/*"
+    "./styles": {
+      "types": "./dist/client/styles/index.d.ts",
+      "default": "./dist/client/styles/index.css"
+    },
+    "./styles/*": "./dist/client/styles/*",
+    "./compat": {
+      "types": "./dist/client/compat.d.ts",
+      "browser": "./dist/client/compat.js",
+      "default": "./dist/server/compat.js"
+    }
   },
   "files": [
-    "src",
-    "!src/demo",
-    "!src/playground",
-    "!src/test",
+    "dist",
     "component-catalog.json",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/build-runtime.mjs",
     "preview": "vite preview",
     "check:standards": "node ../scripts/check-standards.js",
     "check:resize-observer": "node scripts/check-resize-observer-boundary.mjs",
@@ -44,10 +95,15 @@
     "check:oss": "node scripts/check-oss-deps.mjs && node scripts/check-resize-observer-boundary.mjs",
     "catalog:generate": "node scripts/generate-component-catalog.mjs",
     "catalog:check": "node scripts/generate-component-catalog.mjs --check",
-    "verify:styles": "node scripts/verify-styles.mjs"
+    "verify:styles": "node scripts/verify-styles.mjs",
+    "check": "svelte-check --workspace .",
+    "prepublishOnly": "pnpm catalog:check && pnpm build && pnpm pack:check",
+    "pack:check": "node scripts/check-runtime-package.mjs",
+    "source:archive": "node scripts/archive-source.mjs",
+    "test:runtime": "node scripts/test-runtime-consumer.mjs"
   },
   "peerDependencies": {
-    "svelte": "^5.0.0"
+    "svelte": ">=5.56.4 <6"
   },
   "devDependencies": {
     "@codemirror/lang-html": "^6.4.11",
@@ -56,8 +112,10 @@
     "@codemirror/theme-one-dark": "^6.1.3",
     "@replit/codemirror-lang-svelte": "^6.0.0",
     "@snowui-design-system/resource-svelte": "1.0.29",
+    "@sveltejs/package": "^3.0.0",
     "@sveltejs/vite-plugin-svelte": "^7.2.0",
     "@tsconfig/svelte": "^5.0.0",
+    "@types/d3-shape": "^3.1.8",
     "codemirror": "^6.0.2",
     "svelte": "^5.56.4",
     "svelte-check": "^4.3.4",
@@ -66,7 +124,11 @@
     "vite": "^8.1.4"
   },
   "dependencies": {
+    "d3-shape": "^3.2.0",
     "prettier": "3.9.6",
     "prettier-plugin-svelte": "4.1.1"
-  }
+  },
+  "sideEffects": [
+    "**/*.css"
+  ]
 }

@@ -280,7 +280,7 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 > **更新日志 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确多项骨架只是内部渲染布局，不注册为通用宿主布局。
 
 
-`Skeleton.svelte` 是独立骨架原语，不继承 `Frame`。它只负责“骨架长什么样”，而“何时进入骨架态”由 [Frame.svelte](./Frame.svelte) 的 `loading + skeleton` 协议负责。
+`Skeleton.svelte` 是独立骨架原语，不继承 `Frame`。它只负责“骨架长什么样”，而“何时进入骨架态”由 [Frame.svelte](Frame.svelte) 的 `loading + skeleton` 协议负责。
 
 <a id="开发者指南-ai"></a>
 
@@ -288,8 +288,8 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 
 ### 模块索引
 
-- **Skeleton 组件**: [./Skeleton.svelte](./Skeleton.svelte)
-- **加载协议入口**: [./Frame.svelte](./Frame.svelte)
+- **Skeleton 组件**: [./Skeleton.svelte](Skeleton.svelte)
+- **加载协议入口**: [./Frame.svelte](Frame.svelte)
 - **类型定义**: [../logic/frame-types.ts](../logic/frame-types.ts)
 
 ### 关键字 / 函数映射

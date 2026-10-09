@@ -77,7 +77,7 @@
 
 ### API
 
-其他兼容视觉、链接与事件入口参见 [Button](./Button.md)。CopyButton 接管 children、onclick、disabled、currentState、stateContent、whileActive、Click 和 Active，不能用这些宿主字段替代复制状态。
+其他兼容视觉、链接与事件入口参见 [Button](Button.md)。CopyButton 接管 children、onclick、disabled、currentState、stateContent、whileActive、Click 和 Active，不能用这些宿主字段替代复制状态。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 

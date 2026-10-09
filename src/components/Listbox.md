@@ -110,7 +110,7 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 
 ### 组件 Props
 
-继承 [FrameProps](./Frame.md)，排除 `children` / `tag`。Listbox 必须置于 Select 等提供选择上下文的宿主内；展开、当前值和选择事件由宿主拥有，不支持独立 `open`、`value`、`options`、`multiple` 或 `placement` 属性。
+继承 [FrameProps](Frame.md)，排除 `children` / `tag`。Listbox 必须置于 Select 等提供选择上下文的宿主内；展开、当前值和选择事件由宿主拥有，不支持独立 `open`、`value`、`options`、`multiple` 或 `placement` 属性。
 
 
 等宽模式使用锚点实测宽度加固定 2px，左右各外扩 1px，覆盖下层字段边框；保留小数定位精度。该固定 CSS px 补偿不随根字号缩放，适用于所有 Listbox 宿主；Hug 模式不增加补偿，更大的 minWidth / 内容扩展继续生效。规范例外见 [StyleSpec §2.1](../../../specs/StyleSpec.md#21-token-使用规范) 的 USER-LISTBOX-WIDTH-001。
@@ -349,9 +349,9 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 - **HeroUI**: `react-aria-components` Select primitive
 
 ### 关联关系
-- **父级布局**: [Frame.svelte](./Frame.svelte) — 使用 `<Frame column>` 作为内容容器
-- **子组件**: [MenuItem.svelte](./MenuItem.svelte)
-- **宿主组件**: [Select.svelte](./Select.svelte)、[Pagination.svelte](./Pagination.svelte)
+- **父级布局**: [Frame.svelte](Frame.svelte) — 使用 `<Frame column>` 作为内容容器
+- **子组件**: [MenuItem.svelte](MenuItem.svelte)
+- **宿主组件**: [Select.svelte](Select.svelte)、[Pagination.svelte](Pagination.svelte)
 - **自动布局协议**: [../../../specs/LayoutProtocol.md](../../../specs/LayoutProtocol.md)
 - **关联规范**: [../../../specs/HTMLSpec.md](../../../specs/HTMLSpec.md)
 

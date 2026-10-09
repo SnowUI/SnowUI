@@ -289,7 +289,7 @@
 
 ### 模块索引
 
-- **Tag 组件**: [./Tag.svelte](./Tag.svelte)
+- **Tag 组件**: [./Tag.svelte](Tag.svelte)
 - **规范入口**: 本文件
 
 ### 关联关系

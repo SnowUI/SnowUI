@@ -1,7 +1,7 @@
 /**
  * OSS Frame 状态机（v1.0.0 起在 OSS）
  *
- * 与 PRO 版本（pro/src/logic/frame-state.svelte.ts）的差异：
+ * 与 PRO 版本（components/src/logic/frame-pro-state.svelte.ts）的差异：
  * - 不含 §8 联动控制（linkageControl / Motion 依赖）
  * - 构造函数不接收 motion 参数
  * - 事件处理器中的 `if ("target" in config) { ... }` 分支被剥离

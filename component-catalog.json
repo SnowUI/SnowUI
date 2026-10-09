@@ -12,7 +12,11 @@
       "canonical": "Accordion",
       "package": "@snowui-design-system/components",
       "import": "import { Accordion } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Accordion.svelte",
       "documentation": "src/components/Accordion.md",
@@ -29,7 +33,11 @@
       "canonical": "AccordionItem",
       "package": "@snowui-design-system/components",
       "import": "import { AccordionItem } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/AccordionItem.svelte",
       "documentation": "src/components/AccordionItem.md",
@@ -46,7 +54,11 @@
       "canonical": "Avatar",
       "package": "@snowui-design-system/components",
       "import": "import { Avatar } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Avatar.svelte",
       "documentation": "src/components/Avatar.md",
@@ -63,7 +75,11 @@
       "canonical": "AvatarGroup",
       "package": "@snowui-design-system/components",
       "import": "import { AvatarGroup } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/AvatarGroup.svelte",
       "documentation": "src/components/AvatarGroup.md",
@@ -80,7 +96,11 @@
       "canonical": "Badge",
       "package": "@snowui-design-system/components",
       "import": "import { Badge } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Badge.svelte",
       "documentation": "src/components/Badge.md",
@@ -93,11 +113,63 @@
       "deprecated": false
     },
     {
+      "name": "BarChart",
+      "canonical": "BarChart",
+      "package": "@snowui-design-system/components",
+      "import": "import { BarChart } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/BarChart.svelte",
+      "documentation": "src/components/BarChart.md",
+      "description": "用柱状图比较不同类别的数据，支持横向、纵向、分组与堆叠展示，以及坐标轴和交互提示。",
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ],
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "BlurText",
+      "canonical": "BlurText",
+      "package": "@snowui-design-system/components",
+      "import": "import { BlurText } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/BlurText.svelte",
+      "documentation": "src/components/BlurText.md",
+      "description": "通过逐字变清晰、淡入与轻微上移呈现标题和短段落，保持自然换行、字号、行高与文字基线，适合欢迎语、介绍文案和内容揭示。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "Breadcrumb",
       "canonical": "Breadcrumb",
       "package": "@snowui-design-system/components",
       "import": "import { Breadcrumb } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Breadcrumb.svelte",
       "documentation": "src/components/Breadcrumb.md",
@@ -114,7 +186,11 @@
       "canonical": "Button",
       "package": "@snowui-design-system/components",
       "import": "import { Button } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Button.svelte",
       "documentation": "src/components/Button.md",
@@ -147,7 +223,11 @@
       "canonical": "ButtonGroup",
       "package": "@snowui-design-system/components",
       "import": "import { ButtonGroup } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/ButtonGroup.svelte",
       "documentation": "src/components/ButtonGroup.md",
@@ -173,7 +253,11 @@
       "canonical": "Card",
       "package": "@snowui-design-system/components",
       "import": "import { Card } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Card.svelte",
       "documentation": "src/components/Card.md",
@@ -186,11 +270,42 @@
       "deprecated": false
     },
     {
+      "name": "ChartGroup",
+      "canonical": "ChartGroup",
+      "package": "@snowui-design-system/components",
+      "import": "import { ChartGroup } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/ChartGroup.svelte",
+      "documentation": "src/components/ChartGroup.md",
+      "description": "将多个图表组合在同一区域，协调分类悬停、叠加绘制与共享坐标轴，便于比较关联数据。",
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ],
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "Checkbox",
       "canonical": "Checkbox",
       "package": "@snowui-design-system/components",
       "import": "import { Checkbox } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Checkbox.svelte",
       "documentation": "src/components/Checkbox.md",
@@ -207,7 +322,11 @@
       "canonical": "Chip",
       "package": "@snowui-design-system/components",
       "import": "import { Chip } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Chip.svelte",
       "documentation": "src/components/Chip.md",
@@ -220,11 +339,36 @@
       "deprecated": false
     },
     {
+      "name": "CircularChart",
+      "canonical": "CircularChart",
+      "package": "@snowui-design-system/components",
+      "import": "import { CircularChart } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/CircularChart.svelte",
+      "documentation": "src/components/CircularChart.md",
+      "description": "用圆环或饼图展示数据占比，支持分段、圆角、环厚与悬停强调，适合构成分析和比例概览。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "CodeBlock",
       "canonical": "CodeBlock",
       "package": "@snowui-design-system/components",
       "import": "import { CodeBlock } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/CodeBlock.svelte",
       "documentation": "src/components/CodeBlock.md",
@@ -252,7 +396,11 @@
       "canonical": "ColorSchemeButton",
       "package": "@snowui-design-system/components",
       "import": "import { ColorSchemeButton } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/ColorSchemeButton.svelte",
       "documentation": "src/components/ColorSchemeButton.md",
@@ -279,7 +427,11 @@
       "canonical": "CopyButton",
       "package": "@snowui-design-system/components",
       "import": "import { CopyButton } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/CopyButton.svelte",
       "documentation": "src/components/CopyButton.md",
@@ -305,7 +457,11 @@
       "canonical": "CopyLink",
       "package": "@snowui-design-system/components",
       "import": "import { CopyLink } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/CopyLink.svelte",
       "documentation": "src/components/CopyLink.md",
@@ -328,11 +484,58 @@
       "deprecated": false
     },
     {
+      "name": "DataTable",
+      "canonical": "DataTable",
+      "package": "@snowui-design-system/components",
+      "import": "import { DataTable } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/DataTable.svelte",
+      "documentation": "src/components/DataTable.md",
+      "description": "统一管理数据的查询、排序与分页状态，可自由组合工具栏、表格和分页器，构建完整的数据浏览界面。",
+      "intents": [
+        "数据表格",
+        "排序分页表格",
+        "带操作的数据列表",
+        "文件列表",
+        "文件管理",
+        "勾选",
+        "分页",
+        "搜索",
+        "批量操作"
+      ],
+      "aliases": [
+        "高级表格",
+        "数据表"
+      ],
+      "whenToUse": "数据列表需要搜索、排序、筛选、勾选、操作列或分页；组合 TableToolbar、Table 与 Pagination。",
+      "avoidWhen": "只展示表头和数据行时使用 Table。",
+      "related": [
+        "TableToolbar",
+        "Table",
+        "TableHeader",
+        "TableHead",
+        "TableBody",
+        "TableRow",
+        "TableCell",
+        "Pagination"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Dialog",
       "canonical": "Dialog",
       "package": "@snowui-design-system/components",
       "import": "import { Dialog } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Dialog.svelte",
       "documentation": "src/components/Dialog.md",
@@ -349,7 +552,11 @@
       "canonical": "ExpandButton",
       "package": "@snowui-design-system/components",
       "import": "import { ExpandButton } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/ExpandButton.svelte",
       "documentation": "src/components/ExpandButton.md",
@@ -371,11 +578,67 @@
       "deprecated": false
     },
     {
+      "name": "Field",
+      "canonical": "Field",
+      "package": "@snowui-design-system/components",
+      "import": "import { Field } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/Field.svelte",
+      "documentation": "src/components/Field.md",
+      "description": "将输入控件、标签、图标和校验反馈组织为完整的表单字段，统一外观与内容布局。",
+      "intents": [
+        "表单字段组合",
+        "标签帮助错误信息"
+      ],
+      "aliases": [
+        "表单项",
+        "带 label 的输入"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "Input",
+        "Textarea",
+        "Select"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "FlowText",
+      "canonical": "FlowText",
+      "package": "@snowui-design-system/components",
+      "import": "import { FlowText } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/FlowText.svelte",
+      "documentation": "src/components/FlowText.md",
+      "description": "以流动过渡展示文字和数字变化，适合动态文案、计数、计时与倒计时。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "Frame",
       "canonical": "Frame",
       "package": "@snowui-design-system/components",
       "import": "import { Frame } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Frame.svelte",
       "documentation": "src/components/Frame.md",
@@ -388,11 +651,66 @@
       "deprecated": false
     },
     {
+      "name": "FramePro",
+      "canonical": "FramePro",
+      "package": "@snowui-design-system/components",
+      "import": "import { FramePro } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/FramePro.svelte",
+      "documentation": "src/components/FramePro.md",
+      "description": "在 Frame 的布局、状态与动效能力之上，协调多个组件的联动、动效编排与样式变化。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "GaugeChart",
+      "canonical": "GaugeChart",
+      "package": "@snowui-design-system/components",
+      "import": "import { GaugeChart } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/GaugeChart.svelte",
+      "documentation": "src/components/GaugeChart.md",
+      "description": "用半环或半饼展示多项数据占比，支持分段、渐变、环厚与出现动效，适合比例概览。",
+      "intents": [
+        "半环比例图",
+        "半饼图",
+        "分段占比"
+      ],
+      "aliases": [
+        "半圆占比"
+      ],
+      "whenToUse": "以半环或半饼展示多项正数占比，分母为实际显示项之和。",
+      "avoidWhen": "单指标 min/max 仪表没有对应公开 API；任务完成百分比用 Progress。",
+      "related": [
+        "CircularChart",
+        "Progress"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Gradient",
       "canonical": "Gradient",
       "package": "@snowui-design-system/components",
       "import": "import { Gradient } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Gradient.svelte",
       "documentation": "src/components/Gradient.md",
@@ -405,11 +723,36 @@
       "deprecated": false
     },
     {
+      "name": "GradientMotion",
+      "canonical": "GradientMotion",
+      "package": "@snowui-design-system/components",
+      "import": "import { GradientMotion } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/GradientMotion.svelte",
+      "documentation": "src/components/GradientMotion.md",
+      "description": "以流动扫光呈现动态渐变，可用于背景、头像占位或可裁切的媒体区域。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "Icon",
       "canonical": "Icon",
       "package": "@snowui-design-system/components",
       "import": "import { Icon } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Icon.svelte",
       "documentation": "src/components/Icon.md",
@@ -426,7 +769,11 @@
       "canonical": "IconProvider",
       "package": "@snowui-design-system/components",
       "import": "import { IconProvider } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/IconProvider.svelte",
       "documentation": "src/components/IconProvider.md",
@@ -443,7 +790,11 @@
       "canonical": "Image",
       "package": "@snowui-design-system/components",
       "import": "import { Image } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Image.svelte",
       "documentation": "src/components/Image.md",
@@ -460,7 +811,11 @@
       "canonical": "ImageGroup",
       "package": "@snowui-design-system/components",
       "import": "import { ImageGroup } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/ImageGroup.svelte",
       "documentation": "src/components/ImageGroup.md",
@@ -473,11 +828,46 @@
       "deprecated": false
     },
     {
+      "name": "ImageViewer",
+      "canonical": "ImageViewer",
+      "package": "@snowui-design-system/components",
+      "import": "import { ImageViewer } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/ImageViewer.svelte",
+      "documentation": "src/components/ImageViewer.md",
+      "description": "在页面级预览中查看图片或视频，提供前后切换与关闭操作，适合媒体详情浏览。",
+      "intents": [
+        "图片预览",
+        "图片全屏查看",
+        "图片组导航"
+      ],
+      "aliases": [
+        "图片查看器",
+        "灯箱"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "Image",
+        "ImageGroup"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Indicator",
       "canonical": "Indicator",
       "package": "@snowui-design-system/components",
       "import": "import { Indicator } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Indicator.svelte",
       "documentation": "src/components/Indicator.md",
@@ -494,7 +884,11 @@
       "canonical": "Input",
       "package": "@snowui-design-system/components",
       "import": "import { Input } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Input.svelte",
       "documentation": "src/components/Input.md",
@@ -511,7 +905,11 @@
       "canonical": "Kbd",
       "package": "@snowui-design-system/components",
       "import": "import { Kbd } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Kbd.svelte",
       "documentation": "src/components/Kbd.md",
@@ -524,11 +922,42 @@
       "deprecated": false
     },
     {
+      "name": "LineChart",
+      "canonical": "LineChart",
+      "package": "@snowui-design-system/components",
+      "import": "import { LineChart } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/LineChart.svelte",
+      "documentation": "src/components/LineChart.md",
+      "description": "用折线展示数据变化趋势，支持多序列、面积填充、实线与虚线，以及坐标轴、网格和节点样式。",
+      "intents": [
+        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+      ],
+      "aliases": [
+        "图表反白",
+        "黑白自适应",
+        "adaptiveContrast"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "Link",
       "canonical": "Link",
       "package": "@snowui-design-system/components",
       "import": "import { Link } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Link.svelte",
       "documentation": "src/components/Link.md",
@@ -545,7 +974,11 @@
       "canonical": "Listbox",
       "package": "@snowui-design-system/components",
       "import": "import { Listbox } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Listbox.svelte",
       "documentation": "src/components/Listbox.md",
@@ -562,7 +995,11 @@
       "canonical": "LocaleProvider",
       "package": "@snowui-design-system/components",
       "import": "import { LocaleProvider } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/LocaleProvider.svelte",
       "documentation": "src/components/LocaleProvider.md",
@@ -579,7 +1016,11 @@
       "canonical": "MenuItem",
       "package": "@snowui-design-system/components",
       "import": "import { MenuItem } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/MenuItem.svelte",
       "documentation": "src/components/MenuItem.md",
@@ -592,11 +1033,65 @@
       "deprecated": false
     },
     {
+      "name": "NumberFlow",
+      "canonical": "NumberFlow",
+      "package": "@snowui-design-system/components",
+      "import": "import { NumberFlow } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/NumberFlow.svelte",
+      "documentation": "src/components/NumberFlow.md",
+      "description": "以逐位滚动和宽度过渡展示数字变化，保留金额、分组符与小数格式，适合计数器和实时指标。",
+      "intents": [
+        "数字滚动",
+        "数值变化动画"
+      ],
+      "aliases": [
+        "数字流动",
+        "数字滚轮动画"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "NumericText"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "NumericText",
+      "canonical": "NumericText",
+      "package": "@snowui-design-system/components",
+      "import": "import { NumericText } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/NumericText.svelte",
+      "documentation": "src/components/NumericText.md",
+      "description": "对文字或数字中发生变化的部分进行过渡，保留未变内容，适合简短状态、数值与计时信息。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "OverflowAction",
       "canonical": "OverflowAction",
       "package": "@snowui-design-system/components",
       "import": "import { OverflowAction } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/OverflowAction.svelte",
       "documentation": "src/components/OverflowAction.md",
@@ -613,7 +1108,11 @@
       "canonical": "OverflowActions",
       "package": "@snowui-design-system/components",
       "import": "import { OverflowActions } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/OverflowActions.svelte",
       "documentation": "src/components/OverflowActions.md",
@@ -642,7 +1141,11 @@
       "canonical": "Pagination",
       "package": "@snowui-design-system/components",
       "import": "import { Pagination } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Pagination.svelte",
       "documentation": "src/components/Pagination.md",
@@ -659,7 +1162,11 @@
       "canonical": "Popover",
       "package": "@snowui-design-system/components",
       "import": "import { Popover } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Popover.svelte",
       "documentation": "src/components/Popover.md",
@@ -676,7 +1183,11 @@
       "canonical": "Progress",
       "package": "@snowui-design-system/components",
       "import": "import { Progress } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Progress.svelte",
       "documentation": "src/components/Progress.md",
@@ -693,7 +1204,11 @@
       "canonical": "Radio",
       "package": "@snowui-design-system/components",
       "import": "import { Radio } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Radio.svelte",
       "documentation": "src/components/Radio.md",
@@ -706,11 +1221,36 @@
       "deprecated": false
     },
     {
+      "name": "ScrambleText",
+      "canonical": "ScrambleText",
+      "package": "@snowui-design-system/components",
+      "import": "import { ScrambleText } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/ScrambleText.svelte",
+      "documentation": "src/components/ScrambleText.md",
+      "description": "通过字符扰动逐步呈现目标文字，适合标题、短句与状态文案的动态揭示。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "ScrollArea",
       "canonical": "ScrollArea",
       "package": "@snowui-design-system/components",
       "import": "import { ScrollArea } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/ScrollArea.svelte",
       "documentation": "src/components/ScrollArea.md",
@@ -723,11 +1263,47 @@
       "deprecated": false
     },
     {
+      "name": "SearchBox",
+      "canonical": "SearchBox",
+      "package": "@snowui-design-system/components",
+      "import": "import { SearchBox } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/SearchBox.svelte",
+      "documentation": "src/components/SearchBox.md",
+      "description": "提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。",
+      "intents": [
+        "站点搜索",
+        "带快捷键的搜索框",
+        "响应式搜索框"
+      ],
+      "aliases": [
+        "顶部搜索",
+        "窄屏搜索按钮"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "SearchInput",
+        "SearchPopup",
+        "Dialog"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "SearchInput",
       "canonical": "SearchInput",
       "package": "@snowui-design-system/components",
       "import": "import { SearchInput } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/SearchInput.svelte",
       "documentation": "src/components/SearchInput.md",
@@ -748,11 +1324,80 @@
       "deprecated": false
     },
     {
+      "name": "SearchPopup",
+      "canonical": "SearchPopup",
+      "package": "@snowui-design-system/components",
+      "import": "import { SearchPopup } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "block",
+      "source": "src/blocks/SearchPopup.svelte",
+      "documentation": "src/blocks/SearchPopup.md",
+      "description": "可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容。运行时依赖 @snowui-design-system/components/compat 和 Components；不包含搜索算法、最近浏览、热度或业务路由规则。",
+      "intents": [
+        "搜索面板",
+        "搜索结果分组"
+      ],
+      "aliases": [
+        "搜索弹窗"
+      ],
+      "whenToUse": "需要统一搜索输入、分组标题和结果间距的产品区块。",
+      "avoidWhen": "纯浮层容器用 Popover；网站历史与热度由宿主提供。",
+      "related": [
+        "SearchBox",
+        "SearchInput",
+        "Dialog",
+        "Popover",
+        "MenuItem",
+        "Kbd"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "Segmented",
+      "canonical": "Segmented",
+      "package": "@snowui-design-system/components",
+      "import": "import { Segmented } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/Segmented.svelte",
+      "documentation": "src/components/Segmented.md",
+      "description": "将少量互斥选项并排展示，便于快速切换筛选条件或参数，并支持键盘与表单交互。",
+      "intents": [
+        "互斥参数选择",
+        "过滤器单选",
+        "响应式节点选择"
+      ],
+      "aliases": [
+        "节点选择",
+        "Mobile Tablet Desktop 选择",
+        "分段选择器"
+      ],
+      "whenToUse": "多个互斥参数或过滤器之间单选，使用 radiogroup 语义。",
+      "avoidWhen": "切换内容面板时使用 Tab。",
+      "related": [
+        "Tab",
+        "Button"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Select",
       "canonical": "Select",
       "package": "@snowui-design-system/components",
       "import": "import { Select } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Select.svelte",
       "documentation": "src/components/Select.md",
@@ -769,7 +1414,11 @@
       "canonical": "SelectButton",
       "package": "@snowui-design-system/components",
       "import": "import { SelectButton } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/SelectButton.svelte",
       "documentation": "src/components/SelectButton.md",
@@ -796,7 +1445,11 @@
       "canonical": "Separator",
       "package": "@snowui-design-system/components",
       "import": "import { Separator } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Separator.svelte",
       "documentation": "src/components/Separator.md",
@@ -817,11 +1470,118 @@
       "deprecated": false
     },
     {
+      "name": "Sidebar",
+      "canonical": "Sidebar",
+      "package": "@snowui-design-system/components",
+      "import": "import { Sidebar } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "block",
+      "source": "src/blocks/Sidebar.svelte",
+      "documentation": "src/blocks/Sidebar.md",
+      "description": "组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。",
+      "intents": [
+        "文档侧边导航",
+        "可折叠侧栏",
+        "可调宽侧栏"
+      ],
+      "aliases": [
+        "左侧导航",
+        "侧边栏"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "SidebarSection",
+        "SidebarItem"
+      ],
+      "deprecated": false
+    },
+    {
+      "name": "SidebarItem",
+      "canonical": "SidebarItem",
+      "package": "@snowui-design-system/components",
+      "import": "import { SidebarItem } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "block",
+      "source": "src/blocks/SidebarItem.svelte",
+      "documentation": "src/blocks/SidebarItem.md",
+      "description": "在 Sidebar 中呈现导航入口，支持激活状态、图标、层级与状态提示，帮助识别当前位置。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "SidebarSection",
+      "canonical": "SidebarSection",
+      "package": "@snowui-design-system/components",
+      "import": "import { SidebarSection } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "block",
+      "source": "src/blocks/SidebarSection.svelte",
+      "documentation": "src/blocks/SidebarSection.md",
+      "description": "将 Sidebar 导航组织为带标题的分组，支持展开、收起与附加操作，便于浏览较长的导航列表。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "SidePanel",
+      "canonical": "SidePanel",
+      "package": "@snowui-design-system/components",
+      "import": "import { SidePanel } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/SidePanel.svelte",
+      "documentation": "src/components/SidePanel.md",
+      "description": "从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。",
+      "intents": [
+        "侧边详情面板",
+        "行预览面板",
+        "浮动编辑面板"
+      ],
+      "aliases": [
+        "右侧面板",
+        "详情抽屉"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "DataTable"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Skeleton",
       "canonical": "Skeleton",
       "package": "@snowui-design-system/components",
       "import": "import { Skeleton } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Skeleton.svelte",
       "documentation": "src/components/Skeleton.md",
@@ -838,7 +1598,11 @@
       "canonical": "Slider",
       "package": "@snowui-design-system/components",
       "import": "import { Slider } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Slider.svelte",
       "documentation": "src/components/Slider.md",
@@ -851,11 +1615,36 @@
       "deprecated": false
     },
     {
+      "name": "SlotText",
+      "canonical": "SlotText",
+      "package": "@snowui-design-system/components",
+      "import": "import { SlotText } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/SlotText.svelte",
+      "documentation": "src/components/SlotText.md",
+      "description": "以逐字符的纵向滚动展示文字变化，适合短标题、状态、计数与计时信息。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "SnowUILogo",
       "canonical": "SnowUILogo",
       "package": "@snowui-design-system/components",
       "import": "import { SnowUILogo } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/SnowUILogo.svelte",
       "documentation": "src/components/SnowUILogo.md",
@@ -872,7 +1661,11 @@
       "canonical": "Spinner",
       "package": "@snowui-design-system/components",
       "import": "import { Spinner } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Spinner.svelte",
       "documentation": "src/components/Spinner.md",
@@ -889,7 +1682,11 @@
       "canonical": "StyleButton",
       "package": "@snowui-design-system/components",
       "import": "import { StyleButton } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/StyleButton.svelte",
       "documentation": "src/components/StyleButton.md",
@@ -906,7 +1703,11 @@
       "canonical": "Switch",
       "package": "@snowui-design-system/components",
       "import": "import { Switch } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Switch.svelte",
       "documentation": "src/components/Switch.md",
@@ -919,11 +1720,46 @@
       "deprecated": false
     },
     {
+      "name": "Tab",
+      "canonical": "Tab",
+      "package": "@snowui-design-system/components",
+      "import": "import { Tab } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/Tab.svelte",
+      "documentation": "src/components/Tab.md",
+      "description": "在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。",
+      "intents": [
+        "内容面板切换",
+        "视图切换"
+      ],
+      "aliases": [
+        "Tab 切换",
+        "Preview Code 切换",
+        "标签页"
+      ],
+      "whenToUse": "选项对应不同内容区域或视图。",
+      "avoidWhen": "只改变参数或过滤器时使用 Segmented。",
+      "related": [
+        "Segmented",
+        "Button"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Table",
       "canonical": "Table",
       "package": "@snowui-design-system/components",
       "import": "import { Table } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Table.svelte",
       "documentation": "src/components/Table.md",
@@ -940,7 +1776,11 @@
       "canonical": "TableBody",
       "package": "@snowui-design-system/components",
       "import": "import { TableBody } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/TableBody.svelte",
       "documentation": "src/components/TableBody.md",
@@ -957,7 +1797,11 @@
       "canonical": "TableCell",
       "package": "@snowui-design-system/components",
       "import": "import { TableCell } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/TableCell.svelte",
       "documentation": "src/components/TableCell.md",
@@ -974,7 +1818,11 @@
       "canonical": "TableHead",
       "package": "@snowui-design-system/components",
       "import": "import { TableHead } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/TableHead.svelte",
       "documentation": "src/components/TableHead.md",
@@ -991,7 +1839,11 @@
       "canonical": "TableHeader",
       "package": "@snowui-design-system/components",
       "import": "import { TableHeader } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/TableHeader.svelte",
       "documentation": "src/components/TableHeader.md",
@@ -1008,7 +1860,11 @@
       "canonical": "TableRow",
       "package": "@snowui-design-system/components",
       "import": "import { TableRow } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/TableRow.svelte",
       "documentation": "src/components/TableRow.md",
@@ -1021,11 +1877,44 @@
       "deprecated": false
     },
     {
+      "name": "TableToolbar",
+      "canonical": "TableToolbar",
+      "package": "@snowui-design-system/components",
+      "import": "import { TableToolbar } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/TableToolbar.svelte",
+      "documentation": "src/components/TableToolbar.md",
+      "description": "为 DataTable 提供搜索、排序、筛选和批量操作入口，并展示选择状态，适合数据管理界面。",
+      "intents": [
+        "表格工具栏",
+        "表格搜索筛选操作"
+      ],
+      "aliases": [
+        "Table 顶部操作区"
+      ],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [
+        "DataTable",
+        "OverflowActions"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "Tag",
       "canonical": "Tag",
       "package": "@snowui-design-system/components",
       "import": "import { Tag } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Tag.svelte",
       "documentation": "src/components/Tag.md",
@@ -1042,7 +1931,11 @@
       "canonical": "Text",
       "package": "@snowui-design-system/components",
       "import": "import { Text } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Text.svelte",
       "documentation": "src/components/Text.md",
@@ -1059,7 +1952,11 @@
       "canonical": "Textarea",
       "package": "@snowui-design-system/components",
       "import": "import { Textarea } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Textarea.svelte",
       "documentation": "src/components/Textarea.md",
@@ -1076,7 +1973,11 @@
       "canonical": "ColorSchemeButton",
       "package": "@snowui-design-system/components",
       "import": "import { ThemeButton } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/ColorSchemeButton.svelte",
       "documentation": "src/components/ColorSchemeButton.md",
@@ -1091,11 +1992,57 @@
       "deprecated": true
     },
     {
+      "name": "Toast",
+      "canonical": "Toast",
+      "package": "@snowui-design-system/components",
+      "import": "import { Toast } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/Toast.svelte",
+      "documentation": "src/components/Toast.md",
+      "description": "用短暂通知反馈操作结果或状态变化，支持图标、操作和富内容，适合保存成功、错误与提醒。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "Toaster",
+      "canonical": "Toaster",
+      "package": "@snowui-design-system/components",
+      "import": "import { Toaster } from '@snowui-design-system/components';",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/Toaster.svelte",
+      "documentation": "src/components/Toaster.md",
+      "description": "集中展示通过 toast() 触发的全局通知，支持六个屏幕位置、堆叠动效与可见数量控制，让连续反馈保持有序。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "Tooltip",
       "canonical": "Tooltip",
       "package": "@snowui-design-system/components",
       "import": "import { Tooltip } from '@snowui-design-system/components';",
-      "tier": "oss",
+      "runtime": "free",
+      "sourceEntitlement": [
+        "Pro",
+        "Team"
+      ],
       "kind": "component",
       "source": "src/components/Tooltip.svelte",
       "documentation": "src/components/Tooltip.md",

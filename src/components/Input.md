@@ -162,7 +162,7 @@
 
 ### 组件特有属性 (Component-Specific Props)
 
-下表逐项对应具名 Props；未重新声明的通用能力见 [Frame](./Frame.md)。
+下表逐项对应具名 Props；未重新声明的通用能力见 [Frame](Frame.md)。
 
 <a id="宿主协议"></a>
 
@@ -318,7 +318,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 
 ### 展示可打开、可复制的链接
 
-“链接输入框 / 链接 input / 可复制链接”不是可编辑输入。使用 [CopyLink](./CopyLink.md)，无边框和输入框 hover 动效；链接文字 hover 显示下划线、点击在新标签页打开，其余区域点击复制。完整组合约定见 [自然语言映射](../../../specs/NaturalLanguageToSnowUI.md)。Input 保留给需要编辑地址或只读选择值的场景。
+“链接输入框 / 链接 input / 可复制链接”不是可编辑输入。使用 [CopyLink](CopyLink.md)，无边框和输入框 hover 动效；链接文字 hover 显示下划线、点击在新标签页打开，其余区域点击复制。完整组合约定见 [自然语言映射](../../../specs/NaturalLanguageToSnowUI.md)。Input 保留给需要编辑地址或只读选择值的场景。
 
 ### 无障碍与表单建议
 
@@ -623,7 +623,7 @@ invalid=true + !hasCustomTrailing
 
 ### 模块索引 (Module Index)
 
-- **Input 组件**: [./Input.svelte](./Input.svelte)
+- **Input 组件**: [./Input.svelte](Input.svelte)
 
 ## 更新日志
 
@@ -674,7 +674,7 @@ invalid=true + !hasCustomTrailing
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
 - **共享逻辑**: [../logic/frame-field-control.ts](../logic/frame-field-control.ts)
 - **Props 分发**: [../logic/frame-prop-filter.ts](../logic/frame-prop-filter.ts)
 - **字段上下文**: [../context.ts](../context.ts)

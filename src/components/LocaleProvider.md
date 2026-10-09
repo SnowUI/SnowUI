@@ -201,7 +201,7 @@ Use the documented locale and formatting options of date and number components f
 
 | 模块 | 文件 | 职责 |
 | --- | --- | --- |
-| LocaleProvider | [LocaleProvider.svelte](./LocaleProvider.svelte) | 设置 locale Context 并透传 children。 |
+| LocaleProvider | [LocaleProvider.svelte](LocaleProvider.svelte) | 设置 locale Context 并透传 children。 |
 | Locale 解析 | [locale.svelte.ts](../i18n/locale.svelte.ts) | catalog 回退、插值与 Context 读取。 |
 | Message catalog | [messages.ts](../i18n/messages.ts) | 内置 key、默认语言与各 locale 文案。 |
 

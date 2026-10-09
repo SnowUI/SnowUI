@@ -195,9 +195,9 @@ Breadcrumb 支持两种模式：
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| Breadcrumb | [Breadcrumb.svelte](./Breadcrumb.svelte) | 根容器、角色识别、当前态标记、样式 |
-| Button | [Button.svelte](./Button.svelte) | item 可交互外壳；补充当前态不可交互契约 |
-| Text | [Text.svelte](./Text.svelte) | separator 推荐承载组件 |
+| Breadcrumb | [Breadcrumb.svelte](Breadcrumb.svelte) | 根容器、角色识别、当前态标记、样式 |
+| Button | [Button.svelte](Button.svelte) | item 可交互外壳；补充当前态不可交互契约 |
+| Text | [Text.svelte](Text.svelte) | separator 推荐承载组件 |
 
 ### 关键字映射
 

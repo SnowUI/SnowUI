@@ -136,7 +136,7 @@
 5. **智能分辨率选择**: 自动将解析后的尺寸（Resolved Size）传递给资源组件（如 `AvatarByewind`），资源组件会根据该尺寸选择 **3x 分辨率** 的高精图片（例如 80px 尺寸选择 240px 图片）。
 6. **默认 Hover**: 非 disabled 图片与普通组件头像每次进入时随机选择 blue / cyan / green / red / orange / purple 之一，并只对实际图形 alpha 单层叠加；Gradient fallback 无论常态基础形变是否开启，都保持原有五色循环，并按需运行不同周期的四层水波形变。
 
-图片与普通组件 fallback 的六色 hover Overlay 是 [StyleSpec §2.1.3](../../../specs/StyleSpec.md#213-专业艺术色例外强制) 为 Avatar 单独登记的专业艺术色例外：颜色由 Avatar 私有 hover 视觉拥有，不映射为 SnowUI 通用 Token。默认 Gradient 画面的固定配色由 [Gradient](./Gradient.md#专业艺术色例外) 自己的例外登记拥有；作为 fallback 使用 [GradientMotion](../../../pro/src/components/GradientMotion.md#专业艺术色例外) 时，其 shader 画面颜色同样由 GradientMotion 自己拥有。三项例外都不扩展到 Avatar 的尺寸、排版、常规背景、状态、公开通用颜色入口或样式优先级。
+图片与普通组件 fallback 的六色 hover Overlay 是 [StyleSpec §2.1.3](../../../specs/StyleSpec.md#213-专业艺术色例外强制) 为 Avatar 单独登记的专业艺术色例外：颜色由 Avatar 私有 hover 视觉拥有，不映射为 SnowUI 通用 Token。默认 Gradient 画面的固定配色由 [Gradient](Gradient.md#专业艺术色例外) 自己的例外登记拥有；作为 fallback 使用 [GradientMotion](GradientMotion.md#专业艺术色例外) 时，其 shader 画面颜色同样由 GradientMotion 自己拥有。三项例外都不扩展到 Avatar 的尺寸、排版、常规背景、状态、公开通用颜色入口或样式优先级。
 
 
 
@@ -274,12 +274,12 @@
 
 ### 模块索引 (Module Index)
 
-- **Avatar 组件**: [./Avatar.svelte](./Avatar.svelte)
+- **Avatar 组件**: [./Avatar.svelte](Avatar.svelte)
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
-- **子组件**: [Badge.svelte](./Badge.svelte), [Icon.svelte](./Icon.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
+- **子组件**: [Badge.svelte](Badge.svelte), [Icon.svelte](Icon.svelte)
 
 ---
 

@@ -26,7 +26,7 @@ mergeDateFormatOptions(...options)
 
 ## 开发者指南 (AI)
 
-- **实现**: [./date-format.ts](./date-format.ts)
+- **实现**: [./date-format.ts](date-format.ts)
 - **规范**: [../../../specs/DateFormats.md](../../../specs/DateFormats.md)
 - Table、Calendar、Timeline 等组件不得平行维护日期格式规则。
 

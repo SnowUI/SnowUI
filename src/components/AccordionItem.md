@@ -123,7 +123,7 @@
 
 
 
-AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，通过 AccordionContext 读取展开状态与切换方法。
+AccordionItem 必须放在 [Accordion.svelte](Accordion.svelte) 内使用，通过 AccordionContext 读取展开状态与切换方法。
 
 <a id="开发者指南-ai"></a>
 
@@ -142,8 +142,8 @@ AccordionItem 必须放在 [Accordion.svelte](./Accordion.svelte) 内使用，�
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| AccordionItem | [AccordionItem.svelte](./AccordionItem.svelte) | 单项容器 |
-| Accordion | [Accordion.svelte](./Accordion.svelte) | 父级状态容器 |
+| AccordionItem | [AccordionItem.svelte](AccordionItem.svelte) | 单项容器 |
+| Accordion | [Accordion.svelte](Accordion.svelte) | 父级状态容器 |
 
 ### 关键字映射
 

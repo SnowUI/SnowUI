@@ -129,7 +129,7 @@
 
 其中：
 
-- 原子动效定义在 [primitives.ts](./primitives.ts)
+- 原子动效定义在 [primitives.ts](primitives.ts)
 - 具体数值可由组件使用时自定义；当前这些预设只是 Toast 等组件复用的默认组合
 - `SLIDE_STACK_MOTION` 仅保留时序语义，真实叠层可继续由 `stackTranslate + scale + opacity` 组合完成
 

@@ -230,11 +230,11 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 
 ### 模块索引 (Module Index)
 
-- **Badge 组件**: [./Badge.svelte](./Badge.svelte)
+- **Badge 组件**: [./Badge.svelte](Badge.svelte)
 
 ### 关联关系
 
-- **宿主组件**: [Avatar.svelte](./Avatar.svelte), [Icon.svelte](./Icon.svelte)
+- **宿主组件**: [Avatar.svelte](Avatar.svelte), [Icon.svelte](Icon.svelte)
 
 ---
 

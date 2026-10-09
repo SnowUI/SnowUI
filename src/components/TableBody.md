@@ -128,7 +128,7 @@ hover 背景；关闭 `continuousHover` 后不显示行背景。
 
 ## AI Zone
 
-源码见 [TableBody.svelte](./TableBody.svelte)。公开状态与组合所有权以源码和上方使用说明为准。
+源码见 [TableBody.svelte](TableBody.svelte)。公开状态与组合所有权以源码和上方使用说明为准。
 
 ## 更新日志
 

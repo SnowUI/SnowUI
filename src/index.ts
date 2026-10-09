@@ -242,3 +242,84 @@ export {
 export { writeClipboardText } from "./lib/clipboard";
 
 export { default as CopyLink } from "./components/CopyLink.svelte";
+
+// 全量组件与区块；FramePro 保持独立技术身份。
+export { default as FramePro } from "./components/FramePro.svelte";
+export { default as FlowText }      from './components/FlowText.svelte'
+export { default as NumberFlow }    from './components/NumberFlow.svelte'
+export { default as NumericText }     from './components/NumericText.svelte'
+export { default as ScrambleText }    from './components/ScrambleText.svelte'
+export { default as SlotText }        from './components/SlotText.svelte'
+export {
+    chromatic,
+    type ChromaticOptions,
+} from './lib/text-motion/color'
+export type {
+    TextMotionColor,
+    TextMotionColorResolver,
+} from './lib/text-motion/types'
+export { default as GradientMotion }  from './components/GradientMotion.svelte'
+export { default as ImageViewer }     from './components/ImageViewer.svelte'
+export { default as SidePanel }       from './components/SidePanel.svelte'
+export {
+    SIDE_PANEL_INLINE_GAP_PX,
+    createSidePanelLayoutMotionStyle,
+    type SidePanelPlacement,
+    type SidePanelToolbarAction,
+} from './lib/side-panel'
+export { default as Field }           from './components/Field.svelte'
+export { default as SearchBox }       from './components/SearchBox.svelte'
+export {
+    default as DataTable,
+    type DataTableRenderState,
+    type DataTableLoadMoreRequest,
+    type DataTableLoadMoreSource,
+    type DataTableLoadMore,
+    type DataTableLoadMoreMode,
+    type DataTableActionEvent,
+    type DataTableActionItem,
+    type DataTableActionSeparatorItem,
+    type DataTableActionsItem,
+    type DataTableActionsConfig,
+} from './components/DataTable.svelte'
+export { default as TableToolbar } from './components/TableToolbar.svelte'
+export {
+    compareDataTableValues,
+    sortDataTableRows,
+    paginateDataTableRows,
+    type DataTableSortState,
+    type DataTableSortDirection,
+} from './lib/data-table'
+export { default as CircularChart }   from './components/CircularChart.svelte'
+export { default as GaugeChart }      from './components/GaugeChart.svelte'
+export { default as LineChart }       from './components/LineChart.svelte'
+export { default as BarChart }        from './components/BarChart.svelte'
+export { default as ChartGroup }      from './components/ChartGroup.svelte'
+export { default as Tab, type TabItem } from './components/Tab.svelte'
+export { default as Segmented }       from './components/Segmented.svelte'
+export { default as Toast }         from './components/Toast.svelte'
+export { default as Toaster }       from './components/Toaster.svelte'
+export {
+    toast,
+    showToast,
+    dismissToast,
+    dismissAllToasts,
+    registerToastTemplate,
+    unregisterToastTemplate,
+    DEFAULT_TOAST_DURATION,
+    type ToastOptions,
+    type ToastItem,
+    type ToastPosition,
+    type ToastVariant,
+    type ToastSize,
+} from './logic/toast.svelte'
+export { initMotion, getMotion }      from './logic/motion.svelte'
+// ── PRO Blocks（付费源码开放的产品级组合块）──
+export * from './blocks'
+// ── PRO 动效组件（复杂动效 / PRO 指定动效）（v1.0.0 起） ──
+
+export * from './lib/split-pane'
+
+export { default as SearchPopup, type SearchPopupItem } from "./blocks/SearchPopup.svelte";
+
+export { default as BlurText } from "./components/BlurText.svelte";

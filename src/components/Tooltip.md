@@ -209,11 +209,11 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 
 ### 模块索引 (Module Index)
 
-- **Tooltip 组件**: [./Tooltip.svelte](./Tooltip.svelte)
+- **Tooltip 组件**: [./Tooltip.svelte](Tooltip.svelte)
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
 - **子组件**: (作为 Tooltip 内容渲染)
 
 ---

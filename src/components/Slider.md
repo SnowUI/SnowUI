@@ -142,7 +142,7 @@
 
 ### 开发者指南 (AI)
 
-- **实现**: [./Slider.svelte](./Slider.svelte)
+- **实现**: [./Slider.svelte](Slider.svelte)
 - **颜色协议**: [../lib/color.md](../lib/color.md)
 - 视觉层与交互层分离：视觉层输出 SnowUI track / fill / thumb；透明原生 range input 保留键盘、ARIA 与表单能力。
 - Range Slider 渲染两个原生 range input；拖动轨道时选择距离最近的拖动块。

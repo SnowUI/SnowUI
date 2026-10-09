@@ -248,7 +248,7 @@ Pin 内容不参与普通内容滚动流，仍以 Card 根容器为定位参照�
 
 Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载和内容溢出滚动。Card 不内建标题、正文、图标或操作区；内部内容完全由使用方自定义。
 
-用户 API 与组合说明如下；源码实现见 [Card.svelte](./Card.svelte)。
+用户 API 与组合说明如下；源码实现见 [Card.svelte](Card.svelte)。
 
 ---
 
@@ -256,7 +256,7 @@ Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载�
 
 ### AI Zone
 
-- [Card.svelte](./Card.svelte) 拥有根表面、普通内容排列、Pin 与滚动宿主；selected/active 只映射视觉状态，不执行页面操作。
+- [Card.svelte](Card.svelte) 拥有根表面、普通内容排列、Pin 与滚动宿主；selected/active 只映射视觉状态，不执行页面操作。
 - 根节点复用 Frame 处理公开属性、状态与尺寸协议；`useOverlayScrollbar` 和 `resizeManager` 分别拥有共享滚动条与尺寸观察能力，Card 不复制其运行时。
 - 内容完全由 children 提供，不生成标题或按钮，也不提供 parts；Pin 子项脱离普通滚动内容流。
 

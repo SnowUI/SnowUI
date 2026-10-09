@@ -71,8 +71,8 @@ interface TruncationContext {
 
 ## 5. 依赖模块
 
-- [text-collapse.svelte.ts](./text-collapse.svelte.ts) - 多行截断 action
-- [keys.ts](./../keys.ts) - Context Key 定义
+- [text-collapse.svelte.ts](text-collapse.svelte.ts) - 多行截断 action
+- [keys.ts](../keys.ts) - Context Key 定义
 
 <!-- @UserDefined -->
 <!-- 用户自定义内容 -->
@@ -106,10 +106,10 @@ interface TruncationContext {
 
 ### 关联关系
 
-- **消费组件**: [Text.svelte](./../components/Text.svelte)、[Link.svelte](./../components/Link.svelte)
+- **消费组件**: [Text.svelte](../components/Text.svelte)、[Link.svelte](../components/Link.svelte)
 - **TableCell**: 默认单行截断改由 `lib/table-truncation.ts` 的表级批处理器管理，避免逐格控制器与观察目标。
-- **依赖**: [text-collapse.svelte.ts](./text-collapse.svelte.ts)
-- **Context**: [keys.ts](./../keys.ts)
+- **依赖**: [text-collapse.svelte.ts](text-collapse.svelte.ts)
+- **Context**: [keys.ts](../keys.ts)
 
 ---
 

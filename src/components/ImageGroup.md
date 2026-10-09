@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Image, ImageGroup } from '@snowui-design-system/components';
-	import { ImageViewer } from '@snowui/components-pro';
+	import { ImageViewer } from '@snowui-design-system/components/compat';
 	import cover01 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-01-1024.jpg';
 	import cover02 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-02-1024.jpg';
 	import cover03 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-03-1024.jpg';
@@ -142,7 +142,7 @@
 
 ### 模块索引 (Module Index)
 
-- **ImageGroup 组件**: [./ImageGroup.svelte](./ImageGroup.svelte)
+- **ImageGroup 组件**: [./ImageGroup.svelte](ImageGroup.svelte)
 - **页面级预览总线**: [../logic/image-preview.ts](../logic/image-preview.ts)
 
 ### 关键字映射 (Keyword Handling)
@@ -157,9 +157,9 @@
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
-- **核心子组件**: [Image.svelte](./Image.svelte)
-- **预览联动**: [ImageViewer.svelte](./ImageViewer.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
+- **核心子组件**: [Image.svelte](Image.svelte)
+- **预览联动**: [ImageViewer.svelte](ImageViewer.svelte)
 - **预览状态**: [../logic/image-preview.ts](../logic/image-preview.ts)
 
 ---

@@ -75,7 +75,7 @@
 
 ### API
 
-其他兼容视觉、链接与事件入口参见 [Button](./Button.md)。ExpandButton 接管 children、onclick 和 aria-expanded；继承 disabled 阻止用户切换。
+其他兼容视觉、链接与事件入口参见 [Button](Button.md)。ExpandButton 接管 children、onclick 和 aria-expanded；继承 disabled 阻止用户切换。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 

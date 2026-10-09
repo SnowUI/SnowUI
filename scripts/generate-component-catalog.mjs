@@ -31,8 +31,9 @@ function collectExports(indexRelative, defaultKind) {
       canonical: metadata.canonical ?? (name === canonical ? name : canonical),
       package: packageJson.name,
       import: `import { ${name} } from '${packageJson.name}';`,
-      tier: "oss",
-      kind: defaultKind,
+      runtime: "free",
+      sourceEntitlement: ["Pro", "Team"],
+      kind: sourceFile.includes("/blocks/") ? "block" : defaultKind,
       source: sourceFile,
       documentation: fs.existsSync(documentationPath) ? documentationRelative : null,
       description: readDescription(documentationPath, name),
@@ -47,7 +48,7 @@ function collectExports(indexRelative, defaultKind) {
   return entries;
 }
 
-const components = collectExports("src/index.ts", "component")
+const components = [...collectExports("src/index.ts", "component"), ...collectExports("src/blocks/index.ts", "block")]
   .filter((entry, index, all) => all.findIndex((candidate) => candidate.name === entry.name) === index)
   .sort((a, b) => a.name.localeCompare(b.name));
 

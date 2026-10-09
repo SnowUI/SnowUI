@@ -172,7 +172,7 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 
 ### 模块索引 (Module Index)
 
-- **AvatarGroup 组件**: [./AvatarGroup.svelte](./AvatarGroup.svelte)
+- **AvatarGroup 组件**: [./AvatarGroup.svelte](AvatarGroup.svelte)
 
 ### 关键字映射 (Keyword Handling)
 
@@ -199,8 +199,8 @@ AvatarGroup 使用**显式组合模式**：调用方显式书写 `<Avatar as="it
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
-- **核心子组件**: [Avatar.svelte](./Avatar.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
+- **核心子组件**: [Avatar.svelte](Avatar.svelte)
 - **资源支持**: [@snowui-design-system/resource-svelte](https://github.com/snowui-design-system/resource-svelte)
 
 ---

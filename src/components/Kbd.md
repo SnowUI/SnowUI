@@ -125,7 +125,7 @@
 
 | 模块 | 文件 | 职责 |
 |:---|:---|:---|
-| Kbd | [Kbd.svelte](./Kbd.svelte) | 主组件 |
+| Kbd | [Kbd.svelte](Kbd.svelte) | 主组件 |
 
 ### 关键字映射
 

@@ -9,3 +9,7 @@ src/test/*
 !src/test/SnowUILogoHoverController.svelte
 !src/test/GradientMotionController.svelte
 !src/test/TooltipMotionController.svelte
+.runtime-build/
+artifacts/
+
+.svelte-kit/

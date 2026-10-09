@@ -113,7 +113,7 @@
 
 ### 开发者指南 (AI)
 
-- **实现**: [./Progress.svelte](./Progress.svelte)
+- **实现**: [./Progress.svelte](Progress.svelte)
 - **颜色协议**: [../lib/color.md](../lib/color.md)
 - 长条形不确定态使用局部平移关键帧，但时序消费 Frame `loopMotion` bridge。
 - 圆形不确定态在内部圆环 Frame 上使用 `loopMotion.preset="rotateClockwise"`，中心 label 不参与旋转。

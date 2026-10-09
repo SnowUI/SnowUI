@@ -574,8 +574,8 @@ Root Frame(nav)
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| Pagination | [Pagination.svelte](./Pagination.svelte) | 页码窗口、模板读取、默认项生成、可点击性 |
-| Button | [Button.svelte](./Button.svelte) | 使用方自定义角色模板 |
+| Pagination | [Pagination.svelte](Pagination.svelte) | 页码窗口、模板读取、默认项生成、可点击性 |
+| Button | [Button.svelte](Button.svelte) | 使用方自定义角色模板 |
 
 ### 关联关系
 

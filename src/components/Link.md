@@ -192,7 +192,7 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| Link | [Link.svelte](./Link.svelte) | 链接语义、三种视觉变体、下划线与 trailing 替换 |
+| Link | [Link.svelte](Link.svelte) | 链接语义、三种视觉变体、下划线与 trailing 替换 |
 
 ### 关联关系
 

@@ -174,8 +174,8 @@
 
 ### 模块索引
 
-- **ButtonGroup 组件**: [./ButtonGroup.svelte](./ButtonGroup.svelte)
-- **Button 嵌入态**: [./Button.svelte](./Button.svelte)
+- **ButtonGroup 组件**: [./ButtonGroup.svelte](ButtonGroup.svelte)
+- **Button 嵌入态**: [./Button.svelte](Button.svelte)
 
 ### 关键 CSS 类
 

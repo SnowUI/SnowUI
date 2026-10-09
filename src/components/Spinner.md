@@ -125,7 +125,7 @@
 
 ### 模块索引 (Module Index)
 
-- **Spinner 组件**: [./Spinner.svelte](./Spinner.svelte)
+- **Spinner 组件**: [./Spinner.svelte](Spinner.svelte)
 
 ---
 

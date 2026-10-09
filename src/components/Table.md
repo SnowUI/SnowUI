@@ -77,7 +77,7 @@
 
 ## 使用边界与详细说明
 
-列标题通过 TableHead 的 children 插槽传入，支持文字、图标及非交互组件组合。纯图标标题需提供可访问名称；可排序列不要在标题内嵌套交互控件。详见 [TableHead 图标与组件标题](./TableHead.md#图标与组件标题)。
+列标题通过 TableHead 的 children 插槽传入，支持文字、图标及非交互组件组合。纯图标标题需提供可访问名称；可排序列不要在标题内嵌套交互控件。详见 [TableHead 图标与组件标题](TableHead.md#图标与组件标题)。
 
 <a id="oss-table-与-pro-datatable-的边界"></a>
 
@@ -191,7 +191,7 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
 - **激活行**：`<TableRow active>` 由使用方或外部条件持续写入，默认绘制 `--black-4` 背景。它不是 hover 或 selected，不会改变 Checkbox 的选中状态；真实 hover 到激活行时，连续 hover 移动层与激活背景叠加。
 - **静态 hover 预览**：在某个 `<TableRow>` 上加 `data-force-hover="true"`，可让该行在不实际 hover 的情况下恒定呈现 hover 态（背景 / 行 checkbox / 行动按钮 / 两侧渐隐 / 表头全选与表头渐隐均会按该行触发），用于文档截图与视觉走查；业务持久态应使用 `active` Prop。
 
-实现入口为 [TableCell.svelte](./TableCell.svelte) 与 [TableHead.svelte](./TableHead.svelte)。TableCell 在已激活行的现有定位批次中读取内容坐标，不为各内容列新建 Observer。对每个普通内容块，actions 遮罩的两个色标分别是 `fade-width − edge-offset` 与 `fade-width + 固定过渡长度 − edge-offset`；允许负色标，使远离操作区的列保持清晰。TableCell 将 selection 与 actions 两层 mask 以 `mask-composite: intersect` 合成，角色控件自身不参与内容遮罩。
+实现入口为 [TableCell.svelte](TableCell.svelte) 与 [TableHead.svelte](TableHead.svelte)。TableCell 在已激活行的现有定位批次中读取内容坐标，不为各内容列新建 Observer。对每个普通内容块，actions 遮罩的两个色标分别是 `fade-width − edge-offset` 与 `fade-width + 固定过渡长度 − edge-offset`；允许负色标，使远离操作区的列保持清晰。TableCell 将 selection 与 actions 两层 mask 以 `mask-composite: intersect` 合成，角色控件自身不参与内容遮罩。
 
 滚动归属：Table **自己创建唯一的局部横向 viewport**，并通过共享 `useOverlayScrollbar` 将同一条横向轨道 sticky 到当前页面视口底部。轨道只在表格固有最小宽度超过宿主时显示，表格离开视口或到达底端后收回表格边界。不把宽表宽度传播为页面最小宽度，不应再用外层 ScrollArea 包裹 Table，也不得创建第二条同步滚动条。`minWidth` 仍可进一步扩大表格的固有宽度。Table / DataTable 仍不创建纵向滚动容器。吸底轨道必须高于 table 内容层；即使 `TableBody` 默认连续 Hover 将 table 提升为内容层，轨道仍完整接收 hover、pointer down 与拖动，不得由其下方的数据行截获。连续 Hover 层由局部横向 viewport 承载，其背景只绘制在当前可见的表格范围内，不得把隐藏列对应的背景泄露到 viewport 外。
 

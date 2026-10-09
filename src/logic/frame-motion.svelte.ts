@@ -1,7 +1,7 @@
 /**
  * OSS Frame 动效控制器（v1.0.0 起在 OSS）
  *
- * 与 PRO 版本（pro/src/logic/frame-motion.svelte.ts）的差异：
+ * 与 PRO 版本（components/src/logic/frame-pro-motion.svelte.ts）的差异：
  * - 不依赖 Motion 编排器（PRO `motion.svelte.ts`）
  * - 不向 Motion 注册自身（无 `register` / `notify` 调用）
  * - 不实现 `orchestrate*` 编排触发（4 处 $effect 已剥离）

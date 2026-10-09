@@ -252,11 +252,11 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 
 ### 模块索引 (Module Index)
 
-- **Checkbox 组件**: [./Checkbox.svelte](./Checkbox.svelte)
+- **Checkbox 组件**: [./Checkbox.svelte](Checkbox.svelte)
 
 ### 关联关系
 
-- **父组件**: [Frame.svelte](./Frame.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
 
 ---
 

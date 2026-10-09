@@ -108,7 +108,7 @@ ButtonGroup 自 v1.2.0 起自行绘制相邻 Button 之间的装饰性分割线�
 
 ### 模块索引
 
-- **Separator 组件**: [./Separator.svelte](./Separator.svelte)
+- **Separator 组件**: [./Separator.svelte](Separator.svelte)
 
 ### 关键 CSS 类
 

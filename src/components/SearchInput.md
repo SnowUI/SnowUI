@@ -154,7 +154,7 @@
 
 | 模块 | 文件 | 职责 |
 | :--- | :--- | :--- |
-| SearchInput | [SearchInput.svelte](./SearchInput.svelte) | 主组件 |
+| SearchInput | [SearchInput.svelte](SearchInput.svelte) | 主组件 |
 
 ### 关键字映射
 
