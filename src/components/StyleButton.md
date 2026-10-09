@@ -1,5 +1,7 @@
 # StyleButton
 
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+
 > **版本**: v1.0.4
 > **职责**: 在 SnowUI 与 Apple 两种视觉风格之间切换，适合提供界面风格选择的入口。
 > **包归属**: `@snowui-design-system/components`

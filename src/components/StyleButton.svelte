@@ -1,5 +1,6 @@
 <!-- StyleButton：以真实 Button 为宿主的 SnowUI / Apple 风格切换按钮。 -->
 <script lang="ts">
+  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { onMount, type ComponentProps, type Snippet } from "svelte";
     import Button from "./Button.svelte";
     import StyleButtonLogo from "../internal/StyleButtonLogo.svelte";

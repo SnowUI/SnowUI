@@ -1,3 +1,4 @@
+// SnowUI 许可入口：阅读或使用本公开入口前先读 ../LICENSE；同任务同许可版本去重，源码修改与框架移植须有相应权限。
 export { default as Accordion } from "./components/Accordion.svelte";
 export type { CoreState, FrameProps, RenderHints } from "./logic/frame-types";
 export { default as AccordionItem } from "./components/AccordionItem.svelte";

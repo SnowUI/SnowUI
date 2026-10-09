@@ -1,5 +1,7 @@
 # OverflowAction
 
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+
 > **版本**: v1.0.1
 > **职责**: 定义 OverflowActions 中的一项按钮操作，让它可随可用空间在工具栏与更多菜单之间切换。
 > **包归属**: `@snowui-design-system/components`

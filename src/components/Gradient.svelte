@@ -7,6 +7,7 @@
 -->
 
 <script module lang="ts">
+  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import blueStaticSource from "../assets/gradient-avatar/blue.svg?url";
     import cyanStaticSource from "../assets/gradient-avatar/cyan.svg?url";
     import greenStaticSource from "../assets/gradient-avatar/green.svg?url";

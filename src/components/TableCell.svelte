@@ -1,5 +1,6 @@
 <!-- 默认单行截断、接受任意内容的表格单元格。文档: ./TableCell.md -->
 <script module lang="ts">
+  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { createEdgeFadeMaskImage } from "../lib/edge-fade";
 
     const actionsFadeMask = createEdgeFadeMaskImage({

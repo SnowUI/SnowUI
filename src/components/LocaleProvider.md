@@ -1,5 +1,7 @@
 # LocaleProvider
 
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+
 > **版本**: v1.0.0
 > **职责**: 为应用或局部区域统一设置 SnowUI 内置界面文案的语言，支持按需覆盖消息内容。
 > **包归属**: `@snowui-design-system/components`

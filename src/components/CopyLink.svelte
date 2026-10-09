@@ -1,5 +1,6 @@
 <!-- CopyLink：可打开、可复制的链接地址。v1.0.1；文档：./CopyLink.md -->
 <script lang="ts">
+  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Link from "./Link.svelte";
     import CopyButton from "./CopyButton.svelte";

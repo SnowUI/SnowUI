@@ -1,5 +1,6 @@
 <!-- OSS 语义表格根。宽表参与页面固有宽度计算，角色列支持列内/覆盖两种布局。文档: ./Table.md -->
 <script lang="ts">
+  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { untrack, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import type { ResourceSize } from "../context";

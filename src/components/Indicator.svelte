@@ -1,5 +1,6 @@
 <!-- 通用可交互尺寸指示手柄；支持局部命中，重叠时优先调整尺寸。文档: ./Indicator.md -->
 <script module lang="ts">
+  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     export type IndicatorAxis = "width" | "height" | "both";
     export type IndicatorEdge = "start" | "end" | "top" | "bottom";
     export type IndicatorAppearance = "line" | "corner";

@@ -8,6 +8,7 @@
 -->
 
 <script lang="ts">
+  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";

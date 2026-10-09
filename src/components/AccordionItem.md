@@ -1,5 +1,7 @@
 # AccordionItem
 
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+
 > **版本**: v1.3.2
 > **职责**: 定义 Accordion 中的一项折叠内容，将标题与正文组合起来，并随父级统一管理展开状态。
 > **包归属**: `@snowui-design-system/components`

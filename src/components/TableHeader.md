@@ -1,5 +1,7 @@
 # TableHeader
 
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+
 > **版本**: v1.1.0
 > **职责**: 组织 Table 的表头行，明确各列含义，并保留原生表格的表头语义。
 > **包归属**: `@snowui-design-system/components`
