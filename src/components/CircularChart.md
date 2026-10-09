@@ -1,5 +1,7 @@
 # CircularChart
 
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+
 > **版本**: v1.4.2
 > **职责**: 用圆环或饼图展示数据占比，支持分段、圆角、环厚与悬停强调，适合构成分析和比例概览。
 > **包归属**: `@snowui/components-pro`
@@ -120,7 +122,7 @@
 
 ### 设计原则
 
-- **PRO 组件**:图表属于付费高级展示组件，不公开源码，放在 `pro/src/components/`。
+- **专业图表组件**：当前维护位置为 `pro/src/components/`；该目录是迁移期技术位置。全部组件的运行包使用与 Pro / Team 完整源码交付按 [LICENSE](../../LICENSE) 执行，不再以高级功能划分付费运行权益。
 - **最多 10 项**:默认 `maxItems=10`。颜色只使用 `primary` 与 9 个 `secondary-*` token，10 项后颜色会重复且图表辨识度下降，因此组件默认截断到 10 项。
 - **颜色模式**:默认 `colorMode="sequence"` 按 `primary → secondary-purple → secondary-cyan → secondary-mint → secondary-green → secondary-indigo → secondary-blue → secondary-yellow → secondary-orange → secondary-red` 循环；`monochromeFade` 使用 Primary 从 100% 均匀递减到最后一项 20%；`monochrome` 默认所有扇区使用 Black4。每个数据项可通过 `color` 单独定义扇区颜色；`colors` 可作为按 index 的调色板覆盖入口，留空项回退当前颜色模式。
 - **几何缩放**:`cornerRadius` 与 `separatorWidth` 的数值都是 160x160 图表下的设计基准值，组件会按实际 `size / 160` 等比缩放。`auto` 使用默认基准值：圆角 `4`、间隔 `2`。

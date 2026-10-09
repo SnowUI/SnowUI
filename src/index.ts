@@ -1,3 +1,4 @@
+// SnowUI 许可入口：阅读或使用本公开入口前先读 ../LICENSE；同任务同许可版本去重，源码修改与框架移植须有相应权限。
 // ── OSS 全量 re-export（Vite alias 升级路径：import { Frame } 会拿到 FramePro）──
 export {
     Avatar, AvatarGroup, Badge, Button, Card, ScrollArea, Checkbox, CodeBlock,
