@@ -130,7 +130,7 @@ SnowUI NumberFlow 以 Maxwell Barvian 的 MIT 开源项目 Number Flow 为原始
 
 SnowUI 在原始逐位滚轮、`Intl.NumberFormat` parts、趋势方向和进退场架构上增加：
 
-- FramePro 根宿主、SnowUI 排版 / 语义颜色、Skeleton 与 RenderHints；
+- Frame 根宿主、SnowUI 排版 / 语义颜色、Skeleton 与 RenderHints；
 - `motionRole`、`rollDirection`、低位到高位交错，以及时间 / 倒计时的循环数位；
 - `motionColor` 全文颜色序列；`chromatic()` 把完整彩谱连续铺满一位、三位或更多数位，并用独立覆盖层保证颜色不改变原始滚轮；
 - `children` 与 `numberPosition`，以及同帧更新、连续中断时的布局和宽度重定向。
@@ -150,7 +150,7 @@ SnowUI 没有原样公开上游的 `plugins`、`NumberFlowGroup`、CSS parts / S
 - `NumberFlow.svelte`：公开 Props、Intl parts、逐位轨道、位数进退场、宽度测量与 Skeleton。
 - `../lib/text-motion/numeric.ts`：数值提取、趋势、时间角色和循环数位的共享算法。
 - `../lib/text-motion/color.ts`、`typography.ts`、`preference.ts`：变化色、排版桥接和 reduced-motion 判断。
-- `FramePro.svelte`：公开根宿主、外层状态和 Frame 能力。
+- `Frame.svelte`：公开根宿主、外层状态和 Frame 能力。
 
 ### 输出协议
 
@@ -199,4 +199,4 @@ SnowUI 没有原样公开上游的 `plugins`、`NumberFlowGroup`、CSS parts / S
 
 ### v2.0.0
 
-- 使用 FramePro 承载公开根，支持格式化、趋势、循环数位、前后附加内容、宽度过渡、Skeleton 和 reduced-motion 退化。
+- 使用 Frame 承载公开根，支持格式化、趋势、循环数位、前后附加内容、宽度过渡、Skeleton 和 reduced-motion 退化。

@@ -57,7 +57,7 @@
 
 ## AI Zone
 
-主布局为复合管理布局，主要宿主为真实 Popover（内部 Frame），启用 backdrop 时组合 Dialog，不额外包装 FramePro。输入与结果共同使用 Popover 的滚动 body，显式 as="content" 不进入固定搜索 header。results wrapper 拥有分隔线下方间距，group-title 拥有组间间距。根 class snowui-search-popup；私有结果 class 不作为外部接口，显式组合只按公开 as 角色识别。
+主布局为复合管理布局，主要宿主为真实 Popover（内部 Frame），启用 backdrop 时组合 Dialog，不额外包装 Frame。输入与结果共同使用 Popover 的滚动 body，显式 as="content" 不进入固定搜索 header。results wrapper 拥有分隔线下方间距，group-title 拥有组间间距。根 class snowui-search-popup；私有结果 class 不作为外部接口，显式组合只按公开 as 角色识别。
 
 公开 override：--snowui-search-popup-results-gap-override、--snowui-search-popup-group-gap-override；默认分别为 gap-3 与 gap-2（后者加行间距 gap-1 后形成 12px 组间距）。根几何继承 Popover 的覆盖入口，不复制。输入与项的默认视觉只通过公开组件 class 传入自有样式，不穿透其私有 DOM。
 

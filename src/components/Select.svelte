@@ -8,26 +8,19 @@
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { ComponentProps, Snippet } from "svelte";
-    import { setContext } from "svelte";
-    import { ComponentIcon } from "../internal/component-icon/index";
+    import {setContext} from "svelte";
+    import {ComponentIcon} from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
     import Input from "./Input.svelte";
     import Listbox, { type ListboxItem } from "./Listbox.svelte";
     import MenuItem from "./MenuItem.svelte";
-    import { getField, type ListboxOwnerContext, type ListboxOptionRegistration } from "../context";
-    import { LISTBOX_OWNER_CONTEXT_KEY } from "../keys";
-    import {
-        resolveFrameFieldInvalid,
-        resolveFrameFieldValue,
-    } from "../logic/frame-field-control";
-    import { splitFrameHostProps } from "../logic/frame-prop-filter";
-    import { matchesSearch } from "../lib/search-filter";
-    import {
-        mergeComponentPartProps,
-        type ComponentPartsOf,
-        useComponentPart,
-    } from "../logic/component-parts.svelte";
+    import {getField, type ListboxOwnerContext, type ListboxOptionRegistration} from "../context";
+    import {LISTBOX_OWNER_CONTEXT_KEY} from "../keys";
+    import {resolveFrameFieldInvalid, resolveFrameFieldValue} from "../logic/frame-field-control";
+    import {splitFrameHostProps} from "../logic/frame-prop-filter";
+    import {matchesSearch} from "../lib/search-filter";
+    import {mergeComponentPartProps, type ComponentPartsOf, useComponentPart} from "../logic/component-parts.svelte";
 
     export type SelectValue = string | number | undefined;
     export type SelectOption = ListboxItem;

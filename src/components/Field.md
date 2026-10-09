@@ -486,7 +486,7 @@ Field 与独立 Input 使用相同的默认背景 `surface-1`。普通、横向�
 
 ### 关联关系
 
-- **父组件**: [FramePro.svelte](FramePro.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
 - **字段宿主**: [./Input.svelte](Input.svelte), [./Textarea.svelte](Textarea.svelte), [./Select.svelte](Select.svelte)
 - **共享协议**: `context.ts`（@snowui-design-system/components/context）, `keys.ts`（@snowui-design-system/components/keys）
 - **角色类映射**: [../logic/frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts)

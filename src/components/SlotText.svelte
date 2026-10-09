@@ -7,29 +7,13 @@
 
 <script module lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import { animateTextMotionFace, animateTextMotionOpacity } from "../lib/text-motion/animation";
-    import {
-        TEXT_MOTION_COLOR_FADE_MS,
-        animateTextMotionColorSequence,
-    } from "../lib/text-motion/color";
-    import {
-        captureTextMotionRects,
-        flipTextMotionElement,
-        playTextMotionLayout,
-        splitTextMotionGraphemes,
-        type TextMotionTransition,
-    } from "../lib/text-motion/layout";
-    import { shouldReduceTextMotion } from "../lib/text-motion/preference";
-    import {
-        resolveTextMotionTrend,
-    } from "../lib/text-motion/numeric";
-    import {
-        createTextMotionOrder,
-    } from "../lib/text-motion/sequence";
-    import {
-        commitTextMotionTimeline,
-        createTextMotionTimelinePlan,
-    } from "../lib/text-motion/timeline";
+    import {animateTextMotionFace, animateTextMotionOpacity} from "../lib/text-motion/animation";
+    import {TEXT_MOTION_COLOR_FADE_MS, animateTextMotionColorSequence} from "../lib/text-motion/color";
+    import {captureTextMotionRects, flipTextMotionElement, playTextMotionLayout, splitTextMotionGraphemes, type TextMotionTransition} from "../lib/text-motion/layout";
+    import {shouldReduceTextMotion} from "../lib/text-motion/preference";
+    import {resolveTextMotionTrend} from "../lib/text-motion/numeric";
+    import {createTextMotionOrder} from "../lib/text-motion/sequence";
+    import {commitTextMotionTimeline, createTextMotionTimelinePlan} from "../lib/text-motion/timeline";
     import type {
         TextMotionColor as TextMotionColorValue,
         TextMotionRole as TextMotionRoleValue,
@@ -533,17 +517,9 @@
 <script lang="ts">
     import type { SnowUIColor } from "../lib/color";
     import type { FrameProps } from "../logic/frame-types";
-    import {
-        DEFAULT_TEXT_MOTION_COLOR,
-        type TextMotionAlign,
-        type TextMotionColor,
-        type TextMotionRole as SlotTextMotionRole,
-    } from "../lib/text-motion/types";
-    import {
-        createTextMotionTypographyStyle,
-        resolveTextMotionColor,
-    } from "../lib/text-motion/typography";
-    import FramePro from "./FramePro.svelte";
+    import {DEFAULT_TEXT_MOTION_COLOR, type TextMotionAlign, type TextMotionColor, type TextMotionRole as SlotTextMotionRole} from "../lib/text-motion/types";
+    import {createTextMotionTypographyStyle, resolveTextMotionColor} from "../lib/text-motion/typography";
+    import Frame from "./Frame.svelte";
 
     interface Props extends Omit<FrameProps, "children"> {
         text?: string | number;
@@ -672,7 +648,7 @@
     });
 </script>
 
-<FramePro
+<Frame
     {tag}
     class={["snowui-slot-text", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
@@ -702,7 +678,7 @@
     >
         {displayText}
     </svelte:element>
-</FramePro>
+</Frame>
 
 <style>
     :global(:where(.snowui-slot-text)) {

@@ -1,33 +1,17 @@
 <!-- Sidebar PRO Block v1.7.3. 文档: ./Sidebar.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import { onDestroy, onMount, setContext, tick, untrack, type Snippet } from "svelte";
-    import {
-        Button,
-        Indicator,
-        ScrollArea,
-        SnowUILogo,
-        ContinuousHoverController,
-        resizeManager,
-        type FrameProps,
-    } from "../index";
+    import {onDestroy, onMount, setContext, tick, untrack, type Snippet} from "svelte";
+    import {Button, Indicator, ScrollArea, SnowUILogo, ContinuousHoverController, resizeManager, type FrameProps} from "../index";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
-    import {
-        SIDE_PANEL_APPEAR_MOTION,
-        SIDE_PANEL_DISAPPEAR_MOTION,
-    } from "../motion/presets/effects";
-    import { resolveMotionCssTiming } from "../motion/spring";
-    import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
-    import { ComponentIcon } from "../internal/component-icon/index";
-    import FramePro from "../components/FramePro.svelte";
+    import {SIDE_PANEL_APPEAR_MOTION, SIDE_PANEL_DISAPPEAR_MOTION} from "../motion/presets/effects";
+    import {resolveMotionCssTiming} from "../motion/spring";
+    import {CONTINUOUS_HOVER_MOTION_STYLE} from "../motion/presets/continuous-hover";
+    import {ComponentIcon} from "../internal/component-icon/index";
+    import Frame from "../components/Frame.svelte";
     import SidebarSection from "./SidebarSection.svelte";
     import SidebarItem from "./SidebarItem.svelte";
-    import {
-        SIDEBAR_CONTEXT_KEY,
-        type SidebarActionData,
-        type SidebarContext,
-        type SidebarItemData,
-    } from "./sidebar-context.svelte";
+    import {SIDEBAR_CONTEXT_KEY, type SidebarActionData, type SidebarContext, type SidebarItemData} from "./sidebar-context.svelte";
 
     export interface SidebarSectionData {
         id: string;
@@ -522,7 +506,7 @@
     });
 </script>
 
-<FramePro
+<Frame
     bind:element={rootElement}
     tag="aside"
     column
@@ -639,7 +623,7 @@
             onResizeEnd={(next: number) => void finishWidthResize(next)}
         />
     {/if}
-</FramePro>
+</Frame>
 
 {#if fullyCollapsed}
     <div use:floatingToggle popover="manual" class="snowui-sidebar-floating-toggle">

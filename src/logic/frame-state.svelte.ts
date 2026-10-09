@@ -1,22 +1,10 @@
-/**
- * OSS Frame 状态机（v1.0.0 起在 OSS）
- *
- * 与 PRO 版本（components/src/logic/frame-pro-state.svelte.ts）的差异：
- * - 不含 §8 联动控制（linkageControl / Motion 依赖）
- * - 构造函数不接收 motion 参数
- * - 事件处理器中的 `if ("target" in config) { ... }` 分支被剥离
- *
- * 作用半径：1 个 Frame（仅修改自身 currentState 与交互状态）
- *
- * PRO 版本独立维护一份完整实现，FramePro 使用 PRO 版本。
- * 详见 ../components/Frame.md §1 切割原则与 /Frame-Refactor-Plan.md §3.4。
- */
-
-import type { FrameProps, CoreState } from "./frame-types";
-import { resolveFrameWhileMotionConfig } from "./frame-motion-defaults";
+import type { FrameProps, CoreState, LinkageControl } from "./frame-types";
+import type { Motion } from "./motion.svelte";
+import {resolveFrameWhileMotionConfig} from "./frame-motion-defaults";
 
 export class FrameState {
     #props: FrameProps;
+    #motion: Motion | undefined;
 
     // === 交互状态 (Internal Interaction States) ===
     hovered = $state(false);
@@ -29,8 +17,9 @@ export class FrameState {
     // === 核心状态 (Core State) ===
     currentState = $state<CoreState>("Idle");
 
-    constructor(props: FrameProps) {
+    constructor(props: FrameProps, motion: Motion | undefined = undefined) {
         this.#props = props;
+        this.#motion = motion;
 
         $effect(() => {
             const controlledState = this.#props.currentState;
@@ -196,7 +185,7 @@ export class FrameState {
             return false;
         }
 
-        // 这些字段属于普通 Trigger/Linkage 配置，不视为"按状态映射"
+        // 这些字段属于普通 Trigger/Linkage 配置，不视为“按状态映射”
         const reservedKeys = [
             "run",
             "target",
@@ -249,8 +238,9 @@ export class FrameState {
             } else if ("next" in config && typeof config.next === "string") {
                 this.currentState = config.next as CoreState;
             }
-            // OSS Frame 不支持 §8 联动控制 (Click={{target, action}})。
-            // 配置中带 target 字段时，OSS 会忽略；如需联动控制请使用 FramePro。
+            if ("target" in config) {
+                this.#handleLinkageControl(config as LinkageControl);
+            }
         }
     }
 
@@ -293,7 +283,9 @@ export class FrameState {
                 if ("run" in Hover && typeof Hover.run === "function") {
                     Hover.run(e);
                 }
-                // OSS 忽略 target/action（§8 联动控制属 PRO）
+                if ("target" in Hover) {
+                    this.#handleLinkageControl(Hover as LinkageControl);
+                }
             }
         }
     };
@@ -347,7 +339,9 @@ export class FrameState {
                 if ("run" in Focus && typeof Focus.run === "function") {
                     Focus.run(e);
                 }
-                // OSS 忽略 target/action（§8 联动控制属 PRO）
+                if ("target" in Focus) {
+                    this.#handleLinkageControl(Focus as LinkageControl);
+                }
             }
         }
     };
@@ -366,8 +360,9 @@ export class FrameState {
                 Key.run(e);
             } else if ("state" in Key) {
                 this.currentState = Key.state as CoreState;
+            } else if ("target" in Key) {
+                this.#handleLinkageControl(Key as any);
             }
-            // OSS 忽略 target/action（§8 联动控制属 PRO）
         }
     };
 
@@ -406,7 +401,9 @@ export class FrameState {
                 if ("run" in Drag && typeof Drag.run === "function") {
                     Drag.run(e);
                 }
-                // OSS 忽略 target/action（§8 联动控制属 PRO）
+                if ("target" in Drag) {
+                    this.#handleLinkageControl(Drag as LinkageControl);
+                }
             }
         }
     };
@@ -423,4 +420,47 @@ export class FrameState {
     handleScroll = (_e: Event) => {
         // Reserved
     };
+
+    #handleLinkageControl(config: LinkageControl) {
+        if (config.target) {
+            // 1. Resolve Target Controller
+            let controller: any;
+
+            if (typeof config.target === 'string') {
+                // String ID -> Use internal motion instance
+                // No controller object for string IDs, handled in step 2 directly via this.#motion
+            } else if (typeof config.target === 'object') {
+                // Object Ref -> Try to get controller
+                // Case A: Svelte 5 bind:this instance with exported getController
+                if ('getController' in config.target && typeof (config.target as any).getController === 'function') {
+                    controller = (config.target as any).getController();
+                }
+                // Case B: Maybe it IS the controller?
+                else {
+                    controller = config.target;
+                }
+            }
+
+            // 2. Execute Action
+            if (typeof config.target === 'string' && this.#motion) {
+                // Legacy String ID Logic
+                if (config.action === "play") {
+                    this.#motion.Play(config.target, { reverse: config.reverse });
+                } else if (config.action === "reset") {
+                    this.#motion.Reset(config.target);
+                } else if (config.action === "pause") {
+                    this.#motion.pause(config.target);
+                }
+            } else if (controller) {
+                // Object Controller Logic
+                if (config.action === "play" && controller.play) {
+                    controller.play({ reverse: config.reverse });
+                } else if (config.action === "reset" && controller.reset) {
+                    controller.reset();
+                } else if (config.action === "pause" && controller.pause) {
+                    controller.pause();
+                }
+            }
+        }
+    }
 }

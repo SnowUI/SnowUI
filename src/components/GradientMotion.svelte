@@ -32,12 +32,12 @@
 </script>
 
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { observeAppearanceRelease } from "../lib/chart/appearance-viewport";
-    import FramePro, {
+    import {onMount} from "svelte";
+    import {observeAppearanceRelease} from "../lib/chart/appearance-viewport";
+    import Frame, {
         type FrameProps,
         type LoopMotionConfig,
-    } from "./FramePro.svelte";
+    } from "./Frame.svelte";
 
     interface Props extends Omit<FrameProps, "size" | "width" | "height" | "radius"> {
         variant?: GradientMotionVariant;
@@ -649,7 +649,7 @@ void main() {
     });
 </script>
 
-<FramePro
+<Frame
     enableResponsive={false}
     enableContext={false}
     enableScaleObserver={false}
@@ -682,7 +682,7 @@ void main() {
     {#if !webglReady}
         <div class="snowui-gradient-motion-fallback" aria-hidden="true"></div>
     {/if}
-</FramePro>
+</Frame>
 
 <style>
     :global(:where(.snowui-gradient-motion)) {

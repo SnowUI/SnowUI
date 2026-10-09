@@ -22,22 +22,15 @@
     import Button from "./Button.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Text from "./Text.svelte";
-    import { ComponentIcon } from "../internal/component-icon/index";
+    import {ComponentIcon} from "../internal/component-icon/index";
     import type { Snippet } from "svelte";
-    import { getField, getListboxOwner, getListboxHeaderPortal } from "../context";
-    import {
-        resolveFrameFieldInvalid,
-        resolveFrameFieldValue,
-        syncFrameFieldValue,
-    } from "../logic/frame-field-control";
-    import { splitFrameHostProps } from "../logic/frame-prop-filter";
-    import {
-        mergeComponentPartProps,
-        useComponentPart,
-    } from "../logic/component-parts.svelte";
+    import {getField, getListboxOwner, getListboxHeaderPortal} from "../context";
+    import {resolveFrameFieldInvalid, resolveFrameFieldValue, syncFrameFieldValue} from "../logic/frame-field-control";
+    import {splitFrameHostProps} from "../logic/frame-prop-filter";
+    import {mergeComponentPartProps, useComponentPart} from "../logic/component-parts.svelte";
     import type { HTMLInputAttributes } from "svelte/elements";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
-    import { resizeManager } from "../logic/observer.svelte";
+    import {resizeManager} from "../logic/observer.svelte";
 
     type InputValue = string | number | undefined;
     type TemporalInputType =

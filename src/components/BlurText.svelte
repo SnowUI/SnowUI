@@ -1,15 +1,15 @@
 <!-- BlurText 逐字模糊揭示组件 v1.0.0；文档：./BlurText.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import { onMount, onDestroy, tick, untrack } from "svelte";
+    import {onMount, onDestroy, tick, untrack} from "svelte";
     import type { FrameProps } from "../logic/frame-types";
     import type { SnowUIColor } from "../lib/color";
-    import FramePro from "./FramePro.svelte";
-    import { splitTextMotionGraphemes } from "../lib/text-motion/layout";
-    import { createTextMotionTypographyStyle } from "../lib/text-motion/typography";
-    import { animateTextMotionColorSequence, cancelTextMotionColor } from "../lib/text-motion/color";
-    import { shouldReduceTextMotion } from "../lib/text-motion/preference";
-    import { observeAppearanceRelease } from "../lib/chart/appearance-viewport";
+    import Frame from "./Frame.svelte";
+    import {splitTextMotionGraphemes} from "../lib/text-motion/layout";
+    import {createTextMotionTypographyStyle} from "../lib/text-motion/typography";
+    import {animateTextMotionColorSequence, cancelTextMotionColor} from "../lib/text-motion/color";
+    import {shouldReduceTextMotion} from "../lib/text-motion/preference";
+    import {observeAppearanceRelease} from "../lib/chart/appearance-viewport";
     import type { TextMotionAlign, TextMotionColor } from "../lib/text-motion/types";
 
     interface Props extends Omit<FrameProps, "children"> {
@@ -141,13 +141,13 @@
     });
 </script>
 
-<FramePro {...rest} {tag} {enableContext} {enableDefaultMotion}
+<Frame {...rest} {tag} {enableContext} {enableDefaultMotion}
     enableAutoLayout={false} enableResponsive={false} enableScaleObserver={false}
     class={["snowui-blur-text", userClass].filter(Boolean).join(" ")} style={typography}
     role={rest.role ?? (tag === "span" ? "img" : undefined)} aria-label={rest["aria-label"] ?? content}
     renderHints={{ variant: "line", height: "1lh", ...rest.renderHints }}>
     <span bind:this={output} aria-hidden="true">{#each tokens as token, index (index)}{#if token.space}{#if token.value.includes("\n")}{token.value}{:else}<span data-blur-character class="snowui-blur-text-character snowui-blur-text-space">{token.value}</span>{/if}{:else}<span class:snowui-blur-text-word={token.word}>{#each token.characters as character, characterIndex (characterIndex)}<span data-blur-character={character} class="snowui-blur-text-character">{character}</span>{/each}</span>{/if}{/each}</span>
-</FramePro>
+</Frame>
 
 <style>
     :global(:where(.snowui-blur-text)) {

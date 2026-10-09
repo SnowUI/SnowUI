@@ -134,7 +134,7 @@
 
 
 
-`SearchBox` 是搜索浮层的触发器，交互类似 `Select`。它不是原生输入框，整个组件都是可点击区域；视觉颜色、hover、focus、清除 X、内部布局参考 `Input`，并通过 `FramePro` 接通 PRO Frame 能力。
+`SearchBox` 是搜索浮层的触发器，交互类似 `Select`。它不是原生输入框，整个组件都是可点击区域；视觉颜色、hover、focus、清除 X、内部布局参考 `Input`，并通过 `Frame` 接通 PRO Frame 能力。
 
 <a id="开发者指南-ai"></a>
 
@@ -144,7 +144,7 @@
 
 主布局模型：**槽位宿主布局**。定义见 `../../../specs/LayoutProtocol.md`。
 
-`SearchBox` 使用 `FramePro row` 固定启用自动布局协议：
+`SearchBox` 使用 `Frame row` 固定启用自动布局协议：
 
 - Leading：默认 `Search`，或外部 `data-as="leading"` 替换。
 - Content：文本内容，Fill，`min-width: 0`。
@@ -172,13 +172,13 @@
 
 ### Frame 能力
 
-根节点使用 `FramePro`，必须显式传入：
+根节点使用 `Frame`，必须显式传入：
 
 - `enableResponsive`
 - `enableContext`
 - `enableScaleObserver`
 
-`...rest` 透传到根 `FramePro`，保留状态、动效、Skeleton、响应式、样式编排等 PRO 能力。
+`...rest` 透传到根 `Frame`，保留状态、动效、Skeleton、响应式、样式编排等 PRO 能力。
 
 ### 模块索引
 
@@ -188,7 +188,7 @@
 
 ### 关联关系
 
-- **依赖**: FramePro、Icon、Search
+- **依赖**: Frame、Icon、Search
 - **协作组件**: SearchPopup、Kbd
 - **包归属**: PRO
 

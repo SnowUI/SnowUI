@@ -1,92 +1,237 @@
-/**
- * OSS Frame 动效控制器（v1.0.0 起在 OSS）
- *
- * 与 PRO 版本（components/src/logic/frame-pro-motion.svelte.ts）的差异：
- * - 不依赖 Motion 编排器（PRO `motion.svelte.ts`）
- * - 不向 Motion 注册自身（无 `register` / `notify` 调用）
- * - 不实现 `orchestrate*` 编排触发（4 处 $effect 已剥离）
- * - controller 仅暴露 FLIP 自身转场方法（`captureFlip` / `playFlipTo`），不暴露 `play` / `reset` / `captureLayout` / `playLayoutTo` 等需要 Motion 上下文的方法
- *
- * OSS 支持的能力：
- * - layoutId / itemId 自身 FLIP 进场（自动从 layout-flip 模块注册表读取起点）
- * - whileScroll 自身滚动联动
- * - whileAppear / whileHover / whileActive 等通过 CSS bridge 变量（由 frame-motion-defaults.ts 注入）由浏览器原生 transition 执行
- *
- * 作用半径：1 个 Frame
- *
- * PRO 版本独立维护一份完整实现，FramePro 使用 PRO 版本。
- * 详见 ../components/Frame.md §1 切割原则与 /Frame-Refactor-Plan.md §3.4。
- */
+// FrameMotion 逻辑模块
+// v1.1.0
+// 变更记录 (2026-05-03): 接入 layout-flip.ts，captureFlip / playFlipTo 无需 initMotion 上下文即可使用。
+// 变更记录 (2026-03-07): whileLoad 触发源改为 loading，释放 whileLoad 关键字回归纯加载态动效。
+// 变更记录 (2026-02-03): 移除未使用变量以通过检查
 
 import type { FrameProps } from "./frame-types";
+import type { LayoutTransitionOptions } from "./motion-types";
+import type { Motion, MotionEvent } from "./motion.svelte";
 import type { FrameState } from "./frame-state.svelte";
-import {
-    captureFlipRect,
-    beginFlipEnter,
-    applyFlipExit,
-    type FlipTransitionOptions,
-} from "./layout-flip";
+import type { FrameResponsive } from "./frame-responsive.svelte";
+import {hasMotionConfig} from "./frame-utils";
+import {captureFlipRect, beginFlipEnter, applyFlipExit, type FlipTransitionOptions} from "./layout-flip";
 
 export class FrameMotion {
     #props: FrameProps;
+    #motion: Motion | undefined;
     #state: FrameState;
+    #responsive: FrameResponsive | null;
     #getId: () => string | undefined;
     #getElement: () => HTMLElement | undefined;
 
     constructor(
         props: FrameProps,
+        motion: Motion | undefined,
         state: FrameState,
+        responsive: FrameResponsive | null,
         getId: () => string | undefined,
         getElement: () => HTMLElement | undefined,
     ) {
         this.#props = props;
+        this.#motion = motion;
         this.#state = state;
+        this.#responsive = responsive;
         this.#getId = getId;
         this.#getElement = getElement;
-        // 注：OSS 不接受 FrameResponsive 参数（PRO 用它做 whileXs/Sm/... 断点 notify，
-        // OSS 不向编排器 notify，断点动效由 frame-motion-defaults 写入 CSS bridge 完成）
 
-        // === 独立 FLIP 进场 ===
-        // layoutId/itemId 存在时尝试从模块注册表（layout-flip.ts）读取起点并播放进场动效。
-        // 与 PRO 不同：OSS 不向 Motion 编排器注册，所以这是唯一的 FLIP 进场路径。
+        // 注册到编排器，并触发独立 FLIP 进场（无需 Motion 上下文）
         $effect(() => {
+            const id = this.#getId();
             const element = this.#getElement();
+
+            // 独立 FLIP 进场：layoutId/itemId 存在时尝试从模块注册表读取起点
             const flipId = this.#props.itemId ?? this.#props.layoutId;
             if (flipId && element) {
                 beginFlipEnter(flipId, element);
             }
+
+            if (!this.#motion || !this.shouldRegister || !element || !id)
+                return;
+            return this.#motion.register({
+                id,
+                element,
+                timeline: this.#props.timeline,
+                scroll: this.#props.scroll,
+                layoutId: this.#props.itemId ?? this.#props.layoutId,
+                scope: this.#props.scope,
+            });
         });
 
-        // === whileScroll 触发器 ===
+        // === 状态变化 -> 动效通知 (合并优化) ===
+        // 使用单一 effect 替代多个独立 effect，减少响应式订阅开销
+
+        // 缓存上一次的触发器状态，用于差量更新
+        let prevTriggerStates: Record<string, boolean> = {};
+
+        $effect(() => {
+            if (!this.#motion) return;
+            // 收集所有触发器状态
+            const currentStates: Record<string, boolean> = {
+                whileHover: this.#state.hovered,
+                whileClick: this.#state.pressed,
+                whileFocus: this.#state.focused,
+                whileDrag: this.#state.isDragging,
+                whileScroll: this.#state.isScrolling,
+                whileKey: this.#state.isKeyActive,
+                whileLoad:
+                    this.#state.currentState === "StartLoad" ||
+                    this.#state.currentState === "Load" ||
+                    !!this.#props.loading,
+                whileReload:
+                    this.#state.currentState === "Reload" ||
+                    !!this.#props.whileReload,
+                whileActive:
+                    this.#state.currentState === "Active" ||
+                    !!this.#props.whileActive,
+                whileDisabled:
+                    this.#state.currentState === "Disabled" ||
+                    !!this.#props.whileDisabled,
+                whileValidating:
+                    this.#state.currentState === "Validating" ||
+                    !!this.#props.whileValidating,
+                whileUploading:
+                    this.#state.currentState === "Uploading" ||
+                    !!this.#props.whileUploading,
+                whileEditing:
+                    this.#state.currentState === "Editing" ||
+                    !!this.#props.whileEditing,
+                whileCollapsed: !!this.#props.collapsed,
+                whileExpanded: !!this.#props.expanded,
+                whileIdle: !this.#state.isAnyTriggerActive,
+            };
+
+            // 仅通知发生变化的触发器
+            for (const [event, active] of Object.entries(currentStates)) {
+                if (prevTriggerStates[event] !== active) {
+                    this.#notify(event as any, { active });
+                }
+            }
+
+            prevTriggerStates = currentStates;
+        });
+
+        // 生命周期通知 (单独保留，因为需要 cleanup)
+        $effect(() => {
+            this.#notify("whileAppear", { active: true });
+
+            // === 编排触发逻辑 ===
+            // 根据 orchestrateTrigger 决定何时触发编排
+            const trigger = this.#props.orchestrateTrigger ?? "appear";
+
+            if (this.#props.orchestrate && trigger === "appear") {
+                const id = this.#getId();
+                if (id && this.#motion) {
+                    // 使用微任务或下一帧确保子组件已挂载并注册
+                    requestAnimationFrame(() => {
+                        this.#motion?.Play(id);
+                    });
+                }
+            }
+
+            return () => this.#notify("whileDisappear", { active: true });
+        });
+
+        // === orchestrateTrigger: hover ===
+        $effect(() => {
+            const trigger = this.#props.orchestrateTrigger;
+            if (this.#props.orchestrate && trigger === "hover" && this.#state.hovered) {
+                const id = this.#getId();
+                if (id && this.#motion) {
+                    this.#motion.Play(id);
+                }
+            }
+        });
+
+        // === orchestrateTrigger: click ===
+        $effect(() => {
+            const trigger = this.#props.orchestrateTrigger;
+            if (this.#props.orchestrate && trigger === "click" && this.#state.pressed) {
+                const id = this.#getId();
+                if (id && this.#motion) {
+                    this.#motion.Play(id);
+                }
+            }
+        });
+
+        // === orchestrateTrigger: scroll ===
+        $effect(() => {
+            const trigger = this.#props.orchestrateTrigger;
+            if (this.#props.orchestrate && trigger === "scroll" && this.#state.isScrolling) {
+                const id = this.#getId();
+                if (id && this.#motion) {
+                    this.#motion.Play(id);
+                }
+            }
+        });
+
+        // 响应式断点通知
+        let prevBreakpoint: string | undefined;
+        $effect(() => {
+            if (!this.#motion || !this.#responsive) return;
+            const breakpoint = this.#responsive.breakpoint;
+            if (!breakpoint || breakpoint === prevBreakpoint) return;
+
+            const eventMap: Record<string, any> = {
+                xs: "whileXs",
+                sm: "whileSm",
+                md: "whileMd",
+                lg: "whileLg",
+                xl: "whileXl",
+                "2xl": "while2xl",
+            };
+            const eventName = eventMap[breakpoint];
+            if (eventName) this.#notify(eventName, { active: true });
+            prevBreakpoint = breakpoint;
+        });
+
+        // Setup whileScroll trigger
         $effect(() => {
             if (this.#props.whileScroll) {
                 return this.#setupWhileScroll();
             }
         });
-
-        // 注：OSS 不实现 PRO 的以下能力
-        // - 注册到 Motion 编排器（PRO line 49-58）
-        // - 状态→Motion notify 差量更新（PRO line 67-111）
-        // - 生命周期 whileAppear/whileDisappear notify（PRO line 114-132）
-        // - orchestrateTrigger: appear/hover/click/scroll（PRO line 121-165）
-        // - 响应式断点 whileXs/Sm/Md/Lg/Xl/2xl notify（PRO line 168-185）
-        //
-        // 在 OSS 中：
-        // - 状态驱动的视觉变化（hover/focus/active 等）通过 frame-inline-style 注入的 CSS bridge
-        //   变量配合组件 CSS 的 transition 实现，由浏览器原生执行
-        // - whileAppear 生命周期进入组合动效通过 frame-motion-defaults 写入 CSS 变量后
-        //   组件 CSS / Frame 默认 CSS 完成
-        // - 跨组件编排（orchestrate*）属 PRO，OSS 静默忽略相关 props
     }
 
-    /** OSS 不需要 shouldRegister 概念，但保留 getter 以兼容旧调用方（始终返回 false） */
     get shouldRegister() {
-        return false;
+        const id = this.#getId();
+        return !!id || hasMotionConfig(this.#props);
     }
 
     get controller() {
         return {
-            /** 捕获当前 Frame 位置写入模块级 FLIP 注册表，无需 Motion 上下文。 */
+            play: (options?: { reverse?: boolean }) => {
+                const id = this.#getId();
+                if (id && this.#motion) this.#motion.Play(id, options);
+            },
+            captureLayout: (layoutId?: string) => {
+                const id =
+                    layoutId ??
+                    this.#props.itemId ??
+                    this.#props.layoutId ??
+                    this.#getId();
+                const element = this.#getElement();
+                if (id && element && this.#motion) {
+                    this.#motion.captureLayout(id, element);
+                }
+            },
+            playLayoutTo: (
+                target?: HTMLElement | DOMRect,
+                options?: LayoutTransitionOptions & { layoutId?: string },
+            ) => {
+                const id =
+                    options?.layoutId ??
+                    this.#props.itemId ??
+                    this.#props.layoutId ??
+                    this.#getId();
+                const element = this.#getElement();
+                if (id && element && this.#motion) {
+                    this.#motion.playLayoutTo(id, element, target, options);
+                } else {
+                    options?.onComplete?.();
+                }
+            },
+            /** 捕获当前 Frame 位置写入模块级 FLIP 注册表，无需 initMotion 上下文。 */
             captureFlip: (layoutId?: string) => {
                 const id =
                     layoutId ??
@@ -96,7 +241,7 @@ export class FrameMotion {
                 const element = this.#getElement();
                 if (id && element) captureFlipRect(id, element);
             },
-            /** 将当前 Frame 以 FLIP 方式过渡到目标位置，无需 Motion 上下文。 */
+            /** 将当前 Frame 以 FLIP 方式过渡到目标位置，无需 initMotion 上下文。 */
             playFlipTo: (
                 target?: HTMLElement | DOMRect,
                 options?: FlipTransitionOptions,
@@ -108,11 +253,20 @@ export class FrameMotion {
                     options?.onComplete?.();
                 }
             },
-            // 以下方法在 OSS 中不可用（需要 Motion 编排器）：
-            // - play / reset / pause（需要 Motion.Play/Reset/pause）
-            // - captureLayout / playLayoutTo（需要 Motion.captureLayout/playLayoutTo）
-            // 如需以上能力请使用 FramePro。
+            reset: () => {
+                const id = this.#getId();
+                if (id && this.#motion) this.#motion.Reset(id);
+            },
+            pause: () => {
+                // TODO
+            }
         };
+    }
+
+    #notify(event: MotionEvent, detail: any) {
+        const id = this.#getId();
+        if (!this.#motion || !this.shouldRegister || !id) return;
+        this.#motion.notify(id, event, detail);
     }
 
     #setupWhileScroll() {

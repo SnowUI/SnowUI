@@ -20,29 +20,13 @@
 <script lang="ts">
     import type { SnowUIColor } from "../lib/color";
     import type { FrameProps } from "../logic/frame-types";
-    import {
-        registerTextMotionCharacterElement,
-        TEXT_MOTION_CHARACTER_TAG,
-        type TextMotionCharacterAnimationContext,
-        type TextMotionCharacterElement,
-    } from "../lib/text-motion/character";
-    import { createTextMotionFormatter } from "../lib/text-motion/format";
-    import {
-        TEXT_MOTION_LAYOUT_TRANSITION,
-        type TextMotionTransition,
-    } from "../lib/text-motion/layout";
-    import { resolveTextMotionTrend } from "../lib/text-motion/numeric";
-    import {
-        DEFAULT_TEXT_MOTION_COLOR,
-        type TextMotionAlign,
-        type TextMotionColor,
-        type TextMotionRole,
-    } from "../lib/text-motion/types";
-    import {
-        createTextMotionTypographyStyle,
-        resolveTextMotionColor,
-    } from "../lib/text-motion/typography";
-    import FramePro from "./FramePro.svelte";
+    import {registerTextMotionCharacterElement, TEXT_MOTION_CHARACTER_TAG, type TextMotionCharacterAnimationContext, type TextMotionCharacterElement} from "../lib/text-motion/character";
+    import {createTextMotionFormatter} from "../lib/text-motion/format";
+    import {TEXT_MOTION_LAYOUT_TRANSITION, type TextMotionTransition} from "../lib/text-motion/layout";
+    import {resolveTextMotionTrend} from "../lib/text-motion/numeric";
+    import {DEFAULT_TEXT_MOTION_COLOR, type TextMotionAlign, type TextMotionColor, type TextMotionRole} from "../lib/text-motion/types";
+    import {createTextMotionTypographyStyle, resolveTextMotionColor} from "../lib/text-motion/typography";
+    import Frame from "./Frame.svelte";
 
     registerTextMotionCharacterElement();
 
@@ -273,7 +257,7 @@
     });
 </script>
 
-<FramePro
+<Frame
     {tag}
     class={`snowui-numeric-text${userClass ? ` ${userClass}` : ""}`}
     style={rootStyle}
@@ -304,7 +288,7 @@
     >
         {displayValue}
     </svelte:element>
-</FramePro>
+</Frame>
 
 <style>
     :global(:where(.snowui-numeric-text)) {

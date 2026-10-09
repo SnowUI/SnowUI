@@ -8,11 +8,8 @@
 
 <script module lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import {
-        animateTextMotionColorSequence,
-        cancelTextMotionColor,
-    } from "../lib/text-motion/color";
-    import { shouldReduceTextMotion } from "../lib/text-motion/preference";
+    import {animateTextMotionColorSequence, cancelTextMotionColor} from "../lib/text-motion/color";
+    import {shouldReduceTextMotion} from "../lib/text-motion/preference";
     import type { TextMotionColor } from "../lib/text-motion/types";
 
     export type ScrambleTextCharset = "glyphs" | "symbols" | "numbers";
@@ -36,7 +33,7 @@
     const ServerSafeHTMLElement = BROWSER
         ? HTMLElement
         : (class {} as typeof HTMLElement);
-    import { splitTextMotionGraphemes as splitGraphemes } from "../lib/text-motion/layout";
+    import {splitTextMotionGraphemes as splitGraphemes} from "../lib/text-motion/layout";
 
     function createRng(seed: number) {
         let s = seed | 0;
@@ -233,19 +230,13 @@
 </script>
 
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { observeAppearanceRelease } from "../lib/chart/appearance-viewport";
+    import {onMount} from "svelte";
+    import {observeAppearanceRelease} from "../lib/chart/appearance-viewport";
     import type { SnowUIColor } from "../lib/color";
     import type { FrameProps } from "../logic/frame-types";
-    import {
-        DEFAULT_TEXT_MOTION_COLOR,
-        type TextMotionAlign,
-    } from "../lib/text-motion/types";
-    import {
-        createTextMotionTypographyStyle,
-        resolveTextMotionColor,
-    } from "../lib/text-motion/typography";
-    import FramePro from "./FramePro.svelte";
+    import {DEFAULT_TEXT_MOTION_COLOR, type TextMotionAlign} from "../lib/text-motion/types";
+    import {createTextMotionTypographyStyle, resolveTextMotionColor} from "../lib/text-motion/typography";
+    import Frame from "./Frame.svelte";
 
     interface Props extends Omit<FrameProps, "children"> {
         text?: string | number;
@@ -323,7 +314,7 @@
     });
 </script>
 
-<FramePro
+<Frame
     {tag}
     class={["snowui-scramble-text", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
@@ -352,7 +343,7 @@
     >
         {displayText}
     </svelte:element>
-</FramePro>
+</Frame>
 
 <style>
     :global(:where(.snowui-scramble-text)) {

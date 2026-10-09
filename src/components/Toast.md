@@ -197,7 +197,7 @@ showToast("saved-template");                          // 触发 <Toast template 
 
 ```svelte
 <script>
-    import { Button, FramePro as Frame, Text, Toast, Toaster, showToast, toast } from "@snowui-design-system/components";
+    import { Button, Frame, Text, Toast, Toaster, showToast, toast } from "@snowui-design-system/components";
 </script>
 
 <Toaster />
@@ -355,7 +355,7 @@ Toast 动效拆成 4 类原子动效：
 
 | 原子动效 | 职责 | 当前参数 |
 | :--- | :--- | :--- |
-| `slide` | 负责出现 / 退场的 y 位移 | 内层 FramePro 只使用 `y: ["-100%", 0]`、`y: [0, "-100%"]`；bottom 系列方向相反 |
+| `slide` | 负责出现 / 退场的 y 位移 | 内层 Frame 只使用 `y: ["-100%", 0]`、`y: [0, "-100%"]`；bottom 系列方向相反 |
 | `fade` | 负责透明度变化 | 出现 `opacity: [0.8, 1]`；退场 `opacity: [1, 0.8]` |
 | `scale` | 负责出现 / 退场与叠加时等比缩放 | 出现 `scale: [0.96, 1]`；退场 `scale: [1, 0.96]`；叠加 `scale: 1 - index * scaleStep` |
 | `stackTranslate` | 负责叠加时位置错位 | `translateY(index * gap)`；exiting / pushed-out 时额外叠加 `index * gap + offset + 20px` |
@@ -388,7 +388,7 @@ Toast 动效拆成 4 类原子动效：
 | scale / fade / slide / stackTranslate 等基础动效配置 | OSS：`components/src/motion/` 与 OSS Frame 默认动效系统 | 只描述单个 Frame 自身的 transform / opacity / timing，作用半径 = 1 个 Frame |
 | Frame 对多个原子动效的同元素合成输出能力 | OSS：`components/src/logic/` | 仍只影响当前 Frame 自己，不控制其他 Frame |
 | Toast / Toaster 的堆叠策略、队列状态、每条 Toast 的 stack index 计算 | PRO：`components/src/components/Toaster.svelte` / `components/src/logic/toast.svelte.ts` | Toast 是 PRO 全局通知组件，负责跨 Toast 条目的队列与层级管理 |
-| 多个 Toast Frame 的出现、退场、堆叠顺序编排 | PRO：FramePro / PRO motion orchestration 能力 | 涉及多个 Frame 的启动时机、层级和状态协调，作用半径 > 1 |
+| 多个 Toast Frame 的出现、退场、堆叠顺序编排 | PRO：Frame / PRO motion orchestration 能力 | 涉及多个 Frame 的启动时机、层级和状态协调，作用半径 > 1 |
 
 结论：
 
@@ -412,7 +412,7 @@ Toast 动效拆成 4 类原子动效：
 
 - 已完成：真实 Toast 三层堆叠，移除空背景壳体。
 - 已完成：出现 / 退场拆为 `slide + fade + scale`，并抽成 OSS `motion/primitives.ts` 原子构建器。
-- 已完成：Toast 槽位切到 PRO `FramePro`，由 PRO 侧承接 `currentState`、`whileAppear`、`whileDisappear` 与最终组合输出。
+- 已完成：Toast 槽位切到 PRO `Frame`，由 PRO 侧承接 `currentState`、`whileAppear`、`whileDisappear` 与最终组合输出。
 - 已完成：堆叠 transform 合成拆成内外两层，避免位置偏移丢失。
 - 已完成：动效播放期间不阻塞按钮点击，不限制 `toast()` 连续触发。
 - 已完成：当前堆叠阶段仍由 `indexFromFront` 映射视觉状态；文档保留显式状态迁移模型作为后续维护目标。
@@ -487,9 +487,9 @@ Toast 动效拆成 4 类原子动效：
 - Toaster idle 层 rich 背景曾改为不透明 `--background-1`，用于避免后层 Toast 内容透出；该历史策略已在 v2.3.0 撤回。
 - 超过 `maxVisible` 时，当前最后一层 Toast 进入 `pushed-out` 状态，沿入场方向继续位移并渐隐，形成“被新层挤出”的专属退出动效。
 - Toaster 移除 `document.startViewTransition` 更新包装，避免浏览器级过渡队列在动效过程中阻塞按钮连续触发。
-- Toaster 将外层槽位用于堆叠 transform / opacity，内层 FramePro 用于出现与退场，避免 appear/disappear transform 覆盖堆叠位移。
-- 退场残影修复采用“双层 transform”方案：内层 FramePro 保持 `translateY(±100%)` 的稳定退场动效，外层 slot 在 `exiting / pushed-out` 时额外平移 `index * gap + offset + 20px`，不要把 `calc(±100% ± offset ± 20px)` 写进内层 `whileDisappear`。
-- 将 Toaster 堆叠槽位从普通 `div + animate:flip` 改为 `Frame/FramePro`，堆叠 transform / opacity 过渡统一消费 Frame motion。
+- Toaster 将外层槽位用于堆叠 transform / opacity，内层 Frame 用于出现与退场，避免 appear/disappear transform 覆盖堆叠位移。
+- 退场残影修复采用“双层 transform”方案：内层 Frame 保持 `translateY(±100%)` 的稳定退场动效，外层 slot 在 `exiting / pushed-out` 时额外平移 `index * gap + offset + 20px`，不要把 `calc(±100% ± offset ± 20px)` 写进内层 `whileDisappear`。
+- 将 Toaster 堆叠槽位从普通 `div + animate:flip` 改为 `Frame/Frame`，堆叠 transform / opacity 过渡统一消费 Frame motion。
 - `dismissToast()` 改为先标记 `exiting` 并进入 `Disappear` 状态，退出动效结束后再移除队列项，避免 Toast 瞬间消失。
 - Frame 新增 `currentState` 受控状态入口，并让 `Appear` / `Disappear` 状态在 Frame inline motion 中实际输出动效样式。
 - 默认停留时长、区域宽度、堆叠 gap、缩放系数、隐藏规则与 top/bottom 滑入滑出方向对齐 HeroUI。
@@ -515,4 +515,4 @@ Toast 动效拆成 4 类原子动效：
 - default（深色玻璃 pill，sm / md）与 rich（白底卡片，复用 `.snowui-quick-action-panel`）两个变体
 - 6 个出现位置（top / top-left / top-right / bottom / bottom-left / bottom-right），默认 top；距边缘 40px
 - 自动消失（默认 3 秒）+ 同位置堆叠 + `animate:flip` 平滑前移（历史实现，已在 v2.1.0 被 Frame 槽位方案替代）
-- 出入场动效使用显式组合的 `slide + fade + scale`；生命周期状态仍由 FramePro 的 `Appear / Disappear` 承接
+- 出入场动效使用显式组合的 `slide + fade + scale`；生命周期状态仍由 Frame 的 `Appear / Disappear` 承接

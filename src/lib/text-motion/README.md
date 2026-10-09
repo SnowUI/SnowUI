@@ -23,8 +23,8 @@
 ## 与 Frame 动效的边界
 
 - 共享能力不依赖 Frame 默认动效、`while*` 或 bridge 时序，可以自行使用 WAAPI、`requestAnimationFrame`、Svelte transition 等内部实现。
-- 组件根必须保留 `FramePro` 和 FrameProps 透传，且 `enableDefaultMotion` 默认遵循 Frame 的 `true`，使默认动效、显式 `while*` 与父级编排可以控制组件整体。
-- 字符 / 数位动画只能作用于内部承载层，不得覆盖根 `FramePro` 的 `opacity`、`transform` 或状态样式。
+- 组件根必须保留 `Frame` 和 FrameProps 透传，且 `enableDefaultMotion` 默认遵循 Frame 的 `true`，使默认动效、显式 `while*` 与父级编排可以控制组件整体。
+- 字符 / 数位动画只能作用于内部承载层，不得覆盖根 `Frame` 的 `opacity`、`transform` 或状态样式。
 - 仅服务内部测量、宽度轨道等算法节点的嵌套 Frame 可以显式关闭默认动效，但不得影响组件根。
 
 颜色回落的旧 finish / cancel 事件只释放自身登记，不能清除快速更新后的新动画。

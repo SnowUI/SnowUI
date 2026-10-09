@@ -17,26 +17,12 @@
 
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import { onMount, onDestroy } from "svelte";
-    import {
-        composeMotionConfigs,
-        createFadeMotion,
-        createScaleMotion,
-        createSlideYMotion,
-    } from "../motion/primitives";
+    import {onMount, onDestroy} from "svelte";
+    import {composeMotionConfigs, createFadeMotion, createScaleMotion, createSlideYMotion} from "../motion/primitives";
     import type { MotionConfig } from "../logic/motion-config";
-    import {
-        toastStore,
-        dismissToast,
-        pushOutToast,
-        type ToastItem,
-        type ToastPosition,
-    } from "../logic/toast.svelte";
+    import {toastStore, dismissToast, pushOutToast, type ToastItem, type ToastPosition} from "../logic/toast.svelte";
     import Toast from "./Toast.svelte";
-    import {
-        provideComponentParts,
-        type ComponentPartsOf,
-    } from "../logic/component-parts.svelte";
+    import {provideComponentParts, type ComponentPartsOf} from "../logic/component-parts.svelte";
 
     interface Props {
         /** 视口边缘到 Toast 容器的距离，单位 px；默认 16（HeroUI bottom-4 / top-4） */
@@ -288,7 +274,7 @@
         const indexFromFront = stackIndexForItem(item, items);
         const isTop = position.startsWith("top");
         const direction = isTop ? 1 : -1; // top: 后一条向下偏移；bottom: 向上
-        // 退场残影修复：内层 FramePro 保持稳定的 ±100% 出入场动效；
+        // 退场残影修复：内层 Frame 保持稳定的 ±100% 出入场动效；
         // 外层 slot 先抵消当前堆叠层位移，再额外越过可视边缘 20px。
         const exitDistance = indexFromFront * gap + offset + 20;
         const exitTranslate = item.exiting ? (isTop ? -exitDistance : exitDistance) : 0;

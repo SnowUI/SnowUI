@@ -169,7 +169,7 @@ export const examples = [
     {
         name: "A6: Frame 外层动效组合",
         code: `A6
-<FramePro
+<Frame
     whileAppear={{ opacity: [0, 1], y: [8, 0] }}
     class="gap-16"
     column
@@ -178,13 +178,13 @@ export const examples = [
     <NumericText value={12840} />
     <ScrambleText text="SCRAMBLE READY" />
     <FlowText value={2048} />
-</FramePro>`,
+</Frame>`,
         expected: {
-            render: "父级 FramePro 整体渐现和位移时，四个文字动效组件一起响应，同时各自保留内部字符或数位动画。",
+            render: "父级 Frame 整体渐现和位移时，四个文字动效组件一起响应，同时各自保留内部字符或数位动画。",
             interaction: "父级 Frame 动效与内部文字动效并行，内部动画不会覆盖外层 opacity 与 transform。",
             layout: "四个组件按 column 排列并保持各自的内联文字布局。",
         },
-        logic: ["FramePro", "whileAppear", "TextMotion"],
+        logic: ["Frame", "whileAppear", "TextMotion"],
     },
     {
         name: "A7: 数字趋势与数位顺序",

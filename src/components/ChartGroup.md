@@ -344,7 +344,7 @@ interface ChartGroupContext {
   - `Field`: 宿主组件通过 context 协调后代组件。
   - `BarChart`: Chart 原子组件、坐标轴和出现动效 API。
   - `LineChart`: Chart 原子组件、marker hover 与出现动效 API。
-  - `FramePro`: 根层 Frame 能力继承。
+  - `Frame`: 根层 Frame 能力继承。
 - **归属判断**: PRO。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
 
 ## 更新日志

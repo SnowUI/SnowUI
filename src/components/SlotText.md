@@ -116,8 +116,8 @@
 
 - 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../specs/TextMotionSpec.md#2-统一排版与颜色)。
 
-- 主布局模型为内禀原子布局，根层为 `FramePro`。
-- 根 `FramePro` 的 `enableDefaultMotion` 默认保持 `true`；字符槽位动画只作用于内部 face，显式 `while*` 与父级编排可继续控制组件整体。
+- 主布局模型为内禀原子布局，根层为 `Frame`。
+- 根 `Frame` 的 `enableDefaultMotion` 默认保持 `true`；字符槽位动画只作用于内部 face，显式 `while*` 与父级编排可继续控制组件整体。
 - 排版、语意色、变化色与减少动效判断复用 `../lib/text-motion/`。
 - 字符处理先执行 SlotText 私有 `isTail` 分类，再把非 tail 字符交给 `text-motion/timeline.ts` 的 NumericText 同源公共时间轴。不变前缀与后缀只在非 tail 范围内保留，变化中段做 SlotText 私有槽位滚动。
 - 公共时间轴在同一次重组提交中完成退出字符抽离、最终自然宽度更新、保留字符 FLIP 和进退场启动，不得拆成“先移动、再改宽度、再进退场”的串行阶段。
@@ -199,7 +199,7 @@
 
 ### v1.2.0 (2026-06-14)
 
-- 根 `FramePro` 默认启用 Frame 默认动效，内部槽位动画与组件级 `while*` / 父级编排并行工作。
+- 根 `Frame` 默认启用 Frame 默认动效，内部槽位动画与组件级 `while*` / 父级编排并行工作。
 
 ### v1.1.0 (2026-06-14)
 

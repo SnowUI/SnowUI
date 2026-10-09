@@ -243,8 +243,7 @@ export { writeClipboardText } from "./lib/clipboard";
 
 export { default as CopyLink } from "./components/CopyLink.svelte";
 
-// 全量组件与区块；FramePro 保持独立技术身份。
-export { default as FramePro } from "./components/FramePro.svelte";
+// 全量组件与区块；Frame 保持独立技术身份。
 export { default as FlowText }      from './components/FlowText.svelte'
 export { default as NumberFlow }    from './components/NumberFlow.svelte'
 export { default as NumericText }     from './components/NumericText.svelte'

@@ -36,7 +36,7 @@
 
 ## 4. 关联关系
 
-- **调用方**: [FramePro.svelte](../components/FramePro.svelte)
+- **调用方**: [Frame.svelte](../components/Frame.svelte)
 - **默认动效**: `frame-motion-defaults.ts`（@snowui-design-system/components）
 - **Scale 注入**: [frame-scale-resolver.svelte.ts](frame-scale-resolver.svelte.ts)
 - **工具函数**: `frame-utils.ts`（@snowui-design-system/components）

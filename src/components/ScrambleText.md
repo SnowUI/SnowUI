@@ -97,8 +97,8 @@
 
 - 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../specs/TextMotionSpec.md#2-统一排版与颜色)。
 
-- 主布局模型为内禀原子布局，根层为 `FramePro`。
-- 根 `FramePro` 的 `enableDefaultMotion` 默认保持 `true`；扰动动画只更新内部输出层，显式 `while*` 与父级编排可继续控制组件整体。
+- 主布局模型为内禀原子布局，根层为 `Frame`。
+- 根 `Frame` 的 `enableDefaultMotion` 默认保持 `true`；扰动动画只更新内部输出层，显式 `while*` 与父级编排可继续控制组件整体。
 - 排版、语意色、变化色与减少动效判断复用 `../lib/text-motion/`。
 - `cascadeSpeed`、`cascadeDelay`、`duration`、`settleDuration` 等时序不得公开。
 - `customSequence` 是内容语义，不是动效速度调参，可以保留。
@@ -139,7 +139,7 @@
 
 ### v1.2.0 (2026-06-14)
 
-- 根 `FramePro` 默认启用 Frame 默认动效，内部扰动动画与组件级 `while*` / 父级编排并行工作。
+- 根 `Frame` 默认启用 Frame 默认动效，内部扰动动画与组件级 `while*` / 父级编排并行工作。
 
 ### v1.1.0 (2026-06-14)
 

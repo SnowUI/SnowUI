@@ -106,7 +106,7 @@ export const examples = [
     {
         name: "D1: Button 点击触发徽标出入场",
         code: `D1
-<FramePro
+<Frame
     column
     Click={{ Idle: "Active", Active: "Idle" }}
     class="gap-24 items-center"
@@ -125,7 +125,7 @@ export const examples = [
     >
         Button
     </Button>
-</FramePro>`,
+</Frame>`,
 
         expected: {
             render: "默认只显示 Bell 图标和 Button 按钮文案，徽标隐藏。",

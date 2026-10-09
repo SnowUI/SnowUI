@@ -100,8 +100,8 @@
 
 - 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../specs/TextMotionSpec.md#2-统一排版与颜色)。
 
-- 主布局模型为内禀原子布局，根层为 `FramePro`。
-- 根 `FramePro` 的 `enableDefaultMotion` 默认保持 `true`；字符 diff 动画只作用于内部输出层，显式 `while*` 与父级编排可继续控制组件整体。
+- 主布局模型为内禀原子布局，根层为 `Frame`。
+- 根 `Frame` 的 `enableDefaultMotion` 默认保持 `true`；字符 diff 动画只作用于内部输出层，显式 `while*` 与父级编排可继续控制组件整体。
 - 内容标准化、排版、语意色、变化色、字符重组与减少动效判断复用 `../lib/text-motion/`。
 - 字符宽度使用自然排版与 LCP/LCS 区段 FLIP；普通文本变化中段按节点索引从左到右启动，数字运算变化按低位到高位启动。
 - 字符节点创建 / 抽离 / 清理属于共享字符重组逻辑；NumericText 只定义字符出现和消失的视觉 keyframes。
@@ -178,7 +178,7 @@
 
 ### v1.2.0 (2026-06-14)
 
-- 根 `FramePro` 默认启用 Frame 默认动效，内部字符 diff 与组件级 `while*` / 父级编排并行工作。
+- 根 `Frame` 默认启用 Frame 默认动效，内部字符 diff 与组件级 `while*` / 父级编排并行工作。
 
 ### v1.1.0 (2026-06-14)
 

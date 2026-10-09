@@ -10,22 +10,12 @@
     import type { Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Text from "./Text.svelte";
-    import {
-        resolveSnowUIColor,
-        type SnowUIColor,
-    } from "../lib/color";
-    import { splitFrameHostProps } from "../logic/frame-prop-filter";
+    import {resolveSnowUIColor, type SnowUIColor} from "../lib/color";
+    import {splitFrameHostProps} from "../logic/frame-prop-filter";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
-    import {
-        GENERIC_DISAPPEAR_MOTION,
-        GENERIC_SCALE_APPEAR_MOTION,
-    } from "../motion/presets/generic";
-    import { motionMsVar } from "../motion/presets/utils";
-    import {
-        MOTION_DURATION_STANDARD_APPEAR_MS,
-        MOTION_DURATION_STANDARD_DISAPPEAR_MS,
-        MOTION_EASING_STANDARD,
-    } from "../motion/tokens";
+    import {GENERIC_DISAPPEAR_MOTION, GENERIC_SCALE_APPEAR_MOTION} from "../motion/presets/generic";
+    import {motionMsVar} from "../motion/presets/utils";
+    import {MOTION_DURATION_STANDARD_APPEAR_MS, MOTION_DURATION_STANDARD_DISAPPEAR_MS, MOTION_EASING_STANDARD} from "../motion/tokens";
 
     type SliderOrientation = "horizontal" | "vertical";
     type SliderVariant = "default" | "solid" | "soft";

@@ -23,41 +23,23 @@
 </script>
 
 <script lang="ts">
-    import { onDestroy, type Snippet } from "svelte";
-    import { animateTextMotionDelta, animateTextMotionOpacity } from "../lib/text-motion/animation";
-    import { Skeleton } from "../index";
-    import { getSkeleton } from "../context";
-    import { resizeManager } from "../logic/observer.svelte";
+    import {onDestroy, type Snippet} from "svelte";
+    import {animateTextMotionDelta, animateTextMotionOpacity} from "../lib/text-motion/animation";
+    import {Skeleton} from "../index";
+    import {getSkeleton} from "../context";
+    import {resizeManager} from "../logic/observer.svelte";
     import type { SnowUIColor } from "../lib/color";
     import type {
         FrameProps,
         RenderHints,
     } from "../logic/frame-types";
-    import {
-        registerTextMotionCharacterElement,
-        TEXT_MOTION_CHARACTER_TAG,
-        type TextMotionCharacterAnimationContext,
-        type TextMotionCharacterElement,
-    } from "../lib/text-motion/character";
-    import { createTextMotionFormatter } from "../lib/text-motion/format";
+    import {registerTextMotionCharacterElement, TEXT_MOTION_CHARACTER_TAG, type TextMotionCharacterAnimationContext, type TextMotionCharacterElement} from "../lib/text-motion/character";
+    import {createTextMotionFormatter} from "../lib/text-motion/format";
     import type { TextMotionTransition } from "../lib/text-motion/layout";
-    import {
-        extractTextMotionNumber,
-        mapDigitToSignedAxis,
-        resolveTextMotionModuloTrend,
-        resolveTextMotionTrend,
-    } from "../lib/text-motion/numeric";
-    import {
-        DEFAULT_TEXT_MOTION_COLOR,
-        type TextMotionAlign,
-        type TextMotionColor,
-        type TextMotionRole,
-    } from "../lib/text-motion/types";
-    import {
-        createTextMotionTypographyStyle,
-        resolveTextMotionColor,
-    } from "../lib/text-motion/typography";
-    import FramePro from "./FramePro.svelte";
+    import {extractTextMotionNumber, mapDigitToSignedAxis, resolveTextMotionModuloTrend, resolveTextMotionTrend} from "../lib/text-motion/numeric";
+    import {DEFAULT_TEXT_MOTION_COLOR, type TextMotionAlign, type TextMotionColor, type TextMotionRole} from "../lib/text-motion/types";
+    import {createTextMotionTypographyStyle, resolveTextMotionColor} from "../lib/text-motion/typography";
+    import Frame from "./Frame.svelte";
 
     registerTextMotionCharacterElement();
 
@@ -1397,7 +1379,7 @@
         renderHints={flowTextRenderHints}
     />
 {:else}
-    <FramePro
+    <Frame
         {tag}
         class={`snowui-flow-text${userClass ? ` ${userClass}` : ""}`}
         style={rootStyle}
@@ -1431,7 +1413,7 @@
                 {/if}
             </span>
         </span>
-    </FramePro>
+    </Frame>
 {/if}
 
 <style>

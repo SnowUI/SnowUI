@@ -132,7 +132,7 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 `GlobalButtonProps` 为 Button Props 排除 `children / as / iconOnly / disabled / href / onclick / aria-label / title`。`Parts` 为 `ComponentPartsOf<{ Button: typeof Button; SelectButton: typeof SelectButton; Listbox: typeof Listbox; MenuItem: typeof MenuItem; Separator: typeof Separator }>`。每个键配置对应默认子组件的公开 Props，完整覆盖顺序见上文。
 
-其余兼容 Frame Props 透传根容器，共享关键字参见 [FramePro](FramePro.md) 的 OSS 子集；不引入 PRO 专属能力。
+其余兼容 Frame Props 透传根容器，共享关键字参见 [Frame](Frame.md) 的 OSS 子集；不引入 PRO 专属能力。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 

@@ -4,7 +4,7 @@
 
   Original implementation reference: number-flow v0.6.2
   Copyright (c) 2024 Maxwell Barvian, MIT License.
-  SnowUI keeps its own Svelte/FramePro implementation and public contract.
+  SnowUI keeps its own Svelte/Frame implementation and public contract.
 
  1. 核心能力 (Features):
     - 滚轮动效: 模拟物理滚轮的数字滚动效果。
@@ -22,45 +22,25 @@
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { TransitionConfig } from "svelte/transition";
-    import { cubicOut } from "svelte/easing";
-    import { untrack, onDestroy, type Snippet } from "svelte";
+    import {cubicOut} from "svelte/easing";
+    import {untrack, onDestroy, type Snippet} from "svelte";
     import type {
         FrameProps,
         RenderHints,
     } from "../logic/frame-types";
-    import { splitTextMotionGraphemes } from "../lib/text-motion/layout";
+    import {splitTextMotionGraphemes} from "../lib/text-motion/layout";
     import type { SnowUIColor } from "../lib/color";
-    import { Skeleton } from "../index";
-    import { MORPH_MOTION } from "../motion/morph";
-    import { resizeManager } from "../logic/observer.svelte";
-    import { getSkeleton } from "../context";
-    import {
-        animateTextMotionColorSequence,
-        cancelTextMotionColor,
-        resolveChromaticTextMotionColors,
-        TEXT_MOTION_COLOR_FADE_MS,
-        TEXT_MOTION_COLOR_DURATION_MS,
-    } from "../lib/text-motion/color";
-    import {
-        extractTextMotionNumber,
-        mapDigitToSignedAxis,
-        resolveTextMotionModuloTrend,
-        resolveTextMotionTrend,
-    } from "../lib/text-motion/numeric";
-    import { shouldReduceTextMotion } from "../lib/text-motion/preference";
-    import {
-        DEFAULT_TEXT_MOTION_COLOR,
-        type TextMotionAlign,
-        type TextMotionColor,
-        type TextMotionRole,
-        type TextMotionTrend,
-    } from "../lib/text-motion/types";
-    import {
-        createTextMotionTypographyStyle,
-        resolveTextMotionColor,
-    } from "../lib/text-motion/typography";
-    import { getTextMotionStagger } from "../lib/text-motion/sequence";
-    import FramePro from "./FramePro.svelte";
+    import {Skeleton} from "../index";
+    import {MORPH_MOTION} from "../motion/morph";
+    import {resizeManager} from "../logic/observer.svelte";
+    import {getSkeleton} from "../context";
+    import {animateTextMotionColorSequence, cancelTextMotionColor, resolveChromaticTextMotionColors, TEXT_MOTION_COLOR_FADE_MS, TEXT_MOTION_COLOR_DURATION_MS} from "../lib/text-motion/color";
+    import {extractTextMotionNumber, mapDigitToSignedAxis, resolveTextMotionModuloTrend, resolveTextMotionTrend} from "../lib/text-motion/numeric";
+    import {shouldReduceTextMotion} from "../lib/text-motion/preference";
+    import {DEFAULT_TEXT_MOTION_COLOR, type TextMotionAlign, type TextMotionColor, type TextMotionRole, type TextMotionTrend} from "../lib/text-motion/types";
+    import {createTextMotionTypographyStyle, resolveTextMotionColor} from "../lib/text-motion/typography";
+    import {getTextMotionStagger} from "../lib/text-motion/sequence";
+    import Frame from "./Frame.svelte";
 
     type TrendResolver = TextMotionTrend;
     interface NumberFlowTransition {
@@ -1331,7 +1311,7 @@
         renderHints={numberFlowRenderHints}
     />
 {:else}
-    <FramePro
+    <Frame
         {tag}
         class={["snowui-number-flow", className].filter(Boolean).join(" ")}
         style={rootStyle}
@@ -1355,7 +1335,7 @@
         <span class="snowui-number-flow-mask" bind:this={motionElement} aria-hidden="true">
             <span class="snowui-number-flow-layout">
                 {#if numberPosition === "left"}
-                    <FramePro
+                    <Frame
                         enableResponsive={false}
                         enableContext={false}
                         enableScaleObserver={false}
@@ -1438,7 +1418,7 @@
                                 </span>
                             {/each}
                         </span>
-                    </FramePro>
+                    </Frame>
 
                     {#if children}
                         <span class="snowui-number-flow-extra">
@@ -1452,7 +1432,7 @@
                         </span>
                     {/if}
 
-                    <FramePro
+                    <Frame
                         enableResponsive={false}
                         enableContext={false}
                         enableScaleObserver={false}
@@ -1535,11 +1515,11 @@
                                 </span>
                             {/each}
                         </span>
-                    </FramePro>
+                    </Frame>
                 {/if}
             </span>
         </span>
-    </FramePro>
+    </Frame>
 {/if}
 
 <style>

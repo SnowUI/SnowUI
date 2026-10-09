@@ -1,29 +1,19 @@
 <!-- PRO 右侧详情弹出窗。共享 Dialog 面板视觉、右侧浮层 / 内嵌双模式、内置上下工具栏。文档: ./SidePanel.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import { tick, type Snippet } from "svelte";
-    import {
-        Button,
-        Indicator,
-        Tooltip,
-        useLocale,
-        type FrameProps,
-        type DialogBackdrop,
-    } from "../index";
-    import { useOverlayPresence } from "../logic/overlay-presence.svelte";
-    import { resizeManager } from "../logic/observer.svelte";
-    import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
-    import {
-        SIDE_PANEL_APPEAR_MOTION,
-        SIDE_PANEL_DISAPPEAR_MOTION,
-    } from "../motion/presets/effects";
-    import { DIALOG_BACKDROP_MOTION_STYLE } from "../motion/presets/dialog";
-    import { getMotionTotalDurationMs } from "../motion/presets/utils";
+    import {tick, type Snippet} from "svelte";
+    import {Button, Indicator, Tooltip, useLocale, type FrameProps, type DialogBackdrop} from "../index";
+    import {useOverlayPresence} from "../logic/overlay-presence.svelte";
+    import {resizeManager} from "../logic/observer.svelte";
+    import {useOverlayScrollbar} from "../lib/overlay-scrollbar.svelte";
+    import {SIDE_PANEL_APPEAR_MOTION, SIDE_PANEL_DISAPPEAR_MOTION} from "../motion/presets/effects";
+    import {DIALOG_BACKDROP_MOTION_STYLE} from "../motion/presets/dialog";
+    import {getMotionTotalDurationMs} from "../motion/presets/utils";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
-    import { provideComponentParts } from "../logic/component-parts.svelte";
-    import { ComponentIcon } from "../internal/component-icon/index";
+    import {provideComponentParts} from "../logic/component-parts.svelte";
+    import {ComponentIcon} from "../internal/component-icon/index";
     import type { SidePanelPlacement, SidePanelToolbarAction } from "../lib/side-panel";
-    import FramePro from "./FramePro.svelte";
+    import Frame from "./Frame.svelte";
 
     interface Props extends Omit<FrameProps, "children" | "width"> {
         open?: boolean;
@@ -382,7 +372,7 @@
 {/snippet}
 
 {#snippet panelContent()}
-    <FramePro
+    <Frame
         tag="div"
         enableAutoLayout={false}
         currentState={layoutOwnsInlineMotion
@@ -398,7 +388,7 @@
         enableContext={false}
         enableScaleObserver={false}
     >
-        <FramePro
+        <Frame
             bind:element={panelEl}
             tag="aside"
             column
@@ -505,8 +495,8 @@
                 ariaLabel="调整弹出窗宽度"
                 onSizeChange={handleWidthChange}
             />
-        </FramePro>
-    </FramePro>
+        </Frame>
+    </Frame>
 {/snippet}
 
 {#if presence.present}

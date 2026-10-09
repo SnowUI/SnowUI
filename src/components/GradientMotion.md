@@ -205,7 +205,7 @@ GradientMotion 是一个 PRO 动效组件。它输出 glimm.dev 同款 WebGL 扫
 
 ### 关联关系
 
-- **父组件**: [FramePro.svelte](FramePro.svelte)
+- **父组件**: [Frame.svelte](Frame.svelte)
 - **可组合组件**: [Avatar.md](Avatar.md), [Image.md](Image.md)
 
 ---

@@ -16,15 +16,12 @@
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import Button from "./Button.svelte";
     import type { Snippet } from "svelte";
-    import { onMount } from "svelte";
-    import { ComponentIcon } from "../internal/component-icon/index";
+    import {onMount} from "svelte";
+    import {ComponentIcon} from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
-    import { getListboxOwner } from "../context";
-    import { splitFrameHostProps } from "../logic/frame-prop-filter";
-    import {
-        mergeComponentPartProps,
-        useComponentPart,
-    } from "../logic/component-parts.svelte";
+    import {getListboxOwner} from "../context";
+    import {splitFrameHostProps} from "../logic/frame-prop-filter";
+    import {mergeComponentPartProps, useComponentPart} from "../logic/component-parts.svelte";
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
         /** 内置图标按钮配置；事件与角色由所属组件控制。 */

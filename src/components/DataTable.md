@@ -245,17 +245,17 @@
 
 结构：
 
-- Root FramePro（column 状态与组合外壳）
+- Root Frame（column 状态与组合外壳）
   - 使用方组合的 TableToolbar（可选固定操作区）
   - Table（语义表格区）
   - Pagination（可选分页区）
   - 使用方声明的 loading / error / empty 等其他状态区
 
-局部布局来源：Root FramePro 使用 `column + contentFill` 管理直系区域；TableToolbar 保持自身的 row 槽位宿主布局，Table 保持原生表格布局，Pagination 保持内联外壳布局。DataTable 只协调区域排列和数据状态，不改写子组件的主布局模型。
+局部布局来源：Root Frame 使用 `column + contentFill` 管理直系区域；TableToolbar 保持自身的 row 槽位宿主布局，Table 保持原生表格布局，Pagination 保持内联外壳布局。DataTable 只协调区域排列和数据状态，不改写子组件的主布局模型。
 
 padding 归属：DataTable 根层不制造 padding；工具栏、表格 Cell、分页和自定义状态区分别由各自组件负责。内部 Table 的表头与数据 Cell 左右 padding 按 Table 容器宽度在 4px 到 12px 之间响应，上下保持 8px，表格外缘最小 8px、相邻列内容间最小 8px；DataTable 不复制单元格 padding 实现。
 
-gap 归属：Root FramePro 统一控制直系区域间距，默认为 `var(--gap-3)`（12px）；子组件内部 gap 由子组件自身控制。
+gap 归属：Root Frame 统一控制直系区域间距，默认为 `var(--gap-3)`（12px）；子组件内部 gap 由子组件自身控制。
 
 滚动归属：DataTable 不另建滚动区，水平溢出直接继承内部 Table 的局部横向 viewport 与视口贴底轨道；纵向虚拟化或固定表头仍由上层业务区域明确提供。`loadMoreMode="auto"` 只在 DataTable 内部观察表尾哨兵：优先使用最近的纵向滚动祖先作为 root，找不到时使用页面视口，不改变纵向滚动容器归属。
 

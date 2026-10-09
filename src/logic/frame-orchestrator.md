@@ -104,5 +104,5 @@
 
 ### 关联关系
 
-- **核心组件**: [FramePro.svelte](../components/FramePro.svelte)
+- **核心组件**: [Frame.svelte](../components/Frame.svelte)
 - **关联逻辑**: [frame-orchestrator.svelte.ts](frame-orchestrator.svelte.ts)

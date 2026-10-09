@@ -92,7 +92,7 @@ Frame 是所有 SnowUI 组件的基石。**开发任何组件前，必须了解 
 
 ## 运行包与维护源码
 
-公开安装 `@snowui-design-system/components`，通过根入口取得全部组件与区块；`Frame` 为基础宿主，`FramePro` 为跨组件协调宿主。`@snowui-design-system/components/compat` 保留旧包的 `Frame → FramePro` 语义，共享同一份 Context，不包含另一套实现。
+公开安装 `@snowui-design-system/components`，根入口提供全部组件与区块；`Frame` 统一承接布局、状态、加载、动效与显式跨组件协调。`/compat` 仅转发同一套导出和 Context。
 
 预编译产物最低支持 Svelte 5.56.4，升级 Svelte 后须重新验证客户端与服务端。组件内样式由组件加载，共享样式引入 `@snowui-design-system/components/styles`。`pnpm build` 构建双端 JS 与 `.d.ts`；`pnpm pack:check` 检查发布允许清单。
 

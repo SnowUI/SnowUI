@@ -1,21 +1,11 @@
 <!-- PRO 数据表格状态与组合外壳。文档: ./DataTable.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import { onDestroy, tick, type Snippet } from "svelte";
-    import {
-        provideTableContext,
-        type TableColumnRegistration,
-        type TableContext,
-        type TableRoleLayout,
-        type TableRoleOverlayBlurMode,
-        type TableSortState,
-    } from "../lib/table-context.svelte";
+    import {onDestroy, tick, type Snippet} from "svelte";
+    import {provideTableContext, type TableColumnRegistration, type TableContext, type TableRoleLayout, type TableRoleOverlayBlurMode, type TableSortState} from "../lib/table-context.svelte";
     import type { FrameProps } from "../logic/frame-types";
-    import FramePro from "./FramePro.svelte";
-    import {
-        paginateDataTableRows,
-        sortDataTableRows,
-    } from "../lib/data-table";
+    import Frame from "./Frame.svelte";
+    import {paginateDataTableRows, sortDataTableRows} from "../lib/data-table";
 
     export type DataTableMode = "client" | "server";
     export interface DataTableLoadMoreRequest {
@@ -700,7 +690,7 @@
     });
 </script>
 
-<FramePro
+<Frame
     class={`snowui-data-table snowui-data-table-${variant} ${userClass}`}
     column
     contentFill
@@ -724,7 +714,7 @@
             style:bottom={`${-resolvedLoadMoreThreshold}px`}
         ></span>
     {/if}
-</FramePro>
+</Frame>
 
 <style>
     :global(:where(.snowui-data-table)) { position: relative; width: 100%; min-width: 0; gap: var(--gap-3, .75rem); }

@@ -2,17 +2,11 @@
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
-    import {
-        Badge,
-        Button,
-        Link,
-        Tooltip,
-        type FrameProps,
-    } from "../index";
+    import {Badge, Button, Link, Tooltip, type FrameProps} from "../index";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
-    import { ComponentIcon } from "../internal/component-icon/index";
-    import FramePro from "../components/FramePro.svelte";
-    import { getSidebarContext, type SidebarActionData } from "./sidebar-context.svelte";
+    import {ComponentIcon} from "../internal/component-icon/index";
+    import Frame from "../components/Frame.svelte";
+    import {getSidebarContext, type SidebarActionData} from "./sidebar-context.svelte";
 
     interface Props extends Omit<FrameProps, "children" | "id"> {
         id: string;
@@ -71,7 +65,7 @@
     }
 </script>
 
-<FramePro
+<Frame
     tag="div"
     row
     enableAutoLayout={false}
@@ -190,7 +184,7 @@
             {/if}
         </div>
     {/if}
-</FramePro>
+</Frame>
 
 <style>
     :global(:where(.snowui-sidebar-item)) {

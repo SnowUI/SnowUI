@@ -31,28 +31,21 @@
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
-    import { tick, setContext } from "svelte";
+    import {tick, setContext} from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Input from "./Input.svelte";
     import MenuItem from "./MenuItem.svelte";
-    import { getListboxOwner, LISTBOX_HEADER_PORTAL_KEY } from "../context";
-    import { FIELD_CONTEXT_KEY } from "../keys";
-    import { splitFrameHostProps } from "../logic/frame-prop-filter";
-    import { useOverlayPresence } from "../logic/overlay-presence.svelte";
-    import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
-    import { clampFloatingPosition } from "../lib/floating-position";
-    import {
-        DROPDOWN_OVERLAY_APPEAR_MOTION,
-        DROPDOWN_OVERLAY_DISAPPEAR_MOTION,
-    } from "../motion/presets/overlay";
-    import { getMotionTotalDurationMs } from "../motion/presets/utils";
-    import {
-        mergeComponentPartProps,
-        type ComponentPartsOf,
-        useComponentPart,
-    } from "../logic/component-parts.svelte";
-    import { ContinuousHoverController } from "../logic/continuous-hover.svelte";
-    import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
+    import {getListboxOwner, LISTBOX_HEADER_PORTAL_KEY} from "../context";
+    import {FIELD_CONTEXT_KEY} from "../keys";
+    import {splitFrameHostProps} from "../logic/frame-prop-filter";
+    import {useOverlayPresence} from "../logic/overlay-presence.svelte";
+    import {useOverlayScrollbar} from "../lib/overlay-scrollbar.svelte";
+    import {clampFloatingPosition} from "../lib/floating-position";
+    import {DROPDOWN_OVERLAY_APPEAR_MOTION, DROPDOWN_OVERLAY_DISAPPEAR_MOTION} from "../motion/presets/overlay";
+    import {getMotionTotalDurationMs} from "../motion/presets/utils";
+    import {mergeComponentPartProps, type ComponentPartsOf, useComponentPart} from "../logic/component-parts.svelte";
+    import {ContinuousHoverController} from "../logic/continuous-hover.svelte";
+    import {CONTINUOUS_HOVER_MOTION_STYLE} from "../motion/presets/continuous-hover";
 
     export interface ListboxItem {
         value: string;

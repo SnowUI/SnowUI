@@ -1,17 +1,4 @@
-<!--
-  Frame OSS v1.4.0
-  职责：自包含 Frame 容器（作用半径 = 1 个 Frame）。
-  能力：状态机、JS 动效执行、自身 FLIP、Scale Observer、Perception、Skeleton、stateContent Grid Stacking。
-  边界：不含跨组件协调（§7.7 编排模式 / §8 联动控制 / §10 样式编排），那些能力在 FramePro。
-  关键字定义：./Frame.md（本目录，OSS 版规范）；全量关键字 API 见仓库根 ../../../Frame.md。
-
-  v1.0.0 (2026-05-06): OSS / PRO 切割线重构。OSS Frame 接入完整状态机、动效执行、FLIP、Scale Observer、Perception、stateContent。
-                       详见 /Frame-Refactor-Plan.md。
-  v1.4.0 (2026-10-08): 新增 row firstLine，复用共享三槽 CSS 与 DOM 属性，实现附件对齐正文首行。
-  v1.3.1 (2026-08-17): Responsive 与 Scale Observer 统一复用 SSR-safe、按帧交付的共享 resizeManager。
-  v0.1.0 (起点): OSS 仅做 props 归一化、CSS class 拼装、bridge 变量、skeleton 渲染。
--->
-
+<!-- Frame：统一布局、状态、加载、动效与按需跨组件协调宿主。 -->
 <script module lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     export * from "../logic/frame-types";
@@ -19,27 +6,27 @@
 
 <script lang="ts">
     import "../motion/rotate.css";
-    import { setContext, getContext } from "svelte";
-    import { SIZE_CONTEXT_KEY, SKELETON_CONTEXT_KEY } from "../keys";
+    import {getContext, setContext, untrack} from "svelte";
+    import {MOTION_ORCHESTRATOR_CONTEXT_KEY, SIZE_CONTEXT_KEY, SKELETON_CONTEXT_KEY} from "../keys";
+    import type { Motion } from "../logic/motion.svelte";
+
     import type { FrameProps } from "../logic/frame-types";
-    import { Identity } from "../logic/frame-identity.svelte";
-    import { FrameState } from "../logic/frame-state.svelte";
-    import { FrameLayout } from "../logic/frame-layout.svelte";
-    import { FrameResponsive } from "../logic/frame-responsive.svelte";
-    import { FrameMotion } from "../logic/frame-motion.svelte";
-    import { FramePerception } from "../logic/frame-perception.svelte";
-    import { frameScaleObserver } from "../logic/frame-scale-observer.svelte";
-    import { resolveScaleObserverOptions } from "../logic/frame-scale-resolver.svelte";
-    import {
-        buildFrameActions,
-        mountFrameActions,
-    } from "../logic/frame-actions.svelte";
-    import { FRAME_MOTION_DEFAULTS } from "../logic/frame-motion-defaults";
-    import { createFrameInlineStyleRuntime } from "../logic/frame-inline-style.svelte";
-    import { createFrameDomRuntime } from "../logic/frame-dom-runtime.svelte";
-    import { createFrameSkeletonRuntime } from "../logic/frame-skeleton-runtime.svelte";
-    import { createFrameClassStateRuntime } from "../logic/frame-class-state.svelte";
-    import { provideComponentParts } from "../logic/component-parts.svelte";
+    import {Identity} from "../logic/frame-identity.svelte";
+    import {FrameState} from "../logic/frame-state.svelte";
+    import {FrameLayout} from "../logic/frame-layout.svelte";
+    import {FrameResponsive} from "../logic/frame-responsive.svelte";
+    import {FrameMotion} from "../logic/frame-motion.svelte";
+    import {FramePerception} from "../logic/frame-perception.svelte";
+    import {frameScaleObserver} from "../logic/frame-scale-observer.svelte";
+    import {resolveScaleObserverOptions} from "../logic/frame-scale-resolver.svelte";
+    import {buildFrameActions, mountFrameActions} from "../logic/frame-actions.svelte";
+    import {FRAME_MOTION_DEFAULTS} from "../logic/frame-motion-defaults";
+    import {createFrameInlineStyleRuntime} from "../logic/frame-inline-style.svelte";
+    import {createFrameDomRuntime} from "../logic/frame-dom-runtime.svelte";
+    import {createFrameSkeletonRuntime} from "../logic/frame-skeleton-runtime.svelte";
+    import {createFrameClassStateRuntime} from "../logic/frame-class-state.svelte";
+    import {provideComponentParts} from "../logic/component-parts.svelte";
+    import {initOrchestrator, getOrchestrator} from "../logic/frame-orchestrator.svelte";
     import Skeleton from "./Skeleton.svelte";
 
     interface Props extends FrameProps {
@@ -52,49 +39,74 @@
     const frameProps = $derived(rawProps);
     provideComponentParts(() => frameProps.componentParts);
 
-    // === 0.1 能力开关 ===
+    // === 0.1 能力开关推导 ===
+    // 默认全部开启，组件或用户可显式关闭
     const enableResponsive = $derived(frameProps.enableResponsive ?? true);
     const enableContext = $derived(frameProps.enableContext ?? true);
-    const enableScaleObserver = $derived(frameProps.enableScaleObserver ?? false);
+    const enableScaleObserver = $derived(
+        frameProps.enableScaleObserver ?? false,
+    );
+
+    // === Orchestration Setup ===
+    // If 'styles' is provided, we act as a root orchestrator provider
+    function resolveInitialOrchestrator() {
+        if (rawProps.styles) {
+            return initOrchestrator();
+        }
+        return getOrchestrator();
+    }
+
+    const orchestrator = resolveInitialOrchestrator();
+
+    // Sync rules if this is the root
+    $effect(() => {
+        if (rawProps.styles && orchestrator) {
+            orchestrator.setRules(rawProps.styles);
+        }
+    });
 
     // === 1. 身份 (Identity) ===
     // svelte-ignore state_referenced_locally
     const identity = new Identity(frameProps);
 
     // === 2. 响应式 (Responsive) ===
-    // 所有普通 Frame 默认获得 4px 间距下限保护；responsive 只控制放不下时的结构切换。
+    // 根据开关决定是否启用
     const needsResponsive = $derived(
         enableResponsive,
     );
     // svelte-ignore state_referenced_locally
-    const responsive = needsResponsive
-        ? new FrameResponsive(() => frameProps)
-        : null;
+    const responsive = needsResponsive ? new FrameResponsive(() => frameProps) : null;
 
     // === 3. 布局 (Layout) ===
     // svelte-ignore state_referenced_locally
     const layout = new FrameLayout(frameProps, responsive);
 
     // === 4. 状态 (State) ===
-    // OSS 不接受 motion 参数（PRO 用它做 §8 联动控制；OSS 不支持联动）
+    // 获取 motion 实例用于联动控制
+    const motionInstance = getContext<Motion | undefined>(
+        MOTION_ORCHESTRATOR_CONTEXT_KEY,
+    );
     const parentSkeletonContext = getContext<
         { loading: boolean; skeleton?: boolean } | undefined
     >(SKELETON_CONTEXT_KEY);
     // svelte-ignore state_referenced_locally
-    const frameState = new FrameState(frameProps);
+    const frameState = new FrameState(frameProps, motionInstance);
 
     // === 5. 动效 (Motion) ===
-    // OSS FrameMotion 仅承担：自身 FLIP 进场（layoutId/itemId）+ whileScroll 监听
-    // 状态驱动的视觉动效由 frame-inline-style 注入 CSS bridge 变量，由浏览器 transition 完成
+    // 动效能力始终可用（内置组件也需要）
     // svelte-ignore state_referenced_locally
     const motion = new FrameMotion(
         frameProps,
+        motionInstance,
         frameState,
+        responsive,
         () => identity.id,
         () => element,
     );
 
-    // === 6. 加载 / Skeleton 状态 ===
+    // === 6. 感知 (Perception) ===
+    // 根据开关决定是否提供 Context
+    // svelte-ignore state_referenced_locally
     const inheritedLoading = $derived(parentSkeletonContext?.loading ?? false);
     const inheritedSkeleton = $derived(parentSkeletonContext?.skeleton ?? true);
     const explicitLoading = $derived(frameProps.loading === true);
@@ -108,9 +120,9 @@
     );
     const effectiveSkeleton = $derived(explicitSkeleton ?? inheritedSkeleton);
 
-    // === 7. 感知 (Perception) ===
     // svelte-ignore state_referenced_locally
     if (enableContext) {
+        // svelte-ignore state_referenced_locally
         new FramePerception(
             frameProps,
             frameState,
@@ -119,6 +131,7 @@
             () => effectiveLoading,
             () => effectiveSkeleton,
         );
+        // 提供尺寸上下文给子组件（如资源组件选择正确分辨率）
         // svelte-ignore state_referenced_locally
         if (frameProps.size !== undefined) {
             setContext(SIZE_CONTEXT_KEY, {
@@ -129,16 +142,47 @@
         }
     }
 
-    // === 8. Scale Observer ===
-    // OSS 版：不向 orchestrator 上报 width/height/size（无 orchestrator）
-    const scaleObserverOptions = $derived(resolveScaleObserverOptions(frameProps));
+    // === Orchestration Registration & Monitoring ===
+    // Register self if ID is present
+    $effect(() => {
+        const id = identity.id;
+        if (id && orchestrator) {
+            const registration = {
+                id,
+                padding: frameProps.padding,
+                gap: frameProps.gap,
+                radius: frameProps.radius,
+                fontSize: frameProps.fontSize,
+                size: frameProps.size,
+                minWidth: frameProps.minWidth,
+                minHeight: frameProps.minHeight,
+                width: frameProps.width,
+                height: frameProps.height,
+                opacity: frameProps.opacity,
+            } as Record<string, unknown>;
+            registration["border"] = frameProps.border;
+            registration.innerBorder = frameProps.innerBorder;
+            untrack(() => orchestrator.register(id, registration));
+        }
+    });
+
+    const scaleObserverOptions = $derived({
+        ...resolveScaleObserverOptions(frameProps),
+        onResize: (width: number, height: number, size: number) => {
+            const id = identity.id;
+            if (id && orchestrator) {
+                orchestrator.updateState(id, { width, height, size });
+            }
+        },
+    });
     const hasScaleApplyConfig = $derived(
         frameProps.sizeRatio !== undefined ||
             frameProps.iconSizeRatio !== undefined ||
             frameProps.avatarSizeRatio !== undefined,
     );
 
-    // === 9. 多指令 (FrameActions) ===
+    // === 辅助逻辑 ===
+    // 多指令支持
     function multiuse(node: HTMLElement, actions: any[] | undefined) {
         const allActions = buildFrameActions({
             userActions: actions,
@@ -147,10 +191,10 @@
                 : null,
             responsiveAction: responsive?.resizeObserver ?? null,
         });
+
         return mountFrameActions(node, allActions);
     }
 
-    // === 10. State-driven class/style/content ===
     const classStateRuntime = createFrameClassStateRuntime({
         getFrameProps: () => frameProps,
         frameState,
@@ -161,9 +205,6 @@
     });
     const resolvedStateStyle = $derived(classStateRuntime.resolvedStateStyle);
     const computedClass = $derived(classStateRuntime.computedClass);
-    const childrenRenderContext = $derived(classStateRuntime.childrenRenderContext);
-
-    // === 11. Skeleton ===
     let skeletonProbe = $state<HTMLElement>();
     const skeletonRuntime = createFrameSkeletonRuntime({
         getFrameProps: () => frameProps,
@@ -179,10 +220,10 @@
     const shouldRenderDirectSkeleton = $derived(
         skeletonRuntime.shouldRenderDirectSkeleton,
     );
-    const probedSkeletonChildren = $derived(skeletonRuntime.probedSkeletonChildren);
+    const probedSkeletonChildren = $derived(
+        skeletonRuntime.probedSkeletonChildren,
+    );
 
-    // === 12. Inline Style（含 while* bridge 变量）===
-    // OSS：getOrchestratedStyle 始终返回空字符串（OSS 无 §10 样式编排）
     const inlineStyleRuntime = createFrameInlineStyleRuntime({
         getFrameProps: () => frameProps,
         frameState,
@@ -191,11 +232,14 @@
         getEffectiveLoading: () => effectiveLoading,
         getShouldRenderSkeleton: () => shouldRenderSkeleton,
         getResolvedStateStyle: () => resolvedStateStyle,
-        getOrchestratedStyle: () => "",
+        getOrchestratedStyle: () =>
+            identity.id && orchestrator ? orchestrator.getStyle(identity.id) : "",
     });
-    const computedStyle = $derived(inlineStyleRuntime.computedStyle);
+    const childrenRenderContext = $derived(
+        classStateRuntime.childrenRenderContext,
+    );
 
-    // === 13. DOM runtime ===
+    const computedStyle = $derived(inlineStyleRuntime.computedStyle);
     const domRuntime = createFrameDomRuntime({
         getFrameProps: () => frameProps,
         frameState,
@@ -208,7 +252,6 @@
     const nativeHandlers = $derived(domRuntime.nativeHandlers);
     const runtimeDataAttrs = $derived(domRuntime.dataAttrs);
 
-    // === 14. Controller（OSS 仅暴露 FLIP 自身转场方法）===
     export function getController() {
         return motion.controller;
     }
@@ -271,7 +314,7 @@
             renderHints={frameProps.renderHints}
         />
     {:else if frameProps.stateContent}
-        <!-- stateContent: Grid Stacking 确保切换时尺寸不跳动且互相堆叠 -->
+        <!-- stateContent: 使用 Grid Stacking 确保切换时尺寸不跳动且互相堆叠 -->
         <div
             style="display: grid; align-items: inherit; justify-content: inherit; gap: inherit; width: 100%; height: 100%;"
         >

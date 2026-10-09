@@ -68,8 +68,8 @@
 
 ## AI Zone
 
-- 根为 FramePro，主布局为内禀原子布局；enableAutoLayout / enableResponsive 关闭，enableContext 默认开启。根不实现额外子组件组合或 parts。
-- 复用 text-motion 的 grapheme、typography、color、preference；复用 observeAppearanceRelease 的文档出现门禁。纯文本内容归 BlurText，宿主角色、状态、Skeleton 归 FramePro。
+- 根为 Frame，主布局为内禀原子布局；enableAutoLayout / enableResponsive 关闭，enableContext 默认开启。根不实现额外子组件组合或 parts。
+- 复用 text-motion 的 grapheme、typography、color、preference；复用 observeAppearanceRelease 的文档出现门禁。纯文本内容归 BlurText，宿主角色、状态、Skeleton 归 Frame。
 - 真实字符使用 inline-block；英文单词成组保持词间换行，非 ASCII 文本保留逐字换行机会。所有节点继承字号、行高与基线；不使用占位副本、绝对定位或伪元素绘制。根排版 selector 使用 :where，用户 class/style 可覆盖。没有新增公共几何 override。
 - 私有视觉依据 animations-master 的 Blur Reveal：600ms 单字，错峰 30ms / speed（默认 1.5）；blur 12px、translateY 10px，默认 ease-out。透明度与滤镜各自使用 WAAPI，真实字符的 2D transform 由短生命周期 rAF 按同一动画进度更新；入场容器 300ms，曲线 cubic-bezier(0.25, 0.1, 0.35, 1)。颜色生命周期复用共享层，结束回落 280ms。
 - 不导入第三方动效库、不依赖参考仓库；参考项目为 MIT。本实现以 SnowUI 公共能力重新实现，未复制参考运行时。
