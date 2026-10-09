@@ -455,7 +455,7 @@ Button 放入 Pagination 时使用角色模板：
 
 #### Hover State (Hover 状态)
 
-> **参考规范**: [StyleGuide.md - 6.4 Hover 背景色规则](./../../../specs/StyleGuide.md#64-hover-背景色规则)
+> **参考规范**: [StyleGuide.md - 7.4 Hover 背景色规则](./../../../specs/StyleGuide.md#74-hover-背景色规则)
 
 | Variant | Hover 规则 |
 |:---|:---|

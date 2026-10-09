@@ -36,7 +36,7 @@
 
 ## 联动控制
 
-所有断点关键字都支持 `{ target, action }` 语法控制其他组件。详见 [perception.md](./perception.md)。
+所有断点关键字都支持 `{ target, action }` 语法控制其他组件。详见 [frame-perception.md](./frame-perception.md)。
 
 ## 规则配置
 

@@ -605,7 +605,7 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 
 ### 6.3 Surface Hover 覆写变量
 
-**关联文件**: `layout.css`（OSS styles） · [StyleSpec.md §2.4.5](../../../specs/StyleSpec.md#245-frame-hover-覆写变量能力化) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
+**关联文件**: `layout.css`（OSS styles） · [StyleSpec.md §2.4.6](../../../specs/StyleSpec.md#246-frame-hover-覆写变量能力化) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
 
 当 `.snowui-hoverable` 需要覆盖默认 hover 叠加时，可使用以下变量（无需 `!important`，无需事件脚本）：
 

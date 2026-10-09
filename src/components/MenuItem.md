@@ -81,7 +81,7 @@
 | 场景 | padding | 状态来源 | 注册 |
 | :--- | :--- | :--- | :--- |
 | **Listbox 内**（有 `ListboxOwnerContext`） | 8px | context 派生 | 挂载时注册，卸载时注销 |
-| **QuickAction 内 / 独立使用** | 8px | `selected` / `active` Props | 无 |
+| **Popover 内 / 独立使用** | 8px | `selected` / `active` Props | 无 |
 
 点击未禁用的 `MenuItem` 后会派发 `snowui-menu-item-select` 选择意图事件，事件携带 `value` 与可选 `closeOnSelect`。`MenuItem` 本身不决定父级浮层是否关闭；`Popover` 等浮层容器按自身默认策略处理，单个 `MenuItem closeOnSelect={...}` 可覆盖容器默认值。`Listbox` 仍由自身选择协议管理关闭行为。
 
@@ -99,17 +99,17 @@ MenuItem 的根布局固定按 Leading / Label / Trailing 三段组织：
 - 普通文本或 `.snowui-menu-item-label` 是 Content / Fill 槽，负责截断，必须保持 `min-width: 0`。
 - 直系 `as="leading"` / `as="trailing"` 支持复杂结构，Leading 与 Trailing 为 Hug。
 - `showCheck` 开启时，默认 check / delete 按 Trailing / Hug 处理；关闭时不渲染勾选槽位，也不保留 gap。存在自定义直系 trailing 时默认 check 隐藏。
-- Listbox 状态注册、过滤隐藏和 QuickAction 独立状态是 MenuItem 行为协议，不改变根三槽位布局。
+- Listbox 状态注册、过滤隐藏和 Popover 独立状态是 MenuItem 行为协议，不改变根三槽位布局。
 
 ---
 
 <a id="使用示例"></a>
 
 
-### 在 QuickAction 中（独立 Props 控制）
+### 在 Popover 中（独立 Props 控制）
 
 ```svelte
-<QuickAction>
+<Popover>
     <MenuItem onclick={() => alert('通知')}>
         <Icon as="leading"><Bell /></Icon>
         通知
@@ -122,13 +122,13 @@ MenuItem 的根布局固定按 Leading / Label / Trailing 三段组织：
         <Icon as="leading"><Bell /></Icon>
         禁用项
     </MenuItem>
-</QuickAction>
+</Popover>
 ```
 
 ### 复合 leading / trailing
 
 ```svelte
-<QuickAction>
+<Popover>
     <MenuItem>
         <Frame as="leading" row>
             <Icon icon={Tag} />
@@ -139,7 +139,7 @@ MenuItem 的根布局固定按 Leading / Label / Trailing 三段组织：
             <Icon icon={CaretRight} />
         </Frame>
     </MenuItem>
-</QuickAction>
+</Popover>
 ```
 
 ### 在 Listbox 中（context 自动接管）
@@ -231,7 +231,7 @@ Frame row (.snowui-menu-item)
 ### 关联关系
 
 - **父组件（Listbox 场景）**: [Listbox.svelte](Listbox.svelte) → [Select.svelte](Select.svelte)
-- **父组件（QuickAction 场景）**: [QuickAction.svelte](./QuickAction.svelte)
+- **父组件（Popover 场景）**: [Popover.svelte](./Popover.svelte)
 - **取代组件**: 原 `MenuItem.svelte`（已删除）、原 `QuickActionItem.svelte`（已删除）
 
 ---
