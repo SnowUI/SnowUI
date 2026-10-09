@@ -1,6 +1,6 @@
 # TableCell
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.11.0
 > **职责**: 在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。
@@ -33,7 +33,7 @@
 <Table ariaLabel="Component documentation details" minWidth={620} columnWidths={{ component: 160 }}>
 	<TableHeader><TableRow><TableHead columnId="component">Component</TableHead><TableHead columnId="summary">Summary</TableHead><TableHead columnId="status">Status</TableHead></TableRow></TableHeader>
 	<TableBody><TableRow rowId="data-table">
-		<TableCell columnId="component" row nowrap><Link onclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} href="/components/data-table">DataTable</Link><Badge count="PRO" variant="border" /></TableCell>
+		<TableCell columnId="component" row nowrap><Link onclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} href="/components/data-table">DataTable</Link><Badge count="New" variant="border" /></TableCell>
 		<TableCell columnId="summary" lines={2} tooltip>Coordinates search, filtering, sorting, selection, responsive row actions, and pagination while keeping table composition explicit.</TableCell>
 		<TableCell columnId="status" align="end"><Chip variant="background" style="color: var(--secondary-indigo);">Review</Chip></TableCell>
 	</TableRow></TableBody>
@@ -124,7 +124,7 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 
 ## AI Zone
 
-> `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
+> `selection` / `actions` 角色仅在 DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
 
 ## 更新日志
 

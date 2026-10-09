@@ -31,7 +31,7 @@
 ## 使用说明
 
 - 该模块用于 Frame 默认动效系统中的数字场景默认值。
-- OSS 默认不捆绑 FlowText 组件；PRO 包可在运行时注入 `component` 字段。
+- 默认不捆绑 FlowText 组件；调用方可在运行时注入 `component` 字段。
 - 若业务需要自定义数字动效，可在 `while*` 中覆写 `component`/`duration`。
 - `interpolateNumberMotionValue` 只负责数值补间，不创建 DOM，不绑定特定组件；调用方可以自行决定格式化与渲染方式。补间进度默认经过 `NUMBER_MOTION_PROGRESS_POWER` 幂值处理。
 

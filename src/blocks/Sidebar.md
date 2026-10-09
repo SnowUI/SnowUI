@@ -1,6 +1,6 @@
 # Sidebar
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.9.0
 > **职责**: 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
@@ -41,7 +41,7 @@
         <Separator />
         <SidebarSection id="library" title="Library">
             <SidebarItem id="components" label="Components" icon="squares-four" iconCollection="phosphor" />
-            <SidebarItem id="pro" label="PRO components" icon="stack" iconCollection="phosphor" />
+            <SidebarItem id="charts" label="Charts" icon="stack" iconCollection="phosphor" />
         </SidebarSection>
         <div data-as="footer" style="display: flex; align-items: center; gap: var(--gap-3);">
             <Button bare iconOnly href="https://byewind.com" target="_blank" rel="noopener noreferrer" aria-label="SnowUI maintainer"><Avatar src={AvatarByewind} size={24} dataName="SnowUI maintainer" /></Button>
@@ -147,7 +147,7 @@ pointer 位于标题时共享层隐藏，不把标题当作相邻 Item 间隙。
 
 
 
-> **归属**: PRO Blocks / Template Block
+> **归属**: Template Block
 
 Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo 与折叠按钮；导航内容既可由 `sections` 数据生成，也可显式组合 `SidebarItem`、`SidebarSection`、`Separator` 和自定义内容。每个 SidebarSection 在分类内容末尾内置 Separator，分类调用方无需手动添加。根容器默认透明。
 
@@ -188,7 +188,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 | `as="logo"` | 稳定 Header host | 替换默认 SnowUILogo |
 | `as="logo-icon"` | 自定义 Logo 的直接子节点 | 折叠后唯一保留的 Logo 图形 |
 | `as="footer"` | 稳定底部覆盖 Footer host | 折叠态自动隐藏 |
-| `.snowui-scroll-mask` | OSS 通用内容渐隐能力 | 根据滚动位置启用顶部 / 底部渐隐 |
+| `.snowui-scroll-mask` | 通用内容渐隐能力 | 根据滚动位置启用顶部 / 底部渐隐 |
 | `sections` | 默认生成 | 生成 SidebarSection / SidebarItem |
 
 ### 关联关系
@@ -348,4 +348,4 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 ### v1.0.0 (2026-07-23)
 
 #### 新功能
-- 初始 PRO Block 版本：默认 Logo、`as="logo"` 替换、整体折叠、数据/显式组合、覆盖 Footer 与滚动 Body。
+- 初始 区块 版本：默认 Logo、`as="logo"` 替换、整体折叠、数据/显式组合、覆盖 Footer 与滚动 Body。

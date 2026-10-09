@@ -1,6 +1,6 @@
 # Button
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v2.19.0
 > **职责**: 触发操作或导航，支持文字、图标、加载与禁用状态，适合从主要操作到轻量工具按钮的不同场景。
@@ -289,7 +289,7 @@ Active 配色仍由 `data-state="Active"` 自动生效，与 `toggle` 完全一�
 
 ### 与 `aria-pressed` / `aria-selected`(v1.5.0)
 
-OSS Button **自动输出 `aria-pressed`**:
+Button **自动输出 `aria-pressed`**:
 
 - 当 `currentState === "Active"` 时根节点输出 `aria-pressed="true"`;`currentState === "Idle"` 时输出 `aria-pressed="false"`。
 - 仅在状态机声明里出现 `Idle` ↔ `Active` 的 toggle 字典(如 `Click={{ Idle:"Active", Active:"Idle" }}`)时启用;无 toggle 语义的普通 Button 不输出。

@@ -3,7 +3,7 @@
 > **版本**: v1.2.0
 > **目录**: `src/motion/`
 
-本目录放的是 Frame 默认动效的**资源文件层**（`while-*.ts`、`bridge.ts`、`rotate.css`、原子动效构建器等），以及 PRO 指定的复杂动效组件。不是 Motion 引擎本身。  
+本目录放的是 Frame 默认动效的**资源文件层**（`while-*.ts`、`bridge.ts`、`rotate.css`、原子动效构建器等），以及复杂动效组件。不是 Motion 引擎本身。
 底层编排、时间轴、共享元素转场等基础设施在 [`src/logic/`](../logic/README.md)。
 
 创建新组件或新动效前，必须先读本文件，避免把本该复用的动效能力重复写进组件内部。
@@ -40,8 +40,8 @@
   - `createSlideYMotion(y, timing?)`
   - `createStackTranslateMotion(y, timing?)`
   - `composeMotionConfigs(...configs)`
-- 归属：OSS。只描述**单个 Frame 自身**的动作与时序，不负责跨 Frame 编排。
-- 典型用法：Toast 这类 PRO 组件在使用时传入具体数值，把 `slide + fade`、`stackTranslate + scale + opacity` 组合成完整效果。
+- 归属：共享能力。只描述**单个 Frame 自身**的动作与时序，不负责跨 Frame 编排。
+- 典型用法：Toast 这类 组件在使用时传入具体数值，把 `slide + fade`、`stackTranslate + scale + opacity` 组合成完整效果。
 
 ### `tokens.ts` / `presets/`
 
@@ -134,6 +134,6 @@
 ### v1.1.0 (2026-05-12)
 
 #### 新功能
-- 新增 `primitives.ts`：将 `fade / scale / slide / stackTranslate` 作为 OSS 原子动效构建器纳入 `src/motion/`。
+- 新增 `primitives.ts`：将 `fade / scale / slide / stackTranslate` 作为 原子动效构建器纳入 `src/motion/`。
 - 明确 `move.ts` 中的 slide 预设由原子动效组合而成。
-- 明确跨 Frame 的动效编排仍归 PRO；OSS motion 目录只承载单 Frame 自身可复用的动效资源。
+- 明确跨 Frame 的动效编排由协调模块拥有；motion 目录只承载单 Frame 自身可复用的动效资源。

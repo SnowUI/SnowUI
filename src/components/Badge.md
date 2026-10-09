@@ -1,6 +1,6 @@
 # Badge
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.3.3
 > **职责**: 用紧凑的数字、文字或圆点提示未读数量与状态，可搭配按钮、头像和导航项使用。
@@ -110,7 +110,7 @@ Badge 的根节点是 inline-level 定位外壳，内容整体 Hug：
 <Badge count={1} color="Blue" />
 <Badge count={2} color="Red" />
 <Badge dot color="Green" />
-<Badge count="PRO" variant="border" />
+<Badge count="New" variant="border" />
 ```
 
 <a id="角色化组合"></a>
@@ -257,12 +257,12 @@ Badge 的显示 / 隐藏使用两条并行动效，与 transitions.dev Notificat
 ### v1.3.1 (2026-07-30)
 
 #### 修复
-- Border 变体内部文字层改为继承 16px 行高，避免通用 morph-item 将实际高度压缩到 12px；PRO 标签现在与 Kbd 默认 border 高度一致。
+- Border 变体内部文字层改为继承 16px 行高，避免通用 morph-item 将实际高度压缩到 12px；New 标签现在与 Kbd 默认 border 高度一致。
 
 ### v1.3.0 (2026-07-30)
 
 #### 新功能
-- 新增 `variant="border"`，复用 Kbd 默认描边视觉的 Token、padding、圆角、字号与行高，用于 PRO、updated 等状态/分类标签；默认 `filled` 行为不变。
+- 新增 `variant="border"`，复用 Kbd 默认描边视觉的 Token、padding、圆角、字号与行高，用于 New、updated 等状态/分类标签；默认 `filled` 行为不变。
 
 - **Badge-Motion.2026-06-18** 按 transitions.dev Notification badge 的双层结构还原默认动效：Frame 根层执行左下偏移进场，完整视觉 surface 执行中心 scale / opacity / blur；退场时 surface 整体缩小，而不是只缩放数字内容。
 - **Badge-Motion.2026-06-30** 统一 `while*` 完整视觉通道语义：显式对象不再浅合并 Badge 默认 x / y / scale / opacity，只继承默认时序 / 动力学参数。

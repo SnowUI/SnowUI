@@ -1,4 +1,4 @@
-<!-- Logo 专用字标；不公开文字组件 API，不依赖 PRO。 -->
+<!-- Logo 专用字标；不公开文字组件 API，不依赖通用文字动效模块。 -->
 <script lang="ts">
   import { onMount } from "svelte";
   import type { TransitionConfig } from "svelte/transition";
@@ -153,7 +153,7 @@
   const reduced = () =>
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  // 与指定文字动效相同的曲线采样；不是 PRO 运行时依赖。
+  // 与指定文字动效相同的曲线采样；不依赖通用文字动效运行时。
   const stops = [
     0, 0.1052, 0.3155, 0.532, 0.7112, 0.8414, 0.9265, 0.9765, 1.0023, 1.013,
     1.0151, 1.0133, 1.01, 1.0068, 1.0041, 1.0022, 1.001, 1,

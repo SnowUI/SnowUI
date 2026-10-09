@@ -424,7 +424,7 @@
     :global(:where(.snowui-table-body .snowui-table-row:has(+ .snowui-table-row:not([data-skeleton="true"]):hover), .snowui-table-body .snowui-table-row:has(+ .snowui-table-row:not([data-skeleton="true"])[data-force-hover="true"])) > .snowui-table-cell) { border-bottom-color: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row:hover) > .snowui-table-cell[data-role-layout="overlay"]) { background: transparent; }
-    /* overlay 模式 hover 边缘渐进式透明（复用 OSS edge-fade 通用能力 ../lib/edge-fade.ts；详见 Table.md）。
+    /* overlay 模式 hover 边缘渐进式透明（复用 edge-fade 通用能力 ../lib/edge-fade.ts；详见 Table.md）。
        selection mask 按 Checkbox 实际右边缘在内容节点生成；actions mask 依赖行级实测宽度，由内容 TableCell 在自身作用域生成，并按内容右边缘到可见行右边缘的实测距离平移。
        此处状态规则只消费对应 CSS 变量，未触发时无 mask。selection 的内容遮罩与 Checkbox 可见条件一致（hover、键盘 focus、选中或 force-hover）；actions 保持行 hover 时触发。相邻内容从靠控件一侧渐隐到清晰：
        - checkbox 侧（to right）：透明区覆盖到 Checkbox 实际右边缘，再向右使用固定 --size-5（名义 20px）过渡；

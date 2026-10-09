@@ -1,6 +1,6 @@
 # Textarea
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.0.1
 > **职责**: 提供多行文本输入，可承接原生表单属性并组合字段反馈，适合描述、备注和较长内容的编辑。
@@ -95,7 +95,7 @@
 **2026-04-04 补充**: 参考 Figma `10109:19152`，`Textarea` 是表单系列里的单独例外：单独使用时默认内容留白为 `top 12 / right 16 / bottom 24 / left 16`。进入 `Field` 后，只看有没有 `as="segment"`；未标 `segment` 时由外层 `Field` 处理默认 `12 / 16` 与 `gap = 8`，`Textarea` 去掉组件自身 padding，但保留自身 gap；标了 `segment` 时保留 `Textarea` 自身的 padding 与 gap。右下角使用统一 `Indicator appearance="corner"`；字符计数器默认不显示，传入 `maxCount` 后在 hover 到组件时显示计数，超限时持续显示。
 **2026-04-09 补充**: `Textarea` 右下角保留区（含缩放图标与计数器）始终存在；默认要求是 `right = 16px`、`bottom = 0`，不得贴边。
 **2026-04-24 补充**: `Textarea` 使用与 `Listbox` 一致的自定义浮层滚动条：原生滚动条隐藏，thumb 覆盖在内容之上，不占布局宽度；默认宽 4px，hover 到 thumb 后从右向左变为 8px，右边缘距容器右边框 4px，轨道透明并支持拖拽。
-**2026-05-26 补充**: `Textarea` 的顶部/底部滚动渐隐改为复用 `layout.css` 的 `.snowui-scroll-mask` 通用能力（即「内容渐隐层」OSS 通用能力的 CSS 静态形态，能力总览见 [`../lib/edge-fade.md`](../lib/edge-fade.md)），在原生 `<textarea>` 上通过 `data-scroll-mask` 驱动 `mask-image`，不再绘制可见渐变色块。
+**2026-05-26 补充**: `Textarea` 的顶部/底部滚动渐隐改为复用 `layout.css` 的 `.snowui-scroll-mask` 通用能力（即「内容渐隐层」基础共享能力的 CSS 静态形态，能力总览见 [`../lib/edge-fade.md`](../lib/edge-fade.md)），在原生 `<textarea>` 上通过 `data-scroll-mask` 驱动 `mask-image`，不再绘制可见渐变色块。
 
 **继承**: 复用 Frame.svelte 的所有通用能力（状态、动效、响应式、Skeleton、样式编排）。
 **推荐容器**: `Field.svelte`。

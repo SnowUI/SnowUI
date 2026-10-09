@@ -1,10 +1,10 @@
 # SearchPopup
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.0.0
 > **职责**: 统一搜索面板的输入、可选标题、分组与结果间距。
-> **包归属**: PRO Blocks
+> **包归属**: 区块
 > **源码策略**: 付费源码开放
 > **区块类型**: Composite Block
 
@@ -63,6 +63,6 @@
 
 ## 更新日志
 
-- 2026-10-07：以 PRO Composite Block 提供搜索面板组合；原 SearchPopup 浮层容器的历史删除仍成立，新的区块不恢复旧浮层实现。
+- 2026-10-07：以 Composite Block 提供搜索面板组合；原 SearchPopup 浮层容器的历史删除仍成立，新的区块不恢复旧浮层实现。
 
 内置搜索图标复用 ComponentIcon 的 search，24px 画布，原始资源 resource-base/raw-assets/icons/snowui/Search.svg；viewBox 0 0 32 32，未改路径、留白或比例；可由 IconProvider 统一替换。

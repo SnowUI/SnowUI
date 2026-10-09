@@ -1,6 +1,6 @@
 # BarChart
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.4.1
 > **职责**: 用柱状图比较不同类别的数据，支持横向、纵向、分组与堆叠展示，以及坐标轴和交互提示。
@@ -97,7 +97,7 @@
 | showGuides | `boolean` | — | 保留 Chart API 命名；当前不绘制额外 guide |
 | showHoverLabel | `boolean` | — | hover / focus 柱体时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 默认行为：按 `showHoverPanel` 推导。 |
 | alwaysShowHoverLabel | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
-| adaptiveContrast | `boolean` | — | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 默认行为：继承 ChartGroup，否则 `true`。 |
+| adaptiveContrast | `boolean` | — | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 Adaptive Contrast 共享能力实现。 默认行为：继承 ChartGroup，否则 `true`。 |
 | showHoverPanel | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前柱 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
 | hoverPanelVariant | `ChartHoverPanelVariant` | `"light"` | hover 面板视觉样式 |
 | hoverPanelPlacement | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
@@ -147,7 +147,7 @@
 
 ### 设计原则
 
-- **PRO Chart 原子组件**: `BarChart` 只负责柱状图本体，不内置标题、卡片背景、legend 或 toolbar。
+- **Chart 原子组件**: `BarChart` 只负责柱状图本体，不内置标题、卡片背景、legend 或 toolbar。
 - **单元模型**: 一个分类项是一个 **bar unit**。单元统一控制柱粗细、圆角、方向和分类坐标；单元内部可以渲染单柱、多段、相叠柱或多根并排柱。
 - **多段式统一规则**: 三段式是多段式的特例。`mode="stack"` 使用 `segments` 渲染任意段数；`segmentGap={0}` 表示中间无间隔，`segmentGap>0` 表示分段之间有透明间隔且每段独立圆角。hover / focus / 常显数值只在最顶段上方显示一次，值为全部分段之和。
 - **相叠规则**: `mode="overlay"` 使用 `bars` 的前两项有效数据，第一项为后层、第二项为前层；两层各自独立命名和取值，共享零基线同轴相叠，不累加。后层为 10% 不透明度、前层为 100%；前层可高于后层。
@@ -339,7 +339,7 @@ SVG 图层从下到上为：
 
 
 
-> **状态**: 已实现(PRO)
+> **状态**: 已实现
 
 
 
@@ -403,7 +403,7 @@ SVG 图层从下到上为：
 
 ### v1.3.0 (2026-09-03)
 
-- `adaptiveContrast` 接入 OSS 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
+- `adaptiveContrast` 接入 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
 
 ### v1.2.0 (2026-09-02)
 

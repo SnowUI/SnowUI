@@ -1,6 +1,6 @@
 # Popover
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v3.1.1
 > **职责**: 在触发器附近展示补充内容或操作，支持不同尺寸与触发方式，适合快捷操作和轻量交互面板。
@@ -291,9 +291,9 @@ togglePopover("pop-01", buttonEl); // 切换
 | `<QuickAction>...</QuickAction>` | `<Popover size="sm">...</Popover>`(静态)或 `<Popover template id="..." size="sm">...</Popover>`(模版) |
 | `<SearchPopup>...</SearchPopup>` | `<Popover size="md">...</Popover>` |
 
-QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 PRO 中保留为搜索浮层组合参考。
+QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 组件示例中保留为搜索浮层组合参考。
 
-2026-10-07 新增的 [PRO Block SearchPopup](../blocks/SearchPopup.md) 是基于 Popover 的搜索输入与分组结果组合，不恢复旧 SearchPopup 浮层实现；SP-02 现在消费该区块。
+2026-10-07 新增的 [区块 SearchPopup](../blocks/SearchPopup.md) 是基于 Popover 的搜索输入与分组结果组合，不恢复旧 SearchPopup 浮层实现；SP-02 现在消费该区块。
 
 <a id="规范-spec"></a>
 

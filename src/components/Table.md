@@ -1,6 +1,6 @@
 # Table
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v2.6.0
 > **职责**: 以语义化表格展示结构化数据，支持自适应列宽、局部横向滚动与加载状态，可自由组合表头和单元格。
@@ -14,7 +14,7 @@
 ## 使用选择
 
 <!-- usage-guide:start -->
-用于纯展示结构化数据，并组合 TableHeader、TableBody、TableRow、TableHead、TableCell。出现搜索、排序、勾选、操作列或分页时由 PRO DataTable 协调，不在普通 Table 外复制数据管理行为。
+用于纯展示结构化数据，并组合 TableHeader、TableBody、TableRow、TableHead、TableCell。出现搜索、排序、勾选、操作列或分页时由 DataTable 协调，不在普通 Table 外复制数据管理行为。
 
 - 通过 TableHeader / TableBody / TableRow 等保持合法表格层级。
 - columnWidths 保存列宽，columnId 对齐同一列；数据查询、选择、分页交给 DataTable。
@@ -81,13 +81,13 @@
 
 <a id="oss-table-与-pro-datatable-的边界"></a>
 
-### OSS Table 与 PRO DataTable 的边界
+### Table 与 DataTable 的边界
 
-普通 OSS `Table` 是纯数据展示组件：只负责以原生表格语义渲染表头和数据行。普通表格不提供加载更多、checkbox 选择列、按钮操作列、排序、筛选、分页或搜索。
+普通 `Table` 是纯数据展示组件：只负责以原生表格语义渲染表头和数据行。普通表格不提供加载更多、checkbox 选择列、按钮操作列、排序、筛选、分页或搜索。
 
-出现上述任一数据管理或操作能力时，使用 PRO `DataTable`：
+出现上述任一数据管理或操作能力时，使用 `DataTable`：
 
-| 能力 | OSS Table | PRO DataTable |
+| 能力 | Table | DataTable |
 | :--- | :---: | :---: |
 | 表头与数据行展示 | ✓ | ✓ |
 | 加载更多 | — | ✓ |
@@ -97,7 +97,7 @@
 | 分页 | — | ✓ |
 | 搜索 / TableToolbar | — | ✓ |
 
-首次加载 Skeleton 与已有数据加载 Spinner 是 Table 的加载**展示协议**，不包含请求、加载更多、分页或其他数据管理逻辑；这些状态由调用方显式传入，或由 PRO DataTable 协调。
+首次加载 Skeleton 与已有数据加载 Spinner 是 Table 的加载**展示协议**，不包含请求、加载更多、分页或其他数据管理逻辑；这些状态由调用方显式传入，或由 DataTable 协调。
 
 <a id="布局模型"></a>
 
@@ -122,7 +122,7 @@ gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell paddin
 
 固有最小宽度：未声明 `columnWidths` / `minWidth` 时，原生 `table-layout:auto` 以各列内容的 min-content 宽度自动形成整表最小宽度，并至少填满宿主。普通可换行单元格以“最长不可断单词 / 片段 + 单元格左右 padding”为列的自动下限，不会逐字拆分标识符。`lines={1}` / `nowrap` 内容的整行是不可断片段，因而会产生更保守的列下限。任一显式 `columnWidths`、拖动列宽或固定宽度都属于调用方主动覆盖，该列改按 TableCell / TableHead 的截断规则处理。
 
-普通 Table 不提供 checkbox 选择列或按钮操作列。`TableHead/TableCell as="selection|actions"` 只有位于 PRO DataTable Context 中才激活；选择状态、角色布局与批量操作均由 DataTable 持有。
+普通 Table 不提供 checkbox 选择列或按钮操作列。`TableHead/TableCell as="selection|actions"` 只有位于 DataTable Context 中才激活；选择状态、角色布局与批量操作均由 DataTable 持有。
 
 普通 Table 的 TableHead 默认不允许拖动修改列宽；需要时显式传入 `resizable`。DataTable 的普通列保持默认可拖动，显式 `resizable={false}` 可关闭。该默认能力只负责列宽，不会让普通 Table 自动拥有数据排序规则。
 
@@ -184,7 +184,7 @@ DataTable 每收到一条数据就提交一条可见 row，并通过 Table Conte
   - checkbox 一侧：`--snowui-table-selection-fade-start-override`（默认实际 Checkbox 右边缘）→ `--snowui-table-selection-fade-end-override`（默认右边缘 + `--size-5`），过渡不随列宽变化。
   - actions 一侧：完全透明区默认覆盖到最左侧按钮的实际左边缘（实测按钮组宽度含右侧内边距，coverage 默认 `1`）。从该边缘向左用 `--size-5`（名义 20px）固定长度过渡到清晰，不随按钮组宽度、按钮数量或响应式 padding 变化；随全局 Token 缩放。`--snowui-table-actions-fade-coverage-override` 仍可显式调整覆盖比例；`--snowui-table-actions-fade-feather-override` 默认不设置，仅兼容旧调用方显式设置的倍数语义，此时过渡终点仍为透明区宽度乘该倍数。
 
-> 三处渐隐的 `mask-image` 均复用 OSS 通用能力 [`edge-fade`](../lib/edge-fade.md)（`createEdgeFadeMaskImage`）生成并存到 CSS 变量，TableCell / TableHead 的 hover 状态规则只 `mask-image: var(...)` 消费。selection / head 通过私有布局适配 `table-selection-fade.ts` 测量实际 Checkbox 右边缘并在内容节点生成遮罩；actions 遮罩依赖每行实测按钮宽度，因此由各普通内容 TableCell 在自身作用域生成，并减去该内容块右边缘距可见行右边缘的偏移，确保能够读取行级 `--snowui-table-role-overlay-content-width`。上面这些 `*-override` 变量即该能力对表格暴露的可配置参数。「悬浮操作层」本身的定位（sticky / fixed + JS 测量）属于表格布局职责，不在通用能力范围内。
+> 三处渐隐的 `mask-image` 均复用 基础共享能力 [`edge-fade`](../lib/edge-fade.md)（`createEdgeFadeMaskImage`）生成并存到 CSS 变量，TableCell / TableHead 的 hover 状态规则只 `mask-image: var(...)` 消费。selection / head 通过私有布局适配 `table-selection-fade.ts` 测量实际 Checkbox 右边缘并在内容节点生成遮罩；actions 遮罩依赖每行实测按钮宽度，因此由各普通内容 TableCell 在自身作用域生成，并减去该内容块右边缘距可见行右边缘的偏移，确保能够读取行级 `--snowui-table-role-overlay-content-width`。上面这些 `*-override` 变量即该能力对表格暴露的可配置参数。「悬浮操作层」本身的定位（sticky / fixed + JS 测量）属于表格布局职责，不在通用能力范围内。
 - **退出同步**：hover 结束且没有展开的操作菜单时，actions 整个浮层立即隐藏，与内容遮罩撤销同步，避免淡出按钮或模糊层留下残影；进入渐显保持不变。
 - **不影响点击**：`mask` 只改变可见度，不改变命中测试；被渐隐内容里的链接、按钮等仍可正常点击。
 - **与 blur 的关系**：边缘渐隐与 `.snowui-table-role-blur-layer` 背景模糊是两套独立机制。需要只保留渐隐时，把 `--snowui-table-role-overlay-blur-override` 设为 `0rem` 关闭背景模糊即可。
@@ -246,7 +246,7 @@ Table 是 Table / DataTable 的唯一布局计算入口，依据自身容器可�
 
 7. 变宽时先恢复数据列，再恢复 padding，最后角色列回到常驻；隐藏列恢复基于未隐藏的原始内容测量，避免振荡。动态数据、列宽调整、字体加载和 Token 缩放会重新计算。
 
-DataTable 的配置由 Context 下发；显式 Table 配置优先。普通 OSS Table 复用间距、隐藏和滚动规则，不新增 PRO 选择 / 操作状态。旧显式 `roleLayout="column"` / `"overlay"` 保留固定布局含义；column 现在常驻显示角色控件。
+DataTable 的配置由 Context 下发；显式 Table 配置优先。普通 Table 复用间距、隐藏和滚动规则，不新增 选择 / 操作状态。旧显式 `roleLayout="column"` / `"overlay"` 保留固定布局含义；column 现在常驻显示角色控件。
 
 ## AI Zone
 
@@ -305,9 +305,9 @@ Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、
 - 2026-08-03：TableRow 新增外部受控 `active` 激活态；持久 `--black-4` 背景可与连续 hover 层叠加，不与 selected / Checkbox 选中状态绑定。
 - 2026-07-07：减少首屏工作量：普通单元格挂载不再额外排队逐格 rAF；overlay 角色块仅在 hover、focus、选中或强制预览时测量与监听位置，空闲行不触发布局读取。
 
-- 2026-07-07：v2.1.0，明确 OSS Table 只负责表格数据展示；加载更多、selection/actions 角色列、排序筛选、分页和搜索统一归 PRO DataTable。
+- 2026-07-07：v2.1.0，明确 Table 只负责表格数据展示；加载更多、selection/actions 角色列、排序筛选、分页和搜索统一归 DataTable。
 
-- 2026-07-05：v2.0.0，checkbox 选择列与按钮操作列移交 PRO DataTable；普通 Table 删除选择和角色布局 Props。
+- 2026-07-05：v2.0.0，checkbox 选择列与按钮操作列移交 DataTable；普通 Table 删除选择和角色布局 Props。
 
 - 2026-07-01：v1.14.0，数据行注册改为 microtask 批量提交，分页整批替换行时不再逐行触发选择状态重算。
 - 2026-06-30：v1.13.0，增量加载首次开始前自动锁定当前自然列宽，避免新行更宽内容触发 `table-layout:auto` 重排并带动已有行横向晃动；显式 columnWidths / 拖动列宽保持优先。
@@ -326,7 +326,7 @@ Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、
 - 2026-06-30：v1.7.3，striped 数据行圆角改为始终保持；divided hover 背景仅进入时过渡、移出时立即清除，避免圆角恢复直角时仍有渐隐背景残留。
 - 2026-06-30：v1.7.2，默认 divided 表头与静态数据行改为直角；数据行仅在 hover / `data-force-hover` 时形成 12px 外缘圆角，并完整隐藏 hover 表面上下相邻分割线。striped 奇数背景行圆角保持不变。
 - 2026-06-29：v1.7.1，修复 actions 渐隐遮罩失效：依赖行级实测按钮宽度的 mask 生成从 Table 根移到相邻内容 TableCell 自身，避免根节点无法解析后代 CSS 变量；仍统一复用 `edge-fade`。
-- 2026-06-27：v1.7.0，把 overlay「内容渐隐层」提炼为 OSS 通用能力 [`edge-fade`](../lib/edge-fade.md)（`createEdgeFadeMaskImage`）：Table 根用它生成 checkbox / 表头遮罩，actions 遮罩由相邻内容 TableCell 在可读取行级实测宽度的作用域生成；TableCell / TableHead 的 hover 规则统一通过 CSS 变量消费。三处渐隐参数（fade-start / fade-end / coverage / feather）保留为可配置覆盖变量；新增 `--snowui-table-actions-fade-feather-override`（默认 3）控制按钮列柔和尾巴长度。「悬浮操作层」定位仍属表格布局职责。
+- 2026-06-27：v1.7.0，把 overlay「内容渐隐层」提炼为 基础共享能力 [`edge-fade`](../lib/edge-fade.md)（`createEdgeFadeMaskImage`）：Table 根用它生成 checkbox / 表头遮罩，actions 遮罩由相邻内容 TableCell 在可读取行级实测宽度的作用域生成；TableCell / TableHead 的 hover 规则统一通过 CSS 变量消费。三处渐隐参数（fade-start / fade-end / coverage / feather）保留为可配置覆盖变量；新增 `--snowui-table-actions-fade-feather-override`（默认 3）控制按钮列柔和尾巴长度。「悬浮操作层」定位仍属表格布局职责。
 
 - 2026-06-27：v1.6.3，按实际落地参数更新文档：按钮列渐隐 coverage 默认 `0.9`、柔和尾巴终点 `× 3`（尾巴长度 = 透明区的两倍，过渡更缓）；并修正文档中过期的代码示例默认值（checkbox `15% → 60%`、表头 `50% → 100%`）。
 

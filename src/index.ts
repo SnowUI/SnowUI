@@ -143,7 +143,7 @@ export {
 } from "./logic/continuous-hover.svelte";
 
 
-// PRO 包跨包消费需要的工具导出
+// 共享能力公开工具导出
 export { resizeManager } from './logic/observer.svelte'
 export { resizable, clampResizableSize, type ResizableOptions, type ResizeAxis, type ResizeEdge } from "./lib/resizable";
 export {

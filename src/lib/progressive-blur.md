@@ -5,7 +5,7 @@
 
 ## 设计来源
 
-Progressive Blur 参考 `[项目目录]/repos/ProgressiveBlur-main` 中的 Swift 实现。原实现通过 `CIMaskedVariableBlur` 和渐变 mask 让模糊强度沿一个方向变化；Web 平台没有同等的原生可变模糊滤镜，因此 OSS 能力使用多层 `backdrop-filter` 条带叠加，并为每层添加渐隐 mask 近似该效果。
+Progressive Blur 参考 `[项目目录]/repos/ProgressiveBlur-main` 中的 Swift 实现。原实现通过 `CIMaskedVariableBlur` 和渐变 mask 让模糊强度沿一个方向变化；Web 平台没有同等的原生可变模糊滤镜，因此 能力使用多层 `backdrop-filter` 条带叠加，并为每层添加渐隐 mask 近似该效果。
 
 ## API
 

@@ -1,5 +1,5 @@
 export const examples = [{
-    name: "A1: 普通 OSS 数据表格",
+    name: "A1: 普通 数据表格",
     code: `A1
 <Table minWidth={960} ariaLabel="订阅记录">
     <TableHeader>
@@ -51,7 +51,7 @@ export const examples = [{
         render: "渲染只含表头和业务数据行的原生语义表格。",
         layout: "八个普通数据列展示 Table-Demo 表格一的订阅内容，不含 checkbox 列和按钮列。",
         interaction: "仅保留普通数据行的默认 hover；没有搜索、排序、筛选、分页或加载更多交互。",
-        performance: "静态数据直接由 OSS Table 语义组件渲染，不创建 PRO 数据状态。",
+        performance: "静态数据直接由 Table 语义组件渲染，不创建 DataTable 数据状态。",
         responsive: "显式最小宽度为 960px，超出窄容器时由 Table 内置局部横向 viewport 承接，同一轨道贴近视口底部；未声明 minWidth / columnWidths 时由各列 min-content 与 Cell padding 自动汇总整表最小宽度。表头与数据 Cell 左右 padding 按 Table 容器宽度在 4px 到 12px 之间响应，窄容器收敛到每侧 4px，使相邻列最小间距为 8px。",
     },
     logic: ["Semantic", "DisplayOnly", "OSSBoundary"],
@@ -68,7 +68,7 @@ export const examples = [{
 <TableHeader><TableRow><TableHead columnId="name">订阅</TableHead><TableHead columnId="owner">负责人</TableHead><TableHead columnId="status" responsiveHide={false}>状态</TableHead><TableHead columnId="note">备注</TableHead></TableRow></TableHeader>
 <TableBody><TableRow><TableCell columnId="name">SnowUI Professional</TableCell><TableCell columnId="owner">Natali Craig</TableCell><TableCell columnId="status">Active</TableCell><TableCell columnId="note">Annual subscription renewal</TableCell></TableRow></TableBody>
 </Table>`,
-    expected: { render: "纯 OSS Table 根据自身容器宽度响应。", responsive: "先缩左右间距，再隐藏备注和负责人；名称与状态保留。仍超宽时局部滚动，变宽恢复全部列。", interaction: "隐藏列退出焦点顺序，hover 圆角跟随可见首尾。" },
+    expected: { render: "纯 Table 根据自身容器宽度响应。", responsive: "先缩左右间距，再隐藏备注和负责人；名称与状态保留。仍超宽时局部滚动，变宽恢复全部列。", interaction: "隐藏列退出焦点顺序，hover 圆角跟随可见首尾。" },
     logic: ["Responsive", "ColumnVisibility", "ScrollFallback"],
 }, {
         name: "最后一列长文本",

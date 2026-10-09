@@ -1,6 +1,6 @@
 # IconProvider
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.0.0
 > **职责**: 为应用或局部区域统一替换 SnowUI 内置功能图标，未配置的图标继续使用组件默认样式。
@@ -115,7 +115,7 @@ Provider 不生成 DOM。功能名称、Button 的 `aria-label`、交互命中�
 
 - `IconProvider.svelte`：公开 Context Provider，负责 resolver 链和嵌套回退。
 - `logic/component-icon.ts`：公开结构类型与 `createComponentIconResolver()`。
-- `internal/component-icon/ComponentIcon.svelte`：SnowUI 组件与 PRO 的内部语义消费入口。
+- `internal/component-icon/ComponentIcon.svelte`：SnowUI 组件的内部语义消费入口。
 - `internal/component-icon/builtin-icon-data.ts`：随 Components 发布的默认图标快照。
 
 ### 输出协议

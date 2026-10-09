@@ -1,6 +1,6 @@
 # ColorSchemeButton
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.0.2
 > **职责**: 在亮色与暗色主题之间切换，并以图标反馈当前方案，适合网站和应用的主题入口。
@@ -87,7 +87,7 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 
 ### 开发者指南 (AI)
 
-- 包归属：OSS；主布局模型为内联外壳布局。
+- 包归属：共享能力；主布局模型为内联外壳布局。
 - 组合身份：Button 宿主组件特化，不提供 `parts.Button`。
 - 内置图标不传显式 size，必须由 `ComponentIcon` 消费 Button 提供的图标尺寸 Context；切换 IconProvider 不能改变该尺寸所有权。
 - 多实例通过观察根节点 `theme` 属性同步；`applyToDocument={false}` 时由受控 `scheme` 同步。

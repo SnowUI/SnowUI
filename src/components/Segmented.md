@@ -1,6 +1,6 @@
 # Segmented
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.3.0
 > **职责**: 将少量互斥选项并排展示，便于快速切换筛选条件或参数，并支持键盘与表单交互。
@@ -30,7 +30,7 @@
 	import { Segmented } from '@snowui-design-system/components';
 </script>
 
-<Segmented size="lg" value="all" aria-label="Filter components by tier" items={[{ value: 'all', label: 'All' }, { value: 'oss', label: 'OSS' }, { value: 'pro', label: 'PRO' }]} />
+<Segmented size="lg" value="all" aria-label="Filter components by category" items={[{ value: 'all', label: 'All' }, { value: 'basic', label: 'Basic' }, { value: 'composite', label: 'Composite' }]} />
 ```
 <!-- /quick-start:generated -->
 
@@ -57,7 +57,7 @@
 - 显式组合模式：显式书写 `<Button as="item">`，逐项 Props 直接配置。
 
 > **版本**: v1.3.0
-> **状态**: 已实现(PRO)
+> **状态**: 已实现
 > **职责**: RadioGroup 的视觉变体,在多个互斥选项之间切换"过滤器/参数"。视觉系统
 > 与 [Tab](Tab.md) 完全共享,在 ARIA 语义、键盘行为、Form 接入上区分。
 > **设计稿**: Figma node `11838-19967`

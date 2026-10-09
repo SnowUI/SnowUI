@@ -1,6 +1,6 @@
 # Accordion
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.6.2
 > **职责**: 将相关内容组织为可展开、收起的分组，适合常见问题、设置和分段说明，支持单项或多项同时展开。
@@ -50,8 +50,8 @@
 		<Frame as="content" row>Public behavior is checked with type validation, accessibility coverage, and real browser previews.</Frame>
 	</AccordionItem>
 	<AccordionItem value="pro">
-		<Frame as="title" row><Icon as="leading"><Rocket /></Icon>When should I use SnowUI PRO?</Frame>
-		<Frame as="content" row>Use PRO for advanced components and product-ready blocks that coordinate richer application workflows.</Frame>
+		<Frame as="title" row><Icon as="leading"><Rocket /></Icon>When do I need component source?</Frame>
+		<Frame as="content" row>Choose Pro or Team when you need component source, internal modifications, or the included Figma resources.</Frame>
 	</AccordionItem>
 </Accordion>
 ```
@@ -328,4 +328,4 @@ hover 归属：标题 hover 仅改变默认指示图标的透明度，不创建�
 ### v1.0.0 (2026-05-23)
 
 #### 新功能
-- 新增 Accordion OSS 组件，支持单开 / 多开、受控 / 非受控、禁用项、视觉形态与三档尺寸。
+- 新增 Accordion 组件，支持单开 / 多开、受控 / 非受控、禁用项、视觉形态与三档尺寸。

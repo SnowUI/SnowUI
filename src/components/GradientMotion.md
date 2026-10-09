@@ -1,6 +1,6 @@
 # GradientMotion
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v4.0.1
 > **职责**: 以流动扫光呈现动态渐变，可用于背景、头像占位或可裁切的媒体区域。
@@ -170,7 +170,7 @@ GradientMotion 的内置 glimm cosine palette、WebGL 不可用时的 CSS fallba
 
 ## AI Zone
 
-GradientMotion 是一个 PRO 动效组件。它输出 glimm.dev 同款 WebGL 扫光带：单条 gaussian band 按方向穿过画布，使用 cosine palette、边缘 wave/ripple、fresnel 与 specular 高光形成虹彩薄膜效果。
+GradientMotion 是一个 动效组件。它输出 glimm.dev 同款 WebGL 扫光带：单条 gaussian band 按方向穿过画布，使用 cosine palette、边缘 wave/ripple、fresnel 与 specular 高光形成虹彩薄膜效果。
 
 <a id="开发者指南-ai"></a>
 
@@ -262,4 +262,4 @@ GradientMotion 是一个 PRO 动效组件。它输出 glimm.dev 同款 WebGL 扫
 ### v1.0.0 (2026-06-10)
 
 #### 新功能
-- 新增 GradientMotion PRO 组件，支持 6 种渐变预设、随机预设、速度控制、头像与背景场景。
+- 新增 GradientMotion 组件，支持 6 种渐变预设、随机预设、速度控制、头像与背景场景。

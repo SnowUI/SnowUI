@@ -1,7 +1,7 @@
 {
   "license": "SEE LICENSE IN LICENSE",
   "name": "@snowui-design-system/components",
-  "version": "0.3.0-alpha.0",
+  "version": "0.3.0-alpha.1",
   "private": false,
   "type": "module",
   "exports": {
@@ -92,7 +92,7 @@
     "check:standards": "node ../scripts/check-standards.js",
     "check:resize-observer": "node scripts/check-resize-observer-boundary.mjs",
     "fix:standards": "node ../scripts/check-standards.js --fix",
-    "check:oss": "node scripts/check-oss-deps.mjs && node scripts/check-resize-observer-boundary.mjs",
+    "check:boundaries": "node scripts/check-runtime-deps.mjs && node scripts/check-resize-observer-boundary.mjs",
     "catalog:generate": "node scripts/generate-component-catalog.mjs",
     "catalog:check": "node scripts/generate-component-catalog.mjs --check",
     "verify:styles": "node scripts/verify-styles.mjs",

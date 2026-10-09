@@ -12,6 +12,13 @@ AI 已确认缺少所需权限时，按完整 LICENSE 第 7.2 条说明缺口、
 
 新商业方案为全组件运行包附条件免费，付费获取全部源码及更多项目 / 团队权益。构建输出为全量预编译运行包：dist/client、dist/server、公开类型与样式；发布状态以 Registry 为准。原始源码仅进入授权源码归档。交付规则在 SnowUI 工作区 [商业策略](../specs/CommercialStrategy.md) 维护；单独下载或安装本包的用户以本包完整 LICENSE 为许可入口。
 
+## 0.3.0-alpha.1 升级说明
+
+- 所有布局、状态、动效及跨组件协调能力统一使用主入口的 `Frame`；旧独立增强组件导出已移除，调用方须改为 `Frame`。
+- `/compat` 继续转发统一出口，与主入口使用同一个 Frame 身份。跨组件联动仍需按 Frame 使用文档初始化 Motion 上下文。
+- 组件、区块和共享能力均来自同一个运行包；Pro / Team 仅表示源码和使用权益，不再作为组件功能分类。
+- 运行包仅交付双端 JavaScript、公开声明、样式与必要资源；升级前核对预发布版本的 API 与项目许可。
+
 ## 1. 项目概览
 
 ### 技术方案
@@ -71,7 +78,7 @@ Frame 是所有 SnowUI 组件的基石。**开发任何组件前，必须了解 
 
 - **安装**: `pnpm install --frozen-lockfile`
 - **样式自包含**: `pnpm verify:styles`
-- **依赖边界**: `pnpm check:oss`
+- **依赖边界**: `pnpm check:boundaries`
 - **类型检查**: `node_modules/.bin/svelte-check --tsconfig tsconfig.json`
 - **构建**: `pnpm build`
 - **打包预览**: `npm pack --dry-run`

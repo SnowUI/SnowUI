@@ -1,8 +1,8 @@
 /**
  * number.ts
  * v1.1.0
- * 默认数字变化动效配置（OSS 版）。
- * OSS 不捆绑 FlowText 组件；PRO 包会在运行时注入 component 字段。
+ * 默认数字变化动效配置。
+ * 不捆绑 FlowText 组件；调用方可在运行时注入 component 字段。
  */
 
 import type { MotionConfig } from "../logic/motion-config";
@@ -16,7 +16,7 @@ export const NUMBER_MOTION: MotionConfig = {
     component: undefined,
 };
 
-/** PRO 包会将此替换为实际的 FlowText 组件引用 */
+/** 调用方可将此替换为实际的 FlowText 组件引用 */
 export let NUMBER_MOTION_COMPONENT: unknown = undefined;
 
 export function interpolateNumberMotionValue(

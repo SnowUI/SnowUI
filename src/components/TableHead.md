@@ -1,6 +1,6 @@
 # TableHead
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v2.4.0
 > **职责**: 定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。
@@ -205,7 +205,7 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 
-> `selection` / `actions` 角色仅在 PRO DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
+> `selection` / `actions` 角色仅在 DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
 
 ## 更新日志
 

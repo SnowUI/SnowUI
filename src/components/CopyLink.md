@@ -1,6 +1,6 @@
 # CopyLink
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.0.1
 > **职责**: 展示可打开、可复制的链接地址，文字打开链接，其余区域复制地址。
@@ -51,7 +51,7 @@
 - Link 与 CopyButton 为平级交互元素，文字区域导航，其余表面复制；Tab 分别聚焦，Enter 打开，Enter / Space 复制。
 - 文字为复制图标预留 size-4 与 gap-2；文字和尾部图标的最小间距与 Input 一致（默认 8px）。长文字以省略号 `…` 截断，完整地址继续用于导航和复制。
 - 复制按钮为 bare muted，图标在右侧居中。反馈期间沿用 CopyButton 的重复点击保护。
-- 不参与表单提交，不提供编辑、校验或输入框角色；无需 PRO。
+- 不参与表单提交，不提供编辑、校验或输入框角色；无需额外组件包。
 - `--snowui-copy-link-padding-x-override` / `--snowui-copy-link-padding-y-override` / `--snowui-copy-link-radius-override` 分别覆盖默认 padding-4 / padding-3 / radius-4。
 
 ## AI Zone
@@ -74,4 +74,4 @@
 
 ### v1.0.0 (2026-09-27)
 
-- 从 Quick Start 已确认的链接框提取 OSS 组件，统一文字导航、其余区域复制和无边框表面。
+- 从 Quick Start 已确认的链接框提取 组件，统一文字导航、其余区域复制和无边框表面。

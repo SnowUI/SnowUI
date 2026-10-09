@@ -1,6 +1,6 @@
 # ButtonGroup
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.2.1
 > **职责**: 将相关按钮组合为统一的操作组，支持分割线，适合拆分按钮和紧凑工具栏。
@@ -57,7 +57,7 @@
 
 ### 组件边界
 
-- ButtonGroup 属于 OSS 组件，作用半径只覆盖自身一个 Frame 容器，不依赖 PRO 的跨 Frame 编排能力。
+- ButtonGroup 属于 组件，作用半径只覆盖自身一个 Frame 容器，不依赖专业协调模块 的跨 Frame 编排能力。
 - `variant` 对齐 Button 的 `gray` / `filled` / `outline` / `borderless`。初版不开放 `link`，因为 link 形态没有稳定按钮外壳，不适合承载分割线。
 - ButtonGroup 不内置 Popover / Menu 行为。需要菜单时，消费方把 Popover 触发器或菜单图标放入某个 Button 单元格。
 - ButtonGroup 不提供专用 Cell 组件。单元格直接复用 Button，避免平行维护第二套按钮事件、链接、状态、图标尺寸与无障碍逻辑。

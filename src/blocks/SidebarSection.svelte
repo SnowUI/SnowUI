@@ -1,4 +1,4 @@
-<!-- SidebarSection PRO Block v1.4.0. 文档: ./SidebarSection.md -->
+<!-- SidebarSection Block v1.4.0. 文档: ./SidebarSection.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import {untrack, type Snippet} from "svelte";

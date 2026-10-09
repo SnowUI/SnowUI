@@ -1,6 +1,6 @@
 # TableHeader
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.1.0
 > **职责**: 组织 Table 的表头行，明确各列含义，并保留原生表格的表头语义。
@@ -34,11 +34,11 @@
 	<TableHeader><TableRow>
 		<TableHead columnId="component">Component</TableHead>
 		<TableHead columnId="package">Package</TableHead>
-		<TableHead columnId="tier">Tier</TableHead>
+		<TableHead columnId="category">Category</TableHead>
 		<TableHead columnId="updated">Last updated</TableHead>
 		<TableHead columnId="status" align="end">Documentation</TableHead>
 	</TableRow></TableHeader>
-	<TableBody><TableRow rowId="button"><TableCell columnId="component">Button</TableCell><TableCell columnId="package">components</TableCell><TableCell columnId="tier">OSS</TableCell><TableCell columnId="updated">Today</TableCell><TableCell columnId="status" align="end">Published</TableCell></TableRow></TableBody>
+	<TableBody><TableRow rowId="button"><TableCell columnId="component">Button</TableCell><TableCell columnId="package">components</TableCell><TableCell columnId="category">Basic</TableCell><TableCell columnId="updated">Today</TableCell><TableCell columnId="status" align="end">Published</TableCell></TableRow></TableBody>
 </Table>
 ```
 <!-- /quick-start:generated -->

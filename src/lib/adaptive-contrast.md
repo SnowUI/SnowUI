@@ -8,7 +8,7 @@
 
 适合在纯色背景或组件已知的矢量表面上保持线、圆圈与文字可见。同一点使用 sRGB 灰度 0.5 为明暗分界；深背景用 StaticWhite/100，浅背景用 StaticBlack/100，圆圈内外层互为反色。此能力不是彩色补色或 CSS `mix-blend-mode: difference`，也不是对比率合规检测器。
 
-能力属于 OSS `lib`，不依赖 PRO、不自动注入 Frame。组件声明背景表面并拥有自己的前景、事件、几何和 ARIA；消费页面使用组件公开入口。当前接入者是 BarChart、LineChart、ChartGroup 的 `adaptiveContrast`，详见 [ChartSpec](../../../specs/ChartSpec.md#84-自适应黑白对比)。Slider 只是效果参考，本次没有迁移它的内部实现。
+能力属于 `lib`，不依赖专业协调模块、不自动注入 Frame。组件声明背景表面并拥有自己的前景、事件、几何和 ARIA；消费页面使用组件公开入口。当前接入者是 BarChart、LineChart、ChartGroup 的 `adaptiveContrast`，详见 [ChartSpec](../../../specs/ChartSpec.md#84-自适应黑白对比)。Slider 只是效果参考，本次没有迁移它的内部实现。
 
 支持纯色祖先背景及同坐标系的路径填色、透明度、可解析的 SVG 渐变引用。表面顺序为实际由后向前的绘制顺序。调用方必须提供正确几何；不自动采样图片、Canvas、背景渐变、伪元素、阴影、外部覆盖物或不同坐标系的内容。未知 CSS 颜色和渐变前景保留原样；只有明确黑白色参与自动反白。
 
@@ -58,7 +58,7 @@ import { AdaptiveContrastMask } from '@snowui-design-system/components/lib/adapt
 
 组件必须在开启时才渲染遮罩、登记表面；关闭时不启动该能力专属 Observer、监听或持续测量。渲染层不创建 Portal、ResizeObserver、timer 或 rAF。背景 transition 结束后刷新最终色，不承诺逐帧采样过渡色。
 
-独立导入其他 OSS 组件不依赖此模块。接入组件的动态 boolean 分支仍可能保留遮罩静态代码，不能宣称传 false 就产生零字节。2026-09-03 使用 Site 的 Vite 8.2.1 / Svelte 构建三个独立入口，遍历入口 chunk 的静态依赖：普通 Button 的反白模块集合为空；LineChart 的开/关入口都保留同一组共享模块，Rollup `renderedLength` 合计 4,726 字符（颜色模块 418，遮罩 4,308，转出入口 0）。这是 tree-shaking 后、最终压缩前的模块代码长度，不是网络传输增量或 gzip 包体。显式关闭无需初始化的边界由真实浏览器关闭/卸载测试验证。
+独立导入其他 组件不依赖此模块。接入组件的动态 boolean 分支仍可能保留遮罩静态代码，不能宣称传 false 就产生零字节。2026-09-03 使用 Site 的 Vite 8.2.1 / Svelte 构建三个独立入口，遍历入口 chunk 的静态依赖：普通 Button 的反白模块集合为空；LineChart 的开/关入口都保留同一组共享模块，Rollup `renderedLength` 合计 4,726 字符（颜色模块 418，遮罩 4,308，转出入口 0）。这是 tree-shaking 后、最终压缩前的模块代码长度，不是网络传输增量或 gzip 包体。显式关闭无需初始化的边界由真实浏览器关闭/卸载测试验证。
 
 ## 维护与验收
 

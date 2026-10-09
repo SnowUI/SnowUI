@@ -1,6 +1,6 @@
 # LineChart
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.6.1
 > **职责**: 用折线展示数据变化趋势，支持多序列、面积填充、实线与虚线，以及坐标轴、网格和节点样式。
@@ -54,7 +54,7 @@
 | showGuides | `boolean` | — | 是否允许序列绘制节点垂直辅助线 |
 | showHoverLabel | `boolean` | — | hover / focus 节点时是否显示数值 label；当 `showHoverPanel=true` 且未显式传入时实际渲染默认关闭 默认行为：按 `showHoverPanel` 推导。 |
 | alwaysShowHoverLabel | `boolean` | `false` | 是否让数值 label 一直显示；与 `showHoverPanel` 同时开启时允许同时显示 |
-| adaptiveContrast | `boolean` | — | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 默认行为：继承 ChartGroup，否则 `true`。 |
+| adaptiveContrast | `boolean` | — | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 Adaptive Contrast 共享能力实现。 默认行为：继承 ChartGroup，否则 `true`。 |
 | showHoverPanel | `boolean` | `true` | 是否开启 Chart hover 面板，内容按当前节点 / cell 自动生成；默认开启，hover / focus 时显示面板；设为 false 时回到数值 hover label，显式 showHoverLabel 优先 |
 | hoverPanelVariant | `ChartHoverPanelVariant` | `"light"` | hover 面板视觉样式 |
 | hoverPanelPlacement | `ChartHoverPanelPlacement` | `"pointer"` | hover 面板定位；支持 anchor / pointer / pin 位置 |
@@ -104,7 +104,7 @@
 
 ### 设计原则
 
-- **PRO Chart 原子组件**: `LineChart` 只负责折线图本体，不内置标题、卡片背景、legend 或 toolbar。
+- **Chart 原子组件**: `LineChart` 只负责折线图本体，不内置标题、卡片背景、legend 或 toolbar。
 - **无内置示例数据**: `LineChart` 不在组件内部模拟业务数据；示例、业务页面或外层组合组件必须显式传入 `series` 与 `xLabels`。
 - **Area 不拆分**: Area 是 `LineChart` 的序列填充形态；通过 `series[].area` 开启，不单独拆 `AreaChart`。
 - **多序列**: 一张图可同时渲染实线、虚线、ChartSpec 默认色序和不同 marker 策略。
@@ -291,7 +291,7 @@ SVG 图层从下到上为：
 
 
 
-> **状态**: 已实现(PRO)
+> **状态**: 已实现
 
 
 > **参考**: Figma Workshop 节点 `12617:1780`。
@@ -371,7 +371,7 @@ SVG 图层从下到上为：
 
 ### v1.5.0 (2026-09-03)
 
-- `adaptiveContrast` 接入 OSS 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
+- `adaptiveContrast` 接入 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
 
 ### v1.4.2 (2026-09-02)
 

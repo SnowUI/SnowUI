@@ -1,6 +1,6 @@
 # ChartGroup
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v0.4.1
 > **职责**: 将多个图表组合在同一区域，协调分类悬停、叠加绘制与共享坐标轴，便于比较关联数据。
@@ -152,7 +152,7 @@
 | defaultActiveCellIndex | `number \| null` | `null` | 仅初始化内部非受控索引，后续修改不重置状态；activeCellIndex 有定义时此值不参与当前选择。null 表示初始无激活项。 |
 | onCellHoverChange | `(index: number \| null) => void` | — | 共享索引发生变化时接收新索引或 null；由指针、分类格焦点及子图交互触发。内部交互将有限数值限制在有效分类范围内；受控模式只通知，不替调用方改值，无取消返回值。 |
 | showHitLayer | `boolean` | `true` | 控制组级 SVG 分类命中层；仅在 hoverMode=cell 且 showHoverPanel=false 时渲染。开启共享面板后改由根层指针坐标与子图命中处理，false 不等于禁用子图交互。 |
-| adaptiveContrast | `boolean` | `true` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 OSS Adaptive Contrast 共享能力实现。 |
+| adaptiveContrast | `boolean` | `true` | 自适应黑白对比：按纯色宿主背景与同原点叠加柱体的明暗切换黑色数值和默认黑白节点、黑色折线；子图显式值优先，彩色序列与彩色节点不改色。明暗分界为 sRGB 灰度 0.5，随当前柱体形状和透明度变化；不支持背景图片或跨图坐标变换。默认开启，可显式关闭；由 Adaptive Contrast 共享能力实现。 |
 | showHoverPanel | `boolean` | `true` | 将子图上报的数据合并为唯一共享面板；cell 模式下根层指针位置更新当前分类。默认开启；关闭时不显示共享面板，子图按自身 showHoverPanel 配置显示独立面板；若需要数值标签，可同时关闭子图面板或显式设置 showHoverLabel；空数据没有面板。 |
 | showHoverLabel | `boolean` | — | 统一控制子图数值标签；未传时沿用子图配置并根据共享面板推导默认显示。显式 true/false 优先于子图同名配置；true 允许数值标签与共享面板同时显示。 |
 | alwaysShowHoverLabel | `boolean` | `false` | 为子图开启数值标签常显；与子图自身 alwaysShowHoverLabel 按逻辑或合并，因此组级 false 不关闭子图显式常显。仍受最终 showHoverLabel 控制。 |
@@ -175,7 +175,7 @@
 
 ### 设计原则
 
-- **PRO Chart 组合宿主**: `ChartGroup` 负责跨多个 Chart 原子组件的坐标语义与交互状态协调，不替代 `BarChart` / `LineChart` 的绘图职责。
+- **Chart 组合宿主**: `ChartGroup` 负责跨多个 Chart 原子组件的坐标语义与交互状态协调，不替代 `BarChart` / `LineChart` 的绘图职责。
 - **子图表保持原子**: 子图表仍独立传入自身数据、颜色、轴线与出现动效配置；`ChartGroup` 不复制 BarChart / LineChart 的几何绘制算法。
 - **单元格 hover**: 当 `hoverMode="cell"` 时，容器在顶层绘制分类 cell 命中层；每个 cell 以分类中心为基准，左右各半个单元宽度，鼠标进入该区域即可触发共享 `activeCellIndex`。
 - **坐标轴控制**: `ChartGroup` 可统一下发坐标轴显示、网格、辅助线、X/Y label 抽稀、Y 轴 domain / ticks / formatter 与 LineChart 的 `xAxisMode`。子图表显式传入同名 prop 时优先使用子图表自身配置。
@@ -306,7 +306,7 @@ interface ChartGroupContext {
 
 
 
-> **状态**: 已实现(PRO)
+> **状态**: 已实现
 
 
 
@@ -345,7 +345,7 @@ interface ChartGroupContext {
   - `BarChart`: Chart 原子组件、坐标轴和出现动效 API。
   - `LineChart`: Chart 原子组件、marker hover 与出现动效 API。
   - `Frame`: 根层 Frame 能力继承。
-- **归属判断**: PRO。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
+- **归属判断**: 复合组件。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
 
 ## 更新日志
 
@@ -361,7 +361,7 @@ interface ChartGroupContext {
 
 ### v0.3.0 (2026-09-03)
 
-- `adaptiveContrast` 接入 OSS 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
+- `adaptiveContrast` 接入 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
 
 ### v0.2.3 (2026-09-02)
 

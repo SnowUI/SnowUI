@@ -1,6 +1,6 @@
 /**
  * 通用尺寸拖动 action。
- * TableHead、普通容器和 PRO 分栏均可复用同一套 pointer / keyboard / clamp 协议。
+ * TableHead、普通容器和 分栏均可复用同一套 pointer / keyboard / clamp 协议。
  */
 export type ResizeAxis = "horizontal" | "vertical";
 export type ResizeEdge = "start" | "end" | "top" | "bottom";

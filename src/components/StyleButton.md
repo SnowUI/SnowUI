@@ -1,6 +1,6 @@
 # StyleButton
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.0.4
 > **职责**: 在 SnowUI 与 Apple 两种视觉风格之间切换，适合提供界面风格选择的入口。
@@ -85,7 +85,7 @@ StyleButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。默认
 
 ### 开发者指南 (AI)
 
-- 包归属：OSS；主布局模型为内联外壳布局。
+- 包归属：共享能力；主布局模型为内联外壳布局。
 - 组合身份：Button 宿主组件特化，不提供 `parts.Button`。
 - 内置 SnowUI Logo 必须使用 `SnowUILogo variant="icon"`，Apple 状态必须使用 Apple Logo。
 - 两个 Logo 均消费 Button 图标尺寸上下文，不得固定为单一尺寸。

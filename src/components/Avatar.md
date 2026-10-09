@@ -1,6 +1,6 @@
 # Avatar
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v2.12.5
 > **职责**: 展示用户或团队头像，支持图片、文字和渐变占位，让列表、评论与成员信息更易辨认。
@@ -50,7 +50,7 @@
 | --- | --- | --- | --- |
 | src | `string \| Component` | — | 头像图片 URL 或图标组件 |
 | size | `ResourceSize` | — | 头像尺寸档位为 12/16/20/24/28/32/40/48/80；显式值优先，其次父级头像或通用尺寸上下文，无上下文时为 16。 |
-| fallback | `Component` | — | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。PRO 场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与解析后的稳定 `seed`。 |
+| fallback | `Component` | — | 无 `src` 或图片不可用时渲染的自定义头像组件；未传时默认内置 Gradient。动效头像场景可传 `GradientMotion`，Avatar 会传入 `as="avatar-image"`、`size="100%"`、`radius="inherit"` 与解析后的稳定 `seed`。 |
 | fallbackText | `string` | — | 图片不可用时显示的显式回退文字；去除首尾空格，非空时替代默认 Gradient，显式 fallback 组件仍优先。不会从姓名自动生成首字母。 |
 | fallbackColor | `GradientVariant` | — | 显式选择默认 Gradient 的具名艺术配色；优先级高于 `fallbackSeed` 和名称回退。 |
 | fallbackSeed | `string \| number` | — | 稳定身份种子，推荐传入 `user.id`；组件以确定性哈希映射到六种具名配色，相同 seed 始终得到相同颜色，无需持久化颜色字段。 |
@@ -110,7 +110,7 @@
 <!-- 空头像：显示灰色背景与用户图标 -->
 <Avatar variant="empty" />
 
-<!-- PRO 默认头像：使用 GradientMotion 作为默认头像 -->
+<!-- 动效默认头像：使用 GradientMotion 作为默认头像 -->
 <Avatar fallback={GradientMotion} data-name="Ada Lovelace" />
 
 <!-- 角色化头像图片层 -->
@@ -153,7 +153,7 @@
 > **更新日志 (2026-08-03)**: 默认 Gradient 头像 hover 使用七段非对称路径；每次进入随机切换且不重复上一组相位 / 方向配置。
 > **更新日志 (2026-08-02)**: 默认头像改为随机 Gradient；原灰色用户图标改为 `empty` 空头像变体；Avatar 单色 hover 通过像素 alpha 仅叠加实际图形。
 > **更新日志 (2026-08-02)**: Avatar 默认 hover 使用单层 Overlay；每次进入随机六色之一，同一次 hover 内颜色不变，默认文字与用户图标位于叠加层上方。
-> **更新日志 (2026-06-10)**: 新增 `fallback` 组件入口，允许 PRO `GradientMotion` 等视觉组件作为默认头像；补充 `as="avatar-image"` 头像图片层组合规则。
+> **更新日志 (2026-06-10)**: 新增 `fallback` 组件入口，允许 `GradientMotion` 等视觉组件作为默认头像；补充 `as="avatar-image"` 头像图片层组合规则。
 > **更新日志 (2026-05-20)**: 点击型 Avatar 补齐 `cursor: pointer`，与 hover 视觉反馈保持一致。
 > **更新日志 (2026-03-10)**: 补全文档中的 hover 实现方式与样式定义，明确有图 / 首字母 / 默认回退三种 hover 分支。
 > **更新日志 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确头像尺寸、回退层与 badge 定位为组件私有布局。

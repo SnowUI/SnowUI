@@ -1,6 +1,6 @@
 # SearchInput
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.3.0
 > **职责**: 提供带搜索图标的单行输入框，适合列表过滤、页面搜索和工具栏中的查询输入。
@@ -64,7 +64,7 @@
 - `Input` 自身隐藏生成的错误 `Text` 仍可通过平铺后的 `parts.Text` 配置。
 
 > **版本**: v1.3.0
-> **职责**: 提供与 `Input` 一致的 OSS 搜索输入框，默认内置 `Search`。
+> **职责**: 提供与 `Input` 一致的 搜索输入框，默认内置 `Search`。
 
 `SearchInput` 是 `Input` 的搜索场景变体。除默认 `type="search"` 和默认 leading 图标为 `Search` 外，其颜色、hover/focus、清除 X、三槽位布局、Frame 能力与 `Input` 保持一致。
 
@@ -77,7 +77,7 @@
 - 支持外置 leading 替换默认图标
 - 可通过 `collapseBelow` 在自身宽度不足时退化为仅搜索图标；最小宽度由左右实际 padding + leading Icon 固有宽度组成，空值且未聚焦时折叠，聚焦或已有值时恢复输入内容
 - 清除 X、hover、focus、disabled、readonly、invalid 与默认错误 shake 等行为继承 `Input`
-- 根能力通过内部 `Input` 接通 OSS `Frame`
+- 根能力通过内部 `Input` 接通 `Frame`
 
 ---
 
@@ -168,7 +168,7 @@
 ### 关联关系
 
 - **依赖**: Input、Icon、Search
-- **包归属**: OSS
+- **包归属**: @snowui-design-system/components
 
 ---
 

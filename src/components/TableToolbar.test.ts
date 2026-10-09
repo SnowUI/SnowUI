@@ -1,6 +1,6 @@
 export const examples = [
     {
-        name: "TTB-01: PRO DataTable 工具栏",
+        name: "TTB-01: DataTable 工具栏",
         code: `TTB-01
 <DataTable rows={[]}>
     <TableToolbar />

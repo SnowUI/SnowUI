@@ -69,8 +69,8 @@ export const examples = [
         name: "A6: 描边状态标签 (Border)",
         code: `A6
 <div class="flex-row gap-8 items-center">
-    <Kbd>PRO</Kbd>
-    <Badge count="PRO" variant="border" />
+    <Kbd>⌘K</Kbd>
+    <Badge count="New" variant="border" />
     <Badge count="updated" variant="border" />
 </div>`,
         expected: {

@@ -1,6 +1,6 @@
 # SidePanel
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.4.1
 > **职责**: 从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。
@@ -29,11 +29,11 @@
 <script lang="ts">
 	import { Badge, Button, Frame, Input, Text, Textarea } from '@snowui-design-system/components';
 	import { SidePanel, createSidePanelLayoutMotionStyle, type SidePanelPlacement } from '@snowui-design-system/components';
-	type ComponentRecord = { name: string; tier: 'OSS' | 'PRO'; packageName: string; description: string; notes: string; };
+	type ComponentRecord = { name: string; category: 'Basic' | 'Composite'; packageName: string; description: string; notes: string; };
 	let componentRecords = $state<ComponentRecord[]>([
-		{ name: 'DataTable', tier: 'PRO', packageName: '@snowui-design-system/components', description: 'Sort, select, and manage records.', notes: 'Review responsive columns.' },
-		{ name: 'SidePanel', tier: 'PRO', packageName: '@snowui-design-system/components', description: 'View and edit record details.', notes: 'Check floating and inline layouts.' },
-		{ name: 'Button', tier: 'OSS', packageName: '@snowui-design-system/components', description: 'Actions for SnowUI products.', notes: 'Variants ready for release.' }
+		{ name: 'DataTable', category: 'Composite', packageName: '@snowui-design-system/components', description: 'Sort, select, and manage records.', notes: 'Review responsive columns.' },
+		{ name: 'SidePanel', category: 'Composite', packageName: '@snowui-design-system/components', description: 'View and edit record details.', notes: 'Check floating and inline layouts.' },
+		{ name: 'Button', category: 'Basic', packageName: '@snowui-design-system/components', description: 'Actions for SnowUI products.', notes: 'Variants ready for release.' }
 	]);
 	let panelOpen = $state(false);
 	let panelPlacement = $state<SidePanelPlacement>('floating');
@@ -56,7 +56,7 @@
 		<Text style="color: var(--black-40);">Components</Text>
 		<div style="display: grid; gap: var(--gap-2);">
 			{#each componentRecords as component, index (component.name)}
-				<Button variant={index === activeIndex ? 'gray' : 'outline'} onclick={() => openComponent(index)}>{component.name} · {component.tier}</Button>
+				<Button variant={index === activeIndex ? 'gray' : 'outline'} onclick={() => openComponent(index)}>{component.name} · {component.category}</Button>
 			{/each}
 		</div>
 	</div>
@@ -79,7 +79,7 @@
 				style={panelPlacement === 'inline' ? 'height: 100%;' : undefined}
 			>
 				<Frame column gap={4} style="min-width: 0; width: 100%;">
-					<Frame row><Text size={20} weight={600}>{activeComponent.name}</Text><Badge as="trailing" count={activeComponent.tier} color={activeComponent.tier === 'PRO' ? 'Indigo' : 'Blue'} /></Frame>
+					<Frame row><Text size={20} weight={600}>{activeComponent.name}</Text><Badge as="trailing" count={activeComponent.category} color={activeComponent.category === 'Composite' ? 'Indigo' : 'Blue'} /></Frame>
 					<Text style="color: var(--black-40);">{activeComponent.description}</Text>
 					<Input value={activeComponent.packageName} ariaLabel="Package name" />
 					<Textarea value={activeComponent.notes} ariaLabel="Release note" style="height: 8rem;" />
@@ -383,7 +383,7 @@ function download() { /* 接入业务下载 */ }
 
 ### 浮层背景
 
-默认无遮罩，保留背景记录切换。设置 `backdrop="opaque"` 使用 10% 黑色遮罩；`"blur"` 在同一遮罩上增加 `var(--size-5)`（20px）背景模糊；`"transparent"` 仅阻挡背景交互。视觉复用 OSS 的 `.snowui-backdrop`，淡入淡出复用 Dialog motion token，随 SidePanel presence 卸载。内嵌模式不显示遮罩。点击遮罩遵循 `closeOnOutside`，关闭按钮和 Escape 行为不变。
+默认无遮罩，保留背景记录切换。设置 `backdrop="opaque"` 使用 10% 黑色遮罩；`"blur"` 在同一遮罩上增加 `var(--size-5)`（20px）背景模糊；`"transparent"` 仅阻挡背景交互。视觉复用 共享的 `.snowui-backdrop`，淡入淡出复用 Dialog motion token，随 SidePanel presence 卸载。内嵌模式不显示遮罩。点击遮罩遵循 `closeOnOutside`，关闭按钮和 Escape 行为不变。
 
 遮罩渐隐实现复用 [共享 Backdrop](../lib/backdrop.md)，与 Dialog、ImageViewer 使用同一透明起点和减少动效规则。
 
@@ -415,7 +415,7 @@ function download() { /* 接入业务下载 */ }
 
 ### AI Zone
 
-- `SidePanel` 是 PRO 复合管理布局组件，放置在 `components/src/components/SidePanel.svelte`。
+- `SidePanel` 是 复合管理布局组件，放置在 `components/src/components/SidePanel.svelte`。
 - 组件视觉复用 Dialog 所属的 `.snowui-quick-action-panel` 面板基类，背景为 `Background/3`，背景模糊为 `blur(var(--size-10))`（基础 40px）。该视觉基类与出现/退出位移共同承接在外层 `.snowui-side-panel-motion-shell`，避免 transform 祖先隔离内层 `aside` 的 backdrop 采样；内层 `aside` 只保持稳定局部坐标系、内容与交互。不直接以 `Dialog` 为宿主。
 - 关闭：`closeOnEscape`（默认 true）+ `closeOnOutside`（默认 true，点击面板外关闭）。外部关闭在 click 的业务处理完成后判断：同步更新面板内容的点击与本实例已识别的打开/切换入口保持打开，只换内容、不播退场/进场；不要求示例添加特殊标记。普通外部点击仍关闭，保留表格行兼容。异步加载应在点击时同步更新选中记录或加载状态。
 - 内容区 `overflow-y: auto` + overlay scrollbar（根挂 `snowui-overlay-scrollbar-host`，hover 显示），与页面滚动隔离（`overscroll-behavior: contain`）；body 与直系子项 `min-width: 0` 防止长文案顶破右侧 padding。
@@ -479,4 +479,4 @@ function download() { /* 接入业务下载 */ }
 - **SP-Init.10 (2026-07-12)**：内嵌模式默认内边框 0.5px Black/10%（`box-shadow: inset`）。
 - **SP-Init.9 (2026-07-12)**：内嵌模式去掉阴影；高度支持 `--snowui-side-panel-height-override`。
 - **SP-Init.8 (2026-07-12)**：上工具栏标题与关闭 X 拆分；标题只读、固定 Black/20%。
-- **SP-Init.1 (2026-07-08)**：新增 PRO `SidePanel`。
+- **SP-Init.1 (2026-07-08)**：新增 `SidePanel`。

@@ -1,6 +1,6 @@
 # ScrollArea
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.4.0
 > **职责**: 为内容提供可滚动区域与统一的滚动条，适合长列表、面板和受限空间中的正文。
@@ -180,7 +180,7 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 
 ### Frame 集成
 
-- 根层使用 OSS Frame。
+- 根层使用 Frame。
 - `enableResponsive=true`、`enableContext=true`、`enableScaleObserver=false`、`enableDefaultMotion=true` 均显式设置。
 - 根 Frame 只管理组件级外层状态与动效；滚动 Thumb 属于共享专项内部能力。
 - ScrollArea 不使用三槽位布局，不创建 padding、gap 或 radius 默认值。

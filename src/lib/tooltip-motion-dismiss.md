@@ -1,6 +1,6 @@
 # Tooltip 动效感知关闭
 
-`tooltip-motion-dismiss.ts` 是 Tooltip 的 OSS 共享行为能力，用于在触发元素或其祖先开始位置、尺寸动效时立即隐藏已经显示的 Tooltip，避免 Portal 在目标移动期间重新定位而产生跳动。
+`tooltip-motion-dismiss.ts` 是 Tooltip 的 共享行为能力，用于在触发元素或其祖先开始位置、尺寸动效时立即隐藏已经显示的 Tooltip，避免 Portal 在目标移动期间重新定位而产生跳动。
 
 ## 行为
 
@@ -40,6 +40,6 @@
 - **现象与证据**：Tooltip 可在移入后短暂出现，随后收到 Logo 后代的 `animationstart` 并立即卸载；Apple Logo 是静态 SVG，因此另一状态不复现。冷启动时 Logo animation 早于 450ms 首次延迟发生，Tooltip 反而可正常出现，形成“时常无法触发”的表象。
 - **根因**：初版能力把触发器后代的任何 `animationstart` 都当成锚点运动。CSS `AnimationEvent` 不提供动画属性名，装饰性后代 transform 与真正移动触发器的动画被错误合并。
 - **修改内容**：animation 只匹配触发器自身或祖先；后代 animation 被忽略。几何 `transitionrun` 仍匹配触发器、祖先和后代，以保留后代布局变化可能移动触发器 border box 的原保护。
-- **影响面**：所有使用默认 `dismissOnMotion={true}` 且触发内容包含动画 Logo / Icon 的 Tooltip；不改变 Tooltip 外观、hover 延迟、OSS 共享 Portal 或触发器/祖先运动时的关闭行为。
+- **影响面**：所有使用默认 `dismissOnMotion={true}` 且触发内容包含动画 Logo / Icon 的 Tooltip；不改变 Tooltip 外观、hover 延迟、共享 Portal 或触发器/祖先运动时的关闭行为。
 - **验证方式**：在 Test Sidebar 依次触发相邻 Tooltip 与 StyleButton Tooltip，等待 SnowUI Logo hover keyframes 完整启动后 Tooltip 仍保持可见；另验证触发器/祖先 animation 与后代几何 transition 仍立即关闭。
 - **回退约束**：不得恢复“所有后代 animation 一律关闭”。若未来必须识别会改变宿主布局的后代 keyframes，应新增显式语义或可判定的几何协议，而不是从无属性信息的 `animationstart` 猜测。

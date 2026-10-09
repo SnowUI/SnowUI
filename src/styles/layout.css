@@ -330,7 +330,7 @@
 
 /* === Edge Mask 工具类（内容渐隐层 · CSS 静态形态） ===
    语义：只改变元素 alpha 通道，不绘制任何可见色块。
-   这是「内容渐隐层」OSS 通用能力的 CSS 静态形态（能力总览见 components/src/lib/edge-fade.md；
+   这是「内容渐隐层」通用能力的 CSS 静态形态（能力总览见 components/src/lib/edge-fade.md；
    动态/按实测尺寸计算的形态用 lib/edge-fade.ts）。消费方加 .snowui-scroll-mask 并通过
    data-scroll-mask="top|bottom|both" 声明当前需要渐隐的边缘。
    参数：

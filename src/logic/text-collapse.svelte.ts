@@ -5,7 +5,7 @@
 
 import { resizeManager } from "./observer.svelte";
 
-// 内联常量，避免依赖 PRO 包中的 morph.ts
+// 折叠动效使用本模块的固定时序常量
 const MORPH_STYLES = { transition: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)" };
 
 export type CollapseLines = 0 | 1 | 2 | 3;

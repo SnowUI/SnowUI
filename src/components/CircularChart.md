@@ -1,6 +1,6 @@
 # CircularChart
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.4.2
 > **职责**: 用圆环或饼图展示数据占比，支持分段、圆角、环厚与悬停强调，适合构成分析和比例概览。
@@ -415,13 +415,13 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 <a id="7-使用示例"></a>
 
 
-> **状态**: 已实现(PRO)
+> **状态**: 已实现
 
 
 > **参考**: ECharts [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 官方示例，以及本地 ECharts `src/chart/pie/pieLayout.ts`、`src/chart/helper/sectorHelper.ts` 源码。
 
 
-默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度由 `minWidth` 决定，默认 `"40px"`；容器不足下限时保持下限。将 `minWidth` 设为与图表宽度相同即可阻止自动缩小。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `components/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
+默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度由 `minWidth` 决定，默认 `"40px"`；容器不足下限时保持下限。将 `minWidth` 设为与图表宽度相同即可阻止自动缩小。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `components/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
 
 ---
 
@@ -553,7 +553,7 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 
 ### v1.0.0 (2026-05-22)
 
-- 初始实现 PRO 圆形图表组件。
+- 初始实现 圆形图表组件。
 - 支持整体尺寸、环厚、圆角、隔断、hover 外侧增厚可调。
 - 支持中心 hover 标签、最多 10 项、SnowUI `primary + secondary-*` 颜色序列。
 - 接入 Frame 根层、Skeleton、Test 示例与规范登记。

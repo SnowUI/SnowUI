@@ -1,6 +1,6 @@
 # Link
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.3.0
 > **职责**: 在正文、说明和导航中提供清晰的文字链接，支持箭头等视觉形式，表达可继续访问的内容。
@@ -68,7 +68,7 @@
 > **职责**: 提供正文、说明与导航中的文字链接样式。
 > **设计稿**: [Workshop / Link](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12417-11133&t=GYb3gHf9U5Ff6hcQ-4)
 
-Link 是独立的 OSS 文字链接组件。按钮外观但点击后跳转的场景继续使用 `<Button href>`；正文文字链接、带文字箭头链接与外链图标链接使用 `<Link>`。
+Link 是独立的 文字链接组件。按钮外观但点击后跳转的场景继续使用 `<Button href>`；正文文字链接、带文字箭头链接与外链图标链接使用 `<Link>`。
 
 <a id="功能概览"></a>
 
@@ -90,7 +90,7 @@ Link 是独立的 OSS 文字链接组件。按钮外观但点击后跳转的场�
 
 ### 文字截断
 
-Link 复用 OSS 通用 `TruncationController` 与 `fitTextToElement()`，不自行创建尺寸观察器。`lines={1}` 时控制器测量文字层并判断真实截断状态；可见前缀按实际字体宽度拟合，英文等字母文字只保留完整单词，单个单词放不下时只显示省略符；中日韩文字可退回 Unicode 字素边界，因此不会出现半个字或组合字符。显式 `…` 作为可见文字的行内尾部渲染，与最后一个完整单词 / 字之间没有额外间距。
+Link 复用 通用 `TruncationController` 与 `fitTextToElement()`，不自行创建尺寸观察器。`lines={1}` 时控制器测量文字层并判断真实截断状态；可见前缀按实际字体宽度拟合，英文等字母文字只保留完整单词，单个单词放不下时只显示省略符；中日韩文字可退回 Unicode 字素边界，因此不会出现半个字或组合字符。显式 `…` 作为可见文字的行内尾部渲染，与最后一个完整单词 / 字之间没有额外间距。
 
 ```svelte
 <Link href="/docs" lines={1} class="max-w-80">
@@ -260,7 +260,7 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 ### v1.0.0 (2026-06-01)
 
 #### 新功能
-- **LINK-Init.1** 新增独立 OSS Link 组件，迁移原 Button Link 默认样式。
+- **LINK-Init.1** 新增独立 Link 组件，迁移原 Button Link 默认样式。
 - **LINK-Variant.1** 新增 `arrow` 与 `external` 变体，对齐 Workshop Link 样式 2 / 样式 3。
 - **LINK-Hover.1** 新增 `hoverColor`，支持自定义 hover 颜色与 hover 不变色。
 - **LINK-Underline.1** 新增 `underline`，支持 `none` / `always` / `hover`。

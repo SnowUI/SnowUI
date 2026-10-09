@@ -1,7 +1,7 @@
 # resizable
 
 > **版本**: v1.0.0  
-> **职责**: 为表格列、普通容器与 PRO SplitPane 提供统一的尺寸拖动内核。
+> **职责**: 为表格列、普通容器与 SplitPane 提供统一的尺寸拖动内核。
 
 ## 关键字
 
@@ -22,7 +22,7 @@
 - 高频 pointermove 通过 requestAnimationFrame 合并。
 - handle 使用 `role="separator"`、方向与 value ARIA。
 - 键盘方向键调整，Shift 使用大步长。
-- `clampResizableSize()` 是 Table 与 PRO SplitPane 共用的边界内核。
+- `clampResizableSize()` 是 Table 与 SplitPane 共用的边界内核。
 
 ```svelte
 <Frame use={[[resizable, { minSize: 120, maxSize: 480 }]]}>

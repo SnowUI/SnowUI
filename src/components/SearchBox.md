@@ -1,6 +1,6 @@
 # SearchBox
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.1.0
 > **职责**: 提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。
@@ -134,7 +134,7 @@
 
 
 
-`SearchBox` 是搜索浮层的触发器，交互类似 `Select`。它不是原生输入框，整个组件都是可点击区域；视觉颜色、hover、focus、清除 X、内部布局参考 `Input`，并通过 `Frame` 接通 PRO Frame 能力。
+`SearchBox` 是搜索浮层的触发器，交互类似 `Select`。它不是原生输入框，整个组件都是可点击区域；视觉颜色、hover、focus、清除 X、内部布局参考 `Input`，并通过 `Frame` 接通 Frame 能力。
 
 <a id="开发者指南-ai"></a>
 
@@ -178,7 +178,7 @@
 - `enableContext`
 - `enableScaleObserver`
 
-`...rest` 透传到根 `Frame`，保留状态、动效、Skeleton、响应式、样式编排等 PRO 能力。
+`...rest` 透传到根 `Frame`，保留状态、动效、Skeleton、响应式、样式编排等共享能力。
 
 ### 模块索引
 
@@ -190,7 +190,7 @@
 
 - **依赖**: Frame、Icon、Search
 - **协作组件**: SearchPopup、Kbd
-- **包归属**: PRO
+- **包归属**: @snowui-design-system/components
 
 ---
 
@@ -217,4 +217,4 @@
 
 #### 新功能
 
-- 新增 PRO 搜索框触发器，支持灰底和边框样式。
+- 新增 搜索框触发器，支持灰底和边框样式。

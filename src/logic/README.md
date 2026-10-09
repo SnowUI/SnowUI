@@ -97,7 +97,7 @@
 | `wc-adapter.ts` | Web Components 适配层 | 只在自定义元素/宿主集成场景需要 |
 | `../lib/floating-position.ts` | 浮层边缘碰撞、边界夹取和反向方位计算 | Tooltip、Chart hover panel、后续浮层定位 |
 | `../lib/tooltip-delay.ts` | Tooltip hover warmup / cooldown 协调器 | 多个 Tooltip 之间共享首次延迟与快速切换窗口；Popover 复用 `600ms` 基础延迟常量 |
-| `../lib/resizable.ts` | 通用容器尺寸拖动 action 与 clamp 内核 | TableHead、普通容器与 PRO SplitPane 共用 |
+| `../lib/resizable.ts` | 通用容器尺寸拖动 action 与 clamp 内核 | TableHead、普通容器与 SplitPane 共用 |
 
 ### 7. 工具与兼容项
 

@@ -53,7 +53,7 @@ export const examples = [
         <Table><TableHeader><TableRow><TableHead>名称</TableHead></TableRow></TableHeader><TableBody>{#each state.rows as row}<TableRow><TableCell>{row.name}</TableCell></TableRow>{/each}</TableBody></Table>
     {/snippet}
 </DataTable>`,
-        expected: { render: "首次加载按 pageSize 自动渲染 3 行 Skeleton；后台刷新保留已有 rows 并追加 Spinner 行。", layout: "Skeleton 使用表头列结构；Spinner 跨越整张表格并居中。", interaction: "根节点同步 aria-busy，加载占位不提供行交互。", performance: "Skeleton 与 Spinner 都只复用 OSS 通用组件。", responsive: "状态不改变表格宽度协议。" },
+        expected: { render: "首次加载按 pageSize 自动渲染 3 行 Skeleton；后台刷新保留已有 rows 并追加 Spinner 行。", layout: "Skeleton 使用表头列结构；Spinner 跨越整张表格并居中。", interaction: "根节点同步 aria-busy，加载占位不提供行交互。", performance: "Skeleton 与 Spinner 都只复用 通用组件。", responsive: "状态不改变表格宽度协议。" },
         logic: ["Loading", "SkeletonRows", "LoadingSpinner", "Refreshing", "Error"],
     },
     {

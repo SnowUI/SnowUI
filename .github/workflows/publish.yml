@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: publish-oss-${{ github.ref }}
+  group: publish-runtime-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
       - name: Verify self-contained styles
         run: pnpm verify:styles
       - name: Check unified runtime boundary
-        run: pnpm check:oss
+        run: pnpm check:boundaries
       - name: Check component catalog
         run: pnpm catalog:check
       - name: Build components

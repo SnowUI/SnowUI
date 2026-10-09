@@ -1,6 +1,6 @@
 # Tab
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.3.0
 > **职责**: 在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。
@@ -64,7 +64,7 @@
 - 显式组合模式：显式书写 Button，用于 Icon、Text、复杂内容或逐项 Props 差异。
 
 > **版本**: v1.3.0
-> **状态**: 已实现(PRO)
+> **状态**: 已实现
 > **职责**: 在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
 > 由 Tab 容器通过 CSS override Button 的桥接变量接管。
 > **设计稿**: Figma node `11838-19967`
@@ -395,7 +395,7 @@ Tab indicator 的位置与尺寸监听统一通过 Components 的 `resizeManager
 - 共享 indicator 元素位置 / 尺寸过渡，消费 Frame control / size motion bridge 变量
 - Roving tabindex 键盘行为,支持 selectionFollowsFocus 模式开关
 - 支持 `fill` Figma fill 宽度,容器有显式宽度时横向子项等宽填满
-- 配套为 OSS Frame 新增 `FRAME_SIZE_MOTION_BRIDGE`,详见 [bridge.md changelog v1.3.0](../motion/bridge.md)
+- 配套为 Frame 新增 `FRAME_SIZE_MOTION_BRIDGE`,详见 [bridge.md changelog v1.3.0](../motion/bridge.md)
 
 #### 修正
 - `variant="underline"` 容器默认圆角为 0;下划线 / 竖线尺寸由组件计算,不依赖 CSS 强制覆盖内联尺寸

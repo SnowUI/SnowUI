@@ -1,5 +1,5 @@
 <!--
-  ChartGroup 图表组合容器 (PRO)
+  ChartGroup 图表组合容器
   v0.4.1 (2026-09-05)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。

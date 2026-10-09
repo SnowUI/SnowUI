@@ -1,6 +1,6 @@
 # Indicator
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.4.0
 > **职责**: 提供可拖动的尺寸调整手柄，支持鼠标与键盘操作，可用于面板和内容区域的大小调整。
@@ -144,7 +144,7 @@ Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize �
 
 ### 开发者指南 (AI)
 
-- 根层使用 OSS Frame，拖动算法复用 `lib/resizable.ts`。
+- 根层使用 Frame，拖动算法复用 `lib/resizable.ts`。
 - Indicator 将 handle 元素直接交给 resizable；pointerdown / keyboard 从手柄本身起始，并使用 pointer capture + window capture 持续跟踪 move / up / cancel。禁止父组件复制 pointer / keyboard 算法。
 - resizable action 的创建 effect 只跟踪 target / handle / axis；`value`、边界和 callback 使用独立 effect 调用 `action.update()`。创建时必须使用 `untrack()` 读取 options，禁止尺寸写回触发 action destroy，导致拖拽在第一次 pointermove 后中断。
 - width 对应 resizable horizontal axis 与 ARIA vertical orientation；height 对应相反组合。

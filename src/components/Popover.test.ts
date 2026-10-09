@@ -276,7 +276,7 @@ export const examples = [
         <Text class="text-14 text-black-80">通用浮层容器,合并 QuickAction 与 SearchPopup,支持模版 + ID 激活模式。</Text>
         <Frame row class="gap-8 pt-4">
             <Badge>v3.0.0</Badge>
-            <Badge>OSS</Badge>
+            <Badge>Basic</Badge>
         </Frame>
     </Frame>
 </Popover>

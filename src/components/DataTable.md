@@ -1,6 +1,6 @@
 # DataTable
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.14.0
 > **职责**: 统一管理数据的查询、排序与分页状态，可自由组合工具栏、表格和分页器，构建完整的数据浏览界面。
@@ -298,7 +298,7 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 
 ### 响应式
 
-与 OSS Table 共用[完整响应式规则](Table.md#响应式收缩与恢复)：先角色列转浮层，再压缩间距，最后滚动或从右向左隐藏普通列。`horizontalScroll` 默认 true；设为 false 时允许隐藏，`TableHead responsiveHide={false}` 保护指定列，第一普通列始终保留。最终单列的纯文本可收缩，不换行内容省略并默认提供 Tooltip 全文；硬尺寸或不可压缩控件仍滚动兜底。Table 的显式配置优先；DataTable 不另建测量或滚动层。
+与 Table 共用[完整响应式规则](Table.md#响应式收缩与恢复)：先角色列转浮层，再压缩间距，最后滚动或从右向左隐藏普通列。`horizontalScroll` 默认 true；设为 false 时允许隐藏，`TableHead responsiveHide={false}` 保护指定列，第一普通列始终保留。最终单列的纯文本可收缩，不换行内容省略并默认提供 Tooltip 全文；硬尺寸或不可压缩控件仍滚动兜底。Table 的显式配置优先；DataTable 不另建测量或滚动层。
 
 ### 选择列与操作列
 
@@ -365,7 +365,7 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 - 不提供独立 Skeleton 行数属性，避免加载态与真实分页数据高度不一致，尽可能降低首次数据出现时的页面跳动。
 - Skeleton 只替代首次空数据加载；`loading` 或 `refreshing` 时若已有 rows，继续保留现有数据，并在 TableBody 末尾追加跨列居中的 Spinner 行，避免刷新时布局跳动且明确表达仍在加载。
 - `TableHead` 通过双方文档明确的 Table Context 注册列顺序、角色与列宽标识；DataTable / TableBody 不扫描子组件类名或内部 DOM。
-- `TableBody loading={false}` 可显式关闭从 DataTable Context 继承的 Skeleton rows；独立 OSS Table 可用 `<TableBody loading>` 主动启用，此时无法读取分页行数，回退为 10 行。
+- `TableBody loading={false}` 可显式关闭从 DataTable Context 继承的 Skeleton rows；独立 Table 可用 `<TableBody loading>` 主动启用，此时无法读取分页行数，回退为 10 行。
 
 <a id="内部加载更多管线"></a>
 
@@ -389,24 +389,24 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 
 
 
-DataTable 不发起请求，也不格式化业务字段。预取、缓存和无延迟切换属于页面数据层；日期显示统一使用 OSS `formatDate()`。
+DataTable 不发起请求，也不格式化业务字段。预取、缓存和无延迟切换属于页面数据层；日期显示统一使用 `formatDate()`。
 
 ## 更新日志
 
 - 2026-10-07：响应式单元格每侧最小 padding 从 2px 调整为 4px，相邻列最小内容间距为 8px。
 
-- 2026-10-07：v1.14.0，新增 horizontalScroll 策略，roleLayout 默认 auto；所有响应式布局交由 OSS Table 统一计算，保留显式 column / overlay。
+- 2026-10-07：v1.14.0，新增 horizontalScroll 策略，roleLayout 默认 auto；所有响应式布局交由 Table 统一计算，保留显式 column / overlay。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
-- 2026-08-14：v1.13.0，组合的 TableHead / TableCell 左右 padding 随内部 Table 容器宽度在 2px 到 12px 之间响应；保持由 OSS Table 单元格唯一拥有实现。
+- 2026-08-14：v1.13.0，组合的 TableHead / TableCell 左右 padding 随内部 Table 容器宽度在 2px 到 12px 之间响应；保持由 Table 单元格唯一拥有实现。
 - 2026-08-06：v1.12.0，只读默认态复用稳定空选择状态并跳过逐行 Set 查询 / 全选集合扫描；开启 selection 后保持完整选择行为。
 - 2026-07-12：v1.11.0，新增 `selection` / `actions`（默认 false）；默认不显示 checkbox 与操作列，可独立开启。
 - 2026-07-08：v1.10.0，新增 `onRowPreview` 行空白点击预览协议；未配置时空白点击不再切换选中。
 
 - 2026-07-07：优化客户端数据管线：搜索与筛选合并为单次遍历；无查询、筛选、排序或增量数据时复用原数组；选择判断使用 Set，减少大数据表的重复线性查找。
 
-- 2026-07-05：v3.0.0，独占 checkbox 选择列、按钮操作列及其选择状态 / overlay 布局；TableToolbar 改为 PRO DataTable 专用组件。
+- 2026-07-05：v3.0.0，独占 checkbox 选择列、按钮操作列及其选择状态 / overlay 布局；TableToolbar 改为 DataTable 专用组件。
 
 - 2026-07-01：v2.0.0，client 模式内置 query 与 filters 数据处理，并向 TableToolbar 提供查询、筛选、排序和可排序列 Context。
 - 2026-07-01：v1.9.0，`pageSize` 支持双向绑定；每页行数变化时自动回到第 1 页，并新增 `onPageSizeChange`。

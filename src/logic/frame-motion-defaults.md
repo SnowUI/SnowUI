@@ -8,7 +8,7 @@
 - 维护默认动效注册表（replace/disappear/morph/move/rotate/flip/number/slide）
 - 按 `FrameProps` 判定哪些 `while*` 需要默认注入
 - 合并用户传入的 `while*` 覆写配置
-- 作为 OSS 动效原子与默认预设之间的统一汇聚点
+- 作为动效原子与默认预设之间的统一汇聚点
 
 它不负责组件内部专项动画算法。Frame 默认动效的边界是为组件根 Frame 提供统一、简单的状态 / 生命周期动效与组件级控制；已有独立规范和共享实现的专项通用能力可以自行实现内部动画，无需接入本注册表。
 
@@ -93,7 +93,7 @@
 
 ### 原子动效与预设的关系（v1.4.0）
 
-自 `v1.4.0` 起，OSS `src/motion/` 明确分为两层：
+自 `v1.4.0` 起，`src/motion/` 明确分为两层：
 
 | 层级 | 文件 | 职责 |
 | :--- | :--- | :--- |
@@ -104,7 +104,7 @@
 
 - `FRAME_MOTION_DEFAULTS` 继续暴露的是**默认预设**，不是所有原子动效本身。
 - 若组件需要自定义数值组合，应直接消费 `primitives.ts` 或自定义 `while*`，而不是强迫默认注册表承担队列/编排语义。
-- 多个 Frame 之间的时机协调仍属于 PRO，不进入 `frame-motion-defaults.ts`。
+- 多个 Frame 之间的时机协调由协调模块拥有，不进入 `frame-motion-defaults.ts`。
 
 #### `whileAppear` 默认 preset（v1.7.0）
 

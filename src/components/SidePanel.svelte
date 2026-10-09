@@ -1,4 +1,4 @@
-<!-- PRO 右侧详情弹出窗。共享 Dialog 面板视觉、右侧浮层 / 内嵌双模式、内置上下工具栏。文档: ./SidePanel.md -->
+<!-- 右侧详情弹出窗。共享 Dialog 面板视觉、右侧浮层 / 内嵌双模式、内置上下工具栏。文档: ./SidePanel.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import {tick, type Snippet} from "svelte";

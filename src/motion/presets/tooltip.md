@@ -25,7 +25,7 @@
 ### 2026-08-12：Tooltip 已出现后毛玻璃才逐渐清晰
 
 - **问题位置**：Playground Test Sidebar Footer 的 Tooltip；共享 preset 为 `components/src/motion/presets/tooltip.ts`，可见表面为 `Tooltip.svelte` 的 `.snowui-tooltip-content`。
-- **触发条件**：OSS Tooltip 默认生命周期动效启用，默认 light Tooltip 覆盖相邻 Icon；hover 延迟结束后观察 Tooltip 出现的前 150ms。
+- **触发条件**：Tooltip 默认生命周期动效启用，默认 light Tooltip 覆盖相邻 Icon；hover 延迟结束后观察 Tooltip 出现的前 150ms。
 - **现象与证据**：首帧计算样式已经是 `backdrop-filter: blur(20px)`，但 Portal 的 opacity 从 0 渐增。实测 hover 后 500ms、520ms、540ms 的 Portal opacity 约为 `0.03`、`0.29`、`0.58`，模糊对比度随父层透明度一起被削弱，视觉上晚于文字轮廓。
 - **根因**：滤镜没有延迟，也不是性能不足；浏览器先生成 backdrop-filter 结果，再把整个 Portal 按父层 opacity 合成。低 opacity 下模糊结果与原背景混合，必须到渐显后段才容易辨认。
 - **修改内容**：`TOOLTIP_APPEAR_MOTION` 移除 opacity 与 80ms delay，只保留 `0.98 → 1` 的轻微 scale；Tooltip 可见首帧即以完整 opacity 合成背景、文字和毛玻璃。退出 preset 保留快速 opacity + scale。
@@ -69,7 +69,7 @@
 - v1.6.1 (2026-08-21): 宽度弹性改为独立 `800ms` 时间线，快速重定向为 `480ms`；不再把参考页约 `0.8s` 的回弹压缩进位置的短时间线。
 - v1.6.0 (2026-08-21): 参考 beUI Pro Morphic Tooltip 的宽度弹性，增加归一化欠阻尼曲线；约在进度 `45%` 越过目标 `4%` 后回弹，并在既有时间线结束帧精确收敛。
 - v1.5.0 (2026-08-21): Tooltip Foreground 以 `110ms` 从 `0.94` 放大到 `1`，并新增按最终 placement 朝 Tooltip 位置移动的 `2px` 定向滑入；transform origin 对齐触发器侧边中心。
-- v1.4.0 (2026-08-20): Tooltip 生命周期动效改为 OSS 默认能力；preset 数值和分层边界不变。
+- v1.4.0 (2026-08-20): Tooltip 生命周期动效改为 默认能力；preset 数值和分层边界不变。
 - v1.3.0 (2026-08-12): 采用稳定 Backdrop + 动画 Foreground 分层，恢复 opacity + scale 出现效果，同时保持首帧完整毛玻璃。
 - v1.2.0 (2026-08-12): 根据 Test Footer 真实复测，进一步移除出现态 scale，并由 Tooltip 在可见前提供一个预绘制帧；退出动效不变。
 - v1.1.0 (2026-08-12): 出现态移除 Portal opacity 与额外 delay，仅保留轻微 scale，使 Tooltip 和毛玻璃在同一可见首帧生效。

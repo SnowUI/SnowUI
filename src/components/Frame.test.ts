@@ -2,7 +2,7 @@
  * Frame.test.ts
  * v1.0.0
  * 变更记录 (2026-05-20): 改为显式 class 示例。
- * 变更记录 (2026-05-09): 补充 OSS Frame 基础示例，覆盖状态内容与 Skeleton 协议。
+ * 变更记录 (2026-05-09): 补充 Frame 基础示例，覆盖状态内容与 Skeleton 协议。
  */
 export const examples = [
     {
@@ -11,7 +11,7 @@ export const examples = [
 <Frame column class="gap-16">
     <Frame row firstLine class="text-18 gap-8" style="width: 18rem;">
         <Icon as="leading" size={24} icon={Resource.Check} />
-        <span>All PRO components and blocks for your next project</span>
+        <span>All components and blocks for your next project</span>
     </Frame>
     <Frame row firstLine class="text-18 gap-8" style="width: 18rem;">
         <Icon as="leading" size={24} icon={Resource.Check} />

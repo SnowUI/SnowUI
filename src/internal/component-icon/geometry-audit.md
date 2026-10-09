@@ -2,7 +2,7 @@
 
 ## 范围与方法
 
-扫描 Components 与 PRO 的 src 中 Svelte、TypeScript、CSS：核对 ComponentIcon 随包集合，以及直接 SVG、SVG data URL 和动态 SVG 创建入口；不包括调用方显式传入内容及测试示例自绘图形。
+扫描 Components 的 src 中 Svelte、TypeScript、CSS：核对 ComponentIcon 随包集合，以及直接 SVG、SVG data URL 和动态 SVG 创建入口；不包括调用方显式传入内容及测试示例自绘图形。
 
 33 个功能图标、36 个 weight 变体逐一对照 raw-assets。浏览器测量 viewBox、图形包围盒相对外框的位置、宽度及高度；viewBox 必须完全一致，包围盒误差在 16px 名义尺寸下不得超过 0.1px（允许 SVG 优化的曲线舍入）。生成器另外校验随包 path 内容与 assets 一致，仅允许黑色归一化为 currentColor。包围盒检查不等同于逐像素光栅比较。
 

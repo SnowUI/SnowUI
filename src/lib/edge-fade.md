@@ -99,4 +99,4 @@ createEdgeFadeMaskStyle(options): string   // 返回 "-webkit-mask-image:...;mas
 
 - 2026-07-05：v1.2.0，新增 `.snowui-horizontal-scroll-mask` 与 `data-scroll-mask-x`，供 Input 系单行输入按真实横向滚动状态显示 left/right/both 渐隐；Input 清除 X 的右侧渐隐参数与 Table 表头 checkbox 对齐。
 - 2026-06-27：v1.1.0，扩展为「内容渐隐层 + 悬浮操作层」统一能力：纳入 `.snowui-scroll-mask`（静态 CSS 渐隐形态）与新增 `.snowui-overlay-action` / `.snowui-overlay-action-host`（就地悬浮基类）；补充两种渐隐形态选型、性能说明与消费者清单。明确随行 sticky/fixed 跟踪定位为组件职责、不纳入通用基类。
-- 2026-06-27：v1.0.0，从 Table overlay 角色列的内容边缘渐隐提炼为 OSS 通用能力，新增 `createEdgeFadeMaskImage` / `createEdgeFadeMaskStyle`。
+- 2026-06-27：v1.0.0，从 Table overlay 角色列的内容边缘渐隐提炼为 基础共享能力，新增 `createEdgeFadeMaskImage` / `createEdgeFadeMaskStyle`。

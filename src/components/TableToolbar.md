@@ -1,6 +1,6 @@
 # TableToolbar
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **职责**: 为 DataTable 提供搜索、排序、筛选和批量操作入口，并展示选择状态，适合数据管理界面。
 > **包归属**: `@snowui-design-system/components`
@@ -28,11 +28,11 @@
 <script lang="ts">
 	import { DataTable, TableToolbar, type DataTableRenderState } from '@snowui-design-system/components';
 	import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@snowui-design-system/components';
-	type DocRow = { id: number; component: string; tier: 'OSS' | 'PRO'; status: string };
+	type DocRow = { id: number; component: string; category: 'Basic' | 'Composite'; status: string };
 	const docs: DocRow[] = [
-		{ id: 1, component: 'Button', tier: 'OSS', status: 'Published' },
-		{ id: 2, component: 'DataTable', tier: 'PRO', status: 'Review' },
-		{ id: 3, component: 'Tooltip', tier: 'OSS', status: 'Published' }
+		{ id: 1, component: 'Button', category: 'Basic', status: 'Published' },
+		{ id: 2, component: 'DataTable', category: 'Composite', status: 'Review' },
+		{ id: 3, component: 'Tooltip', category: 'Basic', status: 'Published' }
 	];
 	let tableState = $state<DataTableRenderState<DocRow>>();
 	let selectedRowIds = $state<(string | number)[]>([2]);
@@ -49,16 +49,16 @@
 		filter
 		searchPlaceholder="Search component docs…"
 		searchAriaLabel="Search component documentation"
-		filterKey="tier"
-		filterOptions={[{ label: 'OSS', value: 'OSS' }, { label: 'PRO', value: 'PRO' }]}
+		filterKey="category"
+		filterOptions={[{ label: 'Basic', value: 'Basic' }, { label: 'Composite', value: 'Composite' }]}
 		copyLabel="Copy component names"
 		deleteLabel="Remove from review queue"
 		onCopy={copySelection}
 		onDelete={clearSelection}
 	/>
 	<Table ariaLabel="Filtered component documentation">
-		<TableHeader><TableRow><TableHead as="selection" /><TableHead columnId="component">Component</TableHead><TableHead columnId="tier">Tier</TableHead><TableHead columnId="status">Status</TableHead></TableRow></TableHeader>
-		<TableBody>{#each tableState?.rows ?? [] as row}<TableRow rowId={row.id}><TableCell as="selection" /><TableCell columnId="component">{row.component}</TableCell><TableCell columnId="tier">{row.tier}</TableCell><TableCell columnId="status">{row.status}</TableCell></TableRow>{/each}</TableBody>
+		<TableHeader><TableRow><TableHead as="selection" /><TableHead columnId="component">Component</TableHead><TableHead columnId="category">Category</TableHead><TableHead columnId="status">Status</TableHead></TableRow></TableHeader>
+		<TableBody>{#each tableState?.rows ?? [] as row}<TableRow rowId={row.id}><TableCell as="selection" /><TableCell columnId="component">{row.component}</TableCell><TableCell columnId="category">{row.category}</TableCell><TableCell columnId="status">{row.status}</TableCell></TableRow>{/each}</TableBody>
 	</Table>
 </DataTable>
 ```
@@ -149,4 +149,4 @@ DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批�
 
 - 2026-07-07：默认内置模式中的清除、复制、删除、排序与筛选按钮统一使用 bare Button 外观。
 
-- 2026-07-05：v3.0.0，改为 PRO 组件，只服务 DataTable；移出 OSS 包公开入口。
+- 2026-07-05：v3.0.0，改为组合组件，只服务 DataTable；移出 包公开入口。

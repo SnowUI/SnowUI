@@ -14,7 +14,7 @@
 | 首次 hover 未满 `450ms` 就移开 | 不进入立即显示模式 |
 
 cooldown 窗口为 `300ms`。该规则参考 Radix Tooltip 的 `delayDuration` / `skipDelayDuration` 语义。
-OSS 共享 Portal 的相邻切换保留窗口必须与该 `300ms` 值一致；窗口内进入另一 Tooltip 时，不卸载外框，也不重新执行出现动效。连续视觉的时程与打断策略由 Tooltip motion preset 拥有，本模块不增加第二层意图或 burst 延迟。
+共享 Portal 的相邻切换保留窗口必须与该 `300ms` 值一致；窗口内进入另一 Tooltip 时，不卸载外框，也不重新执行出现动效。连续视觉的时程与打断策略由 Tooltip motion preset 拥有，本模块不增加第二层意图或 burst 延迟。
 
 ## 公开 API
 
@@ -38,6 +38,6 @@ OSS 共享 Portal 的相邻切换保留窗口必须与该 `300ms` 值一致；�
 - v1.4.0 (2026-08-21): 明确 warm 切换始终立即提交；视觉积累由 Tooltip 可打断时间线解决，不使用 burst 或第二层触发延迟。
 - v1.3.0 (2026-08-20): 移除固定 100ms 切换延迟；warm Tooltip 恢复立即响应，快速扫过由组件跳过连续裁切。
 - v1.2.0 (2026-08-20): 已显示 Tooltip 间切换增加 100ms 意图确认，短暂掠过触发器不再启动连续裁切动效。
-- v1.1.0 (2026-08-20): 共享 Portal 保留窗口迁为 OSS 默认行为，不再依赖 PRO 注册。
-- v1.0.1 (2026-08-12): 明确 PRO 共享 Portal 的保留窗口必须与 300ms skip-delay 一致，避免相邻触发器 gap 导致外框中断。
+- v1.1.0 (2026-08-20): 共享 Portal 保留窗口迁为默认行为，不再依赖额外注册。
+- v1.0.1 (2026-08-12): 明确 共享 Portal 的保留窗口必须与 300ms skip-delay 一致，避免相邻触发器 gap 导致外框中断。
 - v1.0.0 (2026-06-02): 建立 Tooltip warmup / cooldown 协调。

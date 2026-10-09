@@ -1,6 +1,6 @@
 # Toast
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v2.3.2
 > **职责**: 用短暂通知反馈操作结果或状态变化，支持图标、操作和富内容，适合保存成功、错误与提醒。
@@ -65,7 +65,7 @@
 - Toast 队列状态、position 与关闭事件由 Toaster 控制；外置显式 Props 高于 part。
 
 > **版本**: v2.3.2
-> **状态**: 已实现（PRO）
+> **状态**: 已实现
 > **职责**: 全局浮层通知，支持命令式 API、6 位置堆叠、内置/外置图标三槽位与 rich 富文本变体
 
 Toast 是 SnowUI 的全局通知组件。整套能力由三件交付物组成：
@@ -379,21 +379,21 @@ Toast 动效拆成 4 类原子动效：
 - 具体数值由 Toast / Toaster 使用时传入，例如 `scaleStep`、`stackOpacityStep`、`stackMinOpacity`、`gap`、`offset`。
 - 同一个原子动效在不同组件中可以复用，但数值由使用方决定。
 
-#### OSS / PRO 归属
+#### 技术职责归属
 
 该归属按 `specs/GUIDELINES.md`、`specs/ComponentGuidelines.md §0.5` 与 `components/src/components/Frame.md §1` 的作用半径原则执行：
 
 | 能力 | 归属 | 原因 |
 | :--- | :--- | :--- |
-| scale / fade / slide / stackTranslate 等基础动效配置 | OSS：`components/src/motion/` 与 OSS Frame 默认动效系统 | 只描述单个 Frame 自身的 transform / opacity / timing，作用半径 = 1 个 Frame |
-| Frame 对多个原子动效的同元素合成输出能力 | OSS：`components/src/logic/` | 仍只影响当前 Frame 自己，不控制其他 Frame |
-| Toast / Toaster 的堆叠策略、队列状态、每条 Toast 的 stack index 计算 | PRO：`components/src/components/Toaster.svelte` / `components/src/logic/toast.svelte.ts` | Toast 是 PRO 全局通知组件，负责跨 Toast 条目的队列与层级管理 |
-| 多个 Toast Frame 的出现、退场、堆叠顺序编排 | PRO：Frame / PRO motion orchestration 能力 | 涉及多个 Frame 的启动时机、层级和状态协调，作用半径 > 1 |
+| scale / fade / slide / stackTranslate 等基础动效配置 | 共享模块：`components/src/motion/` 与 Frame 默认动效系统 | 只描述单个 Frame 自身的 transform / opacity / timing，作用半径 = 1 个 Frame |
+| Frame 对多个原子动效的同元素合成输出能力 | 共享模块：`components/src/logic/` | 仍只影响当前 Frame 自己，不控制其他 Frame |
+| Toast / Toaster 的堆叠策略、队列状态、每条 Toast 的 stack index 计算 | 组件模块：`components/src/components/Toaster.svelte` / `components/src/logic/toast.svelte.ts` | Toast 是全局通知组件，负责跨 Toast 条目的队列与层级管理 |
+| 多个 Toast Frame 的出现、退场、堆叠顺序编排 | Frame 与 motion orchestration 能力 | 涉及多个 Frame 的启动时机、层级和状态协调，作用半径 > 1 |
 
 结论：
 
-- 基础动效必须作为 OSS 动效原语落在 OSS Frame / `components/src/motion/` 体系中。
-- 编排能力必须留在 PRO，不把跨 Frame 的 Toast 队列编排下放到 OSS Frame。
+- 基础动效必须作为动效原语落在 Frame / `components/src/motion/` 体系中。
+- Toast 队列与堆叠策略由 Toaster / toast 模块拥有；Frame 只提供通用动效与协调机制。
 - Toaster 只能把 stack index 映射为一组原子动效参数；原子动效本身不应命名为 Toast 专属能力。
 
 #### 实施与验证记录
@@ -411,8 +411,8 @@ Toast 动效拆成 4 类原子动效：
 当前实现状态：
 
 - 已完成：真实 Toast 三层堆叠，移除空背景壳体。
-- 已完成：出现 / 退场拆为 `slide + fade + scale`，并抽成 OSS `motion/primitives.ts` 原子构建器。
-- 已完成：Toast 槽位切到 PRO `Frame`，由 PRO 侧承接 `currentState`、`whileAppear`、`whileDisappear` 与最终组合输出。
+- 已完成：出现 / 退场拆为 `slide + fade + scale`，并抽成 `motion/primitives.ts` 原子构建器。
+- 已完成：Toast 槽位切到 `Frame`，由 Frame 承接 `currentState`、`whileAppear`、`whileDisappear` 与最终组合输出。
 - 已完成：堆叠 transform 合成拆成内外两层，避免位置偏移丢失。
 - 已完成：动效播放期间不阻塞按钮点击，不限制 `toast()` 连续触发。
 - 已完成：当前堆叠阶段仍由 `indexFromFront` 映射视觉状态；文档保留显式状态迁移模型作为后续维护目标。

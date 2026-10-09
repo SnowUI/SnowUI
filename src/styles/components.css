@@ -559,7 +559,7 @@
     /* --snowui-popover-font-size-override: ; */    /* font-size(默认 var(--text-14) = 14px) */
     /* --snowui-popover-line-height-override: ; */  /* line-height(默认 var(--leading-14)) */
 
-    /* PRO SidePanel */
+    /* SidePanel */
     /* --snowui-side-panel-radius-override: ; */            /* 圆角（默认 20px = var(--radius-5)） */
     /* --snowui-side-panel-font-size-override: ; */         /* font-size（默认 var(--text-14) = 14px） */
     /* --snowui-side-panel-line-height-override: ; */       /* line-height（默认 var(--leading-14)） */
@@ -572,7 +572,7 @@
     /* --snowui-scroll-mask-top-solid-ratio-override: ; */          /* 通用滚动遮罩上侧实心占比（默认 0.8） */
     /* --snowui-scroll-mask-bottom-solid-ratio-override: ; */       /* 通用滚动遮罩下侧实心占比（默认 0.8） */
 
-    /* PRO Block Sidebar */
+    /* Block Sidebar */
     /* --snowui-sidebar-width-override: ; */                         /* 展开宽度（默认 220px） */
     /* --snowui-sidebar-collapsed-width-override: ; */               /* 折叠宽度（默认 60px） */
     /* --snowui-sidebar-resize-indicator-offset-override: ; */       /* 展开态右侧宽度 Indicator 视觉中心距右边缘（默认 var(--padding-1) = 4px） */
@@ -664,15 +664,15 @@
     /* --snowui-switch-motion-duration-override: ; */   /* 动效时长（默认值见组件源码） */
     /* --snowui-switch-motion-easing-override: ; */     /* 动效曲线（默认值见组件源码） */
 
-    /* PRO Field */
+    /* Field */
     /* --snowui-field-background-override: ; */  /* 背景（默认值见组件源码） */
 
-    /* PRO ImageViewer */
+    /* ImageViewer */
     /* --snowui-image-viewer-z-index-override: ; */     /* z-index（默认值见组件源码） */
     /* --snowui-backdrop-background-override: ; */  /* 共享遮罩背景；默认取 backdrop 变体 */
     /* --snowui-image-viewer-background-override: ; */  /* 背景（默认值见组件源码） */
 
-    /* PRO CircularChart */
+    /* CircularChart */
     /* --snowui-circular-chart-size-override: ; */               /* 整体尺寸（默认 240px） */
     /* --snowui-circular-chart-label-font-size-override: ; */    /* 中心标签数值字号（160 基准默认 14px，随图表缩放） */
     /* --snowui-circular-chart-label-color-override: ; */        /* 中心标签主色（默认 var(--black-100)） */
@@ -680,7 +680,7 @@
     /* --snowui-circular-chart-label-font-weight-override: ; */  /* 中心标签主行字重（默认 600） */
     /* --snowui-circular-chart-label-muted-font-weight-override: ; */  /* 中心标签次行字重（默认 400） */
 
-    /* PRO GaugeChart */
+    /* GaugeChart */
     /* --snowui-gauge-chart-width-override: ; */                  /* 整体宽度（默认 320px） */
     /* --snowui-gauge-chart-height-override: ; */                 /* 整体高度（默认 160px） */
     /* --snowui-gauge-chart-label-font-size-override: ; */        /* 中心标签数值字号（320 宽基准默认 18px，随图表缩放） */
@@ -689,11 +689,11 @@
     /* --snowui-gauge-chart-label-font-weight-override: ; */      /* 中心标签主行字重（默认 700） */
     /* --snowui-gauge-chart-label-muted-font-weight-override: ; */  /* 中心标签次行字重（默认 400） */
 
-    /* PRO ChartGroup */
+    /* ChartGroup */
     /* --snowui-chart-group-width-override: ; */   /* 整体宽度（默认 800px） */
     /* --snowui-chart-group-height-override: ; */  /* 整体高度（默认 400px） */
 
-    /* PRO LineChart */
+    /* LineChart */
     /* --snowui-line-chart-width-override: ; */             /* 整体宽度（默认 800px） */
     /* --snowui-line-chart-height-override: ; */            /* 整体高度（默认 400px） */
     /* --snowui-line-chart-axis-font-size-override: ; */    /* 坐标轴标签字号（默认 14px） */
@@ -702,7 +702,7 @@
     /* --snowui-line-chart-axis-line-color-override: ; */   /* x 轴基线颜色（默认 var(--black-40)） */
     /* --snowui-line-chart-hover-label-color-override: ; */ /* hover label 颜色（默认 var(--black-100)） */
 
-    /* PRO BarChart */
+    /* BarChart */
     /* --snowui-bar-chart-width-override: ; */             /* 整体宽度（默认 800px） */
     /* --snowui-bar-chart-height-override: ; */            /* 整体高度（默认 400px） */
     /* --snowui-bar-chart-axis-font-size-override: ; */    /* 坐标轴标签字号（默认 12px） */
@@ -711,7 +711,7 @@
     /* --snowui-bar-chart-axis-line-color-override: ; */   /* x 轴基线颜色（默认 var(--black-40)） */
     /* --snowui-bar-chart-hover-label-color-override: ; */ /* hover label 颜色（默认 var(--black-100)） */
 
-    /* PRO SearchBox */
+    /* SearchBox */
     /* --snowui-search-box-width-override: ; */              /* 宽度（默认值见组件源码） */
     /* --snowui-search-box-background-override: ; */         /* 背景（默认值见组件源码） */
     /* --snowui-search-box-placeholder-color-override: ; */  /* 占位符颜色（默认值见组件源码） */
@@ -719,7 +719,7 @@
     /* --snowui-search-box-icon-hover-color-override: ; */   /* 图标悬浮颜色（默认值见组件源码） */
     /* --snowui-search-box-background-blur-override: ; */    /* 背景模糊（默认 1.25rem = 20px） */
 
-    /* PRO SearchPopup 已于 2026-05-15 合并入 Popover 中尺寸,override 入口收敛到 --snowui-popover-* */
+    /* SearchPopup 已于 2026-05-15 合并入 Popover 中尺寸,override 入口收敛到 --snowui-popover-* */
 
     /* ─────────────────────────────────────────
        共享 X 清除/关闭图标按钮基类（.snowui-clear-icon-btn）
@@ -732,7 +732,7 @@
     /* --snowui-clear-icon-hover-opacity-override: ; */   /* hover 态 opacity（默认 1） */
 
 
-    /* PRO Toast */
+    /* Toast */
     /* --snowui-toast-padding-y-override: ; */    /* default 变体 padding-y（默认 md=var(--padding-2)=8px / sm=var(--padding-1)=4px） */
     /* --snowui-toast-padding-x-override: ; */    /* default 变体 padding-x（默认 md=var(--padding-3)=12px / sm=var(--padding-2)=8px） */
     /* --snowui-toast-padding-override: ; */      /* rich 变体整体 padding（默认 var(--padding-3) = 12px） */
@@ -743,7 +743,7 @@
     /* --snowui-toast-success-color-override: ; */ /* 内置 success 图标颜色（默认 var(--secondary-green) = #71DD8C） */
     /* --snowui-toast-warning-color-override: ; */ /* 内置 warning 图标颜色（默认 var(--secondary-yellow) = #FFCC00） */
 
-    /* PRO Tab / Segmented (容器层;inactive Item=Black/100 × opacity 0.4;active Item 按 variant: pill/icon-toggle=Static Black/100,underline=Primary,solid=Button 默认颜色链,bare=Black/100) */
+    /* Tab / Segmented (容器层;inactive Item=Black/100 × opacity 0.4;active Item 按 variant: pill/icon-toggle=Static Black/100,underline=Primary,solid=Button 默认颜色链,bare=Black/100) */
     /* --snowui-tab-padding-override: ; */     /* 容器 padding(默认 sm=calc(var(--padding-1)/2)=2px;md/lg=var(--padding-1)=4px;solid/underline/bare 时为 0) */
     /* --snowui-tab-radius-override: ; */      /* 容器 radius(默认 sm=var(--radius-4)=16;md=var(--radius-5)=20;lg=var(--radius-6)=24;underline/bare=0) */
     /* --snowui-tab-gap-override: ; */         /* 容器子项间距(默认 sm=calc(var(--gap-1)/2)=2px;md/lg=var(--gap-1)=4px;underline/bare 时 sm/md/lg=var(--gap-3/4/5)=12/16/20) */
@@ -865,7 +865,7 @@
 
 /* CopyLink: --snowui-copy-link-padding-x-override (padding-4), --snowui-copy-link-padding-y-override (padding-3), --snowui-copy-link-radius-override (radius-4). */
 
-/* SearchPopup PRO Block：结果与分组间距，默认 gap-2。
+/* SearchPopup Block：结果与分组间距，默认 gap-2。
    --snowui-search-popup-results-gap-override
    --snowui-search-popup-group-gap-override
 */

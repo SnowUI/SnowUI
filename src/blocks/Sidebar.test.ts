@@ -196,20 +196,20 @@ export const examples = [
     {
         name: "SB-08：关闭宽度调整、状态记忆与数据标签",
         code: `SB-08
-{#snippet proTag()}<Tag>PRO</Tag>{/snippet}
+{#snippet statusTag()}<Tag>New</Tag>{/snippet}
 <Frame style="width: 220px; height: 20rem;">
     <Sidebar
         resizable={false}
         persistence={false}
         sections={[
             { id: "components", title: "Components", items: [
-                { id: "gauge-chart", label: "GaugeChart", icon: "gauge", tags: proTag },
+                { id: "gauge-chart", label: "GaugeChart", icon: "gauge", tags: statusTag },
             ] },
         ]}
     />
 </Frame>`,
         expected: {
-            render: "数据模式 SidebarItem 正常渲染由 tags Snippet 提供的 PRO 标签。",
+            render: "数据模式 SidebarItem 正常渲染由 tags Snippet 提供的 New 标签。",
             layout: "关闭 resizable 后不渲染右侧透明调宽命中层，Sidebar 保持 width 指定或默认宽度。",
             interaction: "导航选择与 Section 折叠仍可用；刷新后不恢复 active item 或 Section 折叠状态。",
             performance: "persistence={false} 时不读取或写入 localStorage。",

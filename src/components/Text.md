@@ -1,6 +1,6 @@
 # Text
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v3.5.2
 > **职责**: 统一展示文本，支持排版与截断，适合正文、标签和受限空间中的信息表达。
@@ -221,7 +221,7 @@
 | `.snowui-text-truncate-wrapper` | 包裹内容，保持 `width/height: 100%`，作为裁剪层承载体。 |
 | `.snowui-text-collapse-motion-enabled` | 为 `lines=0/2/3` 的真实截断/展开链路注入 `--snowui-text-collapse-transition`，并合并 hover 的 `margin/transform` 过渡，避免内联 `transition` 覆盖 hover 缓动。 |
 | `.snowui-truncate-container[data-lines="0"][data-expanded="false"] > .snowui-text-truncate-wrapper` | 收起态裁剪，`overflow: hidden`。 |
-| `.snowui-text-truncate-wrapper.snowui-scroll-mask` | 收起态接入「内容渐隐层」OSS 通用能力的 CSS 静态形态（`.snowui-scroll-mask`，能力总览见 [`../lib/edge-fade.md`](../lib/edge-fade.md)），通过 `data-scroll-mask="bottom"` 驱动 `mask-image`。 |
+| `.snowui-text-truncate-wrapper.snowui-scroll-mask` | 收起态接入「内容渐隐层」基础共享能力的 CSS 静态形态（`.snowui-scroll-mask`，能力总览见 [`../lib/edge-fade.md`](../lib/edge-fade.md)），通过 `data-scroll-mask="bottom"` 驱动 `mask-image`。 |
 | `.snowui-truncate-container .snowui-text-expand-button` | `Button as="more"` 的联动定位：Button 声明为 `pin-bottom-right`，边缘间距 4px；Text 将其提升到根层，避开内容 mask，并在展开 / 未截断时隐藏。 |
 | `.snowui-text-multi-line-content.snowui-line-clamp-2/3` | 多行内容独立承载 `display: -webkit-box` + line-clamp；Tooltip 留在 Text 根层，不进入被裁切文本。 |
 | `.snowui-text.snowui-line-clamp-2` | 固定两行：`line-clamp: 2`。 |

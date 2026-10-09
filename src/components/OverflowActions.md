@@ -1,6 +1,6 @@
 # OverflowActions
 
-> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
+> **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
 > **版本**: v1.0.2
 > **职责**: 在有限宽度内优先展示操作按钮，并将放不下的操作收进更多菜单，保持工具栏紧凑可用。
@@ -132,7 +132,7 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 `GlobalButtonProps` 为 Button Props 排除 `children / as / iconOnly / disabled / href / onclick / aria-label / title`。`Parts` 为 `ComponentPartsOf<{ Button: typeof Button; SelectButton: typeof SelectButton; Listbox: typeof Listbox; MenuItem: typeof MenuItem; Separator: typeof Separator }>`。每个键配置对应默认子组件的公开 Props，完整覆盖顺序见上文。
 
-其余兼容 Frame Props 透传根容器，共享关键字参见 [Frame](Frame.md) 的 OSS 子集；不引入 PRO 专属能力。
+其余兼容 Frame Props 透传根容器，共享关键字参见 [Frame](Frame.md) 的公开 API；组合层不重复实现共享行为。
 
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
@@ -150,7 +150,7 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 ### 开发者指南 (AI)
 
-- 包归属：OSS；主布局模型为复合管理布局。
+- 包归属：共享能力；主布局模型为复合管理布局。
 - 组合模式：默认内置模式与显式组合模式并存；显式模式只识别直系 `OverflowAction as="item"` 与 `Separator as="separator"`。
 - `OverflowAction` 通过专用 Context 注册 id / label / icon / disabled / href / 执行函数与测量节点；父组件不得读取任意 Button 内部结构推断语义。
 - 自测量模式复用全局 `resizeManager`；传入 `availableWidth` 时不注册 ResizeObserver。

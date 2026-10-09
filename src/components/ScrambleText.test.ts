@@ -21,7 +21,7 @@ export const examples = [
         code: `A1
 <Frame column class="gap-12">
     <ScrambleText text="DEPLOY READY" charset="glyphs" class="text-24 font-semibold text-black" />
-    <ScrambleText text="SNOWUI PRO" charset="symbols" class="text-20 text-blue" />
+    <ScrambleText text="SNOWUI DESIGN" charset="symbols" class="text-20 text-blue" />
     <ScrambleText text="2026.06.11" charset="numbers" class="text-20 text-purple" />
     <ScrambleText text="Text" mode="cascade" customSequence="a_&ぅ*" motionColor="Indigo" class="text-24 text-green" />
 </Frame>`,

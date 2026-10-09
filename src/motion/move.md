@@ -120,7 +120,7 @@
 
 ## 组合关系
 
-自 `v1.2.0` 起，`move.ts` 中的 slide 预设不再被视为“独立的大动效”，而是由 OSS 原子动效在使用阶段组合而成：
+自 `v1.2.0` 起，`move.ts` 中的 slide 预设不再被视为“独立的大动效”，而是由 原子动效在使用阶段组合而成：
 
 - `SLIDE_FROM_TOP_MOTION` = `createSlideYMotion(["-100%", 0]) + createFadeMotion([0.8, 1])`
 - `SLIDE_FROM_BOTTOM_MOTION` = `createSlideYMotion(["100%", 0]) + createFadeMotion([0.8, 1])`

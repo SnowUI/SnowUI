@@ -216,7 +216,7 @@ Frame 是唯一公共宿主；布局、状态、Context、loading / Skeleton、D
 
 ### 能力开关 (Capability Switches)
 
-**关联文件**: [Frame.svelte](Frame.svelte) · `frame-types.ts`（OSS） · `frame-dom-runtime.svelte.ts`（OSS）
+**关联文件**: [Frame.svelte](Frame.svelte) · `frame-types.ts` · `frame-dom-runtime.svelte.ts`
 
 > **New in v3.2.0**: Scale 支持高度/宽度/混合/高宽比四种计算依据，并可写入运行时宽高比变量。
 
@@ -238,7 +238,7 @@ Frame 是唯一公共宿主；布局、状态、Context、loading / Skeleton、D
 
 ### 基础属性 (Base Props)
 
-**关联文件**: [Frame.svelte](Frame.svelte) · `frame-identity.svelte.ts`（OSS） · `frame-types.ts`（OSS） · `frame-dom-runtime.svelte.ts`（OSS） · [frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts)
+**关联文件**: [Frame.svelte](Frame.svelte) · `frame-identity.svelte.ts` · `frame-types.ts` · `frame-dom-runtime.svelte.ts` · [frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts)
 
 ...rest | - | - | **属性透传**。所有未显式定义的属性透传给根元素 |
 
@@ -279,7 +279,7 @@ Frame 通过 `size` 属性和上下文机制实现跨层级的尺寸控制：
 
 ### 交互与状态 (Interaction & State)
 
-**关联文件**: [Frame.svelte](Frame.svelte) · [frame-state.svelte.ts](../logic/frame-state.svelte.ts) · [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) · `frame-dom-runtime.svelte.ts`（OSS） · [frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts)
+**关联文件**: [Frame.svelte](Frame.svelte) · [frame-state.svelte.ts](../logic/frame-state.svelte.ts) · [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) · `frame-dom-runtime.svelte.ts` · [frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts)
 
 ### 3.1 核心状态 (Core States)
 
@@ -394,7 +394,7 @@ Frame 通过 `size` 属性和上下文机制实现跨层级的尺寸控制：
 
 ### 3.5 原生事件同步
 
-**关联文件**: [frame-state.svelte.ts](../logic/frame-state.svelte.ts) · `frame-dom-runtime.svelte.ts`（OSS）
+**关联文件**: [frame-state.svelte.ts](../logic/frame-state.svelte.ts) · `frame-dom-runtime.svelte.ts`
 
 Frame 自动感知并同步所有原生 DOM 事件，确保内部状态机与外部事件监听器保持一致。
 
@@ -415,7 +415,7 @@ Frame 自动感知并同步所有原生 DOM 事件，确保内部状态机与外
 从 `v3.5.0` 开始，`lines` / `onTruncate` 已从 `Frame` 迁移到 `Text` 组件。
 `Frame` 不再初始化截断模块，也不再消费相关关键字。
 
-**关联文件**: `Text.svelte`（OSS） · `frame-truncation.svelte.ts`（OSS）
+**关联文件**: `Text.svelte` · `frame-truncation.svelte.ts`
 
 ```svelte
 <!-- 单行截断（由 Text 提供） -->
@@ -437,7 +437,7 @@ Frame 自动感知并同步所有原生 DOM 事件，确保内部状态机与外
 
 ### 响应式能力 (Responsiveness)
 
-**关联文件**: `frame-responsive.svelte.ts`（OSS）
+**关联文件**: `frame-responsive.svelte.ts`
 
 | 关键字 | 描述 |
 | :--- | :--- |
@@ -447,7 +447,7 @@ Frame 自动感知并同步所有原生 DOM 事件，确保内部状态机与外
 
 ### 5.1 断点 (Breakpoints)
 
-**关联文件**: `frame-responsive.svelte.ts`（OSS）
+**关联文件**: `frame-responsive.svelte.ts`
 
 
 **Layout 值**: `row` | `column` | `grid` | `row-reverse` | `column-reverse`
@@ -517,7 +517,7 @@ Scale 能力会先监听组件自身或父容器（`self/parent`）的尺寸变�
 
 ### 布局与样式 (Layout & Style)
 
-关联文件: `frame-layout.svelte.ts`（OSS） · [Frame.svelte](Frame.svelte) · `layout.css`（OSS styles） · `auto-layout.css`（OSS styles） · [frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts)
+关联文件: `frame-layout.svelte.ts` · [Frame.svelte](Frame.svelte) · `layout.css`（styles） · `auto-layout.css`（styles） · [frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts)
 
 > [!IMPORTANT]
 > **开发禁令 (Redline)**:
@@ -563,7 +563,7 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 
 ### 6.3 Surface Hover 覆写变量
 
-**关联文件**: `layout.css`（OSS styles） · [StyleSpec.md §2.4.6](../../../specs/StyleSpec.md#246-frame-hover-覆写变量能力化) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
+**关联文件**: `layout.css`（styles） · [StyleSpec.md §2.4.6](../../../specs/StyleSpec.md#246-frame-hover-覆写变量能力化) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
 
 当 `.snowui-hoverable` 需要覆盖默认 hover 叠加时，可使用以下变量（无需 `!important`，无需事件脚本）：
 
@@ -586,11 +586,11 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 
 ### 动效能力 (Motion Capabilities)
 
-**关联文件**: [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) · `motion-config.ts`（OSS） · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
+**关联文件**: [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) · `motion-config.ts` · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
 
 ### 7.0 默认动效系统 (Default Motion System)
 
-**关联文件**: `frame-motion-defaults.ts`（OSS） · `frame-motion-defaults.md`（OSS） · [motion/](../motion) · [FlowText.svelte](FlowText.svelte) · [FlowText.md](FlowText.md) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
+**关联文件**: `frame-motion-defaults.ts` · `frame-motion-defaults.md` · [motion/](../motion) · [FlowText.svelte](FlowText.svelte) · [FlowText.md](FlowText.md) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
 
 > **Changed in v3.6.0**: 动效文件迁移到 `components/src/motion/` 目录，新增 `enableDefaultMotion` 开关。
 
@@ -625,7 +625,7 @@ Frame 默认动效是组件级外层动效与控制层，不是所有内部动�
 
 - Frame 负责根元素整体的状态、生命周期、透明度、位移、缩放，以及父级对多个子 Frame 的编排。
 - 已有正式规范和共享实现的专项通用能力，可以完全独立于 Frame 默认动效实现内部动画，不要求转换为 `while*` 或消费 Frame bridge 时序。文字动效的字符、字形与数位动画是典型示例。
-- 专项动效组件仍须以 `Frame` / `Frame` 为根并透传适用的 Frame Props。因此，父级让全部子级渐隐、显式设置子级 `whileDisappear`，或对组件整体执行位移 / 缩放时，专项动效组件必须像其他 Frame 子级一样响应。
+- 专项动效组件仍须以 `Frame` 为根并透传适用的 Frame Props。因此，父级让全部子级渐隐、显式设置子级 `whileDisappear`，或对组件整体执行位移 / 缩放时，专项动效组件必须像其他 Frame 子级一样响应。
 - 外层 Frame 动效与内部专项动效允许同时运行：Frame 控制组件整体，内部能力控制内容细节。两层不得覆盖彼此负责的状态与样式。
 - `enableDefaultMotion={false}` 仅关闭当前根 Frame 的自动默认注入；内部专项动效继续有效，显式 `while*` 配置也继续有效。
 
@@ -650,7 +650,7 @@ Frame 默认动效是组件级外层动效与控制层，不是所有内部动�
 
 ### while* 动效值配置
 
-**关联文件**: [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) · `motion-config.ts`（OSS）
+**关联文件**: [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) · `motion-config.ts`
 
 ```svelte
 whileActive={{
@@ -705,7 +705,7 @@ SnowUI 组件内部若拥有明确默认视觉，应直接引用组件族 preset
 
 ### 7.1.1 默认加载协议 (Default Loading Protocol)
 
-**关联文件**: [Frame.svelte](Frame.svelte) · `frame-skeleton-runtime.svelte.ts`（OSS） · `frame-dom-runtime.svelte.ts`（OSS） · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
+**关联文件**: [Frame.svelte](Frame.svelte) · `frame-skeleton-runtime.svelte.ts` · `frame-dom-runtime.svelte.ts` · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
 
 **Changed in v3.8.0**: `loading` 成为加载状态入口，`whileLoad` 回归纯加载态动效配置，`skeleton` 独立控制骨架是否显示。
 
@@ -780,7 +780,7 @@ SnowUI 组件内部若拥有明确默认视觉，应直接引用组件族 preset
 
 ### 7.3 响应式驱动动效
 
-**关联文件**: [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) · `frame-responsive.svelte.ts`（OSS）
+**关联文件**: [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) · `frame-responsive.svelte.ts`
 
 | 关键字 | 描述 |
 | :--- | :--- |
@@ -793,7 +793,7 @@ SnowUI 组件内部若拥有明确默认视觉，应直接引用组件族 preset
 
 ### 7.4 动效参数
 
-**关联文件**: `motion-config.ts`（OSS） · [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts)
+**关联文件**: `motion-config.ts` · [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts)
 
 **顶级 Props** (直接传给 Frame)：
 
@@ -966,11 +966,11 @@ SnowUI 组件内部若拥有明确默认视觉，应直接引用组件族 preset
 
 ### Frame 演进 (Frame Evolution)
 
-**关联文件**: `layout.css`（OSS） · [frame-perception.svelte.ts](../logic/frame-perception.svelte.ts)
+**关联文件**: `layout.css` · [frame-perception.svelte.ts](../logic/frame-perception.svelte.ts)
 
 ### 9.1 CSS 行为工具类
 
-**关联文件**: `layout.css`（OSS）
+**关联文件**: `layout.css`
 
 Frame 不再提供角色属性。组件需要共享行为时，主动在 `class` 中声明工具类；组件语义相关的 cursor、user-select、link hover 等由组件 CSS 自治。
 
@@ -1027,7 +1027,7 @@ Frame 不再提供角色属性。组件需要共享行为时，主动在 `class`
 
 ###  样式编排 (Style Orchestration)
 
-**关联文件**: [frame-orchestrator.svelte.ts](../logic/frame-orchestrator.svelte.ts) · [frame-orchestrator.md](../logic/frame-orchestrator.md) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts) · `frame-dom-runtime.svelte.ts`（OSS）
+**关联文件**: [frame-orchestrator.svelte.ts](../logic/frame-orchestrator.svelte.ts) · [frame-orchestrator.md](../logic/frame-orchestrator.md) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts) · `frame-dom-runtime.svelte.ts`
 
 Frame 样式编排系统是一个**集中式、高优先级、支持复杂运算**的样式控制系统。它允许开发者在父容器（Orchestrator）中通过 ID 精确控制任意深层子组件（Target）的样式，建立组件间的联动关系。
 
@@ -1159,7 +1159,7 @@ Call initMotion() during parent component initialization when using cross-compon
 
 ### 1.1 动效时序桥接变量 (Motion Timing Bridge)
 
-**关联文件**: `bridge.ts`（OSS）
+**关联文件**: `bridge.ts`
 
 Frame 会在根节点内联样式上暴露以下时序变量，供控制类组件直接复用默认动效的持续时间和缓动曲线，而不再各自维护一套本地 `duration/easing`：
 
@@ -1189,31 +1189,20 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 > **样式规范**: 详见 [StyleSpec.md](../../../specs/StyleSpec.md)
 
 
-> ## v1.0.0 切割线说明（2026-05-06 起）
->
-> **Frame = Frame + 三类跨组件协调能力**：
->
-> - **§7.7 编排模式**（`orchestrate*`：父控子动效启动时机）
-> - **§8 联动控制**（`Click={{target, action}}`：A → B Frame 的动效播放）
-> - **§10 样式编排**（`styles={{ "#id": {...} }}`：跨组件 ID 寻址 + 表达式求值）
->
-> Frame 全部能力——状态机、JS 动效执行、自身 FLIP、Scale Observer、Perception、stateContent、FrameActions——v1.0.0 起**已下放到 OSS**，Frame 通过共享 OSS 模块复用，不再重复实现。详见 [Frame.md](Frame.md)。
->
-> **Frame 关键字 API**：
-> - 跨组件（必须用 Frame）：见本共享文档 [Frame.md](Frame.md) 中带 `` 标签的章节（§7.7 / §8 / §10）
-> - OSS 共享（Frame 也支持，详细文档在 Frame）：见 [Frame.md](Frame.md) 中带 `` 标签的所有章节，权威规范见 [Frame.md](Frame.md)
->
-> 历史 v3.x 文档保留在下方作为详尽参考；其中"OSS 静态层 + PRO 动作层"等旧表述对应 v0.x 切割线，已被新切割线（自包含 vs 跨组件）取代。
+### 统一 Frame 的能力结构
+
+Frame 通过共享模块统一实现布局、状态、自身动效与跨组件协调。编排模式见 §7.7，联动控制见 §8，样式寻址见 §10；所需 Motion 上下文和启用条件以各节 API 为准。
+
 
 ---
 
-`Frame.svelte` 是所有 PRO 组件的基础构建块。它完整包含 OSS `Frame.svelte` 的全部能力，并在其上附加 JS 动效引擎、交互状态机、FLIP 编排器、可见性感知与动作系统。
+`Frame.svelte` 是统一宿主，提供布局、JS 动效、交互状态机、FLIP、可见性感知、动作与跨组件编排。
 
 阅读本文件时，需要先建立以下目录认知：
 
-- `Frame` 的核心逻辑实现：OSS 层在 `@snowui-design-system/components`（`components/src/logic/`），PRO 层在 `../logic/`。
-- `Frame` 的默认动效实现位于 `components/src/`（OSS，来自 `@snowui-design-system/components`）。
-- `Frame` 的基础动效原子（如 `fade / scale / slide / stackTranslate`）位于 `components/src/motion/primitives.ts`（OSS）；Frame 负责消费这些原子并参与跨 Frame 协调，不重复定义一套平行原子。
+- `Frame` 的共享逻辑统一位于 `components/src/logic/`。
+- `Frame` 的默认动效实现位于 `components/src/`（来自 `@snowui-design-system/components`）。
+- `Frame` 的基础动效原子（如 `fade / scale / slide / stackTranslate`）位于 `components/src/motion/primitives.ts`；Frame 负责消费这些原子并参与跨 Frame 协调，不重复定义一套平行原子。
 
 ---
 
@@ -1312,24 +1301,24 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 
 | 模块 | 代码文件 | 文档 | 职责 |
 |:---|:---|:---|:---|
-| Identity | `frame-identity.svelte.ts`（OSS） | `frame-identity.md`（OSS） | 身份标识管理 |
+| Identity | `frame-identity.svelte.ts` | `frame-identity.md` | 身份标识管理 |
 | State | [frame-state.svelte.ts](../logic/frame-state.svelte.ts) | [frame-state.md](../logic/frame-state.md) | 状态管理 |
-| Layout | `frame-layout.svelte.ts`（OSS） | `frame-layout.md`（OSS） | 布局计算 |
-| Responsive | `frame-responsive.svelte.ts`（OSS） | `frame-responsive.md`（OSS） | 响应式监听 |
+| Layout | `frame-layout.svelte.ts` | `frame-layout.md` | 布局计算 |
+| Responsive | `frame-responsive.svelte.ts` | `frame-responsive.md` | 响应式监听 |
 | Motion | [frame-motion.svelte.ts](../logic/frame-motion.svelte.ts) | [frame-motion.md](../logic/frame-motion.md) | 动效编排 |
-| MotionDefaults | `frame-motion-defaults.ts`（OSS） | `frame-motion-defaults.md`（OSS） | 默认 `while*` 动效注册与解析 |
+| MotionDefaults | `frame-motion-defaults.ts` | `frame-motion-defaults.md` | 默认 `while*` 动效注册与解析 |
 | Perception | [frame-perception.svelte.ts](../logic/frame-perception.svelte.ts) | [frame-perception.md](../logic/frame-perception.md) | 上下文感知 |
 | ScaleObserver | [frame-scale-observer.svelte.ts](../logic/frame-scale-observer.svelte.ts) | [frame-scale-observer.md](../logic/frame-scale-observer.md) | 运行时宽高/高宽比/统一尺寸监听与变量写入 |
 | ScaleResolver | [frame-scale-resolver.svelte.ts](../logic/frame-scale-resolver.svelte.ts) | [frame-scale-resolver.md](../logic/frame-scale-resolver.md) | Scale 参数与样式变量解析 |
 | Actions | [frame-actions.svelte.ts](../logic/frame-actions.svelte.ts) | [frame-actions.md](../logic/frame-actions.md) | Frame actions 组装与挂载 |
-| PropFilter | `frame-prop-filter.ts`（OSS） | `frame-prop-filter.md`（OSS） | DOM 透传属性过滤 |
-| StateValue | `frame-state-value.ts`（OSS） | `frame-state-value.md`（OSS） | 子组件按父 Frame `currentState` 解析状态值 |
-| CSS 行为工具类 | `layout.css`（OSS） | `layout.css`（OSS） | hoverable / field-bordered 样式 |
-| Types | `frame-types.ts`（OSS） | `frame-types.md`（OSS） | 类型定义 |
-| Utils | `frame-utils.ts`（OSS） | `frame-utils.md`（OSS） | 工具函数 |
+| PropFilter | `frame-prop-filter.ts` | `frame-prop-filter.md` | DOM 透传属性过滤 |
+| StateValue | `frame-state-value.ts` | `frame-state-value.md` | 子组件按父 Frame `currentState` 解析状态值 |
+| CSS 行为工具类 | `layout.css` | `layout.css` | hoverable / field-bordered 样式 |
+| Types | `frame-types.ts` | `frame-types.md` | 类型定义 |
+| Utils | `frame-utils.ts` | `frame-utils.md` | 工具函数 |
 | InlineStyle | [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts) | [frame-inline-style.md](../logic/frame-inline-style.md) | 统一拼装 `computedStyle`、时序桥接与 `while*` 内联样式 |
-| DomRuntime | `frame-dom-runtime.svelte.ts`（OSS） | `frame-dom-runtime.md`（OSS） | 统一拼装 DOM props、事件包装器与运行时 `data-*` 属性 |
-| SkeletonRuntime | `frame-skeleton-runtime.svelte.ts`（OSS） | `frame-skeleton-runtime.md`（OSS） | 统一处理 Skeleton probe、子骨架探测与加载渲染前判定 |
+| DomRuntime | `frame-dom-runtime.svelte.ts` | `frame-dom-runtime.md` | 统一拼装 DOM props、事件包装器与运行时 `data-*` 属性 |
+| SkeletonRuntime | `frame-skeleton-runtime.svelte.ts` | `frame-skeleton-runtime.md` | 统一处理 Skeleton probe、子骨架探测与加载渲染前判定 |
 | ClassState | [frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts) | [frame-class-state.md](../logic/frame-class-state.md) | 统一解析 `stateVars/stateClass/stateStyle`、`childrenRenderContext` 与 `computedClass` |
 
 ### 统管式拆分边界（文档先行）
@@ -1358,8 +1347,8 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 | 模块文件 | 已承接职责 |
 |:---|:---|
 | `./../logic/frame-inline-style.svelte.ts` | `computedStyle`、`while*` 内联样式、时序桥接与 Orchestration 暴露变量 |
-| `./`frame-dom-runtime.svelte.ts`（OSS）` | DOM props、可访问性补齐、原生事件包装器与运行时 `data-*` 属性 |
-| `./`frame-skeleton-runtime.svelte.ts`（OSS）` | Skeleton probe、子骨架探测与加载渲染前判定 |
+| `../logic/frame-dom-runtime.svelte.ts` | DOM props、可访问性补齐、原生事件包装器与运行时 `data-*` 属性 |
+| `../logic/frame-skeleton-runtime.svelte.ts` | Skeleton probe、子骨架探测与加载渲染前判定 |
 | `./../logic/frame-class-state.svelte.ts` | `stateVars/stateClass/stateStyle`、`childrenRenderContext` 与 `computedClass` |
 
 #### 实施顺序（约束）
@@ -1412,7 +1401,7 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 - [tokens.css](../styles/tokens.css) - CSS Token 定义
 
 **其他模块**:
-- `geometry-cache.ts`（OSS） - 几何缓存
+- `geometry-cache.ts` - 几何缓存
 - [keys.ts](../keys.ts) - Context Keys
 
 ---
