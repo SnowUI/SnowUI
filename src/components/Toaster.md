@@ -4,7 +4,7 @@
 
 > **版本**: v1.0.1
 > **职责**: 集中展示通过 toast() 触发的全局通知，支持六个屏幕位置、堆叠动效与可见数量控制，让连续反馈保持有序。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button } from '@snowui-design-system/components';
-	import { Toaster, toast, dismissAllToasts } from '@snowui-design-system/components/compat';
+	import { Toaster, toast, dismissAllToasts } from '@snowui-design-system/components';
 </script>
 
 <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--gap-4) var(--gap-3);">

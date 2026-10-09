@@ -8,7 +8,6 @@ const workspaceRoot = resolve(repoRoot, "..");
 const observerPath = resolve(repoRoot, "src/logic/observer.svelte.ts");
 const scanRoots = [
     resolve(repoRoot, "src"),
-    resolve(workspaceRoot, "pro/src"),
     resolve(workspaceRoot, "site/src"),
     resolve(workspaceRoot, "playground/test"),
 ].filter((path) => {

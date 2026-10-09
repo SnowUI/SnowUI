@@ -4,7 +4,7 @@
 
 > **版本**: v1.3.0
 > **职责**: 在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -27,7 +27,7 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { Tab } from '@snowui-design-system/components/compat';
+	import { Tab } from '@snowui-design-system/components';
 </script>
 
 <Tab itemRole="tab" size="lg" value="preview" aria-label="Component example view" items={[{ value: 'preview', label: 'Preview' }, { value: 'code', label: 'Code' }, { value: 'api', label: 'API' }]} />
@@ -162,7 +162,7 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 ```svelte
 <script lang="ts">
   import { Button, Icon, Text } from '@snowui-design-system/components';
-  import { Tab } from '@snowui-design-system/components/compat';
+  import { Tab } from '@snowui-design-system/components';
   import { FourLeafClover, Star } from '@snowui-design-system/resource-svelte';
   let value = $state('web');
 </script>

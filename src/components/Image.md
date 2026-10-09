@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Image } from '@snowui-design-system/components';
-	import { ImageViewer } from '@snowui-design-system/components/compat';
+	import { ImageViewer } from '@snowui-design-system/components';
 	import cover01 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-01-1024.jpg';
 </script>
 

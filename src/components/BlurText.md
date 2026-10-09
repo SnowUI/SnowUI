@@ -4,7 +4,7 @@
 
 > **版本**: v1.0.0
 > **职责**: 逐字从模糊与轻微下移中揭示文字。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 
 ## 组件介绍
 
@@ -21,7 +21,7 @@
 
 ```svelte
 <script lang="ts">
-  import { BlurText } from '@snowui-design-system/components/compat';
+  import { BlurText } from '@snowui-design-system/components';
 </script>
 
 <BlurText text="让灵感逐渐清晰。" size="--text-32" lineHeight="--leading-32" />

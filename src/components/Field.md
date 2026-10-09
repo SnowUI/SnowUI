@@ -4,7 +4,7 @@
 
 > **版本**: v1.3.0
 > **职责**: 将输入控件、标签、图标和校验反馈组织为完整的表单字段，统一外观与内容布局。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Frame, Input, Select } from '@snowui-design-system/components';
-	import { Field } from '@snowui-design-system/components/compat';
+	import { Field } from '@snowui-design-system/components';
 </script>
 
 <Field

@@ -4,7 +4,7 @@
 
 > **版本**: v4.0.4（共享首行对齐布局，2026-10-08）
 > **职责**: 在 Frame 的布局、状态与动效能力之上，协调多个组件的联动、动效编排与样式变化。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-08
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Frame, Text } from '@snowui-design-system/components';
-	import { FramePro } from '@snowui-design-system/components/compat';
+	import { FramePro } from '@snowui-design-system/components';
 </script>
 
 <FramePro
@@ -200,9 +200,9 @@
 
 | 能力 | 相关文件（PRO 专属） |
 |:---|:---|
-| §7.7 **编排模式**（`orchestrate*`：父 Frame 控制多个子 Frame 动效启动时机） | `pro/src/logic/motion-orchestration.ts`、`pro/src/logic/timeline.svelte.ts` |
-| §8 **联动控制**（`Click={{target, action}}`：A Frame 事件触发 B Frame 动效） | PRO `frame-state.svelte.ts`（含 linkageControl）、PRO `frame-motion.svelte.ts`（向 Motion 编排器注册）、`pro/src/logic/motion.svelte.ts` |
-| §10 **样式编排**（`styles={{ "#id": {...} }}`：跨组件 ID 寻址 + 表达式求值） | `pro/src/logic/frame-orchestrator.svelte.ts` |
+| §7.7 **编排模式**（`orchestrate*`：父 Frame 控制多个子 Frame 动效启动时机） | `components/src/logic/motion-orchestration.ts`、`components/src/logic/timeline.svelte.ts` |
+| §8 **联动控制**（`Click={{target, action}}`：A Frame 事件触发 B Frame 动效） | PRO `frame-state.svelte.ts`（含 linkageControl）、PRO `frame-motion.svelte.ts`（向 Motion 编排器注册）、`components/src/logic/motion.svelte.ts` |
+| §10 **样式编排**（`styles={{ "#id": {...} }}`：跨组件 ID 寻址 + 表达式求值） | `components/src/logic/frame-orchestrator.svelte.ts` |
 
 **与 OSS 动效原子的关系（2026-05-12 补充）**：
 
@@ -1281,7 +1281,7 @@ FramePro is part of the PRO package and requires package access. Keep using the 
 
 ```ts
 import { Frame } from '@snowui-design-system/components';
-import { FramePro } from '@snowui-design-system/components/compat';
+import { FramePro } from '@snowui-design-system/components';
 ```
 
 ### Sequence child motion {#orchestration}

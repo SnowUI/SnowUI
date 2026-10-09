@@ -4,7 +4,7 @@
 
 > **版本**: v1.14.0
 > **职责**: 统一管理数据的查询、排序与分页状态，可自由组合工具栏、表格和分页器，构建完整的数据浏览界面。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-07
 
 ## 组件介绍
@@ -30,7 +30,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { Avatar, Button, Chip, formatDate, Frame, Pagination, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, type TableSortState } from '@snowui-design-system/components';
-	import { DataTable, TableToolbar, type DataTableLoadMoreRequest, type DataTableRenderState } from '@snowui-design-system/components/compat';
+	import { DataTable, TableToolbar, type DataTableLoadMoreRequest, type DataTableRenderState } from '@snowui-design-system/components';
 	import { Apple, AvatarFemale01, AvatarFemale02, AvatarFemale03, AvatarMale01, AvatarMale02, Facebook, FigmaA, Google, Gradient01, MagicWand, Medium, Perplexity, Question, Slack, SnowLogo, SortAscending, Calendar, ThreeDots } from '@snowui-design-system/resource-svelte';
 	const DEMO_NOW = new Date("2026-06-19T04:00:00Z");
 	const minute = 60 * 1000;
@@ -270,7 +270,7 @@ TableHead `defaultSort` 同时定义默认列与默认方向，优先于 DataTab
 ```svelte
 <script lang="ts">
   import { Pagination, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@snowui-design-system/components';
-  import { DataTable, TableToolbar, type DataTableRenderState } from '@snowui-design-system/components/compat';
+  import { DataTable, TableToolbar, type DataTableRenderState } from '@snowui-design-system/components';
   const rows = [{ id: 'one', name: 'Project files' }];
   let page = $state(1);
   let state = $state<DataTableRenderState<(typeof rows)[number]>>();

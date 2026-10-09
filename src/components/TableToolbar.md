@@ -3,7 +3,7 @@
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 OSS / PRO 标签仅表示迁移期技术来源。
 
 > **职责**: 为 DataTable 提供搜索、排序、筛选和批量操作入口，并展示选择状态，适合数据管理界面。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -26,7 +26,7 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { DataTable, TableToolbar, type DataTableRenderState } from '@snowui-design-system/components/compat';
+	import { DataTable, TableToolbar, type DataTableRenderState } from '@snowui-design-system/components';
 	import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@snowui-design-system/components';
 	type DocRow = { id: number; component: string; tier: 'OSS' | 'PRO'; status: string };
 	const docs: DocRow[] = [
@@ -130,7 +130,7 @@
 
 ## AI Zone
 
-DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批量操作。它读取 DataTable Context，不支持独立搭配普通 Table。公开入口为 `@snowui-design-system/components/compat`。
+DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批量操作。它读取 DataTable Context，不支持独立搭配普通 Table。公开入口为 `@snowui-design-system/components`。
 
 ## 更新日志
 

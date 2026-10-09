@@ -4,7 +4,7 @@
 
 > **版本**: v1.4.0
 > **职责**: 将 Sidebar 导航组织为带标题的分组，支持展开、收起与附加操作，便于浏览较长的导航列表。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -27,7 +27,7 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { SidebarItem, SidebarSection } from '@snowui-design-system/components/compat';
+	import { SidebarItem, SidebarSection } from '@snowui-design-system/components';
 	let opened = $state('');
 </script>
 

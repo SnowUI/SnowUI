@@ -4,7 +4,7 @@
 
 > **版本**: v1.7.2
 > **职责**: 对文字或数字中发生变化的部分进行过渡，保留未变内容，适合简短状态、数值与计时信息。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button, Text } from '@snowui-design-system/components';
-	import { NumericText, chromatic } from '@snowui-design-system/components/compat';
+	import { NumericText, chromatic } from '@snowui-design-system/components';
 	const headlines = ['Build with SnowUI', 'Ship components', 'Write better docs'];
 	let headlineIndex = $state(0);
 </script>
@@ -119,7 +119,7 @@
 
 
 
-> **组件路径**: `pro/src/components/NumericText.svelte`
+> **组件路径**: `components/src/components/NumericText.svelte`
 
 
 `NumericText` 提供 SwiftUI `numericText` 风格的单行文字 / 数字差异过渡，只动画发生变化的中间区间。

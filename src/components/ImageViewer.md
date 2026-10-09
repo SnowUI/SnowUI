@@ -4,7 +4,7 @@
 
 > **版本**: v1.4.1
 > **职责**: 在页面级预览中查看图片或视频，提供前后切换与关闭操作，适合媒体详情浏览。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button, Image, ImageGroup } from '@snowui-design-system/components';
-	import { ImageViewer } from '@snowui-design-system/components/compat';
+	import { ImageViewer } from '@snowui-design-system/components';
 	import cover01 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-01-1024.jpg';
 	import cover02 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-02-1024.jpg';
 	import cover03 from '@snowui-design-system/resource-base/assets/backgrounds/gradient-03-1024.jpg';

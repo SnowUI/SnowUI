@@ -21,7 +21,7 @@
 
 - `logic` 解决"什么时候动、怎么编排、默认怎么注入"
 - `motion` 是 `logic` 消费的**动效配置资源**（`while-*.ts` / `move.ts`）和**桥接层**（`bridge.ts`），也包含供组件组合使用的原子动效构建器（`primitives.ts`）
-- `pro/src/motion` 是面向用户的**复杂动效组件**
+- `components/src/components` 是面向用户的**复杂动效组件**
 
 ---
 
@@ -96,7 +96,7 @@
 
 - 如果需求是"状态变化怎么通知动效系统"，应改 `logic/frame-motion.svelte.ts`
 - 如果需求是"播放顺序、时间轴、滚动联动、共享元素转场"，应改 `logic/motion*.ts`
-- 如果需求是面向用户的复杂动效组件，应放入 `pro/src/motion/`
+- 如果需求是面向用户的复杂动效组件，应放入 `components/src/components/`
 
 ### 3. 最常见的重复问题
 

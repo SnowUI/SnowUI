@@ -4,7 +4,7 @@
 
 > **版本**: v1.4.1
 > **职责**: 从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,11 +28,11 @@
 ```svelte
 <script lang="ts">
 	import { Badge, Button, Frame, Input, Text, Textarea } from '@snowui-design-system/components';
-	import { SidePanel, createSidePanelLayoutMotionStyle, type SidePanelPlacement } from '@snowui-design-system/components/compat';
+	import { SidePanel, createSidePanelLayoutMotionStyle, type SidePanelPlacement } from '@snowui-design-system/components';
 	type ComponentRecord = { name: string; tier: 'OSS' | 'PRO'; packageName: string; description: string; notes: string; };
 	let componentRecords = $state<ComponentRecord[]>([
-		{ name: 'DataTable', tier: 'PRO', packageName: '@snowui-design-system/components/compat', description: 'Sort, select, and manage records.', notes: 'Review responsive columns.' },
-		{ name: 'SidePanel', tier: 'PRO', packageName: '@snowui-design-system/components/compat', description: 'View and edit record details.', notes: 'Check floating and inline layouts.' },
+		{ name: 'DataTable', tier: 'PRO', packageName: '@snowui-design-system/components', description: 'Sort, select, and manage records.', notes: 'Review responsive columns.' },
+		{ name: 'SidePanel', tier: 'PRO', packageName: '@snowui-design-system/components', description: 'View and edit record details.', notes: 'Check floating and inline layouts.' },
 		{ name: 'Button', tier: 'OSS', packageName: '@snowui-design-system/components', description: 'Actions for SnowUI products.', notes: 'Variants ready for release.' }
 	]);
 	let panelOpen = $state(false);
@@ -144,7 +144,7 @@
 ```svelte
 <script lang="ts">
   import { Frame, Button } from '@snowui-design-system/components';
-  import { SidePanel } from '@snowui-design-system/components/compat';
+  import { SidePanel } from '@snowui-design-system/components';
   let open = $state(true);
 function download() { /* 接入业务下载 */ }
 </script>
@@ -246,7 +246,7 @@ helper 输出以下页面 bridge 变量：
   import {
     SidePanel,
     createSidePanelLayoutMotionStyle,
-  } from "@snowui-design-system/components/compat";
+  } from "@snowui-design-system/components";
 
   let open = $state(false);
   let placement = $state<"floating" | "inline">("floating");
@@ -369,7 +369,7 @@ SidePanel 本身提供高度能力，但页面负责决定它相对于哪个空�
 ```svelte
 <script lang="ts">
   import { Frame, Text } from '@snowui-design-system/components';
-  import { SidePanel } from '@snowui-design-system/components/compat';
+  import { SidePanel } from '@snowui-design-system/components';
   let open = $state(true);
 function download() { /* 接入业务下载 */ }
 </script>
@@ -415,7 +415,7 @@ function download() { /* 接入业务下载 */ }
 
 ### AI Zone
 
-- `SidePanel` 是 PRO 复合管理布局组件，放置在 `pro/src/components/SidePanel.svelte`。
+- `SidePanel` 是 PRO 复合管理布局组件，放置在 `components/src/components/SidePanel.svelte`。
 - 组件视觉复用 Dialog 所属的 `.snowui-quick-action-panel` 面板基类，背景为 `Background/3`，背景模糊为 `blur(var(--size-10))`（基础 40px）。该视觉基类与出现/退出位移共同承接在外层 `.snowui-side-panel-motion-shell`，避免 transform 祖先隔离内层 `aside` 的 backdrop 采样；内层 `aside` 只保持稳定局部坐标系、内容与交互。不直接以 `Dialog` 为宿主。
 - 关闭：`closeOnEscape`（默认 true）+ `closeOnOutside`（默认 true，点击面板外关闭）。外部关闭在 click 的业务处理完成后判断：同步更新面板内容的点击与本实例已识别的打开/切换入口保持打开，只换内容、不播退场/进场；不要求示例添加特殊标记。普通外部点击仍关闭，保留表格行兼容。异步加载应在点击时同步更新选中记录或加载状态。
 - 内容区 `overflow-y: auto` + overlay scrollbar（根挂 `snowui-overlay-scrollbar-host`，hover 显示），与页面滚动隔离（`overscroll-behavior: contain`）；body 与直系子项 `min-width: 0` 防止长文案顶破右侧 padding。

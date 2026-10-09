@@ -4,7 +4,7 @@
 
 > **版本**: v1.7.2
 > **职责**: 用半环或半饼展示多项数据占比，支持分段、渐变、环厚与出现动效，适合比例概览。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -29,7 +29,7 @@
 <script lang="ts">
 	import { Button, Frame, Icon, Text } from '@snowui-design-system/components';
 	import { DotCircle } from '@snowui-design-system/resource-svelte';
-	import { GaugeChart } from '@snowui-design-system/components/compat';
+	import { GaugeChart } from '@snowui-design-system/components';
 	// 本周文档审核的示例数据。
 	const channels = [
 	    { name: 'Ready', value: 72, color: 'var(--primary)' },
@@ -114,7 +114,7 @@
 
 ### 设计原则
 
-- **专业图表组件**：当前维护位置为 `pro/src/components/`；该目录是迁移期技术位置。运行包使用与原始源码交付按 [LICENSE](../../LICENSE) 执行，不再以高级功能划分付费运行权益。
+- **专业图表组件**：当前维护位置为 `components/src/components/`；该目录是迁移期技术位置。运行包使用与原始源码交付按 [LICENSE](../../LICENSE) 执行，不再以高级功能划分付费运行权益。
 - **默认 10 项，最多 28 项**:默认 `maxItems=10`。显式提高 `maxItems` 时最多显示 28 项，颜色序列与 CircularChart 完全一致，10 项后仍按序循环。
 - **颜色优先级**:`data[i].color → colors[i] → colorMode 对应回退色`。单项颜色只影响当前扇区，不会传递给后续扇区。
 - **尺寸基准**:`cornerRadius` 与 `separatorWidth` 都表示 320px 宽仪表图下的设计基准值。组件内部统一按 `width / 320` 等比缩放，数字和字符串数字都按基准值理解。
@@ -122,7 +122,7 @@
 - **图层结构**:base layer 由 `showBaseLayer` 控制，默认关闭，开启时绘制 4% 同色占位层；fill layer 负责真实填充与出现动效；hit layer 使用完整扇区 path 负责 hover / focus / aria。
 - **Hover 强调**:每个扇区从当前几何立即转向最新 hover / focus 目标，取消未完成的旧动画，不积压重播；hover / focus 时扇区不位移，仅外半径缓动增加 `hoverThicknessGrowth`；中心标签上方显示百分比，下方显示当前项名称。
 
-共享纯逻辑位于 `pro/src/lib/chart/`：颜色、渐变、几何基准缩放、圆环扇区 path 与出现时间轴。GaugeChart 自身保留半圆圆心、起始方向、中心标签和 hover 状态管理。
+共享纯逻辑位于 `components/src/lib/chart/`：颜色、渐变、几何基准缩放、圆环扇区 path 与出现时间轴。GaugeChart 自身保留半圆圆心、起始方向、中心标签和 hover 状态管理。
 
 ---
 
@@ -261,7 +261,7 @@ interface GaugeChartItem {
 - 官网 [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 示例用于确认目标视觉：半圆扇区同样需要同时保留清晰间隔和端部圆角。
 - 本地 `[项目目录]/repos/echarts-master/src/chart/pie/pieLayout.ts` 用于确认间隔原则：ECharts 在布局阶段通过 `padAngle` 收缩实际扇区角度。
 - 本地 `[项目目录]/repos/echarts-master/src/chart/helper/sectorHelper.ts` 用于确认圆角原则：`borderRadius` 属于扇区自身几何。
-- SnowUI 最终在共享 `pro/src/lib/chart/arc-path.ts` 中使用 d3-shape 实现对应原则，没有直接复制 ECharts 渲染代码。
+- SnowUI 最终在共享 `components/src/lib/chart/arc-path.ts` 中使用 d3-shape 实现对应原则，没有直接复制 ECharts 渲染代码。
 
 落地规则：
 
@@ -295,7 +295,7 @@ interface GaugeChartItem {
 > **参考**: ECharts [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 官方示例，以及本地 ECharts `src/chart/pie/pieLayout.ts`、`src/chart/helper/sectorHelper.ts` 源码。
 
 
-默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度由 `minWidth` 决定，默认 `"40px"`；容器不足下限时保持下限。将 `minWidth` 设为与图表宽度相同即可阻止自动缩小。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `pro/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
+默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度由 `minWidth` 决定，默认 `"40px"`；容器不足下限时保持下限。将 `minWidth` 设为与图表宽度相同即可阻止自动缩小。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `components/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
 
 ---
 
@@ -424,7 +424,7 @@ interface GaugeChartItem {
 - 圆角和透明间隔统一按 320px 基准等比缩放。
 - 新增 4% 同色占位层、真实填充层、透明命中层与透明间隔。
 - 新增出现动效、受控进度、滚动时间轴、重新填充与反向回退方法。
-- 抽离图表颜色、渐变、几何、圆环 path 与出现时间轴纯逻辑到 `pro/src/lib/chart/`。
+- 抽离图表颜色、渐变、几何、圆环 path 与出现时间轴纯逻辑到 `components/src/lib/chart/`。
 
 ### v1.0.0 (2026-05-22)
 

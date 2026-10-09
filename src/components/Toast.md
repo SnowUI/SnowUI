@@ -4,7 +4,7 @@
 
 > **版本**: v2.3.2
 > **职责**: 用短暂通知反馈操作结果或状态变化，支持图标、操作和富内容，适合保存成功、错误与提醒。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -27,7 +27,7 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { Toast, Button } from '@snowui-design-system/components/compat';
+	import { Toast, Button } from '@snowui-design-system/components';
 </script>
 
 <div style="display: flex; flex-direction: column; align-items: center; gap: var(--gap-4); max-width: 100%;">
@@ -112,7 +112,7 @@ Toast 是 SnowUI 的全局通知组件。整套能力由三件交付物组成：
 ### `toast(input)` — 命令式入口
 
 ```ts
-import { toast } from "@snowui-design-system/components/compat";
+import { toast } from "@snowui-design-system/components";
 
 toast("Done");                                        // 字符串语法 → 等价 { text: "Done" }
 toast({ text: "Done", positive: true });              // 积极语义 → 绿色 CheckCircle
@@ -197,7 +197,7 @@ showToast("saved-template");                          // 触发 <Toast template 
 
 ```svelte
 <script>
-    import { Button, Frame, Text, Toast, Toaster, showToast, toast } from "@snowui-design-system/components/compat";
+    import { Button, FramePro as Frame, Text, Toast, Toaster, showToast, toast } from "@snowui-design-system/components";
 </script>
 
 <Toaster />
@@ -387,7 +387,7 @@ Toast 动效拆成 4 类原子动效：
 | :--- | :--- | :--- |
 | scale / fade / slide / stackTranslate 等基础动效配置 | OSS：`components/src/motion/` 与 OSS Frame 默认动效系统 | 只描述单个 Frame 自身的 transform / opacity / timing，作用半径 = 1 个 Frame |
 | Frame 对多个原子动效的同元素合成输出能力 | OSS：`components/src/logic/` | 仍只影响当前 Frame 自己，不控制其他 Frame |
-| Toast / Toaster 的堆叠策略、队列状态、每条 Toast 的 stack index 计算 | PRO：`pro/src/components/Toaster.svelte` / `pro/src/logic/toast.svelte.ts` | Toast 是 PRO 全局通知组件，负责跨 Toast 条目的队列与层级管理 |
+| Toast / Toaster 的堆叠策略、队列状态、每条 Toast 的 stack index 计算 | PRO：`components/src/components/Toaster.svelte` / `components/src/logic/toast.svelte.ts` | Toast 是 PRO 全局通知组件，负责跨 Toast 条目的队列与层级管理 |
 | 多个 Toast Frame 的出现、退场、堆叠顺序编排 | PRO：FramePro / PRO motion orchestration 能力 | 涉及多个 Frame 的启动时机、层级和状态协调，作用半径 > 1 |
 
 结论：

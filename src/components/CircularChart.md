@@ -4,7 +4,7 @@
 
 > **版本**: v1.4.2
 > **职责**: 用圆环或饼图展示数据占比，支持分段、圆角、环厚与悬停强调，适合构成分析和比例概览。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -29,7 +29,7 @@
 <script lang="ts">
 	import { Button, Frame, Icon, Text } from '@snowui-design-system/components';
 	import { DotCircle } from '@snowui-design-system/resource-svelte';
-	import { CircularChart } from '@snowui-design-system/components/compat';
+	import { CircularChart } from '@snowui-design-system/components';
 	// 假定 SnowUI 官网最近 30 天的访问数据，不代表真实统计。
 	const channels = [
 	    { name: 'Search', value: 12840, color: 'var(--primary)' },
@@ -122,7 +122,7 @@
 
 ### 设计原则
 
-- **专业图表组件**：当前维护位置为 `pro/src/components/`；该目录是迁移期技术位置。全部组件的运行包使用与 Pro / Team 完整源码交付按 [LICENSE](../../LICENSE) 执行，不再以高级功能划分付费运行权益。
+- **专业图表组件**：当前维护位置为 `components/src/components/`；该目录是迁移期技术位置。全部组件的运行包使用与 Pro / Team 完整源码交付按 [LICENSE](../../LICENSE) 执行，不再以高级功能划分付费运行权益。
 - **最多 10 项**:默认 `maxItems=10`。颜色只使用 `primary` 与 9 个 `secondary-*` token，10 项后颜色会重复且图表辨识度下降，因此组件默认截断到 10 项。
 - **颜色模式**:默认 `colorMode="sequence"` 按 `primary → secondary-purple → secondary-cyan → secondary-mint → secondary-green → secondary-indigo → secondary-blue → secondary-yellow → secondary-orange → secondary-red` 循环；`monochromeFade` 使用 Primary 从 100% 均匀递减到最后一项 20%；`monochrome` 默认所有扇区使用 Black4。每个数据项可通过 `color` 单独定义扇区颜色；`colors` 可作为按 index 的调色板覆盖入口，留空项回退当前颜色模式。
 - **几何缩放**:`cornerRadius` 与 `separatorWidth` 的数值都是 160x160 图表下的设计基准值，组件会按实际 `size / 160` 等比缩放。`auto` 使用默认基准值：圆角 `4`、间隔 `2`。
@@ -371,7 +371,7 @@ interface CircularChartGradient {
 - 官网 [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 示例用于确认目标视觉：扇区可以同时具有清晰间隔与端部圆角。
 - 本地 `[项目目录]/repos/echarts-master/src/chart/pie/pieLayout.ts` 用于确认几何原则：ECharts 在布局阶段计算 `padAngle`，再收缩每个扇区的实际 `startAngle` / `endAngle`。
 - 本地 `[项目目录]/repos/echarts-master/src/chart/helper/sectorHelper.ts` 用于确认圆角原则：`borderRadius` 属于扇区自身形状参数，并按环厚解析。
-- SnowUI 没有直接复制 ECharts 渲染代码，而是在共享 `pro/src/lib/chart/arc-path.ts` 中使用 d3-shape 实现等价原则。
+- SnowUI 没有直接复制 ECharts 渲染代码，而是在共享 `components/src/lib/chart/arc-path.ts` 中使用 d3-shape 实现等价原则。
 
 SnowUI 的最终实现为：
 
@@ -421,7 +421,7 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 > **参考**: ECharts [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 官方示例，以及本地 ECharts `src/chart/pie/pieLayout.ts`、`src/chart/helper/sectorHelper.ts` 源码。
 
 
-默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度由 `minWidth` 决定，默认 `"40px"`；容器不足下限时保持下限。将 `minWidth` 设为与图表宽度相同即可阻止自动缩小。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `pro/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
+默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度由 `minWidth` 决定，默认 `"40px"`；容器不足下限时保持下限。将 `minWidth` 设为与图表宽度相同即可阻止自动缩小。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `components/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 OSS `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
 
 ---
 

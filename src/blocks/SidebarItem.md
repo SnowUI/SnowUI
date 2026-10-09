@@ -4,7 +4,7 @@
 
 > **版本**: v1.6.2
 > **职责**: 在 Sidebar 中呈现导航入口，支持激活状态、图标、层级与状态提示，帮助识别当前位置。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -27,7 +27,7 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { SidebarItem } from '@snowui-design-system/components/compat';
+	import { SidebarItem } from '@snowui-design-system/components';
 	let opened = $state('');
 </script>
 

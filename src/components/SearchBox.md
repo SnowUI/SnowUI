@@ -4,7 +4,7 @@
 
 > **版本**: v1.1.0
 > **职责**: 提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -27,7 +27,7 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { SearchBox } from '@snowui-design-system/components/compat';
+	import { SearchBox } from '@snowui-design-system/components';
 	import { Kbd, Popover, SearchInput, MenuItem, Icon, Avatar } from '@snowui-design-system/components';
 	import { MagnifyingGlass, AvatarByewind } from '@snowui-design-system/resource-svelte';
 </script>
@@ -109,7 +109,7 @@
 ```svelte
 <script lang="ts">
   import { Kbd } from '@snowui-design-system/components';
-  import { SearchBox } from '@snowui-design-system/components/compat';
+  import { SearchBox } from '@snowui-design-system/components';
   let open = $state(false);
 </script>
 

@@ -4,7 +4,7 @@
 
 > **版本**: v4.0.1
 > **职责**: 以流动扫光呈现动态渐变，可用于背景、头像占位或可裁切的媒体区域。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -27,7 +27,7 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { GradientMotion } from '@snowui-design-system/components/compat';
+	import { GradientMotion } from '@snowui-design-system/components';
 </script>
 
 <section style="position: relative; isolation: isolate; overflow: hidden; width: min(100%, 34rem); min-height: 220px; border-radius: var(--radius-5); background: var(--background-1);">

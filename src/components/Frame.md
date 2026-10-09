@@ -247,7 +247,7 @@ Frame 根的 `transform` / `transition` 由 `layout.css` 的单一低优先级�
   1. 父 Frame 编排子 Frame 们的动效启动时机（`orchestrate*`）
   2. 一个 Frame 的事件触发另一个 Frame 的动效（`Click={{ target, action }}`）
   3. 容器通过 ID 寻址跨层修改深层 Target 的样式（`styles={{...}}`）
-- **不要在 OSS 组件中直接 import `pro/src/`**。跨包依赖一律走 `@snowui-design-system/components-pro`。
+- 组件内部复用统一源码目录中的公开能力，外部消费者从 `@snowui-design-system/components` 主入口导入。
 - **新建组件优先尝试 OSS**：除非你已经确定要做跨组件编排，否则默认 OSS。把组件放进 PRO 之前问自己："这个能力会改另一个 Frame 吗？" 不会就留 OSS。
 - **子组件消费父状态优先放 OSS**：只要子组件只是读取最近父 Frame 的 `currentState` 并改变自身公开 prop 对应的展示（例如 `Icon.stateIcon`、`Text.stateText`），它仍是半径 1 的自包含能力，不应进入 FramePro。
 - **尺寸观察统一走共享入口**：Frame responsive 与兼容 Scale Observer 只使用 `resizeManager.watch()`；服务端导入不创建 Observer，能力缺失时只关闭尺寸增强，同一帧通知在下一动画帧统一交付。组件、PRO、Site 与 Playground 不得直接 `new ResizeObserver`。

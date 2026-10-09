@@ -314,9 +314,8 @@ export {
     type ToastSize,
 } from './logic/toast.svelte'
 export { initMotion, getMotion }      from './logic/motion.svelte'
-// ── PRO Blocks（付费源码开放的产品级组合块）──
+// 可复用区块
 export * from './blocks'
-// ── PRO 动效组件（复杂动效 / PRO 指定动效）（v1.0.0 起） ──
 
 export * from './lib/split-pane'
 

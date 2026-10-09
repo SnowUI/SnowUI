@@ -10,7 +10,7 @@
 
 ## 组件介绍
 
-可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容。运行时依赖 @snowui-design-system/components/compat 和 Components；不包含搜索算法、最近浏览、热度或业务路由规则。
+可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容。运行时依赖 @snowui-design-system/components 和 Components；不包含搜索算法、最近浏览、热度或业务路由规则。
 
 ## 使用选择
 
@@ -26,7 +26,7 @@
 
 ```svelte
 <script lang="ts">
-    import { SearchPopup } from '@snowui-design-system/components/compat';
+    import { SearchPopup } from '@snowui-design-system/components';
 </script>
 <SearchPopup items={[{ value: 'button', label: 'Button', href: '/components/button', group: 'Recommended components' }]} />
 ```

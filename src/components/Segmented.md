@@ -4,7 +4,7 @@
 
 > **版本**: v1.3.0
 > **职责**: 将少量互斥选项并排展示，便于快速切换筛选条件或参数，并支持键盘与表单交互。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -27,7 +27,7 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { Segmented } from '@snowui-design-system/components/compat';
+	import { Segmented } from '@snowui-design-system/components';
 </script>
 
 <Segmented size="lg" value="all" aria-label="Filter components by tier" items={[{ value: 'all', label: 'All' }, { value: 'oss', label: 'OSS' }, { value: 'pro', label: 'PRO' }]} />
@@ -156,7 +156,7 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 ```svelte
 <script lang="ts">
   import { Button, Icon } from '@snowui-design-system/components';
-  import { Segmented } from '@snowui-design-system/components/compat';
+  import { Segmented } from '@snowui-design-system/components';
   import { FourLeafClover, Star } from '@snowui-design-system/resource-svelte';
   let value = $state('web');
 </script>

@@ -4,7 +4,7 @@
 
 > **版本**: v2.0.5
 > **职责**: 以流动过渡展示文字和数字变化，适合动态文案、计数、计时与倒计时。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button } from '@snowui-design-system/components';
-	import { FlowText, chromatic } from '@snowui-design-system/components/compat';
+	import { FlowText, chromatic } from '@snowui-design-system/components';
 	const headlines = ['Build with SnowUI', 'Ship components', 'Write better docs'];
 	let headlineIndex = $state(0);
 </script>
@@ -106,7 +106,7 @@
 
 
 
-> **组件路径**: `pro/src/components/FlowText.svelte`
+> **组件路径**: `components/src/components/FlowText.svelte`
 
 
 `FlowText` 以流动动效展示文字和数字的变化，适用于动态文案、计数、计时与倒计时。

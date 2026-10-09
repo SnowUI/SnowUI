@@ -4,7 +4,7 @@
 
 > **版本**: v1.4.1
 > **职责**: 用柱状图比较不同类别的数据，支持横向、纵向、分组与堆叠展示，以及坐标轴和交互提示。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button, Frame } from '@snowui-design-system/components';
-	import { BarChart } from '@snowui-design-system/components/compat';
+	import { BarChart } from '@snowui-design-system/components';
 	let monthlyCoverageChart: any;
 </script>
 
@@ -311,7 +311,7 @@ SVG 图层从下到上为：
 
 ### 共享逻辑边界
 
-来自 `pro/src/lib/chart/`：
+来自 `components/src/lib/chart/`：
 
 - `colors.ts`: Chart 默认色序、SnowUI 语意色解析、单色透明度梯度。
 - `gradients.ts`: CSS `linear-gradient(...)` 与渐变对象解析。

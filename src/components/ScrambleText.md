@@ -4,7 +4,7 @@
 
 > **版本**: v1.4.0
 > **职责**: 通过字符扰动逐步呈现目标文字，适合标题、短句与状态文案的动态揭示。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button, Text } from '@snowui-design-system/components';
-	import { ScrambleText, chromatic } from '@snowui-design-system/components/compat';
+	import { ScrambleText, chromatic } from '@snowui-design-system/components';
 	const statuses = ['Preparing docs', 'Checking APIs', 'Ready to publish'];
 	let statusIndex = $state(0);
 </script>
@@ -67,7 +67,7 @@
 
 ```svelte
 <script lang="ts">
-    import { ScrambleText, chromatic } from "@snowui-design-system/components/compat";
+    import { ScrambleText, chromatic } from "@snowui-design-system/components";
 </script>
 
 <ScrambleText
@@ -106,7 +106,7 @@
 
 
 
-> **组件路径**: `pro/src/components/ScrambleText.svelte`
+> **组件路径**: `components/src/components/ScrambleText.svelte`
 
 
 `ScrambleText` 提供字符扰动、循环并归位到目标文字的动效。默认使用 `cascade`，动效速度和字符错峰由组件内部统一维护。

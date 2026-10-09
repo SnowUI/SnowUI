@@ -4,7 +4,7 @@
 
 > **版本**: v0.4.1
 > **职责**: 将多个图表组合在同一区域，协调分类悬停、叠加绘制与共享坐标轴，便于比较关联数据。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button, Frame } from '@snowui-design-system/components';
-	import { BarChart, ChartGroup, LineChart } from '@snowui-design-system/components/compat';
+	import { BarChart, ChartGroup, LineChart } from '@snowui-design-system/components';
 	const weeks = Array.from({ length: 12 }, (_, index) => `W${index + 1}`);
 	const previousQuarterVisits = [4000, 6000, 5200, 7600, 3600, 6600, 4500, 7200, 4800, 8000, 3400, 6400];
 	const currentQuarterVisits = [3250, 6875, 4125, 8750, 2625, 5750, 3250, 6875, 4125, 8750, 2625, 5750];

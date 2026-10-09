@@ -4,7 +4,7 @@
 
 > **版本**: v2.1.0
 > **职责**: 以逐位滚动和宽度过渡展示数字变化，保留金额、分组符与小数格式，适合计数器和实时指标。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button, Text } from '@snowui-design-system/components';
-	import { NumberFlow, chromatic } from '@snowui-design-system/components/compat';
+	import { NumberFlow, chromatic } from '@snowui-design-system/components';
 	let count = $state(0);
 </script>
 
@@ -84,7 +84,7 @@ NumberFlow 适合计数器、金额、指标和时钟等连续数值。它以 `I
 ### Import
 
 ```ts
-import { NumberFlow } from "@snowui-design-system/components/compat";
+import { NumberFlow } from "@snowui-design-system/components";
 ```
 
 <a id="示例"></a>

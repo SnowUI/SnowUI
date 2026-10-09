@@ -4,7 +4,7 @@
 
 > **版本**: v1.11.2
 > **职责**: 以逐字符的纵向滚动展示文字变化，适合短标题、状态、计数与计时信息。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Button, Text } from '@snowui-design-system/components';
-	import { SlotText, chromatic } from '@snowui-design-system/components/compat';
+	import { SlotText, chromatic } from '@snowui-design-system/components';
 	const componentNames = ['Button', 'DataTable', 'SidePanel', 'Tooltip'];
 	let componentIndex = $state(0);
 </script>
@@ -75,7 +75,7 @@
 
 ```svelte
 <script lang="ts">
-    import { SlotText, chromatic } from "@snowui-design-system/components/compat";
+    import { SlotText, chromatic } from "@snowui-design-system/components";
 </script>
 
 <SlotText text="Deploy Ready" motionColor={chromatic()} />
@@ -137,7 +137,7 @@
 
 
 
-> **组件路径**: `pro/src/components/SlotText.svelte`
+> **组件路径**: `components/src/components/SlotText.svelte`
 
 
 `SlotText` 为逐字符纵向槽位滚动文字。动效时序由组件内部维护，不提供时长、错峰、弹性或缓动调参。

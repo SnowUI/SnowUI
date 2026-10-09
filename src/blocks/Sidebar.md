@@ -4,7 +4,7 @@
 
 > **版本**: v1.9.0
 > **职责**: 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-28
 
 ## 组件介绍
@@ -29,7 +29,7 @@
 <script lang="ts">
 	import { Avatar, Button, Icon, Separator } from '@snowui-design-system/components';
 	import { AvatarByewind, Github } from '@snowui-design-system/resource-svelte';
-	import { Sidebar, SidebarItem, SidebarSection } from '@snowui-design-system/components/compat';
+	import { Sidebar, SidebarItem, SidebarSection } from '@snowui-design-system/components';
 	let collapsed = $state(false);
 	let activeItemId = $state('components');
 </script>

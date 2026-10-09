@@ -4,7 +4,7 @@
 
 > **版本**: v1.6.1
 > **职责**: 用折线展示数据变化趋势，支持多序列、面积填充、实线与虚线，以及坐标轴、网格和节点样式。
-> **包归属**: `@snowui-design-system/components/compat`
+> **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
 
 ## 组件介绍
@@ -28,7 +28,7 @@
 ```svelte
 <script lang="ts">
 	import { Frame } from '@snowui-design-system/components';
-	import { LineChart } from '@snowui-design-system/components/compat';
+	import { LineChart } from '@snowui-design-system/components';
 </script>
 
 <LineChart series={[{ name: 'Component pages', data: [1280, 1460, 1390, 1720, 1880, 2140, 2360], color: 'Primary', strokeWidth: 3 }, { name: 'Quick Start', data: [620, 710, 680, 840, 920, 1040, 1180], color: 'var(--secondary-purple)', strokeStyle: 'dashed' }]} xLabels={['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']} width="100%" height={280} yTicks={[0, 500, 1000, 1500, 2000, 2500]} yTickFormatter={(value) => value < 1000 ? String(value) : `${value / 1000}K`} showYAxis showGrid showHoverPanel hoverPanelVariant="surface" />

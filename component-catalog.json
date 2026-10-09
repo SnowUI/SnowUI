@@ -1336,7 +1336,7 @@
       "kind": "block",
       "source": "src/blocks/SearchPopup.svelte",
       "documentation": "src/blocks/SearchPopup.md",
-      "description": "可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容。运行时依赖 @snowui-design-system/components/compat 和 Components；不包含搜索算法、最近浏览、热度或业务路由规则。",
+      "description": "可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容。运行时依赖 @snowui-design-system/components 和 Components；不包含搜索算法、最近浏览、热度或业务路由规则。",
       "intents": [
         "搜索面板",
         "搜索结果分组"
