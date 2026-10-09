@@ -1,7 +1,7 @@
 {
   "name": "@snowui/components-pro",
   "version": "0.1.1",
-  "private": false,
+  "private": true,
   "type": "module",
   "license": "SEE LICENSE IN LICENSE",
   "packageManager": "pnpm@10.20.0",
@@ -9,21 +9,17 @@
     "type": "git",
     "url": "https://github.com/SnowUI/SnowUI-Pro.git"
   },
-  "publishConfig": {
-    "access": "restricted",
-    "registry": "https://npm.pkg.github.com"
-  },
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "svelte": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
     },
     "./component-catalog.json": "./component-catalog.json"
   },
   "files": [
-    "src",
+    "dist",
     "component-catalog.json",
+    "LICENSE",
     "README.md"
   ],
   "scripts": {
@@ -31,15 +27,14 @@
     "catalog:generate": "node scripts/generate-component-catalog.mjs",
     "catalog:check": "node scripts/generate-component-catalog.mjs --check",
     "pack:check": "npm pack --dry-run --cache ./node_modules/.cache/npm",
-    "prepublishOnly": "pnpm catalog:check && pnpm check"
+    "prepublishOnly": "node -e \"throw new Error('Retired: use @snowui-design-system/components')\"",
+    "build": "node scripts/build-compat.mjs"
   },
   "peerDependencies": {
-    "@snowui-design-system/components": ">=0.2.0-alpha.8 <1.0.0",
+    "@snowui-design-system/components": ">=0.3.0-alpha.0 <1.0.0",
     "svelte": "^5.0.0"
   },
-  "dependencies": {
-    "d3-shape": "^3.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@snowui-design-system/components": "0.2.0-alpha.9",
     "@snowui-design-system/resource-svelte": "1.0.29",
