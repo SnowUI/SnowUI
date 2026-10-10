@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "package": "@snowui-design-system/components",
+  "license": "LICENSE",
   "generatedFrom": [
     "src/index.ts",
     "src/components/*.md",
@@ -12,8 +13,13 @@
       "canonical": "Accordion",
       "package": "@snowui-design-system/components",
       "import": "import { Accordion } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -33,8 +39,13 @@
       "canonical": "AccordionItem",
       "package": "@snowui-design-system/components",
       "import": "import { AccordionItem } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -54,8 +65,13 @@
       "canonical": "Avatar",
       "package": "@snowui-design-system/components",
       "import": "import { Avatar } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -75,8 +91,13 @@
       "canonical": "AvatarGroup",
       "package": "@snowui-design-system/components",
       "import": "import { AvatarGroup } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -96,8 +117,13 @@
       "canonical": "Badge",
       "package": "@snowui-design-system/components",
       "import": "import { Badge } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -117,8 +143,13 @@
       "canonical": "BarChart",
       "package": "@snowui-design-system/components",
       "import": "import { BarChart } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -144,8 +175,13 @@
       "canonical": "BlurText",
       "package": "@snowui-design-system/components",
       "import": "import { BlurText } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -165,8 +201,13 @@
       "canonical": "Breadcrumb",
       "package": "@snowui-design-system/components",
       "import": "import { Breadcrumb } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -186,8 +227,13 @@
       "canonical": "Button",
       "package": "@snowui-design-system/components",
       "import": "import { Button } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -223,8 +269,13 @@
       "canonical": "ButtonGroup",
       "package": "@snowui-design-system/components",
       "import": "import { ButtonGroup } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -253,8 +304,13 @@
       "canonical": "Card",
       "package": "@snowui-design-system/components",
       "import": "import { Card } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -274,8 +330,13 @@
       "canonical": "ChartGroup",
       "package": "@snowui-design-system/components",
       "import": "import { ChartGroup } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -301,8 +362,13 @@
       "canonical": "Checkbox",
       "package": "@snowui-design-system/components",
       "import": "import { Checkbox } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -322,8 +388,13 @@
       "canonical": "Chip",
       "package": "@snowui-design-system/components",
       "import": "import { Chip } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -343,8 +414,13 @@
       "canonical": "CircularChart",
       "package": "@snowui-design-system/components",
       "import": "import { CircularChart } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -364,8 +440,13 @@
       "canonical": "CodeBlock",
       "package": "@snowui-design-system/components",
       "import": "import { CodeBlock } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -396,8 +477,13 @@
       "canonical": "ColorSchemeButton",
       "package": "@snowui-design-system/components",
       "import": "import { ColorSchemeButton } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -427,8 +513,13 @@
       "canonical": "CopyButton",
       "package": "@snowui-design-system/components",
       "import": "import { CopyButton } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -457,8 +548,13 @@
       "canonical": "CopyLink",
       "package": "@snowui-design-system/components",
       "import": "import { CopyLink } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -488,8 +584,13 @@
       "canonical": "DataTable",
       "package": "@snowui-design-system/components",
       "import": "import { DataTable } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -531,8 +632,13 @@
       "canonical": "Dialog",
       "package": "@snowui-design-system/components",
       "import": "import { Dialog } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -552,8 +658,13 @@
       "canonical": "ExpandButton",
       "package": "@snowui-design-system/components",
       "import": "import { ExpandButton } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -582,8 +693,13 @@
       "canonical": "Field",
       "package": "@snowui-design-system/components",
       "import": "import { Field } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -613,8 +729,13 @@
       "canonical": "FlowText",
       "package": "@snowui-design-system/components",
       "import": "import { FlowText } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -634,8 +755,13 @@
       "canonical": "Frame",
       "package": "@snowui-design-system/components",
       "import": "import { Frame } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -655,8 +781,13 @@
       "canonical": "GaugeChart",
       "package": "@snowui-design-system/components",
       "import": "import { GaugeChart } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -685,8 +816,13 @@
       "canonical": "Gradient",
       "package": "@snowui-design-system/components",
       "import": "import { Gradient } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -706,8 +842,13 @@
       "canonical": "GradientMotion",
       "package": "@snowui-design-system/components",
       "import": "import { GradientMotion } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -727,8 +868,13 @@
       "canonical": "Icon",
       "package": "@snowui-design-system/components",
       "import": "import { Icon } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -748,8 +894,13 @@
       "canonical": "IconProvider",
       "package": "@snowui-design-system/components",
       "import": "import { IconProvider } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -769,8 +920,13 @@
       "canonical": "Image",
       "package": "@snowui-design-system/components",
       "import": "import { Image } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -790,8 +946,13 @@
       "canonical": "ImageGroup",
       "package": "@snowui-design-system/components",
       "import": "import { ImageGroup } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -811,8 +972,13 @@
       "canonical": "ImageViewer",
       "package": "@snowui-design-system/components",
       "import": "import { ImageViewer } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -842,8 +1008,13 @@
       "canonical": "Indicator",
       "package": "@snowui-design-system/components",
       "import": "import { Indicator } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -863,8 +1034,13 @@
       "canonical": "Input",
       "package": "@snowui-design-system/components",
       "import": "import { Input } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -884,8 +1060,13 @@
       "canonical": "Kbd",
       "package": "@snowui-design-system/components",
       "import": "import { Kbd } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -905,8 +1086,13 @@
       "canonical": "LineChart",
       "package": "@snowui-design-system/components",
       "import": "import { LineChart } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -932,8 +1118,13 @@
       "canonical": "Link",
       "package": "@snowui-design-system/components",
       "import": "import { Link } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -953,8 +1144,13 @@
       "canonical": "Listbox",
       "package": "@snowui-design-system/components",
       "import": "import { Listbox } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -974,8 +1170,13 @@
       "canonical": "LocaleProvider",
       "package": "@snowui-design-system/components",
       "import": "import { LocaleProvider } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -995,8 +1196,13 @@
       "canonical": "MenuItem",
       "package": "@snowui-design-system/components",
       "import": "import { MenuItem } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1016,8 +1222,13 @@
       "canonical": "NumberFlow",
       "package": "@snowui-design-system/components",
       "import": "import { NumberFlow } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1045,8 +1256,13 @@
       "canonical": "NumericText",
       "package": "@snowui-design-system/components",
       "import": "import { NumericText } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1066,8 +1282,13 @@
       "canonical": "OverflowAction",
       "package": "@snowui-design-system/components",
       "import": "import { OverflowAction } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1087,8 +1308,13 @@
       "canonical": "OverflowActions",
       "package": "@snowui-design-system/components",
       "import": "import { OverflowActions } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1120,8 +1346,13 @@
       "canonical": "Pagination",
       "package": "@snowui-design-system/components",
       "import": "import { Pagination } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1141,8 +1372,13 @@
       "canonical": "Popover",
       "package": "@snowui-design-system/components",
       "import": "import { Popover } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1162,8 +1398,13 @@
       "canonical": "Progress",
       "package": "@snowui-design-system/components",
       "import": "import { Progress } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1183,8 +1424,13 @@
       "canonical": "Radio",
       "package": "@snowui-design-system/components",
       "import": "import { Radio } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1204,8 +1450,13 @@
       "canonical": "ScrambleText",
       "package": "@snowui-design-system/components",
       "import": "import { ScrambleText } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1225,8 +1476,13 @@
       "canonical": "ScrollArea",
       "package": "@snowui-design-system/components",
       "import": "import { ScrollArea } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1246,8 +1502,13 @@
       "canonical": "SearchBox",
       "package": "@snowui-design-system/components",
       "import": "import { SearchBox } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1278,8 +1539,13 @@
       "canonical": "SearchInput",
       "package": "@snowui-design-system/components",
       "import": "import { SearchInput } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1307,8 +1573,13 @@
       "canonical": "SearchPopup",
       "package": "@snowui-design-system/components",
       "import": "import { SearchPopup } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1340,8 +1611,13 @@
       "canonical": "Segmented",
       "package": "@snowui-design-system/components",
       "import": "import { Segmented } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1372,8 +1648,13 @@
       "canonical": "Select",
       "package": "@snowui-design-system/components",
       "import": "import { Select } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1393,8 +1674,13 @@
       "canonical": "SelectButton",
       "package": "@snowui-design-system/components",
       "import": "import { SelectButton } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1424,8 +1710,13 @@
       "canonical": "Separator",
       "package": "@snowui-design-system/components",
       "import": "import { Separator } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1453,8 +1744,13 @@
       "canonical": "Sidebar",
       "package": "@snowui-design-system/components",
       "import": "import { Sidebar } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1484,8 +1780,13 @@
       "canonical": "SidebarItem",
       "package": "@snowui-design-system/components",
       "import": "import { SidebarItem } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1505,8 +1806,13 @@
       "canonical": "SidebarSection",
       "package": "@snowui-design-system/components",
       "import": "import { SidebarSection } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1526,8 +1832,13 @@
       "canonical": "SidePanel",
       "package": "@snowui-design-system/components",
       "import": "import { SidePanel } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1556,8 +1867,13 @@
       "canonical": "Skeleton",
       "package": "@snowui-design-system/components",
       "import": "import { Skeleton } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1577,8 +1893,13 @@
       "canonical": "Slider",
       "package": "@snowui-design-system/components",
       "import": "import { Slider } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1598,8 +1919,13 @@
       "canonical": "SlotText",
       "package": "@snowui-design-system/components",
       "import": "import { SlotText } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1619,8 +1945,13 @@
       "canonical": "SnowUILogo",
       "package": "@snowui-design-system/components",
       "import": "import { SnowUILogo } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1640,8 +1971,13 @@
       "canonical": "Spinner",
       "package": "@snowui-design-system/components",
       "import": "import { Spinner } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1661,8 +1997,13 @@
       "canonical": "StyleButton",
       "package": "@snowui-design-system/components",
       "import": "import { StyleButton } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1682,8 +2023,13 @@
       "canonical": "Switch",
       "package": "@snowui-design-system/components",
       "import": "import { Switch } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1703,8 +2049,13 @@
       "canonical": "Tab",
       "package": "@snowui-design-system/components",
       "import": "import { Tab } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1734,8 +2085,13 @@
       "canonical": "Table",
       "package": "@snowui-design-system/components",
       "import": "import { Table } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1755,8 +2111,13 @@
       "canonical": "TableBody",
       "package": "@snowui-design-system/components",
       "import": "import { TableBody } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1776,8 +2137,13 @@
       "canonical": "TableCell",
       "package": "@snowui-design-system/components",
       "import": "import { TableCell } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1797,8 +2163,13 @@
       "canonical": "TableHead",
       "package": "@snowui-design-system/components",
       "import": "import { TableHead } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1818,8 +2189,13 @@
       "canonical": "TableHeader",
       "package": "@snowui-design-system/components",
       "import": "import { TableHeader } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1839,8 +2215,13 @@
       "canonical": "TableRow",
       "package": "@snowui-design-system/components",
       "import": "import { TableRow } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1860,8 +2241,13 @@
       "canonical": "TableToolbar",
       "package": "@snowui-design-system/components",
       "import": "import { TableToolbar } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1889,8 +2275,13 @@
       "canonical": "Tag",
       "package": "@snowui-design-system/components",
       "import": "import { Tag } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1910,8 +2301,13 @@
       "canonical": "Text",
       "package": "@snowui-design-system/components",
       "import": "import { Text } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1931,8 +2327,13 @@
       "canonical": "Textarea",
       "package": "@snowui-design-system/components",
       "import": "import { Textarea } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1952,8 +2353,13 @@
       "canonical": "ColorSchemeButton",
       "package": "@snowui-design-system/components",
       "import": "import { ThemeButton } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1975,8 +2381,13 @@
       "canonical": "Toast",
       "package": "@snowui-design-system/components",
       "import": "import { Toast } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -1996,8 +2407,13 @@
       "canonical": "Toaster",
       "package": "@snowui-design-system/components",
       "import": "import { Toaster } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],
@@ -2017,8 +2433,13 @@
       "canonical": "Tooltip",
       "package": "@snowui-design-system/components",
       "import": "import { Tooltip } from '@snowui-design-system/components';",
-      "runtime": "free",
+      "runtime": "free-download",
       "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
         "Pro",
         "Team"
       ],

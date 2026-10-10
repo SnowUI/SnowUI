@@ -122,7 +122,7 @@
 
 ### 设计原则
 
-- **专业图表组件**：当前维护位置为 `components/src/components/`；该目录是迁移期技术位置。全部组件的运行包使用与 Pro / Team 完整源码交付按 [LICENSE](../../LICENSE) 执行，不再以高级功能划分付费运行权益。
+- **专业图表组件**：当前维护位置为 `components/src/components/`；该目录是迁移期技术位置。全部组件的运行包与原始源码均可免费获取；用途、项目、席位及生产使用权益按 [LICENSE](../../LICENSE) 执行，不按高级功能划分组件。
 - **最多 10 项**:默认 `maxItems=10`。颜色只使用 `primary` 与 9 个 `secondary-*` token，10 项后颜色会重复且图表辨识度下降，因此组件默认截断到 10 项。
 - **颜色模式**:默认 `colorMode="sequence"` 按 `primary → secondary-purple → secondary-cyan → secondary-mint → secondary-green → secondary-indigo → secondary-blue → secondary-yellow → secondary-orange → secondary-red` 循环；`monochromeFade` 使用 Primary 从 100% 均匀递减到最后一项 20%；`monochrome` 默认所有扇区使用 Black4。每个数据项可通过 `color` 单独定义扇区颜色；`colors` 可作为按 index 的调色板覆盖入口，留空项回退当前颜色模式。
 - **几何缩放**:`cornerRadius` 与 `separatorWidth` 的数值都是 160x160 图表下的设计基准值，组件会按实际 `size / 160` 等比缩放。`auto` 使用默认基准值：圆角 `4`、间隔 `2`。

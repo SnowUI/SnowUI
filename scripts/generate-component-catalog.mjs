@@ -31,8 +31,9 @@ function collectExports(indexRelative, defaultKind) {
       canonical: metadata.canonical ?? (name === canonical ? name : canonical),
       package: packageJson.name,
       import: `import { ${name} } from '${packageJson.name}';`,
-      runtime: "free",
-      sourceEntitlement: ["Pro", "Team"],
+      runtime: "free-download",
+      sourceEntitlement: ["Free", "Pro", "Team"],
+      productionEntitlement: ["Pro", "Team"],
       kind: sourceFile.includes("/blocks/") ? "block" : defaultKind,
       source: sourceFile,
       documentation: fs.existsSync(documentationPath) ? documentationRelative : null,
@@ -64,6 +65,7 @@ if (unusedMetadata.length || missingDocumentation.length) {
 const catalog = {
   schemaVersion: 1,
   package: packageJson.name,
+  license: "LICENSE",
   generatedFrom: ["src/index.ts", "src/components/*.md", "component-discovery.json"],
   components
 };
