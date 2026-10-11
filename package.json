@@ -76,14 +76,17 @@
       "types": "./dist/client/compat.d.ts",
       "browser": "./dist/client/compat.js",
       "default": "./dist/server/compat.js"
-    }
+    },
+    "./LICENSE": "./LICENSE"
   },
   "files": [
     "dist",
     "component-catalog.json",
     "README.md",
     "LICENSE",
-    "THIRD_PARTY_NOTICES.md"
+    "THIRD_PARTY_NOTICES.md",
+    "AGENTS.md",
+    "llms.txt"
   ],
   "scripts": {
     "dev": "vite",
