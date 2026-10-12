@@ -1,6 +1,6 @@
 <!-- SnowUI source notice | LICENSE 2.1.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
-<!-- Sidebar Block v1.9.1. 文档: ./Sidebar.md -->
+<!-- Sidebar Block v1.9.2. 文档: ./Sidebar.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import {onDestroy, onMount, setContext, tick, untrack, type Snippet} from "svelte";
@@ -98,8 +98,11 @@
         ...rest
     }: Props = $props();
 
-    let internalCollapsed = $state(untrack(() => defaultCollapsed));
-    const isCollapsed = $derived(collapsed ?? internalCollapsed);
+    // 可绑定 Prop 负责输入/回传，本地 state 保持连续交互时的显示状态。
+    let isCollapsed = $state(untrack(() => collapsed ?? defaultCollapsed));
+    $effect.pre(() => {
+        if (collapsed !== undefined) isCollapsed = collapsed;
+    });
     const fullyCollapsed = $derived(isCollapsed && navigationVariant === "text");
     let floatingToggleHost: HTMLElement | undefined;
     let restoreToggleFocus = $state(false);
@@ -186,8 +189,11 @@
     let logoPlacementFrame = 0;
     let activeRevealFrame = 0;
     let activeRevealTimer = 0;
+    // 显示状态由本地 state 持有；外部 width 变化仍同步进入。
+    let currentWidth = $state(untrack(() => width));
+    $effect.pre(() => { currentWidth = width; });
     const resolvedWidth = $derived(
-        Math.min(Math.max(Number(width) || 220, minWidth), maxWidth),
+        Math.min(Math.max(Number(currentWidth) || 220, minWidth), maxWidth),
     );
     const widthMotionTiming = $derived(
         isCollapsed ? sidebarCollapseTiming : sidebarExpandTiming,
@@ -237,8 +243,8 @@
     async function toggleCollapsed() {
         restoreToggleFocus = !!(rootElement?.contains(document.activeElement) || floatingToggleHost?.contains(document.activeElement));
         const next = !isCollapsed;
-        internalCollapsed = next;
         collapsed = next;
+        isCollapsed = next;
         onCollapsedChange?.(next);
         await tick();
         if (!next && restoreToggleFocus) {
@@ -250,6 +256,7 @@
     function handleWidthChange(next: number) {
         const resolved = Math.min(Math.max(Math.round(next), minWidth), maxWidth);
         width = resolved;
+        currentWidth = resolved;
         onWidthChange?.(resolved);
     }
 

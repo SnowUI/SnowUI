@@ -375,6 +375,8 @@
     mask-repeat: no-repeat;
 }
 
+/* 通用遮罩为低层回退，组件自己的曲线不依赖样式注入顺序。 */
+@layer snowui-scroll-mask-fallback {
 :where(.snowui-scroll-mask[data-scroll-mask="top"]) {
     -webkit-mask-image: linear-gradient(
         to bottom,
@@ -446,6 +448,8 @@
         ),
         transparent 100%
     );
+}
+
 }
 
 /* 单行横向滚动内容渐隐。与纵向 .snowui-scroll-mask 使用同一 alpha-only

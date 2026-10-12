@@ -5,7 +5,7 @@
 > **版本**: v1.0.2
 > **职责**: 在有限宽度内优先展示操作按钮，并将放不下的操作收进更多菜单，保持工具栏紧凑可用。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-12
 
 ## 组件介绍
 
@@ -35,7 +35,7 @@
 		{ type: 'separator' as const, id: 'content-tools' },
 		{ id: 'translate', label: 'Translate', icon: 'translate' },
 		{ id: 'theme', label: 'Switch theme', icon: 'sun' },
-		{ id: 'github', label: 'GitHub source', icon: 'github-logo', href: 'https://github.com/SnowUI/SnowUI' },
+		{ id: 'github', label: 'SnowUI on GitHub', icon: 'github-logo', href: 'https://github.com/SnowUI' },
 		{ type: 'separator' as const, id: 'publishing-tools' },
 		{ id: 'publish', label: 'Publish update', icon: 'upload' },
 		{ id: 'delete-draft', label: 'Delete draft', icon: 'trash' }

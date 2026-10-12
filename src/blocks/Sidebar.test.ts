@@ -25,7 +25,7 @@ export const examples = [
         expected: {
             render: "默认 Logo 由 SnowUILogo icon/text 变体组成，分类标题、分类末尾内置 Separator、active Dashboard、Saved updated 圆点与 Footer 均可见",
             layout: "Sidebar 展开默认宽 220px、折叠宽 60px，根 padding 左右 12px / 上下 16px；Section 标题行 padding 左右 8px / 上下 4px，分类末尾 Separator 节点四边 padding 8px，实际线条保持 0.5px；显式和内置分隔线均不受 Separator 样式先后加载影响；Logo host 左右 padding 4px；Header/Footer 固定，Body 可滚动且纵向滚动条可见并距 Sidebar 右边框 4px",
-            interaction: "Sidebar 任意区域 hover 显示位于 Logo 区域右边的默认变体 icon-only 折叠按钮；展开态透明命中 host 使用 --size-6 并由 Header flex 安置到内容右边界，ResourceSize 16 图标居中后不得越过 Header / 导航项共用的右边界，名义间距为 8px（展开态 host 右侧 margin 为 padding-1，使按钮左移4px），且不使用额外 transform 偏移；折叠按钮不内置 Tooltip，通过动态 aria-label 保留名称，并以 Frame 默认 move spring 跟随 Sidebar 平移；右侧边框全高均可在 160px～480px 范围内拖拽调整宽度，边缘不显示宽度调整指示器，拖拽期间无宽度 transition；透明调宽命中层与可见 scrollbar Thumb 重叠时完全退出 Pointer、hover、拖拽和键盘命中，只允许滚动条响应；分类标题文字与箭头共同点击折叠且标题无 Tooltip",
+            interaction: "Sidebar 任意区域 hover 显示位于 Logo 区域右边的默认变体 icon-only 折叠按钮；展开态透明命中 host 使用 --size-6 并由 Header flex 安置到内容右边界，ResourceSize 16 图标居中后不得越过 Header / 导航项共用的右边界，名义间距为 8px（展开态 host 右侧 margin 为 padding-1，使按钮左移4px），且不使用额外 transform 偏移；折叠按钮不内置 Tooltip，通过动态 aria-label 保留名称，并以 Frame 默认 move spring 跟随 Sidebar 平移；右侧边框全高均可在 160px～480px 范围内拖拽调整宽度，边缘不显示宽度调整指示器，拖拽期间无宽度 transition，连续移动与键盘调整均实时更新，外部 bind:width 的修改同步生效；透明调宽命中层与可见 scrollbar Thumb 重叠时完全退出 Pointer、hover、拖拽和键盘命中，只允许滚动条响应；分类标题文字与箭头共同点击折叠且标题无 Tooltip",
             performance: "as=footer 与 sections 同时传入时不抑制默认导航节点",
             responsive: "固定宽度、左对齐 Test 宿主保持 Sidebar 左边缘不动；折叠时根宽度、Item 文字与标题渐隐同时开始，Item Icon 保持横向位置，标题完全渐隐后 Item 才上移；Footer 固定展开态宽度与底部位置且只渐隐 / 渐显，不随根宽度压缩或位移；折叠后 Item 保持默认 36px 高度，Logo Icon 不跳动，Logo host 保持单行且透明 wordmark 不得换行撑高容器；默认 Logo 只保留 as=logo-icon，同时关闭右侧调宽命中层",
         },
@@ -130,7 +130,7 @@ export const examples = [
     </Sidebar>
 </Frame>`,
         expected: {
-            render: "text 变体折叠后只显示内置展开按钮，不显示 Logo、导航 Item 或 Footer",
+            render: "默认初值、显式 collapsed 与外部绑定均支持反复折叠/展开并恢复焦点；text 变体折叠后只显示内置展开按钮，不显示 Logo、导航 Item 或 Footer",
             layout: "text 折叠按钮从当前 Header 位置连续移动到左上角，展开时反向交接，复用侧栏 spring timing；reduced motion 下直接定位。text 折叠根宽度与 padding 为零，展开按钮在当前可视区域左上角，左边距12px、上边距16px（随 Token 缩放）；有图标模式仍为60px",
             interaction: "折叠状态无需 hover 即可看到顶层展开按钮；键盘切换后焦点恢复，反复展开/折叠只存在一个浮层按钮，卸载后无浮层残留；展开后标题默认可折叠且无 Tooltip",
             performance: "不扫描 children 或 sections 判断是否存在 Icon，变体完全由 navigationVariant 显式决定",

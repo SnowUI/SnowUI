@@ -5,7 +5,7 @@
 > **版本**: v1.0.1
 > **职责**: 定义 OverflowActions 中的一项按钮操作，让它可随可用空间在工具栏与更多菜单之间切换。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-12
 
 ## 组件介绍
 
@@ -32,7 +32,7 @@
 
 <div style="display: flex; align-items: center; justify-content: center; width: 100%;">
 	<OverflowActions overflow="progressive" overflowFrom="end" availableWidth={250} moreLabel="More component actions" style="justify-content: center;">
-		<OverflowAction as="item" id="source" label="View source" icon="code" href="https://github.com/SnowUI/SnowUI" />
+		<OverflowAction as="item" id="github" label="SnowUI on GitHub" icon="github-logo" href="https://github.com/SnowUI" />
 		<OverflowAction as="item" id="copy-import" label="Copy import" icon="copy" />
 		<OverflowAction as="item" id="publish" label="Publish docs" icon="upload" />
 	</OverflowActions>
