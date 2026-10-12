@@ -1,8 +1,16 @@
 /**
  * Tooltip.test.ts
- * v1.11.1
+ * v1.11.2
  */
 export const examples = [
+    {
+        name: "共享浮层关闭与重新显示",
+        code: `<div class="p-40"><Button>文档<Tooltip id="tooltip-dismissal-example">查看组件文档</Tooltip></Button></div>`,
+        expected: {
+            interaction: "反复悬停、移开以及按 Escape 关闭后重新悬停；浮层正常卸载并能再次显示，控制台没有空值错误，普通与减少动效模式均成立。",
+        },
+        logic: ["Dismissal", "Remount", "ReducedMotion", "Regression"],
+    },
     {
         name: "E5: 指针速度自适应",
         code: `E5

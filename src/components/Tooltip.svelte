@@ -1,7 +1,8 @@
 <!-- SnowUI source notice | LICENSE 2.1.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
- Tooltip 文字提示组件 v1.24.2
+ Tooltip 文字提示组件 v1.24.3
+ 变更 (2026-10-12): 共享浮层卸载时安全读取延迟 Props，避免关闭提示后的空值错误。
  变更 (2026-09-20): 连续切换按平滑鼠标速度缩短协调时程，显示期单例采样并在隐藏时释放。
  变更 (2026-09-20): 默认 360px 换行与四边 16px 可视区避让；支持悬停阅读、超高内容滚动和 Escape 关闭。
 
@@ -1683,7 +1684,7 @@
         >&#8203;</span
     >
 
-    <!-- 非受控 hover 模式：页面级共享 Portal，切换触发器时复用同一个外框。 -->
+    <!-- 非受控 hover 模式：页面级共享 Portal。卸载时 Frame 仍可能读取延迟 Props，读取需允许状态已清空。 -->
     {#if overlayVisible && renderedOverlay && !finalDisabled}
         <Frame
             enableResponsive={false}
@@ -1692,7 +1693,7 @@
             enableScaleObserver={false}
             use={[portal]}
             bind:element={tooltipRef}
-            loopMotion={renderedOverlay.loopMotion}
+            loopMotion={renderedOverlay?.loopMotion}
             class="snowui-tooltip-portal"
             style={portalStyle}
             data-ready={portalReady}
@@ -1702,10 +1703,10 @@
                 data-move-mode={moveMode}
                 data-switch-phase={switchPhase}
                 data-retargeting={switchRetargeting}
-                data-rapid-retarget={renderedOverlay.rapidRetarget}
+                data-rapid-retarget={renderedOverlay?.rapidRetarget}
                 data-shell-duration={switchShellDurationMs}
                 data-width-duration={switchWidthDurationMs}
-                data-width-rebound={renderedOverlay.widthRebound}
+                data-width-rebound={renderedOverlay?.widthRebound}
                 data-content-duration={switchContentDurationMs}
                 data-shell-distance={switchShellDistancePx}
                 data-content-distance={switchContentDistancePx}
@@ -1718,24 +1719,24 @@
                     enableScaleObserver={false}
                     whileActive={effectiveSizeMotion}
                     bind:element={sizeShellRef}
-                    data-variant={renderedOverlay.variant}
+                    data-variant={renderedOverlay?.variant}
                     data-size-motion={sizeMotionEnabled && animatedShellSize === undefined}
                     class={[
                         "snowui-tooltip-content",
                         "snowui-tooltip-size-shell",
                         "snowui-rounded-rectangle",
                         `snowui-tooltip-pos-${finalPosition}`,
-                        renderedOverlay.className,
+                        renderedOverlay?.className,
                     ]
                         .filter(Boolean)
                         .join(" ")}
-                    style={[sizeShellStyle, renderedOverlay.style]
+                    style={[sizeShellStyle, renderedOverlay?.style]
                         .filter(Boolean)
                         .join("; ")}
                     role="tooltip"
                     onmouseenter={retainOverlay}
                     onmouseleave={releaseOverlay}
-                    {...renderedOverlay.rest}
+                    {...renderedOverlay?.rest}
                 >
                     <span class="snowui-tooltip-backdrop" aria-hidden="true"></span>
                     <Frame
@@ -1779,10 +1780,10 @@
                             style={incomingLayerStyle}
                         >
                             <span bind:this={sizeContentRef} class="snowui-tooltip-inner">
-                                {#if renderedOverlay.children}
-                                    {@render renderedOverlay.children()}
-                                {:else if renderedOverlay.fallbackContent}
-                                    {renderedOverlay.fallbackContent}
+                                {#if renderedOverlay?.children}
+                                    {@render renderedOverlay?.children?.()}
+                                {:else if renderedOverlay?.fallbackContent}
+                                    {renderedOverlay?.fallbackContent}
                                 {/if}
                             </span>
                         </span>

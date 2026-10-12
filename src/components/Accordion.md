@@ -5,7 +5,7 @@
 > **版本**: v1.6.2
 > **职责**: 将相关内容组织为可展开、收起的分组，适合常见问题、设置和分段说明，支持单项或多项同时展开。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-12
 
 ## 组件介绍
 
@@ -35,7 +35,7 @@
 <Accordion type="multiple" defaultValue={['installation', 'themes']} variant="filled" size="md" style="width: min(100%, 36rem);">
 	<AccordionItem value="installation">
 		<Frame as="title" row><Icon as="leading"><Package /></Icon>How do I install SnowUI?</Frame>
-		<Frame as="content" row>Install the Components and Resource packages, then import only the components your page uses.</Frame>
+		<Frame as="content" row>Install @snowui-design-system/components and import its styles. The Resource package is optional for examples that use its icons.</Frame>
 	</AccordionItem>
 	<AccordionItem value="components">
 		<Frame as="title" row><Icon as="leading"><BookOpen /></Icon>Where can I explore every component?</Frame>
@@ -50,8 +50,8 @@
 		<Frame as="content" row>Public behavior is checked with type validation, accessibility coverage, and real browser previews.</Frame>
 	</AccordionItem>
 	<AccordionItem value="pro">
-		<Frame as="title" row><Icon as="leading"><Rocket /></Icon>When do I need component source?</Frame>
-		<Frame as="content" row>Choose Pro or Team when you need component source, internal modifications, or the included Figma resources.</Frame>
+		<Frame as="title" row><Icon as="leading"><Rocket /></Icon>When do I need a paid license?</Frame>
+		<Frame as="content" row>Source is available under the Free license. Publishing a real product or delivering it to a client requires Pro or Team; project and developer limits also apply.</Frame>
 	</AccordionItem>
 </Accordion>
 ```

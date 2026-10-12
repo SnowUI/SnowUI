@@ -1,7 +1,7 @@
 <!-- SnowUI source notice | LICENSE 2.1.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
-     Text 组件：智能文本显示与截断组件 v3.5.2
+     Text 组件：智能文本显示与截断组件 v3.5.3
 
  文档: ./Text.md
 -->
@@ -80,7 +80,7 @@
         renderHints: userRenderHints = undefined,
         element = $bindable(),
         parts = undefined,
-        children,
+        children: textChildren,
         ...rest
     }: Props = $props();
 
@@ -542,9 +542,9 @@
     });
 </script>
 
-{#if shouldAnalyzeSkeleton && children}
+{#if shouldAnalyzeSkeleton && textChildren}
     <div bind:this={skeletonProbe} aria-hidden="true" style="display: none;">
-        {@render children({ breakpoint: "md" })}
+        {@render textChildren({ breakpoint: "md" })}
     </div>
 {/if}
 
@@ -587,8 +587,8 @@
             >
                 {#if resolvedStateText !== undefined}
                     {resolvedStateText}
-                {:else if children}
-                    {@render children({ breakpoint })}
+                {:else if textChildren}
+                    {@render textChildren({ breakpoint })}
                 {/if}
                 {#if more}
                     <Button
@@ -629,8 +629,8 @@
                 >
                     {#if resolvedStateText !== undefined}
                         {resolvedStateText}
-                    {:else if children}
-                        {@render children({ breakpoint })}
+                    {:else if textChildren}
+                        {@render textChildren({ breakpoint })}
                     {/if}
                 </span>
                 <span class="snowui-text-single-line-visible">
@@ -649,14 +649,14 @@
             >
                 {#if resolvedStateText !== undefined}
                     {resolvedStateText}
-                {:else if children}
-                    {@render children({ breakpoint })}
+                {:else if textChildren}
+                    {@render textChildren({ breakpoint })}
                 {/if}
             </span>
         {:else if resolvedStateText !== undefined}
             {resolvedStateText}
-        {:else if children}
-            {@render children({ breakpoint })}
+        {:else if textChildren}
+            {@render textChildren({ breakpoint })}
         {/if}
 
         {#if needTooltip}
