@@ -11,10 +11,12 @@ const rows=[{id:1,name:'Alpha'},{id:2,name:'Beta'}];
 <svelte:head><title>SnowUI candidate validation</title></svelte:head>
 <p>仅用于示例演示与分享</p>
 <p data-testid="identity">{sameFrame ? 'identity-ok' : 'identity-failed'}</p>
-<Frame column><Button onclick={()=>clicks++}>Count {clicks}</Button><Input aria-label="Name" bind:value/><span data-testid="bound">{value}</span><NumericText value={clicks} animated={false}/></Frame>
+<Frame column><Button onclick={()=>clicks++}>Count {clicks}</Button><Input aria-label="Name" bind:value/><span data-testid="bound">{value}</span><span data-testid="animated-number"><NumericText value={clicks}/></span></Frame>
 <LegacyFrame><span>Legacy snippet</span></LegacyFrame>
 <Sidebar persistence={false} resizable={false}><SidebarItem id="home" label="Home"/></Sidebar>
 <BarChart width={500} height={200} data={[{name:'A',value:10},{name:'B',value:20}]}/>
 <DataTable {rows} rowKey={(row)=>row.id} bind:state={tableState}><TableToolbar search sort={false} filter={false} searchAriaLabel="Search rows"/><Table><TableHeader><TableRow><TableHead columnId="name">Name</TableHead></TableRow></TableHeader><TableBody>{#each tableState?.rows ?? [] as row}<TableRow><TableCell columnId="name">{row.name}</TableCell></TableRow>{/each}</TableBody></Table></DataTable>
 
 <FrameCoordination />
+
+<div data-testid="theme-probe" style="background:var(--background-1)">Theme probe</div>

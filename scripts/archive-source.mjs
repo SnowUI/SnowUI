@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');process.chdir(root);
+execFileSync(process.execPath,['scripts/source-notices.mjs','--check'],{stdio:'inherit'});
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 const licenseText=fs.readFileSync('LICENSE','utf8');
 const licenseVersion=licenseText.match(/许可版本：v([\d.]+)/)?.[1];

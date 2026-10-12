@@ -1,3 +1,5 @@
+/* SnowUI source notice | LICENSE 2.0.0: ../../LICENSE
+复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 // FrameMotion 逻辑模块
 // v1.1.0
 // 变更记录 (2026-05-03): 接入 layout-flip.ts，captureFlip / playFlipTo 无需 initMotion 上下文即可使用。

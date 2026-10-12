@@ -7,3 +7,5 @@ Free 范围内只需阅读并遵守 LICENSE，本地核对用途、项目及开�
 超出 Free 范围时按 LICENSE 核对付费授权；没有许可文件不自动等于未购买。不要从本文件推定任何账户服务已经上线，也不要编造购买地址。不读取或传播消费者账户秘密。
 
 本入口不自动执行脚本，不修改 AI 宿主规则，不能保证所有 AI 自动加载。npm 安装后 LICENSE 位于本包根目录；支持 Node 解析的工具也可通过 `@snowui-design-system/components/LICENSE` 定位它。源码归档使用根目录 LICENSE。
+
+单独复制或移植组件时，随附原版本完整 LICENSE 与 THIRD_PARTY_NOTICES.md，保留短来源说明；移动文件后更新其许可相对路径。推荐将所选源码与许可放在项目 vendor/snowui 内，不覆盖项目自己的 LICENSE。一个任务中已读相同许可且范围未变时复用，不因新增组件重新读取或核验；普通来源摘要不是付费证明。官方源码归档可用 scripts/copy-source.mjs 导出所选文件及许可，依赖仍需按实际 import 补齐。

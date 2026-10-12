@@ -90,7 +90,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/build-runtime.mjs",
+    "build": "pnpm source:notice:check && node scripts/build-runtime.mjs",
     "preview": "vite preview",
     "check:standards": "node ../scripts/check-standards.js",
     "check:resize-observer": "node scripts/check-resize-observer-boundary.mjs",
@@ -103,7 +103,11 @@
     "prepublishOnly": "pnpm catalog:check && pnpm build && pnpm pack:check",
     "pack:check": "node scripts/check-runtime-package.mjs",
     "source:archive": "node scripts/archive-source.mjs",
-    "test:runtime": "node scripts/test-runtime-consumer.mjs"
+    "test:runtime": "node scripts/test-runtime-consumer.mjs",
+    "source:notice:check": "node scripts/source-notices.mjs --check",
+    "source:notice:sync": "node scripts/source-notices.mjs --write",
+    "source:copy": "node scripts/copy-source.mjs",
+    "source:test": "node --test scripts/source-retention.test.mjs"
   },
   "peerDependencies": {
     "svelte": ">=5.56.4 <6"
