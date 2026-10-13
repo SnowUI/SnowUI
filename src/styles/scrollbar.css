@@ -12,7 +12,7 @@
 
 /*
  * ⚠️ ::-webkit-scrollbar 不可嵌套于 :where()，必须使用直接选择器。
- * 规范来源：specs/StyleGuide.md §11
+ * 规范来源：specs/reference/StyleGuide.md §11
  *
  * ── 基础模式（.snowui-scrollbar）──
  * 轨道宽/高 12px = 最大视觉宽 8px + 4px 固定边距（右侧/底部）。

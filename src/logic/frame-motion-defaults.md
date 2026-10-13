@@ -89,7 +89,7 @@
 - 外层 Frame 动效与内部专项动效可以并行运行；前者控制组件整体，后者控制内容细节，双方不得覆盖彼此职责。
 - `enableDefaultMotion={false}` 只影响自动默认注入，不停止组件内部专项动效，也不阻断显式 `while*`。
 
-文字动效的具体约束见 [`TextMotionSpec.md §5.1`](../../../specs/TextMotionSpec.md)。
+文字动效的具体约束见 [`TextMotionSpec.md §5.1`](../../../specs/maintainers/TextMotionSpec.md)。
 
 ### 原子动效与预设的关系（v1.4.0）
 
@@ -114,7 +114,7 @@
 
 Frame 默认动效只作为 generic fallback。Popover、Listbox、Tooltip、Dialog、CodeBlock 等组件语义明确时，应显式引用对应组件族 preset，不直接消费 Frame fallback。
 
-组件族 preset 选择规则见 [`MotionPresetSpec.md`](../../../specs/MotionPresetSpec.md) 与 [`presets/README.md`](../motion/presets/README.md)。
+组件族 preset 选择规则见 [`MotionPresetSpec.md`](../../../specs/maintainers/MotionPresetSpec.md) 与 [`presets/README.md`](../motion/presets/README.md)。
 
 `while*` 默认映射位于 `../motion/while-*.ts`，每个关键字对应一个独立文件：
 

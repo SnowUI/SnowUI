@@ -57,7 +57,7 @@
 | enableContext | `boolean` | `true` | 上下文提供能力。控制 FramePerception Context。 |
 | enableScaleObserver | `boolean` | `false` | 尺寸比例监听能力。开启后向 CSS 变量写入运行时宽高、高宽比与统一尺寸。 |
 | enableDefaultMotion | `boolean` | `true` | **New in v3.6.0** 默认动效开关。设为 `false` 时，该 Frame 的所有 `while*` 不自动注入系统默认动效。用户显式传入的 `while*` 配置不受影响。 |
-| enableAutoLayout | `boolean` | `true` | 自动布局协议开关。当 Frame 声明了 `row` / `column` 方向时默认激活，在根 DOM 上输出 `data-auto-layout` 属性，继承 `auto-layout.css` 的三槽位感知、首行对齐、Wrap、Gap 等规则。设为 `false` 可关闭。详见 [LayoutProtocol.md](../../../specs/LayoutProtocol.md)。 |
+| enableAutoLayout | `boolean` | `true` | 自动布局协议开关。当 Frame 声明了 `row` / `column` 方向时默认激活，在根 DOM 上输出 `data-auto-layout` 属性，继承 `auto-layout.css` 的三槽位感知、首行对齐、Wrap、Gap 等规则。设为 `false` 可关闭。详见 [LayoutProtocol.md](../../../specs/maintainers/LayoutProtocol.md)。 |
 | contentFill | `boolean` | `false` | 普通内容子项宽度填满 Frame 内容区；优先级高于 `contentHug`。 |
 | contentHug | `boolean` | `false` | 普通内容子项宽度按内容收缩。 |
 | pinOffset | `number \| string` | — | Pin 布局两个方向的偏移；数字按 px，字符串原样输出；新用法使用对应 Token 字符串。 |
@@ -224,13 +224,13 @@ Frame 是唯一公共宿主；布局、状态、Context、loading / Skeleton、D
 
 ### 布局模型
 
-主布局模型：**槽位宿主布局**。定义见 [../../../specs/LayoutProtocol.md §12.3](../../../specs/LayoutProtocol.md) 与 [../../../specs/LayoutProtocol.md §2](../../../specs/LayoutProtocol.md)。
+主布局模型：**槽位宿主布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md) 与 [../../../specs/maintainers/LayoutProtocol.md §2](../../../specs/maintainers/LayoutProtocol.md)。
 
 `Frame` 是槽位宿主布局的基础设施：
 
 - 当声明 `row` / `column`，或显式传入 `enableAutoLayout={true}` 时，根节点输出 `data-auto-layout="true"`。
 - `as="leading"` / `as="trailing"` 会透出为 `data-as`，由 `auto-layout.css` 统一处理 Leading / Content / Trailing 三段。
-- Icon＋文字组合默认使用 `row firstLine` 开启首行对齐，输出 `data-first-line="true"`；正文继承宿主行高，附件与单行或多行正文的第一行居中，详见 [LayoutProtocol §4.4](../../../specs/LayoutProtocol.md#44-首行对齐first-line-alignment)。
+- Icon＋文字组合默认使用 `row firstLine` 开启首行对齐，输出 `data-first-line="true"`；正文继承宿主行高，附件与单行或多行正文的第一行居中，详见 [LayoutProtocol §4.4](../../../specs/maintainers/LayoutProtocol.md#44-首行对齐first-line-alignment)。
 - `as="pin-*"` 会透出为 `data-as="pin-*"`，由 `auto-layout.css` 统一处理九方位绝对定位；`pinOffsetX` / `pinOffsetY` 优先于 `pinOffset`。
 - `leading` 与 `trailing` 始终按 Hug 子项处理；普通直系子项作为 Content，必须允许 `min-width: 0`。
 - 普通内容宽度默认自动判断：Frame 有显式宽度（`width` prop、`style="width:..."`、`w-full` / `size-full` 等宽度 class）时为 Fill；Frame 为 Hug 宽度时为 Hug。可用 `contentFill` / `contentHug` 强制覆盖，二者同时出现时 `contentFill` 优先。
@@ -522,7 +522,7 @@ Scale 能力会先监听组件自身或父容器（`self/parent`）的尺寸变�
 > [!IMPORTANT]
 > **开发禁令 (Redline)**:
 > Frame 及基于其构建的所有子组件，其内部严禁使用来自 `snowui.css` 的工具类。所有展示逻辑必须在组件自身的 `<style>` 块中通过 `var(--token)` 引用 `tokens.css` 实现。
-> 详见 [StyleSpec.md §2.11](../../../specs/StyleSpec.md#211-组件开发禁令-system-layer)
+> 详见 [StyleSpec.md §2.11](../../../specs/maintainers/StyleSpec.md#211-组件开发禁令-system-layer)
 
 
 ### 6.1 内部布局控制 (Direction)
@@ -536,13 +536,13 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 | grid | `.snowui-direction-grid` | 网格布局 (grid) |
 | reverse | `.*-reverse` | 反向布局修饰符 |
 
-> 样式优先级体系详见 [StyleSpec.md §2.6](../../../specs/StyleSpec.md#26-样式优先级体系)
+> 样式优先级体系详见 [StyleSpec.md §2.6](../../../specs/maintainers/StyleSpec.md#26-样式优先级体系)
 
 #### 6.1.1 自动布局协议 (Auto Layout Protocol)
 
 当 `enableAutoLayout={true}`（默认）且 Frame 声明了 `row` / `column` 时，Frame 会在根 DOM 输出 `data-auto-layout` 属性，自动继承 `auto-layout.css` 提供的 Level 1 结构化规则：
 
-- 首行对齐：Icon＋文字组合默认使用 `row firstLine`，沿用三槽角色；完整规则见 [LayoutProtocol §4.4](../../../specs/LayoutProtocol.md#44-首行对齐first-line-alignment)。
+- 首行对齐：Icon＋文字组合默认使用 `row firstLine`，沿用三槽角色；完整规则见 [LayoutProtocol §4.4](../../../specs/maintainers/LayoutProtocol.md#44-首行对齐first-line-alignment)。
 - Pin：通过 `as="pin-*"` 定位，不占三槽及首行轨道，可与首行对齐共用。
 - 三槽位感知：子元素通过 `data-as="leading"` / `data-as="trailing"` 声明角色，CSS `:has()` 自动切换 Flex ↔ Grid
 - Wrap 默认开启，Grid 模式下自动抑制
@@ -552,7 +552,7 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 
 设置 `enableAutoLayout={false}` 时不输出此属性，仅使用 `layout.css` 的基础方向类。
 
-完整协议规范详见 [LayoutProtocol.md](../../../specs/LayoutProtocol.md)。
+完整协议规范详见 [LayoutProtocol.md](../../../specs/maintainers/LayoutProtocol.md)。
 
 
 ### 6.2 布局稳定性 (Layout Stability)
@@ -563,7 +563,7 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 
 ### 6.3 Surface Hover 覆写变量
 
-**关联文件**: `layout.css`（styles） · [StyleSpec.md §2.4.6](../../../specs/StyleSpec.md#246-frame-hover-覆写变量能力化) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
+**关联文件**: `layout.css`（styles） · [StyleSpec.md §2.4.6](../../../specs/maintainers/StyleSpec.md#246-frame-hover-覆写变量能力化) · [frame-inline-style.svelte.ts](../logic/frame-inline-style.svelte.ts)
 
 当 `.snowui-hoverable` 需要覆盖默认 hover 叠加时，可使用以下变量（无需 `!important`，无需事件脚本）：
 
@@ -629,7 +629,7 @@ Frame 默认动效是组件级外层动效与控制层，不是所有内部动�
 - 外层 Frame 动效与内部专项动效允许同时运行：Frame 控制组件整体，内部能力控制内容细节。两层不得覆盖彼此负责的状态与样式。
 - `enableDefaultMotion={false}` 仅关闭当前根 Frame 的自动默认注入；内部专项动效继续有效，显式 `while*` 配置也继续有效。
 
-专项能力是否已经“通用化”，由对应规范和共享模块决定。单个组件的私有动画不应以本节为由绕过 Frame 或重复已有动效基础设施。文字动效的完整边界见 [TextMotionSpec.md §5.1](../../../specs/TextMotionSpec.md)。
+专项能力是否已经“通用化”，由对应规范和共享模块决定。单个组件的私有动画不应以本节为由绕过 Frame 或重复已有动效基础设施。文字动效的完整边界见 [TextMotionSpec.md §5.1](../../../specs/maintainers/TextMotionSpec.md)。
 
 ### while* 关键字的作用
 
@@ -1072,7 +1072,7 @@ Frame 样式编排系统是一个**集中式、高优先级、支持复杂运算
 > 样式编排依赖组件的 `id` 属性进行寻址，规则如下：
 > - **受控组件 (Target)**: **必须**提供 `id` (e.g., `id="icon"`), 否则无法被 `styles` 规则选中。
 > - **编排容器 (Provider)**: **可选**提供 `id`。仅当需要引用自身属性（如 `$#root.width`）作为计算源时才需要 ID。
-> - **变量暴露**: 只有显式设置 ID 的组件，其属性才会暴露为 CSS 变量 (e.g. `--[id]-padding`)。暴露的规则遵循 [StyleSpec.md §2.1](../../../specs/StyleSpec.md#21-token-使用规范)，采用计算后的基准模式。
+> - **变量暴露**: 只有显式设置 ID 的组件，其属性才会暴露为 CSS 变量 (e.g. `--[id]-padding`)。暴露的规则遵循 [StyleSpec.md §2.1](../../../specs/maintainers/StyleSpec.md#21-token-使用规范)，采用计算后的基准模式。
 
 | 属性 | 说明 | 对应 CSS 变量 (自动暴露计算值) |
 | :--- | :--- | :--- |
@@ -1176,7 +1176,7 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 - `color` 默认跟随 `whileHover` 的解析结果（150ms easeOut),用于前景/背景色过渡;Tab/Segmented 等切换组件可直接消费。
 - `size` 默认跟随 `whileActive` 的解析结果(回退 `MORPH_MOTION` 250ms easeOut),用于 width/height/min-* 过渡;Tab/Segmented 的 icon-toggle variant 展开宽度即消费此桥接。
 - `loop` 仅在显式传入 `loopMotion` 时输出；其中 `duration / easing / iterationCount / direction / playState` 用于时序桥接。
-- 当 `loopMotion.preset="rotateClockwise"` 时，`Frame` 会在根节点直接启用内建的连续旋转默认能力；对应关键帧资源定义在 `src/rotate.css`，未传 `preset` 时不会强行覆盖组件自己的循环视觉。
+- 当 `loopMotion.preset="rotateClockwise"` 时，`Frame` 会在根节点直接启用内建的连续旋转默认能力；对应关键帧资源定义在 [rotate.css](../motion/rotate.css)，未传 `preset` 时不会强行覆盖组件自己的循环视觉。
 
 > **按需输出说明**: 自 `v3.8.7` 起，`control / border / appear` 这三组桥接变量仅在当前 `Frame` 真的声明了对应 motion 配置时才会写入 HTML；普通无动效组件将直接依赖组件侧 fallback，不再默认输出整段 `300ms ease-out` 内联变量。
 
@@ -1186,7 +1186,7 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 <a id="2-基础属性-base-props"></a>
 
 
-> **样式规范**: 详见 [StyleSpec.md](../../../specs/StyleSpec.md)
+> **样式规范**: 详见 [StyleSpec.md](../../../specs/maintainers/StyleSpec.md)
 
 
 ### 统一 Frame 的能力结构
@@ -1212,7 +1212,7 @@ Frame 通过共享模块统一实现布局、状态、自身动效与跨组件�
 
 ### 角色模式覆盖契约模板（适用于所有组件）
 
-> 规范来源：`../../../specs/StyleSpec.md` §2.9.1
+> 规范来源：`../../../specs/maintainers/StyleSpec.md` §2.9.1
 
 当组件可作为子组件（`as` / slot / children）被宿主组合时，必须提供可覆盖变量桥接，禁止将视觉属性硬编码为不可覆盖终值。
 
@@ -1396,8 +1396,8 @@ Frame 通过共享模块统一实现布局、状态、自身动效与跨组件�
 **子组件**: Button, Text, Avatar, Icon, Badge, Skeleton, AvatarGroup
 
 **规范文档**:
-- [ComponentGuidelines.md](../../../specs/ComponentGuidelines.md) - CSS 行为 与样式体系规范
-- [KeywordSystem.md](../../../specs/KeywordSystem.md) - 关键字分类
+- [ComponentGuidelines.md](../../../specs/maintainers/ComponentGuidelines.md) - CSS 行为 与样式体系规范
+- [KeywordSystem.md](../../../specs/maintainers/KeywordSystem.md) - 关键字分类
 - [tokens.css](../styles/tokens.css) - CSS Token 定义
 
 **其他模块**:

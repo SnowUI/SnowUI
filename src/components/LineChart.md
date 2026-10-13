@@ -228,7 +228,7 @@ Marker 说明：
 - Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘到绘图区线段起点的间距固定为 `12px`。例如 formatter 输出 `100000` 时，绘图区只按该文本比短刻度新增的实际宽度缩小，固定间距不变。
 - 不接入三槽位协议，不承担通用子元素排列。
 
-详见 [LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
+详见 [LayoutProtocol.md §12.7](../../../specs/maintainers/LayoutProtocol.md)。
 
 ---
 

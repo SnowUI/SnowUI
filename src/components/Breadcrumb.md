@@ -141,7 +141,7 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 
 ### 布局模型
 
-主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
+主布局模型：**内联外壳布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.4](../../../specs/maintainers/LayoutProtocol.md)。
 
 - Breadcrumb 根是 `nav` 容器，内部内容整体 Hug。
 - 根容器使用 `inline-flex`，允许换行。
@@ -213,7 +213,7 @@ Breadcrumb 支持两种模式：
 
 - **父组件**: 无
 - **依赖**: Frame、Button、Text
-- **规范**: [../../../specs/LayoutProtocol.md](../../../specs/LayoutProtocol.md)、[../../../specs/ComponentStyleSheet.md](../../../specs/ComponentStyleSheet.md)
+- **规范**: [../../../specs/maintainers/LayoutProtocol.md](../../../specs/maintainers/LayoutProtocol.md)、[../../../specs/reference/ComponentStyleSheet.md](../../../specs/reference/ComponentStyleSheet.md)
 
 ---
 

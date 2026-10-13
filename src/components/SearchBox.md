@@ -128,7 +128,7 @@
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
 
 
 
@@ -142,7 +142,7 @@
 
 ### 布局模型
 
-主布局模型：**槽位宿主布局**。定义见 `../../../specs/LayoutProtocol.md`。
+主布局模型：**槽位宿主布局**。定义见 `../../../specs/maintainers/LayoutProtocol.md`。
 
 `SearchBox` 使用 `Frame row` 固定启用自动布局协议：
 
@@ -154,7 +154,7 @@
 
 ### 样式数值
 
-样式数值登记在 `../../../specs/ComponentStyleSheet.md`。
+样式数值登记在 `../../../specs/reference/ComponentStyleSheet.md`。
 
 默认触发器数值来自 Figma：
 

@@ -85,7 +85,7 @@
 
 ### 内置图标替换规则（强制）
 
-遵循 [ComponentGuidelines.md §2.7.1](../../../specs/ComponentGuidelines.md)。当外部传入 `data-as="leading"`（原生 HTML）或 `as="leading"`（SnowUI 大写组件）的子元素时，组件自动隐藏内置 Dot：
+遵循 [ComponentGuidelines.md §2.7.1](../../../specs/maintainers/ComponentGuidelines.md)。当外部传入 `data-as="leading"`（原生 HTML）或 `as="leading"`（SnowUI 大写组件）的子元素时，组件自动隐藏内置 Dot：
 
 ```svelte
 <!-- 默认：内置 Dot -->
@@ -228,7 +228,7 @@
 ### 关联关系
 
 - **基础**：基于 Frame `row` 接入三槽位自动布局协议
-- **替换协议**：遵循 [ComponentGuidelines.md §2.7.1](../../../specs/ComponentGuidelines.md) 内置 Icon 替换规则
+- **替换协议**：遵循 [ComponentGuidelines.md §2.7.1](../../../specs/maintainers/ComponentGuidelines.md) 内置 Icon 替换规则
 - **覆盖入口**：所有 padding / gap / radius / 字号等都暴露 `--snowui-chip-*-override` 变量
 
 ---

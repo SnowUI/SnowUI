@@ -29,4 +29,4 @@
 - 本模块只解析输入，不拥有业务 value/open/ARIA/事件。
 - 受控字段由父组件类型和实现排除。
 - 不扫描 DOM 或组件 class。
-- 正式规范见 `../../../specs/ComponentGuidelines.md §2.6.8` 与 `../../../specs/StyleSpec.md §2.6`。
+- 正式规范见 `../../../specs/maintainers/ComponentGuidelines.md §2.6.8` 与 `../../../specs/maintainers/StyleSpec.md §2.6`。

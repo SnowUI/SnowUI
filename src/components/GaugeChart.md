@@ -132,7 +132,7 @@
 ### 2.1 Props
 
 
-其余未声明属性透传到根 Frame。根默认 role="img"；可聚焦扇区仍位于 aria-hidden SVG 内，这是 [ChartSpec §9.3](../../../specs/ChartSpec.md#93-已确认实现漂移) 已登记的读屏限制，键盘 focus 可用不等于完整读屏支持。
+其余未声明属性透传到根 Frame。根默认 role="img"；可聚焦扇区仍位于 aria-hidden SVG 内，这是 [ChartSpec §9.3](../../../specs/maintainers/ChartSpec.md#93-已确认实现漂移) 已登记的读屏限制，键盘 focus 可用不等于完整读屏支持。
 
 ### 2.2 方法
 
@@ -178,7 +178,7 @@ interface GaugeChartItem {
 - 不接入三槽位协议，不承担通用子元素排列。
 - 根层显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`，并透传 `class`、`style` 与未声明属性。
 
-详见 [LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
+详见 [LayoutProtocol.md §12.7](../../../specs/maintainers/LayoutProtocol.md)。
 
 ---
 

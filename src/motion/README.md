@@ -77,10 +77,10 @@
 - 定义 `@keyframes snowui-frame-loop-rotate-clockwise` 全局关键帧。
 - 由 `Frame.svelte` 直接 import。
 
-### `FlowText.md`
+### [FlowText 组件文档](../components/FlowText.md)
 
-- 迁移说明，不是实现文件。
-- 当前统一使用 `src/components/FlowText.svelte`，兼容层已删除。
+- 使用与维护说明位于组件目录，不是 motion 目录中的文件。
+- 当前统一使用 [FlowText.svelte](../components/FlowText.svelte)，兼容层已删除。
 
 ---
 

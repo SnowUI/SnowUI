@@ -8,7 +8,7 @@
 
 适合在纯色背景或组件已知的矢量表面上保持线、圆圈与文字可见。同一点使用 sRGB 灰度 0.5 为明暗分界；深背景用 StaticWhite/100，浅背景用 StaticBlack/100，圆圈内外层互为反色。此能力不是彩色补色或 CSS `mix-blend-mode: difference`，也不是对比率合规检测器。
 
-能力属于 `lib`，不依赖专业协调模块、不自动注入 Frame。组件声明背景表面并拥有自己的前景、事件、几何和 ARIA；消费页面使用组件公开入口。当前接入者是 BarChart、LineChart、ChartGroup 的 `adaptiveContrast`，详见 [ChartSpec](../../../specs/ChartSpec.md#84-自适应黑白对比)。Slider 只是效果参考，本次没有迁移它的内部实现。
+能力属于 `lib`，不依赖专业协调模块、不自动注入 Frame。组件声明背景表面并拥有自己的前景、事件、几何和 ARIA；消费页面使用组件公开入口。当前接入者是 BarChart、LineChart、ChartGroup 的 `adaptiveContrast`，详见 [ChartSpec](../../../specs/maintainers/ChartSpec.md#84-自适应黑白对比)。Slider 只是效果参考，本次没有迁移它的内部实现。
 
 支持纯色祖先背景及同坐标系的路径填色、透明度、可解析的 SVG 渐变引用。表面顺序为实际由后向前的绘制顺序。调用方必须提供正确几何；不自动采样图片、Canvas、背景渐变、伪元素、阴影、外部覆盖物或不同坐标系的内容。未知 CSS 颜色和渐变前景保留原样；只有明确黑白色参与自动反白。
 
@@ -64,4 +64,4 @@ import { AdaptiveContrastMask } from '@snowui-design-system/components/lib/adapt
 
 唯一算法入口在本模块，组件只保留前景形状和自身状态映射；不得重新创建图表专属阈值或颜色判定。遮罩附加绘制层不参与 pointer / keyboard 命中，也不重复提供可访问名称。
 
-验证覆盖：黑柱内外不同线色、节点内外反色、浅深色切换、区域 hover、keyboard、彩色前景保留、关闭卸载及非图表 SVG 消费。规范发现入口为 [CommonCapabilities](../../../specs/CommonCapabilities.md) 与 [自然语言映射](../../../specs/NaturalLanguageToSnowUI.md)。
+验证覆盖：黑柱内外不同线色、节点内外反色、浅深色切换、区域 hover、keyboard、彩色前景保留、关闭卸载及非图表 SVG 消费。规范发现入口为 [CommonCapabilities](../../../specs/reference/CommonCapabilities.md) 与 [自然语言映射](../../../specs/reference/NaturalLanguageToSnowUI.md)。

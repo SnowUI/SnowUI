@@ -109,7 +109,7 @@
 
 ### 布局模型
 
-主布局模型：**复合管理布局**。定义见 [../../../specs/LayoutProtocol.md §12.6](../../../specs/LayoutProtocol.md)。
+主布局模型：**复合管理布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.6](../../../specs/maintainers/LayoutProtocol.md)。
 
 结构：
 
@@ -260,7 +260,7 @@ hover 归属：标题 hover 仅改变默认指示图标的透明度，不创建�
 
 - **子组件**: [AccordionItem.svelte](AccordionItem.svelte)
 - **依赖**: Frame、`ACCORDION_CONTEXT_KEY`
-- **规范**: [../../../specs/LayoutProtocol.md §12.6](../../../specs/LayoutProtocol.md)、[../../../specs/ComponentGuidelines.md](../../../specs/ComponentGuidelines.md)
+- **规范**: [../../../specs/maintainers/LayoutProtocol.md §12.6](../../../specs/maintainers/LayoutProtocol.md)、[../../../specs/maintainers/ComponentGuidelines.md](../../../specs/maintainers/ComponentGuidelines.md)
 
 ---
 

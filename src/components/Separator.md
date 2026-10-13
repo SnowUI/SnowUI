@@ -66,7 +66,7 @@
 
 ### 布局模型
 
-主布局模型：**内禀原子布局**。定义见 [../../../specs/LayoutProtocol.md §12.7](../../../specs/LayoutProtocol.md)。
+主布局模型：**内禀原子布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.7](../../../specs/maintainers/LayoutProtocol.md)。
 
 Separator 的尺寸由 `row` / `column`、`length`、`thickness` 与父级上下文变量决定，不承担子元素排列。
 

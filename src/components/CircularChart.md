@@ -175,7 +175,7 @@
 - `labelFormatter` 可自定义中心标签内容，并支持用 `\n` 拆成两行；第一行按数值样式渲染，第二行按名称样式渲染。
 - 可传入直接子元素 `<Text as="segment-value" />` / `<Text as="segment-name" />` 自定义中心标签样式模板；组件会自动写入当前扇区的真实百分比和名称，出现任一角色子元素时不渲染默认中心标签。
 - `showCenterLabel={false}` 可关闭中心标签，同时关闭外部写入的中心标签角色内容。
-- 当前根默认使用 `role="img"` 和 `aria-label="圆形图表"`，命中扇区带独立 `aria-label`。这是 [ChartSpec §9.3](../../../specs/ChartSpec.md#93-已确认实现漂移) 已登记的无障碍实现限制：可聚焦扇区位于 `aria-hidden="true"` 的 SVG 中，仅透传 `role="group"` 不能解决读屏可达性；不得把键盘 focus 可用等同于完整读屏支持。
+- 当前根默认使用 `role="img"` 和 `aria-label="圆形图表"`，命中扇区带独立 `aria-label`。这是 [ChartSpec §9.3](../../../specs/maintainers/ChartSpec.md#93-已确认实现漂移) 已登记的无障碍实现限制：可聚焦扇区位于 `aria-hidden="true"` 的 SVG 中，仅透传 `role="group"` 不能解决读屏可达性；不得把键盘 focus 可用等同于完整读屏支持。
 - 扇区命中层可获得键盘焦点，focus 行为与 hover 一致；中心标签使用 `aria-live="polite"`。
 
 ### 2.6 Frame 集成
@@ -242,7 +242,7 @@ interface CircularChartGradient {
 - 图表尺寸由 `size` 与 SVG 几何算法决定；作为外部布局子项时表现为 Hug。
 - 不接入三槽位协议，不承担通用子元素排列。
 
-详见 [LayoutProtocol.md §12.3](../../../specs/LayoutProtocol.md)。
+详见 [LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md)。
 
 ---
 

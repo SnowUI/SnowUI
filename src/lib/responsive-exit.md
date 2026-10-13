@@ -1,6 +1,6 @@
 # 响应式项目渐隐与停留恢复
 
-权威行为见 [MotionPresetSpec §2.3](../../../specs/MotionPresetSpec.md#23-响应式项目收起)。Table／DataTable 与 OverflowActions 使用同一实现。
+权威行为见 [MotionPresetSpec §2.3](../../../specs/maintainers/MotionPresetSpec.md#23-响应式项目收起)。Table／DataTable 与 OverflowActions 使用同一实现。
 
 ## 纯进度计算
 

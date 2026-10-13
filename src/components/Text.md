@@ -253,7 +253,7 @@ opacity: var(
 说明：基础层只保留 `transform/opacity` 链路；真正的 hover 过渡由 `.snowui-text-hover-enabled` 以显式属性列表注入，避免 `transition: all` 抢占 Frame 默认动效。`--snowui-button-group-content-opacity` 仅由 disabled ButtonGroup 的嵌入态内容提供，用于避免外壳与内部 Text 重复衰减。
 
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 

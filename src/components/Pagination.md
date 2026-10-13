@@ -252,7 +252,7 @@ Pagination 内部将页码与 prev / next 组织为一个分页按钮组。`page
 - `pageSizeGap`：pageSize 与整个分页按钮组之间的间距。
 - 数字按 px 解析；也可传 `"0.75rem"`、`"clamp(...)"` 等 CSS 长度。
 
-根节点 inline style 遵循 [StyleSpec §2.6](../../../specs/StyleSpec.md) 的 Level 6 最高优先级，并由 Pagination 映射到当前有效区域：
+根节点 inline style 遵循 [StyleSpec §2.6](../../../specs/maintainers/StyleSpec.md) 的 Level 6 最高优先级，并由 Pagination 映射到当前有效区域：
 
 ```svelte
 <!-- 有 pageSize：style gap 覆盖 pageSizeGap，组内 gap 仍为 4px -->
@@ -443,7 +443,7 @@ Pagination 只复制模板的外观属性并替换页码文本；点击和可用
 | 圆角 | `var(--radius-3)` |
 | 默认项尺寸 | 不设置最小宽高，由内容、padding 或 Button 模板决定 |
 
-无底色文字 / Icon hover 统一遵循 [../../../specs/StyleSpec.md §2.4.5](../../../specs/StyleSpec.md)：`black/100% × opacity: 0.4 -> 1`，不使用背景叠加。
+无底色文字 / Icon hover 统一遵循 [../../../specs/maintainers/StyleSpec.md §2.4.5](../../../specs/maintainers/StyleSpec.md)：`black/100% × opacity: 0.4 -> 1`，不使用背景叠加。
 
 Figma 对照：
 
@@ -459,7 +459,7 @@ Figma 对照：
 
 ### 布局模型
 
-主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
+主布局模型：**内联外壳布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.4](../../../specs/maintainers/LayoutProtocol.md)。
 
 - 根容器是 `nav`。
 - 根使用 `inline-flex` 与 `min-width: 0`，因此可在 Grid/Flex 子项中按父容器真实宽度收缩；自动响应模式中 pageSize 与分页控件保持同一行，并在空间不足时由组件隐藏 pageSize。
@@ -518,7 +518,7 @@ Root Frame(nav)
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -581,7 +581,7 @@ Root Frame(nav)
 
 - **父组件**: 无
 - **依赖**: Frame、Button 模板 DOM
-- **规范**: [../../../specs/LayoutProtocol.md](../../../specs/LayoutProtocol.md)、[../../../specs/ComponentStyleSheet.md](../../../specs/ComponentStyleSheet.md)、[../../../specs/StyleSpec.md](../../../specs/StyleSpec.md)
+- **规范**: [../../../specs/maintainers/LayoutProtocol.md](../../../specs/maintainers/LayoutProtocol.md)、[../../../specs/reference/ComponentStyleSheet.md](../../../specs/reference/ComponentStyleSheet.md)、[../../../specs/maintainers/StyleSpec.md](../../../specs/maintainers/StyleSpec.md)
 
 ---
 

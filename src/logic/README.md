@@ -12,7 +12,7 @@
 创建新组件前，建议至少按以下顺序阅读：
 
 1. `frame-types.ts` / `frame-types.md`
-2. `layout.css` / `layout.css`
+2. [共享布局样式](../styles/layout.css)（不是 logic 目录中的文件）
 3. `frame-prop-filter.ts` / `frame-prop-filter.md`
 4. `frame-field-control.ts` / `frame-field-control.md`
 5. `frame-state.svelte.ts` / `frame-state.md`
@@ -33,7 +33,7 @@
 | 文件 | 作用 | 什么时候先看 |
 | :--- | :--- | :--- |
 | `frame-types.ts` | `FrameProps`、状态机、事件、动效、编排、Scale、样式编排的总类型契约 | 任何基于 `Frame` 的新组件 |
-| `layout.css` | `.snowui-hoverable` / `.snowui-field-bordered` 工具类 | 判断共享 hover 或输入外框行为时 |
+| [layout.css](../styles/layout.css) | `.snowui-hoverable` / `.snowui-field-bordered` 工具类 | 判断共享 hover 或输入外框行为时 |
 | `frame-identity.svelte.ts` | 处理 `id`，并在存在动效配置时生成稳定自动 ID | 组件需要注册 Motion 或依赖 ID 暴露变量时 |
 | `frame-prop-filter.ts` | 统一识别 Frame 内部关键字；同时负责 `Frame -> DOM` 过滤与 `复合组件 -> Frame/宿主元素` 分发 | `Input / Textarea / Select / SearchField` 这类复合组件 |
 | `frame-field-control.ts` | 统一处理原生表单宿主的 `value/defaultValue`、`invalid/aria-invalid` 与值同步 | `Input / Textarea / Select` 这类字段型复合组件 |

@@ -83,7 +83,7 @@
 
 ### 布局模型
 
-主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
+主布局模型：**内联外壳布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.4](../../../specs/maintainers/LayoutProtocol.md)。
 
 Button 的内部布局不接入三槽位模型：
 
@@ -379,7 +379,7 @@ Button 放入 Pagination 时使用角色模板：
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 
 
@@ -455,7 +455,7 @@ Button 放入 Pagination 时使用角色模板：
 
 #### Hover State (Hover 状态)
 
-> **参考规范**: [StyleGuide.md - 7.4 Hover 背景色规则](./../../../specs/StyleGuide.md#74-hover-背景色规则)
+> **参考规范**: [StyleGuide.md - 7.4 Hover 背景色规则](../../../specs/reference/StyleGuide.md#74-hover-背景色规则)
 
 | Variant | Hover 规则 |
 |:---|:---|

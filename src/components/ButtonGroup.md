@@ -106,7 +106,7 @@
 
 ### 布局模型
 
-主布局模型：**内联外壳布局**。定义见 [../../../specs/LayoutProtocol.md §12.4](../../../specs/LayoutProtocol.md)。
+主布局模型：**内联外壳布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.4](../../../specs/maintainers/LayoutProtocol.md)。
 
 - ButtonGroup 根层管理外壳圆角、背景、边框与裁剪；视觉 padding 转交给嵌入态 Button，确保每个单元格的 hover / 点击热区覆盖自身完整单元格。
 - ButtonGroup 根层显式关闭 Auto Layout；Button 单元格之间的布局 gap 恒为 `0`，内容到内置分割线的视觉距离只由相邻 Button 的内侧 padding 表达。Button hover 盒必须与分割线边界连续。

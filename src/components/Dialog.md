@@ -252,7 +252,7 @@ opaque 与 blur 挂载时从 opacity 0 渐入到设定的遮罩效果；关闭�
 
 > **内置关闭图标（2026-09-11）**：由Button的size上下文控制，parts.Button.size可覆盖默认档位，图形比例遵循ComponentGuidelines §2.7。
 
-> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/maintainers/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
 
 
 
@@ -265,7 +265,7 @@ Dialog 是通用模态容器。面板视觉复用 `.snowui-quick-action-panel`,�
 
 - 源码: `./Dialog.svelte`
 - Logic: `../logic/dialog.svelte.ts`
-- 主布局模型:复合管理布局,登记于 `../../../specs/LayoutProtocol.md §12.3`
+- 主布局模型:复合管理布局,登记于 `../../../specs/maintainers/LayoutProtocol.md §12.3`
 - 样式覆盖入口:`--snowui-dialog-padding-override`、`--snowui-dialog-radius-override`、`--snowui-dialog-font-size-override`、`--snowui-dialog-line-height-override`、`--snowui-dialog-max-width-override`、`--snowui-dialog-gap-override`、`--snowui-dialog-content-gap-override`、`--snowui-dialog-footer-gap-override`、`--snowui-dialog-text-padding-override`
 
 ## 更新日志

@@ -113,7 +113,7 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 继承 [FrameProps](Frame.md)，排除 `children` / `tag`。Listbox 必须置于 Select 等提供选择上下文的宿主内；展开、当前值和选择事件由宿主拥有，不支持独立 `open`、`value`、`options`、`multiple` 或 `placement` 属性。
 
 
-等宽模式使用锚点实测宽度加固定 2px，左右各外扩 1px，覆盖下层字段边框；保留小数定位精度。该固定 CSS px 补偿不随根字号缩放，适用于所有 Listbox 宿主；Hug 模式不增加补偿，更大的 minWidth / 内容扩展继续生效。规范例外见 [StyleSpec §2.1](../../../specs/StyleSpec.md#21-token-使用规范) 的 USER-LISTBOX-WIDTH-001。
+等宽模式使用锚点实测宽度加固定 2px，左右各外扩 1px，覆盖下层字段边框；保留小数定位精度。该固定 CSS px 补偿不随根字号缩放，适用于所有 Listbox 宿主；Hug 模式不增加补偿，更大的 minWidth / 内容扩展继续生效。规范例外见 [StyleSpec §2.1](../../../specs/maintainers/StyleSpec.md#21-token-使用规范) 的 USER-LISTBOX-WIDTH-001。
 
 <a id="宿主协议"></a>
 
@@ -288,7 +288,7 @@ Portal anchor div (position:fixed; width/max-height only)
 
 > **内置图标统一（2026-09-11）**：复用Input与MenuItem的Button bare操作与图标规则。通过搜索新增的自定义选项由默认列表渲染，并支持hover删除；不重复注册为固定选项。
 
-> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/maintainers/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
 
 <a id="样式规范"></a>
 
@@ -352,8 +352,8 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 - **父级布局**: [Frame.svelte](Frame.svelte) — 使用 `<Frame column>` 作为内容容器
 - **子组件**: [MenuItem.svelte](MenuItem.svelte)
 - **宿主组件**: [Select.svelte](Select.svelte)、[Pagination.svelte](Pagination.svelte)
-- **自动布局协议**: [../../../specs/LayoutProtocol.md](../../../specs/LayoutProtocol.md)
-- **关联规范**: [../../../specs/HTMLSpec.md](../../../specs/HTMLSpec.md)
+- **自动布局协议**: [../../../specs/maintainers/LayoutProtocol.md](../../../specs/maintainers/LayoutProtocol.md)
+- **关联规范**: [../../../specs/maintainers/HTMLSpec.md](../../../specs/maintainers/HTMLSpec.md)
 
 ## 更新日志
 

@@ -127,7 +127,7 @@
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -135,13 +135,13 @@
 
 ### 布局模型
 
-主布局模型：**槽位宿主布局**。定义见 `../../../specs/LayoutProtocol.md`。
+主布局模型：**槽位宿主布局**。定义见 `../../../specs/maintainers/LayoutProtocol.md`。
 
 `SearchInput` 直接复用 `Input` 的 Leading / Control / Trailing 三槽位结构。默认 `Search` 作为 leading 子项传入 `Input`，外部提供同角色 leading 时通过 CSS 隐藏默认图标。
 
 ### 样式数值
 
-样式数值登记在 `../../../specs/ComponentStyleSheet.md`。`SearchInput` 默认与 `Input 标准` 保持一致，不另建通用颜色体系；内置默认 `Search` 作为搜索输入的专属视觉，静止态使用 Black/20，`:focus-within` 激活态使用 Black/40。该规则限定在 `.snowui-input.snowui-search-input .snowui-search-input-default-icon`，不影响通用 `Icon` 或外置 leading。
+样式数值登记在 `../../../specs/reference/ComponentStyleSheet.md`。`SearchInput` 默认与 `Input 标准` 保持一致，不另建通用颜色体系；内置默认 `Search` 作为搜索输入的专属视觉，静止态使用 Black/20，`:focus-within` 激活态使用 Black/40。该规则限定在 `.snowui-input.snowui-search-input .snowui-search-input-default-icon`，不影响通用 `Icon` 或外置 leading。
 
 ### 开发者关键字
 

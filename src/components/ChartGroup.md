@@ -252,7 +252,7 @@ interface ChartGroupContext {
 - 共享 cell hit layer 是容器内部绝对定位的 SVG 覆盖层，默认位于子图表上方；每个分类命中区域按分类中心左右半格计算。
 - 不接入三槽位协议，不承担标题、说明、legend 或卡片排版。
 
-详见 [LayoutProtocol.md §12.6](../../../specs/LayoutProtocol.md)。
+详见 [LayoutProtocol.md §12.6](../../../specs/maintainers/LayoutProtocol.md)。
 
 ---
 

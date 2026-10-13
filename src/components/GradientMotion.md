@@ -113,7 +113,7 @@
 
 ### 专业艺术色例外
 
-GradientMotion 的内置 glimm cosine palette、WebGL 不可用时的 CSS fallback palette，以及 `colors` 传入的四个六位 HEX 采样色，已在 [StyleSpec §2.1.3](../../../specs/StyleSpec.md#213-专业艺术色例外强制) 单独登记为专业艺术色例外。shader 必须将这些颜色转换为数值向量并生成连续色域；它们表达生成式画面，不表达按钮、文字、状态或表面语义，因此不要求映射到 SnowUI 语义 Token。
+GradientMotion 的内置 glimm cosine palette、WebGL 不可用时的 CSS fallback palette，以及 `colors` 传入的四个六位 HEX 采样色，已在 [StyleSpec §2.1.3](../../../specs/maintainers/StyleSpec.md#213-专业艺术色例外强制) 单独登记为专业艺术色例外。shader 必须将这些颜色转换为数值向量并生成连续色域；它们表达生成式画面，不表达按钮、文字、状态或表面语义，因此不要求映射到 SnowUI 语义 Token。
 
 该例外只覆盖 GradientMotion 专业画面的 palette。`colors` 不是通用颜色 Prop 协议，不得据此让其他组件跳过 `resolveSnowUIColor()`；组件根的尺寸、圆角、外部 `class` / `style` 覆盖、无障碍、外层 motion 与 reduced-motion 仍遵守现行规范。新增 palette 类型或把这些颜色用于 UI 语义前必须重新登记。
 
