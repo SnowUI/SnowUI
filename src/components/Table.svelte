@@ -1,4 +1,4 @@
-<!-- SnowUI source notice | LICENSE 2.1.0: ../../LICENSE
+<!-- SnowUI source notice | LICENSE 2.2.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 语义表格根。宽表参与页面固有宽度计算，角色列支持列内/覆盖两种布局。文档: ./Table.md -->
 <script lang="ts">

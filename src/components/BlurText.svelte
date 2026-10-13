@@ -1,4 +1,4 @@
-<!-- SnowUI source notice | LICENSE 2.1.0: ../../LICENSE
+<!-- SnowUI source notice | LICENSE 2.2.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- BlurText 逐字模糊揭示组件 v1.0.0；文档：./BlurText.md -->
 <script lang="ts">
