@@ -3,7 +3,19 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
-const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');process.chdir(root);
+const scriptRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+let sourceRoot=scriptRoot,outArgument,taggedRelease=false;
+const args=process.argv.slice(2);
+for(let index=0;index<args.length;index++){
+ const argument=args[index];
+ if(argument==='--source-root'){
+  if(!args[index+1])throw Error('--source-root 需要目录');
+  sourceRoot=path.resolve(args[++index]);
+ }else if(argument==='--tagged-release')taggedRelease=true;
+ else if(!argument.startsWith('-')&&outArgument===undefined)outArgument=argument;
+ else throw Error('用法：node scripts/archive-source.mjs [输出目录] [--source-root 检出目录] [--tagged-release]');
+}
+const root=fs.realpathSync(sourceRoot);process.chdir(root);
 execFileSync(process.execPath,['scripts/source-notices.mjs','--check'],{stdio:'inherit'});
 const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
 const licenseText=fs.readFileSync('LICENSE','utf8');
@@ -11,12 +23,26 @@ const licenseVersion=licenseText.match(/许可版本：v([\d.]+)/)?.[1];
 if(!licenseVersion)throw Error('LICENSE 缺少明确的许可版本');
 const sourceRevision=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
 const sourceDirty=Boolean(execFileSync('git',['status','--porcelain','--untracked-files=normal'],{encoding:'utf8'}).trim());
-const out=path.resolve(process.argv[2]??'artifacts');fs.mkdirSync(out,{recursive:true});
+let sourceTag;
+if(taggedRelease){
+ sourceTag=`v${pkg.version}`;
+ let tagRevision;
+ try{tagRevision=execFileSync('git',['rev-parse','--verify',`refs/tags/${sourceTag}^{commit}`],{encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim();}
+ catch{throw Error(`正式归档缺少 ${sourceTag} tag`);}
+ if(sourceDirty||tagRevision!==sourceRevision)throw Error('正式归档必须从匹配包版本的干净 tag 检出目录生成');
+}
+const out=path.resolve(outArgument??'artifacts');
+if(taggedRelease){
+ const relative=path.relative(root,out);
+ if(relative===''||(relative!=='..'&&!relative.startsWith(`..${path.sep}`)&&!path.isAbsolute(relative)))throw Error('正式归档输出目录必须位于源码检出目录之外');
+}
+fs.mkdirSync(out,{recursive:true});
 const archiveName=`snowui-source-${pkg.version}-license-${licenseVersion}`;
 const stage=fs.mkdtempSync(path.join(out,'.source-'));const folder=path.join(stage,archiveName);fs.mkdirSync(folder);
 const allowed=['src','tests','scripts','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','tsconfig.json','tsconfig.node.json','svelte.config.js','vite.config.ts','LICENSE','THIRD_PARTY_NOTICES.md','README.md','AGENTS.md','llms.txt','component-discovery.json','component-catalog.json'];
 for(const name of allowed){if(!fs.existsSync(name))throw Error('缺少源码交付项 '+name);fs.cpSync(name,path.join(folder,name),{recursive:true,filter:p=>!/(?:^|\/)(?:node_modules|\.git|\.DS_Store|\.env(?:\..*)?)(?:\/|$)/.test(p)&&!/^src\/(?:demo|test|playground)(?:\/|$)/.test(p)});}
-fs.writeFileSync(path.join(folder,'SOURCE_BUILD.md'),'# 免费源码构建\n\n先阅读本归档 LICENSE；AI 入口见 AGENTS.md。Free 范围无需公钥、账户、签名许可或中心登记。Node 24 与 pnpm 10.20；运行 pnpm install --frozen-lockfile，然后 pnpm build、pnpm catalog:check、pnpm pack:check。无需兄弟源码仓库；构建输出为 dist/client 和 dist/server。\n\nnpm 与源码按同一用途、项目和人数许可；允许授权用途内修改样式、交互与框架移植。真实产品上线或交付需 Pro / Team，纯 Demo 可免费线上展示。官方维护规范只约束官方工作区，使用者的源码适配权限以本归档 LICENSE 为准。\n\n此归档为本地交付候选，不代表公开下载或新 npm 版本已发布。SOURCE_MANIFEST.json 记录组件版本、许可版本、来源提交与工作区状态；相同组件版本但许可不同不代表已发布的旧包变更。正式公开交付须经过干净来源与独立构建验证并记录发布日期。源码下载不要求付款；付费设计资源与许可凭证由独立交付服务提供。\n');
-fs.writeFileSync(path.join(folder,'SOURCE_MANIFEST.json'),JSON.stringify({package:pkg.name,packageVersion:pkg.version,licenseVersion,licenseSha256:createHash('sha256').update(licenseText).digest('hex'),sourceRevision,sourceDirty,releaseState:'candidate'},null,2)+'\n');
+const buildNote=taggedRelease?'此归档来自与组件版本匹配的干净发布 tag，仍是待上传候选；正式公开下载、校验值和发布日期须在上传及外网验收后公布。':'此归档为本地交付候选，不代表公开下载或新 npm 版本已发布。';
+fs.writeFileSync(path.join(folder,'SOURCE_BUILD.md'),`# 免费源码构建\n\n先阅读本归档 LICENSE；AI 入口见 AGENTS.md。Free 范围无需公钥、账户、签名许可或中心登记。Node 24 与 pnpm 10.20；运行 pnpm install --frozen-lockfile，然后 pnpm build、pnpm catalog:check、pnpm pack:check。无需兄弟源码仓库；构建输出为 dist/client 和 dist/server。\n\nnpm 与源码按同一用途、项目和人数许可；允许授权用途内修改样式、交互与框架移植。真实产品上线或交付需 Pro / Team，纯 Demo 可免费线上展示。官方维护规范只约束官方工作区，使用者的源码适配权限以本归档 LICENSE 为准。\n\n${buildNote} SOURCE_MANIFEST.json 记录组件版本、许可版本、来源提交与工作区状态；相同组件版本但许可不同不代表已发布的旧包变更。正式公开交付须经过干净来源与独立构建验证并记录发布日期。源码下载不要求付款；付费设计资源与许可凭证由独立交付服务提供。\n`);
+fs.writeFileSync(path.join(folder,'SOURCE_MANIFEST.json'),JSON.stringify({package:pkg.name,packageVersion:pkg.version,licenseVersion,licenseSha256:createHash('sha256').update(licenseText).digest('hex'),sourceRevision,sourceDirty,...(sourceTag?{sourceTag}:{}),releaseState:taggedRelease?'tagged-release-candidate':'candidate'},null,2)+'\n');
 const basename=`${archiveName}.zip`;const dest=path.join(out,basename);fs.rmSync(dest,{force:true});execFileSync('zip',['-qr',dest,path.basename(folder)],{cwd:stage});fs.rmSync(stage,{recursive:true,force:true});
 const checksum=createHash('sha256').update(fs.readFileSync(dest)).digest('hex');fs.writeFileSync(dest+'.sha256',`${checksum}  ${basename}\n`);console.log(dest+'\nSHA256 '+checksum);
