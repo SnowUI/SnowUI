@@ -57,7 +57,7 @@
 | overflow | `"all" \| "progressive"` | `"all"` | all 在放不下时将全部操作转入 More；progressive 按 overflowFrom 逐项转入，保留可容纳的操作。菜单展开时冻结布局。 |
 | overflowFrom | `"start" \| "end"` | `"end"` | progressive 模式从数据/组合顺序的开头或末尾依次转移操作；all 模式不区分方向。 |
 | availableWidth | `number` | — | 外部给定可用于操作组布局的宽度，单位 px；提供后不再注册自身尺寸观察，适合 DataTable 复用列宽。 |
-| moreLabel | `string` | `"更多操作"` | More 按钮的无障碍名称 |
+| moreLabel | `string` | `LocaleProvider` | More 按钮的无障碍名称，未传时按当前语言显示。 |
 | align | `"start" \| "end"` | `"end"` | Listbox 水平对齐 |
 | disabled | `boolean` | `false` | 禁用全部操作 |
 | buttonProps | `GlobalButtonProps` | — | 所有 Action、More 与隐藏测量副本共享的 Button 默认 Props；支持 variant/size/bare/emphasis/class/style，排除由操作组接管的内容、角色、点击、链接、禁用与名称字段。 |

@@ -5,7 +5,7 @@
 > **版本**: v1.8.1
 > **职责**: 清晰展示可复制的代码，支持语法着色、行号、全屏查看和尺寸调整，适合文档与开发工具。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-28
+> **文档修订**: 2026-10-15
 
 ## 组件介绍
 
@@ -175,9 +175,9 @@
 
 代码块根容器默认设置 `font-size: var(--text-12)` 与 `line-height: var(--leading-12)`；内部行号、`pre`、`code`、代码行全部继承根容器排版。`font-family` 默认继承外部上下文，不设置具体字体族，忽略设计稿中的字体设置。
 
-按钮 hover 对齐 Button 的 `bare emphasis="muted"` 模式：关闭背景叠加，默认 `opacity: 0.4`，hover 提升到 `1`，并使用 Frame color motion 变量过渡。
+默认态与全屏态的右上 CopyButton / ExpandButton 仍使用 `bare emphasis="muted"` 的图标强调与复制反馈；每个按钮独立使用上下 4px、左右 8px 的 padding、8px 圆角、半透明代码块语义背景及 20px backdrop blur，hover 时继续由 Button 将强调度提升到 100%。键盘焦点有可见轮廓。`singleLine` 的行内 trailing 复制按钮不使用这组右上视觉。
 
-工具栏使用内部 Pin 布局固定到 `pin-top-right`，偏移为 `var(--padding-2)`；右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
+工具栏使用内部 Pin 布局固定到 `pin-top-right`，距上边缘 8px、右边缘 4px；过长语言标签在可用宽度内省略。代码内容和纵向滚动条从工具栏下方开始，不被按钮覆盖。右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
 
 ---
 

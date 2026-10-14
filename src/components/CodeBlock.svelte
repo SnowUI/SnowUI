@@ -32,6 +32,7 @@
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Indicator from "./Indicator.svelte";
     import CopyButton from "./CopyButton.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
     import { resizeManager } from "../logic/observer.svelte";
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
@@ -183,6 +184,7 @@
     }: Props = $props();
     /* ─── 内部状态 ─── */
     const fullscreenMotionId = `code-block-fullscreen-${++codeBlockInstanceSeed}`;
+    const localeContext = useLocale();
     let isFullscreen = $state(false);
     let isExitingFullscreen = $state(false);
     /** 全屏层 DOM 元素，用于 FLIP 退出动效 */
@@ -640,6 +642,7 @@
         className,
     ].filter(Boolean).join(" ")}
     data-variant={variant}
+    data-top-actions={!isSingleLine && ((showLanguage && language) || showCopyButton || showExpandButton || hasCustomTrailing) ? "true" : undefined}
     data-resized={!isSingleLine && resizeHeight !== undefined ? "true" : undefined}
     style={rootStyle}
     renderHints={{
@@ -696,7 +699,7 @@
                         ? normalizeActionSnippet(copiedIconSnippet)
                         : undefined}
                     class="snowui-code-block-btn snowui-hoverable"
-                    ariaLabel="复制代码"
+                    ariaLabel={localeContext.t("codeBlock.copyCode")}
                 />
             </div>
         {/if}
@@ -705,7 +708,7 @@
     <div
         class="snowui-code-block-toolbar snowui-code-block-default-pin-top-right"
         data-as="pin-top-right"
-        style="--pin-offset: var(--padding-3);"
+        style="--pin-offset-y: var(--padding-2); --pin-offset-x: var(--padding-1);"
     >
         {#if showLanguage && language}
             <span class="snowui-code-block-lang">{language}</span>
@@ -733,7 +736,7 @@
                             ? normalizeActionSnippet(copiedIconSnippet)
                             : undefined}
                         class="snowui-code-block-btn snowui-hoverable"
-                        ariaLabel="复制代码"
+                        ariaLabel={localeContext.t("codeBlock.copyCode")}
                     />
                 {/if}
 
@@ -744,8 +747,8 @@
                         bare
                         emphasis={parts?.ExpandButton?.emphasis ?? "muted"}
                         class="snowui-code-block-btn"
-                        ariaLabel="全屏查看"
-                        collapseAriaLabel="退出全屏"
+                        ariaLabel={localeContext.t("codeBlock.fullscreen")}
+                        collapseAriaLabel={localeContext.t("codeBlock.exitFullscreen")}
                         onclick={toggleFullscreen}
                         icon={hasCustomExpandIcon
                             ? normalizeActionSnippet(expandIconSnippet)
@@ -808,7 +811,7 @@
         appearance="corner"
         applySize={false}
         minSize={60}
-        ariaLabel="调整代码块宽度和高度"
+        ariaLabel={localeContext.t("codeBlock.resize")}
         onSizeChange={handleResizeSize}
     />
     {/if}
@@ -840,7 +843,7 @@
         tag="div"
         role="dialog"
         aria-modal="true"
-        aria-label="全屏代码查看"
+        aria-label={localeContext.t("codeBlock.fullscreenDialog")}
         enableResponsive={false}
         enableContext={false}
         enableScaleObserver={false}
@@ -852,7 +855,7 @@
         <div
             class="snowui-code-block-toolbar snowui-code-block-toolbar-fullscreen"
             data-as="pin-top-right"
-            style="--pin-offset: var(--padding-3);"
+            style="--pin-offset-y: var(--padding-2); --pin-offset-x: var(--padding-1);"
         >
             {#if showLanguage && language}
                 <span class="snowui-code-block-lang">{language}</span>
@@ -877,7 +880,7 @@
                             ? normalizeActionSnippet(copiedIconSnippet)
                             : undefined}
                         class="snowui-code-block-btn snowui-hoverable"
-                        ariaLabel="复制代码"
+                        ariaLabel={localeContext.t("codeBlock.copyCode")}
                     />
                 {/if}
                 {#if showExpandButton}
@@ -887,8 +890,8 @@
                         bare
                         emphasis={parts?.ExpandButton?.emphasis ?? "muted"}
                         class="snowui-code-block-btn"
-                        ariaLabel="全屏查看"
-                        collapseAriaLabel="退出全屏"
+                        ariaLabel={localeContext.t("codeBlock.fullscreen")}
+                        collapseAriaLabel={localeContext.t("codeBlock.exitFullscreen")}
                         onclick={exitFullscreen}
                         collapseIcon={hasCustomCollapseIcon
                             ? normalizeActionSnippet(collapseIconSnippet)
@@ -1094,43 +1097,52 @@
         align-items: center;
         justify-content: space-between;
         gap: var(--gap-2);
+        max-width: calc(100% - var(--size-3));
         z-index: 3;
     }
 
     :global(:where(.snowui-code-block-lang)) {
         color: var(--snowui-code-block-muted-fg);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         user-select: none;
     }
 
     :global(:where(.snowui-code-block-actions)) {
         display: flex;
         align-items: center;
+        flex-shrink: 0;
         gap: var(
             --snowui-code-block-gap-override,
             var(--snowui-code-block-gap)
         );
     }
 
-    /* ─── 图标按钮：统一使用 CopyButton / ExpandButton 的 bare 默认尺寸 ─── */
-    :global(:where(button).snowui-code-block-btn) {
+    /* 默认态与全屏态各按钮独立拥有背景与命中区；singleLine 保留行内 trailing。 */
+    :global(:where(.snowui-code-block-toolbar button).snowui-code-block-btn) {
         --snowui-field-focus-ring-width: 0;
+        --snowui-button-padding-override: var(--padding-1) var(--padding-2);
+        --snowui-button-radius-override: var(--radius-2);
+        --snowui-button-background-override: var(--black-20, #00000033);
         color: var(--snowui-code-block-btn-fg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         transition:
             color var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
 
     :global(
-        :where(button).snowui-code-block-btn:focus,
-        :where(button).snowui-code-block-btn:focus-visible
+        :where(.snowui-code-block-toolbar button).snowui-code-block-btn:focus-visible
     ) {
-        outline: none;
-        box-shadow: none;
+        outline: 2px solid var(--brand, #33d1ffff);
+        outline-offset: 1px;
     }
 
-    :global(:where(button).snowui-code-block-btn:hover:not(:disabled)) {
+    :global(:where(.snowui-code-block-toolbar button).snowui-code-block-btn:hover:not(:disabled)) {
         background-image: none;
-        box-shadow: none;
     }
 
     /* ─── 代码主体区域 ─── */
@@ -1293,6 +1305,14 @@
         );
     }
 
+    :global(:where(.snowui-code-block[data-top-actions="true"])),
+    :global(:where(.snowui-code-block-fullscreen)) {
+        padding-top: calc(
+            var(--snowui-code-block-padding-y-override, var(--snowui-code-block-padding-y))
+            + var(--padding-4)
+        );
+    }
+
     /* 全屏工具栏与普通态保持一致：距上/右 8px。 */
     :global(:where(.snowui-code-block-toolbar-fullscreen)) {
         padding: 0;
@@ -1318,6 +1338,11 @@
         right: 4px;
         bottom: var(--snowui-code-block-footer-height);
         z-index: 2;
+    }
+
+    :global(:where(.snowui-code-block[data-top-actions="true"] .snowui-code-block-scrollbar[data-axis="vertical"])),
+    :global(:where(.snowui-code-block-fullscreen .snowui-code-block-scrollbar[data-axis="vertical"])) {
+        top: calc(var(--padding-2) + var(--size-6) + var(--padding-1));
     }
 
     :global(:where(.snowui-code-block-accessories)) {

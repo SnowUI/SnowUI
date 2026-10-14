@@ -74,7 +74,7 @@
 | pageSize | `number` | `20` | 当前每页条数；选择后组件自行更新绑定值，仅在 `pageSizeOptions` 非空时显示选择器 |
 | pageSizeOptions | `number[]` | `[]` | 可选的每页条数；非正数会被忽略，重复项会被去重 |
 | pageSizeGap | `string \| number` | `16` | pageSize 与分页按钮组之间的独立间距；数字按 px 处理 |
-| pageSizeAriaLabel | `string` | `"每页条数"` | 每页条数选择器的无障碍名称 |
+| pageSizeAriaLabel | `string` | `LocaleProvider` | 每页条数选择器的无障碍名称；默认随 LocaleProvider 使用中文“每页条数”或英文“Items per page” |
 | onPageChange | `(page: number) => void` | — | 可点击页码变化时触发 |
 | onPageSizeChange | `(pageSize: number) => void` | — | 每页条数变化时触发 |
 | children | `Snippet` | — | 角色样式模板 |

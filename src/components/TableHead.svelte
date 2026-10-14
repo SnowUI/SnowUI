@@ -12,9 +12,11 @@
     import { tableSelectionFade } from "../lib/table-selection-fade";
     import { getTableRoleBlurStyles } from "../lib/table-role-blur";
     import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
     import {
         type ComponentPartsOf,
     } from "../logic/component-parts.svelte";
+    const localeContext = useLocale();
     function columnScope(node: HTMLElement) {
         node.setAttribute("scope", "col");
     }
@@ -170,7 +172,7 @@
             <Checkbox
                 checked={selectionState.all}
                 indeterminate={selectionState.some}
-                ariaLabel="选择全部当前行"
+                ariaLabel={localeContext.t("tableHead.selectAll")}
                 onCheckedChange={(checked) => table.setAllRowsSelected(checked)}
             />
         </span>
@@ -224,7 +226,7 @@
                 event.stopPropagation();
                 table.fitColumnWidth(resolvedColumnId, resolvedMinWidth, resolvedMaxWidth);
             }}
-            ariaLabel={`调整 ${resolvedColumnId} 列宽`}
+            ariaLabel={localeContext.t("tableHead.resizeColumn", { column: resolvedColumnId })}
             onSizeChange={(next) => table.setColumnWidth(resolvedColumnId, next)}
         />
     {/if}

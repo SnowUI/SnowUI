@@ -5,6 +5,48 @@
 export const DEFAULT_LOCALE = "zh-CN";
 
 export type SnowUIMessageKey =
+    | "copyButton.copy"
+    | "copyButton.copied"
+    | "codeBlock.copyCode"
+    | "codeBlock.fullscreen"
+    | "codeBlock.exitFullscreen"
+    | "codeBlock.resize"
+    | "codeBlock.fullscreenDialog"
+    | "expandButton.expand"
+    | "expandButton.collapse"
+    | "sidebar.resize"
+    | "pagination.pageSize"
+    | "pagination.previous"
+    | "pagination.next"
+    | "pagination.page"
+    | "input.clear"
+    | "input.increment"
+    | "input.decrement"
+    | "input.openTime"
+    | "input.openDate"
+    | "input.year"
+    | "input.month"
+    | "input.day"
+    | "input.week"
+    | "input.hour"
+    | "input.minute"
+    | "input.second"
+    | "input.yearPlaceholder"
+    | "input.monthPlaceholder"
+    | "input.dayPlaceholder"
+    | "input.weekPlaceholder"
+    | "imageViewer.previous"
+    | "imageViewer.next"
+    | "imageViewer.close"
+    | "toast.close"
+    | "tableHead.selectAll"
+    | "tableHead.resizeColumn"
+    | "tableCell.selectRow"
+    | "text.expand"
+    | "textarea.resize"
+    | "indicator.resizeWidth"
+    | "indicator.resizeHeight"
+    | "indicator.resizeBoth"
     | "colorSchemeButton.toLight"
     | "colorSchemeButton.toDark"
     | "styleButton.toSnowUI"
@@ -18,6 +60,21 @@ export type SnowUIMessageKey =
     | "sidePanel.cancel"
     | "sidePanel.save"
     | "sidePanel.close"
+    | "sidePanel.resize"
+    | "tableToolbar.name"
+    | "tableToolbar.search"
+    | "tableToolbar.sort"
+    | "tableToolbar.filter"
+    | "tableToolbar.clear"
+    | "tableToolbar.copy"
+    | "tableToolbar.delete"
+    | "tableToolbar.selected"
+    | "tableToolbar.deleting"
+    | "tableToolbar.defaultSort"
+    | "tableToolbar.ascending"
+    | "tableToolbar.descending"
+    | "tableToolbar.defaultFilter"
+    | "overflowActions.more"
     | "dialog.close";
 
 export type SnowUIMessageValues = Record<string, string | number>;
@@ -28,6 +85,48 @@ export const SNOWUI_MESSAGES: Record<
     Record<SnowUIMessageKey, string>
 > = {
     "zh-CN": {
+        "copyButton.copy": "复制",
+        "copyButton.copied": "已复制",
+        "codeBlock.copyCode": "复制代码",
+        "codeBlock.fullscreen": "全屏查看",
+        "codeBlock.exitFullscreen": "退出全屏",
+        "codeBlock.resize": "调整代码块宽度和高度",
+        "codeBlock.fullscreenDialog": "全屏代码查看",
+        "expandButton.expand": "展开",
+        "expandButton.collapse": "收起",
+        "sidebar.resize": "调整侧边栏宽度",
+        "pagination.pageSize": "每页条数",
+        "pagination.previous": "上一页",
+        "pagination.next": "下一页",
+        "pagination.page": "第 {{page}} 页",
+        "input.clear": "清除输入",
+        "input.increment": "增加数值",
+        "input.decrement": "减少数值",
+        "input.openTime": "打开时间选择",
+        "input.openDate": "打开日期选择",
+        "input.year": "年",
+        "input.month": "月",
+        "input.day": "日",
+        "input.week": "周",
+        "input.hour": "时",
+        "input.minute": "分",
+        "input.second": "秒",
+        "input.yearPlaceholder": "年",
+        "input.monthPlaceholder": "月",
+        "input.dayPlaceholder": "日",
+        "input.weekPlaceholder": "周",
+        "imageViewer.previous": "上一张",
+        "imageViewer.next": "下一张",
+        "imageViewer.close": "关闭图片预览",
+        "toast.close": "关闭通知",
+        "tableHead.selectAll": "选择全部当前行",
+        "tableHead.resizeColumn": "调整 {{column}} 列宽",
+        "tableCell.selectRow": "选择当前行",
+        "text.expand": "展开",
+        "textarea.resize": "调整文本域大小",
+        "indicator.resizeWidth": "调整宽度",
+        "indicator.resizeHeight": "调整高度",
+        "indicator.resizeBoth": "调整宽度和高度",
         "colorSchemeButton.toLight": "切换到亮色",
         "colorSchemeButton.toDark": "切换到暗色",
         "styleButton.toSnowUI": "切换到 SnowUI 风格",
@@ -41,9 +140,66 @@ export const SNOWUI_MESSAGES: Record<
         "sidePanel.cancel": "取消",
         "sidePanel.save": "保存",
         "sidePanel.close": "关闭",
+        "sidePanel.resize": "调整弹出窗宽度",
+        "tableToolbar.name": "表格工具栏",
+        "tableToolbar.search": "搜索",
+        "tableToolbar.sort": "排序",
+        "tableToolbar.filter": "筛选",
+        "tableToolbar.clear": "清除",
+        "tableToolbar.copy": "复制",
+        "tableToolbar.delete": "删除",
+        "tableToolbar.selected": "已选择 {{count}} 项",
+        "tableToolbar.deleting": "删除中",
+        "tableToolbar.defaultSort": "默认排序",
+        "tableToolbar.ascending": "升序",
+        "tableToolbar.descending": "降序",
+        "tableToolbar.defaultFilter": "默认筛选",
+        "overflowActions.more": "更多操作",
         "dialog.close": "关闭",
     },
     "en-US": {
+        "copyButton.copy": "Copy",
+        "copyButton.copied": "Copied",
+        "codeBlock.copyCode": "Copy code",
+        "codeBlock.fullscreen": "View fullscreen",
+        "codeBlock.exitFullscreen": "Exit fullscreen",
+        "codeBlock.resize": "Resize code block",
+        "codeBlock.fullscreenDialog": "Fullscreen code view",
+        "expandButton.expand": "Expand",
+        "expandButton.collapse": "Collapse",
+        "sidebar.resize": "Resize sidebar width",
+        "pagination.pageSize": "Items per page",
+        "pagination.previous": "Previous page",
+        "pagination.next": "Next page",
+        "pagination.page": "Page {{page}}",
+        "input.clear": "Clear input",
+        "input.increment": "Increase value",
+        "input.decrement": "Decrease value",
+        "input.openTime": "Open time picker",
+        "input.openDate": "Open date picker",
+        "input.year": "Year",
+        "input.month": "Month",
+        "input.day": "Day",
+        "input.week": "Week",
+        "input.hour": "Hour",
+        "input.minute": "Minute",
+        "input.second": "Second",
+        "input.yearPlaceholder": "YYYY",
+        "input.monthPlaceholder": "MM",
+        "input.dayPlaceholder": "DD",
+        "input.weekPlaceholder": "WW",
+        "imageViewer.previous": "Previous image",
+        "imageViewer.next": "Next image",
+        "imageViewer.close": "Close image viewer",
+        "toast.close": "Close notification",
+        "tableHead.selectAll": "Select all current rows",
+        "tableHead.resizeColumn": "Resize {{column}} column",
+        "tableCell.selectRow": "Select current row",
+        "text.expand": "Expand",
+        "textarea.resize": "Resize text area",
+        "indicator.resizeWidth": "Resize width",
+        "indicator.resizeHeight": "Resize height",
+        "indicator.resizeBoth": "Resize width and height",
         "colorSchemeButton.toLight": "Switch to light color scheme",
         "colorSchemeButton.toDark": "Switch to dark color scheme",
         "styleButton.toSnowUI": "Switch to SnowUI style",
@@ -57,6 +213,21 @@ export const SNOWUI_MESSAGES: Record<
         "sidePanel.cancel": "Cancel",
         "sidePanel.save": "Save",
         "sidePanel.close": "Close",
+        "sidePanel.resize": "Resize panel width",
+        "tableToolbar.name": "Table toolbar",
+        "tableToolbar.search": "Search",
+        "tableToolbar.sort": "Sort",
+        "tableToolbar.filter": "Filter",
+        "tableToolbar.clear": "Clear",
+        "tableToolbar.copy": "Copy",
+        "tableToolbar.delete": "Delete",
+        "tableToolbar.selected": "{{count}} selected",
+        "tableToolbar.deleting": "Deleting",
+        "tableToolbar.defaultSort": "Default sort",
+        "tableToolbar.ascending": "Ascending",
+        "tableToolbar.descending": "Descending",
+        "tableToolbar.defaultFilter": "Default filter",
+        "overflowActions.more": "More actions",
         "dialog.close": "Close",
     },
 };

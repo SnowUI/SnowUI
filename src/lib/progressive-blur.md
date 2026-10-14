@@ -1,6 +1,6 @@
 # progressive-blur
 
-> **版本**: v1.0.7  
+> **版本**: v1.1.0
 > **职责**: 为文字覆盖、表格行边缘覆盖和后续遮罩场景提供统一的渐进式模糊样式生成器。
 
 ## 设计来源
@@ -15,9 +15,26 @@ createProgressiveBlurContainerStyle(options)
 createProgressiveBlurLayerStyles(options)
 createUniformBlurStyles(options)
 createUniformBlurLayerStyles(options)
+createEdgeProgressiveBlurStyles(options)
 ```
 
 > `createUniformBlurStyles` / `createUniformBlurLayerStyles` 与渐进式版本共用同一套 `ProgressiveBlurOptions` 和容器定位，但只生成单层、固定 `maxBlur` 强度、在可见宽度处硬截断的普通背景模糊；用于和渐进式模糊做 A/B 对比（见下方“单层与背景模糊的区别”）。
+
+`createEdgeProgressiveBlurStyles` 供整条边缘使用，方向为 `top-to-bottom`、`bottom-to-top`、`left-to-right`、`right-to-left`。它沿用站点顶部经实际验证的四层 2 / 6 / 12 / 24px 模糊和四段渐隐，不改变上表供表格角色块使用的 16 层算法。`extent` 控制垂直方向的可见高度或水平方向的可见宽度，默认 `80px`；`position` 为 `absolute`（默认）或 `fixed`，`zIndex` 可选。返回相同的 `containerStyle` 与 `layers` 数据结构；调用方在相对定位宿主中渲染绝对定位版本，或在页面根部渲染固定版本。容器需 `aria-hidden="true"`，不承载交互；全部层透明且 `pointer-events: none`，浏览器不支持 `backdrop-filter` 时内容仍可读。
+
+```svelte
+<script lang="ts">
+  import { createEdgeProgressiveBlurStyles } from '@snowui-design-system/components';
+  const blur = createEdgeProgressiveBlurStyles({ direction: 'bottom-to-top', extent: '6rem' });
+</script>
+
+<div style="position: relative; min-height: 12rem;">
+  <p>Content remains interactive and readable.</p>
+  <span style={blur.containerStyle} aria-hidden="true">
+    {#each blur.layers as layer (layer.index)}<span style={layer.style}></span>{/each}
+  </span>
+</div>
+```
 
 ## 关键参数
 
@@ -85,6 +102,7 @@ createUniformBlurLayerStyles(options)
 
 ## Changelog
 
+- 2026-10-15：v1.1.0，增加整条边缘四方向公开样式生成器，站点顶部 80px 视觉迁入公共能力；表格渐进模糊原 API 与默认值不变。
 - 2026-06-27：v1.0.7，`createUniformBlur*` 新增 `edgeFeatherRatio`，可在单层背景模糊的内侧边缘加渐变 mask 柔化硬边界（默认 `0` 仍为硬边）。
 - 2026-06-27：v1.0.6，新增 `createUniformBlurStyles` / `createUniformBlurLayerStyles`，生成单层固定强度、硬边界的普通背景模糊，便于和渐进式模糊做 A/B 对比（Table overlay 角色块 `roleOverlayBlurMode="uniform"` 即复用此能力）。
 - 2026-06-27：v1.0.5，`layerCount` 最小值从 `2` 放宽到 `1`，允许退化为单层固定强度模糊；补充“单层与背景模糊的区别”说明。ProgressiveBlur-Demo 各场景新增 Layers 层数控制滑块。

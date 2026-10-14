@@ -56,7 +56,7 @@
 | largeStep | `number` | `32` | 按住 Shift 时方向键每次调整的像素数。 |
 | applySize | `boolean` | `true` | 是否直接写入 target 的 width / height |
 | disabled | `boolean` | `false` | 禁止 Pointer 和键盘调整 |
-| ariaLabel | `string` | `"调整宽度" / "调整高度"` | 无障碍名称 |
+| ariaLabel | `string` | `LocaleProvider` | 无障碍名称；默认随 axis 和 LocaleProvider 切换，英文为 Resize width / Resize height / Resize width and height |
 | onResizeStart | `(value: number, axis: "width" \| "height") => void` | — | 开始调整回调 |
 | onSizeChange | `(value: number, axis: "width" \| "height") => void` | — | 尺寸变化回调 |
 | onResizeEnd | `(value: number, axis: "width" \| "height") => void` | — | 结束调整回调 |

@@ -33,6 +33,7 @@
         mergeComponentPartProps,
         type ComponentPartsOf,
     } from "../logic/component-parts.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
 
     type ButtonProps = ComponentProps<typeof Button>;
     type ControlledGlobalButtonKeys =
@@ -104,7 +105,7 @@
         overflow = "all",
         overflowFrom = "end",
         availableWidth = undefined,
-        moreLabel = "更多操作",
+        moreLabel = undefined,
         align = "end",
         disabled = false,
         buttonProps = undefined,
@@ -114,6 +115,9 @@
         class: userClass = "",
         ...rest
     }: Props = $props();
+
+    const locale = useLocale();
+    const resolvedMoreLabel = $derived(moreLabel ?? locale.t("overflowActions.more"));
 
     let rootElement = $state<HTMLElement | undefined>(undefined);
     let moreMeasureElement = $state<HTMLElement | undefined>(undefined);
@@ -541,8 +545,8 @@
             iconOnly
             showIndicator={false}
             selectionMode="action"
-            ariaLabel={moreLabel}
-            title={moreLabel}
+            ariaLabel={resolvedMoreLabel}
+            title={resolvedMoreLabel}
             disabled={disabled}
             onAction={handleMenuAction}
             parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem }}
@@ -580,7 +584,7 @@
                 iconOnly
                 showIndicator={false}
                 selectionMode="action"
-                ariaLabel={moreLabel}
+                ariaLabel={resolvedMoreLabel}
                 tabindex={-1}
                 parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem }}
             >

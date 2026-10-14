@@ -42,8 +42,8 @@
 | getText | `() => string \| Promise<string>` | — | 点击时读取复制内容，可返回 Promise；优先于 text。求值与写入剪贴板均在 pending 阶段，失败进入 onCopyError。 |
 | writeText | `(text: string) => void \| Promise<void>` | `writeClipboardText` | 替换实际复制操作；Promise 完成后显示成功，抛出错误进入失败反馈。用于已有业务复制回调，避免重复写入剪贴板。 默认行为：内置剪贴板写入。 |
 | feedbackDuration | `number` | `1600` | 复制成功或失败后恢复 idle 的等待时间，单位 ms，负值按 0 处理；pending 与反馈期都忽略重复点击。 |
-| showText | `boolean` | `true` | 显示图标后的 children 或默认“复制”文字；false 时仅显示状态图标；bare 模式无外壳，其余模式启用 Button.iconOnly。 |
-| ariaLabel | `string` | — | 覆盖可访问名称；纯图标模式默认按成功状态使用“已复制”或“复制”，带文字模式默认由内容命名。 |
+| showText | `boolean` | `true` | 显示图标后的 children 或默认复制文字；默认文字随 LocaleProvider 切换，中文“复制”、英文“Copy”；false 时仅显示状态图标；bare 模式无外壳，其余模式启用 Button.iconOnly。 |
+| ariaLabel | `string` | — | 覆盖可访问名称；纯图标模式默认按成功状态使用 LocaleProvider 的“已复制”/“复制”或“Copied”/“Copy”，带文字模式默认由内容命名。 |
 | disabled | `boolean` | `false` | 阻止新的复制操作；已开始的异步复制不会因此取消。 |
 | children | `Snippet` | `—（复制）` | showText=true 时替换图标后的文字，成功时仍保持该内容；false 时忽略。 |
 | icon | `Snippet` | `—（Copy 图标）` | 替换非成功状态的图标；pending 和 error 仍使用该图标。 |
@@ -71,7 +71,7 @@
 
 平铺 Button 兼容 Props。`text` 提供静态内容，`getText` 提供同步或异步动态内容；复制成功触发 `onCopy`，失败触发 `onCopyError`。从复制开始到成功反馈结束的整个非 idle 阶段禁止重复触发；此时不设置 disabled，不改变按钮视觉，只关闭 Button 点击反馈并忽略后续点击。成功反馈在 `feedbackDuration` 后复位。不提供 parts。
 
-`showText={false}` 启用无文字模式，只显示 Copy / Check 图标，并自动提供复制状态的 `aria-label`。图标变化使用内部 Frame 的 150ms replacement appear：复制成功显示 Check，反馈结束恢复 Copy；Button 本身不进入 Active/toggle 视觉。带文字模式下文字始终保持“复制”，只有图标执行内容替换动效。
+`showText={false}` 启用无文字模式，只显示 Copy / Check 图标，并自动提供复制状态的 `aria-label`。图标变化使用内部 Frame 的 150ms replacement appear：复制成功显示 Check，反馈结束恢复 Copy；Button 本身不进入 Active/toggle 视觉。带文字模式下文字始终保持当前 LocaleProvider 的“复制”或“Copy”，只有图标执行内容替换动效。
 
 <a id="api"></a>
 

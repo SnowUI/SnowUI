@@ -33,6 +33,8 @@
     import type { HTMLInputAttributes } from "svelte/elements";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import {resizeManager} from "../logic/observer.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
+    const localeContext = useLocale();
 
     type InputValue = string | number | undefined;
     type TemporalInputType =
@@ -512,34 +514,22 @@
     }
 
     function getTemporalTriggerLabel(inputType: TemporalInputType | null) {
-        return inputType === "time" ? "打开时间选择" : "打开日期选择";
+        return localeContext.t(inputType === "time" ? "input.openTime" : "input.openDate");
     }
 
     function getTemporalAriaLabel(segment: TemporalSegmentKey) {
-        return segment === "year"
-            ? "年"
-            : segment === "month"
-              ? "月"
-              : segment === "day"
-                ? "日"
-                : segment === "week"
-                  ? "周"
-                  : segment === "hour"
-                    ? "时"
-                    : segment === "minute"
-                      ? "分"
-                      : "秒";
+        return localeContext.t(`input.${segment}` as const);
     }
 
     function getTemporalPlaceholder(segment: TemporalSegmentKey) {
         return segment === "year"
-            ? "年"
+            ? localeContext.t("input.yearPlaceholder")
             : segment === "month"
-              ? "月"
+              ? localeContext.t("input.monthPlaceholder")
               : segment === "day"
-                ? "日"
+                ? localeContext.t("input.dayPlaceholder")
                 : segment === "week"
-                  ? "周"
+                  ? localeContext.t("input.weekPlaceholder")
                   : "00";
     }
 
@@ -1453,7 +1443,7 @@
                 type="button"
                 class={`snowui-clear-icon-btn snowui-input-clear-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
                 as="trailing"
-                aria-label="清除输入"
+                aria-label={localeContext.t("input.clear")}
                 onclick={handleClear}
                 onmousedown={(e: MouseEvent) => e.preventDefault()}
                 tabindex={-1}
@@ -1710,7 +1700,7 @@
                     type="button"
                     class={`snowui-input-stepper-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
                     as="up"
-                    aria-label="增加数值"
+                    aria-label={localeContext.t("input.increment")}
                     disabled={stepUpDisabled}
                     onclick={handleStepUp}
                     onmousedown={(e: MouseEvent) => e.preventDefault()}
@@ -1723,7 +1713,7 @@
                     type="button"
                     class={`snowui-input-stepper-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
                     as="down"
-                    aria-label="减少数值"
+                    aria-label={localeContext.t("input.decrement")}
                     disabled={stepDownDisabled}
                     onclick={handleStepDown}
                     onmousedown={(e: MouseEvent) => e.preventDefault()}
@@ -1748,7 +1738,7 @@
                 type="button"
                 class={`snowui-clear-icon-btn snowui-input-clear-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
                 as="trailing"
-                aria-label="清除输入"
+                aria-label={localeContext.t("input.clear")}
                 onclick={handleClear}
                 onmousedown={(e: MouseEvent) => e.preventDefault()}
                 tabindex={-1}

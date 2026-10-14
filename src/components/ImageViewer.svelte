@@ -30,6 +30,8 @@
 
     import { DIALOG_BACKDROP_MOTION_STYLE } from "../motion/presets/dialog";
     import type { BackdropVariant } from "../lib/backdrop";
+    import { useLocale } from "../i18n/locale.svelte";
+    const localeContext = useLocale();
 
     interface ImageViewerItem {
         src?: string | Component;
@@ -470,7 +472,7 @@
                     {...builtInButtonProps}
                     as="prev"
                     iconOnly
-                    aria-label="上一张"
+                    aria-label={localeContext.t("imageViewer.previous")}
                 >
                     <ComponentIcon
                         name="arrow-line-left"
@@ -482,7 +484,7 @@
                     {...builtInButtonProps}
                     as="next"
                     iconOnly
-                    aria-label="下一张"
+                    aria-label={localeContext.t("imageViewer.next")}
                 >
                     <ComponentIcon
                         name="arrow-line-right"
@@ -495,7 +497,7 @@
                         {...builtInButtonProps}
                         as="close"
                         iconOnly
-                        aria-label="关闭图片预览"
+                        aria-label={localeContext.t("imageViewer.close")}
                     >
                         <ComponentIcon name="close" aria-hidden="true" />
                     </Button>

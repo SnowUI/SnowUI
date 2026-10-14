@@ -25,6 +25,7 @@
     import { resizeManager } from "../logic/observer.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
 
     type PageToken = number | "ellipsis";
     type PaginationRole = "current" | "page" | "prev" | "next" | "pageSize";
@@ -73,7 +74,7 @@
         pageSize = $bindable(20),
         pageSizeOptions = [],
         pageSizeGap = 16,
-        pageSizeAriaLabel = "每页条数",
+        pageSizeAriaLabel = undefined,
         onPageChange = undefined,
         onPageSizeChange = undefined,
         children,
@@ -86,6 +87,8 @@
         renderHints: userRenderHints = undefined,
         ...rest
     }: Props = $props();
+    const localeContext = useLocale();
+    const resolvedPageSizeAriaLabel = $derived(pageSizeAriaLabel ?? localeContext.t("pagination.pageSize"));
 
     setContext(BUTTON_COLLECTION_CONTEXT_KEY, { scaleOnHover: false });
 
@@ -319,7 +322,7 @@
         ].join(" ");
 
         if (role === "prev" || role === "next") {
-            button.setAttribute("aria-label", role === "prev" ? "上一页" : "下一页");
+            button.setAttribute("aria-label", localeContext.t(role === "prev" ? "pagination.previous" : "pagination.next"));
             const iconTemplate =
                 role === "prev"
                     ? previousIconTemplateEl?.firstElementChild
@@ -359,7 +362,7 @@
             if (disabled) markUnavailable(button);
         } else {
             button.classList.add("snowui-pagination-page");
-            button.setAttribute("aria-label", `第 ${token} 页`);
+            button.setAttribute("aria-label", localeContext.t("pagination.page", { page: token }));
             if (disabled || disabledPageSet.has(token)) markUnavailable(button);
             else bindClick(button, token);
         }
@@ -379,12 +382,12 @@
         const target = findAvailableControlTarget(role);
         const isUnavailable = disabled || target === undefined;
         const control =
-            cloneTemplate(role) ?? createDefaultButton(role, role === "prev" ? "上一页" : "下一页");
+            cloneTemplate(role) ?? createDefaultButton(role, localeContext.t(role === "prev" ? "pagination.previous" : "pagination.next"));
 
         control.dataset.as = role;
         control.classList.add("snowui-pagination-item", "snowui-rounded-rectangle");
         control.classList.add(`snowui-pagination-${role}`);
-        control.setAttribute("aria-label", role === "prev" ? "上一页" : "下一页");
+        control.setAttribute("aria-label", localeContext.t(role === "prev" ? "pagination.previous" : "pagination.next"));
         appendDefaultControlIcon(control, role);
 
         if (isUnavailable) {
@@ -440,7 +443,7 @@
         template.classList.add("snowui-pagination-page-size-template");
         template.id = pageSizeTriggerId;
         template.setAttribute("role", "combobox");
-        template.setAttribute("aria-label", pageSizeAriaLabel);
+        template.setAttribute("aria-label", resolvedPageSizeAriaLabel);
         template.setAttribute("aria-haspopup", "listbox");
         template.setAttribute("aria-expanded", String(pageSizeOpen));
         template.setAttribute("aria-controls", pageSizeListboxId);
@@ -902,7 +905,8 @@
         onPageChange;
         resolvedPageSize;
         resolvedPageSizeOptions;
-        pageSizeAriaLabel;
+        resolvedPageSizeAriaLabel;
+        localeContext.locale;
         onPageSizeChange;
         showPageSize;
         resolvedGap;
@@ -1003,7 +1007,7 @@
             as="prev"
             {variant}
             iconOnly
-            aria-label="上一页"
+            aria-label={localeContext.t("pagination.previous")}
             data-pagination-variant-fallback="true"
         >
             <ComponentIcon name="arrow-line-left" size="var(--size-4)" aria-hidden="true" />
@@ -1012,7 +1016,7 @@
             as="next"
             {variant}
             iconOnly
-            aria-label="下一页"
+            aria-label={localeContext.t("pagination.next")}
             data-pagination-variant-fallback="true"
         >
             <ComponentIcon name="arrow-line-right" size="var(--size-4)" aria-hidden="true" />

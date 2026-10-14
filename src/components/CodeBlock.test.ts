@@ -7,6 +7,18 @@
  */
 export const examples = [
     {
+        name: "CB-11：右上操作、长语言标签与窄宽度",
+        code: `CB-11
+<CodeBlock
+    language="typescript-with-a-deliberately-long-label"
+    format={false}
+    showLineNumbers
+    code={'const longestLine = "A long line tests horizontal scrolling beside the copy and fullscreen buttons";\\nconsole.log(longestLine);'}
+    style="width: min(100%, 20rem);"
+/>`,
+        logic: ["toolbar", "topActions", "language", "horizontalScrollbar"],
+    },
+    {
         name: "CB-10：文本提示词，仅保留复制",
         code: `CB-10
 <CodeBlock language="text" showLanguage={false} showExpandButton={false}

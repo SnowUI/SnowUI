@@ -14,6 +14,7 @@
     import SidebarSection from "./SidebarSection.svelte";
     import SidebarItem from "./SidebarItem.svelte";
     import {SIDEBAR_CONTEXT_KEY, type SidebarActionData, type SidebarContext, type SidebarItemData} from "./sidebar-context.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
 
     export interface SidebarSectionData {
         id: string;
@@ -97,6 +98,7 @@
         enableDefaultMotion = true,
         ...rest
     }: Props = $props();
+    const localeContext = useLocale();
 
     // 可绑定 Prop 负责输入/回传，本地 state 保持连续交互时的显示状态。
     let isCollapsed = $state(untrack(() => collapsed ?? defaultCollapsed));
@@ -638,7 +640,7 @@
             minSize={minWidth}
             maxSize={maxWidth}
             applySize={false}
-            ariaLabel="调整侧边栏宽度"
+            ariaLabel={localeContext.t("sidebar.resize")}
             onResizeStart={startWidthResize}
             onSizeChange={handleWidthChange}
             onResizeEnd={(next: number) => void finishWidthResize(next)}

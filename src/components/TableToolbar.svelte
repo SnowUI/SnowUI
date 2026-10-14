@@ -18,6 +18,7 @@
     import { getTableContext, type TableSortDirection } from "../lib/table-context.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
 
     export interface TableToolbarFilterOption {
         label: string;
@@ -69,26 +70,26 @@
     }
 
     let {
-        ariaLabel = "表格工具栏",
+        ariaLabel = undefined,
         search = true,
         bulkActionsEnabled = true,
         sort = true,
         sortOptions = undefined,
         filter = true,
-        searchPlaceholder = "搜索",
-        searchAriaLabel = "搜索",
-        sortLabel = "排序",
-        filterLabel = "筛选",
+        searchPlaceholder = undefined,
+        searchAriaLabel = undefined,
+        sortLabel = undefined,
+        filterLabel = undefined,
         filterKey = undefined,
         filterOptions = [],
         selectedCount = undefined,
         showClearAction = true,
         showCopyAction = true,
         showDeleteAction = true,
-        clearLabel = "清除",
-        copyLabel = "复制",
-        deleteLabel = "删除",
-        selectionLabel = (count) => `已选择 ${count} 项`,
+        clearLabel = undefined,
+        copyLabel = undefined,
+        deleteLabel = undefined,
+        selectionLabel = undefined,
         onClearSelection,
         onCopy,
         onDelete,
@@ -102,6 +103,17 @@
         ...rest
     }: Props = $props();
 
+    const locale = useLocale();
+    const resolvedAriaLabel = $derived(ariaLabel ?? locale.t("tableToolbar.name"));
+    const resolvedSearchPlaceholder = $derived(searchPlaceholder ?? locale.t("tableToolbar.search"));
+    const resolvedSearchAriaLabel = $derived(searchAriaLabel ?? locale.t("tableToolbar.search"));
+    const resolvedSortLabel = $derived(sortLabel ?? locale.t("tableToolbar.sort"));
+    const resolvedFilterLabel = $derived(filterLabel ?? locale.t("tableToolbar.filter"));
+    const resolvedClearLabel = $derived(clearLabel ?? locale.t("tableToolbar.clear"));
+    const resolvedCopyLabel = $derived(copyLabel ?? locale.t("tableToolbar.copy"));
+    const resolvedDeleteLabel = $derived(deleteLabel ?? locale.t("tableToolbar.delete"));
+    const resolvedDeletingLabel = $derived(deleteLabel === undefined ? locale.t("tableToolbar.deleting") : `${deleteLabel}…`);
+    const resolvedSelectionLabel = $derived(selectionLabel ?? ((count: number) => locale.t("tableToolbar.selected", { count })));
     const table = getTableContext();
     type DefaultBulkAction = "copy" | "delete";
     let pendingAction = $state<DefaultBulkAction | undefined>();
@@ -187,30 +199,30 @@
     }
 </script>
 
-<Frame tag="div" role="toolbar" aria-label={ariaLabel}
+<Frame tag="div" role="toolbar" aria-label={resolvedAriaLabel}
     class={`snowui-table-toolbar snowui-rounded-rectangle ${userClass}`} data-bulk-pending={pendingAction}
     aria-busy={pendingAction !== undefined ? "true" : undefined} row gap={2}
     enableResponsive={enableResponsive} enableContext={enableContext}
     enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
     {#if search}
         <SearchInput class="snowui-table-toolbar-built-in snowui-table-toolbar-search"
-            as="search" variant="borderless" value={query} placeholder={searchPlaceholder}
-            aria-label={searchAriaLabel} oninput={(event: Event & { currentTarget: HTMLInputElement }) => setQuery(event.currentTarget.value)} />
+            as="search" variant="borderless" value={query} placeholder={resolvedSearchPlaceholder}
+            aria-label={resolvedSearchAriaLabel} oninput={(event: Event & { currentTarget: HTMLInputElement }) => setQuery(event.currentTarget.value)} />
     {/if}
 
     {#if bulkActionsEnabled && hasSelection}
         <span class="snowui-table-toolbar-built-in snowui-table-toolbar-bulk" data-as="bulk">
-            <span class="snowui-table-toolbar-selection" aria-live="polite">{selectionLabel(resolvedSelectedCount)}</span>
-            {#if showClearAction}<Button bare emphasis={builtInBareEmphasis} disabled={pendingAction !== undefined} onclick={() => onClearSelection ? onClearSelection(resolvedSelectedCount) : table.clearSelection()}>{clearLabel}</Button>{/if}
+            <span class="snowui-table-toolbar-selection" aria-live="polite">{resolvedSelectionLabel(resolvedSelectedCount)}</span>
+            {#if showClearAction}<Button bare emphasis={builtInBareEmphasis} disabled={pendingAction !== undefined} onclick={() => onClearSelection ? onClearSelection(resolvedSelectedCount) : table.clearSelection()}>{resolvedClearLabel}</Button>{/if}
             {#if showClearAction && hasBulkItems}<Separator column length={12} />{/if}
             {#if showCopyAction}
                 <span class="snowui-table-toolbar-bulk-action" data-pending={pendingAction === "copy" ? "true" : undefined}>
                     <CopyButton bare showText={false} emphasis={builtInBareEmphasis}
-                        ariaLabel={copyLabel} disabled={pendingAction === "delete"}
+                        ariaLabel={resolvedCopyLabel} disabled={pendingAction === "delete"}
                         writeText={() => runDefaultBulkAction("copy")}>
                         {#snippet icon()}
                             <ComponentIcon name="copy" aria-hidden="true" />
-                            <Tooltip as="tooltip">{copyLabel}</Tooltip>
+                            <Tooltip as="tooltip">{resolvedCopyLabel}</Tooltip>
                         {/snippet}
                     </CopyButton>
                 </span>
@@ -218,11 +230,11 @@
             {#if showDeleteAction}
                 <span class="snowui-table-toolbar-bulk-action" data-pending={pendingAction === "delete" ? "true" : undefined}>
                     {#if pendingAction === "delete"}
-                        <Spinner size={12} aria-label={`${deleteLabel}中`} />
+                        <Spinner size={12} aria-label={resolvedDeletingLabel} />
                     {:else}
-                        <Button bare emphasis={builtInBareEmphasis} aria-label={deleteLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("delete")}>
+                        <Button bare emphasis={builtInBareEmphasis} aria-label={resolvedDeleteLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("delete")}>
                             <ComponentIcon name="trash" aria-hidden="true" />
-                            <Tooltip as="tooltip">{deleteLabel}</Tooltip>
+                            <Tooltip as="tooltip">{resolvedDeleteLabel}</Tooltip>
                         </Button>
                     {/if}
                 </span>
@@ -234,16 +246,16 @@
 
     {#if sort}
         <Select class="snowui-table-toolbar-built-in snowui-table-toolbar-picker" as="sort"
-            bind:value={() => sortValue, setSort} buttonTrigger buttonBare ariaLabel={sortLabel} parts={pickerParts}>
+            bind:value={() => sortValue, setSort} buttonTrigger buttonBare ariaLabel={resolvedSortLabel} parts={pickerParts}>
             {#snippet triggerContent()}
                 <ComponentIcon name="arrows-down-up" aria-hidden="true" />
-                <Tooltip as="tooltip">{sortLabel}</Tooltip>
+                <Tooltip as="tooltip">{resolvedSortLabel}</Tooltip>
             {/snippet}
             <Listbox matchTriggerWidth={false} placementMode="bottom" align="end">
-                <MenuItem as="item" value="default">默认排序</MenuItem>
+                <MenuItem as="item" value="default">{locale.t("tableToolbar.defaultSort")}</MenuItem>
                 {#each columns as column (column.columnId)}
-                    <MenuItem as="item" value={`${column.columnId}:ascending`}>{column.label ?? column.columnId} · 升序</MenuItem>
-                    <MenuItem as="item" value={`${column.columnId}:descending`}>{column.label ?? column.columnId} · 降序</MenuItem>
+                    <MenuItem as="item" value={`${column.columnId}:ascending`}>{column.label ?? column.columnId} · {locale.t("tableToolbar.ascending")}</MenuItem>
+                    <MenuItem as="item" value={`${column.columnId}:descending`}>{column.label ?? column.columnId} · {locale.t("tableToolbar.descending")}</MenuItem>
                 {/each}
             </Listbox>
         </Select>
@@ -251,14 +263,14 @@
 
     {#if filter}
         <Select class="snowui-table-toolbar-built-in snowui-table-toolbar-picker" as="filter"
-            bind:value={filterValue} buttonTrigger buttonBare ariaLabel={filterLabel} parts={pickerParts}
+            bind:value={filterValue} buttonTrigger buttonBare ariaLabel={resolvedFilterLabel} parts={pickerParts}
             data-placeholder-visible={filterValue === "default" ? "true" : undefined}>
             {#snippet triggerContent()}
                 <ComponentIcon name="funnel-simple" aria-hidden="true" />
-                <Tooltip as="tooltip">{filterLabel}</Tooltip>
+                <Tooltip as="tooltip">{resolvedFilterLabel}</Tooltip>
             {/snippet}
             <Listbox matchTriggerWidth={false} placementMode="bottom" align="end">
-                <MenuItem as="item" value="default">默认筛选</MenuItem>
+                <MenuItem as="item" value="default">{locale.t("tableToolbar.defaultFilter")}</MenuItem>
                 {#each filterOptions as option (String(option.value))}
                     <MenuItem as="item" value={String(option.value)}>{option.label}</MenuItem>
                 {/each}

@@ -1,6 +1,18 @@
 /* SnowUI source notice | LICENSE 2.2.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 export type ProgressiveBlurDirection = "left-to-right" | "right-to-left";
+export type EdgeProgressiveBlurDirection =
+    | "top-to-bottom"
+    | "bottom-to-top"
+    | ProgressiveBlurDirection;
+
+export interface EdgeProgressiveBlurOptions {
+    direction?: EdgeProgressiveBlurDirection;
+    /** Visible height for vertical directions or width for horizontal directions. */
+    extent?: string;
+    position?: "absolute" | "fixed";
+    zIndex?: number;
+}
 
 export interface ProgressiveBlurOptions {
     direction?: ProgressiveBlurDirection;
@@ -33,6 +45,64 @@ export interface ProgressiveBlurLayerStyle {
 export interface ProgressiveBlurStyles {
     containerStyle: string;
     layers: ProgressiveBlurLayerStyle[];
+}
+
+/** Four layers match the established 80px Site edge treatment. */
+const EDGE_BLUR_LAYERS = [
+    { blur: "2px", solid: "20%", fade: "100%" },
+    { blur: "6px", solid: "16%", fade: "72%" },
+    { blur: "12px", solid: "10%", fade: "48%" },
+    { blur: "24px", solid: "4%", fade: "28%" },
+] as const;
+
+/**
+ * Decorative full-edge blur. The host supplies aria-hidden and owns its stacking context.
+ * Unsupported backdrop-filter leaves transparent layers and readable content.
+ */
+export function createEdgeProgressiveBlurStyles(
+    options: EdgeProgressiveBlurOptions = {},
+): ProgressiveBlurStyles {
+    const direction = options.direction ?? "top-to-bottom";
+    const vertical = direction === "top-to-bottom" || direction === "bottom-to-top";
+    const edge = {
+        "top-to-bottom": "top: 0; left: 0; right: 0",
+        "bottom-to-top": "bottom: 0; left: 0; right: 0",
+        "left-to-right": "left: 0; top: 0; bottom: 0",
+        "right-to-left": "right: 0; top: 0; bottom: 0",
+    }[direction];
+    const gradient = {
+        "top-to-bottom": "to bottom",
+        "bottom-to-top": "to top",
+        "left-to-right": "to right",
+        "right-to-left": "to left",
+    }[direction];
+    const extent = options.extent ?? "80px";
+    const size = vertical ? `height: ${extent}` : `width: ${extent}`;
+    return {
+        containerStyle: [
+            `position: ${options.position ?? "absolute"}`,
+            edge,
+            size,
+            options.zIndex === undefined ? "" : `z-index: ${options.zIndex}`,
+            "pointer-events: none",
+        ].filter(Boolean).join("; "),
+        layers: EDGE_BLUR_LAYERS.map((layer, index) => {
+            const mask = `linear-gradient(${gradient}, #000 0%, #000 ${layer.solid}, transparent ${layer.fade})`;
+            return {
+                index,
+                style: [
+                    "position: absolute",
+                    "inset: 0",
+                    "pointer-events: none",
+                    "background-image: linear-gradient(transparent, transparent)",
+                    `-webkit-backdrop-filter: blur(${layer.blur})`,
+                    `backdrop-filter: blur(${layer.blur})`,
+                    `-webkit-mask-image: ${mask}`,
+                    `mask-image: ${mask}`,
+                ].join("; "),
+            };
+        }),
+    };
 }
 
 export const DEFAULT_PROGRESSIVE_BLUR_LAYER_COUNT = 16;

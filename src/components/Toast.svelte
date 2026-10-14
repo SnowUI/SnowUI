@@ -31,6 +31,7 @@
     import { Frame, type FrameProps } from "../index";
     import { GENERIC_SCALE_APPEAR_MOTION } from "../motion/presets/generic";
     import { ComponentIcon } from "../internal/component-icon/index";
+    import { useLocale } from "../i18n/locale.svelte";
     import {
         registerToastTemplate,
         unregisterToastTemplate,
@@ -43,6 +44,7 @@
         mergeComponentPartProps,
         useComponentPart,
     } from "../logic/component-parts.svelte";
+    const localeContext = useLocale();
 
     interface Props extends Omit<FrameProps, "children"> {
         /** 内置图标按钮配置；事件与角色由所属组件控制。 */
@@ -213,7 +215,7 @@
             <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
                 class={`snowui-clear-icon-btn snowui-toast-close-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
-                aria-label="关闭通知"
+                aria-label={localeContext.t("toast.close")}
                 onclick={() => onDismiss?.()}
                 onmousedown={(e: MouseEvent) => e.preventDefault()}
                 tabindex={-1}

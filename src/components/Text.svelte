@@ -33,6 +33,8 @@
     } from "../logic/frame-state-value";
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
     import { resizeManager } from "../logic/observer.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
+    const localeContext = useLocale();
 
     type TooltipProp = boolean | string | Snippet | Record<string, any>;
 
@@ -596,7 +598,7 @@
                         {...parts?.Button}
                         as="more"
                         iconOnly
-                        aria-label="展开"
+                        aria-label={localeContext.t("text.expand")}
                         backgroundBlur
                         class="snowui-text-built-in-more"
                     >

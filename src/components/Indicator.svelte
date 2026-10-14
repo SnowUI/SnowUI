@@ -14,6 +14,7 @@
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { resizable, type ResizableOptions } from "../lib/resizable";
     import { untrack } from "svelte";
+    import { useLocale } from "../i18n/locale.svelte";
     import {
         mergeComponentPartProps,
         useComponentPart,
@@ -45,6 +46,7 @@
     }
 
     const inheritedIndicatorPart = useComponentPart<Props>("Indicator");
+    const localeContext = useLocale();
     let explicitProps: Props = $props();
     let {
         axis,
@@ -112,11 +114,11 @@
     const isVisible = $derived(hostHovered || focused || dragging);
     const resolvedAriaLabel = $derived(
         ariaLabel ??
-            (resolvedAxis === "width"
-                ? "调整宽度"
+            localeContext.t(resolvedAxis === "width"
+                ? "indicator.resizeWidth"
                 : resolvedAxis === "height"
-                  ? "调整高度"
-                  : "调整宽度和高度"),
+                  ? "indicator.resizeHeight"
+                  : "indicator.resizeBoth"),
     );
     const rootClass = $derived(
         [

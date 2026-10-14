@@ -496,7 +496,7 @@
                 minSize={minWidth}
                 maxSize={maxWidth}
                 applySize={false}
-                ariaLabel="调整弹出窗宽度"
+                ariaLabel={locale.t("sidePanel.resize")}
                 onSizeChange={handleWidthChange}
             />
         </Frame>

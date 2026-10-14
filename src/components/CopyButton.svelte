@@ -9,6 +9,7 @@
     import { CONTROL_BUTTON_REPLACEMENT_MOTION, CONTROL_BUTTON_MOTION_DURATION_MS, controlButtonMotionStyle } from "../motion/presets/replacement";
     import Frame from "./Frame.svelte";
     import { writeClipboardText } from "../lib/clipboard";
+    import { useLocale } from "../i18n/locale.svelte";
     import {
         mergeComponentPartProps,
         useComponentPart,
@@ -44,6 +45,7 @@
     }
 
     const inheritedCopyButtonPart = useComponentPart<Props>("CopyButton");
+    const localeContext = useLocale();
     let explicitProps: Props = $props();
     let {
         text = undefined,
@@ -125,7 +127,7 @@
     data-copy-button
     data-copy-status={status}
     aria-label={ariaLabel ??
-        (showText ? undefined : status === "success" ? "已复制" : "复制")}
+        (showText ? undefined : localeContext.t(status === "success" ? "copyButton.copied" : "copyButton.copy"))}
     aria-live="polite"
     aria-busy={status === "pending" ? "true" : undefined}
     whileClick={status === "idle" ? userWhileClick : false}
@@ -151,7 +153,7 @@
         {#if children}
             {@render children()}
         {:else}
-            复制
+            {localeContext.t("copyButton.copy")}
         {/if}
     {/if}
 </Button>

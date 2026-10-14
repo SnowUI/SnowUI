@@ -6,6 +6,7 @@
     import type { ComponentProps, Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Button from "./Button.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
     import { CONTROL_BUTTON_REPLACEMENT_MOTION, CONTROL_BUTTON_MOTION_DURATION_MS, controlButtonMotionStyle } from "../motion/presets/replacement";
     import Frame from "./Frame.svelte";
     import {
@@ -28,11 +29,12 @@
     }
 
     const inheritedExpandButtonPart = useComponentPart<Props>("ExpandButton");
+    const localeContext = useLocale();
     let { expanded = $bindable(), ...explicitProps }: Props = $props();
     let {
         defaultExpanded = false,
-        ariaLabel = "展开",
-        collapseAriaLabel = "收起",
+        ariaLabel = undefined,
+        collapseAriaLabel = undefined,
         icon,
         collapseIcon,
         children,
@@ -72,7 +74,7 @@
     iconOnly={!rest.bare && !children}
     {disabled}
     aria-expanded={resolvedExpanded}
-    aria-label={resolvedExpanded ? collapseAriaLabel : ariaLabel}
+    aria-label={resolvedExpanded ? (collapseAriaLabel ?? localeContext.t("expandButton.collapse")) : (ariaLabel ?? localeContext.t("expandButton.expand"))}
     data-expanded={resolvedExpanded ? "true" : "false"}
     onclick={handleClick}
 >

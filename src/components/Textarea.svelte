@@ -18,6 +18,8 @@
     import {useOverlayScrollbar} from "../lib/overlay-scrollbar.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import type { HTMLTextareaAttributes } from "svelte/elements";
+    import { useLocale } from "../i18n/locale.svelte";
+    const localeContext = useLocale();
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
         value?: string;
@@ -343,7 +345,7 @@
                 minWidth={120}
                 minHeight={60}
                 applySize={false}
-                ariaLabel="调整文本域大小"
+                ariaLabel={localeContext.t("textarea.resize")}
                 onSizeChange={handleIndicatorSize}
             />
         {/if}

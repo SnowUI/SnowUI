@@ -25,11 +25,13 @@
     import { tableSelectionFade } from "../lib/table-selection-fade";
     import { getTableRoleBlurStyles } from "../lib/table-role-blur";
     import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
     import {
         mergeComponentPartProps,
         useComponentPart,
         type ComponentPartsOf,
     } from "../logic/component-parts.svelte";
+    const localeContext = useLocale();
     type TooltipProp = boolean | string | Snippet;
     interface Props extends Omit<FrameProps, "children"> {
         columnId?: string;
@@ -312,7 +314,7 @@
             </span>
             <Checkbox
                 checked={isSelected}
-                ariaLabel="选择当前行"
+                ariaLabel={localeContext.t("tableCell.selectRow")}
                 onclick={(event: MouseEvent) => event.stopPropagation()}
                 onCheckedChange={(checked) => {
                     if (rowId !== undefined) table.setRowSelected(rowId, checked);
