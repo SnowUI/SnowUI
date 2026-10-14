@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.9.2
+> **版本**: v1.9.3
 > **职责**: 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-12
+> **文档修订**: 2026-10-14
 
 ## 组件介绍
 
@@ -114,7 +114,7 @@
 - Body 导航内容默认使用 `var(--gap-1)`（4px）间距，直接组合的 SidebarItem 与 SidebarSection 内部列表保持一致。
 - `SidebarItemData.depth={1}` 与显式 `SidebarItem depth={1}` 使用同一二级导航视觉：组件在 leading 槽绘制等长双臂、1px Black/40% 密集点线、4px 圆角的 L 形层级连接线，并以该连接线替换普通 Icon。竖线中心与一级 Item Icon 中心同列，横线中心与二级文字中心同轴。
 - Sidebar 内所有横向 Separator 使用同一默认样式，不区分 SidebarSection 自动生成或调用方显式组合：上下与左右 padding 均为 `8px`（`var(--padding-2)`）、`line-height: 0`、分割线本体保持 Separator 默认 `0.5px` 与 Black/10%。节点自身使用 content-box 背景裁切表达 padding，不要求外部 wrapper 或 class；横向与纵向 padding 分别通过 `--snowui-sidebar-separator-padding-x-override`、`--snowui-sidebar-separator-padding-y-override` 覆盖。每个 SidebarSection 的分类内容末尾内置该 Separator，调用方无需为分类手动补分割线。
-- 状态记忆默认开启，未传 `persistenceKey` 时使用 `snowui:sidebar:default` 保存 active item 与各 Section 的折叠状态。刷新后自动恢复标题展开 / 折叠状态与最后 active item；恢复时若 active item 位于已折叠 Section，Sidebar 强制展开该 Section，并将修正后的展开状态重新保存。同一 origin 存在多个 Sidebar 时，宿主必须提供稳定且唯一的 `persistenceKey`；不需要状态记忆时显式设置 `persistence={false}`。
+- 状态记忆默认开启，未传 `persistenceKey` 时使用 `snowui:sidebar:default` 保存 active item 与各 Section 的折叠状态。刷新后自动恢复标题展开 / 折叠状态与最后 active item；恢复时若当前 active item 位于已折叠 Section，Sidebar 强制展开该 Section，并将修正后的展开状态重新保存。外部传入的 `activeItemId` 优先于旧存储记录；可见的无分类 active item 不得继承旧分类 ID 并误展开该分类。同一 origin 存在多个 Sidebar 时，宿主必须提供稳定且唯一的 `persistenceKey`；不需要状态记忆时显式设置 `persistence={false}`。
 - 恢复 active item 后，仅当 Body 确实存在纵向溢出时才定位：以“active item 中心 = Body 实际可视区域中心”为目标，首尾位置按可滚动边界夹紧。恢复后立即定位一次，并在默认 Section 布局动效结束后再次校正，避免折叠布局变化造成偏移。
 - active 视觉状态由 Sidebar 管理；宿主仍通过 `activeItemId` / `onActiveItemChange` 持有实际导航与内容切换。恢复合法的持久化 active item 时，Sidebar 会调用 `onActiveItemChange` 通知宿主。
 - 默认与自定义 `as="logo"` host 均使用 `4px` 左右 padding，使 Logo 图形与 SidebarItem 图标垂直对齐。
@@ -198,6 +198,9 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/maintainers/LayoutProtocol.md`、`../../../specs/maintainers/ComponentGuidelines.md`
 
 ## 更新日志
+
+### v1.9.3 (2026-10-14)
+- 修复当前 active item 已在无分类位置时，旧存储的分类 ID 导致该分类刷新后被错误展开；外部 active item 优先于历史记录，分类折叠状态仍可恢复。
 
 ### v1.9.2 (2026-10-12)
 - 折叠与宽度以本地响应状态承接可绑定输入及交互回传，修复非绑定和显式初值连续操作时的派生值停滞；外部绑定、默认折叠及键盘焦点恢复保持原有契约。

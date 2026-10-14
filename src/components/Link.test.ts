@@ -1,6 +1,6 @@
 /**
  * Link.test.ts
- * v1.2.0
+ * v1.4.0
  *
  * 测试覆盖：Link.md 定义的默认视觉、Figma 样式 2 / 样式 3、hoverColor、
  * underline、external trailing Icon 替换与通用单行截断 Tooltip。
@@ -39,14 +39,15 @@ export const examples = [
 <div class="flex-col gap-8">
     <Link href="#" underline="always">常态下划线</Link>
     <Link href="#" underline="hover">悬停时出现下划线</Link>
+    <Link href="#" underline="until-hover">悬停时隐藏下划线</Link>
     <Link href="#" variant="arrow" underline="always">箭头不带下划线</Link>
     <Link href="#" variant="external" underline="always">图标不带下划线</Link>
 </div>`,
         expected: {
             render: "下划线只覆盖 Link 文字，不覆盖 arrow 或 external Icon",
-            interaction: "underline=hover 仅在 hover 时显示下划线",
+            interaction: "underline=hover 仅在 hover 时显示下划线；underline=until-hover 常态显示，hover 时隐藏；禁用状态不响应 hover",
         },
-        logic: ["LINK-Underline.1"],
+        logic: ["LINK-Underline.1", "LINK-Underline.2"],
     },
     {
         name: "L-03: Hover 颜色覆盖",

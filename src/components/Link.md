@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.3.0
+> **版本**: v1.4.0
 > **职责**: 在正文、说明和导航中提供清晰的文字链接，支持箭头等视觉形式，表达可继续访问的内容。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-14
 
 ## 组件介绍
 
@@ -63,7 +63,7 @@
 - `parts.Tooltip`：配置单行截断时的内置 Tooltip。
 - 自定义提示结构时使用外置 Tooltip 组合；显式 Props 高于 part。
 
-> **版本**: v1.3.0
+> **版本**: v1.4.0
 > **更新日志 (2026-08-15)**: Link 根节点显式移除原生下划线，不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；`underline` 仍由组件公开 Prop 控制。
 > **职责**: 提供正文、说明与导航中的文字链接样式。
 > **设计稿**: [Workshop / Link](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12417-11133&t=GYb3gHf9U5Ff6hcQ-4)
@@ -78,7 +78,7 @@ Link 是独立的 文字链接组件。按钮外观但点击后跳转的场景�
 - `arrow`：Figma 样式 2。默认颜色文字 + 内置 `ArrowUpRight` trailing Icon；文字 hover 遵守统一颜色规则，装饰箭头使用 `currentColor × opacity: 0.4 -> 1`。
 - `external`：Figma 样式 3。默认颜色文字 + 内置 `ArrowSquareOut` trailing Icon；文字 hover 遵守统一颜色规则，Icon 使用 `currentColor × opacity: 0.4 -> 1`。
 - `hoverColor`：可传入任意 CSS 颜色；传 `false` 时 hover 不变色。
-- `underline`：支持常态下划线、仅 hover 下划线与不显示下划线。默认不显示。
+- `underline`：支持常态下划线、仅 hover 下划线、常态显示但 hover 隐藏，以及不显示下划线。默认不显示。
 - `lines={1}`：启用单行截断；仅在真实溢出时自动显示 Tooltip，完整链接文字来自共享 `TruncationController`。
 - `external` 内置 trailing Icon 可由外置直系 `as="trailing"` 替换。
 
@@ -134,6 +134,7 @@ Link 复用 通用 `TruncationController` 与 `fitTextToElement()`，不自行�
 ```svelte
 <Link href="/docs" underline="always">常态下划线</Link>
 <Link href="/docs" underline="hover">悬停时出现</Link>
+<Link href="/docs" underline="until-hover">悬停时隐藏</Link>
 <Link href="/docs">默认无下划线</Link>
 ```
 
@@ -203,6 +204,10 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 - **迁移**：原 `<Button variant="link">` 已移除；按钮式跳转继续使用 `<Button href>`。
 
 ## 更新日志
+
+### v1.4.0 (2026-10-14)
+
+- **LINK-Underline.2** 新增 `underline="until-hover"`：常态显示文字下划线，非禁用 hover 时隐藏；Link 根继续显式拥有链接装饰，不受可选 `snowui-base.css` 的原生链接规则覆盖。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

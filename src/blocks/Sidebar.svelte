@@ -1,6 +1,6 @@
 <!-- SnowUI source notice | LICENSE 2.2.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
-<!-- Sidebar Block v1.9.2. 文档: ./Sidebar.md -->
+<!-- Sidebar Block v1.9.3. 文档: ./Sidebar.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import {onDestroy, onMount, setContext, tick, untrack, type Snippet} from "svelte";
@@ -432,25 +432,35 @@
             const restoredCollapsedSections =
                 restored.collapsedSections ?? {};
             collapsedSections = restoredCollapsedSections;
+            const targetItemId = activeItemId ?? restored.activeItemId;
+            const targetItem = targetItemId ? findItem(targetItemId) : undefined;
+            const targetSectionId = targetItemId
+                ? targetItem
+                    ? findItemSectionId(targetItemId)
+                    : targetItemId === restored.activeItemId
+                        ? restored.activeItemSectionId
+                        : undefined
+                : undefined;
             if (
-                restored.activeItemId &&
-                restored.activeItemSectionId &&
-                collapsedSections[restored.activeItemSectionId] === true
+                targetSectionId &&
+                collapsedSections[targetSectionId] === true
             ) {
                 collapsedSections = {
                     ...collapsedSections,
-                    [restored.activeItemSectionId]: false,
+                    [targetSectionId]: false,
                 };
             }
             await tick();
-            if (restored.activeItemId && findItem(restored.activeItemId)) {
+            if (!activeItemId && restored.activeItemId && findItem(restored.activeItemId)) {
                 internalActiveItemId = restored.activeItemId;
-                activeItemSectionId =
-                    findItemSectionId(restored.activeItemId) ??
-                    restored.activeItemSectionId;
+                activeItemSectionId = findItemSectionId(restored.activeItemId);
                 onActiveItemChange?.(restored.activeItemId);
                 await tick();
                 expandActiveItemSection(restored.activeItemId);
+            } else if (activeItemId) {
+                activeItemSectionId = findItem(activeItemId)
+                    ? findItemSectionId(activeItemId)
+                    : targetSectionId;
             } else {
                 collapsedSections = restoredCollapsedSections;
             }
@@ -467,7 +477,9 @@
             version: 1,
             activeItemId: resolvedActiveItemId,
             activeItemSectionId: resolvedActiveItemId
-                ? findItemSectionId(resolvedActiveItemId) ?? activeItemSectionId
+                ? findItem(resolvedActiveItemId)
+                    ? findItemSectionId(resolvedActiveItemId)
+                    : activeItemSectionId
                 : undefined,
             collapsedSections,
         };

@@ -25,7 +25,7 @@
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
 
     type LinkVariant = "default" | "arrow" | "external";
-    type LinkUnderline = "none" | "always" | "hover";
+    type LinkUnderline = "none" | "always" | "hover" | "until-hover";
     type TooltipProp = boolean | string | Snippet | Record<string, any>;
 
     const isTooltipConfigObject = (
@@ -407,9 +407,16 @@
 
     :global(:where(.snowui-link)[data-underline="always"] > .snowui-link-content > .snowui-link-label > .snowui-link-label-text),
     :global(:where(.snowui-link)[data-underline="always"] > .snowui-link-content > .snowui-link-label > .snowui-link-label-visible),
+    :global(:where(.snowui-link)[data-underline="until-hover"] > .snowui-link-content > .snowui-link-label > .snowui-link-label-text),
+    :global(:where(.snowui-link)[data-underline="until-hover"] > .snowui-link-content > .snowui-link-label > .snowui-link-label-visible),
     :global(:where(.snowui-link)[data-underline="hover"]:hover:not(.snowui-disabled) > .snowui-link-content > .snowui-link-label > .snowui-link-label-text),
     :global(:where(.snowui-link)[data-underline="hover"]:hover:not(.snowui-disabled) > .snowui-link-content > .snowui-link-label > .snowui-link-label-visible) {
         text-decoration-line: underline;
+    }
+
+    :global(:where(.snowui-link)[data-underline="until-hover"]:hover:not(.snowui-disabled) > .snowui-link-content > .snowui-link-label > .snowui-link-label-text),
+    :global(:where(.snowui-link)[data-underline="until-hover"]:hover:not(.snowui-disabled) > .snowui-link-content > .snowui-link-label > .snowui-link-label-visible) {
+        text-decoration-line: none;
     }
 
     :global(:where(.snowui-link > [data-as="leading"])),

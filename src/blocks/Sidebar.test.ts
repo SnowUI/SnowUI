@@ -187,7 +187,7 @@ export const examples = [
         expected: {
             render: "刷新后恢复各 Section 的展开 / 折叠状态与最后选中的 active item。",
             layout: "列表可滚动时，恢复后的 active item 尽量位于Body 实际可视中心；首尾按滚动边界夹紧。",
-            interaction: "若 active item 所属 Section 上次被折叠，刷新后该 Section 自动展开；hover Section 标题或两个折叠标题之间的空隙时共享 hover 层隐藏，不点亮下方最近 Item；整体折叠后 Item 仍显示连续 hover 背景，直接进入折叠按钮预期位置也会显示按钮。",
+            interaction: "若当前 active item 所属 Section 上次被折叠，刷新后该 Section 自动展开；当前 active item 已位于无分类位置时不沿用旧分类 ID，其他分类仍保持折叠；hover Section 标题或两个折叠标题之间的空隙时共享 hover 层隐藏，不点亮下方最近 Item；整体折叠后 Item 仍显示连续 hover 背景，直接进入折叠按钮预期位置也会显示按钮。",
             performance: "默认使用 snowui:sidebar:default 命名空间读写 localStorage；恢复后进行即时与动效结束后的两次定位校正。多实例通过不同 persistenceKey 隔离。",
             responsive: "Section 内容折叠时卸载；active item 的 Section 归属由 Sidebar 独立记忆。",
         },
