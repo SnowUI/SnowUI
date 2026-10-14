@@ -24,6 +24,7 @@
     import { SKELETON_CONTEXT_KEY } from "../keys";
     import { tableSelectionFade } from "../lib/table-selection-fade";
     import { getTableRoleBlurStyles } from "../lib/table-role-blur";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import {
         mergeComponentPartProps,
         useComponentPart,
@@ -325,7 +326,7 @@
                 {/each}
             </span>
         <span class="snowui-table-role-overlay-controls">{#if children}
-            {@render children()}
+            <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
         {:else if rowId !== undefined && defaultActions.length > 0}
             <OverflowActions
                 items={defaultActions}
@@ -342,10 +343,10 @@
         {/if}</span>
     </span>
     {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1 || nowrap, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : "false"} data-lines={resolvedLines ?? "none"} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
-        {#if children}{@render children()}{/if}
+        {#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}
         {#if tooltip && !hasNestedTruncationOwner && isTruncated && fullText}
             <Tooltip>
-                {#if typeof tooltip === "string"}{tooltip}{:else if typeof tooltip === "function"}{@render tooltip()}{:else}{fullText}{/if}
+                {#if typeof tooltip === "string"}{tooltip}{:else if typeof tooltip === "function"}<ComponentPartsBoundary>{@render tooltip()}</ComponentPartsBoundary>{:else}{fullText}{/if}
             </Tooltip>
         {/if}
     </span>{/if}

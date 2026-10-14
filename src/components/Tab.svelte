@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Tab 视图切换组件
-  v1.1.1 (2026-06-23)
+  v1.3.1 (2026-10-14)
 
   职责:在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
   由 Tab 容器通过 CSS override Button 的桥接变量接管。Tab size 决定容器的
@@ -31,10 +31,10 @@
     import { TAB_INDICATOR_MOTION_STYLE } from "../motion/presets/tab";
     import {
         mergeComponentPartProps,
-        provideComponentParts,
         type ComponentPartsOf,
         useComponentPart,
     } from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
 
     export type TabVariant = "pill" | "solid" | "underline" | "icon-toggle" | "bare";
     export type TabSize = "sm" | "md" | "lg";
@@ -109,7 +109,6 @@
             explicitProps,
         ),
     );
-    provideComponentParts(() => parts);
 
     let rootEl = $state<HTMLElement>();
     let indicatorEl = $state<HTMLElement | null>(null);
@@ -330,13 +329,13 @@
         aria-hidden="true"
     ></div>
     {#if children}
-        {@render children()}
+        <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
     {:else}
         {#each items as item (item.value)}
-            <Button as="item" value={item.value} disabled={item.disabled}>
+            <Button {...parts?.Button} as="item" value={item.value} disabled={item.disabled}>
                 {#if item.icon}
                     {@const ItemIcon = item.icon}
-                    <Icon><ItemIcon /></Icon><Text>{item.label}</Text>
+                    <Icon {...parts?.Icon}><ItemIcon /></Icon><Text {...parts?.Text}>{item.label}</Text>
                 {:else}
                     {item.label}
                 {/if}

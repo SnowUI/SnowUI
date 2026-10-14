@@ -103,6 +103,16 @@
     }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    :where([data-snowui-frame]) {
+        animation: none !important;
+        transition: none !important;
+    }
+    :where(.snowui-frame-state-content-layer) {
+        transition: none !important;
+    }
+}
+
 /* === Hoverable 工具类 (hover 叠加反馈 + 交互态手形指针) ===
    语义:hoverable 表示该元素响应 hover、属于可交互元素。
    消费方(Avatar / Image / Button 等)只需条件加 .snowui-hoverable,
@@ -130,13 +140,13 @@
         transition: var(--snowui-frame-shared-transition);
     }
 
-    :where(.snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled)) {
+    :where(.snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not([aria-disabled="true"]):not(:disabled)) {
         /* 仅更新 overlay 透明度变量；background-image 引用它自动更新，无需重新声明 background-image */
         --snowui-hover-overlay-opacity: var(--snowui-hover-opacity, var(--snowui-frame-hover-opacity, 4%));
     }
 
     /* Dark Mode 补偿 */
-    :where([theme="dark"] .snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not(:disabled)) {
+    :where([theme="dark"] .snowui-hoverable:hover:not(.snowui-disabled):not([data-disabled="true"]):not([aria-disabled="true"]):not(:disabled)) {
         --snowui-frame-hover-opacity: 10%;
     }
 }

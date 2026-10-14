@@ -51,7 +51,7 @@
 | visibleLines | `number` | `5` | 默认状态最多显示几行代码；内容不足时自适应高度，超出后滚动；全屏模式不受此限制 |
 | copyTimeout | `number` | `2000` | 复制成功图标（Check）的停留时长（ms），超时后恢复 Copy 图标 |
 | children | `Snippet` | — | 代码内容或附件源；纯文本会作为代码，`as="trailing"` 会替换右侧动作区 |
-| parts | `ComponentPartsOf<{ Indicator: typeof Indicator; CopyButton: typeof CopyButton; ExpandButton: typeof ExpandButton; }>` | — | 内置 CopyButton、ExpandButton、Indicator 的配置入口；操作按钮通过 emphasis 配置强调程度。 |
+| parts | `ComponentPartsOf<{ Indicator: typeof Indicator; CopyButton: typeof CopyButton; ExpandButton: typeof ExpandButton; }>` | — | 仅配置内置 CopyButton、ExpandButton、Indicator；显式 children 配件不继承，操作按钮可通过 emphasis 配置强调程度。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 

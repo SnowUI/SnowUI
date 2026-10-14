@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Listbox 组件：浮层选项列表面板
- v1.3.5
+ v1.3.6
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -46,6 +46,7 @@
     import {DROPDOWN_OVERLAY_APPEAR_MOTION, DROPDOWN_OVERLAY_DISAPPEAR_MOTION} from "../motion/presets/overlay";
     import {getMotionTotalDurationMs} from "../motion/presets/utils";
     import {mergeComponentPartProps, type ComponentPartsOf, useComponentPart} from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import {ContinuousHoverController} from "../logic/continuous-hover.svelte";
     import {CONTINUOUS_HOVER_MOTION_STYLE} from "../motion/presets/continuous-hover";
 
@@ -588,7 +589,7 @@
                     }}
                 >
                     {#if children}
-                        {@render children()}
+                        <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
                     {:else}
                         {#each items as item (item.value)}
                             <MenuItem as="item" value={item.value} disabled={item.disabled}>
@@ -626,7 +627,7 @@
     <!-- aria-hidden 将其从无障碍树中隐藏 -->
     <div style="display:none;" aria-hidden="true">
         {#if children}
-            {@render children()}
+            <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
         {:else}
             {#each items as item (item.value)}
                 <MenuItem as="item" value={item.value} disabled={item.disabled}>

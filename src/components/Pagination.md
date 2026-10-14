@@ -78,7 +78,7 @@
 | onPageChange | `(page: number) => void` | — | 可点击页码变化时触发 |
 | onPageSizeChange | `(pageSize: number) => void` | — | 每页条数变化时触发 |
 | children | `Snippet` | — | 角色样式模板 |
-| parts | `ComponentPartsOf<{ Button: typeof Button; Listbox: typeof Listbox; MenuItem: typeof MenuItem; }>` | — | 统一配置内置页码按钮、每页条数 Listbox 与选项；显式角色模板 Props 优先 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Listbox: typeof Listbox; MenuItem: typeof MenuItem; }>` | — | 统一配置内置页码按钮、每页条数 Listbox 与选项；显式 children 角色模板不读取父级 parts，自行配置 Props。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 

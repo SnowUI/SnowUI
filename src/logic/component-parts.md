@@ -12,6 +12,8 @@
 
 子组件读取最近父级同名 part。名称必须使用 SnowUI 公开组件名 PascalCase。
 
+显式内容（包括 Frame 的 `stateContent` Snippet）应在无 DOM 的 `ComponentPartsBoundary` 内渲染，建立空 parts 边界；父级生成的默认子项仍可从父级 Context 读取 part，或由父级直接传入对应 Props。边界只隔离 parts，不阻断其他组合 Context。若默认子项位于多层 Frame 内，拥有者须在最后一层直接承载该子项的 Frame 显式传入 `componentParts`；不能仅在外层 `provideComponentParts` 后假定它会穿透 Frame。
+
 ### `mergeComponentPartProps(part, explicitProps)`
 
 合并顺序：

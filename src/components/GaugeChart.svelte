@@ -1053,14 +1053,14 @@
     skeleton={false}
     class={["snowui-gauge-chart", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
-    role="img"
+    role="group"
     aria-label="仪表图"
 >
     <div bind:this={bodyElement} class="snowui-gauge-chart-body">
         <svg
             class="snowui-gauge-chart-svg"
             viewBox={`0 0 ${numericWidth} ${numericHeight}`}
-            aria-hidden="true"
+            role="presentation"
         >
             <defs>
                 {#each segmentPaints as paint, index}

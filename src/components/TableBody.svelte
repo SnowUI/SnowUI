@@ -11,6 +11,7 @@
     import { resizeManager } from "../logic/observer.svelte";
     import { getTableContext, type TableColumnRegistration } from "../lib/table-context.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import { ContinuousHoverController } from "../logic/continuous-hover.svelte";
     import { CONTINUOUS_HOVER_MOTION_STYLE } from "../motion/presets/continuous-hover";
     interface Props extends Omit<FrameProps, "children"> {
@@ -106,7 +107,7 @@
             </TableRow>
         {/each}
     {:else}
-        {#if children}{@render children()}{/if}
+        {#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}
         {#if resolvedLoadingSpinner}
             <TableRow data-loading-spinner="true">
                 <TableCell

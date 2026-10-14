@@ -11,6 +11,7 @@
     import { getTableContext, type TableColumnRegistration, type TableRoleLayout } from "../lib/table-context.svelte";
     import { tableSelectionFade } from "../lib/table-selection-fade";
     import { getTableRoleBlurStyles } from "../lib/table-role-blur";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import {
         type ComponentPartsOf,
     } from "../logic/component-parts.svelte";
@@ -180,11 +181,11 @@
                     <span style={layer.style}></span>
                 {/each}
             </span>
-            {@render children()}
+            <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
         </span>{/if}
     {:else if isSortable}
         <button class="snowui-table-sort" type="button" data-active={isSortActive ? "true" : undefined} onclick={toggleSort}>
-            <span class="snowui-table-head-content">{#if children}{@render children()}{/if}</span>
+            <span class="snowui-table-head-content">{#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}</span>
             {#if isSortActive && direction === "ascending"}
                 <ComponentIcon name="arrows-up" class="snowui-table-sort-icon" size="var(--size-4)" aria-hidden="true" />
             {:else if isSortActive && direction === "descending"}
@@ -192,7 +193,7 @@
             {/if}
         </button>
     {:else}
-        <span class="snowui-table-head-content snowui-table-head-content-static">{#if children}{@render children()}{/if}</span>
+        <span class="snowui-table-head-content snowui-table-head-content-static">{#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}</span>
     {/if}
     {#if !isSelectionRole && !isActionsRole}
         {#if hasSelectionOverlay}

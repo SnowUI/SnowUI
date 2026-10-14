@@ -124,11 +124,21 @@ export function formatPercentLabel(
     value: number | null | undefined,
     options: NumberFormatOptions = {},
 ): string {
+    if (typeof value !== "number" || !Number.isFinite(value)) {
+        return options.emptyValue ?? DEFAULT_NUMBER_EMPTY_VALUE;
+    }
+
+    const hasExplicitFractionDigits =
+        options.fractionDigits !== undefined ||
+        options.percentFractionDigits !== undefined;
+
     return `${formatNumberLabel(value, {
         ...options,
         fractionDigits:
             options.fractionDigits ??
             options.percentFractionDigits ??
             DEFAULT_NUMBER_PERCENT_FRACTION_DIGITS,
+        preserveTrailingZeros:
+            options.preserveTrailingZeros ?? hasExplicitFractionDigits,
     })}%`;
 }

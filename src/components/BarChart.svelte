@@ -2206,7 +2206,7 @@
     bind:element={rootElement}
     class={["snowui-bar-chart", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
-    role="img"
+    role="group"
     aria-label="柱状图"
     {...rest}
     {loading}

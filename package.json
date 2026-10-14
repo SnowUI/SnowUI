@@ -99,7 +99,7 @@
     "catalog:generate": "node scripts/generate-component-catalog.mjs",
     "catalog:check": "node scripts/generate-component-catalog.mjs --check",
     "verify:styles": "node scripts/verify-styles.mjs",
-    "check": "svelte-check --workspace .",
+    "check": "pnpm test:number-format && svelte-check --workspace .",
     "prepublishOnly": "pnpm catalog:check && pnpm build && pnpm pack:check",
     "pack:check": "node scripts/check-runtime-package.mjs",
     "source:archive": "node scripts/archive-source.mjs",
@@ -107,7 +107,8 @@
     "source:notice:check": "node scripts/source-notices.mjs --check",
     "source:notice:sync": "node scripts/source-notices.mjs --write",
     "source:copy": "node scripts/copy-source.mjs",
-    "source:test": "node --test scripts/source-retention.test.mjs"
+    "source:test": "node --test scripts/source-retention.test.mjs",
+    "test:number-format": "node --test scripts/number-format.test.mjs"
   },
   "peerDependencies": {
     "svelte": ">=5.56.4 <6"

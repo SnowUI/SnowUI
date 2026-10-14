@@ -13,6 +13,7 @@
     import {getMotionTotalDurationMs} from "../motion/presets/utils";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import {provideComponentParts} from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import {ComponentIcon} from "../internal/component-icon/index";
     import type { SidePanelPlacement, SidePanelToolbarAction } from "../lib/side-panel";
     import Frame from "./Frame.svelte";
@@ -412,6 +413,7 @@
             enableDefaultMotion={enableDefaultMotion}
             enableContext={enableContext}
             enableScaleObserver={enableScaleObserver}
+            componentParts={parts}
             {...rest}
         >
             {#if showTopToolbar}
@@ -444,7 +446,7 @@
                     class="snowui-side-panel-body snowui-overlay-scrollbar-viewport snowui-scroll-mask"
                     data-scroll-mask={resolveScrollMask(showTopFade, showBottomFade)}
                 >
-                    {#if children}{@render children()}{/if}
+                    {#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}
                 </div>
             </div>
 
@@ -452,7 +454,7 @@
                 <div class="snowui-side-panel-toolbar snowui-side-panel-toolbar-bottom">
                     <div class="snowui-side-panel-toolbar-group">
                         {#if bottomLeading}
-                            {@render bottomLeading()}
+                            <ComponentPartsBoundary>{@render bottomLeading()}</ComponentPartsBoundary>
                         {:else}
                             {#each resolvedBottomLeadingActions as action, index (action.id ?? `${action.role ?? "bottom-leading"}-${index}`)}
                                 {@render actionButton(action)}
@@ -461,7 +463,7 @@
                     </div>
                     <div class="snowui-side-panel-toolbar-group snowui-side-panel-toolbar-group-trailing">
                         {#if bottomTrailing}
-                            {@render bottomTrailing()}
+                            <ComponentPartsBoundary>{@render bottomTrailing()}</ComponentPartsBoundary>
                         {:else}
                             {#each resolvedBottomTrailingActions as action, index (action.id ?? `${action.role ?? "bottom-trailing"}-${index}`)}
                                 {@render actionButton(action)}

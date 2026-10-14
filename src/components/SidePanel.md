@@ -129,7 +129,7 @@
 | onDelete | `() => void \| Promise<void>` | — | 点击默认下工具栏删除操作后回调。 |
 | onClose | `() => void \| Promise<void>` | — | 关闭前回调 |
 | children | `Snippet` | — | 面板滚动内容区，由调用方提供详情或编辑内容。 |
-| parts | `ComponentPartsOf<{ Button: typeof Button; Indicator: typeof Indicator; }>` | — | 内置工具栏 Button 与整边调宽交互层；Indicator 复用默认状态视觉 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Indicator: typeof Indicator; }>` | — | 仅配置内置工具栏 Button 与整边调宽交互层；class / style 等完整 part Props 进入默认实例，children、bottomLeading、bottomTrailing 的显式子组件不继承。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 

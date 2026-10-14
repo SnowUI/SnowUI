@@ -48,7 +48,7 @@
 | tooltip | `TooltipProp` | — | Tooltip 配置。支持自动推导、固定文本、Snippet，或传对象仅覆写 Tooltip 位置/偏移等配置。 |
 | onTruncate | `(isTruncated: boolean) => void` | — | 截断状态变化回调。 |
 | children | `Snippet<[any]>` | — | 默认文字或自定义内容，接收含 breakpoint 的渲染上下文；stateText 命中时以对应状态文本替代。 |
-| parts | `ComponentPartsOf<{ Button: typeof Button; Tooltip: typeof Tooltip; }>` | — | 配置内置 Button 与 Tooltip。 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Tooltip: typeof Tooltip; }>` | — | 仅配置内置 Button 与 Tooltip；显式 children 中的同名组件不继承。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 

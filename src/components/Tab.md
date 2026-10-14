@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.3.0
+> **版本**: v1.3.1
 > **职责**: 在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-14
 
 ## 组件介绍
 
@@ -63,7 +63,7 @@
 - 默认内置模式（推荐）：`items` 自动生成 `<Button as="item">`；item 可用 `icon` 声明图标，Tab 内置生成 `Icon + Text`，适用于 `icon-toggle`；`parts.Button / parts.Icon / parts.Text` 配置统一 Props。
 - 显式组合模式：显式书写 Button，用于 Icon、Text、复杂内容或逐项 Props 差异。
 
-> **版本**: v1.3.0
+> **版本**: v1.3.1
 > **状态**: 已实现
 > **职责**: 在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
 > 由 Tab 容器通过 CSS override Button 的桥接变量接管。
@@ -310,6 +310,10 @@ Tab indicator 的位置与尺寸监听统一通过 Components 的 `resizeManager
 ---
 
 ## 更新日志
+
+### v1.3.1 (2026-10-14)
+
+- 默认 items 生成的 Button、Icon 与 Text 直接接收对应 parts；显式 children 不继承这些默认配置。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

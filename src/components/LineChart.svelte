@@ -2016,7 +2016,7 @@
     bind:element={rootElement}
     class={["snowui-line-chart", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
-    role="img"
+    role="group"
     aria-label="折线图"
     {...rest}
     {loading}

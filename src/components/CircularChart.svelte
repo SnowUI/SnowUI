@@ -1070,14 +1070,14 @@
     skeleton={false}
     class={["snowui-circular-chart", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
-    role="img"
+    role="group"
     aria-label="圆形图表"
 >
     <div bind:this={bodyElement} class="snowui-circular-chart-body">
         <svg
             class="snowui-circular-chart-svg"
             viewBox={`0 0 ${numericSize} ${numericSize}`}
-            aria-hidden="true"
+            role="presentation"
         >
             <defs>
                 {#each segmentPaints as paint, index}

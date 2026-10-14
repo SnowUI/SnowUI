@@ -1177,6 +1177,7 @@ Frame 会在根节点内联样式上暴露以下时序变量，供控制类组�
 - `size` 默认跟随 `whileActive` 的解析结果(回退 `MORPH_MOTION` 250ms easeOut),用于 width/height/min-* 过渡;Tab/Segmented 的 icon-toggle variant 展开宽度即消费此桥接。
 - `loop` 仅在显式传入 `loopMotion` 时输出；其中 `duration / easing / iterationCount / direction / playState` 用于时序桥接。
 - 当 `loopMotion.preset="rotateClockwise"` 时，`Frame` 会在根节点直接启用内建的连续旋转默认能力；对应关键帧资源定义在 [rotate.css](../motion/rotate.css)，未传 `preset` 时不会强行覆盖组件自己的循环视觉。
+- 系统设置 `prefers-reduced-motion: reduce` 时，Frame 根层的进入、退出、状态过渡、内建循环动画及 `stateContent` 交叉淡化立即停止；内容、布局及非退出态的可访问名称直接呈现最终状态，不再等待动效。文字组件的内部专用时间线另按 TextMotionSpec 的各组件 `respectMotionPreference` 默认值处理。
 
 > **按需输出说明**: 自 `v3.8.7` 起，`control / border / appear` 这三组桥接变量仅在当前 `Frame` 真的声明了对应 motion 配置时才会写入 HTML；普通无动效组件将直接依赖组件侧 fallback，不再默认输出整段 `300ms ease-out` 内联变量。
 

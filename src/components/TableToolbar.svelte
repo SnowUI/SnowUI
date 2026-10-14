@@ -17,6 +17,7 @@
     import Tooltip from "./Tooltip.svelte";
     import { getTableContext, type TableSortDirection } from "../lib/table-context.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
 
     export interface TableToolbarFilterOption {
         label: string;
@@ -226,7 +227,7 @@
                     {/if}
                 </span>
             {/if}
-            {#if bulkActions}<span class="snowui-table-toolbar-extra-bulk-actions" inert={pendingAction !== undefined}>{@render bulkActions(resolvedSelectedCount)}</span>{/if}
+            {#if bulkActions}<span class="snowui-table-toolbar-extra-bulk-actions" inert={pendingAction !== undefined}><ComponentPartsBoundary>{@render bulkActions(resolvedSelectedCount)}</ComponentPartsBoundary></span>{/if}
         </span>
         {#if sort || filter || children}<Separator class="snowui-table-toolbar-built-in snowui-table-toolbar-resident-separator" column length={12} />{/if}
     {/if}
@@ -265,7 +266,7 @@
         </Select>
     {/if}
 
-    {#if children}{@render children()}{/if}
+    {#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}
 </Frame>
 
 <style>

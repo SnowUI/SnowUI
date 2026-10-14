@@ -28,6 +28,7 @@
     import {createFrameSkeletonRuntime} from "../logic/frame-skeleton-runtime.svelte";
     import {createFrameClassStateRuntime} from "../logic/frame-class-state.svelte";
     import {provideComponentParts} from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import {initOrchestrator, getOrchestrator} from "../logic/frame-orchestrator.svelte";
     import Skeleton from "./Skeleton.svelte";
 
@@ -322,6 +323,7 @@
         >
             {#each Object.entries(frameProps.stateContent) as [contentState, snippet]}
                 <div
+                    class="snowui-frame-state-content-layer"
                     style="grid-area: 1 / 1; display: flex; flex-direction: inherit; align-items: inherit; justify-content: inherit; gap: inherit; opacity:{frameState.currentState ===
                     contentState
                         ? 1
@@ -337,7 +339,7 @@
                         : 'none'};"
                 >
                     {#if snippet}
-                        {@render snippet()}
+                        <ComponentPartsBoundary>{@render snippet()}</ComponentPartsBoundary>
                     {/if}
                 </div>
             {/each}

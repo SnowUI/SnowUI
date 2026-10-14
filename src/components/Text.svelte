@@ -14,6 +14,7 @@
     import Tooltip from "./Tooltip.svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import { fitTextToElement } from "../lib/truncate";
     import { TextTruncation } from "../logic/frame-truncation.svelte";
     import {
@@ -544,7 +545,7 @@
 
 {#if shouldAnalyzeSkeleton && textChildren}
     <div bind:this={skeletonProbe} aria-hidden="true" style="display: none;">
-        {@render textChildren({ breakpoint: "md" })}
+        <ComponentPartsBoundary>{@render textChildren({ breakpoint: "md" })}</ComponentPartsBoundary>
     </div>
 {/if}
 
@@ -588,7 +589,7 @@
                 {#if resolvedStateText !== undefined}
                     {resolvedStateText}
                 {:else if textChildren}
-                    {@render textChildren({ breakpoint })}
+                    <ComponentPartsBoundary>{@render textChildren({ breakpoint })}</ComponentPartsBoundary>
                 {/if}
                 {#if more}
                     <Button
@@ -630,7 +631,7 @@
                     {#if resolvedStateText !== undefined}
                         {resolvedStateText}
                     {:else if textChildren}
-                        {@render textChildren({ breakpoint })}
+                        <ComponentPartsBoundary>{@render textChildren({ breakpoint })}</ComponentPartsBoundary>
                     {/if}
                 </span>
                 <span class="snowui-text-single-line-visible">
@@ -650,13 +651,13 @@
                 {#if resolvedStateText !== undefined}
                     {resolvedStateText}
                 {:else if textChildren}
-                    {@render textChildren({ breakpoint })}
+                    <ComponentPartsBoundary>{@render textChildren({ breakpoint })}</ComponentPartsBoundary>
                 {/if}
             </span>
         {:else if resolvedStateText !== undefined}
             {resolvedStateText}
         {:else if textChildren}
-            {@render textChildren({ breakpoint })}
+            <ComponentPartsBoundary>{@render textChildren({ breakpoint })}</ComponentPartsBoundary>
         {/if}
 
         {#if needTooltip}

@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Select 组件：自定义下拉选择框（Trigger + 外置 Listbox 组合架构）
- v3.2.2
+ v3.2.3
 
  文档: ./Select.md
 -->
@@ -23,6 +23,7 @@
     import {splitFrameHostProps} from "../logic/frame-prop-filter";
     import {matchesSearch} from "../lib/search-filter";
     import {mergeComponentPartProps, type ComponentPartsOf, useComponentPart} from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
 
     export type SelectValue = string | number | undefined;
     export type SelectOption = ListboxItem;
@@ -420,14 +421,14 @@
             onkeydown={handleTriggerKeydown}
         >
             {#if triggerContent}
-                {@render triggerContent({
+                <ComponentPartsBoundary>{@render triggerContent({
                     value: resolvedValue,
                     option: selectedOption,
                     label: selectedLabel,
                     placeholder,
                     open,
                     disabled,
-                })}
+                })}</ComponentPartsBoundary>
             {:else}
                 {selectedLabel ?? placeholder ?? ariaLabel ?? ""}
             {/if}
@@ -470,7 +471,7 @@
 
     <!-- 默认内置模式生成 Listbox + MenuItem；显式 children 存在时切换为显式组合模式。 -->
     {#if children}
-        {@render children()}
+        <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
     {:else}
         <Listbox
             as="listbox"

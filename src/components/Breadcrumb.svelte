@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Breadcrumb 组件：页面层级路径导航容器
-  v1.1.1
+  v1.1.2
 
   职责：
   - 只作为组合式容器，不生成 items / separator。
@@ -19,6 +19,7 @@
     import Button from "./Button.svelte";
     import Text from "./Text.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import {
         BREADCRUMB_CONTEXT_KEY,
         BUTTON_COLLECTION_CONTEXT_KEY,
@@ -272,7 +273,7 @@
     }}
 >
     {#if children}
-        {@render children()}
+        <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
     {:else}
         {#each items as item, index (`${item.href ?? "current"}:${item.label}:${index}`)}
             {#if index > 0}<Text as="separator">{separator}</Text>{/if}

@@ -35,6 +35,7 @@
     import { resizeManager } from "../logic/observer.svelte";
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import {
         captureFlipRect,
         beginFlipEnter,
@@ -826,7 +827,7 @@
     </div>
     {#if children}
         <div class="snowui-code-block-accessories" aria-hidden="true">
-            {@render children()}
+            <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
         </div>
     {/if}
 </Frame>

@@ -24,6 +24,7 @@
     import { BUTTON_COLLECTION_CONTEXT_KEY, LISTBOX_OWNER_CONTEXT_KEY } from "../keys";
     import { resizeManager } from "../logic/observer.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
 
     type PageToken = number | "ellipsis";
     type PaginationRole = "current" | "page" | "prev" | "next" | "pageSize";
@@ -988,7 +989,7 @@
 >
     <div class="snowui-pagination-templates" bind:this={templatesEl} aria-hidden="true">
         {#if children}
-            {@render children()}
+            <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
         {:else}
             <Button as="pageSize" variant="borderless" />
         {/if}

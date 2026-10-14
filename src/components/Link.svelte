@@ -21,6 +21,7 @@
         measureTextForElement,
     } from "../lib/truncate";
     import { TruncationController } from "../logic/frame-truncation.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
 
     type LinkVariant = "default" | "arrow" | "external";
@@ -259,7 +260,7 @@
                     class="snowui-link-label-text snowui-link-label-measure"
                     aria-hidden="true"
                 >
-                    {@render children?.()}
+                    <ComponentPartsBoundary>{@render children?.()}</ComponentPartsBoundary>
                 </span>
                 <span class="snowui-link-label-visible">
                     {visibleText}{#if truncation.isTruncated}<span
@@ -269,7 +270,7 @@
                 </span>
             {:else}
                 <span bind:this={contentElement} class="snowui-link-label-text">
-                    {@render children?.()}
+                    <ComponentPartsBoundary>{@render children?.()}</ComponentPartsBoundary>
                 </span>
             {/if}
         </span>
