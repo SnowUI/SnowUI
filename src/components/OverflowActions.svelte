@@ -53,6 +53,8 @@
         icon?: OverflowActionIcon;
         disabled?: boolean;
         href?: string;
+        target?: string;
+        rel?: string;
         onAction?: () => void;
     }
 
@@ -117,6 +119,7 @@
     let moreMeasureElement = $state<HTMLElement | undefined>(undefined);
     let fadeMeasureElement: HTMLElement | undefined;
     const separatorWidths = new Map<HTMLElement, number>();
+    const actionWidths = new Map<string, { full: number; compact: number }>();
     let modes = $state<Record<string, OverflowActionMode>>({});
     let menuEntries = $state<Extract<LayoutEntry, { type: "action" }>[]>([]);
     let hasOverflow = $state(false);
@@ -191,11 +194,22 @@
         );
         onAction?.({ id, item, source, originalEvent });
         if (source === "menu" && action.href && typeof window !== "undefined") {
-            window.location.assign(action.href);
+            if (action.target && action.target !== "_self") {
+                window.open(action.href, action.target, action.rel?.includes("noreferrer") ? "noopener,noreferrer" : "noopener");
+            } else {
+                window.location.assign(action.href);
+            }
         }
     }
 
     function requestLayout() {
+        // 内容或 Props 改变时才重新测量；连续拖动只复用固有宽度。
+        actionWidths.clear();
+        separatorWidths.clear();
+        scheduleLayout();
+    }
+
+    function scheduleLayout() {
         if (!isMounted || layoutFrame) return;
         layoutFrame = requestAnimationFrame(() => { void flushLayout(); });
     }
@@ -258,10 +272,7 @@
         if (entry.type === "separator") {
             return separatorWidths.get(entry.element) ?? 0;
         }
-        const element = mode === "compact"
-            ? entry.action.getCompactMeasureElement()
-            : entry.action.getFullMeasureElement();
-        return element?.getBoundingClientRect().width ?? 0;
+        return actionWidths.get(entry.action.id)?.[mode] ?? 0;
     }
 
     function totalWidth(
@@ -290,19 +301,27 @@
             .map(entry => entry.action);
         const allIds = new Set(actions.map(action => action.id));
         const normalizedAll = normalizeEntries(entries, allIds);
+        const computed = getComputedStyle(rootElement);
+        // 与 Table 一样读取小数布局宽度；clientWidth 的整数取整会在临界点往返跳变。
         const width = Math.max(
             0,
-            availableWidth ?? rootElement.getBoundingClientRect().width,
+            availableWidth ?? (Number.parseFloat(computed.width) || rootElement.clientWidth),
         );
-        const computed = getComputedStyle(rootElement);
         const gap = Number.parseFloat(computed.columnGap || computed.gap) || 0;
         const canCompact = compact === "auto" && actions.length > 0 &&
             actions.every(action => !!action.icon);
 
-        // 隐藏的 Separator 仍参与未来布局预算；同帧恢复测量后还原，不改变绘制状态。
-        separatorWidths.clear();
+        // 隐藏项只在内容变化后测量一次，避免拖动时反复切换 display 触发布局反馈。
+        for (const action of actions) {
+            if (!actionWidths.has(action.id)) {
+                actionWidths.set(action.id, {
+                    full: action.getWidth("full"),
+                    compact: action.getWidth("compact"),
+                });
+            }
+        }
         for (const entry of entries) {
-            if (entry.type !== "separator") continue;
+            if (entry.type !== "separator" || separatorWidths.has(entry.element)) continue;
             const hidden = entry.element.hidden;
             entry.element.hidden = false;
             separatorWidths.set(entry.element, entry.element.getBoundingClientRect().width);
@@ -419,14 +438,23 @@
         requestLayout();
     }
 
+    function handleViewportResize() {
+        // 窗口缩放时在下一次绘制前同步求解，观察器随后交付同一宽度也不会重新测量。
+        updateLayout();
+    }
+
     onMount(() => {
         isMounted = true;
         if (rootElement) movement = createOverflowActionsMotion(rootElement);
+        window.addEventListener('resize', handleViewportResize);
+        document.fonts?.addEventListener('loadingdone', requestLayout);
         requestLayout();
     });
 
     onDestroy(() => {
         isMounted = false;
+        if (typeof window !== 'undefined') window.removeEventListener('resize', handleViewportResize);
+        if (typeof document !== 'undefined') document.fonts?.removeEventListener('loadingdone', requestLayout);
         movement?.destroy();
         exit.destroy();
         if (layoutFrame) cancelAnimationFrame(layoutFrame);
@@ -435,11 +463,15 @@
     $effect(() => {
         const node = rootElement;
         if (availableWidth !== undefined || !node) return;
-        return resizeManager.watch(node, () => { void flushLayout(); });
+        return resizeManager.watch(node, () => {
+            // 观察器已在动画帧交付，直接求解，避免额外一帧的旧位置与新位置叠画。
+            if (layoutFrame) cancelAnimationFrame(layoutFrame);
+            layoutFrame = 0;
+            updateLayout();
+        });
     });
 
     $effect(() => {
-        availableWidth;
         compact;
         overflow;
         overflowFrom;
@@ -448,6 +480,12 @@
         parts?.Button;
         parts?.SelectButton;
         requestLayout();
+    });
+
+    $effect(() => {
+        availableWidth;
+        // 外部列宽也可能逐帧变化；只更新预算，不使固有宽度缓存失效。
+        if (isMounted) void flushLayout();
     });
 </script>
 
@@ -488,6 +526,8 @@
                     icon={item.icon}
                     disabled={item.disabled}
                     href={item.href}
+                    target={item.target}
+                    rel={item.rel}
                     onclick={item.onAction}
                 />
             {/if}

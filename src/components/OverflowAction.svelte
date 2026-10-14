@@ -33,8 +33,10 @@
         icon?: OverflowActionIcon;
         disabled?: boolean;
         href?: string;
+        iconOnly?: boolean;
         onclick?: (event?: MouseEvent) => void;
         children?: Snippet;
+        control?: Snippet<[(event?: MouseEvent) => void, boolean]>;
         parts?: ComponentPartsOf<{ Button: typeof Button }>;
         as?: string;
         [key: string]: any;
@@ -46,8 +48,10 @@
         icon = undefined,
         disabled = false,
         href = undefined,
+        iconOnly = false,
         onclick = undefined,
         children = undefined,
+        control = undefined,
         parts = undefined,
         as = undefined,
         ...rest
@@ -64,6 +68,7 @@
         ),
     );
     let rootElement = $state<HTMLElement | undefined>(undefined);
+    let visualElement = $state<HTMLElement | undefined>(undefined);
     let fullMeasureElement = $state<HTMLElement | undefined>(undefined);
     let compactMeasureElement = $state<HTMLElement | undefined>(undefined);
     const mode = $derived(owner?.getMode(id) ?? "full");
@@ -96,10 +101,20 @@
             get icon() { return icon; },
             get disabled() { return disabled; },
             get href() { return href; },
+            get target() { return rest.target; },
+            get rel() { return rest.rel; },
             execute(event) { onclick?.(event); },
             getElement: () => rootElement,
-            getFullMeasureElement: () => fullMeasureElement,
-            getCompactMeasureElement: () => compactMeasureElement,
+            getWidth(mode) {
+                const hidden = rootElement?.dataset.overflowMode === "hidden";
+                if (hidden && rootElement) rootElement.style.display = "inline-flex";
+                try {
+                    const element = control ? visualElement : mode === "compact" ? compactMeasureElement : fullMeasureElement;
+                    return element?.getBoundingClientRect().width ?? 0;
+                } finally {
+                    if (hidden && rootElement) rootElement.style.removeProperty("display");
+                }
+            },
         });
     });
 
@@ -109,6 +124,8 @@
         icon;
         disabled;
         href;
+        iconOnly;
+        control;
         resolvedButtonProps;
         owner?.requestLayout();
     });
@@ -125,6 +142,8 @@
 {#snippet renderFull()}
     {#if children}
         {@render children()}
+    {:else if iconOnly}
+        {@render renderIcon()}
     {:else}
         {@render renderIcon()}
         {label}
@@ -145,8 +164,10 @@
     enableDefaultMotion={false}
     {...frameRestProps}
 >
-    <span class="snowui-overflow-action-visual">
-        {#if mode === "compact"}
+    <span bind:this={visualElement} class="snowui-overflow-action-visual" style:visibility={mode === "hidden" ? "hidden" : undefined}>
+        {#if control}
+            {@render control(execute, resolvedDisabled)}
+        {:else if mode === "compact"}
             <Button
                 {...resolvedButtonProps}
                 iconOnly
@@ -161,6 +182,8 @@
         {:else}
             <Button
                 {...resolvedButtonProps}
+                {iconOnly}
+                aria-label={iconOnly ? label : undefined}
                 disabled={resolvedDisabled}
                 {href}
                 onclick={execute}
@@ -171,9 +194,9 @@
 
     </span>
 
-    <span class="snowui-overflow-action-measure" aria-hidden="true" inert>
+    {#if !control}<span class="snowui-overflow-action-measure" aria-hidden="true" inert>
         <span bind:this={fullMeasureElement}>
-            <Button {...resolvedButtonProps} tabindex={-1}>
+            <Button {...resolvedButtonProps} {iconOnly} aria-label={iconOnly ? label : undefined} tabindex={-1}>
                 {@render renderFull()}
             </Button>
         </span>
@@ -184,7 +207,7 @@
                 </Button>
             </span>
         {/if}
-    </span>
+    </span>{/if}
 </Frame>
 
 <style>
@@ -205,12 +228,6 @@
         line-height: inherit;
     }
 
-    :global(:where(.snowui-overflow-action[data-overflow-mode="hidden"])) {
-        position: absolute;
-        visibility: hidden;
-        pointer-events: none;
-    }
-
     :global(:where(.snowui-overflow-action-measure)) {
         position: absolute;
         inset: 0 auto auto 0;
@@ -219,5 +236,9 @@
         pointer-events: none;
         contain: layout style;
         white-space: nowrap;
+    }
+
+    :global(:where(.snowui-overflow-action[data-overflow-mode="hidden"])) {
+        display: none;
     }
 </style>

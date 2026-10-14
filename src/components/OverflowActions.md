@@ -128,7 +128,7 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 ### 数据类型与继承边界
 
-`OverflowActionsItem` 是两种数据的联合：操作为 `{ type?: "action"; id: string; label: string; icon?: string | Snippet; disabled?: boolean; href?: string; onAction?: () => void }`，结构项为 `{ type: "separator"; id: string }`。单项 onAction 在组级 onAction 之前调用。
+`OverflowActionsItem` 是两种数据的联合：操作为 `{ type?: "action"; id: string; label: string; icon?: string | Snippet; disabled?: boolean; href?: string; target?: string; rel?: string; onAction?: () => void }`，结构项为 `{ type: "separator"; id: string }`。单项 onAction 在组级 onAction 之前调用。外链的 `target` / `rel` 同时用于可见链接和 More 菜单，新窗口始终强制 `noopener`；显式 `OverflowAction` 同样支持。
 
 `GlobalButtonProps` 为 Button Props 排除 `children / as / iconOnly / disabled / href / onclick / aria-label / title`。`Parts` 为 `ComponentPartsOf<{ Button: typeof Button; SelectButton: typeof SelectButton; Listbox: typeof Listbox; MenuItem: typeof MenuItem; Separator: typeof Separator }>`。每个键配置对应默认子组件的公开 Props，完整覆盖顺序见上文。
 
@@ -154,7 +154,7 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - 组合模式：默认内置模式与显式组合模式并存；显式模式只识别直系 `OverflowAction as="item"` 与 `Separator as="separator"`。
 - `OverflowAction` 通过专用 Context 注册 id / label / icon / disabled / href / 执行函数与测量节点；父组件不得读取任意 Button 内部结构推断语义。
 - 自测量模式复用全局 `resizeManager`；传入 `availableWidth` 时不注册 ResizeObserver。
-- 布局计算统一读取完整、Icon-only、Separator 与 More 的测量宽度；读写按单次调度分批完成。
+- 布局计算统一读取完整、Icon-only、Separator 与 More 的测量宽度；内容或 Props 变化后刷新固有宽度缓存，连续拖动复用缓存，不反复恢复隐藏项测量。自测量读取小数 CSS 布局宽度，并在共享 ResizeObserver 的交付帧直接求解，避免临界点取整和额外一帧引起抖动。
 - DataTable 应从列宽上下文传入 `availableWidth`，禁止为每个 actions 单元格新增 Observer。
 - More 菜单由 SelectButton / Listbox / MenuItem 承担打开、Portal、焦点、键盘与关闭行为。
 
@@ -169,6 +169,8 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - [MenuItem.svelte](MenuItem.svelte)
 
 ## 更新日志
+
+- 2026-10-14：连续拖动时复用操作项和 Separator 宽度，按 Table 的小数布局宽度和观察器同帧求解；避免隐藏按钮反复参与测量与临界宽度抖动。
 
 - 2026-10-07：接入共享宽度驱动渐隐与 1s 停留恢复；保留 compact、双向 progressive、all、菜单冻结及操作语义，焦点所在按钮收纳后移到 More。
 

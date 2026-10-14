@@ -11,10 +11,11 @@ export interface OverflowActionRegistration {
     icon?: OverflowActionIcon;
     disabled: boolean;
     href?: string;
+    target?: string;
+    rel?: string;
     execute: (event?: MouseEvent) => void;
     getElement: () => HTMLElement | undefined;
-    getFullMeasureElement: () => HTMLElement | undefined;
-    getCompactMeasureElement: () => HTMLElement | undefined;
+    getWidth: (mode: "full" | "compact") => number;
 }
 
 export interface OverflowActionsContext {
