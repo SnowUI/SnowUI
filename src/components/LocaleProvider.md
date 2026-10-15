@@ -73,7 +73,7 @@ It translates supported built-in messages, such as dialog close labels and color
 
 ### Import {#import}
 
-LocaleProvider is included in the open-source Components package. Follow Quick Start to install the package and load the shared stylesheet.
+LocaleProvider is included in the publicly downloadable Components package under the SnowUI license. Follow Quick Start to install the package and load the shared stylesheet.
 
 ```ts
 import { LocaleProvider } from '@snowui-design-system/components';
