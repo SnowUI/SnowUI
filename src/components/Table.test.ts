@@ -48,7 +48,7 @@ export const examples = [{
     </TableBody>
 </Table>`,
     expected: {
-        render: "渲染只含表头和业务数据行的原生语义表格。",
+        render: "渲染只含表头和业务数据行的原生语义表格；表格名为订阅记录，滚动区域中文名称为“订阅记录，可横向滚动”。",
         layout: "八个普通数据列展示 Table-Demo 表格一的订阅内容，不含 checkbox 列和按钮列。",
         interaction: "仅保留普通数据行的默认 hover；没有搜索、排序、筛选、分页或加载更多交互。",
         performance: "静态数据直接由 Table 语义组件渲染，不创建 DataTable 数据状态。",

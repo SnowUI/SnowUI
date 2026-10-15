@@ -10,6 +10,7 @@
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
     import { TableTruncationManager } from "../lib/table-truncation";
     import { observeTableResponsive } from "../lib/table-responsive";
+    import { useLocale } from "../i18n/locale.svelte";
     interface Props extends Omit<FrameProps, "children"> {
         columnWidths?: Record<string, number>;
         horizontalScroll?: boolean;
@@ -48,6 +49,7 @@
     let autoLockedColumnWidths = $state<Record<string, number>>({});
     let hasAutoLockedColumnWidths = $state(false);
     const parentTable = getTableContext();
+    const localeContext = useLocale();
     let measuredActionsWidth = $state(0);
     let resolvedRoleLayout = $state<"column" | "overlay">("overlay");
     const requestedRoleLayout = $derived(roleLayout ?? parentTable.getRoleLayout());
@@ -212,7 +214,9 @@
         class="snowui-table-scroll-viewport snowui-overlay-scrollbar-viewport"
         data-scroll-axis="horizontal"
         role="region"
-        aria-label={ariaLabel ? `${ariaLabel} horizontal scroll` : "Scrollable table"}
+        aria-label={ariaLabel
+            ? localeContext.t("table.scrollRegionNamed", { name: ariaLabel })
+            : localeContext.t("table.scrollRegion")}
         tabindex="0"
     >
         <Frame

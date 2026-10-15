@@ -50,7 +50,7 @@
 | --- | --- | --- | --- |
 | responsiveHide | `boolean` | `true` | 关闭横向滚动时允许该普通列自动隐藏；false 始终保留。第一普通列和角色列不隐藏。 |
 | columnId | `string` | — | 稳定列标识；角色列使用内置标识 默认行为：普通列必填。 |
-| label | `string` | — | 注册给 TableToolbar 排序 Listbox 的可读列名 默认行为：columnId。 |
+| label | `string` | — | 可读列名：供 TableToolbar 排序列表和列宽手柄使用。排序列表未传时沿用 columnId；列宽手柄未传时使用本地化的通用名称，不朗读内部 columnId。 |
 | sortDirection | `"ascending" \| "descending"` | — | 独立受控排序方向 默认行为：context 推导。 |
 | defaultSort | `"ascending" \| "descending"` | — | 声明表格默认按当前列的正序或反序排列；同时使当前列可排序 |
 | defaultSortActive | `boolean` | `false` | 使 `defaultSort` 的默认方向也显示激活态和图标，并将交互循环扩展为可取消排序 |
@@ -83,7 +83,7 @@ Table 与 DataTable 共用 TableHead，`children` 本身就是标题插槽，无
 <TableHead columnId="status" label="Payment status"><Chip>Payment status</Chip></TableHead>
 ```
 
-纯图标标题必须提供可访问名称。`label` 用于 TableToolbar 排序列表的可读列名，不会自动成为标题或排序按钮的可访问名称；图标本身提供 `role="img"` 与 `aria-label` 后，静态标题和内置排序按钮都能获得含义。可排序列会把 children 放入内置 button，因此只组合非交互展示组件，避免嵌套 Button、链接、输入控件。selection 角色仍由内置全选 Checkbox 承担。
+纯图标标题必须提供可访问名称。`label` 用于 TableToolbar 排序列表及列宽手柄的可读列名，不会自动成为标题或排序按钮的可访问名称；图标本身提供 `role="img"` 与 `aria-label` 后，静态标题和内置排序按钮都能获得含义。可排序列会把 children 放入内置 button，因此只组合非交互展示组件，避免嵌套 Button、链接、输入控件。selection 角色仍由内置全选 Checkbox 承担。
 
 
 <a id="内置组件双模式"></a>
@@ -201,6 +201,8 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 
 ## AI Zone
+
+列宽手柄使用 `tableHead.resizeColumn`（传入显式 `label`）或 `tableHead.resizeColumnGeneric`（未传可读名称）；`label` 属于调用方业务文案，保留原文。`columnId` 仅供内部列识别及既有 TableToolbar 回退，不写入手柄的可访问名称。
 
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 

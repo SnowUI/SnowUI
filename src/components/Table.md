@@ -68,7 +68,7 @@
 | horizontalScroll | `boolean` | `true`（继承 DataTable） | 默认保留全部列并横向滚动；false 时先从右向左隐藏可隐藏列，保留列仍超宽时滚动兜底。 |
 | roleLayout | `TableRoleLayout` | DataTable 配置或 `"auto"` | auto 根据空间在常驻 column 和 hover overlay 之间切换；显式 column / overlay 固定布局。 |
 | minWidth | `number \| string` | — | 显式扩大表格最小宽度；未设置时由各列 min-content + Cell padding 自动汇总，溢出由 Table 内置局部横向 viewport 承接 |
-| ariaLabel | `string` | — | 表格无障碍名称 |
+| ariaLabel | `string` | — | 表格的业务可访问名称，保持调用方原文；横向滚动区域会按当前 LocaleProvider 在该名称后补充“可横向滚动”，未提供时使用本地化的通用名称。 |
 | loadingSpinnerSize | `ResourceSize` | `16` | 已有数据继续加载时，表体末尾居中 Spinner 的尺寸 |
 | onColumnWidthsChange | `(widths: Record<string, number>) => void` | — | 拖动列宽后的完整快照 |
 | children | `Snippet` | — | 语义表格内容，无参数；组合 TableHeader / TableBody，数据管理由外层 DataTable 提供。 |
@@ -249,6 +249,8 @@ Table 是 Table / DataTable 的唯一布局计算入口，依据自身容器可�
 DataTable 的配置由 Context 下发；显式 Table 配置优先。普通 Table 复用间距、隐藏和滚动规则，不新增 选择 / 操作状态。旧显式 `roleLayout="column"` / `"overlay"` 保留固定布局含义；column 现在常驻显示角色控件。
 
 ## AI Zone
+
+内置滚动区域文案使用 `table.scrollRegion` / `table.scrollRegionNamed`；`ariaLabel` 是调用方业务文案，不由组件翻译。Provider 的 `messages` 可覆盖滚动提示模板，普通表格与 DataTable 内的 Table 共用同一行为。
 
 响应式由私有 `lib/table-responsive.ts` 批处理。只观察每表 viewport 和 Token 探针；内容、显式列宽、字体 / 资源变化使完整列测量缓存失效。隐形且 inert 的原生 DOM 副本只在测量帧存在，恢复隐藏列及原始 colspan 后测量首选 / 最小间距；不创建第二套 Svelte 组件，也不为每个 Cell 创建 Observer。正常容器 resize 复用缓存，在共享尺寸观察器的帧交付中直接计算，不再额外排队一帧；使用未取整的 CSS 内容宽度，避免慢速拖动时渐隐阶梯式跳变。可压缩区间的 padding 由已测得的首选／最小宽度生成 CSS 容器宽度公式，与列宽在同一次浏览器布局中变化，不等尺寸回调再补跳；显式固定列宽导致区间长度为零时保留边界选择。只提交角色布局、padding 公式、隐藏状态及可见边缘。
 

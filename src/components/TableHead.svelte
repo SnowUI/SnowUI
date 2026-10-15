@@ -226,7 +226,9 @@
                 event.stopPropagation();
                 table.fitColumnWidth(resolvedColumnId, resolvedMinWidth, resolvedMaxWidth);
             }}
-            ariaLabel={localeContext.t("tableHead.resizeColumn", { column: resolvedColumnId })}
+            ariaLabel={label?.trim()
+                ? localeContext.t("tableHead.resizeColumn", { column: label })
+                : localeContext.t("tableHead.resizeColumnGeneric")}
             onSizeChange={(next) => table.setColumnWidth(resolvedColumnId, next)}
         />
     {/if}

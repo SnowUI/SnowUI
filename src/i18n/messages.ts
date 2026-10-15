@@ -39,8 +39,11 @@ export type SnowUIMessageKey =
     | "imageViewer.next"
     | "imageViewer.close"
     | "toast.close"
+    | "table.scrollRegion"
+    | "table.scrollRegionNamed"
     | "tableHead.selectAll"
     | "tableHead.resizeColumn"
+    | "tableHead.resizeColumnGeneric"
     | "tableCell.selectRow"
     | "text.expand"
     | "textarea.resize"
@@ -119,8 +122,11 @@ export const SNOWUI_MESSAGES: Record<
         "imageViewer.next": "下一张",
         "imageViewer.close": "关闭图片预览",
         "toast.close": "关闭通知",
+        "table.scrollRegion": "可横向滚动的表格",
+        "table.scrollRegionNamed": "{{name}}，可横向滚动",
         "tableHead.selectAll": "选择全部当前行",
         "tableHead.resizeColumn": "调整 {{column}} 列宽",
+        "tableHead.resizeColumnGeneric": "调整列宽",
         "tableCell.selectRow": "选择当前行",
         "text.expand": "展开",
         "textarea.resize": "调整文本域大小",
@@ -192,8 +198,11 @@ export const SNOWUI_MESSAGES: Record<
         "imageViewer.next": "Next image",
         "imageViewer.close": "Close image viewer",
         "toast.close": "Close notification",
+        "table.scrollRegion": "Scrollable table",
+        "table.scrollRegionNamed": "{{name}}, horizontally scrollable",
         "tableHead.selectAll": "Select all current rows",
         "tableHead.resizeColumn": "Resize {{column}} column",
+        "tableHead.resizeColumnGeneric": "Resize column width",
         "tableCell.selectRow": "Select current row",
         "text.expand": "Expand",
         "textarea.resize": "Resize text area",
