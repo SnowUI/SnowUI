@@ -14,6 +14,14 @@ test('所有可复制实现带许可入口，Owner 主题文件不改动',()=>{
  assert.ok(protectedFiles.has('src/styles/themes.css'));
  assert.ok(!fs.readFileSync(path.join(root,'src/styles/themes.css'),'utf8').includes('SnowUI source notice'));
 });
+test('内置 Phosphor 图标的独立版权与许可随源码复制材料保留',()=>{
+ const icons=fs.readFileSync(path.join(root,'src/internal/component-icon/builtin-icon-data.ts'),'utf8');
+ assert.match(icons,/"sourceCollection": "phosphor"/);
+ const notice=fs.readFileSync(path.join(root,'THIRD_PARTY_NOTICES.md'),'utf8');
+ assert.match(notice,/## Phosphor Icons（内置功能图标快照；MIT）/);
+ assert.match(notice,/Copyright \(c\) 2023 Phosphor Icons/);
+ assert.match(notice,/The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software\./);
+});
 test('选择两个实现导出保留完整许可、路径、原字节及来源摘要',t=>{
  const out=path.join(temp(t),'vendor','snowui');const files=['src/components/Button.svelte','src/lib/date-format.ts'];
  const result=copySource(files,out);assert.equal(result.files,2);
