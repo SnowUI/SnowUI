@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Select 组件：自定义下拉选择框（Trigger + 外置 Listbox 组合架构）
- v3.2.3
+ v3.2.4
 
  文档: ./Select.md
 -->
@@ -180,9 +180,9 @@
     let registeredOptions = $state<ListboxOptionRegistration[]>([]);
     // options 模式以调用方当前数据为准；MenuItem 的注册只发生在挂载时，
     // 同一 value 的标签随语言或业务状态更新时不能继续使用旧注册快照。
-    const availableOptions = $derived(children
+    const availableOptions: ListboxOptionRegistration[] = $derived(children
         ? registeredOptions
-        : options.map((option) => ({
+        : (options as SelectOption[]).map((option: SelectOption) => ({
             value: option.value,
             label: option.label,
             disabled: option.disabled ?? false,
