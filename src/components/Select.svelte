@@ -178,6 +178,15 @@
 
     // 通过 MenuItem 注册收集的选项
     let registeredOptions = $state<ListboxOptionRegistration[]>([]);
+    // options 模式以调用方当前数据为准；MenuItem 的注册只发生在挂载时，
+    // 同一 value 的标签随语言或业务状态更新时不能继续使用旧注册快照。
+    const availableOptions = $derived(children
+        ? registeredOptions
+        : options.map((option) => ({
+            value: option.value,
+            label: option.label,
+            disabled: option.disabled ?? false,
+        })));
 
     // 搜索过滤状态
     let filterText = $state("");
@@ -190,14 +199,14 @@
     // 自定义项始终显示（不参与过滤，由 MenuItem 自身判断）
     // 匹配策略由 src/lib/search-filter.ts 的 matchesSearch 统一处理
     const filteredOptions = $derived.by(() => {
-        if (!filterText) return registeredOptions;
-        return registeredOptions.filter(o => matchesSearch(o.label, filterText));
+        if (!filterText) return availableOptions;
+        return availableOptions.filter(o => matchesSearch(o.label, filterText));
     });
 
     // 派生显示值
     const hasValue = $derived(resolvedValueStr !== undefined && resolvedValueStr !== "");
     const selectedOption = $derived(
-        registeredOptions.find((o) => o.value === resolvedValueStr) ??
+        availableOptions.find((o) => o.value === resolvedValueStr) ??
         customOptions.find((o) => o.value === resolvedValueStr)
     );
     const selectedLabel = $derived(selectedOption?.label ?? (hasValue ? resolvedValueStr : undefined));
@@ -275,7 +284,7 @@
             const trimmed = val.trim();
             if (!trimmed) return;
             // 不与已有静态项或自定义项重复
-            if (registeredOptions.some(o => o.value === trimmed)) return;
+            if (availableOptions.some(o => o.value === trimmed)) return;
             if (customOptions.some(o => o.value === trimmed)) return;
             customOptions = [...customOptions, { value: trimmed, label: trimmed, disabled: false }];
         },
@@ -298,7 +307,7 @@
 
     // 打开 Listbox
     function openListbox() {
-        const allOptions = [...registeredOptions, ...customOptions];
+        const allOptions = [...availableOptions, ...customOptions];
         const idx = allOptions.findIndex((o) => o.value === resolvedValueStr);
         activeIndex = idx >= 0 ? idx : 0;
         open = true;

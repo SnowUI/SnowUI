@@ -2,7 +2,7 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v3.2.3
+> **版本**: v3.2.4
 > **职责**: 在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-14
@@ -83,6 +83,7 @@
 ### 默认内置模式 / 显式组合模式
 
 - 默认内置模式（推荐）：传入 `options`，Select 自动生成 Listbox 与 MenuItem；搜索框默认关闭，通过 `parts.Listbox.search=true` 开启；通过 `parts.Button`、`parts.Listbox`、`parts.Input`、`parts.MenuItem` 配置隐藏实例。
+- `options` 中同一 `value` 的 `label` 或 `disabled` 更新时，当前选择的显示标签、搜索与键盘选项按新数据更新；调用方负责提供目标语言的业务文案。
 - 显式组合模式：显式书写 Listbox / Input / MenuItem，用于复杂内容或逐项差异；子组件 Props 直接写在实例上。
 - 显式 children 存在时替换默认内置 Listbox，不同时激活两套选项。
 
@@ -94,7 +95,7 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 />
 ```
 
-> **版本**: v3.2.3
+> **版本**: v3.2.4
 > **职责**: 自定义下拉选择组件；默认根据 options 内置 Listbox / MenuItem，高级场景支持显式组合，两种模式共用 `ListboxOwnerContext`。
 
 `buttonTrigger` 可将字段型 trigger 切换为真正的 bare `Button`；优先使用 `triggerContent` snippet，未提供时依次回退到选中项、`placeholder`、`ariaLabel`。适合 TableToolbar 的排序、筛选等图标操作。按钮保持 `aria-haspopup="listbox"`、`aria-expanded`、键盘导航和选中后焦点恢复。该模式的 Select 外层是无视觉 wrapper，不接入独立字段的 `.snowui-field-bordered` 外壳，最终背景、边框、尺寸与圆角只由真实 Button 宿主拥有。
@@ -564,6 +565,10 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 ---
 
 ## 更新日志
+
+### v3.2.4 (2026-10-17)
+
+- 默认 `options` 模式在选项标签动态更新后立即使用当前数据，避免语言切换时触发器保留旧标签；显式 children 的注册协议不变。
 
 ### v3.2.3 (2026-10-14)
 
