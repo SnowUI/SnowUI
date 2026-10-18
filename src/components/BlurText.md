@@ -60,7 +60,7 @@
 
 ## 参考来源
 
-- 本地参考源码：`../../../../repos/animations-master/`（相对于本文档），其中 Blur Reveal 示例位于 `src/lib/components/spell/blur-reveal/blur-reveal.svelte`。
+- 本地参考源码：`../../../../github/ui/animations-master/`（相对于本文档），其中 Blur Reveal 示例位于 `src/lib/components/spell/blur-reveal/blur-reveal.svelte`。
 - 原站示例：[Svelte Animations · Blur Reveal](https://sv-animations.vercel.app/spell/blur-reveal)。
 - 参考网站：[Text Motion Observatory · References](https://text-motion-observatory.farewelltowind.chatgpt.site/references)。
 

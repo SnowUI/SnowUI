@@ -369,8 +369,8 @@ interface CircularChartGradient {
 本组件同时参考 ECharts 官网示例与本地源码：
 
 - 官网 [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 示例用于确认目标视觉：扇区可以同时具有清晰间隔与端部圆角。
-- 本地 `[项目目录]/repos/echarts-master/src/chart/pie/pieLayout.ts` 用于确认几何原则：ECharts 在布局阶段计算 `padAngle`，再收缩每个扇区的实际 `startAngle` / `endAngle`。
-- 本地 `[项目目录]/repos/echarts-master/src/chart/helper/sectorHelper.ts` 用于确认圆角原则：`borderRadius` 属于扇区自身形状参数，并按环厚解析。
+- 本地 `[项目目录]/github/ui/echarts-master/src/chart/pie/pieLayout.ts` 用于确认几何原则：ECharts 在布局阶段计算 `padAngle`，再收缩每个扇区的实际 `startAngle` / `endAngle`。
+- 本地 `[项目目录]/github/ui/echarts-master/src/chart/helper/sectorHelper.ts` 用于确认圆角原则：`borderRadius` 属于扇区自身形状参数，并按环厚解析。
 - SnowUI 没有直接复制 ECharts 渲染代码，而是在共享 `components/src/lib/chart/arc-path.ts` 中使用 d3-shape 实现等价原则。
 
 SnowUI 的最终实现为：

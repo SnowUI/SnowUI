@@ -259,8 +259,8 @@ interface GaugeChartItem {
 本组件与 CircularChart 共用同一套扇区几何。参考来源与职责分别是：
 
 - 官网 [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 示例用于确认目标视觉：半圆扇区同样需要同时保留清晰间隔和端部圆角。
-- 本地 `[项目目录]/repos/echarts-master/src/chart/pie/pieLayout.ts` 用于确认间隔原则：ECharts 在布局阶段通过 `padAngle` 收缩实际扇区角度。
-- 本地 `[项目目录]/repos/echarts-master/src/chart/helper/sectorHelper.ts` 用于确认圆角原则：`borderRadius` 属于扇区自身几何。
+- 本地 `[项目目录]/github/ui/echarts-master/src/chart/pie/pieLayout.ts` 用于确认间隔原则：ECharts 在布局阶段通过 `padAngle` 收缩实际扇区角度。
+- 本地 `[项目目录]/github/ui/echarts-master/src/chart/helper/sectorHelper.ts` 用于确认圆角原则：`borderRadius` 属于扇区自身几何。
 - SnowUI 最终在共享 `components/src/lib/chart/arc-path.ts` 中使用 d3-shape 实现对应原则，没有直接复制 ECharts 渲染代码。
 
 落地规则：

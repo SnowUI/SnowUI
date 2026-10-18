@@ -126,7 +126,7 @@ import { NumberFlow } from "@snowui-design-system/components";
 
 ### 原始实现与 SnowUI 扩展
 
-SnowUI NumberFlow 以 Maxwell Barvian 的 MIT 开源项目 Number Flow 为原始实现参考：工作区源代码见 [`number-flow-main`](../../../../repos/number-flow-main/README.md)，原始 API、示例和使用限制见 [Number Flow 官方文档](https://number-flow.barvian.me/)。当前对照版本为 core `number-flow@0.6.2` 与 Svelte wrapper `@number-flow/svelte@0.4.2`。
+SnowUI NumberFlow 以 Maxwell Barvian 的 MIT 开源项目 Number Flow 为原始实现参考：工作区源代码见 [`number-flow-main`](../../../../github/ui/number-flow-main/README.md)，原始 API、示例和使用限制见 [Number Flow 官方文档](https://number-flow.barvian.me/)。当前对照版本为 core `number-flow@0.6.2` 与 Svelte wrapper `@number-flow/svelte@0.4.2`。
 
 SnowUI 在原始逐位滚轮、`Intl.NumberFormat` parts、趋势方向和进退场架构上增加：
 
