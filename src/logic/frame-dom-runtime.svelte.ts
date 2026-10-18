@@ -2,10 +2,11 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 /**
  * frame-dom-runtime.svelte.ts
- * v1.0.0
+ * v1.0.1
  * 职责：统一拼装 Frame 根节点的 DOM props、事件包装器与运行时 data 属性。
  *
  * Log:
+ * - [2026-10-18] Fix: 事件包装器改读稳定源状态，避免同步卸载后读取已销毁派生状态，并保留同一事件中的实时禁用/加载语义。
  * - [2026-03-09] Init: 从 Frame.svelte 抽离 DOM 透传过滤、disabled/aria 补齐、readonly capture、原生事件包装与 data-* 运行时属性组装。
  */
 
@@ -161,7 +162,7 @@ export function createFrameDomRuntime(options: FrameDomRuntimeOptions) {
     function wrap(handler: any, internal: (e?: any) => void) {
         return (e: any) => {
             if (
-                filteredProps.disabled ||
+                !!options.getFrameProps().disabled ||
                 options.frameState.currentState === "Disabled" ||
                 options.getEffectiveLoading()
             ) {

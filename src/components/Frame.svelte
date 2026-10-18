@@ -110,17 +110,17 @@
     // === 6. 感知 (Perception) ===
     // 根据开关决定是否提供 Context
     // svelte-ignore state_referenced_locally
-    const inheritedLoading = $derived(parentSkeletonContext?.loading ?? false);
     const inheritedSkeleton = $derived(parentSkeletonContext?.skeleton ?? true);
-    const explicitLoading = $derived(frameProps.loading === true);
     const explicitSkeleton = $derived(frameProps.skeleton);
-    const stateLoading = $derived(
-        frameState.currentState === "StartLoad" ||
-            frameState.currentState === "Load",
-    );
-    const effectiveLoading = $derived(
-        inheritedLoading || explicitLoading || stateLoading,
-    );
+    function resolveEffectiveLoading() {
+        return (
+            (parentSkeletonContext?.loading ?? false) ||
+            rawProps.loading === true ||
+            frameState.currentState === "StartLoad" ||
+            frameState.currentState === "Load"
+        );
+    }
+    const effectiveLoading = $derived(resolveEffectiveLoading());
     const effectiveSkeleton = $derived(explicitSkeleton ?? inheritedSkeleton);
 
     // svelte-ignore state_referenced_locally
@@ -131,7 +131,7 @@
             frameState,
             layout,
             responsive,
-            () => effectiveLoading,
+            resolveEffectiveLoading,
             () => effectiveSkeleton,
         );
         // 提供尺寸上下文给子组件（如资源组件选择正确分辨率）
@@ -246,7 +246,7 @@
     const domRuntime = createFrameDomRuntime({
         getFrameProps: () => frameProps,
         frameState,
-        getEffectiveLoading: () => effectiveLoading,
+        getEffectiveLoading: resolveEffectiveLoading,
         getHasScaleApplyConfig: () => hasScaleApplyConfig,
     });
     const resolvedTag = $derived(domRuntime.resolvedTag);
