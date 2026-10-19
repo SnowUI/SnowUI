@@ -21,4 +21,16 @@ export const examples = [
         },
         logic: ["SS-Init.1"],
     },
+    {
+        name: "SS-02：默认与英文可访问名称",
+        code: `<Frame column gap={16}>
+    <SidebarSection id="default-locale" title="文档"><Text>默认简中：收起文档／展开文档</Text></SidebarSection>
+    <LocaleProvider locale="en-US"><SidebarSection id="english-locale" title="Documentation"><Text>English: Collapse Documentation / Expand Documentation</Text></SidebarSection></LocaleProvider>
+</Frame>`,
+        expected: {
+            render: "默认简中与显式英文名称按当前展开状态输出，业务标题保持原文",
+            interaction: "键盘 Enter／Space 均可反复展开与收起，aria-expanded 和可访问名称同步",
+        },
+        logic: ["SS-Locale.1"],
+    },
 ] as const;

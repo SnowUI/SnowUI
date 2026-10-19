@@ -14,6 +14,8 @@ export type SnowUIMessageKey =
     | "codeBlock.fullscreenDialog"
     | "expandButton.expand"
     | "expandButton.collapse"
+    | "sidebarSection.expand"
+    | "sidebarSection.collapse"
     | "sidebar.resize"
     | "pagination.pageSize"
     | "pagination.previous"
@@ -98,6 +100,8 @@ export const SNOWUI_MESSAGES: Record<
         "codeBlock.fullscreenDialog": "全屏代码查看",
         "expandButton.expand": "展开",
         "expandButton.collapse": "收起",
+        "sidebarSection.expand": "展开{{title}}",
+        "sidebarSection.collapse": "收起{{title}}",
         "sidebar.resize": "调整侧边栏宽度",
         "pagination.pageSize": "每页条数",
         "pagination.previous": "上一页",
@@ -175,6 +179,8 @@ export const SNOWUI_MESSAGES: Record<
         "codeBlock.fullscreenDialog": "Fullscreen code view",
         "expandButton.expand": "Expand",
         "expandButton.collapse": "Collapse",
+        "sidebarSection.expand": "Expand {{title}}",
+        "sidebarSection.collapse": "Collapse {{title}}",
         "sidebar.resize": "Resize sidebar width",
         "pagination.pageSize": "Items per page",
         "pagination.previous": "Previous page",

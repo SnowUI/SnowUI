@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.1
+> **版本**: v1.4.2
 > **职责**: 将 Sidebar 导航组织为带标题的分组，支持展开、收起与附加操作，便于浏览较长的导航列表。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - id 标识分组，title 提供组名，children 放置导航项。
 - collapsible / collapsed 控制分组收起，defaultCollapsed 为初始状态；actions 提供组级操作。
+- 内置展开／收起可访问名称随 LocaleProvider 更新；title 与 action.label 属于调用方内容，保持原样。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -83,6 +84,10 @@
 | CSS 类名 | `snowui-sidebar-section` | 根节点 |
 | 布局模型 | Managed Composite | Header + content |
 
+### 多语言
+
+内置标题按钮通过 `useLocale()` 读取 `sidebarSection.expand`／`sidebarSection.collapse`，用 `{{title}}` 插入原始标题。无 Provider 时为默认简中；可用 LocaleProvider 的 `messages` 覆盖完整模板。没有新增显式文案 Prop；标题及操作标签不由组件翻译。
+
 ### 模块索引
 
 | 模块 | 文件 | 职责 |
@@ -90,6 +95,8 @@
 | SidebarSection | [SidebarSection.svelte](SidebarSection.svelte) | 分类折叠与标题操作 |
 
 ## 更新日志
+
+- 2026-10-20：内置分类展开／收起名称接入统一 locale 与 messages 覆盖，支持动态语言切换，标题与操作内容保持调用方原文。
 
 - 2026-10-14：修复未传 `collapsed` 的分类折叠后无法重新展开；保持布尔值受控用法、键盘操作与 Sidebar 持久化状态。
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
