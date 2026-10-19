@@ -79,8 +79,20 @@ const publicFile=p=>{
 try{
  for(const name of allowed){if(!fs.existsSync(name))throw Error('缺少源码交付项 '+name);fs.cpSync(name,path.join(folder,name),{recursive:true,filter:publicFile});}
 const buildNote=taggedRelease?'此归档来自与组件版本匹配的干净发布 tag，仍是待上传候选；正式公开下载、校验值和发布日期须在上传及外网验收后公布。':'此归档为本地交付候选，不代表公开下载或新 npm 版本已发布。';
-fs.writeFileSync(path.join(folder,'SOURCE_BUILD.md'),`# 免费源码构建\n\n先阅读本归档 LICENSE；AI 入口见 AGENTS.md。Free 范围无需公钥、账户、签名许可或中心登记。Node 24 与 pnpm 10.20；运行 pnpm install --frozen-lockfile，然后 pnpm build、pnpm catalog:check、pnpm pack:check。无需兄弟源码仓库；构建输出为 dist/client 和 dist/server。\n\nnpm 与源码按同一用途、项目和人数许可；允许授权用途内修改样式、交互与框架移植。真实产品上线或交付需 Pro / Team，纯 Demo 可免费线上展示。官方维护规范只约束官方工作区，使用者的源码适配权限以本归档 LICENSE 为准。\n\n所有者身份与官方维护核验见 OWNER_IDENTITY.md 和 owner-identity.public.json。公开登记可以复制，但不是当前持钥证明或法律著作权认证；验证方须先独立确认官方公钥指纹，再发起本次任务的新挑战。作者可用专用 24 词在可信本机工具中离线恢复原密钥，GitHub 仅参与首次登记；恢复仍须匹配可信注册记录。核验实现、私钥、助记词、恢复文件、加密备份和挑战使用状态不在本归档中，也不提供给 AI。正式工具分发与官方 HTTPS 身份锚点尚未上线，缺少可信核验能力时记录 unknown，不自行写入已通过。\n\n${buildNote} SOURCE_MANIFEST.json 记录组件版本、许可版本、来源提交、工作区状态与公开身份文件摘要；相同组件版本但许可不同不代表已发布的旧包变更。正式公开交付须经过干净来源与独立构建验证并记录发布日期。源码下载不要求付款；付费设计资源与许可凭证由独立交付服务提供。\n`);
-fs.writeFileSync(path.join(folder,'SOURCE_MANIFEST.json'),JSON.stringify({package:pkg.name,packageVersion:pkg.version,licenseVersion,licenseSha256:createHash('sha256').update(licenseText).digest('hex'),sourceRevision,sourceDirty,...(sourceTag?{sourceTag}:{}),ownerIdentity:{path:'owner-identity.public.json',sha256:createHash('sha256').update(fs.readFileSync(path.join(folder,'owner-identity.public.json'))).digest('hex')},releaseState:taggedRelease?'tagged-release-candidate':'candidate'},null,2)+'\n');
+fs.writeFileSync(path.join(folder,'SOURCE_BUILD.md'),`# 免费源码构建\n\n先阅读本归档 LICENSE；AI 入口见 AGENTS.md。Free 范围无需公钥、账户、签名许可或中心登记。Node 24 与 pnpm 10.20；运行 pnpm install --frozen-lockfile，然后 pnpm build、pnpm catalog:check、pnpm pack:check。无需兄弟源码仓库；构建输出为 dist/client 和 dist/server。\n\nnpm 与源码按同一用途、项目和人数许可；允许授权用途内修改样式、交互与框架移植。真实产品上线或交付需 Pro / Team，纯 Demo 可免费线上展示。官方维护规范只约束官方工作区，使用者的源码适配权限以本归档 LICENSE 为准。\n\n所有者身份与官方维护核验见 OWNER_IDENTITY.md 和 owner-identity.public.json。公开登记可以复制，但不是当前持钥证明或法律著作权认证；验证方须先独立确认官方公钥指纹，再发起本次任务的新挑战。作者可用专用 24 词在可信本机工具中离线恢复原密钥，GitHub 仅参与首次登记；恢复仍须匹配可信注册记录。核验实现、私钥、助记词、恢复文件、加密备份和挑战使用状态不在本归档中，也不提供给 AI。正式工具分发与官方 HTTPS 身份锚点尚未上线，缺少可信核验能力时记录 unknown，不自行写入已通过。\n\n${buildNote} SOURCE_MANIFEST.json 记录除清单自身外全部文件的路径、字节数和SHA-256，以及组件版本、许可版本、来源提交、工作区状态与公开身份文件摘要。清单与归档自带摘要不证明官方来源；如需核对完整性，应从独立可信来源固定清单摘要并用可信独立工具核对；这不是Free使用前置。正式发行签名与可信分发仍未完成。正常修改并不自动构成侵权；相同组件版本但许可不同不代表已发布的旧包变更。正式公开交付须经过干净来源与独立构建验证并记录发布日期。源码下载不要求付款；付费设计资源与许可凭证由独立交付服务提供。\n`);
+// 清单覆盖最终候选的全部普通文件；排除清单自身以避免循环摘要。
+const files=[];
+function inventory(directory,prefix=''){
+ for(const name of fs.readdirSync(directory).sort()){
+  const absolute=path.join(directory,name),relative=prefix+name,stat=fs.lstatSync(absolute);
+  if(stat.isDirectory())inventory(absolute,relative+'/');
+  else if(stat.isFile()){
+   const bytes=fs.readFileSync(absolute);files.push({path:relative,size:bytes.length,sha256:createHash('sha256').update(bytes).digest('hex')});
+  }else throw Error('源码清单仅接受普通文件和目录：'+relative);
+ }
+}
+inventory(folder);files.sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);
+fs.writeFileSync(path.join(folder,'SOURCE_MANIFEST.json'),JSON.stringify({schemaVersion:1,files,package:pkg.name,packageVersion:pkg.version,licenseVersion,licenseSha256:createHash('sha256').update(licenseText).digest('hex'),sourceRevision,sourceDirty,...(sourceTag?{sourceTag}:{}),ownerIdentity:{path:'owner-identity.public.json',sha256:createHash('sha256').update(fs.readFileSync(path.join(folder,'owner-identity.public.json'))).digest('hex')},releaseState:taggedRelease?'tagged-release-candidate':'candidate'},null,2)+'\n');
 const basename=`${archiveName}.zip`;const dest=path.join(out,basename);fs.rmSync(dest,{force:true});execFileSync('zip',['-qr',dest,path.basename(folder)],{cwd:stage});
 const checksum=createHash('sha256').update(fs.readFileSync(dest)).digest('hex');fs.writeFileSync(dest+'.sha256',`${checksum}  ${basename}\n`);console.log(dest+'\nSHA256 '+checksum);
 }finally{fs.rmSync(stage,{recursive:true,force:true});}

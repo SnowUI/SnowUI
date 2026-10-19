@@ -94,6 +94,14 @@ test('源码归档保留公开身份材料及摘要，不携带私有核验实�
  assert.deepEqual(identity,fs.readFileSync(path.join(fixture.base,'owner-identity.public.json')));
  const manifest=JSON.parse(execFileSync('unzip',['-p',zip,prefix+'SOURCE_MANIFEST.json'],{encoding:'utf8'}));
  assert.deepEqual(manifest.ownerIdentity,{path:'owner-identity.public.json',sha256:createHash('sha256').update(identity).digest('hex')});
+ assert.equal(manifest.schemaVersion,1);
+ const names=listing.trim().split('\n').filter(name=>!name.endsWith('/')&&name!==prefix+'SOURCE_MANIFEST.json').map(name=>name.slice(prefix.length)).sort();
+ assert.deepEqual(manifest.files.map(entry=>entry.path),names);
+ for(const entry of manifest.files){
+  const bytes=execFileSync('unzip',['-p',zip,prefix+entry.path]);
+  assert.equal(entry.size,bytes.length);assert.equal(entry.sha256,createHash('sha256').update(bytes).digest('hex'));
+ }
+ assert.equal(manifest.files.some(entry=>entry.path==='SOURCE_MANIFEST.json'),false);
  assert.match(execFileSync('unzip',['-p',zip,prefix+'SOURCE_BUILD.md'],{encoding:'utf8'}),/官方 HTTPS 身份锚点尚未上线/);
 });
 
