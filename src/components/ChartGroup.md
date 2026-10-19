@@ -2,7 +2,7 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v0.4.1
+> **版本**: v0.4.2
 > **职责**: 将多个图表组合在同一区域，协调分类悬停、叠加绘制与共享坐标轴，便于比较关联数据。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
@@ -18,6 +18,7 @@
 
 - 只提供共享轴与交互配置，不自动创建图表、标题或图例。
 - 显式组合 BarChart / LineChart，并协调各自 width、height 与定位，才能共享同一画布。
+- 根默认可访问名称随 LocaleProvider 切换，使用 `chartGroup.name`；显式 `aria-label` 优先。数据单元格组使用 `chartGroup.cells`。缺少 xLabels 对应项时使用 `chartGroup.cell` 的 `{{index}}` 完整模板（从 1 开始）；显式分类名称保持原样。业务名称、数据值与数字格式保持调用方内容。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -260,7 +261,7 @@ interface ChartGroupContext {
 
 ### 无障碍与 Frame 集成
 
-- 根层使用 `role="group"` 和 `aria-label="组合图表"`。
+- 根层使用 `role="group"` 和 `aria-label="组合图表"`（zh-CN 默认，随 locale 切换）。
 - 未开启共享面板且 `hoverMode="cell"`、`showHitLayer=true` 时，每个 cell hit rect 使用 `role="button"`、`tabindex="0"` 和分类 label 作为 `aria-label`。
 - `loading` 保留组合画布、共享坐标和子图节点；根 Frame 明确关闭 Skeleton，子图通过加载上下文同步恢复到出现动效起点。
 - 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
@@ -296,6 +297,11 @@ interface ChartGroupContext {
 
 
 ## AI Zone
+
+### 内置文案与语言
+
+使用现有 `useLocale()`，key：`chartGroup.name`、`chartGroup.cells`、`chartGroup.cell`。显式根 `aria-label` 保持优先；业务数据名、坐标标签与格式化数值不进入翻译表。
+
 
 以下章节保留源码维护约束，不属于应用接入步骤。
 
@@ -348,6 +354,10 @@ interface ChartGroupContext {
 - **归属判断**: 复合组件。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
 
 ## 更新日志
+
+### v0.4.2 (2026-10-20)
+
+- 内置根名称、数据单元格组名称与缺省单元格名称接入统一 locale；显式 aria-label、业务名称与数字格式保持原有优先级。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

@@ -20,6 +20,15 @@ export type SnowUIMessageKey =
     | "pagination.navigation"
     | "spinner.loading"
     | "scrollArea.content"
+    | "barChart.name"
+    | "barChart.cells"
+    | "lineChart.name"
+    | "lineChart.cells"
+    | "circularChart.name"
+    | "gaugeChart.name"
+    | "chartGroup.name"
+    | "chartGroup.cells"
+    | "chartGroup.cell"
     | "tag.close"
     | "sidebar.navigation"
     | "sidebar.expand"
@@ -115,6 +124,15 @@ export const SNOWUI_MESSAGES: Record<
         "pagination.navigation": "分页导航",
         "spinner.loading": "加载中",
         "scrollArea.content": "可滚动内容",
+        "barChart.name": "柱状图",
+        "barChart.cells": "柱状图数据单元格",
+        "lineChart.name": "折线图",
+        "lineChart.cells": "折线图数据单元格",
+        "circularChart.name": "圆形图表",
+        "gaugeChart.name": "仪表图",
+        "chartGroup.name": "组合图表",
+        "chartGroup.cells": "组合图表数据单元格",
+        "chartGroup.cell": "单元格 {{index}}",
         "tag.close": "关闭标签",
         "sidebar.navigation": "主导航",
         "sidebar.expand": "展开侧边栏",
@@ -203,6 +221,15 @@ export const SNOWUI_MESSAGES: Record<
         "pagination.navigation": "Pagination",
         "spinner.loading": "Loading",
         "scrollArea.content": "Scrollable content",
+        "barChart.name": "Bar chart",
+        "barChart.cells": "Bar chart data cells",
+        "lineChart.name": "Line chart",
+        "lineChart.cells": "Line chart data cells",
+        "circularChart.name": "Circular chart",
+        "gaugeChart.name": "Gauge chart",
+        "chartGroup.name": "Chart group",
+        "chartGroup.cells": "Chart group data cells",
+        "chartGroup.cell": "Cell {{index}}",
         "tag.close": "Close tag",
         "sidebar.navigation": "Primary navigation",
         "sidebar.expand": "Expand sidebar",

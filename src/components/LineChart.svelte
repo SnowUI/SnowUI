@@ -2,13 +2,16 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   LineChart 折线图组件
-  v1.6.1 (2026-09-05)
+  v1.6.3 (2026-10-20)
 
   职责:渲染带横坐标、纵坐标、网格、实线/虚线、面积填充、圆角转折线与可定制节点点样式的折线图。
   文档: ./LineChart.md
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
+
+    const localeContext = useLocale();
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { AdaptiveContrastMask } from "../lib/adaptive-contrast-renderer";
     import { getAdaptiveContrastColor, isAdaptiveContrastMonochrome } from "../lib/adaptive-contrast";
@@ -2017,7 +2020,7 @@
     class={["snowui-line-chart", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
     role="group"
-    aria-label="折线图"
+    aria-label={localeContext.t("lineChart.name")}
     {...rest}
     {loading}
     skeleton={false}
@@ -2236,7 +2239,7 @@
             <g
                 class="snowui-line-chart-cell-hit-layer"
                 role="group"
-                aria-label="折线图数据单元格"
+                aria-label={localeContext.t("lineChart.cells")}
                 onpointerleave={() => hideCellHover(effectiveActiveCellIndex ?? -1)}
             >
                 {#each rawXLabels as label, index}

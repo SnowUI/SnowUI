@@ -320,4 +320,16 @@ CG-01
         },
         logic: ["Loading", "NoSkeleton", "StableGeometry", "ChartGroup"],
     },
+    {
+        name: "Locale: 默认中文与英文内置名称",
+        code: `<ChartGroup width={320} height={200} showHoverPanel={false} />
+<LocaleProvider locale="en-US">
+    <ChartGroup width={320} height={200} showHoverPanel={false} />
+</LocaleProvider>`,
+        expected: {
+            render: "默认中文与英文Provider分别提供内置名称；业务内容保持原样",
+            interaction: "键盘焦点仍可进入命中项；显式aria-label和Provider messages保持既有优先级",
+        },
+        logic: ["Locale", "AccessibleName", "Keyboard"],
+    },
 ] as const;

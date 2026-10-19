@@ -2,13 +2,16 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   GaugeChart 仪表图组件
-  v1.7.2 (2026-09-05)
+  v1.7.4 (2026-10-20)
 
   职责:渲染具备同色占位层、透明间隔、渐变填充与顺序出现动效的半圆仪表比例图。
   Hover:每个扇区独立完成向外增厚与复位动效;中心标签显示当前项。
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
+
+    const localeContext = useLocale();
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
     import { onDestroy, onMount, tick } from "svelte";
@@ -1054,7 +1057,7 @@
     class={["snowui-gauge-chart", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
     role="group"
-    aria-label="仪表图"
+    aria-label={rest["aria-label"] ?? localeContext.t("gaugeChart.name")}
 >
     <div bind:this={bodyElement} class="snowui-gauge-chart-body">
         <svg

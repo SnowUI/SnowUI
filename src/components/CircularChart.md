@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.3
+> **版本**: v1.4.4
 > **职责**: 用圆环或饼图展示数据占比，支持分段、圆角、环厚与悬停强调，适合构成分析和比例概览。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - data 使用 name 与有限正 value；只显示前 maxItems 个有效项，占比分母为这些显示项之和。显式空数组展示空图。
 - 推荐用数字 size；字符串几何只取数值部分，不能依赖百分比或 CSS 变量完成自适应。中心内容用公开 center-label / segment-value / segment-name 角色。
+- 根默认可访问名称随 LocaleProvider 切换，使用 `circularChart.name`；显式 `aria-label` 优先。业务名称、数据值与数字格式保持调用方内容。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -175,7 +176,7 @@
 - `labelFormatter` 可自定义中心标签内容，并支持用 `\n` 拆成两行；第一行按数值样式渲染，第二行按名称样式渲染。
 - 可传入直接子元素 `<Text as="segment-value" />` / `<Text as="segment-name" />` 自定义中心标签样式模板；组件会自动写入当前扇区的真实百分比和名称，出现任一角色子元素时不渲染默认中心标签。
 - `showCenterLabel={false}` 可关闭中心标签，同时关闭外部写入的中心标签角色内容。
-- 根使用 `role="group"` 和 `aria-label="圆形图表"`；SVG 不隐藏可聚焦扇区，每个扇区命中项以 `role="button"` 和包含名称、百分比的独立 `aria-label` 暴露给辅助技术。
+- 根使用 `role="group"` 和 `aria-label="圆形图表"`（zh-CN 默认，随 locale 切换）；SVG 不隐藏可聚焦扇区，每个扇区命中项以 `role="button"` 和包含名称、百分比的独立 `aria-label` 暴露给辅助技术。
 - 扇区命中层可获得键盘焦点，focus 行为与 hover 一致；中心标签使用 `aria-live="polite"`。
 
 ### 2.6 Frame 集成
@@ -364,6 +365,11 @@ interface CircularChartGradient {
 
 ## AI Zone
 
+### 内置文案与语言
+
+使用现有 `useLocale()`，key：`circularChart.name`。显式根 `aria-label` 保持优先；业务数据名、坐标标签与格式化数值不进入翻译表。
+
+
 ### 6.2 ECharts 参考与 SnowUI 实现细则
 
 本组件同时参考 ECharts 官网示例与本地源码：
@@ -479,6 +485,10 @@ opacityProgress = clamp((elapsed - startOffset) / 750, 0, 1)
 ---
 
 ## 更新日志
+
+### v1.4.4 (2026-10-20)
+
+- 内置根名称接入统一 locale；修复显式 aria-label 被默认值覆盖，业务名称与数字格式保持原样。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

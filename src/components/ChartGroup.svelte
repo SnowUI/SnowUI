@@ -2,13 +2,16 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   ChartGroup 图表组合容器
-  v0.4.1 (2026-09-05)
+  v0.4.2 (2026-10-20)
 
   职责:协调多个 Chart 原子组件的共享分类单元格 hover 与叠加画布。
   文档: ./ChartGroup.md
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
+
+    const localeContext = useLocale();
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { onDestroy, setContext, untrack, type Snippet } from "svelte";
     import { Frame, type FrameProps } from "../index";
@@ -515,7 +518,7 @@
     class={["snowui-chart-group", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
     role="group"
-    aria-label="组合图表"
+    aria-label={localeContext.t("chartGroup.name")}
     {...rest}
     {loading}
     skeleton={false}
@@ -535,7 +538,7 @@
             width={numericWidth}
             height={numericHeight}
             role="group"
-            aria-label="组合图表数据单元格"
+            aria-label={localeContext.t("chartGroup.cells")}
             onpointerleave={() => setActiveCellIndex(null)}
         >
             {#each Array(cellCount) as _, index}
@@ -550,7 +553,7 @@
                     height={plotHeight}
                     tabindex="0"
                     role="button"
-                    aria-label={xLabels[index] ?? `Cell ${index + 1}`}
+                    aria-label={xLabels[index] ?? localeContext.t("chartGroup.cell", { index: index + 1 })}
                     use:cellHit={index}
                 />
             {/each}

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.7.3
+> **版本**: v1.7.4
 > **职责**: 用半环或半饼展示多项数据占比，支持分段、渐变、环厚与出现动效，适合比例概览。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - 当前组件展示半环形比例数据，并非 min/max 单指标仪表；data 每项使用 name 和正 value，占比按有效显示项之和计算。
 - 省略 data 会显示示例数据，空数组展示空图；中心文案与内容用 centerTitle、centerSubtitle 或公开角色配置。
+- 根默认可访问名称随 LocaleProvider 切换，使用 `gaugeChart.name`；显式 `aria-label` 优先。业务名称、数据值与数字格式保持调用方内容。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -132,7 +133,7 @@
 ### 2.1 Props
 
 
-其余未声明属性透传到根 Frame。根使用 `role="group"` 和 `aria-label="仪表图"`；SVG 不隐藏可聚焦扇区，每个扇区命中项以 `role="button"` 和包含名称、百分比的独立 `aria-label` 暴露给辅助技术。
+其余未声明属性透传到根 Frame。根使用 `role="group"` 和 `aria-label="仪表图"`（zh-CN 默认，随 locale 切换）；SVG 不隐藏可聚焦扇区，每个扇区命中项以 `role="button"` 和包含名称、百分比的独立 `aria-label` 暴露给辅助技术。
 
 ### 2.2 方法
 
@@ -254,6 +255,11 @@ interface GaugeChartItem {
 
 ## AI Zone
 
+### 内置文案与语言
+
+使用现有 `useLocale()`，key：`gaugeChart.name`。显式根 `aria-label` 保持优先；业务数据名、坐标标签与格式化数值不进入翻译表。
+
+
 ### 5.1 ECharts 参考与 SnowUI 实现细则
 
 本组件与 CircularChart 共用同一套扇区几何。参考来源与职责分别是：
@@ -356,6 +362,10 @@ interface GaugeChartItem {
 ---
 
 ## 更新日志
+
+### v1.7.4 (2026-10-20)
+
+- 内置根名称接入统一 locale；修复显式 aria-label 被默认值覆盖，业务名称与数字格式保持原样。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
