@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.6.1
+> **版本**: v1.6.2
 > **职责**: 提供页码导航，帮助用户在多页数据之间切换，适合表格、列表和搜索结果。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - page 从 1 开始，total 表示总页数，不是数据条数；onPageChange 连接页面状态。
 - pageSizeOptions 配置每页条数选择，pageSize 可绑定；数据请求和总页数计算由页面或 DataTable 负责。
+- 根导航默认名称随LocaleProvider更新，显式ariaLabel优先；不改变页码、每页条数与业务请求责任。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -66,7 +67,7 @@
 | total | `number` | `1` | 总页数 |
 | disabled | `boolean` | `false` | 禁用整个 Pagination |
 | disabledPages | `number[]` | `[]` | 禁用指定页码；上一页 / 下一页会跳过连续禁用页，指向该方向最近的可用页 |
-| ariaLabel | `string` | `"Pagination"` | 根导航区域的无障碍标签 |
+| ariaLabel | `string` | `locale 文案` | 根导航区域的无障碍标签；省略时随LocaleProvider更新，显式ariaLabel优先 |
 | variant | `PaginationVariant` | `"outline"` | 普通页与前后页的按钮样式；当前页使用对应的强调搭配 |
 | responsive | `PaginationResponsive` | `"auto"` | `auto` 根据容器宽度自动选择完整页码、省略页码与最小前后页；`none` 保持静态页码窗口与原有换行行为 |
 | widthMode | `PaginationWidthMode` | `"fill"` | `auto` 在完整页码可容纳时按剩余空间判断，`hug` 保持内容宽度，`fill` 始终等宽填充；fill 模式含省略号时也填满可用宽度；hug 保持内容宽度 |
@@ -93,7 +94,7 @@
 - `parts.MenuItem`：统一配置 pageSize 选项。
 - 具体结构差异继续通过现有 `as` 模板/外置选择器协议完成；外置显式 Props 高于 part。
 
-> **版本**: v1.6.1
+> **版本**: v1.6.2
 > **职责**: 提供页码导航容器。
 > **设计稿**: [Workshop / Pagination](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12078-21567&t=nY2VC3oisn12OH01-4)
 
@@ -570,6 +571,10 @@ Root Frame(nav)
 | A13 | pageSize 模板置于最右侧、Listbox 选择与 Fill 剩余宽度布局 |
 | A14 | pageSize 模板置于页码左侧 |
 
+### 多语言
+
+根导航默认名称随LocaleProvider更新，显式ariaLabel优先；不改变页码、每页条数与业务请求责任。 通过useLocale读取`pagination.navigation`，Provider messages可覆盖完整消息；未增加公开文案Prop。
+
 ### 模块索引
 
 | 模块 | 文件 | 职责 |
@@ -586,6 +591,10 @@ Root Frame(nav)
 ---
 
 ## 更新日志
+
+### v1.6.2 (2026-10-20)
+
+- 根导航默认名称随LocaleProvider更新，显式ariaLabel优先；不改变页码、每页条数与业务请求责任。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

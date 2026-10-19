@@ -151,4 +151,16 @@ export const examples = [
 />`,
         logic: ["BuiltInMode", "DefaultCompositionStyle", "Button", "Text"],
     },
+    {
+        name: "默认与英文内置名称",
+        code: `<Frame column gap={16}>
+<Breadcrumb items={[{ label: 'Parent' }, { label: 'Current' }]} />
+<LocaleProvider locale="en-US"><Breadcrumb items={[{ label: 'Parent' }, { label: 'Current' }]} /></LocaleProvider>
+</Frame>`,
+        expected: {
+            accessibility: "默认简中面包屑导航；英文Breadcrumb，显式业务文案保持原样",
+            interaction: "内置名称随Provider语言／messages变化，原操作与状态保持",
+        },
+        logic: ["Locale.DefaultNames"],
+    },
 ] as const;

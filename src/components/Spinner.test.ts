@@ -84,5 +84,17 @@ export const examples = [
             responsive: "None"
         },
         logic: ["speed"]
-    }
+    },
+    {
+        name: "默认与英文内置名称",
+        code: `<Frame column gap={16}>
+<Spinner />
+<LocaleProvider locale="en-US"><Spinner /></LocaleProvider>
+</Frame>`,
+        expected: {
+            accessibility: "默认简中加载中；英文Loading，显式业务文案保持原样",
+            interaction: "内置名称随Provider语言／messages变化，原操作与状态保持",
+        },
+        logic: ["Locale.DefaultNames"],
+    },
 ] as const;

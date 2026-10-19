@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Breadcrumb 组件：页面层级路径导航容器
-  v1.1.2
+  v1.1.3
 
   职责：
   - 只作为组合式容器，不生成 items / separator。
@@ -13,6 +13,7 @@
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { setContext, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
@@ -33,6 +34,8 @@
         disabled?: boolean;
     }
 
+    const localeContext = useLocale();
+
     interface Props extends Omit<FrameProps, "children"> {
         ariaLabel?: string;
         variant?: BreadcrumbVariant;
@@ -44,7 +47,7 @@
     }
 
     let {
-        ariaLabel = "Breadcrumb",
+        ariaLabel = undefined,
         variant = "borderless",
         children,
         items = [],
@@ -259,7 +262,7 @@
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
     enableAutoLayout={false}
-    aria-label={ariaLabel}
+    aria-label={ariaLabel ?? localeContext.t("breadcrumb.navigation")}
     class={["snowui-breadcrumb", userClass].filter(Boolean).join(" ")}
     use={finalUse}
     componentParts={parts}

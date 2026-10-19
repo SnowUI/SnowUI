@@ -351,4 +351,16 @@ export const examples = [
 </Pagination>`,
         logic: ["Parts", "Listbox", "MenuItem"],
     },
+    {
+        name: "默认与英文内置名称",
+        code: `<Frame column gap={16}>
+<Pagination page={2} total={4} responsive="none" widthMode="hug" />
+<LocaleProvider locale="en-US"><Pagination page={2} total={4} responsive="none" widthMode="hug" /></LocaleProvider>
+</Frame>`,
+        expected: {
+            accessibility: "默认简中分页导航；英文Pagination，显式业务文案保持原样",
+            interaction: "内置名称随Provider语言／messages变化，原操作与状态保持",
+        },
+        logic: ["Locale.DefaultNames"],
+    },
 ] as const;

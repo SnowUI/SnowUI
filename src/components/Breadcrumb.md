@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.1.2
+> **版本**: v1.1.3
 > **职责**: 展示当前页面的层级路径，帮助用户理解所在位置并返回上级页面。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - items 生成路径，最后一项自动成为不可交互的当前页。
 - 显式 children 使用 `Button as="item"` 与 `Text as="separator"`，会替换 items；parts 仅配置默认生成的内容。
+- 根导航默认名称随LocaleProvider更新，显式ariaLabel优先；路径文字与业务内容保持调用方原文。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -45,7 +46,7 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| ariaLabel | `string` | `"Breadcrumb"` | 根导航区域的无障碍标签 |
+| ariaLabel | `string` | `locale 文案` | 根导航区域的无障碍标签；省略时随LocaleProvider更新，显式ariaLabel优先 |
 | variant | `BreadcrumbVariant` | `"borderless"` | 内部 `Button as="item"` 的默认 Button 变体；parts 与子级 Button 显式 `variant` 可覆盖 |
 | children | `Snippet` | — | 显式声明 Button as="item" 与 Text as="separator"，替换内建 items 与 separator；最后一个 item 仍自动成为当前页。 |
 | items | `BreadcrumbItem[]` | `[]` | 内建路径数据，每项含 label、可选 href/disabled；自动生成 Button 与分隔 Text，最后一项为不可交互的当前页。children 存在时忽略此数组。 |
@@ -191,6 +192,10 @@ Breadcrumb 支持两种模式：
 | data 属性 | `data-as="separator"` | separator 角色 |
 | data 属性 | `data-current="page"` | 当前页面 item |
 
+### 多语言
+
+根导航默认名称随LocaleProvider更新，显式ariaLabel优先；路径文字与业务内容保持调用方原文。 通过useLocale读取`breadcrumb.navigation`，Provider messages可覆盖完整消息；未增加公开文案Prop。
+
 ### 模块索引
 
 | 模块 | 文件 | 职责 |
@@ -218,6 +223,10 @@ Breadcrumb 支持两种模式：
 ---
 
 ## 更新日志
+
+### v1.1.3 (2026-10-20)
+
+- 根导航默认名称随LocaleProvider更新，显式ariaLabel优先；路径文字与业务内容保持调用方原文。
 
 ### v1.1.2 (2026-10-14)
 

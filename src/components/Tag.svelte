@@ -1,7 +1,7 @@
 <!-- SnowUI source notice | LICENSE 2.2.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
-  Tag 组件：标签 v1.2.3
+  Tag 组件：标签 v1.2.4
 
   布局模型：内联外壳布局（与 Button 一致），不接入三槽位。
   - 子元素通过 gap 自然排列；外部覆盖 `--snowui-tag-gap`（或传 gap）即可同步影响所有子元素之间的间距，包括内置 X 与文字、外部 Icon 与文字。
@@ -22,6 +22,7 @@
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import Button from "./Button.svelte";
@@ -29,6 +30,8 @@
     import { ComponentIcon } from "../internal/component-icon/index";
     import { resizeManager } from "../logic/observer.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
+
+    const localeContext = useLocale();
 
     interface Props extends Omit<FrameProps, "size"> {
         /** 内置图标按钮配置；事件与角色由所属组件控制。 */
@@ -283,7 +286,7 @@
         <Button bare emphasis="muted" size="sm" {...parts?.Button}
             type="button"
             class={`snowui-clear-icon-btn snowui-tag-close${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
-            aria-label="Close tag"
+            aria-label={localeContext.t("tag.close")}
             onclick={handleCloseClick}
         >
             <ComponentIcon name="close" aria-hidden="true" />

@@ -93,4 +93,16 @@ export const examples = [
     </Tag>
 </div>`,
     },
+    {
+        name: "默认与英文内置名称",
+        code: `<Frame column gap={16}>
+<Tag closable>Business tag</Tag>
+<LocaleProvider locale="en-US"><Tag closable>Business tag</Tag></LocaleProvider>
+</Frame>`,
+        expected: {
+            accessibility: "默认简中关闭标签；英文Close tag，显式业务文案保持原样",
+            interaction: "内置名称随Provider语言／messages变化，原操作与状态保持",
+        },
+        logic: ["Locale.DefaultNames"],
+    },
 ];

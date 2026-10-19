@@ -16,6 +16,11 @@ export type SnowUIMessageKey =
     | "expandButton.collapse"
     | "sidebarSection.expand"
     | "sidebarSection.collapse"
+    | "breadcrumb.navigation"
+    | "pagination.navigation"
+    | "spinner.loading"
+    | "scrollArea.content"
+    | "tag.close"
     | "sidebar.navigation"
     | "sidebar.expand"
     | "sidebar.collapse"
@@ -106,6 +111,11 @@ export const SNOWUI_MESSAGES: Record<
         "expandButton.collapse": "收起",
         "sidebarSection.expand": "展开{{title}}",
         "sidebarSection.collapse": "收起{{title}}",
+        "breadcrumb.navigation": "面包屑导航",
+        "pagination.navigation": "分页导航",
+        "spinner.loading": "加载中",
+        "scrollArea.content": "可滚动内容",
+        "tag.close": "关闭标签",
         "sidebar.navigation": "主导航",
         "sidebar.expand": "展开侧边栏",
         "sidebar.collapse": "收起侧边栏",
@@ -189,6 +199,11 @@ export const SNOWUI_MESSAGES: Record<
         "expandButton.collapse": "Collapse",
         "sidebarSection.expand": "Expand {{title}}",
         "sidebarSection.collapse": "Collapse {{title}}",
+        "breadcrumb.navigation": "Breadcrumb",
+        "pagination.navigation": "Pagination",
+        "spinner.loading": "Loading",
+        "scrollArea.content": "Scrollable content",
+        "tag.close": "Close tag",
         "sidebar.navigation": "Primary navigation",
         "sidebar.expand": "Expand sidebar",
         "sidebar.collapse": "Collapse sidebar",

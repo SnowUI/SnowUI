@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Pagination 组件：页码导航容器
-  v1.6.1
+  v1.6.2
 
   职责：
   - 读取直系 Button 作为 current / page / prev / next 角色样式模板。
@@ -66,7 +66,7 @@
         total = 1,
         disabled = false,
         disabledPages = [],
-        ariaLabel = "Pagination",
+        ariaLabel = undefined,
         variant = "outline",
         responsive = "auto",
         widthMode = "fill",
@@ -974,7 +974,7 @@
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
     enableAutoLayout={false}
-    aria-label={ariaLabel}
+    aria-label={ariaLabel ?? localeContext.t("pagination.navigation")}
     data-disabled={disabled ? "true" : undefined}
     data-responsive={responsive}
     data-width-mode={widthMode}

@@ -119,4 +119,16 @@ export const examples = [
         },
         logic: ["Horizontal", "ViewportTrack", "LongContent"],
     },
+    {
+        name: "默认与英文内置名称",
+        code: `<Frame column gap={16}>
+<ScrollArea style="width: 220px; height: 64px;"><div style="height: 240px;">Business content</div></ScrollArea>
+<LocaleProvider locale="en-US"><ScrollArea style="width: 220px; height: 64px;"><div style="height: 240px;">Business content</div></ScrollArea></LocaleProvider>
+</Frame>`,
+        expected: {
+            accessibility: "默认简中可滚动内容；英文Scrollable content，显式业务文案保持原样",
+            interaction: "内置名称随Provider语言／messages变化，原操作与状态保持",
+        },
+        logic: ["Locale.DefaultNames"],
+    },
 ] as const;

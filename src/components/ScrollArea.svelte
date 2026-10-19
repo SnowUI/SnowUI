@@ -13,9 +13,12 @@
 </script>
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
     import type { Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
+
+    const localeContext = useLocale();
 
     interface Props
         extends Omit<FrameProps, "children" | "enableAutoLayout"> {
@@ -34,7 +37,7 @@
         axis = "vertical",
         horizontalTrackPosition = "container",
         horizontalScrollbarVisibility = "always",
-        ariaLabel = "Scrollable content",
+        ariaLabel = undefined,
         viewport = $bindable(),
         onscroll,
         children,
@@ -105,7 +108,7 @@
         class="snowui-scroll-area-viewport snowui-overlay-scrollbar-viewport"
         data-scroll-axis={axis}
         role="region"
-        aria-label={ariaLabel}
+        aria-label={ariaLabel ?? localeContext.t("scrollArea.content")}
         tabindex="0"
         {onscroll}
     >

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.2.3
+> **版本**: v1.2.4
 > **职责**: 以可交互标签表达标记、筛选条件或路径片段，适合组织内容与收敛选择范围。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - closable 显示关闭操作，onClose 通知页面移除数据；关闭不会替页面修改列表。
 - variant、shape 和 toggle 分别控制外观、形状与切换能力；parts 仅配置默认关闭按钮。
+- 内置关闭按钮名称随LocaleProvider更新，可用Provider messages覆盖；标签内容与关闭后移除责任仍由调用方负责。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -120,7 +121,7 @@
 
 - 当 `variant="active"`（映射到 `currentState="Active"`）或通过 `toggle` / `Click={{ Idle: "Active", Active: "Idle" }}` 切到 Active 时，根节点输出 `aria-pressed="true"`；处于 Idle 时输出 `aria-pressed="false"`。
 - 消费方显式传入 `aria-pressed` 或 `aria-selected` 时**外部值优先**，用于列表选择语境改用 `aria-selected`。
-- 删除 X 渲染为 `<button type="button" aria-label="Close tag">`，键盘可达，屏幕阅读器可识别。
+- 删除 X 渲染为真实 `button type="button"`，内置名称随LocaleProvider更新（默认简中“关闭标签”、英文“Close tag”），键盘可达。
 - 删除 X 点击时组件内部会 `stopPropagation()`，避免误触 Tag 根节点的 `onclick`；移除逻辑仍由消费方在 `onClose` 中决定。
 
 <a id="布局变量链"></a>
@@ -287,6 +288,10 @@
 
 ### 开发者指南 (AI)
 
+### 多语言
+
+内置关闭按钮名称随LocaleProvider更新，可用Provider messages覆盖；标签内容与关闭后移除责任仍由调用方负责。 通过useLocale读取`tag.close`，Provider messages可覆盖完整消息；未增加公开文案Prop。
+
 ### 模块索引
 
 - **Tag 组件**: [./Tag.svelte](Tag.svelte)
@@ -302,6 +307,10 @@
 ---
 
 ## 更新日志
+
+### v1.2.4 (2026-10-20)
+
+- 内置关闭按钮名称随LocaleProvider更新，可用Provider messages覆盖；标签内容与关闭后移除责任仍由调用方负责。
 
 - 2026-10-05：原 Indigo 默认配色改为 Brand（`--brand`），保留原有透明度、状态与覆盖机制。
 

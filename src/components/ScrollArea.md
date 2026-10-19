@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.0
+> **版本**: v1.4.1
 > **职责**: 为内容提供可滚动区域与统一的滚动条，适合长列表、面板和受限空间中的正文。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - axis 选择滚动方向；内容或宿主需要有限尺寸才能形成滚动区域。
 - bind:viewport 获取实际滚动元素，onscroll 接收滚动事件；用 ariaLabel 描述区域用途。
+- 滚动viewport默认名称随LocaleProvider更新，显式ariaLabel优先；children保持调用方内容。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -68,7 +69,7 @@
 | axis | `ScrollAreaAxis` | `"vertical"` | 允许滚动的方向 |
 | horizontalTrackPosition | `ScrollAreaHorizontalTrackPosition` | `"container"` | 横向轨道停靠在容器底边，或在长容器经过页面视口时贴近视口底部 |
 | horizontalScrollbarVisibility | `"always" \| "hover"` | `"always"` | 横向滚动条在内容溢出时常显，或仅在鼠标移入区域时显示 |
-| ariaLabel | `string` | `"Scrollable content"` | viewport 的无障碍标签；viewport 使用 `role="region"` |
+| ariaLabel | `string` | `locale 文案` | viewport 的无障碍标签；省略时随LocaleProvider更新，显式ariaLabel优先；viewport 使用 `role="region"` |
 | viewport | `HTMLElement` | — | 暴露内部可滚动 viewport，供读取或设置原生滚动位置 |
 | onscroll | `(event: Event) => void` | — | viewport 原生 scroll 事件 |
 | children | `Snippet` | — | 任意可滚动内容 |
@@ -158,6 +159,10 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 | CSS 共享类 | `snowui-overlay-scrollbar*` | 轨道与 Thumb 共享视觉 |
 | 通用逻辑 | `useOverlayScrollbar` | 尺寸、位置、滚动同步和拖动 |
 
+### 多语言
+
+滚动viewport默认名称随LocaleProvider更新，显式ariaLabel优先；children保持调用方内容。 通过useLocale读取`scrollArea.content`，Provider messages可覆盖完整消息；未增加公开文案Prop。
+
 ### 模块索引
 
 | 模块 | 文件 | 职责 |
@@ -193,6 +198,10 @@ ScrollArea 封装可滚动 viewport、横向/纵向轨道、Thumb 尺寸同步�
 ---
 
 ## 更新日志
+
+### v1.4.1 (2026-10-20)
+
+- 滚动viewport默认名称随LocaleProvider更新，显式ariaLabel优先；children保持调用方内容。
 
 - 2026-10-08：整条 Overlay 轨道触发 hover；点击空白轨道定位滑块中心并支持继续拖动，取消捕获和卸载时清理交互。
 

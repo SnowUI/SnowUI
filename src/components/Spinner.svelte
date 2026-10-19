@@ -2,13 +2,14 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Spinner 加载组件
- v1.2.2
+ v1.2.3
  
  描述: 通用的加载状态指示器，支持多种视觉变体。
  详情: 详见 Spinner.md
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { type Snippet } from "svelte";
     import Frame, {
@@ -23,6 +24,8 @@
     } from "../logic/component-parts.svelte";
 
     type SpinnerVariant = "circle" | "spokes" | "pills";
+
+    const localeContext = useLocale();
 
     interface Props extends FrameProps {
         variant?: SpinnerVariant;
@@ -122,7 +125,7 @@
         .join("; ")}
     {responsive}
     role="status"
-    aria-label="Loading"
+    aria-label={localeContext.t("spinner.loading")}
     renderHints={spinnerRenderHints}
     {...rest}
 >
