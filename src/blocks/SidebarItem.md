@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.6.2
+> **版本**: v1.6.3
 > **职责**: 在 Sidebar 中呈现导航入口，支持激活状态、图标、层级与状态提示，帮助识别当前位置。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - 提供稳定 id 与 label；href 表示导航地址，onSelect 处理选择通知。
 - disabled 禁止导航；actions 配置条目附加操作，parts 配置内置徽标和操作按钮。
+- 内置updated圆点的名称随LocaleProvider更新；label、tags及actions仍属调用方内容。折叠态的装饰与可访问树结构保持原有契约。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -91,6 +92,10 @@
 | 布局模型 | Slot Host | leading / content / trailing |
 | Context | `SIDEBAR_CONTEXT_KEY` | 折叠与 active owner |
 
+### 多语言
+
+内置updated圆点的名称随LocaleProvider更新；label、tags及actions仍属调用方内容。折叠态的装饰与可访问树结构保持原有契约。 内置消息通过useLocale读取`sidebarItem.updated`，可用Provider messages覆盖；没有新增文案Prop。
+
 ### 模块索引
 
 | 模块 | 文件 | 职责 |
@@ -98,6 +103,8 @@
 | SidebarItem | [SidebarItem.svelte](SidebarItem.svelte) | 导航语义与状态视觉 |
 
 ## 更新日志
+
+- 2026-10-20：内置updated圆点的名称随LocaleProvider更新；label、tags及actions仍属调用方内容。折叠态的装饰与可访问树结构保持原有契约。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

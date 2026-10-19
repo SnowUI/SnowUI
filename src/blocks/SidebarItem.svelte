@@ -1,6 +1,6 @@
 <!-- SnowUI source notice | LICENSE 2.2.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
-<!-- SidebarItem Block v1.6.0. 文档: ./SidebarItem.md -->
+<!-- SidebarItem Block v1.6.3. 文档: ./SidebarItem.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
@@ -8,6 +8,7 @@
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import {ComponentIcon} from "../internal/component-icon/index";
     import Frame from "../components/Frame.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
     import {getSidebarContext, type SidebarActionData} from "./sidebar-context.svelte";
 
     interface Props extends Omit<FrameProps, "children" | "id"> {
@@ -43,6 +44,7 @@
         ...rest
     }: Props = $props();
 
+    const localeContext = useLocale();
     const sidebar = getSidebarContext();
     const collapsed = $derived(sidebar?.collapsed ?? false);
     const active = $derived(sidebar?.activeItemId === id);
@@ -100,7 +102,7 @@
                         as="badge"
                         dot
                         class="snowui-sidebar-item-badge-collapsed"
-                        aria-label="Updated"
+                        aria-label={localeContext.t("sidebarItem.updated")}
                     />
                 {/if}
             </span>
@@ -117,7 +119,7 @@
                     as="badge"
                     dot
                     class="snowui-sidebar-item-badge"
-                    aria-label="Updated"
+                    aria-label={localeContext.t("sidebarItem.updated")}
                 />
             {/if}
         </span>

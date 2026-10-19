@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.9.3
+> **版本**: v1.9.4
 > **职责**: 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - sections 提供导航数据；children 与 sections 同时渲染，并非替换关系。
 - 直属 as="logo" 替换标识，as="footer" 进入固定底部；宽度和折叠状态可绑定，默认启用持久化。
+- 导航及滚动区默认名称、内置折叠按钮（含text浮层展开按钮）随LocaleProvider更新；显式ariaLabel优先于Provider消息。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -67,7 +68,7 @@
 | activeItemId | `string` | — | 外部控制的选中项 id；未传时使用内部选择或恢复的持久化值。仅选择状态，不自动替宿主进行路由。 |
 | persistence | `boolean` | `true` | 是否记忆 active item 与各 Section 折叠状态 |
 | persistenceKey | `string` | `"default"` | localStorage 实例命名空间；同一页面存在多个 Sidebar 时必须分别设置 |
-| ariaLabel | `string` | `"Primary navigation"` | 导航及其滚动区域的可访问名称，多实例应提供可区分的名称。 |
+| ariaLabel | `string` | `locale 文案` | 导航及其滚动区域的可访问名称；省略时随 LocaleProvider 更新，显式值优先，多实例应提供可区分的名称。 |
 | continuousHover | `boolean` | `true` | 是否在可用导航项之间移动共享 hover 背景；关闭后恢复逐项 hover，选中状态不受影响。 |
 | onCollapsedChange | `(collapsed: boolean) => void` | — | 用户点击内置按钮切换后调用，参数为新折叠状态，不可取消。 |
 | onWidthChange | `(width: number) => void` | — | 用户调宽时调用，参数为夹取到 minWidth/maxWidth 的整数像素宽度。 |
@@ -164,6 +165,10 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 | 直接角色 | `logo` / `footer` | 替换默认 Logo / 安置固定 Footer 内容 |
 | 布局模型 | Managed Composite | 固定 Header / ScrollArea / 覆盖 Footer 结构 |
 
+### 多语言
+
+导航及滚动区默认名称、内置折叠按钮（含text浮层展开按钮）随LocaleProvider更新；显式ariaLabel优先于Provider消息。 内置消息通过useLocale读取`sidebar.navigation`、`sidebar.expand`、`sidebar.collapse`、`sidebar.resize`，可用Provider messages覆盖；没有新增文案Prop。
+
 ### 模块索引
 
 | 模块 | 文件 | 职责 |
@@ -198,6 +203,8 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/maintainers/LayoutProtocol.md`、`../../../specs/maintainers/ComponentGuidelines.md`
 
 ## 更新日志
+
+- 2026-10-20：导航及滚动区默认名称、内置折叠按钮（含text浮层展开按钮）随LocaleProvider更新；显式ariaLabel优先于Provider消息。
 
 ### v1.9.3 (2026-10-14)
 - 修复当前 active item 已在无分类位置时，旧存储的分类 ID 导致该分类刷新后被错误展开；外部 active item 优先于历史记录，分类折叠状态仍可恢复。

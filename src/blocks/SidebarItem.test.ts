@@ -41,4 +41,16 @@ export const examples = [
         },
         logic: ["SI-Init.2"],
     },
+    {
+        name: "导航多语言：默认简中与英文",
+        code: `<Frame row gap={16} style="height: 320px;">
+<Sidebar persistence={false} resizable={false}><SidebarItem id="default" label="业务名称" icon="gauge" updated /></Sidebar>
+<LocaleProvider locale="en-US"><Sidebar persistence={false} resizable={false}><SidebarItem id="english" label="Business label" icon="gauge" updated /></Sidebar></LocaleProvider>
+</Frame>`,
+        expected: {
+            accessibility: "默认主导航／收起侧边栏／已更新，英文Primary navigation／Collapse sidebar／Updated；业务label不翻译，折叠状态与名称同步",
+            interaction: "键盘可反复折叠展开，text变体浮层展开按钮使用当前locale",
+        },
+        logic: ["Sidebar.Locale"],
+    },
 ] as const;

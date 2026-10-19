@@ -1,6 +1,6 @@
 <!-- SnowUI source notice | LICENSE 2.2.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
-<!-- Sidebar Block v1.9.3. 文档: ./Sidebar.md -->
+<!-- Sidebar Block v1.9.4. 文档: ./Sidebar.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import {onDestroy, onMount, setContext, tick, untrack, type Snippet} from "svelte";
@@ -83,7 +83,7 @@
         activeItemId = undefined,
         persistence = true,
         persistenceKey = "default",
-        ariaLabel = "Primary navigation",
+        ariaLabel = undefined,
         continuousHover = true,
         onCollapsedChange = undefined,
         onWidthChange = undefined,
@@ -580,7 +580,7 @@
                 iconOnly
                 size="sm"
                 class="snowui-sidebar-collapse-button"
-                aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+                aria-label={localeContext.t(isCollapsed ? "sidebar.expand" : "sidebar.collapse")}
                 onclick={toggleCollapsed}
             >
                 <ComponentIcon name="rightbar" aria-hidden="true" />
@@ -591,10 +591,10 @@
     <ScrollArea
         bind:viewport={bodyViewport}
         class="snowui-sidebar-body"
-        ariaLabel={ariaLabel}
+        ariaLabel={ariaLabel ?? localeContext.t("sidebar.navigation")}
         onscroll={syncBodyScrollMask}
     >
-        <nav bind:this={navigationElement} class="snowui-sidebar-navigation" style={CONTINUOUS_HOVER_MOTION_STYLE} aria-label={ariaLabel}>
+        <nav bind:this={navigationElement} class="snowui-sidebar-navigation" style={CONTINUOUS_HOVER_MOTION_STYLE} aria-label={ariaLabel ?? localeContext.t("sidebar.navigation")}>
             {#each sections as section (section.id)}
                 <SidebarSection
                     {...parts?.SidebarSection}
@@ -650,7 +650,7 @@
 
 {#if fullyCollapsed}
     <div use:floatingToggle popover="manual" class="snowui-sidebar-floating-toggle">
-        <Button iconOnly size="sm" aria-label="Expand sidebar" onclick={toggleCollapsed}>
+        <Button iconOnly size="sm" aria-label={localeContext.t("sidebar.expand")} onclick={toggleCollapsed}>
             <ComponentIcon name="rightbar" aria-hidden="true" />
         </Button>
     </div>

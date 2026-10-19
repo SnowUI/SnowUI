@@ -16,6 +16,10 @@ export type SnowUIMessageKey =
     | "expandButton.collapse"
     | "sidebarSection.expand"
     | "sidebarSection.collapse"
+    | "sidebar.navigation"
+    | "sidebar.expand"
+    | "sidebar.collapse"
+    | "sidebarItem.updated"
     | "sidebar.resize"
     | "pagination.pageSize"
     | "pagination.previous"
@@ -102,6 +106,10 @@ export const SNOWUI_MESSAGES: Record<
         "expandButton.collapse": "收起",
         "sidebarSection.expand": "展开{{title}}",
         "sidebarSection.collapse": "收起{{title}}",
+        "sidebar.navigation": "主导航",
+        "sidebar.expand": "展开侧边栏",
+        "sidebar.collapse": "收起侧边栏",
+        "sidebarItem.updated": "已更新",
         "sidebar.resize": "调整侧边栏宽度",
         "pagination.pageSize": "每页条数",
         "pagination.previous": "上一页",
@@ -181,6 +189,10 @@ export const SNOWUI_MESSAGES: Record<
         "expandButton.collapse": "Collapse",
         "sidebarSection.expand": "Expand {{title}}",
         "sidebarSection.collapse": "Collapse {{title}}",
+        "sidebar.navigation": "Primary navigation",
+        "sidebar.expand": "Expand sidebar",
+        "sidebar.collapse": "Collapse sidebar",
+        "sidebarItem.updated": "Updated",
         "sidebar.resize": "Resize sidebar width",
         "pagination.pageSize": "Items per page",
         "pagination.previous": "Previous page",
