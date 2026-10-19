@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "ownerId": "snowui:byewind",
+  "displayName": "ByeWind",
+  "role": "original-author-maintainer",
+  "githubUserId": 4132956,
+  "repositoryId": 1229240692,
+  "repositoryOwnerId": 242970969,
+  "repository": "SnowUI/SnowUI",
+  "algorithm": "Ed25519",
+  "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAjvD3II2CdzYO8XySlrJkrs7mdj+koSGbEfXP4hb9Yc8=\n-----END PUBLIC KEY-----\n",
+  "fingerprint": "sha256:dbd7bbb7e79fc97ceaaa670d9b361befccf5b866a87d171c7ab098310daa7ee6",
+  "github": {
+    "userId": 4132956,
+    "loginObserved": "byewind",
+    "repositoryId": 1229240692,
+    "repositoryOwnerId": 242970969,
+    "repository": "SnowUI/SnowUI",
+    "checkedAt": 1792440260,
+    "repositoryAdminObserved": true
+  },
+  "githubBinding": "local-enrollment-observation",
+  "enrollmentAuthority": "current-user-approved-first-enrollment",
+  "legalOwnershipVerified": false,
+  "statement": "本机首次登记观察到指定 GitHub 账号管理官方仓库；GitHub 未签证此公钥，且本记录不认证法律著作权。"
+}
