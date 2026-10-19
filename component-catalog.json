@@ -1278,6 +1278,32 @@
       "deprecated": false
     },
     {
+      "name": "OTPInput",
+      "canonical": "OTPInput",
+      "package": "@snowui-design-system/components",
+      "import": "import { OTPInput } from '@snowui-design-system/components';",
+      "runtime": "free-download",
+      "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/OTPInput.svelte",
+      "documentation": "src/components/OTPInput.md",
+      "description": "提供 4–8 位数字一次性验证码输入，支持整码粘贴、短信自动填充、原生表单提交与重置。",
+      "intents": [],
+      "aliases": [],
+      "whenToUse": null,
+      "avoidWhen": null,
+      "related": [],
+      "deprecated": false
+    },
+    {
       "name": "OverflowAction",
       "canonical": "OverflowAction",
       "package": "@snowui-design-system/components",

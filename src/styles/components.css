@@ -24,6 +24,12 @@
  */
 
 :root {
+    /* OTPInput */
+    /* --snowui-otp-input-gap-override: ; */ /* default: var(--gap-2) */
+    /* --snowui-otp-input-size-override: ; */ /* default: var(--size-10) */
+    /* --snowui-otp-input-radius-override: ; */ /* default: var(--radius-3) */
+    /* --snowui-otp-input-font-size-override: ; */ /* default: var(--text-16) */
+    /* --snowui-otp-input-line-height-override: ; */ /* default: var(--leading-14) */
 
     /* ─────────────────────────────────────────
        Accordion

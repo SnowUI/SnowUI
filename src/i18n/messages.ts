@@ -19,6 +19,7 @@ export type SnowUIMessageKey =
     | "pagination.previous"
     | "pagination.next"
     | "pagination.page"
+    | "otpInput.invalidCode"
     | "input.clear"
     | "input.increment"
     | "input.decrement"
@@ -102,6 +103,7 @@ export const SNOWUI_MESSAGES: Record<
         "pagination.previous": "上一页",
         "pagination.next": "下一页",
         "pagination.page": "第 {{page}} 页",
+        "otpInput.invalidCode": "请输入 {{length}} 位数字验证码",
         "input.clear": "清除输入",
         "input.increment": "增加数值",
         "input.decrement": "减少数值",
@@ -178,6 +180,7 @@ export const SNOWUI_MESSAGES: Record<
         "pagination.previous": "Previous page",
         "pagination.next": "Next page",
         "pagination.page": "Page {{page}}",
+        "otpInput.invalidCode": "Enter a {{length}}-digit verification code",
         "input.clear": "Clear input",
         "input.increment": "Increase value",
         "input.decrement": "Decrease value",

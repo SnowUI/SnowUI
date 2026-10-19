@@ -225,11 +225,11 @@
     transition: box-shadow 0.2s;
 }
 
-:where(.snowui-field-bordered:hover) {
+:where(.snowui-field-bordered:hover, .snowui-field-bordered[data-field-hover="true"]) {
     box-shadow: inset 0 0 0 var(--snowui-field-border-width, 0.03125rem) var(--snowui-field-hover-border-color, var(--black-20, #00000033));
 }
 
-:where(.snowui-field-bordered:focus-within) {
+:where(.snowui-field-bordered:focus-within, .snowui-field-bordered[data-field-focus="true"]) {
     box-shadow:
         inset 0 0 0 var(--snowui-field-border-width, 0.03125rem) var(--snowui-field-focus-border-color, var(--black-40, #00000066)),
         0 0 0 var(--snowui-field-focus-ring-width, 0.25rem) var(--snowui-field-focus-ring-color, var(--black-4, #0000000a));
@@ -759,5 +759,15 @@
     justify-content: center;
     flex: 0 0 auto;
     padding: var(--snowui-control-inset);
+    box-sizing: border-box;
+}
+
+/* Input and segmented fields share the same error text typography. */
+:where(.snowui-field-error-message) {
+    width: 100%;
+    padding: 0;
+    color: var(--secondary-red, #ff4747ff);
+    font-size: var(--text-12);
+    line-height: var(--leading-12);
     box-sizing: border-box;
 }

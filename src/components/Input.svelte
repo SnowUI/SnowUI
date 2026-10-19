@@ -1768,7 +1768,7 @@
         <Text
             {...parts?.Text}
             as="error"
-            class={`snowui-input-error${parts?.Text?.class ? ` ${parts.Text.class}` : ""}`}
+            class={`snowui-input-error snowui-field-error-message${parts?.Text?.class ? ` ${parts.Text.class}` : ""}`}
         >
             {#if typeof error === "function"}
                 {@render error()}
@@ -1852,12 +1852,6 @@
 
     :global(:where(.snowui-input-error-layout > .snowui-input-error)) {
         display: none;
-        width: 100%;
-        padding: 0;
-        color: var(--secondary-red, #ff4747ff);
-        font-size: var(--text-12);
-        line-height: var(--leading-12);
-        box-sizing: border-box;
     }
 
     :global(

@@ -61,6 +61,8 @@ export { default as Separator } from "./components/Separator.svelte";
 export { default as Progress } from "./components/Progress.svelte";
 export { default as Slider } from "./components/Slider.svelte";
 export { default as Input } from './components/Input.svelte'
+export { default as OTPInput } from "./components/OTPInput.svelte";
+export type { OTPLength } from "./components/OTPInput.svelte";
 export { default as SearchInput } from "./components/SearchInput.svelte";
 export { default as Textarea } from "./components/Textarea.svelte";
 export { default as Select } from "./components/Select.svelte";
