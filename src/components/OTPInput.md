@@ -37,7 +37,7 @@
 | --- | --- | --- | --- |
 | value | `string` | `""` | 过滤后的数字值，支持 `bind:value`；外部更新会同步显示。 |
 | defaultValue | `string` | — | 未提供 value 时的初始值，也是原生表单 reset 的恢复值；同时提供两者时 value 决定当前显示，defaultValue 决定 reset 基线。 |
-| length | `4 \| 5 \| 6 \| 7 \| 8` | `6` | 验证码位数；改变时立即按新长度截断值并重建格数。 |
+| length | `OTPLength` | `6` | 验证码位数；改变时立即按新长度截断值并重建格数。 |
 | oncomplete | `(value: string) => void` | — | 用户输入首次形成新的完整值时回调；初始化、外部赋值和重复相同值不触发。 |
 | name | `string` | — | 原生字段名；启用时由 FormData 收集过滤后的完整或部分值。 |
 | form | `string` | — | 按 id 关联外部 form。 |
@@ -51,12 +51,17 @@
 | title | `string` | — | 原生提示；不替代可访问名称。 |
 | invalid | `boolean` | `false` | 调用方控制的持续错误态，输出 aria-invalid、Input 同款边框/聚焦环/错误文字与 shake；不会被内置 2 秒计时器清除。 |
 | error | `string \| Snippet` | locale 文案 | 错误文字或内容；显式值优先于 locale 默认文案。 |
-| oninput / onchange / onfocus / onblur / onkeydown / onpaste | 原生事件回调 | — | 在真实 input 对应事件后调用。 |
+| oninput | `(event: Event) => void` | — | 用户输入已归一化或有效粘贴已写入后回调；拒绝粘贴不会触发。 |
+| onchange | `(event: Event) => void` | — | 转发真实 input 的原生 change 事件。 |
+| onfocus | `(event: FocusEvent) => void` | — | 真实 input 获得焦点、同步活动格后回调。 |
+| onblur | `(event: FocusEvent) => void` | — | 真实 input 失去焦点、隐藏激活框后回调。 |
+| onkeydown | `(event: KeyboardEvent) => void` | — | 原生按键处理前回调，可通过 preventDefault 取消默认行为。 |
+| onpaste | `(event: ClipboardEvent) => void` | — | 校验粘贴内容前回调；preventDefault 可取消整次组件粘贴处理。 |
 | class / style / Frame Props | `FrameProps` | — | 适用能力应用于公开根 Frame；tag、children 和 F-03B enableScaleObserver 不公开，合法原生属性由共享分流器只传给 input。 |
 
 公开样式覆盖：`--snowui-otp-input-gap-override`、`--snowui-otp-input-size-override`、`--snowui-otp-input-radius-override`、`--snowui-otp-input-font-size-override`、`--snowui-otp-input-line-height-override`。
 
-## 行为与无障碍
+## 使用边界与详细说明
 
 - 单一真实 `<input type="text" inputmode="numeric">` 负责键盘、选择、删除、替换、自动填充、表单和辅助技术；根 `role="group"` 与 input 共享显式可访问名称，分格为 `aria-hidden` 视觉层。错误通过 aria-describedby 关联，并由 polite 状态区播报。
 - 点击任意格会选择对应字符，因此下一次键入替换该格；活动格跟随 input 的真实 selection。原生方向键、Home、End、Backspace、Delete、选择替换与撤销行为保持可用。
