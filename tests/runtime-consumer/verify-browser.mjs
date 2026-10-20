@@ -13,4 +13,25 @@ const separators=await page.locator('.snowui-sidebar .snowui-separator-row').eva
 assert.equal(separators.length,2);
 for(const height of separators)assert.equal(height,0.5,'运行包侧栏必须保留真实分隔线绘制高度');
 console.log('PASS: tarball Sidebar explicit and built-in Separator content height 0.5px');
+// 仅消费已安装tarball的公开Context，语言更新必须保留同一分组折叠状态。
+assert.ok(html.includes('Primary navigation'),'服务端已编译Provider必须输出英文默认名称');
+await page.getByRole('navigation',{name:'Primary navigation',exact:true}).waitFor();
+await page.getByRole('button',{name:'Collapse Components',exact:true}).click();
+await page.getByRole('button',{name:'Expand Components',exact:true}).waitFor();
+await page.getByRole('button',{name:'Use Chinese',exact:true}).click();
+await page.getByRole('navigation',{name:'主导航',exact:true}).waitFor();
+await page.getByRole('button',{name:'展开Components',exact:true}).waitFor();
+assert.equal(await page.getByRole('button',{name:'收起Components',exact:true}).count(),0,'切语言不得重开已折叠分组');
+await page.getByRole('button',{name:'展开Components',exact:true}).click();
+await page.getByRole('button',{name:'收起Components',exact:true}).waitFor();
+await page.getByRole('button',{name:'Override labels',exact:true}).click();
+await page.getByRole('navigation',{name:'Package navigation',exact:true}).waitFor();
+await page.getByRole('button',{name:'Close Components',exact:true}).waitFor();
+await page.getByRole('button',{name:'Use English',exact:true}).click();
+await page.getByRole('button',{name:'Close Components',exact:true}).waitFor();
+await page.getByRole('button',{name:'Override labels',exact:true}).click();
+await page.getByRole('navigation',{name:'Primary navigation',exact:true}).waitFor();
+await page.getByRole('button',{name:'Collapse Components',exact:true}).waitFor();
+assert.equal(await page.getByRole('button',{name:'Count 2',exact:true}).count(),1,'Provider局部更新不得重置外围业务计数');
+console.log('PASS: tarball LocaleProvider SSR, reactive en/zh, messages override and removal, SidebarSection collapse state and external business state');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');await browser.close();
