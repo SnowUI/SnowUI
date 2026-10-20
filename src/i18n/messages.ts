@@ -34,6 +34,7 @@ export type SnowUIMessageKey =
     | "sidePanel.title"
     | "slider.title"
     | "menuItem.deleteCustom"
+    | "listbox.search"
     | "tag.close"
     | "sidebar.navigation"
     | "sidebar.expand"
@@ -143,6 +144,7 @@ export const SNOWUI_MESSAGES: Record<
         "sidePanel.title": "详情",
         "slider.title": "文本",
         "menuItem.deleteCustom": "删除自定义选项",
+        "listbox.search": "搜索",
         "tag.close": "关闭标签",
         "sidebar.navigation": "主导航",
         "sidebar.expand": "展开侧边栏",
@@ -245,6 +247,7 @@ export const SNOWUI_MESSAGES: Record<
         "sidePanel.title": "Details",
         "slider.title": "Text",
         "menuItem.deleteCustom": "Delete custom option",
+        "listbox.search": "Search",
         "tag.close": "Close tag",
         "sidebar.navigation": "Primary navigation",
         "sidebar.expand": "Expand sidebar",

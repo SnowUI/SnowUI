@@ -195,4 +195,17 @@ export const examples = [
         },
         logic: ["ContinuousHover", "OptOut"],
     },
+    {
+        name: "LB-Locale: 默认中文与英文搜索占位",
+        code: `LB-Locale
+<Select ariaLabel="默认列表搜索" options={[{value:"docs",label:"业务文档"}]} parts={{Listbox:{search:true}}} />
+<LocaleProvider locale="en-US">
+    <SelectButton search ariaLabel="English list search" options={[{value:"docs",label:"业务文档"}]} />
+</LocaleProvider>`,
+        expected: {
+            render: "打开两个宿主的真实列表，默认搜索占位分别为搜索／Search，业务选项不变",
+            interaction: "搜索过滤与选择沿用原宿主；显式parts.Input占位及显式Input子项保持优先",
+        },
+        logic: ["Locale", "Search", "ExplicitPartPriority", "SelectButton"],
+    },
 ] as const;

@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Select 组件：自定义下拉选择框（Trigger + 外置 Listbox 组合架构）
- v3.2.4
+ v3.2.5
 
  文档: ./Select.md
 -->
@@ -244,7 +244,7 @@
         get activeIndex() { return activeIndex; },
         get showCheck() { return listboxShowCheck; },
         get search() { return false; },
-        get triggerEl() { return buttonTrigger ? (selectEl ?? null) : (triggerEl ?? null); },
+        get triggerEl() { return buttonTrigger ? (selectEl?.querySelector<HTMLButtonElement>("button") ?? null) : (triggerEl ?? null); },
         get anchorEl() {
             // 宽度锚点：优先以最近 .snowui-field（含 label 的整体）等宽
             const currentTrigger = buttonTrigger ? selectEl : triggerEl;

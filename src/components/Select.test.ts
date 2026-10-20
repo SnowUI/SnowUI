@@ -181,4 +181,16 @@ export const examples = [
 </Select>`,
         logic: ["Selected", "ShowCheck", "ExplicitComposition"],
     },
+    {
+        name: "SEL-Locale-Focus: 按钮触发搜索列表关闭焦点",
+        code: `SEL-Locale-Focus
+<LocaleProvider locale="en-US">
+    <Select buttonTrigger ariaLabel="Business choices" options={[{value:"docs",label:"业务文档"}]} parts={{Listbox:{search:true}}} />
+</LocaleProvider>`,
+        expected: {
+            render: "内置搜索列表保持Search占位及业务选项，触发器保持Button宿主",
+            interaction: "搜索无匹配时Escape关闭后焦点回到真实触发Button，不停留在无视觉wrapper",
+        },
+        logic: ["ButtonTrigger", "Keyboard", "Escape", "FocusReturn", "Locale"],
+    },
 ] as const;

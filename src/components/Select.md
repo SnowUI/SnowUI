@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v3.2.4
+> **版本**: v3.2.5
 > **职责**: 在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - options 默认生成列表；显式 children 提供 Listbox / MenuItem 后替换默认列表。
 - persistent 保存选择；action 只调用 onAction 并关闭，不保存本次选择。默认子项用 parts，显式子项直接配置。
+- 列表通过 Escape 关闭后，字段型与 buttonTrigger／SelectButton 模式均恢复真实触发按钮焦点；搜索头关闭行为由共享 Listbox 管理。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -285,6 +286,11 @@ Select 的根布局固定按 Leading / Trigger / Trailing 三段组织：
 
 
 ## AI Zone
+
+### 关闭焦点与定位锚点
+
+`ListboxOwnerContext.triggerEl` 始终提供真实交互按钮；buttonTrigger模式由Select自身解析内置Button，不向Listbox暴露无视觉wrapper作为焦点目标。`anchorEl`继续按既有Field／Select外壳定位，不随焦点目标修复改变。
+
 
 ### 架构图
 
@@ -565,6 +571,10 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 ---
 
 ## 更新日志
+
+### v3.2.5 (2026-10-20)
+
+- 修复buttonTrigger／SelectButton列表关闭后向无视觉外壳恢复焦点，改为向共享Listbox提供真实触发按钮；定位锚点和选择协议保持不变。
 
 ### v3.2.4 (2026-10-17)
 

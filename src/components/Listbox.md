@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.3.6
+> **版本**: v1.3.7
 > **职责**: 在浮层中展示可选择的选项，支持搜索过滤与键盘操作，可作为 Select 的选择面板。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - items 的 value 必须唯一，label 用于显示和搜索；children 存在时替换 items。
 - 显式选项使用 MenuItem as="item"；显式搜索使用 Input as="search" 并关闭内置 search，避免重复输入框。
+- 默认内置搜索占位通过 listbox.search 随 LocaleProvider 切换；parts.Input.placeholder（含空字符串）与原生 aria-label 保持优先，显式 Input 子项由调用方配置，查询和选项内容不翻译。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -68,7 +69,7 @@
 - 默认内置模式（推荐）：`items` 自动生成 `<MenuItem as="item">`；设置 `search` 可生成固定搜索框。未设置 `maxHeight` 时，面板高度按实际可见 MenuItem 的高度计算：默认最多完整显示 10 项，超过后显示浮层滚动条；通过 `parts.Input` / `parts.MenuItem` 配置内置组件。
 - 显式组合模式：显式书写 MenuItem，用于复杂内容或逐项 Props 差异；存在 children 时不再生成 items。
 
-Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、`search={false}` 隐藏搜索框、`maxHeight` 显式修改最大高度、`scrollbar={false}` 隐藏浮层滚动条。搜索框默认 placeholder 为“搜索”，有搜索框时面板默认最小宽度为 160px。显式组合模式使用 `search` 时同样自动插入 Input；不设置时也可设置 `search={false}` 并手动书写 `<Input as="search">`。`maxHeight` 与 `scrollbar` 始终作为 Listbox 面板能力生效。
+Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、`search={false}` 隐藏搜索框、`maxHeight` 显式修改最大高度、`scrollbar={false}` 隐藏浮层滚动条。搜索框缺省 placeholder 通过 `listbox.search` 随 locale 使用“搜索”（zh-CN）／“Search”（en-US），`parts.Input.placeholder`（含空字符串）保持优先，有搜索框时面板默认最小宽度为 160px。显式组合模式使用 `search` 时同样自动插入 Input；不设置时也可设置 `search={false}` 并手动书写 `<Input as="search">`。`maxHeight` 与 `scrollbar` 始终作为 Listbox 面板能力生效。
 
 未设置 `maxHeight` 时，可用视口空间只改变完整可见的 Item 数量，不产生半项高度：面板在 2～10 项之间选择能够容纳的完整项数；即使触发器下方空间不足，也至少为现有选项中的前 2 项保留完整高度。少于 2 项时按实际项数 Hug。显式 `maxHeight` 继续按调用方给定的长度与视口可用高度取较小值。
 
@@ -122,10 +123,11 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 | 按键 | 行为 |
 | :--- | :--- |
 | `↑` / `↓` | 上下移动高亮选项（含自定义项） |
-| `Enter` / `Space` | 确认选择高亮项并关闭 |
+| `Enter` / `Space`（选项列表中） | 确认选择高亮项并关闭 |
 | `Enter`（搜索框无匹配 + `allowCustomValue`） | 添加当前输入为自定义项并选中 |
-| `Escape` | 关闭浮层，焦点还原至 Trigger |
-| `Tab` | 关闭浮层 |
+| `Escape` | 搜索头或列表中关闭浮层，焦点还原至 Trigger；无匹配选项时也可关闭；调用方 preventDefault 可取消 |
+| `Tab` | 搜索头或列表中关闭浮层，保留原生焦点导航；调用方 preventDefault 可取消 |
+| 空格、Home / End（搜索框中） | 保留原生文本编辑，不选择选项 |
 
 ---
 
@@ -220,6 +222,11 @@ hover / active 背景。disabled、filtered 项不会成为目标。
 
 
 ## AI Zone
+
+### 内置搜索文案
+
+默认生成的搜索 Input 使用 `useLocale()` 读取 `listbox.search`；Provider messages 可覆盖，`parts.Input` 的显式字段仍后置覆盖。显式 `Input as="search"` 不消费默认占位。查询、选项名／值与搜索／选择状态由原宿主协议管理，不翻译、不重建。
+
 
 以下章节保留源码维护约束，不属于应用接入步骤。
 
@@ -356,6 +363,11 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 - **关联规范**: [../../../specs/maintainers/HTMLSpec.md](../../../specs/maintainers/HTMLSpec.md)
 
 ## 更新日志
+
+### v1.3.7 (2026-10-20)
+
+- 搜索头接入共享 Escape／Tab 关闭；无匹配选项时也可关闭，保留原生文本编辑及调用方取消权。
+- 默认内置搜索占位接入统一 locale；parts.Input 与显式搜索子项保持既有优先级，查询、选项及选择行为保持原样。
 
 ### v1.3.6 (2026-10-14)
 

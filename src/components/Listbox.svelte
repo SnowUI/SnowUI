@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Listbox 组件：浮层选项列表面板
- v1.3.6
+ v1.3.7
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -31,6 +31,7 @@
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
     import {tick, setContext} from "svelte";
@@ -87,6 +88,8 @@
         [key: string]: any;
     }
 
+    const localeContext = useLocale();
+
     const inheritedListboxPart = useComponentPart<Props>("Listbox");
     let explicitProps: Props = $props();
     let {
@@ -116,7 +119,6 @@
     const resolvedParts = $derived({
         ...parts,
         Input: {
-            placeholder: "搜索",
             ...parts?.Input,
         },
         MenuItem: {
@@ -473,9 +475,25 @@
         return () => document.removeEventListener("pointerdown", handler, true);
     });
 
+    // 搜索头与列表共享关闭键；搜索头的其他按键继续交给原生输入框。
+    function handleDismissKeydown(e: KeyboardEvent) {
+        if (!owner || e.defaultPrevented) return false;
+        if (e.key === "Escape") {
+            e.preventDefault();
+            owner.setOpen(false);
+            owner.triggerEl?.focus();
+            return true;
+        }
+        if (e.key === "Tab") {
+            owner.setOpen(false);
+            return true;
+        }
+        return false;
+    }
+
     // 键盘导航
     function handleKeydown(e: KeyboardEvent) {
-        if (!owner) return;
+        if (handleDismissKeydown(e) || !owner) return;
         const opts = [...owner.options, ...owner.customOptions];
         const len = opts.length;
         if (len === 0) return;
@@ -506,14 +524,6 @@
                 ) {
                     owner.selectOption(opts[owner.activeIndex].value);
                 }
-                break;
-            case "Escape":
-                e.preventDefault();
-                owner.setOpen(false);
-                owner.triggerEl?.focus();
-                break;
-            case "Tab":
-                owner.setOpen(false);
                 break;
         }
     }
@@ -552,12 +562,14 @@
             enableScaleObserver={enableScaleObserver}
             {...frameRestProps}
         >
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
                 bind:this={headerEl}
                 class="snowui-listbox-header snowui-quick-action-panel-header"
+                onkeydown={handleDismissKeydown}
             >
                 {#if resolvedSearch}
-                    <Input {...resolvedParts.Input} as="search" />
+                    <Input placeholder={localeContext.t("listbox.search")} {...resolvedParts.Input} as="search" />
                 {/if}
             </div>
             <div
