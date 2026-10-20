@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.1
+> **版本**: v1.4.2
 > **职责**: 从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - bind:open 控制显示，placement 选择浮动或内嵌，width 可绑定并受最小/最大值限制。
 - children 是滚动内容；内嵌位移动效按 inlineMotionOwner 指定唯一负责方，避免页面与组件重复移动。
+- 未传 title 时，工具栏标题与面板名称随 LocaleProvider 切换；显式 title（含空字符串）及业务内容保持原样。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -116,7 +117,7 @@
 | bottomTrailing | `Snippet` | — | 下栏右侧整组显式替换；传入即显示下栏 |
 | bottomLeadingActions | `SidePanelToolbarAction[]` | — | 数据内置；传入即显示下栏；有 `bottomLeading` 时忽略 默认行为：可编辑时默认 copy/delete。 |
 | bottomTrailingActions | `SidePanelToolbarAction[]` | — | 数据内置；传入即显示下栏；有 `bottomTrailing` 时忽略 默认行为：可编辑时默认 取消/保存。 |
-| title | `string` | `"Details"` | 上工具栏右侧标题及面板无障碍名称 |
+| title | `string` | — | 上工具栏右侧标题及面板无障碍名称；未传时使用 sidePanel.title，zh-CN 为“详情”、en-US 为“Details”；显式空字符串保留 |
 | showTitle | `boolean` | `false` | 是否显示工具栏标题；关闭后保留无障碍名称与工具栏按钮 |
 | backdrop | `DialogBackdrop \| false` | `false` | 浮层背景，复用 Dialog 共享遮罩；内嵌模式忽略 |
 | closeOnEscape | `boolean` | `true` | Escape 关闭 |
@@ -390,6 +391,11 @@ function download() { /* 接入业务下载 */ }
 
 ## AI Zone
 
+### 内置文案与语言
+
+使用现有 `useLocale()`，key：`sidePanel.title`。未传 title 时，工具栏标题与面板名称随 LocaleProvider 切换；显式 title（含空字符串）及业务内容保持原样。Provider messages 可覆盖缺省文案。
+
+
 以下章节保留源码维护约束，不属于应用接入步骤。
 
 ### 不变量与验收
@@ -431,7 +437,7 @@ function download() { /* 接入业务下载 */ }
 - **只读 + 自定义下栏**：传入 `bottomLeading` / `bottomTrailing` / `bottomLeadingActions` / `bottomTrailingActions` 任一即显示下工具栏；只自定义一侧时另一侧为空，可编辑时缺省侧用默认按钮。
 - **上工具栏固定默认内置**（placement / previous / next + 标题 + 关闭 X），**不支持**替换。
 - 上、下工具栏的内置 icon-only Button 显式使用 `emphasis="muted"`，并在 hover 时显示自身 `ariaLabel` 的 Tooltip；调用方显式传入的 `bottomLeading` / `bottomTrailing` 不会被改写。可通过 `parts.Button.emphasis` 统一覆盖内置按钮的强调级别。
-- 内置 placement、previous、next、copy、delete、cancel、save、close 文案通过 `LocaleProvider` / `useLocale()` 读取；对应 key 为 `sidePanel.placement.toInline`、`sidePanel.placement.toFloating`、`sidePanel.previous`、`sidePanel.next`、`sidePanel.copy`、`sidePanel.delete`、`sidePanel.cancel`、`sidePanel.save`、`sidePanel.close`。无 Provider 时为 `zh-CN`。`title` 与 actions 数组的 `label` / `ariaLabel` 属于调用方业务文案，保持最高优先级且不翻译。
+- 内置 placement、previous、next、copy、delete、cancel、save、close 文案通过 `LocaleProvider` / `useLocale()` 读取；对应 key 为 `sidePanel.placement.toInline`、`sidePanel.placement.toFloating`、`sidePanel.previous`、`sidePanel.next`、`sidePanel.copy`、`sidePanel.delete`、`sidePanel.cancel`、`sidePanel.save`、`sidePanel.close`。无 Provider 时为 `zh-CN`。显式 `title` 与 actions 数组的 `label` / `ariaLabel` 属于调用方业务文案，保持最高优先级且不翻译。
 - 下栏优先级：Snippet **>** actions 数组 **>** 默认可编辑按钮。
 - 内置 Button 与整边调宽交互层通过 `parts.Button` / `parts.Indicator` 批量配置；Indicator 复用默认状态视觉。
 - 无上工具栏时，顶部内容间距与滚动渐隐范围均为 `var(--padding-4)`（16px）；无下工具栏时底部同样为 16px。有工具栏的一侧按工具栏高度预留。到达对应滚动端点后关闭该侧渐隐，保留内容间距。
@@ -448,6 +454,10 @@ function download() { /* 接入业务下载 */ }
 | `onClick` | 自定义回调 |
 
 ## 更新日志
+
+### v1.4.2 (2026-10-20)
+
+- 未传 title 时，工具栏标题与面板名称随 LocaleProvider 切换；显式 title（含空字符串）及业务内容保持原样。
 
 - 2026-09-28：内置 Indicator 使用整边命中，移除透明颜色特化，统一常态与 hover 视觉。
 

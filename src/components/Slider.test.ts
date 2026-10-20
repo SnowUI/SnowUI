@@ -113,4 +113,17 @@ export const examples = [
         },
         logic: ["variant", "soft", "theme-adaptive", "Black10", "Black100"],
     },
+    {
+        name: "Locale: 默认中文与英文内置文案",
+        code: `Locale
+<Slider variant="soft" value={42} showLabel ariaLabel="业务数值" />
+<LocaleProvider locale="en-US">
+<Slider variant="soft" value={42} showLabel ariaLabel="业务数值" />
+</LocaleProvider>`,
+        expected: {
+            render: "默认中文与英文Provider分别提供内置文案；业务内容保持原样",
+            interaction: "语言切换不重置原有值与状态，显式文案保持优先",
+        },
+        logic: ["Locale", "ExplicitTextPriority", "BusinessContent"],
+    },
 ] as const;

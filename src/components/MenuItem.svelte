@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  MenuItem 组件：浮层面板操作项（统一版）
- v1.2.3
+ v1.2.4
 
  职责：
  - 同时支持两种使用场景：
@@ -14,6 +14,7 @@
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import Button from "./Button.svelte";
@@ -24,6 +25,8 @@
     import {getListboxOwner} from "../context";
     import {splitFrameHostProps} from "../logic/frame-prop-filter";
     import {mergeComponentPartProps, useComponentPart} from "../logic/component-parts.svelte";
+
+    const localeContext = useLocale();
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
         /** 内置图标按钮配置；事件与角色由所属组件控制。 */
@@ -234,7 +237,7 @@
             type="button"
             class={`snowui-clear-icon-btn snowui-menu-item-delete snowui-menu-item-check${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
             as="trailing"
-            aria-label="删除自定义选项"
+            aria-label={localeContext.t("menuItem.deleteCustom")}
             onclick={handleDelete}
             onmousedown={handleMousedown}
             tabindex={-1}

@@ -136,4 +136,17 @@ export const examples = [
         },
         logic: ["SP-Init.1"],
     },
+    {
+        name: "Locale: 默认中文与英文内置文案",
+        code: `Locale
+<SidePanel open placement="inline" showTitle closeOnOutside={false} style="height:12rem;">业务详情</SidePanel>
+<LocaleProvider locale="en-US">
+<SidePanel open placement="inline" showTitle closeOnOutside={false} style="height:12rem;">业务详情</SidePanel>
+</LocaleProvider>`,
+        expected: {
+            render: "默认中文与英文Provider分别提供内置文案；业务内容保持原样",
+            interaction: "语言切换不重置原有值与状态，显式文案保持优先",
+        },
+        logic: ["Locale", "ExplicitTextPriority", "BusinessContent"],
+    },
 ] as const;

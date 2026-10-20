@@ -80,7 +80,7 @@
         bottomTrailing = undefined,
         bottomLeadingActions = undefined,
         bottomTrailingActions = undefined,
-        title = "Details",
+        title = undefined,
         showTitle = false,
         backdrop = false,
         closeOnEscape = true,
@@ -105,6 +105,7 @@
 
     provideComponentParts(() => parts);
     const locale = useLocale();
+    const resolvedTitle = $derived(title ?? locale.t("sidePanel.title"));
 
     let panelEl = $state<HTMLElement | undefined>();
     let viewportEl = $state<HTMLElement | undefined>();
@@ -398,7 +399,7 @@
             enableAutoLayout={false}
             role="dialog"
             aria-modal={placement === "floating" ? "true" : undefined}
-            aria-label={title}
+            aria-label={resolvedTitle}
             tabindex="-1"
             data-placement={placement}
             data-inline-motion-owner={placement === "inline" ? inlineMotionOwner : undefined}
@@ -424,7 +425,7 @@
                         {/each}
                     </div>
                     <div class="snowui-side-panel-title-group">
-                        {#if showTitle}<span class="snowui-side-panel-title">{title}</span>{/if}
+                        {#if showTitle}<span class="snowui-side-panel-title">{resolvedTitle}</span>{/if}
                         <Button
                             bare
                             emphasis={parts?.Button?.emphasis ?? "muted"}

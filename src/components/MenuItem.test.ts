@@ -165,6 +165,19 @@ export const examples = [
         },
         logic: ["Popover", "Layout", "Icon"],
     },
+    {
+        name: "Locale: 默认中文与英文内置文案",
+        code: `Locale
+<Select value="docs" options={[{value:"docs",label:"业务选项"}]} parts={{Listbox:{search:true},Input:{allowCustomValue:true}}} />
+<LocaleProvider locale="en-US">
+<Select value="docs" options={[{value:"docs",label:"业务选项"}]} parts={{Listbox:{search:true},Input:{allowCustomValue:true}}} />
+</LocaleProvider>`,
+        expected: {
+            render: "默认中文与英文Provider分别提供内置文案；业务内容保持原样",
+            interaction: "打开选项，输入新名称后Enter创建；hover自定义项时删除名称随Provider语言变化",
+        },
+        logic: ["Locale", "ExplicitTextPriority", "BusinessContent"],
+    },
 ] as const;
 
 

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.1.0
+> **版本**: v1.1.2
 > **职责**: 提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - 这是可点击搜索入口；bind:open 同步浮层状态，value 用于展示当前查询。
 - 通过 children 组合浮层或快捷键提示；需要直接编辑查询时使用 SearchInput。
+- 默认占位和清除名称随 LocaleProvider 切换；显式 placeholder（含空字符串）与 aria-label 优先，查询值保持原样。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -57,7 +58,7 @@
 | parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置内部生成的清除 Button；显式子内容不消费该默认配置。 |
 | variant | `"gray" \| "outline"` | `"gray"` | 搜索框样式 |
 | value | `string \| number` | — | 当前搜索文本或展示值 |
-| placeholder | `string` | `"Search"` | 占位文本 |
+| placeholder | `string` | — | 占位文本；未传时使用 searchBox.placeholder，zh-CN 为“搜索”、en-US 为“Search”；显式空字符串保留 |
 | open | `boolean` | `false` | 浮层打开状态，支持 `bind:open` |
 | disabled | `boolean` | `false` | 禁用触发器 |
 | readonly | `boolean` | `false` | 只读触发器，不响应打开 |
@@ -128,6 +129,11 @@
 
 ## AI Zone
 
+### 内置文案与语言
+
+使用现有 `useLocale()`，key：`searchBox.placeholder`、`searchBox.clear`。默认占位和清除名称随 LocaleProvider 切换；显式 placeholder（含空字符串）与 aria-label 优先，查询值保持原样。Provider messages 可覆盖缺省文案。
+
+
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
 
 
@@ -195,6 +201,10 @@
 ---
 
 ## 更新日志
+
+### v1.1.2 (2026-10-20)
+
+- 默认占位和清除名称随 LocaleProvider 切换；显式 placeholder（含空字符串）与 aria-label 优先，查询值保持原样。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

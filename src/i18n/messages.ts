@@ -29,6 +29,11 @@ export type SnowUIMessageKey =
     | "chartGroup.name"
     | "chartGroup.cells"
     | "chartGroup.cell"
+    | "searchBox.placeholder"
+    | "searchBox.clear"
+    | "sidePanel.title"
+    | "slider.title"
+    | "menuItem.deleteCustom"
     | "tag.close"
     | "sidebar.navigation"
     | "sidebar.expand"
@@ -133,6 +138,11 @@ export const SNOWUI_MESSAGES: Record<
         "chartGroup.name": "组合图表",
         "chartGroup.cells": "组合图表数据单元格",
         "chartGroup.cell": "单元格 {{index}}",
+        "searchBox.placeholder": "搜索",
+        "searchBox.clear": "清除搜索内容",
+        "sidePanel.title": "详情",
+        "slider.title": "文本",
+        "menuItem.deleteCustom": "删除自定义选项",
         "tag.close": "关闭标签",
         "sidebar.navigation": "主导航",
         "sidebar.expand": "展开侧边栏",
@@ -230,6 +240,11 @@ export const SNOWUI_MESSAGES: Record<
         "chartGroup.name": "Chart group",
         "chartGroup.cells": "Chart group data cells",
         "chartGroup.cell": "Cell {{index}}",
+        "searchBox.placeholder": "Search",
+        "searchBox.clear": "Clear search",
+        "sidePanel.title": "Details",
+        "slider.title": "Text",
+        "menuItem.deleteCustom": "Delete custom option",
         "tag.close": "Close tag",
         "sidebar.navigation": "Primary navigation",
         "sidebar.expand": "Expand sidebar",

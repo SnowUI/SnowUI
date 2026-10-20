@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.2
+> **版本**: v1.4.3
 > **职责**: 通过拖动选择单个数值或数值区间，支持水平、垂直、步进与填充式展示，适合范围和参数调整。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - bind:value 使用数值表示单滑块，数组表示双滑块范围；边界属性为 minValue / maxValue。
 - step 控制步长，ariaLabel 提供名称；显式 Text as="label" 替换默认标签。
+- solid／soft 的缺省条形标题随 LocaleProvider 切换；显式 title（含空字符串）、ariaLabel、数值及显式 label 保持原样。标题不替代可访问名称。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -48,7 +49,7 @@
 | step | `number` | `1` | 步进值 |
 | orientation | `SliderOrientation` | `"horizontal"` | 轨道方向 |
 | variant | `SliderVariant` | `"default"` | `solid` 为高对比条形样式；`soft` 为使用 Black token 的主题自适应低对比条形样式 |
-| title | `string` | `"Text"` | `solid` / `soft` 左侧内置标题；空字符串可隐藏；不是 label |
+| title | `string` | — | `solid` / `soft` 左侧内置标题；未传时使用 slider.title，zh-CN 为“文本”、en-US 为“Text”；显式空字符串可隐藏；不是 label，也不替代 ariaLabel |
 | showSteps | `boolean` | `false` | 使用 1px 透明缝隙按照 step 切割轨道与填充条 |
 | showLabel | `boolean` | `false` | 是否生成跟随拖动块的内置 Text label；水平条形 Range 合并为一个范围标签，其他 Range 生成两个 |
 | thickness | `number \| string` | — | 轨道粗细；在条形变体中控制整体高度 |
@@ -80,7 +81,7 @@
 - 内置 label 默认排版为 12px / 16px，可通过 `parts.Text` 配置。显式 `<Text as="label">` 内容保持原样并替换内置 label。
 - 水平 label 位于拖动块上方，纵向 label 位于拖动块左侧，默认间距均为 2px；label 只在 hover 时显示。
 - Range Slider 使用两个直系 `as="label"` 内容时，按顺序分别跟随起点和终点拖动块。
-- `solid` / `soft` 是 Workshop `14458:37835` 的两种 32px 条形变体：水平容器默认高 32px、圆角 8px，填充区域扩展为完整高度且左右两端均保留圆角；`title` 是左侧内置标题，默认 `"Text"`，不属于 label。
+- `solid` / `soft` 是 Workshop `14458:37835` 的两种 32px 条形变体：水平容器默认高 32px、圆角 8px，填充区域扩展为完整高度且左右两端均保留圆角；`title` 是左侧内置标题，缺省随 locale 使用“文本”／“Text”，不属于 label。
 - `solid` 为高对比样式：填充默认 `Primary`，覆盖区域的 title、数值 label 与指示器使用 `Static White/100%`；未覆盖文字使用 `Black/100%`。
 - `soft` 为主题自适应的低对比样式：填充默认 `Black/10%`，title、数值 label 与指示器均以 `Black/100%` 为基色，随亮色 / 暗色主题 token 变化。
 - 两种条形变体的右侧数值均复用其他变体的 label 协议：默认不显示，`showLabel=true` 时生成实时百分比，继续支持 `parts.Text` 与显式 label。数值 label 常态通过独立 `opacity: 0.4` 显示，hover、focus 或拖动时提升到 `opacity: 0.8`。
@@ -135,6 +136,11 @@
 
 ## AI Zone
 
+### 内置文案与语言
+
+使用现有 `useLocale()`，key：`slider.title`。solid／soft 的缺省条形标题随 LocaleProvider 切换；显式 title（含空字符串）、ariaLabel、数值及显式 label 保持原样。标题不替代可访问名称。Provider messages 可覆盖缺省文案。
+
+
 **继承**: 复用 Frame.svelte 的通用能力。
 **默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`, `enableDefaultMotion=true`。
 
@@ -149,6 +155,10 @@
 - steps 只在固定尺寸的 track 上使用 CSS mask 生成 1px 透明缝隙；父级 mask 同时裁切内部 fill，切割线不会随填充宽度移动，也不假设页面背景色。
 
 ## 更新日志
+
+### v1.4.3 (2026-10-20)
+
+- solid／soft 的缺省条形标题随 LocaleProvider 切换；显式 title（含空字符串）、ariaLabel、数值及显式 label 保持原样。标题不替代可访问名称。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

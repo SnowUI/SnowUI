@@ -2,12 +2,13 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Slider 滑动输入组件
-  v1.4.2
+  v1.4.3
 
   文档: ./Slider.md
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
@@ -21,6 +22,8 @@
 
     type SliderOrientation = "horizontal" | "vertical";
     type SliderVariant = "default" | "solid" | "soft";
+
+    const localeContext = useLocale();
 
     interface Props extends Omit<FrameProps, "children"> {
         value?: number | number[];
@@ -53,7 +56,7 @@
         step = 1,
         orientation = "horizontal",
         variant = "default",
-        title = "Text",
+        title = undefined,
         showSteps = false,
         showLabel = false,
         thickness = undefined,
@@ -76,6 +79,8 @@
         children,
         ...rest
     }: Props = $props();
+
+    const resolvedTitle = $derived(title ?? localeContext.t("slider.title"));
 
     let controlRef = $state<HTMLElement>();
     let labelsRef = $state<HTMLElement>();
@@ -327,8 +332,8 @@
         onpointerup={handlePointerUp}
         onpointercancel={handlePointerUp}
     >
-        {#if isBarVariant && title}
-            <Text class="snowui-slider-title">{title}</Text>
+        {#if isBarVariant && resolvedTitle}
+            <Text class="snowui-slider-title">{resolvedTitle}</Text>
         {/if}
 
         {#if children || showLabel}

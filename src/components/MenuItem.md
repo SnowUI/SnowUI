@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.2.3
+> **版本**: v1.2.4
 > **职责**: 在选项列表或快捷操作面板中呈现一项内容，支持图标、选中状态与禁用反馈。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - 接入 Listbox 时使用 as="item"，同一列表的 value 必须唯一。
 - disabled 禁止操作；leading / trailing 放置附件，closeOnSelect 决定选中后是否关闭所属面板。
+- 自定义选项的内置删除名称随 LocaleProvider 切换；查询、选项名称和值保持原样，删除仍由所属 Listbox 管理。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -169,6 +170,11 @@ MenuItem 在支持连续 hover 的 Listbox / Popover 中由宿主的唯一背景
 
 ## AI Zone
 
+### 内置文案与语言
+
+使用现有 `useLocale()`，key：`menuItem.deleteCustom`。自定义选项的内置删除名称随 LocaleProvider 切换；查询、选项名称和值保持原样，删除仍由所属 Listbox 管理。Provider messages 可覆盖缺省文案。
+
+
 以下章节保留源码维护约束，不属于应用接入步骤。
 
 ### 架构
@@ -237,6 +243,10 @@ Frame row (.snowui-menu-item)
 ---
 
 ## 更新日志
+
+### v1.2.4 (2026-10-20)
+
+- 自定义选项的内置删除名称随 LocaleProvider 切换；查询、选项名称和值保持原样，删除仍由所属 Listbox 管理。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

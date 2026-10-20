@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   SearchBox 搜索框触发器
-  v1.1.0
+  v1.1.2
 
   文档: ./SearchBox.md
 
@@ -14,6 +14,7 @@
 -->
 
 <script lang="ts">
+    import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import { Button } from "../index";
@@ -24,6 +25,8 @@
         resizeManager,
         type FrameProps,
     } from "../index";
+
+    const localeContext = useLocale();
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
         /** 内置图标按钮配置；事件与角色由所属组件控制。 */
@@ -48,7 +51,7 @@
     let {
         variant = "gray",
         value = $bindable(),
-        placeholder = "Search",
+        placeholder = undefined,
         open = $bindable(false),
         disabled = false,
         readonly = false,
@@ -74,7 +77,7 @@
     const hasValue = $derived(
         value !== undefined && value !== null && String(value) !== "",
     );
-    const displayText = $derived(hasValue ? String(value) : placeholder);
+    const displayText = $derived(hasValue ? String(value) : (placeholder ?? localeContext.t("searchBox.placeholder")));
 
     const searchBoxRenderHints = $derived({
         variant: userRenderHints?.variant ?? "line",
@@ -201,7 +204,7 @@
             type="button"
             class={`snowui-clear-icon-btn snowui-search-box-clear-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
             as="trailing"
-            aria-label="清除搜索内容"
+            aria-label={localeContext.t("searchBox.clear")}
             onclick={handleClear}
             onmousedown={(event: MouseEvent) => event.preventDefault()}
             tabindex={-1}
