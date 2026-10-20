@@ -1,6 +1,6 @@
 /**
  * Image.test.ts
- * v1.0.0
+ * v1.1.0
  */
 export const examples = [
     {
@@ -38,5 +38,13 @@ export const examples = [
         <Heart />
     </Icon>
 </Image>`,
+    },
+    {
+        name: "4: 字符串图片加载策略",
+        code: `4
+<Image src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='gray'/%3E%3C/svg%3E" size={80} mediaLoading="eager" alt="立即加载" />
+<Image src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='gray'/%3E%3C/svg%3E" size={80} mediaLoading="lazy" alt="懒加载" />`,
+        expected: { render: "原生图片分别输出 eager / lazy，mediaLoading 不泄漏到根 DOM", performance: "使用原生请求，保持 load/error 与 Skeleton 状态" },
+        logic: ["4"],
     },
 ] as const;

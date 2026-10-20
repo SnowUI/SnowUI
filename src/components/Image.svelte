@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Image 图片组件
-  v1.4.0
+  v1.5.0
 -->
 
 <script lang="ts">
@@ -25,12 +25,15 @@
         type PreviewMode,
     } from "../logic/image-preview";
 
+    import { useMediaLoading, type MediaLoading } from "../lib/media-loading";
+
     type ImageSize = BaseResourceSize | 56 | 64 | 72;
 
     interface Props extends FrameProps {
         src?: string | Component;
         size?: ImageSize;
         alt?: string;
+        mediaLoading?: MediaLoading;
         previewMode?: PreviewMode;
         onOpen?: (event?: MouseEvent | KeyboardEvent) => void;
         badgePosition?: "top" | "bottom";
@@ -42,6 +45,7 @@
         src = undefined,
         size = undefined,
         alt = undefined,
+        mediaLoading = undefined,
         previewMode = undefined,
         onOpen = undefined,
         badgePosition = "top",
@@ -56,7 +60,7 @@
         class: className = "",
         style: userStyle = "",
         renderHints: userRenderHints = undefined,
-        children,
+        children: userChildren,
         ...rest
     }: Props = $props();
 
@@ -73,6 +77,9 @@
         } = rest as Record<string, any>;
         return forwardedProps;
     });
+
+    const inheritedMediaLoading = useMediaLoading();
+    const resolvedMediaLoading = $derived(mediaLoading ?? inheritedMediaLoading());
 
     getSize();
     const sizeCtx = getSizeContext();
@@ -421,7 +428,7 @@
                                 {src}
                                 alt={alt ?? ""}
                                 class="snowui-image-media"
-                                loading="lazy"
+                                loading={resolvedMediaLoading}
                                 onload={handleStringImageLoad}
                                 onerror={handleStringMediaError}
                             />
@@ -447,8 +454,8 @@
                 </div>
             {/if}
         </div>
-        {#if children}
-            {@render children({})}
+        {#if userChildren}
+            {@render userChildren()}
         {/if}
     {/snippet}
 </Frame>

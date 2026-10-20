@@ -6,6 +6,6 @@ const code=fs.readFileSync('minimal-dist/button.js','utf8');
 assert.ok(code.includes('snowui-button'));
 const chunks=(Array.isArray(result)?result:[result]).flatMap(r=>r.output).filter(o=>o.type==='chunk');
 for(const chunk of chunks)for(const [id,module] of Object.entries(chunk.modules)) {
- if(/\/components\/(BarChart|DataTable)\.js$|\/blocks\/Sidebar\.js$/.test(id))assert.equal(module.renderedLength,0,`Unexpected retained implementation: ${id}`);
+ if(/\/lib\/media-loading\.js$|\/components\/(BarChart|DataTable)\.js$|\/blocks\/Sidebar\.js$/.test(id))assert.equal(module.renderedLength,0,`Unexpected retained implementation: ${id}`);
 }
 console.log('PASS: Button-only bundle excludes charts, DataTable and Sidebar');

@@ -34,4 +34,16 @@ await page.getByRole('navigation',{name:'Primary navigation',exact:true}).waitFo
 await page.getByRole('button',{name:'Collapse Components',exact:true}).waitFor();
 assert.equal(await page.getByRole('button',{name:'Count 2',exact:true}).count(),1,'Provider局部更新不得重置外围业务计数');
 console.log('PASS: tarball LocaleProvider SSR, reactive en/zh, messages override and removal, SidebarSection collapse state and external business state');
+assert.ok(html.includes('Media action'));
+assert.equal(await page.getByRole('button',{name:'Media action',exact:true}).count(),1);
+// 服务端与水合后验证原生图片属性和最近作用域，单项覆盖不能泄漏到 DOM。
+for(const [alt,loading] of [['default media','lazy'],['inherited media','eager'],['explicit media','lazy'],['nested media','lazy'],['nested eager media','eager']]) {
+ assert.match(html,new RegExp(`alt="${alt}"[^>]*loading="${loading}"`));
+ assert.equal(await page.getByAltText(alt,{exact:true}).getAttribute('loading'),loading);
+}
+await page.getByRole('button',{name:'Toggle media loading',exact:true}).click();
+await page.waitForFunction(()=>document.querySelector('img[alt="inherited media"]')?.loading==='lazy');
+assert.equal(await page.getByAltText('nested eager media',{exact:true}).getAttribute('loading'),'eager');
+assert.equal(await page.locator('[medialoading]').count(),0);
+console.log('PASS: tarball media-loading SSR, hydration, reactive inherited default, explicit override and nearest scope');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');await browser.close();

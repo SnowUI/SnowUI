@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.0
+> **版本**: v1.5.0
 > **职责**: 展示图片及其占位状态，支持组合角标、操作与预览入口，适合内容图片和媒体缩略图。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-20
 
 ## 组件介绍
 
@@ -44,6 +44,7 @@
 | src | `string \| Component` | — | 图片 / 视频 URL，或 `resource-svelte` 图片组件 |
 | size | `ImageSize` | — | 图片尺寸。未显式设置时自动继承 `ImageGroup` 提供的尺寸上下文。 |
 | alt | `string` | — | 图片替代文本 |
+| mediaLoading | `MediaLoading` | 继承或 `"lazy"` | 字符串图片的原生加载策略；显式值优先于最近的 `provideMediaLoading()` 默认值。与 Frame 的视觉 `loading` 无关。 |
 | previewMode | `PreviewMode` | — | 显式控制预览方式；未声明时，页面存在共享 ImageViewer 则接入 Viewer，否则字符串媒体回退为新窗口 |
 | onOpen | `(event?: MouseEvent \| KeyboardEvent) => void` | — | 点击或键盘触发打开时调用；提供后接管默认 Viewer / 新窗口动作，调用方负责处理打开行为。 |
 | badgePosition | `"top" \| "bottom"` | `"top"` | 角标位置：top 为右上，bottom 为右下。 |
@@ -54,6 +55,21 @@
 ## 使用边界与详细说明
 
 <a id="布局模型"></a>
+
+### 图片加载策略
+
+默认保持 `lazy`。需要首屏外图片立即请求时，单项使用 `<Image mediaLoading="eager" ... />`；完整示例墙等子树可在宿主组件初始化时调用公开 `provideMediaLoading('eager')`。嵌套 Provider 取最近值，单项显式 Prop 优先；传入 `() => policy` 可响应状态变化，SSR 与客户端使用同一默认值。
+
+```svelte
+<script lang="ts">
+    import { Image, provideMediaLoading } from '@snowui-design-system/components';
+    provideMediaLoading('eager');
+</script>
+<Image src="/cover.jpg" alt="封面" />
+<Image src="/secondary.jpg" alt="次要图片" mediaLoading="lazy" />
+```
+
+`eager` 会提前消耗网络和解码资源，不承诺图片下载成功或固定完成时限；真实加载期间仍显示 Skeleton。仅影响字符串图片的 `<img loading>`，不改视频的 `preload="metadata"`、资源组件自身的加载协议、预览器中尚未打开的媒体或动画播放时机。详见 [通用加载策略](../lib/media-loading.md)。
 
 ### 布局模型
 
@@ -218,6 +234,11 @@
 ---
 
 ## 更新日志
+
+### v1.5.0 (2026-10-20)
+
+- 修正外部 children 与 Frame 内部同名 Snippet 在 SSR 编译时相互遮蔽造成递归；媒体挂件行为保持。
+- 新增 `mediaLoading` 与公开 `provideMediaLoading()` 作用域默认值；默认 lazy，单项覆盖优先，保持视频及资源组件原行为。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
