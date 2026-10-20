@@ -82,8 +82,8 @@
 				<Frame column gap={4} style="min-width: 0; width: 100%;">
 					<Frame row><Text size={20} weight={600}>{activeComponent.name}</Text><Badge as="trailing" count={activeComponent.category} color={activeComponent.category === 'Composite' ? 'Indigo' : 'Blue'} /></Frame>
 					<Text style="color: var(--black-40);">{activeComponent.description}</Text>
-					<Input value={activeComponent.packageName} ariaLabel="Package name" />
-					<Textarea value={activeComponent.notes} ariaLabel="Release note" style="height: 8rem;" />
+					<Input value={activeComponent.packageName} aria-label="Package name" />
+					<Textarea value={activeComponent.notes} aria-label="Release note" style="height: 8rem;" />
 				</Frame>
 			</SidePanel>
 		</div>
