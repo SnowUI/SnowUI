@@ -29,6 +29,18 @@ export interface OverflowActionsContext {
 
 export const OVERFLOW_ACTIONS_CONTEXT_KEY = Symbol("snowui-overflow-actions");
 
+/** 宿主只提供布局约束，不接管显式子项的按钮视觉。 */
+export interface OverflowActionsLayoutContext {
+    readonly availableWidth: number | undefined;
+    readonly maxVisible: number | undefined;
+    readonly overflow: "all" | "progressive" | undefined;
+}
+export const OVERFLOW_ACTIONS_LAYOUT_CONTEXT_KEY = Symbol("snowui-overflow-actions-layout");
+
+export function getOverflowActionsLayoutContext() {
+    return getContext<OverflowActionsLayoutContext | undefined>(OVERFLOW_ACTIONS_LAYOUT_CONTEXT_KEY);
+}
+
 export function getOverflowActionsContext(): OverflowActionsContext | undefined {
     return getContext<OverflowActionsContext | undefined>(
         OVERFLOW_ACTIONS_CONTEXT_KEY,

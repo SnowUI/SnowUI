@@ -1,4 +1,5 @@
 export const examples = [
+    {name:"OA-数量上限",code:`<OverflowActions overflow="progressive" maxVisible={1} items={[{id:'edit',label:'编辑'},{id:'copy',label:'复制'},{id:'more',label:'详情'}]} />`,expected:{render:"最多直出一个操作，其余进入More。",interaction:"More保留原操作顺序，菜单关闭后更新布局。"},logic:["MaxVisible","Progressive"]},
     {
         name: "OA-01:默认数据与完整操作",
         code: `OA-01

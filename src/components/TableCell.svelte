@@ -12,7 +12,8 @@
     });
 </script>
 <script lang="ts">
-    import { getContext, type Snippet } from "svelte";
+    import { getContext, setContext, type Snippet } from "svelte";
+    import { OVERFLOW_ACTIONS_LAYOUT_CONTEXT_KEY, type OverflowActionsLayoutContext } from "../logic/overflow-actions.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Tooltip from "./Tooltip.svelte";
     import Checkbox from "./Checkbox.svelte";
@@ -86,8 +87,13 @@
         isActionsRole && rowId !== undefined ? table.getRowActions(rowId) : [],
     );
     const actionsAvailableWidth = $derived(
-        Math.max(0, (width ?? table.getActionsColumnWidth()) - 24),
+        table.getActionsContentWidth() ?? Math.max(0, (width ?? table.getActionsColumnWidth()) - 24),
     );
+    setContext<OverflowActionsLayoutContext>(OVERFLOW_ACTIONS_LAYOUT_CONTEXT_KEY, {
+        get availableWidth() { return isActionsRole ? actionsAvailableWidth : undefined; },
+        get maxVisible() { return isActionsRole ? table.getActionsMaxVisible() : undefined; },
+        get overflow() { return isActionsRole ? table.getActionsOverflow() : undefined; },
+    });
     const resolvedLines = $derived(skeleton || isSelectionRole || isActionsRole || lines === false ? undefined : lines);
     const contextRowAppearMotion = $derived(
         !skeleton && !isSelectionRole && !isActionsRole && rowId !== undefined
@@ -331,7 +337,9 @@
             <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
         {:else if rowId !== undefined && defaultActions.length > 0}
             <OverflowActions
+                {...table.getActionsProps()}
                 items={defaultActions}
+                maxVisible={table.getActionsMaxVisible()}
                 compact={table.getActionsCompact()}
                 overflow={table.getActionsOverflow()}
                 overflowFrom={table.getActionsOverflowFrom()}
@@ -385,9 +393,9 @@
     :global(:where(.snowui-table-cell-skeleton)) { display: flex; width: 100%; align-items: center; }
     :global(:where(.snowui-table-cell[data-as="selection"] .snowui-table-selection-control)),
     :global(:where(.snowui-table-cell-content[data-actions="true"])) { opacity: 0; pointer-events: none; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-as="selection"] .snowui-table-selection-control),
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has([data-as="actions"] :focus), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-as="selection"] .snowui-table-selection-control),
     :global(:where(.snowui-table-cell[data-as="selection"] .snowui-table-selection-control[data-selected="true"])) { opacity: 1; pointer-events: auto; }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell:not([data-role-layout="overlay"]) .snowui-table-cell-content[data-actions="true"]) { opacity: 1; pointer-events: auto; }
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has([data-as="actions"] :focus), .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell:not([data-role-layout="overlay"]) .snowui-table-cell-content[data-actions="true"]) { opacity: 1; pointer-events: auto; }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="selection"])),
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="actions"])) { position: sticky; width: 0; min-width: 0; max-width: 0; padding: 0; overflow: visible; background: transparent; z-index: 3; }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="selection"])) { left: 0; }
@@ -395,7 +403,7 @@
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-selection-control)) { position: absolute; inset-block: 0 calc(-1 * var(--border-1, .5px)); inset-inline-start: 0; box-sizing: border-box; display: flex; width: var(--size-10, 2.5rem); align-items: center; justify-content: center; overflow: visible; padding-block: var(--padding-2); padding-inline: max(var(--padding-2), var(--snowui-table-responsive-cell-padding-inline, var(--padding-3))); border-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)); background: transparent; z-index: 2147483647; pointer-events: auto; }
     /* 内容 mask 退出是离散切换；同步撤去整个操作浮层，避免淡出按钮叠在已恢复的文字上。 */
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"])) { opacity: 1; visibility: hidden; pointer-events: none; transition: none; }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"]) { visibility: visible; }
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has([data-as="actions"] :focus), .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"]) { visibility: visible; }
     :global(:where(.snowui-table-body .snowui-table-row:last-child) > .snowui-table-cell) { border-bottom-color: transparent; }
     :global(:where(.snowui-table-cell-content)) { position: relative; display: block; min-width: 0; max-width: 100%; overflow: hidden; --snowui-table-cell-actions-legacy-tail: calc(var(--snowui-table-cell-actions-fade-width) * (var(--snowui-table-actions-fade-feather-override) - 1)); --snowui-table-cell-actions-fade-width: calc(var(--snowui-table-role-overlay-content-width, var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3))) * var(--snowui-table-actions-fade-coverage-override, 1)); }
     /* 关闭截断的普通内容保留子组件外扩；角色浮层和 Skeleton 仍使用各自裁切。 */
@@ -412,14 +420,14 @@
     :global(:where(.snowui-table-cell-content[data-actions="true"] .snowui-table-role-overlay-controls)) { display: flex; align-items: center; justify-content: flex-end; gap: var(--snowui-table-cell-actions-gap-override, var(--gap-2)); }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"])) { position: absolute; inset-block: 0 calc(-1 * var(--border-1, .5px)); inset-inline-end: 0; display: flex; width: var(--snowui-table-role-overlay-width-override, calc((var(--size-12, 3rem) + var(--size-14, 3.5rem)) / 3)); max-width: none; align-items: center; justify-content: flex-end; overflow: hidden; padding-inline: max(var(--padding-2), var(--snowui-table-responsive-cell-padding-inline, var(--padding-3))); border-radius: var(--snowui-table-row-radius-override, var(--radius-3, 0.75rem)); }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-role-blur-layer)) { opacity: 0; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-role-blur-layer) { opacity: 1; }
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has([data-as="actions"] :focus), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-role-blur-layer) { opacity: 1; }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-selection-control) > :not(.snowui-table-role-blur-layer)),
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"]) > :not(.snowui-table-role-blur-layer)) { position: relative; z-index: 2; }
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-selection-control) > :not(.snowui-table-role-blur-layer)),
     :global(:where(.snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"]) > :not(.snowui-table-role-blur-layer)) { opacity: 0; pointer-events: none; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control > :not(.snowui-table-role-blur-layer)),
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has([data-as="actions"] :focus), .snowui-table-row[data-selected="true"]) .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control > :not(.snowui-table-role-blur-layer)),
     :global(:where(.snowui-table-cell[data-role-layout="overlay"][data-as="selection"] .snowui-table-selection-control[data-selected="true"]) > :not(.snowui-table-role-blur-layer)),
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"] > :not(.snowui-table-role-blur-layer)) { opacity: 1; pointer-events: auto; }
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has([data-as="actions"] :focus), .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) .snowui-table-cell[data-role-layout="overlay"] .snowui-table-cell-content[data-actions="true"] > :not(.snowui-table-role-blur-layer)) { opacity: 1; pointer-events: auto; }
     :global(:where(.snowui-table-cell[data-table-variant="striped"])) { border-bottom-color: transparent; }
     :global(:where(.snowui-table-body .snowui-table-row:nth-child(odd of :not(:has(> .snowui-table-loading-cell)))) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, var(--surface-3, #f7f7f7)); }
     :global(:where(.snowui-table-body .snowui-table-row:nth-child(even of :not(:has(> .snowui-table-loading-cell)))) > .snowui-table-cell[data-table-variant="striped"]) { background: var(--snowui-table-row-active-background, transparent); }
@@ -443,13 +451,13 @@
             -webkit-mask-image var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out),
             mask-image var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out);
     }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row[data-selected="true"]) > .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell > .snowui-table-cell-content) {
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has([data-as="actions"] :focus), .snowui-table-row[data-selected="true"]) > .snowui-table-cell[data-role-layout="overlay"][data-as="selection"] + .snowui-table-cell > .snowui-table-cell-content) {
         --snowui-table-cell-active-selection-mask: var(--snowui-table-selection-fade-mask);
         -webkit-mask-image: var(--snowui-table-cell-active-selection-mask), var(--snowui-table-cell-active-actions-mask, linear-gradient(#000, #000));
         mask-image: var(--snowui-table-cell-active-selection-mask), var(--snowui-table-cell-active-actions-mask, linear-gradient(#000, #000));
         mask-composite: intersect;
     }
-    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) > .snowui-table-cell:not([data-as="selection"]):has(~ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"]) > .snowui-table-cell-content) {
+    :global(:where(.snowui-table-row:hover, .snowui-table-row[data-force-hover="true"], .snowui-table-row:has(:focus-visible), .snowui-table-row:has([data-as="actions"] :focus), .snowui-table-row:has(.snowui-select-button-trigger[aria-expanded="true"])) > .snowui-table-cell:not([data-as="selection"]):has(~ .snowui-table-cell[data-role-layout="overlay"][data-as="actions"]) > .snowui-table-cell-content) {
         --snowui-table-cell-active-actions-mask: var(--snowui-table-cell-actions-fade-mask);
         -webkit-mask-image: var(--snowui-table-cell-active-selection-mask, linear-gradient(#000, #000)), var(--snowui-table-cell-active-actions-mask);
         mask-image: var(--snowui-table-cell-active-selection-mask, linear-gradient(#000, #000)), var(--snowui-table-cell-active-actions-mask);

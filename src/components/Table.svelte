@@ -51,6 +51,7 @@
     const parentTable = getTableContext();
     const localeContext = useLocale();
     let measuredActionsWidth = $state(0);
+    let actionsContentWidth = $state<number | undefined>(undefined);
     let resolvedRoleLayout = $state<"column" | "overlay">("overlay");
     const requestedRoleLayout = $derived(roleLayout ?? parentTable.getRoleLayout());
     const resolvedHorizontalScroll = $derived(horizontalScroll ?? parentTable.getHorizontalScroll());
@@ -60,8 +61,8 @@
         const controller = untrack(() => observeTableResponsive(tableElement as HTMLTableElement, viewportElement!, {
             horizontalScroll: resolvedHorizontalScroll,
             roleLayout: requestedRoleLayout,
-            actionsWidth: columnWidths.__actions ?? parentTable.getActionsColumnWidth(),
-            onLayout: (layout, width) => { resolvedRoleLayout = layout; measuredActionsWidth = width; },
+            actionsWidth: Math.min(columnWidths.__actions ?? parentTable.getActionsColumnWidth(), parentTable.getActionsMaxWidth()),
+            onLayout: (layout, width, contentWidth) => { resolvedRoleLayout = layout; measuredActionsWidth = width; actionsContentWidth = contentWidth; },
         }));
         responsiveController = controller;
         return () => { controller.destroy(); responsiveController = undefined; };
@@ -72,8 +73,8 @@
         const options = {
             horizontalScroll: resolvedHorizontalScroll,
             roleLayout: requestedRoleLayout,
-            actionsWidth: columnWidths.__actions ?? parentTable.getActionsColumnWidth(),
-            onLayout: (layout: "column" | "overlay", width: number) => { resolvedRoleLayout = layout; measuredActionsWidth = width; },
+            actionsWidth: Math.min(columnWidths.__actions ?? parentTable.getActionsColumnWidth(), parentTable.getActionsMaxWidth()),
+            onLayout: (layout: "column" | "overlay", width: number, contentWidth: number) => { resolvedRoleLayout = layout; measuredActionsWidth = width; actionsContentWidth = contentWidth; },
         };
         untrack(() => responsiveController?.update(options));
     });
@@ -143,9 +144,11 @@
     }
 
     provideTableContext({
+        getActionsColumnWidth: () => measuredActionsWidth || parentTable.getActionsColumnWidth(),
+        getActionsContentWidth: () => actionsContentWidth,
         getRoleLayout: () => requestedRoleLayout === "auto" ? resolvedRoleLayout : requestedRoleLayout,
         getHorizontalScroll: () => resolvedHorizontalScroll,
-        getColumnWidth: (columnId) =>
+        getColumnWidth: (columnId) => columnId === "__actions" && measuredActionsWidth > 0 ? measuredActionsWidth :
             columnWidths[columnId]
             ?? autoLockedColumnWidths[columnId]
             ?? (columnId === "__actions" && (requestedRoleLayout === "column" || (requestedRoleLayout === "auto" && resolvedRoleLayout === "column"))

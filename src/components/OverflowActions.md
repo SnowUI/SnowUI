@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.0.2
+> **版本**: v1.1.0
 > **职责**: 在有限宽度内优先展示操作按钮，并将放不下的操作收进更多菜单，保持工具栏紧凑可用。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-12
+> **文档修订**: 2026-10-21
 
 ## 组件介绍
 
@@ -52,11 +52,12 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
-| items | `OverflowActionsItem[]` | `[]` | 默认内建操作与分隔项数组；action 提供 id、label，可选 icon/disabled/href/onAction，separator 提供 type="separator" 与 id。每个 id 唯一；children 存在时改用显式子项。 |
+| items | `OverflowActionsItem[]` | `[]` | 默认内建操作与分隔项数组；action 提供 id、label，可选 icon/disabled/href/target/rel/onAction/buttonProps/parts，separator 提供 type="separator" 与 id。每个 id 唯一；children 存在时改用显式子项。 |
 | compact | `"auto" \| "none"` | `"auto"` | auto 在宽度不足且所有 Action 都有 icon 与 label 时先统一隐藏文字；none 跳过此步骤，直接按 overflow 转移操作。 |
 | overflow | `"all" \| "progressive"` | `"all"` | all 在放不下时将全部操作转入 More；progressive 按 overflowFrom 逐项转入，保留可容纳的操作。菜单展开时冻结布局。 |
 | overflowFrom | `"start" \| "end"` | `"end"` | progressive 模式从数据/组合顺序的开头或末尾依次转移操作；all 模式不区分方向。 |
 | availableWidth | `number` | — | 外部给定可用于操作组布局的宽度，单位 px；提供后不再注册自身尺寸观察，适合 DataTable 复用列宽。 |
+| maxVisible | `number` | — | 最多直出操作数，不含More／Separator；缺省不限制，有限值向下取整并至少0，非有限值不限制。宽度可进一步收纳；菜单展开冻结。 |
 | moreLabel | `string` | `LocaleProvider` | More 按钮的无障碍名称，未传时按当前语言显示。 |
 | align | `"start" \| "end"` | `"end"` | Listbox 水平对齐 |
 | disabled | `boolean` | `false` | 禁用全部操作 |
@@ -134,6 +135,11 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 其余兼容 Frame Props 透传根容器，共享关键字参见 [Frame](Frame.md) 的公开 API；组合层不重复实现共享行为。
 
+
+### 数量上限与数据项样式
+
+`maxVisible?: number` 限制直出操作数量，不包含More与Separator；缺省不限制。有限数字向下取整并至少为0，NaN／Infinity按缺省处理。0时有操作只显示More，空组不显示More；数量上限同时约束full及compact，宽度可进一步收纳，`all`仍在需要收纳时全部进入菜单。菜单展开冻结，关闭再应用最新数量／宽度。数据action可用`buttonProps`配置当前项的直接Button Props、`parts.Button`配置该项owned Button，优先级为组默认→组parts→单项parts→单项buttonProps；不改变More默认。
+
 > 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
 ---
@@ -169,6 +175,10 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - [MenuItem.svelte](MenuItem.svelte)
 
 ## 更新日志
+
+### v1.1.0 (2026-10-21)
+
+- 新增maxVisible与数据项buttonProps／parts，数量与宽度共同收纳，保持菜单冻结与独立组缺省行为。
 
 - 2026-10-14：连续拖动时复用操作项和 Separator 宽度，按 Table 的小数布局宽度和观察器同帧求解；避免隐藏按钮反复参与测量与临界宽度抖动。
 

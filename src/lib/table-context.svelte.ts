@@ -5,6 +5,8 @@ import type { ResourceSize } from "../context";
 import type { MotionConfig } from "../logic/motion-config";
 import type { TableTruncationResult } from "./table-truncation";
 import type { OverflowActionsItem } from "../components/OverflowActions.svelte";
+import type { ComponentProps } from "svelte";
+import type OverflowActions from "../components/OverflowActions.svelte";
 
 export type TableSortDirection = "ascending" | "descending";
 export type TableRoleLayout = "auto" | "column" | "overlay";
@@ -55,6 +57,9 @@ export interface TableContext {
     getActionsCompact: () => "auto" | "none";
     getActionsOverflow: () => "all" | "progressive";
     getActionsOverflowFrom: () => "start" | "end";
+    getActionsMaxVisible: () => number;
+    getActionsProps: () => Pick<ComponentProps<typeof OverflowActions>, "buttonProps" | "parts" | "moreLabel">;
+    getActionsContentWidth: () => number | undefined;
     getActionsColumnWidth: () => number;
     getActionsMinWidth: () => number;
     getActionsMaxWidth: () => number;
@@ -122,8 +127,11 @@ const fallback: TableContext = {
     getRowActions: () => [],
     runRowAction: () => {},
     getActionsCompact: () => "auto",
-    getActionsOverflow: () => "all",
+    getActionsOverflow: () => "progressive",
     getActionsOverflowFrom: () => "end",
+    getActionsMaxVisible: () => 3,
+    getActionsProps: () => ({}),
+    getActionsContentWidth: () => undefined,
     getActionsColumnWidth: () => 160,
     getActionsMinWidth: () => 40,
     getActionsMaxWidth: () => 320,

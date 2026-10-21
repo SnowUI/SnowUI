@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.11.0
+> **版本**: v1.12.0
 > **职责**: 在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-07
+> **文档修订**: 2026-10-21
 
 ## 组件介绍
 
@@ -122,11 +122,19 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 
 
 
+### 响应式操作布局
+
+DataTable的actions单元格向默认和显式OverflowActions提供同一布局预算、缺省maxVisible=3及progressive。显式组仍可配置数量／compact／overflow和自身样式，但availableWidth不能绕过本表预算。单元格不定义按钮variant；菜单不被行预算裁切。
+
 ## AI Zone
 
 > `selection` / `actions` 角色仅在 DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
 
 ## 更新日志
+
+### v1.12.0 (2026-10-21)
+
+- 默认及显式操作组复用布局预算；操作触发器恢复焦点时保持可见，不改变鼠标Checkbox退出规则。
 
 - 2026-10-07：关闭横向滚动时，待隐藏列按容器宽度同步渐隐；完整规则由 [Table 响应式](Table.md#响应式收缩与恢复) 统一定义。
 

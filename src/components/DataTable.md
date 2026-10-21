@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.14.0
+> **版本**: v1.15.0
 > **职责**: 统一管理数据的查询、排序与分页状态，可自由组合工具栏、表格和分页器，构建完整的数据浏览界面。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-07
+> **文档修订**: 2026-10-21
 
 ## 组件介绍
 
@@ -370,6 +370,12 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 <a id="内部加载更多管线"></a>
 
 
+### 操作组配置与视觉预算
+
+actions配置新增maxVisible（缺省3）、buttonProps、parts和moreLabel，类型复用OverflowActions；单项支持target／rel／buttonProps／parts。缺省progressive从末端收纳，显式all、compact与方向保持。组级样式只作用于默认生成组，单项buttonProps优先于单项parts.Button。显式children替换默认内容；其中OverflowActions共享本表布局预算，不继承默认生成组的视觉。
+
+操作区先按本表实际可见viewport的20%、14rem及显式／拖动列宽上限取小，并预留选择和受保护数据宽度；总预算包含padding、More及渐隐覆盖。More最小命中尺寸优先，极窄冲突时局部滚动，不缩小字体／控件或为保操作先隐藏数据。
+
 ## AI Zone
 
 以下章节保留源码维护约束，不属于应用接入步骤。
@@ -392,6 +398,10 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 DataTable 不发起请求，也不格式化业务字段。预取、缓存和无延迟切换属于页面数据层；日期显示统一使用 `formatDate()`。
 
 ## 更新日志
+
+### v1.15.0 (2026-10-21)
+
+- 配置式操作组透传数量、组级及单项样式；操作预算先于数据响应式分配。
 
 - 2026-10-07：响应式单元格每侧最小 padding 从 2px 调整为 4px，相邻列最小内容间距为 8px。
 

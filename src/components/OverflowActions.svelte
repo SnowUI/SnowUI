@@ -28,6 +28,7 @@
         type OverflowActionMode,
         type OverflowActionRegistration,
         type OverflowActionsContext,
+        getOverflowActionsLayoutContext,
     } from "../logic/overflow-actions.svelte";
     import {
         mergeComponentPartProps,
@@ -45,7 +46,7 @@
         | "onclick"
         | "aria-label"
         | "title";
-    type GlobalButtonProps = Omit<ButtonProps, ControlledGlobalButtonKeys>;
+    export type GlobalButtonProps = Omit<ButtonProps, ControlledGlobalButtonKeys>;
 
     export interface OverflowActionsActionItem {
         type?: "action";
@@ -57,6 +58,8 @@
         target?: string;
         rel?: string;
         onAction?: () => void;
+        buttonProps?: GlobalButtonProps;
+        parts?: ComponentProps<typeof OverflowAction>["parts"];
     }
 
     export interface OverflowActionsSeparatorItem {
@@ -89,6 +92,7 @@
         overflow?: "all" | "progressive";
         overflowFrom?: "start" | "end";
         availableWidth?: number;
+        maxVisible?: number;
         moreLabel?: string;
         align?: "start" | "end";
         disabled?: boolean;
@@ -102,9 +106,10 @@
     let {
         items = [],
         compact = "auto",
-        overflow = "all",
+        overflow = undefined,
         overflowFrom = "end",
         availableWidth = undefined,
+        maxVisible = undefined,
         moreLabel = undefined,
         align = "end",
         disabled = false,
@@ -117,6 +122,16 @@
     }: Props = $props();
 
     const locale = useLocale();
+    const layoutContext = getOverflowActionsLayoutContext();
+    const resolvedOverflow = $derived(overflow ?? layoutContext?.overflow ?? "all");
+    const resolvedMaxVisible = $derived.by(() => {
+        const value = maxVisible ?? layoutContext?.maxVisible;
+        return typeof value === "number" && Number.isFinite(value) ? Math.max(0, Math.floor(value)) : Infinity;
+    });
+    const resolvedAvailableWidth = $derived(
+        layoutContext?.availableWidth === undefined ? availableWidth
+            : Math.min(availableWidth ?? Infinity, layoutContext.availableWidth),
+    );
     const resolvedMoreLabel = $derived(moreLabel ?? locale.t("overflowActions.more"));
 
     let rootElement = $state<HTMLElement | undefined>(undefined);
@@ -309,7 +324,7 @@
         // 与 Table 一样读取小数布局宽度；clientWidth 的整数取整会在临界点往返跳变。
         const width = Math.max(
             0,
-            availableWidth ?? (Number.parseFloat(computed.width) || rootElement.clientWidth),
+            resolvedAvailableWidth ?? (Number.parseFloat(computed.width) || rootElement.clientWidth),
         );
         const gap = Number.parseFloat(computed.columnGap || computed.gap) || 0;
         const canCompact = compact === "auto" && actions.length > 0 &&
@@ -338,16 +353,17 @@
             let nextMenuEntries: LayoutEntry[] = [];
             let visibleEntries = normalizedAll;
 
-            if (totalWidth(normalizedAll, "full", false, gap) <= budget) {
+            if (actions.length <= resolvedMaxVisible && totalWidth(normalizedAll, "full", false, gap) <= budget) {
                 // Full is the preferred stable state.
             } else if (
                 canCompact &&
+                actions.length <= resolvedMaxVisible &&
                 totalWidth(normalizedAll, "compact", false, gap) <= budget
             ) {
                 nextModes = Object.fromEntries(
                     actions.map(action => [action.id, "compact" as OverflowActionMode]),
                 );
-            } else if (overflow === "all") {
+            } else if (resolvedOverflow === "all") {
                 nextModes = Object.fromEntries(
                     actions.map(action => [action.id, "hidden" as OverflowActionMode]),
                 );
@@ -359,7 +375,7 @@
                 const candidates = overflowFrom === "start" ? actions : [...actions].reverse();
                 for (const candidate of candidates) {
                     const normalizedVisible = normalizeEntries(entries, visibleIds);
-                    if (totalWidth(normalizedVisible, baseMode, true, gap) <= budget) break;
+                    if (visibleIds.size <= resolvedMaxVisible && totalWidth(normalizedVisible, baseMode, true, gap) <= budget) break;
                     visibleIds.delete(candidate.id);
                 }
                 visibleEntries = normalizeEntries(entries, visibleIds);
@@ -466,7 +482,7 @@
 
     $effect(() => {
         const node = rootElement;
-        if (availableWidth !== undefined || !node) return;
+        if (resolvedAvailableWidth !== undefined || !node) return;
         return resizeManager.watch(node, () => {
             // 观察器已在动画帧交付，直接求解，避免额外一帧的旧位置与新位置叠画。
             if (layoutFrame) cancelAnimationFrame(layoutFrame);
@@ -478,6 +494,8 @@
     $effect(() => {
         compact;
         overflow;
+        resolvedMaxVisible;
+        resolvedOverflow;
         overflowFrom;
         items;
         buttonProps;
@@ -487,7 +505,7 @@
     });
 
     $effect(() => {
-        availableWidth;
+        resolvedAvailableWidth;
         // 外部列宽也可能逐帧变化；只更新预算，不使固有宽度缓存失效。
         if (isMounted) void flushLayout();
     });
@@ -524,6 +542,8 @@
                 <Separator {...parts?.Separator} as="separator" column />
             {:else}
                 <OverflowAction
+                    {...item.buttonProps}
+                    parts={item.parts}
                     as="item"
                     id={item.id}
                     label={item.label}

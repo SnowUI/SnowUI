@@ -3,7 +3,9 @@
 <!-- 数据表格状态与组合外壳。文档: ./DataTable.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import {onDestroy, tick, type Snippet} from "svelte";
+    import {onDestroy, tick, type Snippet, type ComponentProps} from "svelte";
+    import type OverflowActions from "./OverflowActions.svelte";
+    import type { OverflowActionsActionItem } from "./OverflowActions.svelte";
     import {provideTableContext, type TableColumnRegistration, type TableContext, type TableRoleLayout, type TableRoleOverlayBlurMode, type TableSortState} from "../lib/table-context.svelte";
     import type { FrameProps } from "../logic/frame-types";
     import Frame from "./Frame.svelte";
@@ -53,7 +55,7 @@
         rowIds: [] as Array<string | number>,
     };
     export type DataTableVariant = "striped" | "divided";
-    export interface DataTableActionItem {
+    export interface DataTableActionItem extends OverflowActionsActionItem {
         type?: "action";
         id: string;
         label: string;
@@ -86,6 +88,10 @@
         minWidth?: number;
         maxWidth?: number;
         resizable?: boolean;
+        maxVisible?: number;
+        buttonProps?: ComponentProps<typeof OverflowActions>["buttonProps"];
+        parts?: ComponentProps<typeof OverflowActions>["parts"];
+        moreLabel?: string;
     }
     interface DataTableActionsContextExtension {
         getRowActions: (rowId: string | number) => DataTableActionsItem[];
@@ -223,7 +229,7 @@
     const actionsColumnWidth = $derived(
         actionsConfig
             ? Math.max(40, Number(actionsConfig.width) || 160)
-            : 40,
+            : 160,
     );
     function scheduleRowRegistrationCommit() {
         if (rowRegistrationCommitQueued) return;
@@ -559,14 +565,13 @@
             });
         },
         getActionsCompact: () => actionsConfig?.compact ?? "auto",
-        getActionsOverflow: () => actionsConfig?.overflow ?? "all",
+        getActionsOverflow: () => actionsConfig?.overflow ?? "progressive",
         getActionsOverflowFrom: () => actionsConfig?.overflowFrom ?? "end",
+        getActionsMaxVisible: () => actionsConfig?.maxVisible ?? 3,
+        getActionsProps: () => ({buttonProps: actionsConfig?.buttonProps, parts: actionsConfig?.parts, moreLabel: actionsConfig?.moreLabel}),
         getActionsColumnWidth: () => actionsColumnWidth,
         getActionsMinWidth: () => Math.max(40, Number(actionsConfig?.minWidth) || 40),
-        getActionsMaxWidth: () => Math.max(
-            actionsColumnWidth,
-            Number(actionsConfig?.maxWidth) || 320,
-        ),
+        getActionsMaxWidth: () => Math.max(40, Number(actionsConfig?.maxWidth) || Math.max(actionsColumnWidth, 320)),
         isActionsResizable: () => actionsConfig?.resizable === true,
         getVariant: () => variant,
         getLoading: () => loading && visibleRows.length === 0,

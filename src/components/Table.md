@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v2.6.0
+> **版本**: v2.7.0
 > **职责**: 以语义化表格展示结构化数据，支持自适应列宽、局部横向滚动与加载状态，可自由组合表头和单元格。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-07
+> **文档修订**: 2026-10-21
 
 ## 组件介绍
 
@@ -248,6 +248,10 @@ Table 是 Table / DataTable 的唯一布局计算入口，依据自身容器可�
 
 DataTable 的配置由 Context 下发；显式 Table 配置优先。普通 Table 复用间距、隐藏和滚动规则，不新增 选择 / 操作状态。旧显式 `roleLayout="column"` / `"overlay"` 保留固定布局含义；column 现在常驻显示角色控件。
 
+### 操作角色预算
+
+DataTable操作列按本表局部viewport计算20%／14rem／显式及拖动列宽上限的最小预算，先收操作再执行角色列、padding和原有数据响应式规则。预算包含padding与浮层渐隐覆盖；More最小可用尺寸优先，极窄滚动兜底。菜单展开冻结布局、关闭后更新；统一观察器和字体／Token失效触发重测，不新增逐行ResizeObserver。
+
 ## AI Zone
 
 内置滚动区域文案使用 `table.scrollRegion` / `table.scrollRegionNamed`；`ariaLabel` 是调用方业务文案，不由组件翻译。Provider 的 `messages` 可覆盖滚动提示模板，普通表格与 DataTable 内的 Table 共用同一行为。
@@ -274,6 +278,10 @@ DataTable 的配置由 Context 下发；显式 Table 配置优先。普通 Table
 Table 不包含工具栏、分页、请求或缓存。它公开 `TableHeader`、`TableBody`、`TableRow`、`TableHead`、`TableCell` 供声明式组合。
 
 ## 更新日志
+
+### v2.7.0 (2026-10-21)
+
+- 复用统一响应式控制器计算操作视觉预算，缓存More与padding测量并保留极窄滚动。
 
 - 2026-10-07：渐隐仅作用于内容；收列与恢复由独立内容层过渡位置和可见宽度。移除临时 fixed 布局与零宽末列插值，背景、分隔线及外缘保持完整，快速反向时从当前几何接管。
 

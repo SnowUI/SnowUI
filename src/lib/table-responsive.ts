@@ -9,10 +9,11 @@ interface Options {
     horizontalScroll: boolean;
     roleLayout: TableRoleLayout;
     actionsWidth: number;
-    onLayout: (layout: "column" | "overlay", actionsWidth: number) => void;
+    onLayout: (layout: "column" | "overlay", actionsWidth: number, actionsContentWidth: number) => void;
 }
 interface Column {
     role: boolean;
+    actions: boolean;
     hideable: boolean;
     preferred: number;
     minimum: number;
@@ -37,6 +38,8 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
         }
     });
     let measuredActionsWidth = 0;
+    let cachedActionsPadding = 0;
+    let cachedMoreWidth = 0;
     let complexGrid = false;
     const originalSpans = new WeakMap<HTMLTableCellElement, number>();
     const renderedSpans = new WeakMap<HTMLTableCellElement, number>();
@@ -102,19 +105,50 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
             const role = head.dataset.as === 'selection' || head.dataset.as === 'actions';
             const hideable = !complexGrid && !role && !firstData && head.dataset.responsiveHide !== 'false' && head.colSpan === 1;
             if (!role) firstData = false;
-            return { role, hideable, preferred: preferred[index], minimum: minimum[index] };
+            return { role, actions: head.dataset.as === 'actions', hideable, preferred: preferred[index], minimum: minimum[index] };
         });
+        measureActionChrome();
         copy.remove();
+    }
+
+    function measureActionChrome() {
+        const actionCells = Array.from(table.querySelectorAll<HTMLElement>('.snowui-table-cell[data-as="actions"]'));
+        let padding = preferredPadding * 2;
+        let moreWidth = 0;
+        for (const cell of actionCells) {
+            const style = getComputedStyle(cell);
+            const content = cell.querySelector<HTMLElement>('.snowui-table-cell-content[data-actions="true"]');
+            const contentStyle = content ? getComputedStyle(content) : undefined;
+            padding = Math.max(padding, parseFloat(style.paddingLeft) + parseFloat(style.paddingRight),
+                contentStyle ? parseFloat(contentStyle.paddingLeft) + parseFloat(contentStyle.paddingRight) : 0);
+            for (const more of cell.querySelectorAll<HTMLElement>('.snowui-overflow-actions-more-measure')) {
+                moreWidth = Math.max(moreWidth, more.getBoundingClientRect().width);
+            }
+        }
+        cachedActionsPadding = padding;
+        cachedMoreWidth = moreWidth;
     }
 
     function flush() {
         frame = 0;
         if (disposed || !table.isConnected || viewport.clientWidth <= 0) return;
+        // 菜单存在时保留触发器几何；关闭属性变更会重新进入同一求解入口。
+        if (table.querySelector('.snowui-select-button-trigger[aria-expanded="true"]')) return;
         if (!columns) measureColumns();
         const measured = columns!;
         // clientWidth 会取整；慢速拖动时会让 padding 与渐隐每隔 1px 才跳一次。
         // 内部 viewport 无边框及 padding，计算样式保留未受 transform 影响的 CSS 小数宽度。
         const available = parseFloat(getComputedStyle(viewport).width) || viewport.clientWidth;
+        const padding = cachedActionsPadding;
+        const moreWidth = cachedMoreWidth;
+        const protectedWidth = measured.filter(column => !column.role && !column.hideable).reduce((sum, column) => sum + column.minimum, 0);
+        const selectionWidth = measured.filter(column => column.role && !column.actions).reduce((sum, column) => sum + column.minimum, 0);
+        const floor = moreWidth + padding + fadeDistance;
+        const budget = Math.max(floor, Math.min(available * .2,
+            14 * (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16),
+            options.actionsWidth, Math.max(0, available - protectedWidth - selectionWidth)));
+        measuredActionsWidth = budget;
+        for (const column of measured) if (column.actions) column.preferred = column.minimum = budget;
         const full = measured.reduce((sum, column) => sum + column.preferred, 0);
         const layout = options.roleLayout === 'auto' ? (full <= available + 0.5 ? 'column' : 'overlay') : options.roleLayout;
         const included = measured.filter(column => layout === 'column' || !column.role);
@@ -169,13 +203,13 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
         table.classList.toggle('snowui-table-responsive-text-fit', textFit);
         // 容器改变时由同一次 CSS 布局同步调整 padding，不能等尺寸回调再补一次位移。
         // 显式固定列宽可能使首选与最小宽度相等，此时保留原来的边界选择。
-        const padding = preferred > minimum
+        const responsivePadding = preferred > minimum
             ? `clamp(${minimumPadding}px, calc(${minimumPadding}px + (100cqw - ${minimum}px) * ${(preferredPadding - minimumPadding) / (preferred - minimum)}), ${preferredPadding}px)`
             : `${minimumPadding + (preferredPadding - minimumPadding) * ratio}px`;
         const paddingProperty = '--snowui-table-responsive-cell-padding-inline';
-        if (table.style.getPropertyValue(paddingProperty) !== padding) table.style.setProperty(paddingProperty, padding);
+        if (table.style.getPropertyValue(paddingProperty) !== responsivePadding) table.style.setProperty(paddingProperty, responsivePadding);
         table.dataset.responsiveLayout = layout;
-        options.onLayout(layout, measuredActionsWidth);
+        options.onLayout(layout, measuredActionsWidth, Math.max(moreWidth, budget - padding - fadeDistance));
         for (const row of rows()) {
             let index = 0;
             const visible: HTMLTableCellElement[] = [];
@@ -237,10 +271,10 @@ export function observeTableResponsive(table: HTMLTableElement, viewport: HTMLEl
                 originalSpans.set(record.target, record.target.colSpan);
                 return true;
             }
-            return record.type !== 'attributes' || record.attributeName !== 'style' || (record.target instanceof Element && record.target.matches('th, td'));
+            return record.type !== 'attributes' || record.attributeName !== 'style' || (record.target instanceof Element && (record.target.matches('th, td') || record.target.closest('.snowui-overflow-actions-more-measure')));
         })) refresh();
     });
-    observer.observe(table, { childList: true, characterData: true, subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['data-responsive-hide', 'data-column-id', 'style', 'colspan', 'rowspan', 'class'] });
+    observer.observe(table, { childList: true, characterData: true, subtree: true, attributes: true, attributeOldValue: true, attributeFilter: ['data-responsive-hide', 'data-column-id', 'style', 'colspan', 'rowspan', 'class', 'aria-expanded'] });
     window.addEventListener('resize', refresh);
     table.addEventListener('load', refresh, true);
     document.fonts?.addEventListener('loadingdone', refresh);

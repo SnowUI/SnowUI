@@ -1,4 +1,5 @@
 export const examples = [
+    {name:"操作数量与容器预算",code:`<DataTable rows={[{id:'one'}]} rowKey={row => row.id} actions={{maxVisible:3, items:()=>Array.from({length:6},(_,i)=>({id:String(i),label:'操作 '+i}))}}><Table><TableHeader><TableRow><TableHead columnId="name">记录</TableHead><TableHead as="actions"/></TableRow></TableHeader><TableBody><TableRow rowId="one"><TableCell columnId="name">SnowUI</TableCell><TableCell as="actions"/></TableRow></TableBody></Table></DataTable>`,expected:{render:"六个操作按数量与本表可见宽度共同收纳。",interaction:"更多菜单保持全部操作可达。",responsive:"先保数据，极窄保留More并局部滚动。"},logic:["ActionsBudget","MaxVisible"]},
     {
         name: "A0: 两种行视觉",
         code: `A0
