@@ -1,6 +1,6 @@
 /**
  * Pagination.test.ts
- * v1.6.1
+ * v1.6.3
  * 变更记录 (2026-05-26): 新增 Pagination 角色模板式示例。
  */
 export const examples = [
@@ -164,7 +164,7 @@ export const examples = [
             render: "不提供模板时，pageSize 位于左侧，当前页使用 gray Button，其余分页与前后页使用 outline Button。",
             layout: "pageSize 保持 Hug，与右侧等宽 Fill 分页组间隔 16px。",
             interaction: "页数选择、页码与前后页均使用内置交互。",
-            performance: "默认模板由 Pagination 内部统一生成。",
+            performance: "默认模板由 Pagination 内部统一生成；更新后卸载取消待执行渲染与布局，重新挂载不复用旧实例回调。",
             responsive: "分页组填满 pageSize 之外的剩余宽度。",
         },
         logic: ["DefaultStyle", "BuiltInMode", "PageSize", "Fill"],

@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Pagination 组件：页码导航容器
-  v1.6.2
+  v1.6.3
 
   职责：
   - 读取直系 Button 作为 current / page / prev / next 角色样式模板。
@@ -401,30 +401,23 @@
     function compactControl(control: HTMLElement) {
         const graphicSelector = "svg, img, .snowui-icon, .snowui-icon-wrapper";
         const hasGraphic = !!control.querySelector(graphicSelector);
-        const directTextNodes = Array.from(control.childNodes).filter(
-            (node): node is Text => node.nodeType === Node.TEXT_NODE && !!node.textContent?.trim(),
-        );
-        const fallbackTextElements = Array.from(control.children).filter(
-            (element): element is HTMLElement =>
-                element instanceof HTMLElement &&
-                !element.matches(".snowui-text") &&
-                !element.matches(graphicSelector) &&
-                !element.querySelector(graphicSelector) &&
-                !!element.textContent?.trim(),
-        );
-        const hasText =
-            !!control.querySelector(".snowui-text")?.textContent?.trim() ||
-            directTextNodes.length > 0 ||
-            fallbackTextElements.length > 0;
-        if (!hasGraphic || !hasText) return;
-        for (const textNode of directTextNodes) {
+        if (!hasGraphic) return;
+        // 文本可能位于模板的内容包装层；只收集普通文字，保留图标子树。
+        const walker = document.createTreeWalker(control, NodeFilter.SHOW_TEXT);
+        const textNodes: Text[] = [];
+        let node: Node | null;
+        while ((node = walker.nextNode())) {
+            if (node.textContent?.trim() && !node.parentElement?.closest(graphicSelector)) {
+                textNodes.push(node as Text);
+            }
+        }
+        if (textNodes.length === 0) return;
+        for (const textNode of textNodes) {
+            if (textNode.parentElement?.closest(".snowui-text")) continue;
             const text = document.createElement("span");
             text.className = "snowui-pagination-responsive-text";
             text.textContent = textNode.textContent;
             textNode.replaceWith(text);
-        }
-        for (const element of fallbackTextElements) {
-            element.classList.add("snowui-pagination-responsive-text");
         }
         control.setAttribute("data-composition-content", "hidden");
         control.setAttribute("data-responsive-compact", "true");
@@ -914,7 +907,11 @@
         responsive;
         userStyle;
         if (!itemsEl || !templatesEl) return;
-        tick().then(() => renderPaginationItems());
+        let cancelled = false;
+        tick().then(() => {
+            if (!cancelled) renderPaginationItems();
+        });
+        return () => { cancelled = true; };
     });
 
     $effect(() => {
@@ -943,7 +940,11 @@
         resolvedPageSizeOptions;
         responsive;
         if (!itemsEl) return;
-        tick().then(requestLayout);
+        let cancelled = false;
+        tick().then(() => {
+            if (!cancelled) requestLayout();
+        });
+        return () => { cancelled = true; };
     });
 
     $effect(() => {
