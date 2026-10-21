@@ -1,4 +1,4 @@
-<!-- SnowUI source notice | LICENSE 2.2.0: ../../LICENSE
+<!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 通用可交互尺寸指示手柄；支持局部命中，重叠时优先调整尺寸。文档: ./Indicator.md -->
 <script module lang="ts">

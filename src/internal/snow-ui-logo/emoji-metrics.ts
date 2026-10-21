@@ -1,4 +1,4 @@
-/* SnowUI source notice | LICENSE 2.2.0: ../../../LICENSE
+/* SnowUI source notice | LICENSE 2.3.0: ../../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 // 品牌专用：以系统 emoji 的实际着色像素边界匹配 32×32 图标，保持原始比例。
 export const LOGO_EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
