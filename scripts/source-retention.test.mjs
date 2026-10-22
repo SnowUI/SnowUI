@@ -5,14 +5,13 @@ import {execFileSync} from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import {createHash,createPublicKey} from 'node:crypto';
-import {root,sourceFiles,checkNotices,sourceNotice,protectedFiles} from './source-notices.mjs';
+import {root,sourceFiles,checkNotices,sourceNotice} from './source-notices.mjs';
 import {copySource} from './copy-source.mjs';
 const temp=t=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'snowui-retention-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));return dir;};
-test('所有可复制实现带许可入口，Owner 主题文件不改动',()=>{
+test('所有可复制实现含主题权威源均带许可入口',()=>{
  assert.deepEqual(checkNotices(),[]);
  assert.ok(sourceFiles().length>200);
- assert.ok(protectedFiles.has('src/styles/themes.css'));
- assert.ok(!fs.readFileSync(path.join(root,'src/styles/themes.css'),'utf8').includes('SnowUI source notice'));
+ assert.ok(fs.readFileSync(path.join(root,'src/styles/themes.css'),'utf8').startsWith(sourceNotice('src/styles/themes.css')));
 });
 test('内置 Phosphor 图标的独立版权与许可随源码复制材料保留',()=>{
  const icons=fs.readFileSync(path.join(root,'src/internal/component-icon/builtin-icon-data.ts'),'utf8');
@@ -44,7 +43,7 @@ test('已有项目及许可不覆盖，越界、测试文件和缺失说明均�
  assert.throws(()=>sourceFiles(fake),/符号链接/);
 });
 test('许可文件头生成幂等，版本入口与免费去重规则一致',()=>{
- for(const file of sourceFiles())if(!protectedFiles.has(file)){
+ for(const file of sourceFiles()){
   const text=fs.readFileSync(path.join(root,file),'utf8');assert.equal(text.split('SnowUI source notice').length,2);assert.ok(text.startsWith(sourceNotice(file)));assert.doesNotMatch(sourceNotice(file),/\bv\d+\.\d+\.\d+\b/,'许可版本不应被组件元数据解析器误识别');
  }
  assert.match(fs.readFileSync(path.join(root,'AGENTS.md'),'utf8'),/同任务、同版本、同已确认范围无需重复读取/);
