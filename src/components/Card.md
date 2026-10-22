@@ -5,7 +5,7 @@
 > **版本**: v1.0.1
 > **职责**: 为相关内容提供统一的卡片表面，可自由组合文字、媒体和操作，支持固定子项与内容滚动。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -162,15 +162,15 @@ Card 不提供 `CardItem` 子组件。需要 leading / content / trailing 三槽
 
 ```svelte
 <Card>
-  <Frame row>
+  <Frame singleLine>
     <Icon as="leading">...</Icon>
-    <Text>标题</Text>
+    <Text lines={1}>标题</Text>
     <Button as="trailing" bare>...</Button>
   </Frame>
 </Card>
 ```
 
-这样可以复用 SnowUI 现有的三槽位、Fill / Hug、gap、wrap 与外置槽位替换协议。
+这样可以复用 SnowUI 现有的三槽位、Fill / Hug、gap、wrap 与外置槽位替换协议。单行名称、日期、状态或独立文字组合使用 `singleLine`，缩窄及缩放后间距仍至少4 CSS px；附件声明 leading / trailing 保留尺寸，文字用 `Text lines={1}` 缩略并保留全文访问。地址、说明正文、统计列组和外部卡片换行仍由各自布局负责，不将整张 Card 强制为单行。
 
 ---
 
@@ -261,6 +261,8 @@ Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载�
 - 内容完全由 children 提供，不生成标题或按钮，也不提供 parts；Pin 子项脱离普通滚动内容流。
 
 ## 更新日志
+
+- 2026-10-23：既有名称／数值、状态和任务附件示例接入Frame单行组合；保留正文／统计分组与Card自身行为，仅文档和示例修订。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

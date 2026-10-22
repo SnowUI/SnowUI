@@ -105,9 +105,9 @@ export const examples = [
         name: "A6: Frame 三槽内容",
         code: `A6
 <Card>
-    <Frame row>
+    <Frame singleLine>
         <Icon as="leading" size={16}><Paperclip /></Icon>
-        <Text>Attachment.pdf</Text>
+        <Text lines={1}>Attachment.pdf</Text>
         <Button as="trailing" bare iconOnly emphasis="muted" variant="borderless" aria-label="下载">
             <Icon size={16}><ArrowLineDown /></Icon>
         </Button>
@@ -118,7 +118,7 @@ export const examples = [
             layout: "Card 不创建 CardItem，三槽由 Frame 承接。",
             interaction: "trailing Button 保留自身交互。",
             performance: "复用既有 Frame 三槽协议。",
-            responsive: "三槽内容可按 Frame 规则响应。",
+            responsive: "单行三槽在缩窄／缩放后保留至少4 CSS px间距，附件不缩小，文字缩略并可访问全文。",
         },
         logic: ["Frame", "Slots"],
     },
