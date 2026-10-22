@@ -105,8 +105,9 @@ export function toast(input: string | ToastOptions): string {
         duration: opts.duration ?? DEFAULT_TOAST_DURATION,
         ...opts,
     };
-    // 新 Toast 推入数组尾部；Toaster 渲染时将"最新一条"展示在前
-    toastStore.items.push(item);
+    // 替换队列数组，确保退出标记更新后，后续入队仍使宿主分组重新求值。
+    // 最新条目位于数组尾部；Toaster 渲染时将其展示在前。
+    toastStore.items = [...toastStore.items, item];
     return id;
 }
 
@@ -137,7 +138,8 @@ export function dismissToast(id: string, exitFromIndex?: number): void {
     setTimeout(() => {
         const removeIdx = toastStore.items.findIndex((t) => t.id === id);
         if (removeIdx === -1) return;
-        const removed = toastStore.items.splice(removeIdx, 1)[0];
+        const removed = toastStore.items[removeIdx];
+        toastStore.items = toastStore.items.filter((candidate) => candidate.id !== id);
         removed?.onDismiss?.();
     }, TOAST_EXIT_DURATION);
 }
@@ -162,7 +164,8 @@ export function pushOutToast(id: string, exitFromIndex: number): void {
     setTimeout(() => {
         const removeIdx = toastStore.items.findIndex((t) => t.id === id);
         if (removeIdx === -1) return;
-        const removed = toastStore.items.splice(removeIdx, 1)[0];
+        const removed = toastStore.items[removeIdx];
+        toastStore.items = toastStore.items.filter((candidate) => candidate.id !== id);
         removed?.onDismiss?.();
     }, TOAST_EXIT_DURATION);
 }
