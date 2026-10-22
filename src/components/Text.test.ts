@@ -21,7 +21,7 @@ export const examples = [
     },
     {
         name: "单行截断：完整可访问名称",
-        code: `完整名称
+        code: `单行截断
 <Button style="width: 140px; min-width: 0;"><Text lines={1}>发送完整产品更新通知 Send complete product updates</Text></Button>`,
         expected: {
             render: "可见文字按既有拟合逻辑省略；按钮的可访问名称仍包含全文，且不重复播报前缀。",

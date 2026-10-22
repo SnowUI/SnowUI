@@ -1,5 +1,5 @@
 <script lang="ts">
-import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd} from '@snowui-design-system/components';
+import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge} from '@snowui-design-system/components';
 let calls=$state(0);
 let checkboxValues=$state<string[]>([]);
 let radioValue=$state<string|null|undefined>(null);
@@ -51,4 +51,10 @@ let captionCalls=$state(0);
 <section aria-label="Package navigation owners">
 <SearchBox class="package-search-box" gap={0} value="Complete package search query" clearable={false} style="width:240px"><Kbd as="trailing">⌘K</Kbd></SearchBox>
 <Breadcrumb class="package-breadcrumb" gap={0} ariaLabel="Package page path" items={[{label:'Parent workspace'},{label:'Current page'}]} style="width:320px"/>
+</section>
+
+<section aria-label="Package sidebar owners" style="width:160px">
+<SidebarItem id="package-sidebar-button" label="Complete package navigation title" icon="user" updated actions={[{id:'more',label:'Package item More',icon:'three-dots'}]}>{#snippet tags()}<Badge variant="border" count="New" />{/snippet}</SidebarItem>
+<SidebarItem id="package-sidebar-link" href="#package-content-line" label="Complete linked package navigation title" icon="user" updated>{#snippet tags()}<Badge variant="border" count="New" />{/snippet}</SidebarItem>
+<SidebarSection id="package-sidebar-section" title="Complete package section title" actions={[{id:'more',label:'Package section More',icon:'three-dots'},{id:'add',label:'Package section Add',icon:'plus'}]}><Text>Package section body</Text></SidebarSection>
 </section>

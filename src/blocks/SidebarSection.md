@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.2
+> **版本**: v1.5.0
 > **职责**: 将 Sidebar 导航组织为带标题的分组，支持展开、收起与附加操作，便于浏览较长的导航列表。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-20
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -64,6 +64,8 @@
 
 ### API 参考
 
+长标题使用 Text 单行缩略并保留完整可访问名称，不新增标题 Tooltip；箭头与末尾操作保留自身尺寸，标题与操作之间的有效间距至少为 4 CSS px。标题行高度同时容纳内置图标既有的 12px 下限与上下 padding，避免小根字号裁切图形；正文、分隔线与整体折叠时序保持不变。
+
 整体 Sidebar 折叠时，标题行先消费 Frame color bridge 渐隐；透明度归零后，标题高度、纵向 padding 与 Section gap 才消费 Frame size bridge 收起，因此内容 Item 在标题消失后才开始上移。标题节点保留在 DOM 中，并在折叠期间通过 `inert`、`aria-hidden` 与延迟 `visibility: hidden` 停止交互。分类自身折叠时不渲染内容子树；未传 `collapsed` 时不得把一次点击的内部状态写成受控 Prop，否则会盖住 Sidebar 的持久化状态并阻止再次展开。Sidebar 在折叠前记忆 active item 的 Section 归属，因此刷新恢复无需保留隐藏内容 DOM。每个分类内容末尾内置一个横向 `Separator`，展开、分类折叠与 Sidebar 整体折叠时均由 SidebarSection 统一保留，调用方无需手动添加；它与 Sidebar 内显式组合的横向 Separator 一起消费 Sidebar 统一的四边 `8px` padding、零行高和横向 / 纵向 padding override，Separator 自身仍可通过 `parts.Separator` 配置。标题行默认 padding 为左右 `8px`（`var(--padding-2)`）、上下 `4px`（`var(--padding-1)`），同时作用于标题、折叠箭头与 actions 的完整排列区域。有标题时默认可折叠；标题文字与箭头共同位于一个 `Button bare emphasis="muted"` 中，整段标题均可点击且不显示 Tooltip。数据生成的 action 可用 `iconCollection: "snowui"` 显式选择同名 SnowUI 图标，action Tooltip 统一显示在按钮右侧。标题操作按钮之间固定使用 `var(--gap-2)`（8px），并同样显式使用 muted 强调级别保留 40% → hover 100% 的次级操作视觉。
 
 ---
@@ -95,6 +97,10 @@
 | SidebarSection | [SidebarSection.svelte](SidebarSection.svelte) | 分类折叠与标题操作 |
 
 ## 更新日志
+
+### v1.5.0 (2026-10-23)
+
+- 长标题使用 Text 单行缩略并保留完整可访问名称，不新增标题 Tooltip；箭头与末尾操作保留自身尺寸，标题与操作之间的有效间距至少为 4 CSS px。标题行高度同时容纳内置图标既有的 12px 下限与上下 padding，避免小根字号裁切图形；正文、分隔线与整体折叠时序保持不变。
 
 - 2026-10-20：内置分类展开／收起名称接入统一 locale 与 messages 覆盖，支持动态语言切换，标题与操作内容保持调用方原文。
 

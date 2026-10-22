@@ -1,6 +1,6 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
-<!-- SidebarSection Block v1.4.2. 文档: ./SidebarSection.md -->
+<!-- SidebarSection Block v1.5.0. 文档: ./SidebarSection.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import {untrack, type Snippet} from "svelte";
@@ -90,13 +90,13 @@
                     aria-controls={contentId}
                     onclick={toggle}
                 >
-                    <Text class="snowui-sidebar-section-title">{title}</Text>
+                    <Text lines={1} tooltip={false} class="snowui-sidebar-section-title">{title}</Text>
                     <span class="snowui-sidebar-section-toggle-icon">
                         <ComponentIcon name="arrow-line-down" aria-hidden="true" />
                     </span>
                 </Button>
             {:else}
-                <Text class="snowui-sidebar-section-title snowui-sidebar-section-static-title">
+                <Text lines={1} tooltip={false} class="snowui-sidebar-section-title snowui-sidebar-section-static-title">
                     {title}
                 </Text>
             {/if}
@@ -146,12 +146,13 @@
     }
     :global(:where(.snowui-sidebar-section-header)) {
         display: flex;
-        max-height: var(--size-6);
-        min-height: var(--size-6);
+        --snowui-sidebar-section-header-height: max(var(--size-6), calc(12px + 2 * var(--snowui-sidebar-section-title-padding-y-override, var(--padding-1))));
+        max-height: var(--snowui-sidebar-section-header-height);
+        min-height: var(--snowui-sidebar-section-header-height);
         box-sizing: border-box;
         align-items: center;
         justify-content: space-between;
-        gap: var(--gap-1);
+        gap: max(4px, var(--gap-1));
         padding: var(
                 --snowui-sidebar-section-title-padding-y-override,
                 var(--padding-1)
@@ -174,6 +175,11 @@
                 var(--snowui-frame-size-motion-easing, ease-out),
             visibility 0s linear;
     }
+    :global(:where(.snowui-sidebar-section-toggle)) {
+        min-width: 0;
+        max-width: 100%;
+        flex: 0 1 auto;
+    }
     :global(:where(.snowui-sidebar-section-title)) {
         font-size: var(--snowui-sidebar-section-title-font-size-override, var(--text-12));
         line-height: var(--snowui-sidebar-section-title-line-height-override, var(--leading-12));
@@ -184,6 +190,7 @@
     }
     :global(:where(.snowui-sidebar-section-toggle-icon)) {
         display: inline-flex;
+        flex: 0 0 auto;
         opacity: 0;
         transition:
             opacity var(--snowui-frame-color-motion-duration, 0.15s)
@@ -209,6 +216,7 @@
     }
     :global(:where(.snowui-sidebar-section-actions)) {
         display: flex;
+        flex: 0 0 auto;
         align-items: center;
         gap: var(--gap-2);
     }

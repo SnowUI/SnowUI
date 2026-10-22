@@ -71,6 +71,23 @@ await page.locator('.package-line-menu').click();
 assert.equal(await page.getByTestId('package-content-calls').textContent(),'2');
 await page.evaluate(()=>{document.documentElement.style.fontSize='';});
 console.log('PASS: tarball singleLine SSR/hydration, narrow/recovery, 16/8px roots, independent text labels, Button/MenuItem/Chip/Link gap, native td and accessible Tab label');
+// 实际 tarball 中的复合侧栏宿主，验证真实状态附件和操作预算。
+for(const fontSize of ['16px','8px']) {
+ await page.evaluate(size=>{document.documentElement.style.fontSize=size;document.documentElement.style.setProperty('--gap-scale','.25');},fontSize);
+ for(const id of ['package-sidebar-button','package-sidebar-link']) {
+  const item=page.locator(`[data-sidebar-item-id="${id}"]`);await item.hover();
+  const fit=await item.evaluate(n=>{const root=n.getBoundingClientRect(),leading=n.querySelector('.snowui-sidebar-item-leading').getBoundingClientRect(),content=n.querySelector('.snowui-sidebar-item-content').getBoundingClientRect(),parts=[...n.querySelector('.snowui-sidebar-item-content').children].map(c=>c.getBoundingClientRect()),actions=n.querySelector('.snowui-sidebar-item-actions')?.getBoundingClientRect();return {gaps:[content.left-leading.right,...parts.slice(1).map((c,i)=>c.left-parts[i].right),...(actions?[actions.left-parts.at(-1).right]:[])],inside:parts.at(-1).right<=root.right,leading:leading.width};});
+  assert.ok(fit.gaps.every(g=>g>=4),JSON.stringify(fit));assert.ok(fit.inside);assert.ok(fit.leading>=12);
+ }
+ const section=page.locator('[data-sidebar-section-id="package-sidebar-section"]');await section.hover();
+ const fit=await section.evaluate(n=>{const header=n.querySelector('.snowui-sidebar-section-header').getBoundingClientRect(),title=n.querySelector('.snowui-sidebar-section-title').getBoundingClientRect(),arrow=n.querySelector('.snowui-sidebar-section-toggle-icon').getBoundingClientRect(),actions=n.querySelector('.snowui-sidebar-section-actions').getBoundingClientRect();return {gaps:[arrow.left-title.right,actions.left-arrow.right],inside:actions.right<=header.right&&actions.top>=header.top&&actions.bottom<=header.bottom};});assert.ok(fit.gaps.every(g=>g>=4));assert.ok(fit.inside);
+}
+await page.locator('[data-sidebar-section-id="package-sidebar-section"] .snowui-sidebar-section-toggle').click();
+assert.equal(await page.getByText('Package section body',{exact:true}).count(),0);
+await page.locator('[data-sidebar-section-id="package-sidebar-section"] .snowui-sidebar-section-toggle').press('Enter');
+await page.getByText('Package section body',{exact:true}).waitFor();
+await page.evaluate(()=>{document.documentElement.style.fontSize='';document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball SidebarItem Button/Link, 16/8px gap floor, tags/update/action budget, SidebarSection title fit and keyboard reopening');
 // 原生标签与截断名称必须由实际预编译包保留，不能只验源码 alias。
 const completeCaption='Complete package action 完整执行名称';
 await page.getByRole('button',{name:completeCaption,exact:true}).waitFor();

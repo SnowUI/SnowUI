@@ -87,7 +87,7 @@
     ───────────────────────────────────────── */
     /* --snowui-link-font-size-override: ; */   /* font-size（默认 var(--text-14) = 14px） */
     /* --snowui-link-line-height-override: ; */ /* line-height（默认 var(--leading-14) = 20px） */
-    /* --snowui-link-gap-override: ; */         /* 内部内容与 leading / trailing 间距（默认 calc(var(--gap-1) / 2) = 2px） */
+    /* --snowui-link-gap-override: ; */         /* 内部内容与 leading / trailing 间距（首选 var(--gap-1)，有效值至少 4 CSS px） */
     /* --snowui-link-color-override: ; */       /* 常态颜色（默认 Black40；自动 hover 规则使用 Link color Prop） */
     /* --snowui-link-icon-size-override: ; */   /* 内置 ArrowUpRight / ArrowSquareOut 尺寸（默认 var(--size-3) = 12px；不覆盖外置 Icon） */
     /* --snowui-link-decoration-opacity-override: ; */       /* trailing 箭头 / Icon 常态透明度（默认 0.4） */
@@ -606,7 +606,7 @@
     /* --snowui-sidebar-section-title-line-height-override: ; */     /* 分类标题行高（默认 var(--leading-12)） */
     /* --snowui-sidebar-item-padding-x-override: ; */                /* 导航项横向 padding（默认 var(--padding-2)） */
     /* --snowui-sidebar-item-padding-y-override: ; */                /* 导航项纵向 padding（默认 var(--padding-2)） */
-    /* --snowui-sidebar-item-gap-override: ; */                      /* 导航项内部间距（默认 var(--gap-2)） */
+    /* --snowui-sidebar-item-gap-override: ; */                      /* 导航项内部间距（首选 var(--gap-2)，有效值至少 4 CSS px） */
     /* --snowui-sidebar-item-radius-override: ; */                   /* 导航项圆角（默认 var(--radius-3)） */
     /* --snowui-sidebar-item-font-size-override: ; */                /* 导航文字字号（默认 var(--text-14)） */
     /* --snowui-sidebar-item-line-height-override: ; */              /* 导航文字行高（默认 var(--leading-14)） */

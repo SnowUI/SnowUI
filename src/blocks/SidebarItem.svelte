@@ -1,6 +1,6 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
-<!-- SidebarItem Block v1.6.3. 文档: ./SidebarItem.md -->
+<!-- SidebarItem Block v1.7.0. 文档: ./SidebarItem.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
@@ -202,6 +202,11 @@
         color: var(--black-100, #000);
         --snowui-sidebar-item-content-opacity: 1;
     }
+    :global(:where(.snowui-sidebar-item:not([data-collapsed="true"]):has(> .snowui-sidebar-item-actions))) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: max(4px, var(--gap-1));
+    }
     :global(:where(.snowui-sidebar-item[data-disabled="true"])) { opacity: 0.2; }
     :global(:where(.snowui-sidebar-item-main)) {
         width: 100%;
@@ -211,7 +216,7 @@
         flex-wrap: nowrap;
         align-items: center;
         justify-content: flex-start;
-        gap: var(--snowui-sidebar-item-gap-override, var(--gap-2));
+        gap: max(4px, var(--snowui-sidebar-item-gap-override, var(--gap-2)));
         padding: var(--snowui-sidebar-item-padding-y-override, var(--padding-2))
             var(--snowui-sidebar-item-padding-x-override, var(--padding-2));
         border-radius: inherit;
@@ -232,9 +237,9 @@
     :global(:where(.snowui-sidebar-item-leading)) {
         position: relative;
         display: inline-flex;
-        width: var(--size-5);
-        height: var(--size-5);
-        flex: 0 0 var(--size-5);
+        width: max(12px, var(--size-5));
+        height: max(12px, var(--size-5));
+        flex: 0 0 max(12px, var(--size-5));
         align-items: center;
         justify-content: center;
         opacity: 1;
@@ -255,8 +260,9 @@
     :global(:where(.snowui-sidebar-item-content)) {
         display: inline-flex;
         min-width: 0;
+        max-width: 100%;
         align-items: center;
-        gap: var(--snowui-sidebar-item-gap-override, var(--gap-2));
+        gap: max(4px, var(--snowui-sidebar-item-gap-override, var(--gap-2)));
         opacity: var(--snowui-sidebar-item-content-opacity);
         visibility: visible;
         transition:
@@ -284,8 +290,9 @@
         right: -2px;
     }
     :global(:where(.snowui-sidebar-item-actions)) {
-        position: absolute;
-        right: var(--padding-2);
+        position: relative;
+        flex: 0 0 auto;
+        margin-right: var(--snowui-sidebar-item-padding-x-override, var(--padding-2));
         display: flex;
         align-items: center;
         gap: var(--gap-1);
@@ -312,6 +319,9 @@
         overflow: hidden;
     }
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-actions)) {
+        position: absolute;
+        right: var(--snowui-sidebar-item-padding-x-override, var(--padding-2));
+        margin-right: 0;
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
