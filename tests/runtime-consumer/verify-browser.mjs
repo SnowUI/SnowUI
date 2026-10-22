@@ -1,7 +1,8 @@
 import {chromium} from 'playwright';
 import assert from 'node:assert/strict';
 const response=await fetch(process.env.SNOWUI_TEST_URL);const html=await response.text();assert.equal(response.status,200);assert.ok(html.includes('identity-ok'));assert.ok(html.includes('Count 0'));assert.ok(html.includes('Legacy snippet'));
-const browser=await chromium.launch({headless:true});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error'||m.text().includes('hydration_mismatch'))errors.push(m.text());});
+const browser=await chromium.launch({headless:true});const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error'||m.text().includes('hydration_mismatch')||m.text().includes('derived_inert'))errors.push(m.text());});
+try {
 await page.goto(process.env.SNOWUI_TEST_URL);await page.getByRole('button',{name:'Count 0',exact:true}).click();await page.getByRole('button',{name:'Count 1',exact:true}).waitFor();await page.getByRole('textbox',{name:'Name',exact:true}).fill('Bound value');assert.equal(await page.getByTestId('bound').textContent(),'Bound value');await page.getByRole('searchbox',{name:'Search rows',exact:true}).fill('Beta');await page.waitForFunction(()=>!document.querySelector('tbody')?.textContent?.includes('Alpha'));assert.ok((await page.locator('tbody').textContent()).includes('Beta'));assert.equal(await page.getByTestId('identity').textContent(),'identity-ok');await page.getByRole('button',{name:'Coordinate target',exact:true}).click();assert.equal(await page.getByTestId('coordination-count').textContent(),'1');assert.equal(await page.locator('#coordinated-target').evaluate(el=>getComputedStyle(el).opacity),'0.4');const countButton=page.getByRole('button',{name:'Count 1',exact:true});await countButton.focus();await page.keyboard.press('Space');await page.getByRole('button',{name:'Count 2',exact:true}).waitFor();
 await page.waitForFunction(()=>document.querySelector('[data-testid="animated-number"]')?.textContent?.trim()==='2');
 const light=await page.getByTestId('theme-probe').evaluate(el=>getComputedStyle(el).backgroundColor);await page.evaluate(()=>document.documentElement.setAttribute('theme','dark'));const dark=await page.getByTestId('theme-probe').evaluate(el=>getComputedStyle(el).backgroundColor);assert.notEqual(dark,light);await page.evaluate(()=>document.documentElement.removeAttribute('theme'));assert.equal(await page.getByTestId('theme-probe').evaluate(el=>getComputedStyle(el).backgroundColor),light);
@@ -46,4 +47,48 @@ await page.waitForFunction(()=>document.querySelector('img[alt="inherited media"
 assert.equal(await page.getByAltText('nested eager media',{exact:true}).getAttribute('loading'),'eager');
 assert.equal(await page.locator('[medialoading]').count(),0);
 console.log('PASS: tarball media-loading SSR, hydration, reactive inherited default, explicit override and nearest scope');
-assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');await browser.close();
+// 新增生命周期与通知队列用例必须走实际安装包，不能解析维护工作区源码。
+const pagination=page.getByRole('navigation',{name:'Package pagination',exact:true});
+let generation=0,callbacks=0,serial=0;
+for(const reducedMotion of ['no-preference','reduce']) {
+ await page.emulateMedia({reducedMotion});
+ for(const composition of ['built-in','explicit'])for(const responsive of ['auto','none']) {
+  await page.getByRole('combobox',{name:'Package pagination composition',exact:true}).selectOption(composition);
+  await page.getByRole('combobox',{name:'Package pagination responsive',exact:true}).selectOption(responsive);
+  for(let cycle=0;cycle<3;cycle++) {
+   await pagination.locator('[aria-current="page"]').filter({hasText:/^1$/}).waitFor();
+   await pagination.locator('[data-page="2"]').click();
+   await pagination.locator('[aria-current="page"]').filter({hasText:/^2$/}).waitFor();
+   await page.getByRole('button',{name:'Dispose package pagination',exact:true}).click();
+   await pagination.waitFor({state:'detached'});
+   assert.equal(await page.getByTestId('package-pagination-state').textContent(),`Instance ${generation}, page 4, page size 10`);
+   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
+   assert.deepEqual(errors,[]);
+   await page.getByRole('button',{name:'Restore package pagination',exact:true}).click();generation++;
+   await pagination.locator('[aria-current="page"]').filter({hasText:/^1$/}).waitFor();
+  }
+ }
+ for(const position of ['top','top-left','top-right','bottom','bottom-left','bottom-right']) {
+  await page.getByRole('combobox',{name:'Package notification position',exact:true}).selectOption(position);
+  await page.getByRole('button',{name:'Package timed',exact:true}).click();
+  await page.mouse.move(1,1);
+  await page.getByText('Package timed notification',{exact:true}).waitFor({state:'detached'});
+  await page.getByTestId('package-notification-dismissed').filter({hasText:new RegExp(`^${++callbacks}$`)}).waitFor();
+  await page.getByRole('button',{name:'Package persistent',exact:true}).click();
+  await page.getByText('Package persistent notification',{exact:true}).waitFor();
+  await page.getByRole('button',{name:'Package clear notifications',exact:true}).click();
+  await page.getByText('Package persistent notification',{exact:true}).waitFor({state:'detached'});
+  await page.getByTestId('package-notification-dismissed').filter({hasText:new RegExp(`^${++callbacks}$`)}).waitFor();
+ }
+ await page.getByRole('button',{name:'Package four notifications',exact:true}).click();
+ await page.getByText(`Package revision ${serial+4}`,{exact:true}).waitFor();
+ await page.getByText(`Package revision ${serial+1}`,{exact:true}).waitFor({state:'detached'});
+ await page.getByTestId('package-notification-dismissed').filter({hasText:new RegExp(`^${++callbacks}$`)}).waitFor();
+ await page.getByRole('button',{name:'Package clear notifications',exact:true}).click();
+ callbacks+=3;serial+=4;
+ await page.getByTestId('package-notification-dismissed').filter({hasText:new RegExp(`^${callbacks}$`)}).waitFor();
+ assert.equal(await page.getByText(/^Package revision /).count(),0);
+}
+console.log('PASS: tarball Pagination 8 lifecycle combinations / 24 teardown-remount cycles; Toast 6 positions / 2 motion modes, exit cleanup, next enqueue, push-out and exact dismissal callbacks');
+assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
+} finally { await browser.close(); }

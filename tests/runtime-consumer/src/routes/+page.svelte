@@ -2,6 +2,7 @@
 import * as SnowUI from "@snowui-design-system/components";
 import MediaLoading from '../MediaLoading.svelte';
 import FrameCoordination from "../FrameCoordination.svelte";
+import NotificationLifecycle from '../NotificationLifecycle.svelte';
 import {LocaleProvider, Image, Button, Frame, Input, NumericText, BarChart, Sidebar, SidebarItem, SidebarSection, Separator, DataTable, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableToolbar, type DataTableRenderState} from '@snowui-design-system/components';
 import {Frame as LegacyFrame} from '@snowui-design-system/components/compat';
 import '@snowui-design-system/components/styles';
@@ -28,5 +29,7 @@ const messages=$derived(overrideLabels?{'sidebar.navigation':'Package navigation
 <div data-testid="theme-probe" style="background:var(--background-1)">Theme probe</div>
 
 <MediaLoading />
+
+<NotificationLifecycle />
 
 <Image src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'/%3E" alt="default media" size={80} previewMode="none" />
