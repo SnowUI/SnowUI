@@ -1,6 +1,6 @@
 /**
  * Field.test.ts
- * v1.4.0
+ * v1.4.1
  * 变更记录 (2026-07-05): F-04 增加 Field 内置 error，验证双 segment 后方的整行错误提示。
  * 变更记录 (2026-03-30): 将 Field-Demo 的 F-01 ~ F-05 全量迁入 test 项目，后续字段组合与 Figma 样式微调统一在 test 中验证。
  * 变更记录 (2026-03-16): 新增 `Field row / column` 根节点简写示例，覆盖无需额外 `Frame` 的整块横向/竖向组合。
@@ -107,5 +107,20 @@ export const examples = [
 </Field>`,
         expected: {render: "连续字段表面没有结构间距，两个字段各自保留至少 4 CSS px 的图文间距。"},
         logic: ["ContentLine", "Narrow", "Ownership"],
+    },
+    {
+        name: "F-09：默认字段的外部附件同排",
+        code: `F-09
+<Field style="width: 20rem;">
+    <Text as="label">Due Date</Text>
+    <Icon as="leading" icon={Resource.CalendarBlank} size={20} />
+    <Input type="date" defaultValue="2026-02-01" aria-label="Due Date" />
+    <Button as="trailing" bare aria-label="Date options"><Icon icon={Resource.ArrowLineUpDown} size={16} /></Button>
+</Field>`,
+        expected: {
+            layout: "标签保留上行，外部 leading、原生日期控件与 trailing 保持同排；有效图文间距至少4 CSS px，图形不收缩；无附件时控件填满可用区域。",
+            responsive: "16px／8px根字号、gap缩放及窄宽恢复不改变三列归属，内部日期分段仍为连续文字结构。",
+        },
+        logic: ["DefaultFieldControlPlacement", "singleLineOwner"],
     },
 ] as const;

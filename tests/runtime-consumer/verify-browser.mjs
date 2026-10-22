@@ -134,6 +134,20 @@ await page.waitForFunction(()=>getComputedStyle(document.querySelector('.package
 await packageSearch.focus();await packageSearch.fill('New package query');assert.equal(await packageSearch.inputValue(),'New package query');
 await page.evaluate(()=>{document.documentElement.style.fontSize='';document.documentElement.style.removeProperty('--gap-scale');});
 console.log('PASS: tarball Input/Field/Select/SearchInput types, SSR/hydration, 16/8px minimum gaps, continuous segments, combobox name, native form values, unbound clear collapse and actual borderless clear width');
+for(const fontSize of ['16px','8px']) {
+ await page.evaluate(size=>{document.documentElement.style.fontSize=size;document.documentElement.style.setProperty('--gap-scale','.25');},fontSize);
+ const field=page.locator('.package-default-field');
+ for(const width of [260,160,120,260]) {
+  await field.evaluate((n,w)=>{n.style.width=`${w}px`;},width);
+  const fit=await field.evaluate(n=>{const control=n.querySelector(':scope > .package-default-date').getBoundingClientRect(),leading=n.querySelector(':scope > [data-as="leading"]').getBoundingClientRect(),trailing=n.querySelector(':scope > [data-as="trailing"]').getBoundingClientRect(),label=n.querySelector(':scope > [data-as="label"]').getBoundingClientRect();return {gaps:[control.left-leading.right,trailing.left-control.right],sameRow:[leading,trailing].every(b=>Math.abs(b.top+b.bottom-control.top-control.bottom)<1),labelAbove:label.bottom<=control.top+.5};});
+  assert.ok(fit.sameRow,JSON.stringify(fit));assert.ok(fit.labelAbove);assert.ok(fit.gaps.every(g=>g>=4));
+  assert.equal(await field.locator('input').inputValue(),'2026-02-01');
+ }
+}
+await page.getByRole('button',{name:'Package date action',exact:true}).click();assert.equal(await page.getByTestId('package-field-actions').textContent(),'1');
+await page.evaluate(()=>{document.documentElement.style.fontSize='';document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball default Field keeps label above and external graphic/date/action on one row at 16/8px, scaled gaps and narrow/recovery widths');
+
 // 默认列表标签通过实际安装包验证视口内的文字、附件和完整选择值。
 await page.setViewportSize({width:360,height:720});
 const longChoice='Complete package workspace name with a searchable distinctive TailToken';

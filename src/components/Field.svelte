@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Field 组件：表单容器
- v1.4.0
+ v1.4.1
 
  文档: ./Field.md
 -->
@@ -399,10 +399,11 @@
         min-width: 0;
     }
 
+    /* 原生控件的方向 class 属于其内部布局；不能将其误作 Field 的整行容器。 */
     :global(
             :where(
-                    .snowui-field > .snowui-direction-row,
-                    .snowui-field > .snowui-direction-row-reverse
+                    .snowui-field > .snowui-direction-row:not(.snowui-field-host),
+                    .snowui-field > .snowui-direction-row-reverse:not(.snowui-field-host)
                 )
         ) {
         grid-column: 1 / -1;
@@ -413,8 +414,8 @@
 
     :global(
             :where(
-                    .snowui-field > .snowui-direction-row:not([data-single-line="true"]),
-                    .snowui-field > .snowui-direction-row-reverse:not([data-single-line="true"])
+                    .snowui-field > .snowui-direction-row:not(.snowui-field-host):not([data-single-line="true"]),
+                    .snowui-field > .snowui-direction-row-reverse:not(.snowui-field-host):not([data-single-line="true"])
                 )
         ) {
         display: flex;
@@ -424,15 +425,15 @@
 
     :global(
             :where(
-                    .snowui-field > .snowui-direction-row > *,
-                    .snowui-field > .snowui-direction-row-reverse > *
+                    .snowui-field > .snowui-direction-row:not(.snowui-field-host) > *,
+                    .snowui-field > .snowui-direction-row-reverse:not(.snowui-field-host) > *
                 )
         ) {
         min-width: 0;
     }
 
     /* 列向 Field 中的行 segment 容器（如 FM-01 City|ZIP）：
-       .snowui-field > .snowui-direction-row 规则会将 gap 设为 8px，
+       .snowui-field > .snowui-direction-row:not(.snowui-field-host) 规则会将 gap 设为 8px，
        此规则在其之后出现，将 gap 重置为 0（分割线由 box-shadow 负责）。 */
     :global(
             :where(
@@ -470,9 +471,9 @@
 
     :global(
             :where(
-                    .snowui-field.snowui-direction-row > .snowui-direction-row,
+                    .snowui-field.snowui-direction-row > .snowui-direction-row:not(.snowui-field-host),
                     .snowui-field.snowui-direction-row-reverse
-                        > .snowui-direction-row-reverse
+                        > .snowui-direction-row-reverse:not(.snowui-field-host)
                 )
         ) {
         flex: 1 1 0;
@@ -482,9 +483,9 @@
 
     :global(
             :where(
-                    .snowui-field.snowui-direction-row > .snowui-direction-row:not([data-single-line="true"]),
+                    .snowui-field.snowui-direction-row > .snowui-direction-row:not(.snowui-field-host):not([data-single-line="true"]),
                     .snowui-field.snowui-direction-row-reverse
-                        > .snowui-direction-row-reverse:not([data-single-line="true"])
+                        > .snowui-direction-row-reverse:not(.snowui-field-host):not([data-single-line="true"])
                 )
         ) {
         display: flex;
@@ -495,10 +496,10 @@
     :global(
             :where(
                     .snowui-field.snowui-direction-row
-                        > .snowui-direction-row
+                        > .snowui-direction-row:not(.snowui-field-host)
                         > .snowui-input.snowui-field-host,
                     .snowui-field.snowui-direction-row-reverse
-                        > .snowui-direction-row-reverse
+                        > .snowui-direction-row-reverse:not(.snowui-field-host)
                         > .snowui-input.snowui-field-host
                 )
         ) {
@@ -509,10 +510,10 @@
     :global(
             :where(
                     .snowui-field.snowui-direction-row
-                        > .snowui-direction-row
+                        > .snowui-direction-row:not(.snowui-field-host)
                         > .snowui-icon-wrapper,
                     .snowui-field.snowui-direction-row-reverse
-                        > .snowui-direction-row-reverse
+                        > .snowui-direction-row-reverse:not(.snowui-field-host)
                         > .snowui-icon-wrapper
                 )
         ) {
@@ -655,8 +656,8 @@
 
     :global(
             :where(
-                    .snowui-field > .snowui-direction-column,
-                    .snowui-field > .snowui-direction-column-reverse
+                    .snowui-field > .snowui-direction-column:not(.snowui-field-host),
+                    .snowui-field > .snowui-direction-column-reverse:not(.snowui-field-host)
                 )
         ) {
         grid-column: 1 / -1;
@@ -671,8 +672,8 @@
 
     :global(
             :where(
-                    .snowui-field > .snowui-direction-column > *,
-                    .snowui-field > .snowui-direction-column-reverse > *
+                    .snowui-field > .snowui-direction-column:not(.snowui-field-host) > *,
+                    .snowui-field > .snowui-direction-column-reverse:not(.snowui-field-host) > *
                 )
         ) {
         min-width: 0;
@@ -751,9 +752,9 @@
     :global(
             :where(
                 .snowui-field
-                    > .snowui-direction-row
+                    > .snowui-direction-row:not(.snowui-field-host)
                     > .snowui-field-host:not([data-as="segment"]),
-                .snowui-field > .snowui-direction-row-reverse
+                .snowui-field > .snowui-direction-row-reverse:not(.snowui-field-host)
                     > .snowui-field-host:not([data-as="segment"])
             )
         ) {
@@ -764,9 +765,9 @@
     :global(
             :where(
                 .snowui-field
-                    > .snowui-direction-row
+                    > .snowui-direction-row:not(.snowui-field-host)
                     > .snowui-field-host:not([data-as="segment"]):not([data-single-line="true"]),
-                .snowui-field > .snowui-direction-row-reverse
+                .snowui-field > .snowui-direction-row-reverse:not(.snowui-field-host)
                     > .snowui-field-host:not([data-as="segment"]):not([data-single-line="true"])
             )
         ) {
@@ -777,8 +778,8 @@
     :global(
             :where(
                     .snowui-field > .snowui-role-row > .snowui-field-host.snowui-input-has-root-accessory,
-                    .snowui-field > .snowui-direction-row > .snowui-field-host.snowui-input-has-root-accessory,
-                    .snowui-field > .snowui-direction-row-reverse > .snowui-field-host.snowui-input-has-root-accessory,
+                    .snowui-field > .snowui-direction-row:not(.snowui-field-host) > .snowui-field-host.snowui-input-has-root-accessory,
+                    .snowui-field > .snowui-direction-row-reverse:not(.snowui-field-host) > .snowui-field-host.snowui-input-has-root-accessory,
                     .snowui-field.snowui-direction-row > .snowui-field-host.snowui-input-has-root-accessory,
                     .snowui-field.snowui-direction-row-reverse > .snowui-field-host.snowui-input-has-root-accessory
                 )
@@ -822,8 +823,8 @@
 
     :global(
             :where(
-                .snowui-field > .snowui-direction-column > .snowui-field-host,
-                .snowui-field > .snowui-direction-column-reverse
+                .snowui-field > .snowui-direction-column:not(.snowui-field-host) > .snowui-field-host,
+                .snowui-field > .snowui-direction-column-reverse:not(.snowui-field-host)
                     > .snowui-field-host
             )
         ) {
@@ -834,8 +835,8 @@
 
     :global(
             :where(
-                .snowui-field > .snowui-direction-column > .snowui-field-host:not([data-single-line="true"]),
-                .snowui-field > .snowui-direction-column-reverse
+                .snowui-field > .snowui-direction-column:not(.snowui-field-host) > .snowui-field-host:not([data-single-line="true"]),
+                .snowui-field > .snowui-direction-column-reverse:not(.snowui-field-host)
                     > .snowui-field-host:not([data-single-line="true"])
             )
         ) {
@@ -1273,34 +1274,34 @@
                     .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-role-col + .snowui-direction-row-reverse,
                     .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-role-col + .snowui-direction-column,
                     .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-role-col + .snowui-direction-column-reverse,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row + .snowui-field-host,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row + .snowui-role-row,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row + .snowui-role-col,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row + .snowui-direction-row,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row + .snowui-direction-row-reverse,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row + .snowui-direction-column,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row + .snowui-direction-column-reverse,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse + .snowui-field-host,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse + .snowui-role-row,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse + .snowui-role-col,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse + .snowui-direction-row,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse + .snowui-direction-row-reverse,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse + .snowui-direction-column,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse + .snowui-direction-column-reverse,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column + .snowui-field-host,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column + .snowui-role-row,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column + .snowui-role-col,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column + .snowui-direction-row,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column + .snowui-direction-row-reverse,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column + .snowui-direction-column,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column + .snowui-direction-column-reverse,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse + .snowui-field-host,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse + .snowui-role-row,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse + .snowui-role-col,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse + .snowui-direction-row,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse + .snowui-direction-row-reverse,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse + .snowui-direction-column,
-                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse + .snowui-direction-column-reverse
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row:not(.snowui-field-host) + .snowui-field-host,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row:not(.snowui-field-host) + .snowui-role-row,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row:not(.snowui-field-host) + .snowui-role-col,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row:not(.snowui-field-host) + .snowui-direction-row,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row:not(.snowui-field-host) + .snowui-direction-row-reverse,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row:not(.snowui-field-host) + .snowui-direction-column,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row:not(.snowui-field-host) + .snowui-direction-column-reverse,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse:not(.snowui-field-host) + .snowui-field-host,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse:not(.snowui-field-host) + .snowui-role-row,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse:not(.snowui-field-host) + .snowui-role-col,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse:not(.snowui-field-host) + .snowui-direction-row,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse:not(.snowui-field-host) + .snowui-direction-row-reverse,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse:not(.snowui-field-host) + .snowui-direction-column,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-row-reverse:not(.snowui-field-host) + .snowui-direction-column-reverse,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column:not(.snowui-field-host) + .snowui-field-host,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column:not(.snowui-field-host) + .snowui-role-row,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column:not(.snowui-field-host) + .snowui-role-col,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column:not(.snowui-field-host) + .snowui-direction-row,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column:not(.snowui-field-host) + .snowui-direction-row-reverse,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column:not(.snowui-field-host) + .snowui-direction-column,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column:not(.snowui-field-host) + .snowui-direction-column-reverse,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-field-host,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-role-row,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-role-col,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-direction-row,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-direction-row-reverse,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-direction-column,
+                    .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-direction-column-reverse
                 )
         ) {
         box-shadow: inset 0 var(--border-1) 0 var(--black-20, #00000033);
@@ -1355,11 +1356,11 @@
     :global(
             :where(
                     .snowui-field.snowui-direction-row
-                        > .snowui-direction-row
+                        > .snowui-direction-row:not(.snowui-field-host)
                         > .snowui-icon-wrapper
                         + *,
                     .snowui-field.snowui-direction-row-reverse
-                        > .snowui-direction-row-reverse
+                        > .snowui-direction-row-reverse:not(.snowui-field-host)
                         > .snowui-icon-wrapper
                         + *
                 )

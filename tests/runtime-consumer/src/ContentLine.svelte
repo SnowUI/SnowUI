@@ -5,6 +5,7 @@ let checkboxValues=$state<string[]>([]);
 let radioValue=$state<string|null|undefined>(null);
 let switchValue=$state(false);
 let captionCalls=$state(0);
+let fieldActionCalls=$state(0);
 </script>
 {#snippet graphic()}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" aria-hidden="true"><path d="m3 10 4 4 10-10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
@@ -31,6 +32,14 @@ let captionCalls=$state(0);
 </section>
 
 <section aria-label="Package field owners">
+<Field class="package-default-field" style="width:260px">
+<Text as="label">Package due date</Text>
+<Icon as="leading" size={20}>{@render graphic()}</Icon>
+<Input class="package-default-date" type="date" value="2026-02-01" clearable={false} aria-label="Package due date"/>
+<Button as="trailing" bare aria-label="Package date action" onclick={()=>fieldActionCalls++}><Icon size={16}>{@render graphic()}</Icon></Button>
+</Field>
+<output data-testid="package-field-actions">{fieldActionCalls}</output>
+
 <form id="package-field-form" style="width:260px">
 <Field row class="package-segment-field">
 <Input class="package-segment-input" as="segment" gap={0} name="entry" aria-label="Package entry" value="Complete editable entry" clearable={false}><Icon as="leading" size={20}>{@render graphic()}</Icon></Input>
