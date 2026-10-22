@@ -1,8 +1,11 @@
+/* SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
+复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 /*
- * SnowUI 主题同步文件。
- * 仅允许项目所有者手动修改；每次必须同时修改 Components 与页面样式仓库中的
- * 两份主题文件，并保持内容完全一致。
- * AI、自动脚本和发布流程只能校验一致性，不得自动覆盖任一文件。
+ * SnowUI 主题唯一来源：components/src/styles/themes.css。
+ * 维护AI与脚本可修改此源；禁止手工维护第二份主题。
+ * 应用主题入口由工作区同步脚本自动生成，不单独编辑。
+ * 生成：node specs/scripts/sync-themes.mjs --write；检查：同命令 --check。
+ * 源码许可路径以下方 notice 的权威源位置为准；生成不改变适用许可。
  */
 
 /*

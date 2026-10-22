@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
-import {root,sourceFiles,sourceNotice,protectedFiles} from './source-notices.mjs';
+import {root,sourceFiles,sourceNotice} from './source-notices.mjs';
 const hash=bytes=>createHash('sha256').update(bytes).digest('hex');
 /** 导出所选文件及完整许可；保留 src 路径，不猜测依赖，不覆盖用户文件。 */
 export function copySource(files,out,base=root){
@@ -14,7 +14,7 @@ export function copySource(files,out,base=root){
  const entries=selected.map(file=>{
   if(!allowed.has(file))throw Error('仅支持明确的组件或共享源码路径');
   const bytes=fs.readFileSync(path.join(base,file));
-  if(!protectedFiles.has(file)&&!bytes.toString().startsWith(sourceNotice(file,base)))throw Error('所选源码缺少当前许可说明');
+  if(!bytes.toString().startsWith(sourceNotice(file,base)))throw Error('所选源码缺少当前许可说明');
   return {file,bytes};
  });
  // 先读取全部材料，任何校验失败均不留下半份交付。
