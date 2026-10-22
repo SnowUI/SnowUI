@@ -1,11 +1,11 @@
 /**
  * Listbox.test.ts
- * v1.1.0
+ * v1.4.0
  * 变更记录 (2026-04-20): 移除 Combobox 示例（组件已废弃）；新增 LB-06/LB-07 覆盖
  *   Input as="search" 搜索过滤与 allowCustomValue 自定义选项功能。
  *
  * 覆盖：Listbox 作为 Select 宿主的下拉面板；内嵌 Input as="search" 启用搜索过滤。
- * 注意：Listbox 本身无独立 Props，所有状态通过 ListboxOwnerContext 从宿主获取，
+ * 注意：Listbox 提供 items／parts／面板 Props，选择状态通过 ListboxOwnerContext 从宿主获取，
  *       示例须嵌套在 Select 内使用。
  */
 export const examples = [
@@ -207,5 +207,14 @@ export const examples = [
             interaction: "搜索过滤与选择沿用原宿主；显式parts.Input占位及显式Input子项保持优先",
         },
         logic: ["Locale", "Search", "ExplicitPartPriority", "SelectButton"],
+    },
+    {
+        name: "LB-Long：长默认标签与可见勾选附件",
+        code: `LB-Long
+<Select ariaLabel="Workspace" defaultValue="long" style="width: 8rem;">
+    <Listbox search showCheck items={[{value: "long", label: "Complete workspace name with a distinctive final token"}, {value: "short", label: "Short"}]} />
+</Select>`,
+        expected: {render: "长默认标签在视口约束下收缩，勾选图标保持可见；全文可访问且仍可搜索。"},
+        logic: ["ContentLine", "Viewport", "FullText"],
     },
 ] as const;

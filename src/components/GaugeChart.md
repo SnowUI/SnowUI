@@ -31,7 +31,7 @@
 	import { Button, Frame, Icon, Text } from '@snowui-design-system/components';
 	import { DotCircle } from '@snowui-design-system/resource-svelte';
 	import { GaugeChart } from '@snowui-design-system/components';
-	// 本周文档审核的示例数据。
+	// Sample data for this week’s documentation review.
 	const channels = [
 	    { name: 'Ready', value: 72, color: 'var(--primary)' },
 	    { name: 'Review', value: 18, color: 'var(--secondary-purple)' },
@@ -46,7 +46,7 @@
         aria-label="Sample weekly documentation review" />
     <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--gap-4) var(--gap-3);" aria-label="Review status legend">
         {#each channels as item}
-            <Frame row style="gap: var(--gap-0);"><Icon size={12} style={`color: ${item.color};`}><DotCircle weight="fill" /></Icon><Text style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">{item.name}</Text></Frame>
+            <Frame singleLine gap={0}><Icon as="leading" size={12} style={`color: ${item.color};`}><DotCircle weight="fill" /></Icon><Text lines={1} style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">{item.name}</Text></Frame>
         {/each}
     </div>
     <div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--gap-4) var(--gap-3);">

@@ -85,6 +85,7 @@ export const FRAME_INTERNAL_PROP_KEYS = [
     "expanded",
     "row",
     "firstLine",
+    "singleLine",
     "column",
     "grid",
     "reverse",

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.2.28
+> **版本**: v1.3.0
 > **职责**: 选择一个或多个独立选项，支持选中、未选中和部分选中状态，适合表单与批量选择。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -47,6 +47,8 @@
 | indeterminate | `boolean` | `false` | 不确定状态（双向绑定） |
 | onCheckedChange | `(checked: boolean) => void` | — | 原生复选状态变化后的回调 |
 | ariaLabel | `string` | — | 无可见 label 时的无障碍名称 |
+| singleLine | `boolean` | `true` | 默认标签与控件保持单行，附件不压缩；窄宽时原始标签可省略显示并保留完整可访问名称，不复制 children。复杂多行内容可显式设为 false，由该内容拥有布局。需要全文提示时组合 Text lines={1}。 |
+| gap | `number` | — | 继承 Frame 的间距 Token 序号；省略时使用原组件间距，显式值覆盖组件间距。有效间距至少 4 CSS px，包含零值、根字号及 gap-scale 缩放；较大首选值保留。 |
 | children | `Snippet` | — | 标签内容 |
 | enableResponsive | `boolean` | `false` | 启用响应式 |
 | enableContext | `boolean` | `false` | 启用上下文 |
@@ -65,8 +67,8 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 
 - 根节点保持 `inline-flex`，内容整体 Hug。
 - `.snowui-checkbox-visual` 是固定 Hug 的控件视觉体。
-- `.snowui-checkbox-label` 是可选 label，默认 Hug，不承担 Fill。
-- visual 与 label 的距离由 `--snowui-checkbox-gap` 管理，可通过 `--snowui-checkbox-gap-override` 覆盖。
+- `.snowui-checkbox-label` 是可选标签，空间充足时 Hug，受限时允许收缩并单行省略；原始内容及完整原生名称保留。
+- visual 与 label 的距离由 `--snowui-checkbox-gap` 管理，可通过 gap 或 `--snowui-checkbox-gap-override` 设置首选值；有效间距至少 4 CSS px。
 - `size` 表示包含透明留白的控件占位尺寸，不改变 label 的布局策略。
 - 四周留白为 `size / 16`，可见图形宽高为 `size × 0.875`；例如 `size={32}` 占位 32×32px、图形 28×28px、四边各 2px。留白与图形随 size、根字号和尺寸 Token 等比缩放，留白仍可点击。
 - 留白由共享控件壳持有，label 位于壳外；内边框继续按名义 size 的 `0.0625` 计算，圆角、Dot 与选中环按可见图形尺寸计算。
@@ -195,7 +197,7 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 ### 2. 默认样式 (Defaults)
 
 - **Display**: `inline-flex`, `align-items: center`
-- **Gap**: `var(--gap-1)` (4px) - 图标与文字间距
+- **Gap**: 首选 `var(--gap-1)`，缩放和零值下的有效间距仍至少为 4 CSS px。
 - **Cursor**: `pointer` (Disabled 时为 `default`)
 - **Font**: `var(--text-14)` (14px), `line-height: var(--leading-14)` (20px)
 
@@ -261,6 +263,11 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
 ---
 
 ## 更新日志
+
+### v1.3.0 (2026-10-23)
+
+- 标签采用共享单行预设并保留原始 Snippet；窄宽时允许标签收缩，复杂多行内容可显式退出。控件与标签间距消费共享解析，零值与字体／gap 缩放不低于 4 CSS px；较大首选值、视觉体尺寸和透明留白比例保持。
+- 分组同步仅在成员实际变化时更新数组，修复空数组在初始化时重复写入引发的 effect 更新循环；半选清除和单次回调保持。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

@@ -2,7 +2,7 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；旧 基础与协调 标签仅表示迁移期技术来源。
 
-> **版本**: v5.0.1（事件卸载安全，2026-10-18）
+> **版本**: v5.1.0（单行内容组合，2026-10-22）
 > **职责**: 统一布局、状态、加载与动效，并通过显式配置支持多个组件的联动和样式编排。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-18
@@ -17,7 +17,7 @@
 用于需要布局、状态、Context、loading、Skeleton 与动效的通用宿主；普通页面结构可使用语义 HTML。
 
 - row / column / grid 选择布局；as 声明组合角色，bind:element 获取根元素。
-- 图标与文字组合显式使用 row firstLine；颜色、间距和圆角优先 Token 与公开 class/style。
+- 单行标签使用 singleLine；允许换行的图文正文使用 row firstLine。颜色、间距和圆角优先 Token 与公开 class/style。
 - orchestrate*、target/action 和 styles 都由 Frame 承接；跨组件 Motion 使用 initMotion() 建立上下文。
 - 没有配置 styles、没有 Motion 上下文时，不创建跨组件注册表或动效订阅。
 <!-- usage-guide:end -->
@@ -29,21 +29,22 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { Frame, Text } from '@snowui-design-system/components';
+	import { Frame, Badge, Button, Text } from '@snowui-design-system/components';
 </script>
 
 <Frame
-	id="documentation-workflow"
-	orchestrate
-	orchestrateMode="sequential"
-	orchestrateDelay={100}
-	orchestrateOrder="visual-row"
-	orchestrateTrigger="appear"
-	style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-2); width: min(100%, 36rem);"
+	column
+	contentFill
+	padding={6}
+	gap={4}
+	radius={5}
+	border={1}
+	whileHover={{ y: [0, -4], duration: 180 }}
+	style="width: min(100%, 30rem); background: var(--background-1);"
 >
-	<Frame column padding={4} radius={4} border={1} whileAppear={{ opacity: [0, 1], y: [8, 0] }}><Text weight={600}>1 · Generate</Text><Text>Create canonical component pages.</Text></Frame>
-	<Frame column padding={4} radius={4} border={1} whileAppear={{ opacity: [0, 1], y: [8, 0] }}><Text weight={600}>2 · Validate</Text><Text>Check API and example parity.</Text></Frame>
-	<Frame column padding={4} radius={4} border={1} whileAppear={{ opacity: [0, 1], y: [8, 0] }}><Text weight={600}>3 · Publish</Text><Text>Ship the verified documentation.</Text></Frame>
+	<Frame singleLine><Text lines={1} size={20} weight={600}>Build with SnowUI</Text><Badge as="trailing" count="v2.4" color="Indigo" /></Frame>
+	<Text>Compose responsive layout, state, interaction, and motion through one public foundation.</Text>
+	<Frame row><Button variant="filled" href="/components/quick-start">Quick Start</Button><Button as="trailing" variant="outline" href="/components">Browse components</Button></Frame>
 </Frame>
 ```
 <!-- /quick-start:generated -->
@@ -121,7 +122,8 @@
 | lg | `"row" \| "column" \| "grid" \| "row-reverse" \| "column-reverse"` | — | 兼容断点方向 lg，启用 enableResponsive 时按 mobile-first 级联；新页面优先页面 responsive utilities。 |
 | xl | `"row" \| "column" \| "grid" \| "row-reverse" \| "column-reverse"` | — | 兼容断点方向 xl，启用 enableResponsive 时按 mobile-first 级联；新页面优先页面 responsive utilities。 |
 | 2xl | `"row" \| "column" \| "grid" \| "row-reverse" \| "column-reverse"` | — | 兼容断点方向 2xl，启用 enableResponsive 时按 mobile-first 级联；新页面优先页面 responsive utilities。 |
-| firstLine | `boolean` | `false` | Icon＋文字组合的默认设计方式，组合时显式声明；通用 Frame 不自动识别内容。在 row / row-reverse 三槽布局中，将 leading / trailing 附件与正文第一行行框居中；正文须继承宿主行高。非 row、无附件或 enableAutoLayout=false 时不增强；与 Pin 兼容。 |
+| singleLine | `boolean` | `false` | 显式单行图文／文字组合预设：横排居中、不换行、gap至少4 CSS px；leading／trailing附件保持尺寸，普通内容可收缩。优先于方向断点及responsive结构回退；不自动识别子项、不生成文字或Tooltip。Text lines=1负责截断与全文访问。enableAutoLayout=false时关闭本预设。 |
+| firstLine | `boolean` | `false` | 允许换行的图文正文显式声明首行对齐；单行标签使用singleLine，通用Frame不自动识别内容。在 row / row-reverse 三槽布局中，将 leading / trailing 附件与正文第一行行框居中；正文须继承宿主行高。非 row、无附件或 enableAutoLayout=false 时不增强；与 Pin 兼容。 |
 | row | `boolean` | — | 设置横向布局；同时声明 column 或 grid 时 row 优先。 |
 | column | `boolean` | — | 设置纵向布局；未启用 row 时生效，配合 reverse 改变方向。 |
 | grid | `boolean` | — | 设置网格基础布局；row、column 均未启用时生效，网格列由公开 class/style 配置。 |
@@ -204,7 +206,7 @@ Frame 是唯一公共宿主；布局、状态、Context、loading / Skeleton、D
 | **状态触发** | `Click`, `Drag`, `Hover`, `Focus`, `Key`, `Scroll` |
 | **形态** | `collapsed`, `expanded` |
 | **响应式** | `responsive` 内容适配；`xs`–`2xl` 仅作旧断点兼容 |
-| **布局** | `row`, `column`, `grid`, `reverse`, `firstLine`, `morph`, `contentFill`, `contentHug`, `pinOffset`, `pinOffsetX`, `pinOffsetY` |
+| **布局** | `row`, `column`, `grid`, `reverse`, `firstLine`, `singleLine`, `morph`, `contentFill`, `contentHug`, `pinOffset`, `pinOffsetX`, `pinOffsetY` |
 | **动效触发** | `whileLoad`, `whileReload`, `whileAppear`, `whileDisappear`, `whileIdle`, `whileActive`, `whileDisabled`, `whileClick`, `whileDrag`, `whileHover`, `whileFocus`, `whileKey`, `whileScroll`, `whileValidating`, `whileUploading`, `whileEditing` |
 | **形态动效** | `whileCollapsed`, `whileExpanded` |
 | **响应式动效** | `whileXs`, `whileSm`, `whileMd`, `whileLg`, `whileXl`, `while2xl` |
@@ -232,7 +234,7 @@ Frame 是唯一公共宿主；布局、状态、Context、loading / Skeleton、D
 
 - 当声明 `row` / `column`，或显式传入 `enableAutoLayout={true}` 时，根节点输出 `data-auto-layout="true"`。
 - `as="leading"` / `as="trailing"` 会透出为 `data-as`，由 `auto-layout.css` 统一处理 Leading / Content / Trailing 三段。
-- Icon＋文字组合默认使用 `row firstLine` 开启首行对齐，输出 `data-first-line="true"`；正文继承宿主行高，附件与单行或多行正文的第一行居中，详见 [LayoutProtocol §4.4](../../../specs/maintainers/LayoutProtocol.md#44-首行对齐first-line-alignment)。
+- 允许换行的图文正文使用 `row firstLine` 开启首行对齐，输出 `data-first-line="true"`；正文继承宿主行高，附件与单行或多行正文的第一行居中，详见 [LayoutProtocol §4.4](../../../specs/maintainers/LayoutProtocol.md#44-首行对齐first-line-alignment)。
 - `as="pin-*"` 会透出为 `data-as="pin-*"`，由 `auto-layout.css` 统一处理九方位绝对定位；`pinOffsetX` / `pinOffsetY` 优先于 `pinOffset`。
 - `leading` 与 `trailing` 始终按 Hug 子项处理；普通直系子项作为 Content，必须允许 `min-width: 0`。
 - 普通内容宽度默认自动判断：Frame 有显式宽度（`width` prop、`style="width:..."`、`w-full` / `size-full` 等宽度 class）时为 Fill；Frame 为 Hug 宽度时为 Hug。可用 `contentFill` / `contentHug` 强制覆盖，二者同时出现时 `contentFill` 优先。
@@ -544,7 +546,7 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 
 当 `enableAutoLayout={true}`（默认）且 Frame 声明了 `row` / `column` 时，Frame 会在根 DOM 输出 `data-auto-layout` 属性，自动继承 `auto-layout.css` 提供的 Level 1 结构化规则：
 
-- 首行对齐：Icon＋文字组合默认使用 `row firstLine`，沿用三槽角色；完整规则见 [LayoutProtocol §4.4](../../../specs/maintainers/LayoutProtocol.md#44-首行对齐first-line-alignment)。
+- 首行对齐：允许换行的图文正文使用 `row firstLine`，沿用三槽角色；完整规则见 [LayoutProtocol §4.4](../../../specs/maintainers/LayoutProtocol.md#44-首行对齐first-line-alignment)。
 - Pin：通过 `as="pin-*"` 定位，不占三槽及首行轨道，可与首行对齐共用。
 - 三槽位感知：子元素通过 `data-as="leading"` / `data-as="trailing"` 声明角色，CSS `:has()` 自动切换 Flex ↔ Grid
 - Wrap 默认开启，Grid 模式下自动抑制
@@ -556,6 +558,25 @@ Frame 通过计算 `direction` 生成对应的样式类名（Level 1 权重）�
 
 完整协议规范详见 [LayoutProtocol.md](../../../specs/maintainers/LayoutProtocol.md)。
 
+
+### 单行图文组合
+
+单行名称、日期、状态或头像＋姓名默认用`singleLine`表达组合语义；它隐含row，禁止flex子项和标签拆行，不因兼容断点或responsive.direction转成column。附件显式标为leading／trailing，保持其Hug／Fixed尺寸；普通内容允许收缩，Pin不占间距。普通Frame的wrap、长正文firstLine和Tag内部间距不受影响。
+
+```svelte
+<script lang="ts">
+    import {Frame, Icon, Text} from '@snowui-design-system/components';
+    import {Calendar} from '@snowui-design-system/resource-svelte';
+</script>
+<Frame singleLine style="width: 12rem;">
+    <Icon as="leading" icon={Calendar} size={20} />
+    <Text lines={1}>Last updated just now</Text>
+</Frame>
+```
+
+截断、Tooltip及全文访问由Text拥有，不由Frame复制实现。独立文字元素＋文字元素也可使用此组合；同一段文字的连续字符不用拆开加gap。空间不足时先让文字收缩／截断；连附件与4px间距也放不下时，由外层局部滚动保留内容，不能压缩附件或把它裁掉。
+
+默认首选gap仍为8px，显式gap编号0也按4 CSS px下限解析，根字号／gap-scale缩小时保持该组合下限；已有更大间距保持并按既有响应式压缩／恢复。公开class/style仍是显式样式接管入口，调用方不得用它们破坏组合最低间距或单行语义。enableAutoLayout=false关闭本预设；只关闭enableResponsive不会关闭其静态布局。不新增观察器、自动子项识别或DOM包装。
 
 ### 6.2 布局稳定性 (Layout Stability)
 
@@ -1141,7 +1162,7 @@ import { Frame, initMotion } from '@snowui-design-system/components';
 
 ### Layout and content {#layout-and-content}
 
-Use row, column, grid, as, and row firstLine to compose content. Use public tokens and class/style for visual values. loading and skeleton share the same inherited context.
+Use singleLine with leading/trailing attachments and Text lines={1} for one-line labels. Use row firstLine for wrapping prose; row, column, grid, and as compose other layouts. Use public tokens and class/style for visual values. loading and skeleton share the same inherited context.
 
 ### Coordination {#coordination}
 
@@ -1274,7 +1295,7 @@ Frame 通过共享模块统一实现布局、状态、自身动效与跨组件�
 | **事件** | `Click`, `Drag`, `Hover`, `Focus`, `Key`, `Scroll` |
 | **形态** | `collapsed`, `expanded` |
 | **响应式** | `breakpoint`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl` |
-| **布局** | `row`, `column`, `grid`, `reverse`, `firstLine`, `morph` |
+| **布局** | `row`, `column`, `grid`, `reverse`, `firstLine`, `singleLine`, `morph` |
 | **动效** | `whileLoad`, `whileReload`, `whileAppear`, `whileDisappear`, `whileIdle`, `whileActive`, `whileDisabled`, `whileClick`, `whileDrag`, `whileHover`, `whileFocus`, `whileKey`, `whileScroll`, `whileValidating`, `whileUploading`, `whileEditing`, `whileCollapsed`, `whileExpanded`, `whileXs`, `whileSm`, `whileMd`, `whileLg`, `whileXl`, `while2xl` |
 | **编排** | `orchestrate`, `orchestrateMode`, `orchestrateDelay`, `orchestrateOrder`, `orchestrateGroup`, `orchestrateTrigger`, `orchestrateTarget` |
 | **链式继承** | `parent` (访问祖父组件上下文) |
@@ -1411,6 +1432,10 @@ Frame 通过共享模块统一实现布局、状态、自身动效与跨组件�
 
 
 ## 更新日志
+
+### v5.1.0 (2026-10-22)
+
+- 新增显式singleLine组合预设；保留普通wrap、firstLine多行正文及Text截断所有权。
 
 ### v5.0.1 (2026-10-18)
 

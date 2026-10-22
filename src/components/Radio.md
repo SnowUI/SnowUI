@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.3.17
+> **版本**: v1.4.0
 > **职责**: 在一组互斥选项中选择一项，适合需要直接展示所有选项的表单设置。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -45,6 +45,8 @@
 | size | `ResourceSize \| number` | — | 控件占位尺寸，支持 12/16/20/24/28/32/40/48/80 及自定义数值；未传时优先继承尺寸上下文，否则为 16。图形占尺寸的 87.5%，不改变标签字号。 |
 | disabled | `boolean` | `false` | 禁止点击与键盘切换，并移出 Tab 顺序；保留当前选中状态。 |
 | variant | `"outline" \| "filled"` | `"filled"` | filled 使用粗选中环，outline 使用细外框与中心点；两者具有相同的选择行为。 |
+| singleLine | `boolean` | `true` | 默认标签与控件保持单行，附件不压缩；窄宽时原始标签可省略显示并保留完整可访问名称，不复制 children。复杂多行内容可显式设为 false，由该内容拥有布局。需要全文提示时组合 Text lines={1}。 |
+| gap | `number` | — | 继承 Frame 的间距 Token 序号；省略时使用原组件间距，显式值覆盖组件间距。有效间距至少 4 CSS px，包含零值、根字号及 gap-scale 缩放；较大首选值保留。 |
 | children | `Snippet` | — | 显示在圆形控件旁的标签，可组合标题和说明；建议始终提供可读标签。 |
 | enableResponsive | `boolean` | `false` | 传递给 Frame 的响应式能力开关；按 Frame 的响应式配置处理布局。 |
 | enableContext | `boolean` | `false` | 传递给 Frame 的通用上下文能力开关；不控制 Radio 自身读取的尺寸与 Image 角标上下文。 |
@@ -73,8 +75,8 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 
 - 根节点保持 `inline-flex`，内容整体 Hug。
 - `.snowui-radio-visual` 是固定 Hug 的控件视觉体。
-- `.snowui-radio-label` 是可选 label，默认 Hug，不承担 Fill。
-- visual 与 label 的距离由 `--snowui-radio-gap` 管理，可通过 `--snowui-radio-gap-override` 覆盖。
+- `.snowui-radio-label` 是可选标签，空间充足时 Hug，受限时允许收缩并单行省略；原始内容及完整原生名称保留。
+- visual 与 label 的距离由 `--snowui-radio-gap` 管理，可通过 gap 或 `--snowui-radio-gap-override` 设置首选值；有效间距至少 4 CSS px。
 - `size` 表示包含透明留白的控件占位尺寸，不改变 label 的布局策略。
 - 四周留白为 `size / 16`，可见图形宽高为 `size × 0.875`；例如 `size={32}` 占位 32×32px、图形 28×28px、四边各 2px。留白与图形随 size、根字号和尺寸 Token 等比缩放，留白仍可点击。
 - 留白由共享控件壳持有，label 位于壳外；内边框继续按名义 size 的 `0.0625` 计算，圆角、Dot 与选中环按可见图形尺寸计算。
@@ -145,7 +147,7 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 - 使用原生 `<input type="radio">` 作为基础语义，并在组件内补充“再次点击可取消”逻辑
 - 支持 Tab 键聚焦
 - 支持 Space 键选中与取消
-- 支持方向键在同组内切换
+- 组选择由绑定管理；当前不提供组内方向键导航
 - 禁用状态下 `tabindex=-1`
 
 
@@ -185,7 +187,7 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 ### 2. 默认样式 (Defaults)
 
 - **Display**: `inline-flex`, `align-items: center`
-- **Gap**: `var(--gap-1)` (4px) - 图标与文字间距
+- **Gap**: 首选 `var(--gap-1)`，缩放和零值下的有效间距仍至少为 4 CSS px。
 - **Cursor**: 由 Frame `Surface` 通用规则控制（可交互时 pointer，Disabled 时 default）
 - **Font**: `var(--text-14)` (14px), `line-height: var(--leading-14)` (20px)
 
@@ -237,6 +239,11 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 - **选中态 Hover**: Outline 分别处理 Dot 与外框；Filled 只处理粗选中环，白色孔不变
 
 ## 更新日志
+
+### v1.4.0 (2026-10-23)
+
+- 标签采用共享单行预设并保留原始 Snippet；窄宽时允许标签收缩，复杂多行内容可显式退出。控件与标签间距消费共享解析，零值与字体／gap 缩放不低于 4 CSS px；较大首选值、视觉体尺寸和透明留白比例保持。
+- 点击继续采用既有可取消选择合同，但不取消原生点击的默认状态提交，修复取消后绑定为 false 而原生 input 仍为 checked 的漂移；Space 仍阻止浏览器重复激活。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

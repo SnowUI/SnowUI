@@ -32,6 +32,7 @@
 	import { Avatar, Button, Chip, formatDate, Frame, Pagination, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, type TableSortState } from '@snowui-design-system/components';
 	import { DataTable, TableToolbar, type DataTableLoadMoreRequest, type DataTableRenderState } from '@snowui-design-system/components';
 	import { Apple, AvatarFemale01, AvatarFemale02, AvatarFemale03, AvatarMale01, AvatarMale02, Facebook, FigmaA, Google, Gradient01, MagicWand, Medium, Perplexity, Question, Slack, SnowLogo, SortAscending, Calendar, ThreeDots } from '@snowui-design-system/resource-svelte';
+	import { OverflowActions, OverflowAction } from '@snowui-design-system/components';
 	const DEMO_NOW = new Date("2026-06-19T04:00:00Z");
 	const minute = 60 * 1000;
 	const hour = 60 * minute;
@@ -91,10 +92,10 @@
                 <TableHead as="selection" />
                 <TableHead columnId="createdAt" label="Date" resizable>Date</TableHead>
                 <TableHead columnId="store" label="Stores" resizable>Stores</TableHead>
-                <TableHead columnId="subscriber" resizable>Subscriber</TableHead>
-                <TableHead columnId="price" resizable>Price</TableHead>
-                <TableHead columnId="status" resizable>Status</TableHead>
-                {#if showNote}<TableHead columnId="note" resizable>Note</TableHead>{/if}
+                <TableHead columnId="subscriber" label="Subscriber" resizable>Subscriber</TableHead>
+                <TableHead columnId="price" label="Price" resizable>Price</TableHead>
+                <TableHead columnId="status" label="Status" resizable>Status</TableHead>
+                {#if showNote}<TableHead columnId="note" label="Note" resizable>Note</TableHead>{/if}
                 <TableHead as="actions" />
             </TableRow></TableHeader
         >
@@ -104,25 +105,25 @@
             {#each stateRows as row (row.id)}
                 <TableRow rowId={row.id} active={row.id === activeRowId}>
                     <TableCell as="selection" />
-                    <TableCell columnId="createdAt" row gap={1}>
-                        <a onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-created-at`}>
+                    <TableCell columnId="createdAt" singleLine gap={1}>
+                        <Text tag="a" lines={1} onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-created-at`}>
                             {formatDate(
                                     row.createdAt,
-                                    { relative: true, now: DEMO_NOW },
+                                    { relative: true, now: DEMO_NOW, locale: 'en-US' },
                                 )}
-                        </a>
+                        </Text>
                     </TableCell>
-                    <TableCell columnId="store" row nowrap>
-                        <Avatar src={row.logo} size={24} />
-                        <a onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-store`}>{row.store}</a>
+                    <TableCell columnId="store" singleLine>
+                        <Avatar as="leading" src={row.logo} size={24} />
+                        <Text tag="a" lines={1} onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-store`}>{row.store}</Text>
                     </TableCell>
-                    <TableCell columnId="subscriber" row nowrap>
-                        <Avatar src={row.avatar} size={24} />
-                        <a onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-subscriber`}>{row.subscriber}</a>
+                    <TableCell columnId="subscriber" singleLine>
+                        <Avatar as="leading" src={row.avatar} size={24} />
+                        <Text tag="a" lines={1} onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-subscriber`}>{row.subscriber}</Text>
                     </TableCell>
-                    <TableCell columnId="price" row gap={1} nowrap>
-                        <a onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-price`}>${row.price}</a>
-                        {#if row.term === "Renewal"}<Question size={16} aria-label="Renewal price" />{/if}
+                    <TableCell columnId="price" singleLine gap={1}>
+                        <Text tag="a" lines={1} onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-price`}>${row.price}</Text>
+                        {#if row.term === "Renewal"}<Icon as="trailing" icon={Question} size={16} aria-label="Renewal price" />{/if}
                     </TableCell>
                     <TableCell columnId="status">
                         <a onclick={(event) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event) => { event.preventDefault(); event.stopPropagation(); }} style={cellLinkStyle} href={`#subscription-${row.id}-status`}>
@@ -137,19 +138,14 @@
                             {row.note}
                     </TableCell>{/if}
                     <TableCell as="actions">
-                        {#if !onlyLastAction}
-                            <Button onclick={() => feedback = `Editing ${row.subscriber}.`}>Edit</Button>
-                            <Button aria-label="Renewal info" onclick={() => feedback = `${row.term} · ${row.plan}`} bare
-                                ><Question size={16} /></Button
-                            >
-                            <Button aria-label="Sort by store" onclick={() => sort = { columnId: 'store', direction: 'ascending' }} bare
-                                ><SortAscending size={16} /></Button
-                            >
-                        {/if}
-                        <Button bare onclick={() => feedback = `${row.store} · ${row.status}`}
-                            aria-label={`More actions for ${row.subscriber}`}
-                            ><ThreeDots size={16} /></Button
-                        >
+                        <OverflowActions moreLabel={`More actions for ${row.subscriber}`}>
+                            {#if !onlyLastAction}
+                                <OverflowAction as="item" id="edit" label="Edit" onclick={() => feedback = `Editing ${row.subscriber}.`} />
+                                <OverflowAction as="item" id="info" label="Renewal info" icon="question" onclick={() => feedback = `${row.term} · ${row.plan}`} />
+                                <OverflowAction as="item" id="sort" label="Sort by store" icon="sort-ascending" onclick={() => sort = { columnId: 'store', direction: 'ascending' }} />
+                            {/if}
+                            <OverflowAction as="item" id="details" label="Subscription details" onclick={() => feedback = `${row.store} · ${row.status}`} />
+                        </OverflowActions>
                     </TableCell>
                 </TableRow>
             {/each}
@@ -170,7 +166,7 @@
         </TableBody>
     {/snippet}
 <DataTable defaultSort={{ columnId: "createdAt", direction: "descending" }} variant="striped" {rows} {sorters} rowKey={(row) => row.id}
-  selection actions roleLayout="overlay" bind:query bind:sort bind:pageSize bind:page
+  selection actions horizontalScroll={false} roleLayout="overlay" bind:query bind:sort bind:pageSize bind:page
   bind:state={tableState} bind:selectedRowIds>
   <TableToolbar searchPlaceholder="Search subscriptions…" filterKey="status"
     filterOptions={[{ label: 'Active', value: 'Active' }, { label: 'Expired', value: 'Expired' }]}

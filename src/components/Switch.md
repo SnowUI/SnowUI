@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.1.17
+> **版本**: v1.2.0
 > **职责**: 在开启与关闭之间切换，适合需要即时生效的设置和功能开关。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -43,6 +43,8 @@
 | value | `any` | — | 传给内部原生 checkbox 的值，不决定开关状态，也不建立选择组。当前 `name` / `form` 等其余属性传给外层标签，不转发至内部 input，因此仅设置 `value` 不会产生具名表单提交项。 |
 | size | `ResourceSize \| number` | — | 可见轨道高度，数字按根字号为 16px 时的名义 px 解析，外侧留白另计。支持 12 / 16 / 20 / 24 / 28 / 32 / 40 / 48 / 80 及其它有限正数；未传时依次读取父级尺寸 Context 的 `iconSize`、`size`，最后回退到 16。非法数字回退到默认尺寸 Token。显式值优先，随根字号缩放。 |
 | disabled | `boolean` | `false` | 禁用原生输入及用户切换，保留当前开关值和标签，退出 Tab 顺序。外部仍可更新 `checked`。 |
+| singleLine | `boolean` | `true` | 默认标签与控件保持单行，附件不压缩；窄宽时原始标签可省略显示并保留完整可访问名称，不复制 children。复杂多行内容可显式设为 false，由该内容拥有布局。需要全文提示时组合 Text lines={1}。 |
+| gap | `number` | — | 继承 Frame 的间距 Token 序号；省略时使用原组件间距，显式值覆盖组件间距。有效间距至少 4 CSS px，包含零值、根字号及 gap-scale 缩放；较大首选值保留。 |
 | children | `Snippet` | — | 无参数标签内容，显示在轨道后；省略时不显示标签。标签文字同时为内部开关提供可访问名称，可通过内容 Snippet 组合文本。 |
 | enableResponsive | `boolean` | `false` | 传给根 Frame，启用其容器内容适配监听；不改变 Switch 的标准尺寸值域。通用行为见 [Frame 能力开关](Frame.md)。 |
 | enableContext | `boolean` | `false` | 传给根 Frame，控制向子组件提供状态、加载与动效等 Context；不控制 Switch 读取父级尺寸 Context。通用行为见 [Frame 能力开关](Frame.md)。 |
@@ -61,8 +63,8 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 
 - 根节点保持 `inline-flex`，内容整体 Hug。
 - `.snowui-switch-track` 是固定 Hug 的控件视觉体。
-- `.snowui-switch-label` 是可选 label，默认 Hug，不承担 Fill。
-- track 与 label 的距离由 `--snowui-switch-gap` 管理，可通过 `--snowui-switch-gap-override` 覆盖。
+- `.snowui-switch-label` 是可选标签，空间充足时 Hug，受限时允许收缩并单行省略；原始内容及完整原生名称保留。
+- track 与 label 的距离由 `--snowui-switch-gap` 管理，可通过 gap 或 `--snowui-switch-gap-override` 设置首选值；有效间距至少 4 CSS px。
 - `size` 表示可见轨道高度；四边透明留白各为 `size / 14`，控件占位高为 `size × 8 / 7`、宽为 `size × (1.8 + 1 / 7)`。例如 `size={28}` 轨道为 50.4×28px，四边各留 2px，占位为 54.4×32px。
 - 留白与 track / thumb 随 size、根字号和尺寸 Token 等比缩放，留白仍可点击；label 位于留白壳外。
 
@@ -145,7 +147,7 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 
 - **轨道圆角**: `var(--radius-full, 50%)` (pill shape)
 - **滑块圆角**: `var(--radius-full, 50%)` (circle)
-- **组件间距**: `var(--gap-1)` (4px)
+- **组件间距**: 首选 `var(--gap-1)`，有效间距至少为 4 CSS px。
 
 ### 状态样式
 
@@ -169,6 +171,10 @@ Switch 属于“控件视觉体 + label”的内联外壳子类：
 - **阴影**: Thumb 带 Drop Shadow 2
 
 ## 更新日志
+
+### v1.2.0 (2026-10-23)
+
+- 标签采用共享单行预设并保留原始 Snippet；窄宽时允许标签收缩，复杂多行内容可显式退出。控件与标签间距消费共享解析，零值与字体／gap 缩放不低于 4 CSS px；较大首选值、视觉体尺寸和透明留白比例保持。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

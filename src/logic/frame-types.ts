@@ -405,6 +405,8 @@ export interface FrameProps {
     row?: boolean;
     /** Row 附件与正文首行行框居中；正文继承宿主行高，默认关闭。 */
     firstLine?: boolean;
+    /** 单行图文组合：横排、附件Hug、有效gap至少4 CSS px；文字截断仍归Text。 */
+    singleLine?: boolean;
     column?: boolean;
     grid?: boolean;
     reverse?: boolean;

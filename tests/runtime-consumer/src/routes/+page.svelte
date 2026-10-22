@@ -1,6 +1,7 @@
 <script lang="ts">
 import * as SnowUI from "@snowui-design-system/components";
 import MediaLoading from '../MediaLoading.svelte';
+import ContentLine from '../ContentLine.svelte';
 import FrameCoordination from "../FrameCoordination.svelte";
 import NotificationLifecycle from '../NotificationLifecycle.svelte';
 import {LocaleProvider, Image, Button, Frame, Input, NumericText, BarChart, Sidebar, SidebarItem, SidebarSection, Separator, DataTable, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableToolbar, type DataTableRenderState} from '@snowui-design-system/components';
@@ -22,7 +23,7 @@ const messages=$derived(overrideLabels?{'sidebar.navigation':'Package navigation
 <div style="height:400px"><Sidebar persistence={false} resizable={false}><SidebarItem id="home" label="Home"/><Separator/><SidebarSection id="components" title="Components"><SidebarItem id="button" label="Button"/></SidebarSection></Sidebar></div>
 </LocaleProvider>
 <BarChart width={500} height={200} data={[{name:'A',value:10},{name:'B',value:20}]}/>
-<DataTable {rows} rowKey={(row)=>row.id} bind:state={tableState}><TableToolbar search sort={false} filter={false} searchAriaLabel="Search rows"/><Table><TableHeader><TableRow><TableHead columnId="name">Name</TableHead></TableRow></TableHeader><TableBody>{#each tableState?.rows ?? [] as row}<TableRow><TableCell columnId="name">{row.name}</TableCell></TableRow>{/each}</TableBody></Table></DataTable>
+<DataTable {rows} rowKey={(row)=>row.id} bind:state={tableState}><TableToolbar search sort={false} filter={false} searchAriaLabel="Search rows"/><Table ariaLabel="Package filtered rows"><TableHeader><TableRow><TableHead columnId="name">Name</TableHead></TableRow></TableHeader><TableBody>{#each tableState?.rows ?? [] as row}<TableRow><TableCell columnId="name">{row.name}</TableCell></TableRow>{/each}</TableBody></Table></DataTable>
 
 <FrameCoordination />
 
@@ -33,3 +34,5 @@ const messages=$derived(overrideLabels?{'sidebar.navigation':'Package navigation
 <NotificationLifecycle />
 
 <Image src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'/%3E" alt="default media" size={80} previewMode="none" />
+
+<ContentLine />

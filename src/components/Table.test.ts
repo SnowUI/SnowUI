@@ -17,7 +17,7 @@ export const examples = [{
     <TableBody>
         <TableRow>
             <TableCell columnId="date">Just now</TableCell>
-            <TableCell columnId="store"><Frame row contentHug><Avatar src={SnowLogo} size={24} />SnowUI Pro</Frame></TableCell>
+            <TableCell columnId="store"><Frame singleLine contentHug><Avatar as="leading" src={SnowLogo} size={24} /><Text lines={1}>SnowUI Pro</Text></Frame></TableCell>
             <TableCell columnId="subscriber">Natali Craig</TableCell>
             <TableCell columnId="affiliate">—</TableCell>
             <TableCell columnId="plan"><Chip variant="background" class="text-purple">Monthly $19.9</Chip></TableCell>
@@ -27,7 +27,7 @@ export const examples = [{
         </TableRow>
         <TableRow>
             <TableCell columnId="date">1 min ago</TableCell>
-            <TableCell columnId="store"><Frame row contentHug><Avatar src={Gradient01} size={24} />My illustration world</Frame></TableCell>
+            <TableCell columnId="store"><Frame singleLine contentHug><Avatar as="leading" src={Gradient01} size={24} /><Text lines={1}>My illustration world</Text></Frame></TableCell>
             <TableCell columnId="subscriber">Kate Morrison</TableCell>
             <TableCell columnId="affiliate">Kate Morrison</TableCell>
             <TableCell columnId="plan"><Chip variant="background" class="text-purple">Affiliate Yearly $189</Chip></TableCell>

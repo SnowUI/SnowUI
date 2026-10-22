@@ -2,7 +2,7 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v3.2.5
+> **版本**: v3.3.0
 > **职责**: 在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-20
@@ -45,6 +45,7 @@
 
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
+| gap | `number` | — | 继承 Frame 的间距 token 索引；省略时保留组件原首选间距，显式值覆盖首选间距，有效图文间距仍至少为 4 CSS px；显式零和根字号／间距缩放不压低下限。 |
 | value | `SelectValue` | — | 当前值，支持 `bind:value` |
 | defaultValue | `SelectValue` | — | 初始值 |
 | placeholder | `string` | — | 空值占位文字，显示在 Trigger 中 |
@@ -181,6 +182,8 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 ### 布局模型
 
 主布局模型：**槽位宿主布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md)。
+
+普通字段模式的根宿主固定采用单行内容协议，选中值可收缩，图标与标签的有效间距至少为 4 CSS px；gap={0}、根字号或间距缩放不压低下限，较大首选间距保持。buttonTrigger 模式由真实 Button 拥有图文内容，Select 的无视觉定位外壳不增加空白间距。自定义 children 保留原结构，弹层与表单协议不变。
 
 Select 的根布局固定按 Leading / Trigger / Trailing 三段组织：
 
@@ -571,6 +574,11 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 ---
 
 ## 更新日志
+
+### v3.3.0 (2026-10-23)
+
+- 字段模式采用共享单行与最小图文间距；buttonTrigger 的无视觉外壳不新增间距，真实 Button 保持内容所有权。
+- 将具名 ariaLabel 传给实际 combobox，保留选项、原生表单值、关闭后焦点与自定义附件协议。
 
 ### v3.2.5 (2026-10-20)
 

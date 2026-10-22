@@ -8,6 +8,16 @@
  */
 export const examples = [
     {
+        name: "MI-Line: 单行与复杂内容的显式边界",
+        code: `MI-Line
+<Frame column style="width: 200px;">
+    <MenuItem selected gap={0}><Icon as="leading" icon={Bell} /><Text lines={1}>通知设置 Notification preferences</Text></MenuItem>
+    <MenuItem singleLine={false}><Frame column gap={1}><Text>复杂内容</Text><Text>保留调用方多行结构</Text></Frame></MenuItem>
+</Frame>`,
+        expected: { layout: "默认单行保持附件及至少4px间距；复杂多行内容显式退出。" },
+    },
+
+    {
         name: "MI-01:Popover sm 内基础渲染(原 QuickAction 场景)",
         code: `MI-01
 <Popover size="sm" style="width: 16rem;">
@@ -149,19 +159,19 @@ export const examples = [
         code: `MI-08
 <Popover size="sm" style="width: 29.75rem;">
     <MenuItem as="item">
-        <Frame as="leading" row>
-            <Icon icon={Resource.Tag} />
-            <span>Tags</span>
+        <Frame as="leading" singleLine>
+            <Icon as="leading" icon={Resource.Tag} />
+            <Text lines={1}>Tags</Text>
         </Frame>
-        <Frame as="trailing" style="gap:4px" row>
-            <span class="text-black-40">Multi-Select</span>
-            <Icon icon={Resource.CaretRight} class="text-black-20" />
+        <Frame as="trailing" singleLine gap={1}>
+            <Text lines={1} class="text-black-40">Multi-Select</Text>
+            <Icon as="trailing" icon={Resource.CaretRight} class="text-black-20" />
         </Frame>
     </MenuItem>
 </Popover>`,
         expected: {
             render: "MenuItem 使用直系 Frame as=leading 呈现 Tag 图标与 Tags,使用直系 Frame as=trailing 替换默认 check 呈现 Multi-Select 与箭头",
-            layout: "leading 与 trailing 都作为整体槽位参与根级三槽位布局,复合槽位内部默认保持 8px gap",
+            layout: "leading 与 trailing 都作为整体槽位参与根级三槽位布局,复合槽位显式单行，leading 保持默认 8px，trailing 首选 4px，均不低于 4 CSS px",
         },
         logic: ["Popover", "Layout", "Icon"],
     },

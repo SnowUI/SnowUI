@@ -31,7 +31,7 @@
 	import { Button, Frame, Icon, Text } from '@snowui-design-system/components';
 	import { DotCircle } from '@snowui-design-system/resource-svelte';
 	import { CircularChart } from '@snowui-design-system/components';
-	// 假定 SnowUI 官网最近 30 天的访问数据，不代表真实统计。
+	// Illustrative SnowUI site visits over the last 30 days; these are not actual statistics.
 	const channels = [
 	    { name: 'Search', value: 12840, color: 'var(--primary)' },
 	    { name: 'Direct', value: 8560, color: 'var(--secondary-purple)' },
@@ -53,7 +53,7 @@
             </div>
             <div style="display: grid; grid-template-columns: auto auto; align-items: center; gap: var(--gap-2) var(--gap-6);">
     {#each channels as item}
-        <Frame row style="gap: var(--gap-0);"><Icon size={12} style={`color: ${item.color};`}><DotCircle weight="fill" /></Icon><Text style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">{item.name}</Text></Frame>
+        <Frame singleLine gap={0}><Icon as="leading" size={12} style={`color: ${item.color};`}><DotCircle weight="fill" /></Icon><Text lines={1} style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">{item.name}</Text></Frame>
         <Text style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100); text-align: right; font-variant-numeric: tabular-nums;">{item.value.toLocaleString('en-US')}</Text>
     {/each}
 </div>

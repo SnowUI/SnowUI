@@ -15,6 +15,7 @@
     import { getContext, setContext, type Snippet } from "svelte";
     import { OVERFLOW_ACTIONS_LAYOUT_CONTEXT_KEY, type OverflowActionsLayoutContext } from "../logic/overflow-actions.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
+    import { contentLineGap } from "../logic/content-line";
     import Tooltip from "./Tooltip.svelte";
     import Checkbox from "./Checkbox.svelte";
     import Skeleton from "./Skeleton.svelte";
@@ -42,6 +43,7 @@
         align?: "start" | "center" | "end";
         roleLayout?: TableRoleLayout;
         nowrap?: boolean;
+        singleLine?: boolean;
         skeleton?: boolean;
         children?: Snippet;
         parts?: ComponentPartsOf<{
@@ -52,8 +54,9 @@
     }
     const inheritedTableCellPart = useComponentPart<Props>("TableCell");
     let explicitProps: Props = $props();
-    let { columnId, as: role = undefined, lines = 1, tooltip = true, onTruncate = undefined, align = "start", roleLayout = undefined, row = false, gap = 2, nowrap: explicitNowrap = undefined, skeleton = false, children, parts = undefined, whileAppear: userWhileAppear = undefined, currentState: userCurrentState = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $derived(mergeComponentPartProps(inheritedTableCellPart.current, explicitProps));
-    const nowrap = $derived(explicitNowrap ?? (lines !== 2 && lines !== 3));
+    let { columnId, as: role = undefined, lines = 1, tooltip = true, onTruncate = undefined, align = "start", roleLayout = undefined, row: explicitRow = false, singleLine = false, gap = 2, nowrap: explicitNowrap = undefined, skeleton = false, children, parts = undefined, whileAppear: userWhileAppear = undefined, currentState: userCurrentState = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $derived(mergeComponentPartProps(inheritedTableCellPart.current, explicitProps));
+    const row = $derived(singleLine || explicitRow);
+    const nowrap = $derived(singleLine || (explicitNowrap ?? (lines !== 2 && lines !== 3)));
     let roleOverlayElement = $state<HTMLElement>();
     let hasNestedTruncationOwner = $state(false);
     const table = getTableContext();
@@ -94,7 +97,7 @@
         get maxVisible() { return isActionsRole ? table.getActionsMaxVisible() : undefined; },
         get overflow() { return isActionsRole ? table.getActionsOverflow() : undefined; },
     });
-    const resolvedLines = $derived(skeleton || isSelectionRole || isActionsRole || lines === false ? undefined : lines);
+    const resolvedLines = $derived(skeleton || isSelectionRole || isActionsRole || lines === false && !singleLine ? undefined : singleLine ? 1 : lines);
     const contextRowAppearMotion = $derived(
         !skeleton && !isSelectionRole && !isActionsRole && rowId !== undefined
             ? table.getRowAppearMotion(rowId)
@@ -273,7 +276,7 @@
     const contentStyle = $derived(
         `${gap === undefined
             ? ""
-            : `gap:${typeof gap === "number" ? `var(--gap-${gap}, calc(var(--gap-1) * ${gap}))` : gap};`}` +
+            : `gap:${contentLineGap(gap, row && nowrap)};`}` +
         `${hasActionsOverlay ? `--snowui-table-cell-actions-fade-mask:${actionsFadeMask};--snowui-table-role-overlay-width-override:${width ?? table.getActionsColumnWidth()}px;` : ""}`,
     );
     const selectionBlur = $derived(getTableRoleBlurStyles(table, "left-to-right"));
@@ -352,7 +355,7 @@
             />
         {/if}</span>
     </span>
-    {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1 || nowrap, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-nowrap={nowrap ? "true" : "false"} data-lines={resolvedLines ?? "none"} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
+    {:else}<span use:registerTruncation={{ enabled: resolvedLines === 1 || nowrap, onChange: onTruncate }} class={`snowui-table-cell-content ${resolvedLines && !(row && nowrap) ? `snowui-line-clamp-${resolvedLines}` : ""}`} data-row={row ? "true" : undefined} data-single-line={row && nowrap && resolvedLines === 1 ? "true" : undefined} data-nowrap={nowrap ? "true" : "false"} data-lines={resolvedLines ?? "none"} data-truncated={isTruncated ? "true" : "false"} style={contentStyle}>
         {#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}
         {#if tooltip && !hasNestedTruncationOwner && isTruncated && fullText}
             <Tooltip>
@@ -474,7 +477,7 @@
     :global(:where(.snowui-table-cell[data-table-variant="striped"])) { --snowui-table-cell-corner-radius: var(--snowui-table-row-radius-override, var(--radius-3)); }
     :global(:where(.snowui-table-cell[data-role-layout="column"]) .snowui-table-selection-control),
     :global(:where(.snowui-table-cell[data-role-layout="column"]) .snowui-table-cell-content[data-actions="true"]) { opacity: 1; pointer-events: auto; }
-    :global(:where(.snowui-table-responsive-text-fit .snowui-table-cell-content[data-nowrap="true"]:not([data-actions="true"]))) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    :global(:where(.snowui-table-responsive-text-fit .snowui-table-cell-content[data-nowrap="true"]:not([data-row="true"]):not([data-actions="true"]))) { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     :global(:where(.snowui-table-responsive-text-fit .snowui-table-cell-content[data-nowrap="false"])) { overflow-wrap: anywhere; }
     :global(:where(.snowui-table-cell:not([data-as]) > .snowui-table-cell-content)) { opacity: var(--snowui-table-responsive-column-opacity, 1); }
     @media (prefers-reduced-motion: reduce) {

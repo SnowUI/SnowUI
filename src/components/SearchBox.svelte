@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   SearchBox 搜索框触发器
-  v1.1.2
+  v1.2.0
 
   文档: ./SearchBox.md
 
@@ -14,6 +14,7 @@
 -->
 
 <script lang="ts">
+    import {contentLineGap} from "../logic/content-line";
     import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
@@ -32,6 +33,7 @@
         /** 内置图标按钮配置；事件与角色由所属组件控制。 */
         parts?: ComponentPartsOf<{ Button: typeof Button }>;
         variant?: "gray" | "outline";
+        gap?: number;
         value?: string | number;
         placeholder?: string;
         open?: boolean;
@@ -50,6 +52,7 @@
 
     let {
         variant = "gray",
+        gap = undefined,
         value = $bindable(),
         placeholder = undefined,
         open = $bindable(false),
@@ -64,6 +67,7 @@
         onClear = undefined,
         onclick: userOnClick = undefined,
         onkeydown: userOnKeyDown = undefined,
+        enableAutoLayout = true,
         enableResponsive = false,
         enableContext = true,
         enableScaleObserver = false,
@@ -73,6 +77,12 @@
         element = $bindable(),
         ...rest
     }: Props = $props();
+
+    const internalAutoLayout = $derived(enableAutoLayout === false ? true : enableAutoLayout);
+    const rootStyle = $derived([
+        gap !== undefined ? `--snowui-search-box-gap-override: ${contentLineGap(gap)}` : "",
+        userStyle,
+    ].filter(Boolean).join("; ") || undefined);
 
     const hasValue = $derived(
         value !== undefined && value !== null && String(value) !== "",
@@ -172,7 +182,7 @@
     ]
         .filter(Boolean)
         .join(" ")}
-    style={userStyle || undefined}
+    style={rootStyle}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
@@ -180,6 +190,8 @@
     onclick={handleClick}
     onkeydown={handleKeydown}
     {...rest}
+    enableAutoLayout={internalAutoLayout}
+    singleLine
 >
     {#if showSearchIcon}
         <ComponentIcon
@@ -247,10 +259,7 @@
             var(--snowui-search-box-padding-y)
                 var(--snowui-search-box-padding-x)
         );
-        gap: var(
-            --snowui-search-box-gap-override,
-            var(--snowui-search-box-gap)
-        );
+        gap: max(4px, var(--snowui-search-box-gap-override, var(--snowui-search-box-gap)));
         border-radius: var(
             --snowui-search-box-radius-override,
             var(--snowui-search-box-radius)

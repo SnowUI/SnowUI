@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.12.0
+> **版本**: v1.13.0
 > **职责**: 在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-21
+> **文档修订**: 2026-10-22
 
 ## 组件介绍
 
@@ -33,7 +33,7 @@
 <Table ariaLabel="Component documentation details" minWidth={620} columnWidths={{ component: 160 }}>
 	<TableHeader><TableRow><TableHead columnId="component">Component</TableHead><TableHead columnId="summary">Summary</TableHead><TableHead columnId="status">Status</TableHead></TableRow></TableHeader>
 	<TableBody><TableRow rowId="data-table">
-		<TableCell columnId="component" row nowrap><Link onclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} href="/components/data-table">DataTable</Link><Badge count="New" variant="border" /></TableCell>
+		<TableCell columnId="component" singleLine><Link onclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} onauxclick={(event: MouseEvent) => { event.preventDefault(); event.stopPropagation(); }} href="/components/data-table">DataTable</Link><Badge count="New" variant="border" /></TableCell>
 		<TableCell columnId="summary" lines={2} tooltip>Coordinates search, filtering, sorting, selection, responsive row actions, and pagination while keeping table composition explicit.</TableCell>
 		<TableCell columnId="status" align="end"><Chip variant="background" style="color: var(--secondary-indigo);">Review</Chip></TableCell>
 	</TableRow></TableBody>
@@ -51,6 +51,7 @@
 | onTruncate | `(isTruncated: boolean) => void` | — | 真实溢出状态变化 |
 | align | `"start" \| "center" \| "end"` | `"start"` | 内容对齐 默认行为：start。 |
 | roleLayout | `TableRoleLayout` | — | 覆盖当前角色单元格的角色列布局；普通单元格忽略 默认行为：Table context。 |
+| singleLine | `boolean` | `false` | 单行图文预设只作用于内部内容，不改变 td 的原生表格布局；启用 row、nowrap、单行及至少4px间距。用 Text lines={1} 管理可收缩文字及全文提示。 |
 | nowrap | `boolean` | — | 文字不换行；与 row 同用时同时禁止 flex 子项换行 默认行为：`true`（lines=2/3 时 false）。 |
 | skeleton | `boolean` | `false` | TableBody 内部 Skeleton rows 协议；渲染非交互占位内容并关闭截断 |
 | children | `Snippet` | — | 单元格内容，无参数；actions 角色提供显式内容时替换默认操作，选择角色仍由 DataTable 协议管理。 |
@@ -68,10 +69,10 @@
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
 - Skeleton 是加载基础设施，不作为公开 part。
 
-> **版本**: v1.11.0
+> **版本**: v1.13.0
 > **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。需要换行时显式传入 `nowrap={false} lines={false}`；声明 `lines={2}` / `lines={3}` 也视为显式开启多行，未指定 nowrap 时自动允许换行；横向图标与文字默认不换行。
 
-默认单元格高度为 40px，内边距上下保持 8px；左右 padding 根据最近 Table 容器宽度在 4px 到 12px 之间流动，常见窄屏宽度即收敛到每侧 4px，宽表恢复为 12px，首尾可见单元格朝向表格外缘的一侧至少 8px。Table 使用原生相邻列布局，列与列之间没有额外 gap；相邻单元格 padding 相加后的最小视觉间距为 8px。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。横向内容在单元格内垂直居中，不保留行内文字基线的下行空间。
+默认单元格高度为 40px，内边距上下保持 8px；左右 padding 根据最近 Table 容器宽度在 4px 到 12px 之间流动，常见窄屏宽度即收敛到每侧 4px，宽表恢复为 12px，首尾可见单元格朝向表格外缘的一侧至少 8px。Table 使用原生相邻列布局，列与列之间没有额外 gap；相邻单元格 padding 相加后的最小视觉间距为 8px。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。横向内容在单元格内垂直居中，不保留行内文字基线的下行空间。`row` 与单行截断同时使用时仍保持横向布局；窄容器文本适配不得把该内容改为块级文字流、丢弃图文间距。
 
 未显式固定列宽时，单元格的固有 min-content 会参与 Table 自动列宽：可换行内容保留最长不可断单词 / 片段，`lines={1}` 或 `nowrap` 保留整行。显式 `columnWidths`、拖动列宽或其他固定宽度优先，此时仍按 `lines` / tooltip 规则截断。
 
@@ -131,6 +132,10 @@ DataTable的actions单元格向默认和显式OverflowActions提供同一布局�
 > `selection` / `actions` 角色仅在 DataTable Context 中生效；普通 Table 不提供内置 Checkbox 或按钮操作列。
 
 ## 更新日志
+
+### v1.13.0 (2026-10-22)
+
+- 修复单行截断样式及窄容器文字适配覆盖row布局、导致图文间距失效和分行的问题。保留普通纯文本截断与显式多行路径。
 
 ### v1.12.0 (2026-10-21)
 

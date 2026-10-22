@@ -13,6 +13,7 @@ export const examples = [
         code: `1
 <Icon size={80} />
 <Icon size={80}><Bell /></Icon>`,
+        expected: { render: "空占位与外部图形各渲染一次；直接children在源码及运行包SSR／水合均不得递归。" },
     },
     {
         name: "2: 图片地址与尺寸",

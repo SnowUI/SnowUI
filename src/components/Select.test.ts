@@ -1,6 +1,6 @@
 /**
  * Select.test.ts
- * v2.0.0
+ * v3.3.0
  * 变更记录 (2026-04-18): 适配 Listbox + MenuItem 组合 API，替代 <option> children。
  * 变更记录 (2026-03-30): 将 Select-Demo 的 S-01 ~ S-09 全量迁入 test 项目，后续下拉样式与 Figma 对照统一在 test 中调整。
  * 变更记录 (2026-03-15): 新增 Select 组件示例，覆盖单选、多选、占位项、表单提交与 Frame 通用能力。
@@ -192,5 +192,14 @@ export const examples = [
             interaction: "搜索无匹配时Escape关闭后焦点回到真实触发Button，不停留在无视觉wrapper",
         },
         logic: ["ButtonTrigger", "Keyboard", "Escape", "FocusReturn", "Locale"],
+    },
+    {
+        name: "S-13：窄选择框与完整可访问名称",
+        code: `S-13
+<Select gap={0} ariaLabel="Select workspace" defaultValue="snowui" style="width: 8rem; max-width: 100%;" options={[{value: "snowui", label: "SnowUI design workspace"}, {value: "personal", label: "Personal workspace"}]}>
+    <Icon as="leading" icon={Resource.Check} />
+</Select>`,
+        expected: {render: "选中值可收缩，图标与指示器稳定，真实 combobox 保留完整名称。"},
+        logic: ["ContentLine", "Narrow", "Ownership"],
     },
 ] as const;

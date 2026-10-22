@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Field 组件：表单容器
- v1.3.0
+ v1.4.0
 
  文档: ./Field.md
 -->
@@ -11,6 +11,7 @@
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { setContext, type Snippet } from "svelte";
     import { Frame, Text, type FrameProps } from "../index";
+    import {contentLineGap} from "../logic/content-line";
     import { FIELD_CONTEXT_KEY } from "../keys";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
 
@@ -80,7 +81,7 @@
         data-invalid={invalid ? "true" : undefined}
         data-readonly={readonly ? "true" : undefined}
         {disabled}
-        style={`${userStyle}${gap !== undefined ? `; --snowui-field-gap-override: var(--gap-${gap})` : ""}`}
+        style={`${userStyle}${gap !== undefined ? `; --snowui-field-gap-override: ${contentLineGap(gap)}` : ""}`}
         enableResponsive={enableResponsive}
         enableContext={enableContext}
         enableScaleObserver={enableScaleObserver}
@@ -142,11 +143,12 @@
 
     :global(:where(.snowui-field)) {
         --snowui-field-radius: var(--radius-4);
+        --snowui-field-gap-resolved: var(--snowui-field-gap-override, var(--gap-2));
         --snowui-field-background: var(--surface-1, #ffffffcc);
         display: grid;
         grid-template-columns: auto minmax(0, 1fr) auto;
         align-items: center;
-        gap: var(--snowui-field-gap-override, var(--gap-2));
+        gap: var(--snowui-field-gap-resolved);
         width: 100%;
         min-width: 0;
         min-height: 0;
@@ -345,9 +347,6 @@
     /* segment 保留原生布局和 padding，仅去边框与容器基础 */
     :global(:where(.snowui-field > [data-as="segment"])) {
         grid-column: 1 / -1;
-        display: flex;
-        align-items: center;
-        gap: 0;
         margin: 0;
         width: 100%;
         min-width: 0;
@@ -355,6 +354,12 @@
         background: transparent;
         box-shadow: none; /* 不加 !important，允许后续分割线规则覆盖 */
         box-sizing: border-box;
+    }
+
+    :global(:where(.snowui-field > [data-as="segment"]:not([data-single-line="true"]))) {
+        display: flex;
+        align-items: center;
+        gap: 0;
     }
 
     :global(:where(.snowui-field > [data-as="segment"] > *)) {
@@ -379,12 +384,15 @@
 
     :global(:where(.snowui-field > .snowui-role-row)) {
         grid-column: 1 / -1;
-        display: flex;
-        align-items: stretch;
-        gap: 0;
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+    }
+
+    :global(:where(.snowui-field > .snowui-role-row:not([data-single-line="true"]))) {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
     }
 
     :global(:where(.snowui-field > .snowui-role-row > *)) {
@@ -398,12 +406,20 @@
                 )
         ) {
         grid-column: 1 / -1;
-        display: flex;
-        align-items: stretch;
-        gap: var(--gap-2);
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+    }
+
+    :global(
+            :where(
+                    .snowui-field > .snowui-direction-row:not([data-single-line="true"]),
+                    .snowui-field > .snowui-direction-row-reverse:not([data-single-line="true"])
+                )
+        ) {
+        display: flex;
+        align-items: stretch;
+        gap: var(--gap-2);
     }
 
     :global(
@@ -421,9 +437,9 @@
     :global(
             :where(
                     .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse)
-                        > [data-as="segment"].snowui-direction-row,
+                        > [data-as="segment"].snowui-direction-row:not([data-single-line="true"]),
                     .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse)
-                        > [data-as="segment"].snowui-direction-row-reverse
+                        > [data-as="segment"].snowui-direction-row-reverse:not([data-single-line="true"])
                 )
         ) {
         gap: 0;
@@ -437,7 +453,7 @@
                 )
         ) {
         align-items: stretch;
-        gap: var(--snowui-field-gap-override, var(--gap-2));
+        gap: var(--snowui-field-gap-resolved);
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
@@ -460,11 +476,20 @@
                 )
         ) {
         flex: 1 1 0;
+        padding: var(--padding-3) var(--padding-4);
+        box-sizing: border-box;
+    }
+
+    :global(
+            :where(
+                    .snowui-field.snowui-direction-row > .snowui-direction-row:not([data-single-line="true"]),
+                    .snowui-field.snowui-direction-row-reverse
+                        > .snowui-direction-row-reverse:not([data-single-line="true"])
+                )
+        ) {
         display: flex;
         align-items: center;
         gap: var(--gap-2);
-        padding: var(--padding-3) var(--padding-4);
-        box-sizing: border-box;
     }
 
     :global(
@@ -503,25 +528,31 @@
     }
 
     :global(:where(.snowui-field.snowui-direction-row > [data-as="segment"].snowui-direction-row)) {
+        /* Frame 间距压缩后仍将整条内容行居中，避免 wrap 行贴向段落顶部。 */
+        box-sizing: border-box;
+    }
+
+    :global(:where(.snowui-field.snowui-direction-row > [data-as="segment"].snowui-direction-row:not([data-single-line="true"]))) {
         display: flex;
         flex-direction: row;
         gap: 0;
         align-items: center;
-        /* Frame 间距压缩后仍将整条内容行居中，避免 wrap 行贴向段落顶部。 */
         align-content: center;
         justify-content: center;
-        box-sizing: border-box;
     }
 
     :global(:where(.snowui-field.snowui-direction-row > [data-as="segment"])) {
         flex: 1 1 0;
         min-width: 0;
         padding: var(--padding-3) var(--padding-4);
-        gap: 0;
         box-sizing: border-box;
         border-radius: 0;
         background: transparent;
         box-shadow: none;
+    }
+
+    :global(:where(.snowui-field.snowui-direction-row > [data-as="segment"]:not([data-single-line="true"]))) {
+        gap: 0;
     }
 
     :global(
@@ -530,11 +561,8 @@
                 .snowui-field.snowui-direction-row > .snowui-select.snowui-field-host[data-as="segment"]
             )
         ) {
-        gap: var(--gap-2);
         --snowui-input-padding-override: 0;
         --snowui-select-padding-override: 0;
-        --snowui-input-gap-override: var(--gap-2);
-        --snowui-select-gap-override: var(--gap-2);
     }
 
     :global(
@@ -544,11 +572,8 @@
             )
         ) {
         padding: 0;
-        gap: var(--gap-2);
         --snowui-input-padding-override: 0;
         --snowui-select-padding-override: 0;
-        --snowui-input-gap-override: var(--gap-2);
-        --snowui-select-gap-override: var(--gap-2);
     }
 
     :global(
@@ -559,11 +584,8 @@
             .snowui-field:not(.snowui-direction-row) > [data-as="segment"] .snowui-select.snowui-field-host
         )
     ) {
-        gap: var(--gap-2);
         --snowui-input-padding-override: var(--padding-3) var(--padding-4);
         --snowui-select-padding-override: var(--padding-3) var(--padding-4);
-        --snowui-input-gap-override: var(--gap-2);
-        --snowui-select-gap-override: var(--gap-2);
     }
 
     /* Input 含附件时切换为 grid 布局，
@@ -663,7 +685,7 @@
                 )
         ) {
         align-items: stretch;
-        gap: var(--snowui-field-gap-override, var(--gap-2));
+        gap: var(--snowui-field-gap-resolved);
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
@@ -694,9 +716,12 @@
 
     :global(:where(.snowui-field > .snowui-role-row > .snowui-field-host)) {
         flex: 1 1 0;
+        box-sizing: border-box;
+    }
+
+    :global(:where(.snowui-field > .snowui-role-row > .snowui-field-host:not([data-single-line="true"]))) {
         display: flex;
         align-items: center;
-        box-sizing: border-box;
     }
 
     :global(
@@ -708,9 +733,19 @@
                 )
         ) {
         flex: 1 1 0;
+        box-sizing: border-box;
+    }
+
+    :global(
+            :where(
+                    .snowui-field.snowui-direction-row
+                        > .snowui-field-host:not([data-as="segment"]):not([data-single-line="true"]),
+                    .snowui-field.snowui-direction-row-reverse
+                        > .snowui-field-host:not([data-as="segment"]):not([data-single-line="true"])
+                )
+        ) {
         display: flex;
         align-items: center;
-        box-sizing: border-box;
     }
 
     :global(
@@ -723,9 +758,20 @@
             )
         ) {
         flex: 1 1 0;
+        box-sizing: border-box;
+    }
+
+    :global(
+            :where(
+                .snowui-field
+                    > .snowui-direction-row
+                    > .snowui-field-host:not([data-as="segment"]):not([data-single-line="true"]),
+                .snowui-field > .snowui-direction-row-reverse
+                    > .snowui-field-host:not([data-as="segment"]):not([data-single-line="true"])
+            )
+        ) {
         display: flex;
         align-items: center;
-        box-sizing: border-box;
     }
 
     :global(
@@ -741,11 +787,14 @@
     }
 
     :global(:where(.snowui-field > .snowui-role-col > .snowui-field-host)) {
-        display: flex;
-        align-items: center;
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+    }
+
+    :global(:where(.snowui-field > .snowui-role-col > .snowui-field-host:not([data-single-line="true"]))) {
+        display: flex;
+        align-items: center;
     }
 
     :global(
@@ -755,11 +804,20 @@
                         > .snowui-field-host
                 )
         ) {
-        display: flex;
-        align-items: center;
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+    }
+
+    :global(
+            :where(
+                    .snowui-field.snowui-direction-column > .snowui-field-host:not([data-single-line="true"]),
+                    .snowui-field.snowui-direction-column-reverse
+                        > .snowui-field-host:not([data-single-line="true"])
+                )
+        ) {
+        display: flex;
+        align-items: center;
     }
 
     :global(
@@ -769,11 +827,20 @@
                     > .snowui-field-host
             )
         ) {
-        display: flex;
-        align-items: center;
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+    }
+
+    :global(
+            :where(
+                .snowui-field > .snowui-direction-column > .snowui-field-host:not([data-single-line="true"]),
+                .snowui-field > .snowui-direction-column-reverse
+                    > .snowui-field-host:not([data-single-line="true"])
+            )
+        ) {
+        display: flex;
+        align-items: center;
     }
 
     :global(:where(.snowui-field > [data-as="segment"] > .snowui-field-host)) {
@@ -787,12 +854,15 @@
 
 
     :global(:where(.snowui-field > .snowui-role-col > .snowui-role-row)) {
-        display: flex;
-        align-items: stretch;
-        gap: var(--gap-2);
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+    }
+
+    :global(:where(.snowui-field > .snowui-role-col > .snowui-role-row:not([data-single-line="true"]))) {
+        display: flex;
+        align-items: stretch;
+        gap: var(--gap-2);
     }
 
     :global(
@@ -802,12 +872,21 @@
                         > .snowui-role-row
                 )
         ) {
-        display: flex;
-        align-items: stretch;
-        gap: var(--gap-2);
         width: 100%;
         min-width: 0;
         box-sizing: border-box;
+    }
+
+    :global(
+            :where(
+                    .snowui-field.snowui-direction-column > .snowui-role-row:not([data-single-line="true"]),
+                    .snowui-field.snowui-direction-column-reverse
+                        > .snowui-role-row:not([data-single-line="true"])
+                )
+        ) {
+        display: flex;
+        align-items: stretch;
+        gap: var(--gap-2);
     }
 
     :global(:where(.snowui-field > .snowui-role-col > .snowui-role-row > *)) {
@@ -1342,4 +1421,11 @@
         box-shadow: none;
     }
 
+    :global(:where(.snowui-field[data-single-line="true"], .snowui-field:has(> [data-as="leading"], > [data-as="trailing"]))) {
+        --snowui-field-gap-resolved: max(4px, var(--snowui-field-gap-override, var(--gap-2)));
+    }
+
+    :global(:where(.snowui-field[data-single-line="true"])) {
+        align-items: center;
+    }
 </style>

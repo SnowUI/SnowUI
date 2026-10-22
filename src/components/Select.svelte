@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Select 组件：自定义下拉选择框（Trigger + 外置 Listbox 组合架构）
- v3.2.5
+ v3.3.0
 
  文档: ./Select.md
 -->
@@ -20,6 +20,7 @@
     import {getField, type ListboxOwnerContext, type ListboxOptionRegistration} from "../context";
     import {LISTBOX_OWNER_CONTEXT_KEY} from "../keys";
     import {resolveFrameFieldInvalid, resolveFrameFieldValue} from "../logic/frame-field-control";
+    import {contentLineGap} from "../logic/content-line";
     import {splitFrameHostProps} from "../logic/frame-prop-filter";
     import {matchesSearch} from "../lib/search-filter";
     import {mergeComponentPartProps, type ComponentPartsOf, useComponentPart} from "../logic/component-parts.svelte";
@@ -48,6 +49,7 @@
 
     interface Props extends Omit<FrameProps, "children" | "tag"> {
         value?: SelectValue;
+        gap?: number;
         defaultValue?: SelectValue;
         placeholder?: string;
         name?: string;
@@ -125,6 +127,7 @@
         enableScaleObserver = false,
         class: userClass = "",
         style: userStyle = "",
+        gap = undefined,
         renderHints: userRenderHints = undefined,
         ...rest
     }: Omit<Props, "value"> = $derived(
@@ -133,6 +136,11 @@
             explicitProps,
         ),
     );
+
+    const selectRootStyle = $derived([
+        gap !== undefined ? `--snowui-select-gap-override: ${contentLineGap(gap)}` : "",
+        userStyle,
+    ].filter(Boolean).join("; ") || undefined);
 
     const splitProps = $derived.by(() => splitFrameHostProps(rest));
     const frameRestProps = $derived(splitProps.frameProps);
@@ -395,7 +403,7 @@
     data-readonly={readonly ? "true" : undefined}
     data-open={open ? "true" : undefined}
     {disabled}
-    style={userStyle || undefined}
+    style={selectRootStyle}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
     enableScaleObserver={enableScaleObserver}
@@ -403,6 +411,7 @@
     renderHints={selectRenderHints}
     componentParts={resolvedSelectParts}
     {...frameRestProps}
+    singleLine={!buttonTrigger}
 >
     <!-- 隐藏表单提交 input（替代原 hidden <select>） -->
     {#if name}
@@ -450,6 +459,7 @@
         class="snowui-select-trigger snowui-native-control"
         type="button"
         role="combobox"
+        aria-label={ariaLabel}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listboxId}
@@ -504,6 +514,7 @@
         --snowui-select-padding-y: var(--padding-3); /* 12px */
         --snowui-select-padding-x: var(--padding-4); /* 16px */
         --snowui-select-gap: var(--gap-2);
+        --snowui-select-gap-resolved: max(4px, var(--snowui-select-gap-override, var(--snowui-select-gap)));
         --snowui-select-font-size: var(--text-14);
         --snowui-select-line-height: var(--leading-14);
         --snowui-select-placeholder-color: var(--black-20, #00000033);
@@ -512,7 +523,7 @@
         width: var(--snowui-select-width-override, var(--snowui-select-width));
         height: var(--snowui-select-height-override, var(--snowui-select-height));
         min-width: 0;
-        gap: var(--snowui-select-gap-override, var(--snowui-select-gap));
+        gap: var(--snowui-select-gap-resolved);
         padding: var(--snowui-select-padding-y) var(--snowui-select-padding-x);
         border-radius: var(--snowui-select-radius-override, var(--snowui-select-radius));
         background-color: var(--snowui-select-background-override, var(--snowui-select-background));
@@ -535,7 +546,7 @@
     /* 嵌入态（非 segment）：Field 接管外壳 */
     :global(:where(.snowui-select[data-embedded="true"]:not([data-as="segment"]))) {
         padding: var(--snowui-select-padding-override, 0);
-        gap: var(--snowui-select-gap-override, var(--snowui-select-gap));
+        gap: var(--snowui-select-gap-resolved);
         border-radius: 0;
         background-color: transparent;
         overflow: visible;
@@ -596,7 +607,7 @@
         display: inline-flex;
         align-items: inherit;
         justify-content: center;
-        gap: var(--snowui-select-gap-override, var(--snowui-select-gap));
+        gap: var(--snowui-select-gap-resolved);
         min-width: 0;
         white-space: nowrap;
     }

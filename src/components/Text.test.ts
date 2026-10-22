@@ -1,6 +1,6 @@
 /**
  * Text.test.ts - Text 组件测试示例
- * v3.4.1
+ * v3.5.4
  *
  * 示例设计原则：每个示例展示 Text 组件的一个核心特性
  * 变更 (2026-06-23): 示例 3 验证共享边界拟合与显式行内省略符。
@@ -13,6 +13,21 @@
  * - 调整 6/9 示例中的子用例容器约束，保证截断与 more 按钮展示稳定可复现
  */
 export const examples = [
+    {
+        name: "单行宿主：截断锚点居中",
+        code: `单行宿主
+<Frame singleLine style="width: 140px;"><Icon as="leading" icon={Check} size={20}/><Text lines={1}>长文字截断后仍与附件居中</Text></Frame>`,
+        expected: { layout: "出现Tooltip前后均垂直居中；保留全文提示。" },
+    },
+    {
+        name: "单行截断：完整可访问名称",
+        code: `完整名称
+<Button style="width: 140px; min-width: 0;"><Text lines={1}>发送完整产品更新通知 Send complete product updates</Text></Button>`,
+        expected: {
+            render: "可见文字按既有拟合逻辑省略；按钮的可访问名称仍包含全文，且不重复播报前缀。",
+            responsive: "扩宽后恢复完整可见文字并移除仅供辅助技术读取的副本。",
+        },
+    },
     {
         name: "1. 基础文本",
         code: `<Text>这是一段普通的文字，不会被截断。</Text>`,

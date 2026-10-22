@@ -1,6 +1,6 @@
 /**
  * Input.test.ts
- * v1.1.0
+ * v1.2.0
  * 变更记录 (2026-04-20): 新增 I-39/I-40 覆盖 Input as="search" 在 Listbox 内的过滤与自定义值功能。
  * 变更记录 (2026-03-30): 将 Input-Demo 的 I-00 ~ I-38（保留现存编号）迁入 test 项目，后续输入框与 Figma 的样式比对统一在 test 中进行。
  * 变更记录 (2026-03-29): 删除 `Input type="file"` 示例；该类型不再作为组件支持范围。
@@ -554,5 +554,14 @@ export const examples = [
 </Input>`,
         expected: { render: "点击或 Tab 聚焦只读输入后，复制按钮仍可见且可操作，不出现清除按钮。" },
         logic: ["Readonly", "Trailing", "Focus"],
+    },
+    {
+        name: "I-43：窄宽度图文输入与零间距下限",
+        code: `I-43
+<Input gap={0} aria-label="Search entries" value="A complete editable query" style="width: 8rem; max-width: 100%;">
+    <Icon as="leading" icon={Resource.Check} />
+</Input>`,
+        expected: {render: "图标保持固有宽度，原生文字可编辑，附件间距至少 4 CSS px。"},
+        logic: ["ContentLine", "Narrow", "Ownership"],
     },
 ] as const;

@@ -2,7 +2,7 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.2.4
+> **版本**: v1.3.0
 > **职责**: 在选项列表或快捷操作面板中呈现一项内容，支持图标、选中状态与禁用反馈。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-20
@@ -28,15 +28,15 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { MenuItem, Popover, Icon } from '@snowui-design-system/components';
+	import { MenuItem, Popover, Icon, Text } from '@snowui-design-system/components';
 	import { Copy, Check, ArrowCounterClockwise, Upload } from '@snowui-design-system/resource-svelte';
 </script>
 
 <Popover size="sm" style="width: min(100%, 22rem);">
-    <MenuItem><Icon as="leading"><Copy /></Icon>Duplicate example</MenuItem>
-    <MenuItem><Icon as="leading"><Check /></Icon>Mark reviewed</MenuItem>
-    <MenuItem><Icon as="leading"><ArrowCounterClockwise /></Icon>Reset sample</MenuItem>
-    <MenuItem disabled><Icon as="leading"><Upload /></Icon>Publish · owner only</MenuItem>
+    <MenuItem><Icon as="leading"><Copy /></Icon><Text lines={1}>Duplicate example</Text></MenuItem>
+    <MenuItem><Icon as="leading"><Check /></Icon><Text lines={1}>Mark reviewed</Text></MenuItem>
+    <MenuItem><Icon as="leading"><ArrowCounterClockwise /></Icon><Text lines={1}>Reset sample</Text></MenuItem>
+    <MenuItem disabled><Icon as="leading"><Upload /></Icon><Text lines={1}>Publish · owner only</Text></MenuItem>
 </Popover>
 ```
 <!-- /quick-start:generated -->
@@ -46,6 +46,7 @@
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
 | parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置默认内置删除按钮的公开 Props（如 size、class、style）；删除事件、可访问名称和角色仍由组件控制，不影响外置子项。 |
+| singleLine | `boolean` | `true` | 普通菜单标签内部复用Frame单行预设，保持附件Hug与最小4 CSS px间距；复杂多行children可显式false并由其内容owner排版。长标签用Text lines=1提供截断和全文。 |
 | value | `string` | — | 选项值（通过 as="item" 接入 Listbox 时必填且同一列表内唯一；独立使用时作为选择意图事件的业务标识） |
 | selected | `boolean` | `false` | 是否选中（独立使用时有效；使用 as="item" 接入 Listbox 后由宿主覆盖） |
 | active | `boolean` | `false` | 是否高亮（独立使用时有效；使用 as="item" 接入 Listbox 后由宿主覆盖） |
@@ -96,7 +97,7 @@
 
 MenuItem 的根布局固定按 Leading / Label / Trailing 三段组织：
 
-- 根节点是 `Frame row`，并在组件内部固定启用 `enableAutoLayout`；外部传入 `enableAutoLayout={false}` 不关闭 MenuItem 的内部槽位协议。
+- 根节点是`Frame row singleLine`，并在组件内部固定启用 `enableAutoLayout`；外部传入 `enableAutoLayout={false}` 不关闭 MenuItem 的内部槽位协议。
 - 普通文本或 `.snowui-menu-item-label` 是 Content / Fill 槽，负责截断，必须保持 `min-width: 0`。
 - 直系 `as="leading"` / `as="trailing"` 支持复杂结构，Leading 与 Trailing 为 Hug。
 - `showCheck` 开启时，默认 check / delete 按 Trailing / Hug 处理；关闭时不渲染勾选槽位，也不保留 gap。存在自定义直系 trailing 时默认 check 隐藏。
@@ -131,12 +132,12 @@ MenuItem 的根布局固定按 Leading / Label / Trailing 三段组织：
 ```svelte
 <Popover>
     <MenuItem>
-        <Frame as="leading" row>
+        <Frame as="leading" singleLine>
             <Icon icon={Tag} />
-            <span>Tags</span>
+            <Text lines={1}>Tags</Text>
         </Frame>
-        <Frame as="trailing" row>
-            <span>Multi-Select</span>
+        <Frame as="trailing" singleLine>
+            <Text lines={1}>Multi-Select</Text>
             <Icon icon={CaretRight} />
         </Frame>
     </MenuItem>
@@ -243,6 +244,10 @@ Frame row (.snowui-menu-item)
 ---
 
 ## 更新日志
+
+### v1.3.0 (2026-10-22)
+
+- 普通标签复用Frame显式单行预设，复杂多行children保留显式关闭路径；选项注册、选择、菜单关闭与删除行为保持。
 
 ### v1.2.4 (2026-10-20)
 

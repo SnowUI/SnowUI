@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.1.5
+> **版本**: v1.2.0
 > **职责**: 提供单行输入，支持文本、搜索、密码、数字、日期时间与颜色，可组合标签、图标和校验反馈。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -50,6 +50,7 @@
 | --- | --- | --- | --- |
 | element | `HTMLElement` | — | 外层 Frame 根元素引用，支持 bind:element；不是原生 input 引用。 |
 | type | `HTMLInputAttributes["type"]` | `"text"` | 选择单行输入类型；支持 text、search、email、password、url、tel、number、date、time、datetime-local、month、week、color。日期时间和颜色具有组件展示层及原生值宿主；file / range 会回退为 text，不提供上传或滑杆。 |
+| gap | `number` | — | 继承 Frame 的间距 token 索引；省略时保留组件原首选间距，显式值覆盖首选间距，有效图文间距仍至少为 4 CSS px；显式零和根字号／间距缩放不压低下限。 |
 | value | `InputValue` | — | 当前值，支持 bind:value 双向同步；显式 value 优先于 defaultValue。原生编辑和内置清除事件同步 input.value 字符串；number 可使用数字初值，业务计算需自行转换。 |
 | defaultValue | `InputValue` | — | 未传 value 时的初始值；输入后的值由组件同步管理；表单重置若需恢复业务初值，应在 onreset 中显式恢复绑定值。 |
 | placeholder | `string` | — | 空输入的提示文字，不替代可访问标签；日期时间输入保留分段占位。 |
@@ -169,6 +170,8 @@
 ### 布局模型
 
 主布局模型：**槽位宿主布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md)。
+
+根宿主固定采用单行内容协议，Leading / Control / Trailing 之间的有效间距至少为 4 CSS px；显式 gap={0}、根字号或间距缩放不会压低该下限，较大的原有首选间距保持。Field 只编排外部区域与连续字段表面，不改写 Input 自己的内部布局或附件间距。日期分段、颜色文本与绘制结构的内部零间距不受影响。
 
 Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 
@@ -626,6 +629,11 @@ invalid=true + !hasCustomTrailing
 - **Input 组件**: [./Input.svelte](Input.svelte)
 
 ## 更新日志
+
+### v1.2.0 (2026-10-23)
+
+- 内部单行图文间距统一解析，包含嵌入 Field 的实际网格宿主；显式零与缩放保持 4 CSS px 下限，保留日期分段和绘制结构的内部间距。
+- 由 Input 提供实际内容状态，供 SearchInput 折叠使用；清除按钮的可用状态仍独立遵守 disabled、readonly 和 clearable。
 
 - 2026-10-05：日期分段聚焦与选中背景、全局文字与输入选区统一使用 Brand 40%，保留原有前景色与交互。
 

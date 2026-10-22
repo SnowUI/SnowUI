@@ -5,6 +5,15 @@
  * 测试覆盖：Chip.md 定义的所有功能点
  */
 export const examples = [
+    {
+        name: "C3: 单行图文最小间距",
+        code: `C3
+<Frame column style="width: 140px;">
+    <Chip><Text lines={1}>Classification label 分类名称</Text></Chip>
+    <Chip variant="background" showDot><Text lines={1}>Status label 状态名称</Text></Chip>
+</Frame>`,
+        expected: { layout: "Dot与文字至少4px；缩小根字号也不贴合；附件不压缩。" },
+    },
     // === A: 基础形态（尺寸全覆盖） ===
     {
         name: "A1: 默认形态 — 尺寸全覆盖",

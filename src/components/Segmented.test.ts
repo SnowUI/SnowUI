@@ -36,8 +36,8 @@ export const examples = [
     <Segmented variant="solid" value="a"><Button as="item" value="a"><Icon><FourLeafClover /></Icon>Web</Button><Button as="item" value="b"><Icon><Star /></Icon>Mobile</Button></Segmented>
     <Segmented variant="underline" value="a"><Button as="item" value="a"><Icon><FourLeafClover /></Icon>Web</Button><Button as="item" value="b"><Icon><Star /></Icon>Mobile</Button></Segmented>
     <Segmented variant="icon-toggle" value="a">
-        <Button as="item" value="a"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
-        <Button as="item" value="b"><Icon><Star /></Icon><Text>Mobile</Text></Button>
+        <Button as="item" value="a" aria-label="Web"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
+        <Button as="item" value="b" aria-label="Mobile"><Icon><Star /></Icon><Text>Mobile</Text></Button>
     </Segmented>
     <Segmented variant="bare" value="a"><Button as="item" value="a">Web</Button><Button as="item" value="b" iconOnly aria-label="收藏"><Icon><Star /></Icon></Button></Segmented>
 </Frame>`,

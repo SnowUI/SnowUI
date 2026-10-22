@@ -2,10 +2,10 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Breadcrumb 组件：页面层级路径导航容器
-  v1.1.3
+  v1.2.0
 
   职责：
-  - 只作为组合式容器，不生成 items / separator。
+  - 默认 items 生成真实 Button／分隔 Text；显式 children 替代默认内容。
   - 识别直系 data-as="item" / data-as="separator" 子级。
   - 将最后一个 item 标记为当前页，并让当前页不可 hover / 点击 / 聚焦。
 
@@ -13,6 +13,7 @@
 -->
 
 <script lang="ts">
+    import {contentLineGap} from "../logic/content-line";
     import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { setContext, type Snippet } from "svelte";
@@ -38,6 +39,7 @@
 
     interface Props extends Omit<FrameProps, "children"> {
         ariaLabel?: string;
+        gap?: number;
         variant?: BreadcrumbVariant;
         children?: Snippet;
         items?: BreadcrumbItem[];
@@ -48,6 +50,7 @@
 
     let {
         ariaLabel = undefined,
+        gap = undefined,
         variant = "borderless",
         children,
         items = [],
@@ -57,9 +60,15 @@
         enableContext = true,
         enableScaleObserver = false,
         class: userClass = "",
+        style: userStyle = "",
         use: userActions = [],
         ...rest
     }: Props = $props();
+
+    const rootStyle = $derived([
+        gap !== undefined ? `--snowui-breadcrumb-row-gap-override: ${contentLineGap(gap)}; --snowui-breadcrumb-column-gap-override: ${contentLineGap(gap)}` : "",
+        userStyle,
+    ].filter(Boolean).join("; ") || undefined);
 
     setContext<BreadcrumbContext>(BREADCRUMB_CONTEXT_KEY, {
         present: true,
@@ -264,6 +273,7 @@
     enableAutoLayout={false}
     aria-label={ariaLabel ?? localeContext.t("breadcrumb.navigation")}
     class={["snowui-breadcrumb", userClass].filter(Boolean).join(" ")}
+    style={rootStyle}
     use={finalUse}
     componentParts={parts}
     {...rest}
@@ -290,14 +300,8 @@
         display: inline-flex;
         flex-wrap: wrap;
         align-items: center;
-        row-gap: var(
-            --snowui-breadcrumb-row-gap-override,
-            var(--snowui-breadcrumb-row-gap, var(--gap-1))
-        );
-        column-gap: var(
-            --snowui-breadcrumb-column-gap-override,
-            var(--snowui-breadcrumb-column-gap, var(--gap-1))
-        );
+        row-gap: max(4px, var(--snowui-breadcrumb-row-gap-override, var(--snowui-breadcrumb-row-gap, var(--gap-1))));
+        column-gap: max(4px, var(--snowui-breadcrumb-column-gap-override, var(--snowui-breadcrumb-column-gap, var(--gap-1))));
         box-sizing: border-box;
         max-width: 100%;
     }

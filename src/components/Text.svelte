@@ -1,7 +1,7 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
-     Text 组件：智能文本显示与截断组件 v3.5.3
+     Text 组件：智能文本显示与截断组件 v3.5.4
 
  文档: ./Text.md
 -->
@@ -636,12 +636,15 @@
                         <ComponentPartsBoundary>{@render textChildren({ breakpoint })}</ComponentPartsBoundary>
                     {/if}
                 </span>
-                <span class="snowui-text-single-line-visible">
+                <span class="snowui-text-single-line-visible" aria-hidden={truncation.isTruncated ? "true" : undefined}>
                     {singleLineVisibleText}{#if truncation.isTruncated}<span
                             class="snowui-text-single-line-ellipsis"
                             aria-hidden="true">…</span
                         >{/if}
                 </span>
+                {#if truncation.isTruncated}
+                    <span class="snowui-sr-only">{truncation.fullText}</span>
+                {/if}
             </span>
         {:else if lines === 2 || lines === 3}
             <span
@@ -758,6 +761,11 @@
         width: fit-content;
         max-width: 100%;
         align-self: flex-start;
+    }
+
+    /* 显式单行宿主负责交叉轴；Tooltip Hug 只限制宽度。 */
+    :global(:where([data-single-line="true"] > .snowui-text-tooltip-anchor-hug)) {
+        align-self: center;
     }
 
     :global(:where(li.snowui-text-block)) {

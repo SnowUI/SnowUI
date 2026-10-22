@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.3.7
+> **版本**: v1.4.0
 > **职责**: 在浮层中展示可选择的选项，支持搜索过滤与键盘操作，可作为 Select 的选择面板。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-20
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -47,7 +47,7 @@
 | --- | --- | --- | --- |
 | children | `Snippet` | — | 无参数的显式选项内容；传入后不生成 `items`。选项使用 `MenuItem as="item"` 并提供唯一 `value`；外置搜索使用 `Input as="search"`，同时设置 `search={false}` 避免重复内置搜索框。 |
 | items | `ListboxItem[]` | `[]` | 默认内置选项数组；每项包含必填且唯一的字符串 `value`、显示及搜索使用的 `label`、可选 `disabled`。有 children 时忽略；运行时自定义项由宿主另行管理。 |
-| parts | `ComponentPartsOf<{ Input: typeof Input; MenuItem: typeof MenuItem; }>` | — | 配置默认内置 Input 和 MenuItem 的公开 Props，例如搜索 placeholder、allowCustomValue 或选项 showCheck；显式子项需自行配置。parts.MenuItem.showCheck 优先于 Listbox 的 showCheck。 |
+| parts | `ComponentPartsOf<{ Input: typeof Input; MenuItem: typeof MenuItem; Text: typeof Text; }>` | — | 配置默认内置 Input、MenuItem 与字符串标签 Text 的公开 Props，例如搜索 placeholder、allowCustomValue、选项 showCheck 或标签排版；parts.Text 只作用于实际生成的 items／自定义选项标签，显式子项自行配置。parts.MenuItem.showCheck 优先于 Listbox 的 showCheck。 |
 | search | `boolean` | — | 是否生成固定在面板顶部的 Input；依次读取显式值、宿主配置并回退 true。Select 默认向 Listbox 提供 false；需要搜索时显式开启。 |
 | maxHeight | `number \| string` | — | 面板最大高度，数字为 px，字符串为 CSS 长度；受可用视口约束。未设置时最多完整显示 10 项，空间不足时至少保留实际选项中的前 2 项。 |
 | minWidth | `number \| string` | — | 面板最小宽度，数字为 px，字符串为 CSS 长度；未设置时搜索开启取 160px，否则取 0。内容与视口约束仍参与最终宽度计算。 |
@@ -73,7 +73,7 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 
 未设置 `maxHeight` 时，可用视口空间只改变完整可见的 Item 数量，不产生半项高度：面板在 2～10 项之间选择能够容纳的完整项数；即使触发器下方空间不足，也至少为现有选项中的前 2 项保留完整高度。少于 2 项时按实际项数 Hug。显式 `maxHeight` 继续按调用方给定的长度与视口可用高度取较小值。
 
-> **版本**: v1.3.6
+> **版本**: v1.4.0
 > **状态**: 已实现
 > **更新日志 (2026-04-28)**: 标注主布局模型为复合管理布局；补充关键字表格、用户定义区与更新日志，以满足组件开发链路检查。
 > **职责**: 浮层选项列表面板，作为 Select 的下拉面板。Portal 到 body，position:fixed 定位，选中项中心对齐 Trigger，遵循 Quick Action 视觉规范。支持内嵌 `<Input as="search">` 搜索/过滤。
@@ -95,6 +95,8 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 - Listbox 的区域结构为 portal anchor / panel / header / scroll body / option list / overlay scrollbar。
 - Header 与滚动体复用 QuickAction 的面板区域规范；选项行优先复用 `MenuItem` 的槽位宿主布局。
 - `Input as="search"` 只作为固定 header 内容移入，不参与滚动列表布局。
+- 默认 items 与运行时自定义选项的字符串标签由 Text lines={1} 显示；较长内容在视口约束下收缩并提供全文访问，勾选／删除图标保持在可见面板内。面板内部继续受外层宽度约束，短标签的 Hug 宽度不改为强制铺满视口。
+- Text 仅拥有默认字符串标签的排版与全文展示；选择值、搜索、注册、键盘和焦点仍由原宿主协议拥有。调用方显式 MenuItem／Snippet 不被自动包裹，也不读取父级 parts.Text。
 - Listbox 不注册为三槽位宿主，也不把 Portal 定位、滚动条和搜索区抽象成通用布局；这些都属于复合组件私有管理逻辑。
 
 <a id="架构"></a>
@@ -363,6 +365,11 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 - **关联规范**: [../../../specs/maintainers/HTMLSpec.md](../../../specs/maintainers/HTMLSpec.md)
 
 ## 更新日志
+
+### v1.4.0 (2026-10-23)
+
+- 默认字符串标签复用 Text 单行排版及全文访问，开放强类型 parts.Text；显式选项内容继续由调用方拥有。
+- 将内部面板限制在既有外层视口约束内，避免长标签将勾选／删除图标带到可见区域之外；保留短内容 Hug、全文搜索、选择、注册与焦点协议。
 
 ### v1.3.7 (2026-10-20)
 

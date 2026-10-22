@@ -1,6 +1,6 @@
 /**
  * Breadcrumb.test.ts
- * v1.0.0
+ * v1.2.0
  * 变更记录 (2026-05-25): 新增 Breadcrumb 容器组合式示例。
  */
 export const examples = [
@@ -162,5 +162,12 @@ export const examples = [
             interaction: "内置名称随Provider语言／messages变化，原操作与状态保持",
         },
         logic: ["Locale.DefaultNames"],
+    },
+    {
+        name: "A9: 路径间距下限与既有换行",
+        code: `A9
+<Breadcrumb gap={0} style="width: 14rem;" items={[{label: "Parent workspace"}, {label: "Current component page"}]} />`,
+        expected: {render: "独立路径元素保持至少4 CSS px间距，较窄时按原合同换行，当前页仍不可交互。"},
+        logic: ["ContentSpacing", "Wrap", "Current"],
     },
 ] as const;

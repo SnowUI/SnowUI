@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   SearchInput 简单搜索输入框
-  v1.3.0
+  v1.3.1
 
   文档: ./SearchInput.md
 -->
@@ -66,18 +66,34 @@
     );
 
     let responsiveIcon = $state(false);
-    const hasValue = $derived(
-        value !== undefined && value !== null && String(value) !== "" ||
-            value === undefined &&
-                defaultValue !== undefined &&
-                defaultValue !== null &&
-                String(defaultValue) !== "",
-    );
+    let clearControlWidth = $state<number>();
+    const searchRootStyle = $derived([
+        clearControlWidth !== undefined ? `--snowui-search-input-clear-width: ${clearControlWidth}px` : "",
+        rest.style,
+    ].filter(Boolean).join("; ") || undefined);
+
 
     $effect(() => {
         const node = element;
         const threshold = collapseBelow;
+        const currentVariant = variant;
+        // 默认外观不登记额外尺寸订阅；仅 borderless 预留列需要真实按钮宽度。
+        rest.clearable;
+        rest.disabled;
+        rest.readonly;
         if (!node) return;
+        const clearControl = currentVariant === "borderless"
+            ? node.querySelector<HTMLElement>(":scope > .snowui-input-clear-btn")
+            : null;
+        const updateClearWidth = (entry?: ResizeObserverEntry) => {
+            clearControlWidth = clearControl
+                ? entry?.borderBoxSize?.[0]?.inlineSize ?? clearControl.offsetWidth
+                : undefined;
+        };
+        updateClearWidth();
+        const stopClear = clearControl
+            ? resizeManager.watch(clearControl, updateClearWidth)
+            : undefined;
 
         const update = (width: number) => {
             if (
@@ -98,6 +114,8 @@
 
         return () => {
             unwatch();
+            stopClear?.();
+            clearControlWidth = undefined;
             responsiveIcon = false;
         };
     });
@@ -109,8 +127,9 @@
     {defaultValue}
     {type}
     {as}
-    class={`snowui-search-input snowui-search-input-${variant}${responsiveIcon ? " snowui-search-input-responsive-icon" : ""}${hasValue ? " snowui-search-input-has-value" : ""}${userClass ? ` ${userClass}` : ""}`}
+    class={`snowui-search-input snowui-search-input-${variant}${responsiveIcon ? " snowui-search-input-responsive-icon" : ""}${userClass ? ` ${userClass}` : ""}`}
     {...rest}
+    style={searchRootStyle}
 >
     {#if showSearchIcon}
         <ComponentIcon
@@ -128,7 +147,7 @@
     :global(
             .snowui-frame.snowui-input.snowui-search-input.snowui-search-input-responsive-icon:not(
                     :focus-within
-                ):not(.snowui-search-input-has-value)
+                ):not([data-has-content="true"])
         ) {
         display: grid;
         grid-template-columns: minmax(0, 1fr);
@@ -141,7 +160,7 @@
             :where(
                     .snowui-input.snowui-search-input-responsive-icon:not(
                             :focus-within
-                        ):not(.snowui-search-input-has-value)
+                        ):not([data-has-content="true"])
                         > [data-as="leading"]
                 )
         ) {
@@ -156,7 +175,7 @@
             :where(
                     .snowui-input.snowui-search-input-responsive-icon:not(
                             :focus-within
-                        ):not(.snowui-search-input-has-value)
+                        ):not([data-has-content="true"])
                         > .snowui-input-control
                 )
         ) {
@@ -174,7 +193,7 @@
             :where(
                     .snowui-input.snowui-search-input-responsive-icon:not(
                             :focus-within
-                        ):not(.snowui-search-input-has-value)
+                        ):not([data-has-content="true"])
                         > :not([data-as="leading"]):not(
                             .snowui-input-control
                         )
@@ -220,8 +239,8 @@
         ) {
         width: calc(
             100% +
-                var(--snowui-input-gap-override, var(--snowui-input-gap)) +
-                var(--snowui-clear-icon-size-override, 1rem)
+                var(--snowui-input-gap-resolved) +
+                var(--snowui-search-input-clear-width, var(--snowui-clear-icon-size-override, 1rem))
         );
     }
 

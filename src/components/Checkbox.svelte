@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 
  Checkbox 组件：复选框控件
- v1.2.28
+ v1.3.0
 
  1. 核心能力:
     - 支持选中、未选中、不确定三种状态
@@ -28,6 +28,7 @@
         resolveResourceSizeToken,
     } from "../logic/resource-size";
     import type { Snippet } from "svelte";
+    import { contentLineGap } from "../logic/content-line";
     import {
         mergeComponentPartProps,
         useComponentPart,
@@ -43,6 +44,8 @@
         onCheckedChange?: (checked: boolean) => void;
         ariaLabel?: string;
         children?: Snippet;
+        singleLine?: boolean;
+        gap?: number;
         enableResponsive?: boolean;
         enableContext?: boolean;
         [key: string]: any;
@@ -63,6 +66,8 @@
         onCheckedChange,
         ariaLabel = undefined,
         children,
+        singleLine = true,
+        gap = undefined,
 
         // Capability Props
         enableResponsive = false,
@@ -100,7 +105,15 @@
             : "",
     );
     const checkboxRootStyle = $derived(
-        [checkboxSizeStyle, userStyle].filter(Boolean).join("; ") || undefined,
+        [
+            checkboxSizeStyle,
+            gap !== undefined
+                ? `--snowui-checkbox-gap-override: ${contentLineGap(gap)}`
+                : "",
+            userStyle,
+        ]
+            .filter(Boolean)
+            .join("; ") || undefined,
     );
     const checkboxRenderHints = $derived({
         variant: userRenderHints?.variant ?? "rect",
@@ -127,7 +140,7 @@
                 if (!group.includes(value)) {
                     group = [...group, value];
                 }
-            } else {
+            } else if (group.includes(value)) {
                 group = group.filter((v: any) => v !== value);
             }
         }
@@ -149,6 +162,7 @@
 
 <Frame
     tag="label"
+    {singleLine}
     class={`snowui-checkbox${userClass ? ` ${userClass}` : ""}`}
     data-disabled={disabled ? "true" : undefined}
     {disabled}
@@ -193,7 +207,7 @@
         </span>
     </span>
     {#if children}
-        <span class="snowui-checkbox-label">
+        <span class="snowui-checkbox-label snowui-control-label">
             {@render children()}
         </span>
     {/if}
@@ -217,10 +231,9 @@
     :global(:where(.snowui-checkbox)) {
         display: inline-flex;
         align-items: center;
-        gap: var(
-            --snowui-checkbox-gap-override,
-            var(--snowui-checkbox-gap, var(--gap-1))
-        );
+        gap: max(4px, var(--snowui-checkbox-gap-override, var(--snowui-checkbox-gap)));
+        min-width: 0;
+        max-width: 100%;
         vertical-align: middle;
         user-select: none;
         cursor: var(--snowui-state-cursor, pointer);

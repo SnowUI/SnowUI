@@ -1,4 +1,6 @@
 export const examples = [
+    {name:"A9: 图文组合保持横排",code:`A9
+<Table horizontalScroll={false}><TableHeader><TableRow><TableHead>Store</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell row><Icon as="leading" icon={Resource.Check} size={20}/><Text as="truncation-owner" lines={1}>SnowUI Store with a very long name</Text></TableCell></TableRow></TableBody></Table>`,expected:{render:"单行截断不替换横排布局。",layout:"图文gap至少4px，附件保持尺寸。",interaction:"Text为最近截断owner。",responsive:"收窄及恢复均保持同排，必要时局部滚动。"},logic:["row","nowrap","Text"]},
     {
         name: "A1: 默认单行截断",
         code: `A1

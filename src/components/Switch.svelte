@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 
  Switch 组件：开关切换控件
- v1.1.17
+ v1.2.0
 
  1. 核心能力:
     - 双向绑定 checked 状态
@@ -27,6 +27,7 @@
         resolveResourceSizeToken,
     } from "../logic/resource-size";
     import type { Snippet } from "svelte";
+    import { contentLineGap } from "../logic/content-line";
 
     interface Props extends Omit<FrameProps, "size"> {
         checked?: boolean;
@@ -34,6 +35,8 @@
         size?: ResourceSize | number;
         disabled?: boolean;
         children?: Snippet;
+        singleLine?: boolean;
+        gap?: number;
         enableResponsive?: boolean;
         enableContext?: boolean;
         [key: string]: any;
@@ -46,6 +49,8 @@
         size = undefined,
         disabled = false,
         children,
+        singleLine = true,
+        gap = undefined,
 
         // Capability Props
         enableResponsive = false,
@@ -76,7 +81,15 @@
             : "",
     );
     const toggleRootStyle = $derived(
-        [toggleSizeStyle, userStyle].filter(Boolean).join("; ") || undefined,
+        [
+            toggleSizeStyle,
+            gap !== undefined
+                ? `--snowui-switch-gap-override: ${contentLineGap(gap)}`
+                : "",
+            userStyle,
+        ]
+            .filter(Boolean)
+            .join("; ") || undefined,
     );
     const toggleRenderHints = $derived({
         variant: userRenderHints?.variant ?? "line",
@@ -101,6 +114,7 @@
 
 <Frame
     tag="label"
+    {singleLine}
     class={`snowui-switch${userClass ? ` ${userClass}` : ""}`}
     data-disabled={disabled ? "true" : undefined}
     {disabled}
@@ -129,7 +143,7 @@
         </span>
     </span>
     {#if children}
-        <span class="snowui-switch-label">
+        <span class="snowui-switch-label snowui-control-label">
             {@render children()}
         </span>
     {/if}
@@ -140,7 +154,9 @@
     :global(:where(.snowui-switch)) {
         display: inline-flex;
         align-items: center;
-        gap: var(--snowui-switch-gap-override, var(--snowui-switch-gap));
+        gap: max(4px, var(--snowui-switch-gap-override, var(--snowui-switch-gap)));
+        min-width: 0;
+        max-width: 100%;
         vertical-align: middle;
         user-select: none;
         cursor: var(--snowui-state-cursor, pointer);

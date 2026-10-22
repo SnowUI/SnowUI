@@ -2,6 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 import { getContext } from "svelte";
 import { FRAME_BREAKPOINTS_CONTEXT_KEY } from "../keys";
+import { isSingleLineLayout } from "./content-line";
 import { resizeManager } from "./observer.svelte";
 import type {
     FrameProps,
@@ -136,7 +137,7 @@ export class FrameResponsive {
     }
 
     get fitDirection() {
-        return this.fitActive ? this.config?.direction : undefined;
+        return this.fitActive && !isSingleLineLayout(this.#getProps()) ? this.config?.direction : undefined;
     }
 
     get breakpoint() {
@@ -200,7 +201,7 @@ export class FrameResponsive {
 
     #applyFallbackAttributes(node: HTMLElement) {
         const config = this.config;
-        if (!this.fitActive || !config) {
+        if (!this.fitActive || !config || isSingleLineLayout(this.#getProps())) {
             node.removeAttribute("data-responsive-layout");
             node.removeAttribute("data-responsive-align");
             node.removeAttribute("data-responsive-justify");
@@ -245,8 +246,14 @@ export class FrameResponsive {
         ) {
             this.#restoreSpacing(node);
             const computed = getComputedStyle(node);
-            const gap = px(computed.columnGap === "normal" ? "0" : computed.columnGap);
-            const gapFloor = resolveFloor(gap, this.config?.minGap);
+            let gap = px(computed.columnGap === "normal" ? "0" : computed.columnGap);
+            if (isSingleLineLayout(this.#getProps()) && gap < 4) {
+                gap = 4;
+                node.style.setProperty("gap", "4px");
+            }
+            const gapFloor = isSingleLineLayout(this.#getProps())
+                ? Math.max(4, resolveFloor(gap, this.config?.minGap))
+                : resolveFloor(gap, this.config?.minGap);
             node.style.setProperty("gap", `${gapFloor}px`);
             for (const side of ["top", "right", "bottom", "left"] as const) {
                 const property = `padding${side[0].toUpperCase()}${side.slice(1)}` as keyof CSSStyleDeclaration;
@@ -271,7 +278,11 @@ export class FrameResponsive {
         const isRow =
             isFlex && (direction === "row" || direction === "row-reverse");
         const children = Array.from(node.children).filter(isMeasurableChild);
-        const gap = px(computed.columnGap === "normal" ? "0" : computed.columnGap);
+        let gap = px(computed.columnGap === "normal" ? "0" : computed.columnGap);
+        if (isSingleLineLayout(this.#getProps()) && gap < 4) {
+            gap = 4;
+            node.style.setProperty("gap", "4px");
+        }
         const padding = {
             top: px(computed.paddingTop),
             right: px(computed.paddingRight),
@@ -295,7 +306,9 @@ export class FrameResponsive {
 
         if (preferredWidth <= width + EPSILON) return;
 
-        const gapFloor = resolveFloor(gap, this.config?.minGap);
+        const gapFloor = isSingleLineLayout(this.#getProps())
+            ? Math.max(4, resolveFloor(gap, this.config?.minGap))
+            : resolveFloor(gap, this.config?.minGap);
         const paddingFloor = {
             top: resolvePaddingFloor(
                 padding.top,

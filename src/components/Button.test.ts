@@ -31,6 +31,16 @@
  */
 export const examples = [
     {
+        name: "BTN-Gap: 单行图文最小间距",
+        code: `BTN-Gap
+<Frame column gap={2} style="width: 200px;">
+    <Button gap={0}><Icon as="leading" icon={Check} /><Text lines={1}>保存并继续 Save and continue</Text></Button>
+    <Button gap={1}><Text lines={1}>更多操作 More actions</Text><Icon as="trailing" icon={ArrowLineDown} /></Button>
+</Frame>`,
+        expected: { layout: "单行内容的有效间距至少4px；保留附件与Text全文提示，不额外包Frame。" },
+    },
+
+    {
         name: "BTN-Hug：默认内容宽度",
         code: `BTN-Hug
 <div style="display: flex; flex-direction: column; width: 320px; gap: var(--gap-4);">

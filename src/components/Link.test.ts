@@ -75,7 +75,7 @@ export const examples = [
     </Link>
 </div>`,
         expected: {
-            render: "两个 Link 根均保持 Hug；第二个 Link 将外置 trailing 投影为根级直系槽位，清除格式空白并隐藏内置 ArrowSquareOut；文字缩短时 Icon 随文字左移，布局 gap 保持 2px",
+            render: "两个 Link 根均保持 Hug；第二个 Link 将外置 trailing 投影为根级直系槽位，清除格式空白并隐藏内置 ArrowSquareOut；文字缩短时 Icon 随文字左移，布局 gap 保持至少4px",
         },
         logic: ["LINK-Icon.1"],
     },

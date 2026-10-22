@@ -23,8 +23,8 @@ export const examples = [
         name: "TB-03:Icon Toggle",
         code: `TB-03
 <Tab variant="icon-toggle" value="web">
-    <Button as="item" value="web"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
-    <Button as="item" value="mobile"><Icon><Star /></Icon><Text>Mobile</Text></Button>
+    <Button as="item" value="web" aria-label="Web"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
+    <Button as="item" value="mobile" aria-label="Mobile"><Icon><Star /></Icon><Text>Mobile</Text></Button>
 </Tab>`,
         expected: { render: "非激活项隐藏文字；半透明容器使用 20px 背景模糊。", layout: "宽度随内容变化。", interaction: "切换时由 Button 自己处理内部文字。", performance: "父级不穿透 Text；模糊仅作用于小面积静态容器。", responsive: "跟随容器。" },
         logic: ["PublicBridge", "ContentVisibility"],
@@ -93,9 +93,9 @@ export const examples = [
     <Frame column class="gap-8">
         <Text>icon-toggle</Text>
         <Frame row wrap class="gap-16 items-center">
-            <Tab variant="icon-toggle" size="sm" value="all"><Button as="item" value="all"><Icon><FourLeafClover /></Icon><Text>All</Text></Button><Button as="item" value="random"><Icon><Star /></Icon><Text>Random</Text></Button></Tab>
-            <Tab variant="icon-toggle" size="md" value="all"><Button as="item" value="all"><Icon><FourLeafClover /></Icon><Text>All</Text></Button><Button as="item" value="random"><Icon><Star /></Icon><Text>Random</Text></Button></Tab>
-            <Tab variant="icon-toggle" size="lg" value="all"><Button as="item" value="all"><Icon><FourLeafClover /></Icon><Text>All</Text></Button><Button as="item" value="random"><Icon><Star /></Icon><Text>Random</Text></Button></Tab>
+            <Tab variant="icon-toggle" size="sm" value="all"><Button as="item" value="all" aria-label="All"><Icon><FourLeafClover /></Icon><Text>All</Text></Button><Button as="item" value="random" aria-label="Random"><Icon><Star /></Icon><Text>Random</Text></Button></Tab>
+            <Tab variant="icon-toggle" size="md" value="all"><Button as="item" value="all" aria-label="All"><Icon><FourLeafClover /></Icon><Text>All</Text></Button><Button as="item" value="random" aria-label="Random"><Icon><Star /></Icon><Text>Random</Text></Button></Tab>
+            <Tab variant="icon-toggle" size="lg" value="all"><Button as="item" value="all" aria-label="All"><Icon><FourLeafClover /></Icon><Text>All</Text></Button><Button as="item" value="random" aria-label="Random"><Icon><Star /></Icon><Text>Random</Text></Button></Tab>
         </Frame>
     </Frame>
     <Frame column class="gap-8">
@@ -150,7 +150,7 @@ export const examples = [
             render: "Tab 根据 items 内置生成两个 Button，并为每项生成 Icon + Text。",
             layout: "激活项显示图标与文字，非激活项只显示图标，宽度随内容平滑变化。",
             interaction: "点击或键盘切换后，新激活项展开文字，原激活项收起文字。",
-            performance: "复用默认内置 Button 与现有 icon-toggle indicator / 宽度动效。",
+            performance: "复用默认内置 Button 与现有 icon-toggle indicator / 宽度动效；隐藏文字后仍保留label可访问名称。",
             responsive: "跟随 Tab 容器与 size 档位。",
         },
         logic: ["BuiltInMode", "IconToggle", "Icon", "Text"],

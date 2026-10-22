@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  MenuItem 组件：浮层面板操作项（统一版）
- v1.2.4
+ v1.3.0
 
  职责：
  - 同时支持两种使用场景：
@@ -33,6 +33,8 @@
         parts?: ComponentPartsOf<{ Button: typeof Button }>;
         /** 选项值（在 Listbox 内使用时必填，同一 Listbox 内必须唯一） */
         value?: string;
+        /** 普通标签使用单行共享预设；复杂多行children显式关闭。 */
+        singleLine?: boolean;
         /** 是否选中（独立使用时有效；Listbox 内由 context 覆盖） */
         selected?: boolean;
         /** 是否高亮（独立使用时有效；Listbox 内由 context 覆盖） */
@@ -52,6 +54,7 @@
     let explicitProps: Props = $props();
     let {
         value,
+        singleLine = true,
         selected: selectedProp = false,
         active: activeProp = false,
         disabled = false,
@@ -197,6 +200,7 @@
     tag="div"
     {as}
     row
+    {singleLine}
     id={optionId}
     role={owner ? "option" : undefined}
     class={`snowui-menu-item snowui-rounded-rectangle${userClass ? ` ${userClass}` : ""}`}
@@ -259,9 +263,9 @@
     /* ── 操作项基础样式 ── */
     :global(:where(.snowui-menu-item)) {
         --snowui-menu-item-gap: var(--gap-2, 0.5rem);
-        --snowui-menu-item-slot-gap: var(--snowui-menu-item-gap);
+        --snowui-menu-item-slot-gap: max(4px, var(--snowui-menu-item-gap));
         padding: var(--snowui-menu-item-padding-override, var(--padding-2, 0.5rem));
-        gap: var(--snowui-menu-item-gap);
+        gap: var(--snowui-menu-item-slot-gap);
         border-radius: var(--snowui-menu-item-radius-override, var(--radius-3, 0.75rem));
         font-size: var(--text-14);
         line-height: var(--leading-14);

@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 
  Radio 组件：单选按钮控件
- v1.3.17
+ v1.4.0
 
  1. 核心能力:
     - 支持单选和分组模式
@@ -33,6 +33,7 @@
         resolveResourceSizeToken,
     } from "../logic/resource-size";
     import type { Snippet } from "svelte";
+    import { contentLineGap } from "../logic/content-line";
 
     interface Props extends Omit<FrameProps, "size"> {
         checked?: boolean;
@@ -42,6 +43,8 @@
         disabled?: boolean;
         variant?: "outline" | "filled";
         children?: Snippet;
+        singleLine?: boolean;
+        gap?: number;
         enableResponsive?: boolean;
         enableContext?: boolean;
         [key: string]: any;
@@ -56,6 +59,8 @@
         disabled = false,
         variant = "filled",
         children,
+        singleLine = true,
+        gap = undefined,
         as = undefined,
         class: userClass,
         style: userStyle,
@@ -89,7 +94,14 @@
         as === "badge" && imageCtx ? imageCtx.badgeStyle : "",
     );
     const radioRootStyle = $derived.by(() => {
-        const styles = [hostStyle, radioSizeStyle, userStyle]
+        const styles = [
+            hostStyle,
+            radioSizeStyle,
+            gap !== undefined
+                ? `--snowui-radio-gap-override: ${contentLineGap(gap)}`
+                : "",
+            userStyle,
+        ]
             .filter(Boolean)
             .join("; ");
         return styles || undefined;
@@ -145,9 +157,8 @@
         }
     }
 
-    function handleClick(event: MouseEvent) {
+    function handleClick() {
         if (disabled) return;
-        event.preventDefault();
         applySelection(!checked);
     }
 
@@ -162,6 +173,7 @@
 
 <Frame
     tag="label"
+    {singleLine}
     class={`snowui-radio${userClass ? ` ${userClass}` : ""}`}
     as={layoutAs}
     data-variant={variant}
@@ -196,7 +208,7 @@
         </span>
     </span>
     {#if children}
-        <span class="snowui-radio-label">
+        <span class="snowui-radio-label snowui-control-label">
             {@render children()}
         </span>
     {/if}
@@ -207,7 +219,9 @@
     :global(:where(.snowui-radio)) {
         display: inline-flex;
         align-items: center;
-        gap: var(--snowui-radio-gap-override, var(--snowui-radio-gap));
+        gap: max(4px, var(--snowui-radio-gap-override, var(--snowui-radio-gap)));
+        min-width: 0;
+        max-width: 100%;
         vertical-align: middle;
         user-select: none;
         cursor: var(--snowui-state-cursor, pointer);

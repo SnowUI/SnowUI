@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.3.1
+> **版本**: v1.3.2
 > **职责**: 在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-22
 
 ## 组件介绍
 
@@ -63,7 +63,7 @@
 - 默认内置模式（推荐）：`items` 自动生成 `<Button as="item">`；item 可用 `icon` 声明图标，Tab 内置生成 `Icon + Text`，适用于 `icon-toggle`；`parts.Button / parts.Icon / parts.Text` 配置统一 Props。
 - 显式组合模式：显式书写 Button，用于 Icon、Text、复杂内容或逐项 Props 差异。
 
-> **版本**: v1.3.1
+> **版本**: v1.3.2
 > **状态**: 已实现
 > **职责**: 在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
 > 由 Tab 容器通过 CSS override Button 的桥接变量接管。
@@ -108,6 +108,8 @@
 
 #### variant="icon-toggle"(样式4)
 容器视觉与 pill 相同，包含与 SearchBox 一致的 `blur(1.25rem)`（20px）背景模糊。未激活项隐藏 `.snowui-text`,只显示图标(子项内部需包含 Icon + Text 节点);激活项显示 icon + text,文字渐显时消费 Frame 生命周期进入 bridge 时序,宽度通过 Frame size motion bridge 平滑展开。
+
+默认items模式在icon-toggle中使用每项label作为可访问名称，文字隐藏时仍可识别；显式children模式由调用方给每个Button提供aria-label。内部图文间距复用Button所有者，不给每个控件外包Frame。
 
 #### variant="bare"
 容器无背景、padding 和圆角，不显示 indicator；Item 无背景、padding 和圆角，只通过 `opacity: 0.4 -> 1` 表达未激活、hover 与激活状态。内容可以是文字、单 Icon 或 Icon + 文字。Item gap 复用 underline 的尺寸梯度：SM=12px / MD=16px / LG=20px。
@@ -187,8 +189,8 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 
 <!-- 样式4 icon-toggle -->
 <Tab variant="icon-toggle">
-  <Button as="item" value="web"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
-  <Button as="item" value="mobile"><Icon><Star /></Icon><Text>Mobile</Text></Button>
+  <Button as="item" value="web" aria-label="Web"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
+  <Button as="item" value="mobile" aria-label="Mobile"><Icon><Star /></Icon><Text>Mobile</Text></Button>
 </Tab>
 
 <!-- 样式4 icon-toggle：默认内置模式 -->
@@ -310,6 +312,9 @@ Tab indicator 的位置与尺寸监听统一通过 Components 的 `resizeManager
 ---
 
 ## 更新日志
+
+### v1.3.2 (2026-10-22)
+- icon-toggle默认项保留label可访问名称，不随文字隐藏而丢失；Segmented沿宿主链继承，间距与交互继续复用Button。
 
 ### v1.3.1 (2026-10-14)
 

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.1.3
+> **版本**: v1.2.0
 > **职责**: 展示当前页面的层级路径，帮助用户理解所在位置并返回上级页面。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-20
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -47,6 +47,7 @@
 | 关键字 | 类型 | 默认值 | 描述 |
 | --- | --- | --- | --- |
 | ariaLabel | `string` | `locale 文案` | 根导航区域的无障碍标签；省略时随LocaleProvider更新，显式ariaLabel优先 |
+| gap | `number` | — | 继承 Frame 的间距 token 索引，设置路径元素的首选行／列间距；省略保留原首选值，有效间距至少为 4 CSS px，显式零与根字号／间距缩放不压低下限；更大首选间距及根容器原换行合同保留。 |
 | variant | `BreadcrumbVariant` | `"borderless"` | 内部 `Button as="item"` 的默认 Button 变体；parts 与子级 Button 显式 `variant` 可覆盖 |
 | children | `Snippet` | — | 显式声明 Button as="item" 与 Text as="separator"，替换内建 items 与 separator；最后一个 item 仍自动成为当前页。 |
 | items | `BreadcrumbItem[]` | `[]` | 内建路径数据，每项含 label、可选 href/disabled；自动生成 Button 与分隔 Text，最后一项为不可交互的当前页。children 存在时忽略此数组。 |
@@ -81,7 +82,7 @@
 | 角色 | 推荐写法 | 描述 |
 | :--- | :--- | :--- |
 | item | `<Button as="item">...</Button>` | 一个面包屑路径片段 |
-| separator | `<Text as="separator">/</Text>` | 分隔符；Breadcrumb 不提供 separator prop |
+| separator | `<Text as="separator">/</Text>` | 分隔符；显式组合自行声明，默认 items 模式可用 separator prop |
 
 SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as="item"` / `data-as="separator"`。
 
@@ -149,6 +150,7 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 - 子级 Button 保留自身内联外壳布局。
 - 子级 Text 保留自身文本流布局。
 - Breadcrumb 只管理根 gap、separator 样式、非当前透明度与最后一项当前态。
+- 路径元素之间的有效行／列间距至少为 4 CSS px；显式 gap={0}、根字号或间距缩放不压低下限，较大首选间距保持。根容器继续允许路径片段换行，不把整条导航强制改成 singleLine；各 Button 内部的图文单行仍由 Button 拥有。
 
 布局变量链：
 
@@ -223,6 +225,11 @@ Breadcrumb 支持两种模式：
 ---
 
 ## 更新日志
+
+### v1.2.0 (2026-10-23)
+
+- 路径元素首选间距复用共享 token 解析，有效行／列间距至少为 4 CSS px，显式零与字号／间距缩放不压低下限。
+- 保留普通路径换行、子 Button 所有权、当前页事件保护及分隔符可访问性；更正旧文档称不提供 separator prop 的事实错误，现有 API 不变。
 
 ### v1.1.3 (2026-10-20)
 

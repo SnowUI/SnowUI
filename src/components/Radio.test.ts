@@ -1,6 +1,16 @@
 
 export const examples = [
     {
+        name: "单行标签与复杂多行退出",
+        code: `单行标签
+<div style="width: 140px;"><Radio gap={0}>接收完整产品更新通知</Radio></div>
+<Radio singleLine={false}><Frame column gap={1}><Text>主要设置</Text><Text>保留多行说明</Text></Frame></Radio>`,
+        expected: {
+            layout: "单行标签与控件间距至少 4 CSS px；受限文字可收缩，控件保持尺寸；复杂内容显式退出后仍为两行。",
+            interaction: "原生完整名称、点击及 Space 切换保持一致。",
+        },
+    },
+    {
         name: "1: 基础用法",
         code: `1
 <div class="flex gap-4 items-center">

@@ -1,6 +1,6 @@
 /**
  * SearchInput.test.ts
- * v1.3.0
+ * v1.3.1
  *
  * 测试覆盖：SearchInput.md 定义的默认 Search、外置 leading、清除 X、Input 宿主 Props 平铺。
  */
@@ -72,5 +72,13 @@ export const examples = [
             responsive: "组件自身宽度不大于 80px 时进入 icon 退化态；即使外部 width 更小，最小宽度仍为左右实际 padding + leading Icon",
         },
         logic: ["ResponsiveCollapse", "Search", "Focus"],
+    },
+    {
+        name: "SI-08：未绑定搜索清空后折叠",
+        code: `SI-08
+<SearchInput collapseBelow={100} gap={0} defaultValue="Query" aria-label="Search entries" style="width: 5rem;" />
+<Button>Leave search</Button>`,
+        expected: {render: "初始查询保持展开；清空后离开输入框恢复图标态，聚焦或再次输入恢复真实输入内容。"},
+        logic: ["ContentLine", "Narrow", "Ownership"],
     },
 ] as const;

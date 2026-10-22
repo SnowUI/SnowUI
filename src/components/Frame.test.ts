@@ -6,6 +6,16 @@
  */
 export const examples = [
     {
+        name: "F-single-line: 单行图文组合",
+        code: `F-single-line
+<Frame singleLine style="width: 12rem;">
+    <Icon as="leading" icon={Resource.Check} size={20} />
+    <Text lines={1}>SnowUI Store with a very long name</Text>
+</Frame>`,
+        expected: {render:"图文始终同排；文字省略后可查看全文。",layout:"附件不压缩，内部有效gap至少4px。",interaction:"截断与Tooltip由Text拥有。",responsive:"父容器缩窄只压间距和文字，恢复后还原；普通wrap及firstLine保持。"},
+        logic:["singleLine","as","Text"],
+    },
+    {
         name: "F-first-line: 首行对齐与 Pin",
         code: `F-first-line
 <Frame column class="gap-16">

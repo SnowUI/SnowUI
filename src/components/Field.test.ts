@@ -1,6 +1,6 @@
 /**
  * Field.test.ts
- * v1.2.1
+ * v1.4.0
  * 变更记录 (2026-07-05): F-04 增加 Field 内置 error，验证双 segment 后方的整行错误提示。
  * 变更记录 (2026-03-30): 将 Field-Demo 的 F-01 ~ F-05 全量迁入 test 项目，后续字段组合与 Figma 样式微调统一在 test 中验证。
  * 变更记录 (2026-03-16): 新增 `Field row / column` 根节点简写示例，覆盖无需额外 `Frame` 的整块横向/竖向组合。
@@ -93,5 +93,19 @@ export const examples = [
     <Text as="error">Error messages.</Text>
 </Field>`,
         logic: ["Label", "Error"],
+    },
+    {
+        name: "F-08：连续字段与内部内容行所有权",
+        code: `F-08
+<Field row style="width: 24rem; max-width: 100%;">
+    <Input as="segment" gap={0} aria-label="First entry" value="First entry">
+        <Icon as="leading" icon={Resource.Check} />
+    </Input>
+    <Input as="segment" gap={0} aria-label="Second entry" value="Second entry">
+        <Icon as="leading" icon={Resource.Check} />
+    </Input>
+</Field>`,
+        expected: {render: "连续字段表面没有结构间距，两个字段各自保留至少 4 CSS px 的图文间距。"},
+        logic: ["ContentLine", "Narrow", "Ownership"],
     },
 ] as const;

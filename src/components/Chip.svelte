@@ -1,7 +1,7 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
-  Chip 组件：标签芯片 v1.1.0
+  Chip 组件：标签芯片 v1.2.0
 
   布局模型：槽位宿主布局（三槽位：leading / content / trailing）
   通过 Frame `row` 关键字激活 auto-layout 协议，子元素以 `data-as="leading|trailing"` 声明角色。
@@ -86,7 +86,7 @@
 
 <Frame
     bind:element={hostElement}
-    row
+    singleLine
     enableResponsive={true}
     enableContext={true}
     enableScaleObserver={false}
@@ -127,7 +127,7 @@
     :global(:where(.snowui-chip)) {
         --snowui-chip-font-size: var(--text-12);
         --snowui-chip-line-height: var(--leading-12);
-        --snowui-chip-gap: 0;
+        --snowui-chip-gap: var(--gap-1);
         --snowui-chip-icon-size: calc(var(--size-4) * 3 / 4); /* 12px */
         --snowui-chip-padding: 0;
         --snowui-chip-radius: 0;
@@ -140,6 +140,8 @@
         flex-wrap: nowrap;
         align-items: center;
         width: max-content;
+        max-width: 100%;
+        min-width: 0;
         box-sizing: border-box;
         color: inherit;
         font-size: var(
@@ -150,7 +152,7 @@
             --snowui-chip-line-height-override,
             var(--snowui-chip-line-height)
         );
-        gap: var(--snowui-chip-gap-override, var(--snowui-chip-gap));
+        gap: max(4px, var(--snowui-chip-gap-override, var(--snowui-chip-gap)));
         padding: var(
             --snowui-chip-padding-override,
             var(--snowui-chip-padding)

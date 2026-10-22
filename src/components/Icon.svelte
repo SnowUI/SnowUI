@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Icon 图标组件
-  v2.3.3
+  v2.3.4
 
  1. 核心能力 (Features):
     - 统一尺寸: 默认 16px。支持 16, 20, 24, 28, 32, 40, 48, 80 八种标准尺寸。
@@ -82,7 +82,7 @@
         renderHints: userRenderHints = undefined,
         as = "icon",
         badgePosition = "top",
-        children,
+        children: iconChildren,
         ...rest
     }: Props = $props();
 
@@ -324,7 +324,7 @@
         renderHints={iconRenderHints}
         {...rest}
     >
-        {#snippet children({ responsive })}
+        {#snippet children()}
             <div class="snowui-icon-content">
                 {#if src}
                     <img {src} alt="" class="snowui-icon-image" />
@@ -338,8 +338,8 @@
                         width="100%"
                         height="100%"
                     />
-                {:else if children}
-                    {@render children({ responsive })}
+                {:else if iconChildren}
+                    {@render iconChildren()}
                 {:else}
                     <div class="snowui-icon-default snowui-rounded-rectangle"></div>
                 {/if}

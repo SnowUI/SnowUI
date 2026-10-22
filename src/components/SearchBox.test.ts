@@ -1,6 +1,6 @@
 /**
  * SearchBox.test.ts
- * v1.1.0
+ * v1.2.0
  *
  * 测试覆盖：SearchBox.md 定义的 variant、外置 Kbd、清除 X、禁用态、点击弹出 SearchPopup。
  */
@@ -87,5 +87,14 @@ export const examples = [
             interaction: "语言切换不重置原有值与状态，显式文案保持优先",
         },
         logic: ["Locale", "ExplicitTextPriority", "BusinessContent"],
+    },
+    {
+        name: "SB-07：窄宽度图文与零间距下限",
+        code: `SB-07
+<SearchBox gap={0} value="Complete business search query" style="width: 8rem;">
+    <Kbd as="trailing">⌘K</Kbd>
+</SearchBox>`,
+        expected: {render: "图标、查询文字与快捷键保持同排和至少4 CSS px有效间距，文字可收缩，完整名称保留。"},
+        logic: ["ContentLine", "Narrow", "FullName"],
     },
 ] as const;

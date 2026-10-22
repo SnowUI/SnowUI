@@ -11,6 +11,7 @@
  */
 
 import type { CoreState, FrameProps } from "./frame-types";
+import { contentLineGap, isSingleLineLayout } from "./content-line";
 import type { FrameState } from "./frame-state.svelte";
 import type { FrameMotion } from "./frame-motion.svelte";
 import { motionConfigToStyle } from "./frame-utils";
@@ -220,9 +221,7 @@ function buildDirectLayoutStyle(frameProps: FrameProps): string {
     const styles = [
         gap === undefined || gap === null
             ? ""
-            : typeof gap === "number"
-              ? `gap: var(--gap-${gap}, calc(4px * ${gap} * var(--gap-scale, 1)))`
-              : `gap: ${gap}`,
+            : `gap: ${contentLineGap(gap, isSingleLineLayout(frameProps))}`,
         frameProps.width === undefined || frameProps.width === null
             ? ""
             : `width: ${typeof frameProps.width === "number" ? `${frameProps.width}px` : frameProps.width}`,

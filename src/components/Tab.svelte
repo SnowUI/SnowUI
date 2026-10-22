@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Tab 视图切换组件
-  v1.3.1 (2026-10-14)
+  v1.3.2 (2026-10-22)
 
   职责:在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
   由 Tab 容器通过 CSS override Button 的桥接变量接管。Tab size 决定容器的
@@ -332,7 +332,9 @@
         <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
     {:else}
         {#each items as item (item.value)}
-            <Button {...parts?.Button} as="item" value={item.value} disabled={item.disabled}>
+            <Button {...parts?.Button} as="item" value={item.value} disabled={item.disabled}
+                aria-label={variant === "icon-toggle" ? item.label : parts?.Button?.["aria-label"]}
+            >
                 {#if item.icon}
                     {@const ItemIcon = item.icon}
                     <Icon {...parts?.Icon}><ItemIcon /></Icon><Text {...parts?.Text}>{item.label}</Text>

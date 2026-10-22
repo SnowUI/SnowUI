@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Button 组件：基础交互按钮
-  v2.19.0
+  v2.20.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -24,6 +24,7 @@
   import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
   import { resizeManager } from "../logic/observer.svelte";
   import Frame, { type FrameProps } from "./Frame.svelte";
+  import { contentLineGap } from "../logic/content-line";
   import {
     BUTTON_HOVER_SCALE_UP_MOTION,
     getButtonBackgroundScale,
@@ -55,6 +56,8 @@
     emphasis?: "normal" | "muted";
     /** 是否启用背景内容模糊；默认 false。 */
     backgroundBlur?: boolean;
+    /** 内容间距Token编号；单行图文保持至少4 CSS px。 */
+    gap?: number;
     /** 是否同时启用内置 hover 放大与配套点击缩回 / 恢复；复合控件项可由容器默认关闭。 */
     scaleOnHover?: boolean;
     /** 内容整体跟随背景 hover / 点击缩放；默认跟随背景，可独立关闭。 */
@@ -88,6 +91,7 @@
     bare = false,
     emphasis = "normal",
     backgroundBlur = false,
+    gap = undefined,
     scaleOnHover = undefined,
     contentScaleOnHover = undefined,
     toggle = false,
@@ -350,7 +354,7 @@
     const clickMotionStyle = clickMotion
       ? `--snowui-button-click-transform-from: ${clickMotion.from}; --snowui-button-content-click-transform-from: ${clickMotion.contentFrom}`
       : "";
-    const styles = [`--snowui-button-icon-size: ${contextPixelSize / 16}rem`, defaultHoverMotionStyle, clickMotionStyle, hostStyle, userStyle]
+    const styles = [`--snowui-button-icon-size: ${contextPixelSize / 16}rem`, `--snowui-button-content-gap: ${contentLineGap(gap ?? "var(--snowui-button-gap-override, var(--snowui-button-gap))", true)}`, defaultHoverMotionStyle, clickMotionStyle, hostStyle, userStyle]
       .filter(Boolean)
       .join("; ");
     return styles || undefined;
@@ -781,7 +785,7 @@
       --snowui-button-padding-override,
       var(--snowui-button-padding)
     );
-    gap: var(--snowui-button-gap-override, var(--snowui-button-gap));
+    gap: var(--snowui-button-content-gap);
     border-radius: var(--snowui-button-resolved-radius);
     font-size: var(
       --snowui-button-font-size-override,

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.1.2
+> **版本**: v1.2.0
 > **职责**: 提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-20
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -57,6 +57,7 @@
 | --- | --- | --- | --- |
 | parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置内部生成的清除 Button；显式子内容不消费该默认配置。 |
 | variant | `"gray" \| "outline"` | `"gray"` | 搜索框样式 |
+| gap | `number` | — | 继承 Frame 的间距 token 索引；省略时保留原首选间距，显式值覆盖首选间距；有效图文间距至少为 4 CSS px，显式零、根字号或间距缩放不压低下限。 |
 | value | `string \| number` | — | 当前搜索文本或展示值 |
 | placeholder | `string` | — | 占位文本；未传时使用 searchBox.placeholder，zh-CN 为“搜索”、en-US 为“Search”；显式空字符串保留 |
 | open | `boolean` | `false` | 浮层打开状态，支持 `bind:open` |
@@ -150,7 +151,7 @@
 
 主布局模型：**槽位宿主布局**。定义见 `../../../specs/maintainers/LayoutProtocol.md`。
 
-`SearchBox` 使用 `Frame row` 固定启用自动布局协议：
+`SearchBox` 使用 `Frame row singleLine` 固定启用内部自动布局协议；外部 `enableAutoLayout={false}` 不关闭该搜索触发器的三槽位布局。图标、内容与快捷键／清除附件之间的有效间距至少为 4 CSS px，根字号或间距缩放和 gap={0} 不压低下限，较大的首选间距保留。单行内容不响应 column 方向降级；图标退化态仍只显示原有 leading，不插入文字或空槽。原始文本流继续保留完整可访问名称，外置 children 与弹层仍由原组合协议拥有：
 
 - Leading：默认 `Search`，或外部 `data-as="leading"` 替换。
 - Content：文本内容，Fill，`min-width: 0`。
@@ -201,6 +202,11 @@
 ---
 
 ## 更新日志
+
+### v1.2.0 (2026-10-23)
+
+- 搜索触发器复用共享单行与间距解析，显式零和字号／间距缩放后仍至少为 4 CSS px，保留较大首选间距与原图标退化态。
+- 固定内部三槽位布局，避免响应式 column 或外部关闭 auto layout 破坏已声明的宿主合同；清除、键盘、禁用／只读、外置快捷键与搜索浮层协议不变。
 
 ### v1.1.2 (2026-10-20)
 

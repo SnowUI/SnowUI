@@ -274,4 +274,24 @@
 :where([data-auto-layout][data-responsive-layout="true"][data-responsive-children-min-width="true"] > :not([data-as])) {
     min-width: var(--snowui-frame-responsive-child-min-width);
 }
+/* 显式单行组合与已有三槽／Text共用，不创建第二套文本截断或附件识别。 */
+:where([data-single-line="true"]) {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    align-items: center;
+    column-gap: max(4px, var(--gap-2));
+}
+:where([data-single-line="true"] > :not([data-as])) {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+}
+/* 原生控件标签保留原始 DOM 名称；仅共享外壳的单行视觉裁切，不复制 Text 控制器。 */
+:where([data-single-line="true"] > .snowui-control-label) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+:where([data-single-line="true"] > :is([data-as="leading"], [data-as="trailing"])) {
+    flex: 0 0 auto;
+}
 }

@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Input 组件：基础单行输入框
- v1.1.5
+ v1.2.0
 
  文档: ./Input.md
 -->
@@ -28,6 +28,7 @@
     import type { Snippet } from "svelte";
     import {getField, getListboxOwner, getListboxHeaderPortal} from "../context";
     import {resolveFrameFieldInvalid, resolveFrameFieldValue, syncFrameFieldValue} from "../logic/frame-field-control";
+    import {contentLineGap} from "../logic/content-line";
     import {splitFrameHostProps} from "../logic/frame-prop-filter";
     import {mergeComponentPartProps, useComponentPart} from "../logic/component-parts.svelte";
     import type { HTMLInputAttributes } from "svelte/elements";
@@ -55,6 +56,7 @@
 
     interface Props extends Omit<FrameProps, "tag"> {
         element?: HTMLElement;
+        gap?: number;
         type?: HTMLInputAttributes["type"];
         value?: InputValue;
         defaultValue?: InputValue;
@@ -163,6 +165,7 @@
         enableScaleObserver = false,
         class: userClass = "",
         style: userStyle = "",
+        gap = undefined,
         renderHints: userRenderHints = undefined,
         children = undefined,
         allowCustomValue = false,
@@ -173,6 +176,11 @@
             explicitProps,
         ),
     );
+
+    const inputRootStyle = $derived([
+        gap !== undefined ? `--snowui-input-gap-override: ${contentLineGap(gap)}` : "",
+        userStyle,
+    ].filter(Boolean).join("; ") || undefined);
 
     const splitProps = $derived.by(() => splitFrameHostProps(rest));
     const frameRestProps = $derived(splitProps.frameProps);
@@ -231,10 +239,11 @@
             !isCustomColorType &&
             !isCustomTemporalType,
     );
+    const hasContent = $derived(
+        resolvedValue !== undefined && resolvedValue !== null && String(resolvedValue) !== "",
+    );
     const hasClearableValue = $derived(
-        clearable && isClearableType && !readonly && !disabled &&
-            resolvedValue !== undefined &&
-            String(resolvedValue) !== "",
+        clearable && isClearableType && !readonly && !disabled && hasContent,
     );
     const temporalInputType = $derived(
         isCustomTemporalType
@@ -1376,6 +1385,7 @@
         bind:this={hostElement}
         class={`snowui-input snowui-rounded-rectangle snowui-field-host${(hasRootAccessory || (resolvedInvalid && !hasCustomTrailing)) ? " snowui-input-has-root-accessory" : ""}${embeddedRoleClass ? ` ${embeddedRoleClass}` : ""}${userClass ? ` ${userClass}` : ""}`}
         data-auto-layout="true"
+        data-single-line="true"
         data-as={typeof rest.as === "string" ? rest.as : undefined}
         data-embedded={isEmbedded ? "true" : undefined}
         data-field-control={isEmbedded ? "input" : undefined}
@@ -1383,11 +1393,12 @@
             ? "true"
             : undefined}
         data-has-value={hasClearableValue ? "true" : undefined}
+        data-has-content={hasContent ? "true" : undefined}
         data-invalid={resolvedInvalid ? "true" : undefined}
         data-readonly={readonly ? "true" : undefined}
         data-input-type={normalizedInputType}
         data-requested-input-type={type !== normalizedInputType ? type : undefined}
-        style={userStyle || undefined}
+        style={inputRootStyle}
     >
         <!-- svelte-ignore a11y_autofocus -->
         <input
@@ -1476,14 +1487,16 @@
         data-field-control={isEmbedded ? "input" : undefined}
         data-has-root-accessory={hasRootAccessory ? "true" : undefined}
         data-has-value={hasClearableValue ? "true" : undefined}
+        data-has-content={hasContent ? "true" : undefined}
         {disabled}
-        style={userStyle || undefined}
+        style={inputRootStyle}
         enableResponsive={enableResponsive}
         enableContext={enableContext}
         enableScaleObserver={enableScaleObserver}
         enableAutoLayout={internalAutoLayout}
         renderHints={inputRenderHints}
         {...frameRestProps}
+        singleLine
     >
     {#if isCustomColorType}
         <div class="snowui-input-color-shell">
@@ -1804,6 +1817,7 @@
         --snowui-input-padding-y: var(--padding-3); /* 12px */
         --snowui-input-padding-x: var(--padding-4); /* 16px */
         --snowui-input-gap: var(--gap-2);
+        --snowui-input-gap-resolved: max(4px, var(--snowui-input-gap-override, var(--snowui-input-gap)));
         --snowui-input-font-size: var(--text-14);
         --snowui-input-line-height: var(--leading-14);
         --snowui-input-placeholder-color: var(--black-20, #00000033);
@@ -1816,7 +1830,7 @@
             var(--snowui-input-height)
         );
         min-width: 0;
-        gap: var(--snowui-input-gap-override, var(--snowui-input-gap));
+        gap: var(--snowui-input-gap-resolved);
         padding: var(--snowui-input-padding-y) var(--snowui-input-padding-x);
         border-radius: var(
             --snowui-input-radius-override,
@@ -1925,7 +1939,7 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: stretch;
-        gap: var(--snowui-input-gap);
+        gap: var(--snowui-input-gap-resolved);
         padding: 0; /* Stepper 场景下由内部控制 Padding */
     }
 
@@ -1939,7 +1953,7 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
-        gap: var(--snowui-input-gap);
+        gap: var(--snowui-input-gap-resolved);
         box-sizing: border-box;
     }
 
@@ -1993,7 +2007,7 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         align-items: center;
-        gap: var(--snowui-input-gap);
+        gap: var(--snowui-input-gap-resolved);
         box-sizing: border-box;
     }
 
@@ -2003,7 +2017,7 @@
                 ):has(> [data-as="leading"]):not(:has(> [data-as="trailing"]))
         ) {
         grid-template-columns: auto minmax(0, 1fr);
-        gap: var(--snowui-input-gap);
+        gap: var(--snowui-input-gap-resolved);
     }
 
     :global(
@@ -2012,7 +2026,7 @@
                 ):has(> [data-as="leading"]):has(> [data-as="trailing"])
         ) {
         grid-template-columns: auto minmax(0, 1fr) auto;
-        gap: var(--snowui-input-gap);
+        gap: var(--snowui-input-gap-resolved);
     }
 
     :global(
@@ -2105,7 +2119,7 @@
         display: inline-flex;
         align-items: inherit;
         justify-content: center;
-        gap: var(--snowui-input-gap);
+        gap: var(--snowui-input-gap-resolved);
         min-width: 0;
         white-space: nowrap;
         line-height: inherit;
@@ -2151,7 +2165,7 @@
         display: inline-flex;
         align-items: inherit;
         justify-content: center;
-        gap: var(--snowui-input-gap);
+        gap: var(--snowui-input-gap-resolved);
         min-width: 0;
         white-space: nowrap;
         color: var(--black-20, #00000033);
@@ -2268,7 +2282,7 @@
     }
 
     :global(:where(.snowui-input-color-display)) {
-        gap: var(--snowui-input-gap);
+        gap: var(--snowui-input-gap-resolved);
         padding: 0; /* 统一由 Frame 负责 Padding */
         pointer-events: none;
         user-select: none;
@@ -2681,10 +2695,7 @@
                 )
         ) {
         grid-template-columns: auto minmax(0, 1fr);
-        gap: var(
-            --snowui-input-gap-override,
-            var(--snowui-input-gap)
-        );
+        gap: var(--snowui-input-gap-resolved);
     }
 
     :global(

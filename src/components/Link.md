@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.0
+> **版本**: v1.5.0
 > **职责**: 在正文、说明和导航中提供清晰的文字链接，支持箭头等视觉形式，表达可继续访问的内容。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-14
+> **文档修订**: 2026-10-22
 
 ## 组件介绍
 
@@ -63,7 +63,7 @@
 - `parts.Tooltip`：配置单行截断时的内置 Tooltip。
 - 自定义提示结构时使用外置 Tooltip 组合；显式 Props 高于 part。
 
-> **版本**: v1.4.0
+> **版本**: v1.5.0
 > **更新日志 (2026-08-15)**: Link 根节点显式移除原生下划线，不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；`underline` 仍由组件公开 Prop 控制。
 > **职责**: 提供正文、说明与导航中的文字链接样式。
 > **设计稿**: [Workshop / Link](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12417-11133&t=GYb3gHf9U5Ff6hcQ-4)
@@ -108,7 +108,7 @@ Link 复用 通用 `TruncationController` 与 `fitTextToElement()`，不自行�
 
 主布局模型：**槽位宿主布局**（三槽位：leading / content / trailing）。
 
-通过 `<Frame row>` 输出 `data-auto-layout`，复用 [`auto-layout.css`](../styles/auto-layout.css) 的三槽位布局。默认文字作为 Content；`external` 变体的内置 `ArrowSquareOut` 作为 trailing。Snippet 中的外置直系 `as="leading"` / `as="trailing"` 会投影回 Link 根层，保持 Frame 对直系槽位的 Grid 落列、水平居中与统一 gap 规则。Link 根通过 `[data-auto-layout]` 组件级确权，将公共槽位 gap 覆盖为 `calc(var(--gap-1) / 2)`，保证内置 / 外置 leading、trailing 与文字间距均为 2px。外置 Icon 保留自身尺寸，未传 `size` 时使用 Icon 默认的 16px。
+通过 `<Frame row>` 输出 `data-auto-layout`，复用 [`auto-layout.css`](../styles/auto-layout.css) 的三槽位布局。默认文字作为 Content；`external` 变体的内置 `ArrowSquareOut` 作为 trailing。Snippet 中的外置直系 `as="leading"` / `as="trailing"` 会投影回 Link 根层，保持 Frame 对直系槽位的 Grid 落列、水平居中与统一 gap 规则。Link 根通过 `[data-auto-layout]` 组件级确权，将公共槽位 gap 保持为至少4 CSS px，默认首选 `var(--gap-1)`；含附件或单行截断时复用Frame singleLine，纯文字且未启用截断时保留原文字流。长标签显式使用 `lines={1}`，复用Link已有截断／全文提示。外置 Icon 保留自身尺寸，未传 `size` 时使用 Icon 默认的 16px。
 
 ### 内置图标与替换
 
@@ -167,7 +167,7 @@ Link 复用 通用 `TruncationController` 与 `fitTextToElement()`，不自行�
 | :--- | :--- | :--- |
 | `--snowui-link-font-size` | `var(--text-14)` | 文字字号 |
 | `--snowui-link-line-height` | `var(--leading-14)` | 文字行高 |
-| `--snowui-link-gap` | `calc(var(--gap-1) / 2)` | 内部内容与 leading / trailing 的间距，默认 2px |
+| `--snowui-link-gap` | `var(--gap-1)` | 内容与 leading / trailing 间距，实际至少4 CSS px，根字号缩小时仍保持下限 |
 | `--snowui-link-color` | color（默认 Black40） | 默认文字颜色 |
 | `--snowui-link-hover-color` | color 自动规则 / `hoverColor` | hover 文字颜色；trailing 箭头 / Icon 继承该颜色 |
 | `--snowui-link-icon-size` | `var(--size-3)` | 内置 `ArrowUpRight` / `ArrowSquareOut` 尺寸，默认 12px；不覆盖外置 Icon |
@@ -204,6 +204,9 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 - **迁移**：原 `<Button variant="link">` 已移除；按钮式跳转继续使用 `<Button href>`。
 
 ## 更新日志
+
+### v1.5.0 (2026-10-22)
+- 内外置附件与文字间距保持至少4 CSS px；图文／单行截断复用Frame singleLine，纯文字流保持原合同，截断仍由Link拥有。
 
 ### v1.4.0 (2026-10-14)
 

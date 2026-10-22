@@ -78,6 +78,7 @@
 
     let hostElement = $state<HTMLElement>();
     let contentElement = $state<HTMLElement>();
+    let hasCustomLeading = $state(false);
     let hasCustomTrailing = $state(false);
     const truncation = new TruncationController(
         undefined,
@@ -177,6 +178,7 @@
                         });
                 }
             }
+            hasCustomLeading = !!host.querySelector(':scope > [data-as="leading"]');
             hasCustomTrailing = !!host.querySelector(
                 ':scope > [data-as="trailing"]:not(.snowui-link-default-trailing)',
             );
@@ -216,6 +218,7 @@
     bind:element={hostElement}
     tag="a"
     row
+    singleLine={resolvedLines === 1 || variant !== "default" || hasCustomLeading || hasCustomTrailing}
     {href}
     {target}
     {rel}
@@ -309,7 +312,7 @@
     :global(:where(.snowui-link)) {
         --snowui-link-font-size: var(--text-14);
         --snowui-link-line-height: var(--leading-14);
-        --snowui-link-gap: calc(var(--gap-1) / 2);
+        --snowui-link-gap: var(--gap-1);
         --snowui-link-icon-size: var(--size-3);
         --snowui-link-color: var(--black-40, #00000066);
         --snowui-link-hover-color: var(--black-100, #000000ff);
@@ -320,7 +323,7 @@
         text-decoration: none;
         width: fit-content;
         max-width: 100%;
-        gap: var(--snowui-link-gap-override, var(--snowui-link-gap));
+        gap: max(4px, var(--snowui-link-gap-override, var(--snowui-link-gap)));
         font-size: var(
             --snowui-link-font-size-override,
             var(--snowui-link-font-size)
@@ -336,7 +339,7 @@
     }
 
     :global(:where(.snowui-link)[data-auto-layout]) {
-        gap: var(--snowui-link-gap-override, var(--snowui-link-gap));
+        gap: max(4px, var(--snowui-link-gap-override, var(--snowui-link-gap)));
     }
 
     :global(:where(.snowui-link):hover:not(.snowui-disabled)),

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.1.0
+> **版本**: v1.2.0
 > **职责**: 以紧凑的行内标签展示分类、状态或简短信息，可与文字、图标和列表内容自然组合。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-22
 
 ## 组件介绍
 
@@ -73,7 +73,7 @@
 ### 布局模型
 
 主布局模型：**槽位宿主布局**（三槽位：leading / content / trailing）。
-通过 `<Frame row>` 输出 `data-auto-layout`，复用 [`auto-layout.css`](../styles/auto-layout.css) 的三槽位 grid 模板，子元素以 `data-as="leading" | "trailing"` 声明角色。
+通过 `<Frame singleLine>` 输出 `data-auto-layout`，复用 [`auto-layout.css`](../styles/auto-layout.css) 的三槽位 grid 模板，子元素以 `data-as="leading" | "trailing"` 声明角色。
 
 ### 默认 Leading 图标 (Built-in)
 
@@ -124,7 +124,7 @@
 | :--- | :--- | :--- |
 | `--snowui-chip-font-size` | `var(--text-12)`（lg：`var(--text-14)`) | 文字字号 |
 | `--snowui-chip-line-height` | `var(--leading-12)`（lg：`var(--leading-14)`) | 文字行高 |
-| `--snowui-chip-gap` | `0` | 槽位间距（与设计稿对齐，无间距；通过外部 override 调整） |
+| `--snowui-chip-gap` | `var(--gap-1)` | 单行图文间距；实际至少4 CSS px，保留更大首选间距。Tag内部例外不适用于Chip。 |
 | `--snowui-chip-icon-size` | `12px`（sm）/ `16px`（lg） | 默认 Dot 尺寸 |
 | `--snowui-chip-padding` | `0`（default）/ `2px 8px`（sm+bg）/ `4px 12px`（lg+bg） | 内边距 |
 | `--snowui-chip-radius` | `0`（default）/ `9999px`（background） | 圆角 |
@@ -188,7 +188,7 @@
 | Color | `inherit`（继承父容器） |
 | Font Size | `var(--text-12)` |
 | Line Height | `var(--leading-12)` |
-| Gap | `0` |
+| Gap | `max(4px, var(--snowui-chip-gap))` |
 | Padding | `0` |
 | Background | `transparent` |
 | Border | `none` |
@@ -234,6 +234,9 @@
 ---
 
 ## 更新日志
+
+### v1.2.0 (2026-10-22)
+- 内部复用 Frame 单行预设，Dot／附件与文字保持至少4 CSS px间距；仅Tag内部继续原例外。颜色、图标替换和尺寸档位保持。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Listbox 组件：浮层选项列表面板
- v1.3.7
+ v1.4.0
 
  职责：
  - 作为 Select / Combobox 的浮层下拉面板
@@ -37,6 +37,7 @@
     import {tick, setContext} from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Input from "./Input.svelte";
+    import Text from "./Text.svelte";
     import MenuItem from "./MenuItem.svelte";
     import {getListboxOwner, LISTBOX_HEADER_PORTAL_KEY} from "../context";
     import {FIELD_CONTEXT_KEY} from "../keys";
@@ -66,6 +67,7 @@
         parts?: ComponentPartsOf<{
             Input: typeof Input;
             MenuItem: typeof MenuItem;
+            Text: typeof Text;
         }>;
         /** 默认内置模式是否生成固定在顶部的搜索框。 */
         search?: boolean;
@@ -554,7 +556,7 @@
             data-open={presence.closing ? undefined : "true"}
             data-closing={presence.closing ? "true" : undefined}
             class="snowui-listbox-portal snowui-quick-action-panel snowui-rounded-rectangle"
-            style="width: max-content; min-width: 100%; max-height: inherit;"
+            style="width: max-content; min-width: 100%; max-width: 100%; max-height: inherit;"
             contentFill
             {enableAutoLayout}
             enableResponsive={enableResponsive}
@@ -605,13 +607,13 @@
                     {:else}
                         {#each items as item (item.value)}
                             <MenuItem as="item" value={item.value} disabled={item.disabled}>
-                                {item.label}
+                                <Text lines={1} {...parts?.Text}>{item.label}</Text>
                             </MenuItem>
                         {/each}
                     {/if}
                     {#each owner?.customOptions ?? [] as item (item.value)}
                         <MenuItem as="item" value={item.value} disabled={item.disabled}>
-                            {item.label}
+                            <Text lines={1} {...parts?.Text}>{item.label}</Text>
                         </MenuItem>
                     {/each}
                 </Frame>
@@ -643,7 +645,7 @@
         {:else}
             {#each items as item (item.value)}
                 <MenuItem as="item" value={item.value} disabled={item.disabled}>
-                    {item.label}
+                    <Text lines={1} {...parts?.Text}>{item.label}</Text>
                 </MenuItem>
             {/each}
         {/if}

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v2.19.0
+> **版本**: v2.20.0
 > **职责**: 触发操作或导航，支持文字、图标、加载与禁用状态，适合从主要操作到轻量工具按钮的不同场景。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-28
+> **文档修订**: 2026-10-22
 
 ## 组件介绍
 
@@ -48,6 +48,7 @@
 | iconOnly | `boolean` | `false` | 有 padding 的纯图标按钮模式，专门控制只有图标时的对称 padding 和图标大小；sm/md/lg 图标为 16/20/24px。无外壳图标按钮直接使用 bare。缺少 aria-label、aria-labelledby 或 title 时开发环境警告。 |
 | bare | `boolean` | `false` | 无外壳按钮，以图标操作为主，也可包含文字或其他内容。忽略 variant，移除 padding、radius、背景、边框和 hover overlay，保留内容 gap。无需叠加 iconOnly；同 size 的图标与 iconOnly 一致，为 16/20/24px，子图标显式 size 优先。默认 100% 不透明，emphasis="muted" 启用 40% → hover 100%。 |
 | emphasis | `"normal" \| "muted"` | `"normal"` | bare 模式的视觉强调级别。`normal` 常态与 hover 均为 100%；`muted` 常态为 40%，hover 提升到 100%。非 bare 模式下不改变现有 variant 视觉。 |
+| gap | `number` | — | 兼容间距编号，映射原gap Token；图文／独立文字内容间距至少4 CSS px，0按下限处理，保留更大首选值。无需另包Frame。 |
 | backgroundBlur | `boolean` | `false` | 是否模糊按钮背后的内容。开启时使用与 BarChart 模糊浮层一致的 `backdrop-filter: blur(1.25rem)`。 |
 | scaleOnHover | `boolean` | — | 是否同时启用 Button 内置背景层 hover 放大及配套点击缩回 / 恢复动效。独立动作默认开启；内容默认跟随缩放，命中区和布局不变。复合控件容器可提供 `false` 默认值，子 Button 显式传 `true` 可重新开启。bare 没有背景层，因此无视觉效果；本 Prop 不覆盖显式 `whileHover`。 |
 | contentScaleOnHover | `boolean` | 跟随背景缩放 | 是否让文字、Icon、Spinner 等内容作为整体跟随内置背景 hover 与点击缩放。`false` 仅关闭内容缩放；`true` 仍要求背景缩放生效，不能绕过 scaleOnHover=false、bare、disabled 或显式 whileHover 接管。 |
@@ -88,7 +89,7 @@
 Button 的内部布局不接入三槽位模型：
 
 - 根节点保持 inline-level 外壳，内容整体 Hug。
-- 内部图标、文本、Spinner 等轻量内容通过 `gap` 自然排列。
+- 内部图标、文本、Spinner等轻量内容通过共享单行间距解析自然排列，有效gap至少4 CSS px；根字号或gap-scale缩小时仍保持下限，已有更大间距不统一压到4px。纯图标不新增文字或空槽。
 - 文字型 Button 默认 `white-space: nowrap`，保证按钮文案作为一个操作短语保持单行；特殊长文案可由使用方通过外部 style / class 显式覆盖。
 - 默认宽度及最小宽度为 `max-content`，即“内容 + gap + padding”的 Hug 宽度；纵向 Flex / Grid 的默认 stretch 不会把 Button 拉满。只有显式 width / Fill 或组件声明的专属组合布局可以拉宽，不能把 Button 压到吞掉默认 padding。
 - Button 自身负责 padding / gap / radius / font-size / line-height，并通过 `--snowui-button-*-override` 变量允许外部覆盖。
@@ -485,6 +486,10 @@ Button 放入 Pagination 时使用角色模板：
 ---
 
 ## 更新日志
+
+### v2.20.0 (2026-10-22)
+
+- 内部内容复用共享单行间距下限；保留Hug、size／padding、图标尺寸、动效和事件，不要求调用方外包Frame。
 
 - 2026-10-05：原 Indigo 默认配色改为 Brand（`--brand`），保留原有透明度、状态与覆盖机制。
 

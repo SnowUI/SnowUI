@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.3.0
+> **版本**: v1.3.1
 > **职责**: 提供带搜索图标的单行输入框，适合列表过滤、页面搜索和工具栏中的查询输入。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -63,7 +63,7 @@
 - 组件无额外 wrapper，真实 `Input` 仍是根宿主；事件只由该宿主触发一次。
 - `Input` 自身隐藏生成的错误 `Text` 仍可通过平铺后的 `parts.Text` 配置。
 
-> **版本**: v1.3.0
+> **版本**: v1.3.1
 > **职责**: 提供与 `Input` 一致的 搜索输入框，默认内置 `Search`。
 
 `SearchInput` 是 `Input` 的搜索场景变体。除默认 `type="search"` 和默认 leading 图标为 `Search` 外，其颜色、hover/focus、清除 X、三槽位布局、Frame 能力与 `Input` 保持一致。
@@ -137,6 +137,8 @@
 
 主布局模型：**槽位宿主布局**。定义见 `../../../specs/maintainers/LayoutProtocol.md`。
 
+搜索图标、原生输入和清除按钮的间距由 Input 统一解析，至少为 4 CSS px。空值折叠直接使用 Input 的实际内容状态，不另存一份输入值或清除状态；defaultValue、未绑定输入、外部绑定、disabled、readonly 与 clearable={false} 都采用同一内容判断。borderless 才为真实清除按钮增加共享 resizeManager 尺寸订阅，读取未变换的实际宽度，卸载或条件变化时清理；默认外观不增加该订阅，不支持 ResizeObserver 时保留首次测量与原生编辑。
+
 `SearchInput` 直接复用 `Input` 的 Leading / Control / Trailing 三槽位结构。默认 `Search` 作为 leading 子项传入 `Input`，外部提供同角色 leading 时通过 CSS 隐藏默认图标。
 
 ### 样式数值
@@ -161,7 +163,7 @@
 | 关键字 | 处理方式 | 说明 |
 | :--- | :--- | :--- |
 | showSearchIcon | 条件渲染 | `false` 时不渲染默认 Search |
-| collapseBelow | 共享尺寸观察 | 复用 `resizeManager` 监听真实根宿主；只写入 `data-responsive-collapse="icon"`，空值且未聚焦时由 SearchInput 自己收敛布局，不改变 Input 的通用布局协议 |
+| collapseBelow | 共享尺寸观察 | 复用 `resizeManager` 监听真实根宿主；维护响应式图标布局类，读取 Input 根宿主的实际内容状态；空值且未聚焦时由 SearchInput 自己收敛布局，不改变 Input 的通用布局协议 |
 | variant | 根 class | `borderless` 由 SearchInput 自己移除边框、背景、圆角、padding 和 focus ring；以 `flex: 1 1 0; width: auto; max-width: 100%` 填满确定容器的可用空间，并避免 shrink-to-fit 宿主因输入状态重算百分比宽度；父容器不得通过后代选择器改写这些视觉或布局 |
 | children | 透传到 Input | 用于外置 leading/trailing 或其他组合内容 |
 
@@ -173,6 +175,11 @@
 ---
 
 ## 更新日志
+
+### v1.3.1 (2026-10-23)
+
+- 边框隐藏模式使用 Input 已解析间距与实际清除按钮宽度，修复小字号时原生文字区域延伸不足；尺寸观察复用共享管理器并清理。
+- 折叠使用 Input 实际内容状态，修复未绑定输入清空后仍保留展开状态的问题；不复制输入值、原生事件或业务查询逻辑。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
