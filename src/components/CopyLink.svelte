@@ -1,6 +1,6 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
-<!-- CopyLink：可打开、可复制的链接地址。v1.0.1；文档：./CopyLink.md -->
+<!-- CopyLink：可打开、可复制的链接地址。v1.0.2；文档：./CopyLink.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import Frame, { type FrameProps } from "./Frame.svelte";
@@ -43,7 +43,7 @@
         --snowui-copy-link-padding-x: var(--padding-4);
         --snowui-copy-link-padding-y: var(--padding-3);
         --snowui-copy-link-radius: var(--radius-4);
-        --snowui-copy-link-trailing-space: calc(var(--size-4) + var(--gap-2));
+        --snowui-copy-link-trailing-space: calc(max(12px, var(--size-4)) + max(4px, var(--gap-2)));
         position: relative;
         display: flex;
         align-items: center;

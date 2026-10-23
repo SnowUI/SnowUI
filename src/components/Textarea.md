@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.0.1
+> **版本**: v1.0.2
 > **职责**: 提供多行文本输入，可承接原生表单属性并组合字段反馈，适合描述、备注和较长内容的编辑。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-28
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -88,7 +88,7 @@
 - `parts.Indicator`：统一配置 resize 模式下的内置 Indicator。
 - Textarea value、invalid、disabled 与输入事件属于父组件受控协议。
 
-> **版本**: v1.0.1
+> **版本**: v1.0.2
 > **更新日志 (2026-04-28)**: 标注主布局模型为复合管理布局，并同步代码版本。
 > **职责**: 基础多行文本输入宿主，负责承接原生 `<textarea>` 能力与 Frame 通用能力。
 
@@ -112,6 +112,7 @@
 - Textarea 的区域结构为 root host / native control / footer / Indicator corner / counter / overlay scrollbar。
 - 进入 Field 时，Textarea 只作为多行输入宿主参与 Field 的槽位宿主布局；自身 footer、计数器、resize 与 scrollbar 仍由 Textarea 私有管理。
 - `as="segment"` 只影响 Textarea 与 Field 的连续字段表面关系，不把 Textarea 改造成通用槽位容器。
+- footer 的计数器与 Indicator 同排时优先 gap-1，并保留 4 CSS px 间距下限及较大 Token；单一附件不产生空槽。多行输入正文、计数显隐和手柄固有尺寸保持各自协议。
 - footer 使用内部 Pin 布局固定到 `pin-bottom-right`。独立模式偏移为 `var(--padding-1)`；嵌入 Field 时通过 `--pin-offset-x/y` 负值补偿 Field padding。
 - 自定义浮层滚动条复用 `useOverlayScrollbar`，但滚动条定位和右下角保留区属于 Textarea 私有区域结构。
 
@@ -310,6 +311,10 @@
 ---
 
 ## 更新日志
+
+### v1.0.2 (2026-10-23)
+
+- 计数器与尺寸手柄之间保留 4 CSS px 间距；独立／Field／segment 共用，保留多行编辑、原生表单、计数显隐与缩放交互。
 
 - 2026-09-28：同步 Indicator 的统一命中与状态视觉；Corner 默认同时调整宽高，显式单轴配置继续生效。
 

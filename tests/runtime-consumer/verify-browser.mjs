@@ -432,5 +432,26 @@ for(const font of [16,8]) {
 }
 await page.evaluate(()=>document.documentElement.style.fontSize='');
 console.log('PASS: actual tarball five chart families, 16/8px, LTR/RTL, zero/default/large gaps and narrow/recovery');
+for(const font of [16,8]){
+ await page.evaluate(font=>document.documentElement.style.fontSize=`${font}px`,font);
+ for(const form of await page.locator('.package-copy-textarea').all()){
+  for(const width of [320,180,120,80,320]){
+   await form.evaluate((node,width)=>node.style.width=`${width}px`,width);
+   const gap=await form.locator('.snowui-copy-link').evaluate(node=>{const a=node.querySelector('a').getBoundingClientRect(),b=node.querySelector('button svg').getBoundingClientRect();return getComputedStyle(node).direction==='rtl'?a.left-b.right:b.left-a.right;});assert.ok(gap>=3.9,`CopyLink ${font}/${width}: ${gap}`);
+   for(const root of await form.locator('.snowui-textarea').all()){
+    await root.hover();await root.locator('.snowui-textarea-counter').waitFor({state:'visible'});
+    const gap=await root.evaluate(node=>{const a=node.querySelector('.snowui-textarea-counter').getBoundingClientRect(),b=node.querySelector('.snowui-indicator-visual svg:not([data-indicator-filter])').getBoundingClientRect();return getComputedStyle(node).direction==='rtl'?a.left-b.right:b.left-a.right;});assert.ok(gap>=3.9,`Textarea glyph ${font}/${width}: ${gap}`);
+   }
+  }
+  await form.evaluate(node=>{node.style.setProperty('--gap-2','24px');node.style.setProperty('--gap-1','24px');});
+  for(const root of await form.locator('.snowui-copy-link,.snowui-textarea').all()){
+   const gap=await root.evaluate(node=>{const copy=node.classList.contains('snowui-copy-link'),a=node.querySelector(copy?'a':'.snowui-textarea-counter').getBoundingClientRect(),b=node.querySelector(copy?'button svg':'[data-resize-handle]').getBoundingClientRect();return getComputedStyle(node).direction==='rtl'?a.left-b.right:b.left-a.right;});assert.ok(gap>=23.9,`larger preferred token: ${gap}`);
+  }
+  await form.locator('.snowui-copy-link button').focus();await page.keyboard.press('Space');await page.waitForFunction(()=>document.querySelector('[data-package-copied]').textContent==='https://snowui.dev/components/quick-start?source=complete-shared-address');
+  const textarea=form.locator('textarea').first();await textarea.fill('Updated notes');assert.equal(await form.evaluate(node=>new FormData(node).get('standalone-'+node.dir)),'Updated notes');
+ }
+}
+await page.evaluate(()=>document.documentElement.style.fontSize='');
+console.log('PASS: actual tarball CopyLink and Textarea glyph gaps at 16/8px, LTR/RTL, narrow/recovery, standalone/Field/segment, full URL keyboard copy and native form data');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

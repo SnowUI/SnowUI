@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Textarea 组件：基础多行文本输入框
- v1.0.1
+ v1.0.2
 
  文档: ./Textarea.md
 -->
@@ -578,7 +578,7 @@
         display: inline-flex;
         align-items: center;
         justify-content: flex-end;
-        gap: 0;
+        gap: max(4px, var(--gap-1));
         min-width: 0;
         pointer-events: none;
         /* Resize 命中区高于 scrollbar；footer 空白区仍可穿透。 */
