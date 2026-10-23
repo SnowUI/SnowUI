@@ -1,6 +1,7 @@
 /**
  * Form.test.ts
- * v1.0.3
+ * v1.0.4
+ * 变更记录 (2026-10-24): FM-14标签组用既有singleLine与局部横向ScrollArea保留同排、有效间距和完整标签。
  * 变更记录 (2026-04-10): 按最新需求文档收敛 FM-01 / FM-02 / FM-05 / FM-15 / FM-19，还原统一外壳、真实日期输入、紧凑消息输入区与 datalist 例外规则。
  * 变更记录 (2026-04-02): FM-03 改为 `label + row + checkbox items` 结构，对齐 Figma `10044:18936` 的通知方式布局。
  * 变更记录 (2026-04-02): FM-05 从 `row` 分段结构改为 `leading + Input + trailing` 宿主结构，去掉不该出现的中间分割线。
@@ -213,13 +214,23 @@ export const examples = [
     },
     {
         name: "FM-14：标签 chips",
-        code: `<Field style="width: 360px;">
+        code: `FM-14
+<Field style="width: 360px;">
     <Text as="label" style="color: var(--black-40, rgba(0, 0, 0, 0.4));">Title</Text>
-    <Frame as="row" row>
-        <Text style="display: inline-flex; align-items: center; min-height: 1.5rem; padding: 0.25rem 0.5rem; border-radius: 999rem; background: var(--black-10, rgba(0, 0, 0, 0.04)); color: var(--black-80, rgba(0, 0, 0, 0.8)); font-size: 12px; line-height: 16px;">List Item</Text>
-        <Text style="display: inline-flex; align-items: center; min-height: 1.5rem; padding: 0.25rem 0.5rem; border-radius: 999rem; background: var(--black-10, rgba(0, 0, 0, 0.04)); color: var(--black-80, rgba(0, 0, 0, 0.8)); font-size: 12px; line-height: 16px;">Tag</Text>
-    </Frame>
+    <ScrollArea as="row" axis="horizontal" ariaLabel="Form labels" style="width: 100%;">
+        <Frame singleLine style="width: max-content; min-width: 100%;">
+            <Text lines={1} style="display: inline-flex; align-items: center; min-height: 1.5rem; padding: 0.25rem 0.5rem; border-radius: 999rem; background: var(--black-10, rgba(0, 0, 0, 0.04)); color: var(--black-80, rgba(0, 0, 0, 0.8)); font-size: 12px; line-height: 16px;">List Item</Text>
+            <Text lines={1} style="display: inline-flex; align-items: center; min-height: 1.5rem; padding: 0.25rem 0.5rem; border-radius: 999rem; background: var(--black-10, rgba(0, 0, 0, 0.04)); color: var(--black-80, rgba(0, 0, 0, 0.8)); font-size: 12px; line-height: 16px;">Tag</Text>
+        </Frame>
+    </ScrollArea>
 </Field>`,
+        expected: {
+            render: "保留Title及List Item／Tag两个既有文字标签。",
+            layout: "标签组同排、内部有效间距至少4 CSS px，Field角色与表面保持。",
+            interaction: "极窄时通过ScrollArea原生键盘横向滚动访问完整标签。",
+            performance: "复用公开Frame／Text／ScrollArea，不增加页面私有测量或Observer。",
+            responsive: "根字号16／8px与LTR／RTL下保留完整标签，不拆行；不足空间由局部滚动承接。",
+        },
         logic: ["Composition"],
     },
     {
