@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   SnowUILogo 组件
-  v1.19.1
+  v1.19.2
 
   职责：按 Workshop 品牌设计稿渲染 SnowUI 图标、字标及其横向/纵向组合。
   文档：./SnowUILogo.md
@@ -602,6 +602,7 @@
     align-items: center;
     justify-content: center;
     font-size: calc(var(--text-12) * var(--snowui-snow-ui-logo-scale));
+    --snowui-snow-ui-logo-wordmark-drawing-height: calc(var(--size-3) * var(--snowui-snow-ui-logo-scale));
     flex: none;
     width: var(
       --snowui-snow-ui-logo-wordmark-width-override,
@@ -616,6 +617,7 @@
 
   :global(:where(.snowui-snow-ui-logo-vertical) .snowui-snow-ui-logo-wordmark) {
     font-size: calc(var(--text-14) * 20 / 14 * (1 - var(--snowui-snow-ui-logo-compact)) * var(--snowui-snow-ui-logo-scale));
+    --snowui-snow-ui-logo-wordmark-drawing-height: calc(var(--size-5) * (1 - var(--snowui-snow-ui-logo-compact)) * var(--snowui-snow-ui-logo-scale));
     opacity: calc(1 - var(--snowui-snow-ui-logo-compact));
     overflow: visible;
     width: var(

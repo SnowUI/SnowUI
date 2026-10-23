@@ -216,14 +216,14 @@
       duration: reduced() ? 0 : 220,
       delay: reduced() ? 0 : rank * 24,
       easing: (t) => 1 - Math.pow(1 - t, 3),
-      css: (t, u) => `opacity:${t};transform:scaleX(${1 - .3 * u}) scaleY(${1 - .12 * u});filter:blur(${.045 * u}em)`,
+      css: (t, u) => `opacity:${t};transform:scaleX(${1 - .3 * u}) scaleY(${1 - .12 * u});filter:blur(calc(${.045 * u} * var(--snowui-snow-ui-logo-wordmark-drawing-height)))`,
     };
     return {
       duration: reduced() ? 0 : 550,
       delay: reduced() ? 0 : (rank * 550 * 0.3) / changedCount,
       easing,
       css: (t, u) =>
-        `opacity:${Math.max(0, Math.min(1, t))};transform:translateY(${(direction === "out" ? -0.35 : 0.35) * u}em) scale(${1 - 0.4 * u}) rotate(${2 * u}deg);filter:blur(${Math.max(0, 0.1 * u)}em)`,
+        `opacity:${Math.max(0, Math.min(1, t))};transform:translateY(calc(${(direction === "out" ? -0.35 : 0.35) * u} * var(--snowui-snow-ui-logo-wordmark-drawing-height))) scale(${1 - 0.4 * u}) rotate(${2 * u}deg);filter:blur(calc(${Math.max(0, 0.1 * u)} * var(--snowui-snow-ui-logo-wordmark-drawing-height)))`,
     };
   }
 </script>
@@ -248,14 +248,14 @@
       onoutrostart={onmotionstart}
       onintroend={onmotionend}
       onoutroend={onmotionend}
-      style:left={`calc(${align === "left" ? "0%" : "50%"} + ${letter.left}em)`}
-      style:width={`${letter.width}em`}
+      style:left={`calc(${align === "left" ? "0%" : "50%"} + ${letter.left} * var(--snowui-snow-ui-logo-wordmark-drawing-height))`}
+      style:width={`calc(${letter.width} * var(--snowui-snow-ui-logo-wordmark-drawing-height))`}
     >
       {#if letter.glyph}
         <svg
           viewBox={`${letter.glyph.x} 0 ${letter.glyph.width} 98`}
-          width={`${letter.glyph.width / 98}em`}
-          height="1em"
+          style:width={`calc(${letter.glyph.width / 98} * var(--snowui-snow-ui-logo-wordmark-drawing-height))`}
+          style:height="var(--snowui-snow-ui-logo-wordmark-drawing-height)"
           overflow="visible"
           fill="none"
         >
@@ -316,8 +316,8 @@
       {:else}
         <svg
           viewBox={`0 0 ${letter.width * 100} 100`}
-          width={`${letter.width}em`}
-          height="1em"
+          style:width={`calc(${letter.width} * var(--snowui-snow-ui-logo-wordmark-drawing-height))`}
+          style:height="var(--snowui-snow-ui-logo-wordmark-drawing-height)"
           overflow="visible"
         >
           <text
@@ -338,7 +338,7 @@
   .snowui-logo-letters {
     display: block;
     width: 100%;
-    height: 1em;
+    height: var(--snowui-snow-ui-logo-wordmark-drawing-height);
     position: relative;
     white-space: pre;
     color: var(--black-100);
@@ -349,7 +349,7 @@
     display: inline-flex;
     align-items: center;
     flex: none;
-    height: 1em;
+    height: var(--snowui-snow-ui-logo-wordmark-drawing-height);
     line-height: 1;
     transform-origin: center;
     transition: left 550ms

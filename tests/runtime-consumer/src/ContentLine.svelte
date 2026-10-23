@@ -1,5 +1,5 @@
 <script lang="ts">
-import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip, Sidebar, Avatar} from '@snowui-design-system/components';
+import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip, Sidebar, Avatar, SnowUILogo} from '@snowui-design-system/components';
 let calls=$state(0);
 let checkboxValues=$state<string[]>([]);
 let radioValue=$state<string|null|undefined>(null);
@@ -95,4 +95,10 @@ let packagePanelDraft=$state('Package draft');
 <SidebarItem id="package-footer-navigation" label="Package footer navigation" />
 <Frame as="footer" singleLine><Avatar as="leading" aria-label="Package current user" /><Text lines={1}>Complete package current user name</Text></Frame>
 </Sidebar>
+</section>
+
+<section aria-label="Package brand canvases">
+<SnowUILogo data-package-brand variant="text" />
+<SnowUILogo data-package-brand variant="horizontal" scale={.5} />
+<SnowUILogo data-package-brand variant="vertical" compactProgress={.5} />
 </section>

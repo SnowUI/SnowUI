@@ -291,5 +291,13 @@ await packageFooter.evaluate(n=>n.style.removeProperty('width'));
 await packageSidebar.hover();await packageSidebar.getByRole('button',{name:'收起侧边栏',exact:true}).click();await packageSidebar.waitFor({state:'visible'});assert.equal(await packageSidebar.getAttribute('data-collapsed'),'true');assert.equal(await packageSidebar.locator('.snowui-sidebar-footer').getAttribute('aria-hidden'),'true');await packageSidebar.hover();await packageSidebar.getByRole('button',{name:'展开侧边栏',exact:true}).click();assert.equal(await packageSidebar.getAttribute('data-collapsed'),'false');
 await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
 console.log('PASS: tarball Sidebar explicit footer 4px, stable Avatar, complete truncated user name, 16/8px and 180/120/80/60/recovery, 24px override and original collapse/reopen');
+
+await page.emulateMedia({reducedMotion:'reduce'});await page.mouse.move(0,0);
+for(const font of[16,8,20])for(const textScale of[.5,1,2]){
+ await page.evaluate(({font,textScale})=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--text-scale',String(textScale));},{font,textScale});
+ const boxes=await page.locator('[data-package-brand] .snowui-snow-ui-logo-wordmark').evaluateAll(nodes=>nodes.map(n=>{const r=n.getBoundingClientRect(),letters=[...n.querySelectorAll('.snowui-logo-letter > svg')].map(n=>n.getBoundingClientRect());return{height:r.height,font:parseFloat(getComputedStyle(n).fontSize),count:letters.length,inside:letters.every(b=>b.left>=r.left-.5&&b.right<=r.right+.5&&b.top>=r.top-.5&&b.bottom<=r.bottom+.5),paintHeight:Math.max(...letters.map(b=>b.height))};}));assert.equal(boxes.length,3);for(const box of boxes){assert.equal(box.count,6);assert.ok(box.inside,JSON.stringify(box));assert.ok(Math.abs(box.paintHeight-box.height)<.1,JSON.stringify(box));}
+}
+await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--text-scale');});
+console.log('PASS: tarball SnowUILogo text/horizontal/vertical canvases at root 16/8/20 and text-scale .5/1/2, proportional drawing, compact and exact glyph containment without changing body-text floors');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

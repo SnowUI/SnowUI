@@ -1,6 +1,6 @@
 /**
  * SnowUILogo.test.ts
- * v1.19.1
+ * v1.19.2
  */
 export const examples = [
   {
