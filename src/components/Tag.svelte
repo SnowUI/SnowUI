@@ -1,7 +1,7 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
-  Tag 组件：标签 v1.2.4
+  Tag 组件：标签 v1.2.5
 
   布局模型：内联外壳布局（与 Button 一致），不接入三槽位。
   - 子元素通过 gap 自然排列；外部覆盖 `--snowui-tag-gap`（或传 gap）即可同步影响所有子元素之间的间距，包括内置 X 与文字、外部 Icon 与文字。
@@ -114,10 +114,20 @@
         return Number.isFinite(parsed) ? parsed : fallback;
     }
 
+    function readLayoutBorderBox(style: CSSStyleDeclaration, axis: "width" | "height", fallback: number): number {
+        const length = parseFloat(style[axis]);
+        if (!Number.isFinite(length)) return fallback;
+        if (style.boxSizing !== "content-box") return length;
+        const edges = axis === "width" ? ["Left", "Right"] : ["Top", "Bottom"];
+        return length + edges.reduce((sum, edge) => sum
+            + readPixelValue(style.getPropertyValue(`padding-${edge.toLowerCase()}`), 0)
+            + readPixelValue(style.getPropertyValue(`border-${edge.toLowerCase()}-width`), 0), 0);
+    }
+
     function updateShapeMetrics(host: HTMLElement) {
         const style = getComputedStyle(host);
-        measuredWidth = host.offsetWidth;
-        measuredHeight = host.offsetHeight;
+        measuredWidth = readLayoutBorderBox(style, "width", host.offsetWidth);
+        measuredHeight = readLayoutBorderBox(style, "height", host.offsetHeight);
         measuredArrowWidth = readPixelValue(
             style.getPropertyValue("--snowui-tag-arrow-width"),
             8,

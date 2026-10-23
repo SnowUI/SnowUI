@@ -1,6 +1,7 @@
 <script lang="ts">
-import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip, Sidebar, Avatar, SnowUILogo} from '@snowui-design-system/components';
+import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip, Sidebar, Avatar, SnowUILogo, Tag, ScrollArea} from '@snowui-design-system/components';
 let calls=$state(0);
+let packageTagVisible=$state(true);
 let checkboxValues=$state<string[]>([]);
 let radioValue=$state<string|null|undefined>(null);
 let switchValue=$state(false);
@@ -101,4 +102,13 @@ let packagePanelDraft=$state('Package draft');
 <SnowUILogo data-package-brand variant="text" />
 <SnowUILogo data-package-brand variant="horizontal" scale={.5} />
 <SnowUILogo data-package-brand variant="vertical" compactProgress={.5} />
+</section>
+
+<section data-package-tag-group style="width:320px">
+<ScrollArea axis="horizontal" horizontalTrackPosition="viewport"><Frame singleLine gap={1} width="max-content" minWidth="100%">
+<Tag toggle>Package design label</Tag>
+<Tag shape="right-arrow" style="width:113.375px;height:21.375px">Path</Tag>
+{#if packageTagVisible}<Tag shape="left-arrow" closable onClose={()=>packageTagVisible=false} style="box-sizing:content-box;width:113.375px;height:21.375px;padding:3.25px 5.125px">Closable</Tag>{/if}
+</Frame></ScrollArea>
+<Button onclick={()=>packageTagVisible=true}>Reset package tags</Button>
 </section>

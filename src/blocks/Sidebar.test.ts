@@ -47,9 +47,9 @@ export const examples = [
             <SidebarItem id="social" label="Social media" icon="chat" />
         </SidebarSection>
         <SidebarSection id="tags" title="Tags">
-            <Frame row wrap class="gap-4">
+            <ScrollArea axis="horizontal" horizontalTrackPosition="viewport" style="max-width: 100%;"><Frame singleLine gap={1} width="max-content" minWidth="100%">
                 <Tag>Overview</Tag><Tag>Settings</Tag><Tag>Billing</Tag>
-            </Frame>
+            </Frame></ScrollArea>
         </SidebarSection>
     </Sidebar>
 </Frame>`,

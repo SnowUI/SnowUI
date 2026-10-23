@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.2.4
+> **版本**: v1.2.5
 > **职责**: 以可交互标签表达标记、筛选条件或路径片段，适合组织内容与收敛选择范围。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-20
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -28,14 +28,14 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { Tag, Button } from '@snowui-design-system/components';
+	import { Tag, Button, Frame, ScrollArea } from '@snowui-design-system/components';
 </script>
 
-<div style="display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: var(--gap-4) var(--gap-3);">
+<ScrollArea axis="horizontal" horizontalTrackPosition="viewport" style="max-width: 100%;"><Frame singleLine gap={3} width="max-content" minWidth="100%" class="justify-center">
 	<Tag toggle>Design</Tag>
 	<Tag toggle>Engineering</Tag>
 	<Tag toggle>Product</Tag>
-</div>
+</Frame></ScrollArea>
 ```
 <!-- /quick-start:generated -->
 
@@ -307,6 +307,12 @@
 ---
 
 ## 更新日志
+
+### v1.2.5 (2026-10-23)
+
+- 箭头画布保留宿主的小数布局宽高，避免整数取整令轮廓越出外壳并挤占相邻标签间距；父级transform不重复计入尺寸，箭头公式与Tag内部零间距不变。
+
+- 2026-10-23：现有标签集合示例复用Frame单行及ScrollArea局部横向滚动，标签之间保留至少4px；Tag内部零间距、箭头、关闭和切换行为不变，仅文档与调用方示例修订。
 
 ### v1.2.4 (2026-10-20)
 

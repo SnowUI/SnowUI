@@ -1,6 +1,6 @@
 /**
  * Tag.test.ts
- * v1.2.2
+ * v1.2.5
  *
  * 测试覆盖：Tag.md 定义的所有功能点
  */
@@ -10,7 +10,7 @@ export const examples = [
         name: "A1: 默认形态（仅文字 / 含 leading / 含 trailing / 含 X / 组合）",
         code: `A1
 <div class="flex-col gap-8">
-    <div class="flex-row gap-8 items-center">
+    <ScrollArea axis="horizontal" horizontalTrackPosition="viewport" style="max-width: 100%;"><Frame singleLine gap={2} width="max-content" minWidth="100%">
         <Tag>Label</Tag>
         <Tag>
             <Icon as="leading"><DotCircle Weight="fill" /></Icon>
@@ -30,7 +30,7 @@ export const examples = [
             Label
             <Icon as="trailing"><Check /></Icon>
         </Tag>
-    </div>
+    </Frame></ScrollArea>
     <div class="text-12 text-black-40">
         说明:边距按"靠近边的元素类型"自动调整 —— 文字距边 8px、Icon/X 距边 4px。组件通过 MutationObserver 检测真实首/末位节点（含文本节点），写入 data-edge-left / data-edge-right;closable 的 X 不计入末位检测，由 hover 状态另行收紧右 padding。
     </div>
@@ -46,24 +46,24 @@ export const examples = [
     {
         name: "B1: 激活态 — 文字、Icon、X 统一渲染为 Brand；aria-pressed=true",
         code: `B1
-<div class="flex-row gap-8 items-center">
+<ScrollArea axis="horizontal" horizontalTrackPosition="viewport" style="max-width: 100%;"><Frame singleLine gap={2} width="max-content" minWidth="100%">
     <Tag variant="active">Filtered</Tag>
     <Tag variant="active" closable>
         <Icon as="leading"><DotCircle Weight="fill" /></Icon>
         Filtered
     </Tag>
-</div>`,
+</Frame></ScrollArea>`,
     },
 
     // === C: 箭头形状 ===
     {
         name: "C1: 路径片段（左 / 右箭头壳）",
         code: `C1
-<div class="flex-row gap-8 items-center">
+<ScrollArea axis="horizontal" horizontalTrackPosition="viewport" style="max-width: 100%;"><Frame singleLine gap={2} width="max-content" minWidth="100%">
     <Tag shape="left-arrow">Settings</Tag>
     <Tag shape="right-arrow">Home</Tag>
     <Tag shape="right-arrow" closable>Filters</Tag>
-</div>`,
+</Frame></ScrollArea>`,
     },
 
     // === D: 外部 gap 覆盖 ===
@@ -82,7 +82,7 @@ export const examples = [
     {
         name: "E1: Toggle 写法 — aria-pressed 自动输出",
         code: `E1
-<div class="flex-row gap-8 items-center">
+<ScrollArea axis="horizontal" horizontalTrackPosition="viewport" style="max-width: 100%;"><Frame singleLine gap={2} width="max-content" minWidth="100%">
     <Tag toggle>Toggle me</Tag>
     <Tag toggle closable>
         <Icon as="leading"><DotCircle Weight="fill" /></Icon>
@@ -91,7 +91,7 @@ export const examples = [
     <Tag whileClick={false} Click={{ Idle: "Active", Active: "Idle" }}>
         Custom toggle
     </Tag>
-</div>`,
+</Frame></ScrollArea>`,
     },
     {
         name: "默认与英文内置名称",

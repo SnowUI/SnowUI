@@ -299,5 +299,18 @@ for(const font of[16,8,20])for(const textScale of[.5,1,2]){
 }
 await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--text-scale');});
 console.log('PASS: tarball SnowUILogo text/horizontal/vertical canvases at root 16/8/20 and text-scale .5/1/2, proportional drawing, compact and exact glyph containment without changing body-text floors');
+
+const packageTagGroup=page.locator('[data-package-tag-group]'),packageTags=packageTagGroup.locator('.snowui-tag');await page.emulateMedia({reducedMotion:'reduce'});await page.mouse.move(0,0);
+for(const font of[16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ for(const width of[320,180,120,80,320]){
+  await packageTagGroup.evaluate((n,width)=>n.style.width=`${width}px`,width);
+  const q=await packageTags.evaluateAll(nodes=>{const r=nodes.map(n=>(n.querySelector('.snowui-tag-arrow-shape')??n).getBoundingClientRect()).sort((a,b)=>a.left-b.left);return{sameRow:r.every(b=>Math.abs(b.top+b.bottom-r[0].top-r[0].bottom)<1),gaps:r.slice(1).map((b,i)=>b.left-r[i].right),internal:nodes.map(n=>parseFloat(getComputedStyle(n).columnGap))};});assert.ok(q.sameRow&&q.gaps.every(g=>g>=3.99)&&q.internal.every(g=>g===0),JSON.stringify(q));
+  for(let i=0;i<3;i++){await packageTags.nth(i).scrollIntoViewIfNeeded();}
+ }
+}
+const toggled=packageTags.first();await toggled.scrollIntoViewIfNeeded();await toggled.click();assert.equal(await toggled.getAttribute('aria-pressed'),'true');await toggled.click();assert.equal(await toggled.getAttribute('aria-pressed'),'false');const closed=packageTags.last();await closed.scrollIntoViewIfNeeded();await closed.hover();await closed.getByRole('button',{name:'关闭标签',exact:true}).click();assert.equal(await packageTags.count(),2);await packageTagGroup.getByRole('button',{name:'Reset package tags',exact:true}).click();assert.equal(await packageTags.count(),3);
+await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball Tag groups keep 4px outside and zero inside, exact fractional arrow canvases including content-box, horizontal narrow/recovery, toggle, close and reset');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

@@ -204,6 +204,8 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 ## 更新日志
 
+- 2026-10-23：既有Tags集合Test复用Frame单行与ScrollArea局部横向滚动，外部标签间距至少4px；不改Sidebar运行行为或Tag内部间距。
+
 ### v1.9.5 (2026-10-23)
 - 显式singleLine的Footer内容组合保留4 CSS px横向间距，保留较大公开覆盖；普通Footer布局、默认Logo图形及折叠／滚动渐隐不变。
 - 自定义品牌名与底部头像姓名示例复用Frame单行和Text全文缩略，沿用既有logo-icon／leading角色。
