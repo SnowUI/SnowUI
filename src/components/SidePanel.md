@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.4.2
+> **版本**: v1.4.3
 > **职责**: 从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-20
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -80,7 +80,7 @@
 				style={panelPlacement === 'inline' ? 'height: 100%;' : undefined}
 			>
 				<Frame column gap={4} style="min-width: 0; width: 100%;">
-					<Frame row><Text size={20} weight={600}>{activeComponent.name}</Text><Badge as="trailing" count={activeComponent.category} color={activeComponent.category === 'Composite' ? 'Indigo' : 'Blue'} /></Frame>
+					<Frame singleLine><Text lines={1} size={20} weight={600}>{activeComponent.name}</Text><Badge as="trailing" count={activeComponent.category} color={activeComponent.category === 'Composite' ? 'Indigo' : 'Blue'} /></Frame>
 					<Text style="color: var(--black-40);">{activeComponent.description}</Text>
 					<Input value={activeComponent.packageName} aria-label="Package name" />
 					<Textarea value={activeComponent.notes} aria-label="Release note" style="height: 8rem;" />
@@ -454,6 +454,11 @@ function download() { /* 接入业务下载 */ }
 | `onClick` | 自定义回调 |
 
 ## 更新日志
+
+### v1.4.3 (2026-10-23)
+
+- 内置标题与关闭操作的有效间距在根字号／gap缩放后保持至少4 CSS px，保留更大公开覆盖；工具栏结构、标题全文名称和面板交互不变。
+- 显式名称／分类标题与Demo明细使用既有Frame单行、Text全文缩略；复杂姓名／邮箱保留两行信息结构。
 
 ### v1.4.2 (2026-10-20)
 

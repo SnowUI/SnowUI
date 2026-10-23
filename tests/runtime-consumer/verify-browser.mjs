@@ -241,5 +241,20 @@ assert.deepEqual(packageMinus,{viewBox:'0 0 32 32',box:[4,15,24,2]});
 await packageAccordionTitle.click();await page.waitForFunction(()=>document.querySelector('[data-testid="package-accordion-state"]')?.textContent==='/1');await packageAccordionTitle.press('Enter');await page.waitForFunction(()=>document.querySelector('[data-testid="package-accordion-state"]')?.textContent==='0/2');await packageAccordion.locator('.snowui-accordion-content').first().click({position:{x:4,y:4}});assert.equal(await packageAccordionTitle.getAttribute('aria-expanded'),'true');assert.equal(await page.getByTestId('package-accordion-state').textContent(),'0/2');
 await page.evaluate(()=>document.documentElement.style.fontSize='16px');
 console.log('PASS: tarball Accordion built-in title Text part, explicit ownership, 16/8px and 320/180/120/recovery, complete names, 4px/12px layout floors, original plus/minus geometry, binding callbacks and prose click isolation');
+
+await page.locator('#package-show-side-panel').click();
+const packagePanel=page.getByRole('dialog',{name:'Complete package panel installation and delivery settings',exact:true});await packagePanel.waitFor();
+for(const font of [16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ await page.waitForFunction(()=>{const group=document.querySelector('.package-side-panel .snowui-side-panel-title-group'),title=group.querySelector('.snowui-side-panel-title').getBoundingClientRect(),close=group.querySelector('.snowui-side-panel-close').getBoundingClientRect();return close.left-title.right>=4&&close.width>=12&&title.width>0&&Math.abs(title.top+title.bottom-close.top-close.bottom)<1;});
+}
+await packagePanel.evaluate(n=>n.style.setProperty('--snowui-side-panel-toolbar-gap','24px'));
+assert.equal(await packagePanel.locator('.snowui-side-panel-title-group').evaluate(n=>{const a=n.querySelector('.snowui-side-panel-title').getBoundingClientRect(),b=n.querySelector('.snowui-side-panel-close').getBoundingClientRect();return b.left-a.right;}),24);
+await packagePanel.evaluate(n=>n.style.removeProperty('--snowui-side-panel-toolbar-gap'));
+const packagePanelDraft=packagePanel.getByRole('textbox',{name:'Package panel draft',exact:true});await packagePanelDraft.fill('Unsaved tarball panel draft');const packagePanelNode=await packagePanel.elementHandle();
+await packagePanel.locator('.snowui-side-panel-toolbar-top .snowui-side-panel-toolbar-group .snowui-button').first().click();await page.waitForFunction(()=>document.querySelector('.package-side-panel')?.dataset.placement==='inline');assert.equal(await packagePanelDraft.inputValue(),'Unsaved tarball panel draft');assert.equal(await packagePanel.evaluate((n,prior)=>n===prior,packagePanelNode),true);
+await packagePanel.locator('.snowui-side-panel-toolbar-top .snowui-side-panel-toolbar-group .snowui-button').first().click();await page.waitForFunction(()=>document.querySelector('.package-side-panel')?.dataset.placement==='floating');assert.equal(await packagePanelDraft.inputValue(),'Unsaved tarball panel draft');await packagePanel.locator('.snowui-side-panel-close').click();await packagePanel.waitFor({state:'detached'});
+await page.evaluate(()=>{document.documentElement.style.fontSize='16px';document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball SidePanel title/close 4px and 12px at 16/8px, larger 24px override, complete panel name, stable portal identity and unsaved draft across placement and close');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

@@ -1,5 +1,5 @@
 <script lang="ts">
-import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem} from '@snowui-design-system/components';
+import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel} from '@snowui-design-system/components';
 let calls=$state(0);
 let checkboxValues=$state<string[]>([]);
 let radioValue=$state<string|null|undefined>(null);
@@ -8,6 +8,8 @@ let captionCalls=$state(0);
 let fieldActionCalls=$state(0);
 let accordionValue=$state<string|string[]|undefined>('0');
 let accordionChangeCalls=$state(0);
+let packagePanelOpen=$state(false);
+let packagePanelDraft=$state('Package draft');
 </script>
 {#snippet graphic()}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" aria-hidden="true"><path d="m3 10 4 4 10-10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
@@ -77,4 +79,9 @@ let accordionChangeCalls=$state(0);
 <AccordionItem value="explicit"><Frame as="title" singleLine><Icon as="leading" size={20}>{@render graphic()}</Icon><Text lines={1}>Complete explicit package section title</Text></Frame><Frame as="content" row>Explicit package prose remains independent.</Frame></AccordionItem>
 </Accordion>
 <Accordion class="package-minus-accordion" indicatorVariant="minus" defaultValue="0" style="width:260px" items={[{title:'Package legacy minus mode',content:'Legacy expansion mode remains available.'}]}/>
+</section>
+
+<section aria-label="Package SidePanel owner">
+<Button id="package-show-side-panel" onclick={()=>packagePanelOpen=true}>Package panel</Button>
+<SidePanel class="package-side-panel" bind:open={packagePanelOpen} showTitle closeOnOutside={false} title="Complete package panel installation and delivery settings" width={320}><Input aria-label="Package panel draft" bind:value={packagePanelDraft}/></SidePanel>
 </section>

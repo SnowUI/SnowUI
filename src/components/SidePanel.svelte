@@ -694,7 +694,7 @@
         align-items: center;
         max-width: 50%;
         min-width: 0;
-        gap: var(--snowui-side-panel-toolbar-gap);
+        gap: max(4px, var(--snowui-side-panel-toolbar-gap));
         flex: 0 1 auto;
     }
 
