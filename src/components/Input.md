@@ -517,7 +517,9 @@ Input 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 或复杂槽位�
 | 仅 trailing | `1fr auto` | — | 2 |
 | leading + trailing | `auto 1fr auto` | 1 | 3 |
 
-复杂结构应使用 `Frame as="leading" row` / `Frame as="trailing" row` 包裹，作为一个整体槽位参与布局；内部 gap 默认沿用 Input gap。
+图形与短标签并排时使用 `Frame as="leading" singleLine` / `Frame as="trailing" singleLine`，标签使用 `Text lines={1}`；附件内部由 Frame 保持单行和至少 4 CSS px 间距，Input 只管理整个附件槽位。复杂多行内容按自身结构显式组合。
+
+复杂附件需要为可编辑／可选内容保留宽度；下例显式设置最小240 CSS px，并用ScrollArea在更窄容器中局部横向滚动。
 
 用法示例：
 ```svelte
@@ -533,16 +535,18 @@ Input 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 或复杂槽位�
 </Input>
 
 <!-- 复杂 leading + trailing -->
-<Input as="segment">
-    <Frame as="leading" row>
-        <Icon><Search /></Icon>
-        <span>Filter</span>
+<ScrollArea axis="horizontal" ariaLabel="Input with attachments" width="100%">
+<Input minWidth={240} as="segment">
+    <Frame as="leading" singleLine>
+        <Icon as="leading"><Search /></Icon>
+        <Text lines={1}>Filter</Text>
     </Frame>
-    <Frame as="trailing" row>
-        <span class="text-black-40">Ctrl K</span>
-        <Icon><XCircle /></Icon>
+    <Frame as="trailing" singleLine>
+        <Text class="text-black-40" lines={1}>Ctrl K</Text>
+        <Icon as="trailing"><XCircle /></Icon>
     </Frame>
 </Input>
+</ScrollArea>
 ```
 
 ### 8. type="number" 步进器规范
@@ -629,6 +633,8 @@ invalid=true + !hasCustomTrailing
 - **Input 组件**: [./Input.svelte](Input.svelte)
 
 ## 更新日志
+
+- 2026-10-23：复杂附件中的图形／短标签示例复用Frame单行与Text全文缩略；仅文档修订，宿主、清除和选择协议保持。
 
 ### v1.2.0 (2026-10-23)
 

@@ -5,7 +5,7 @@
 > **版本**: v3.3.0
 > **职责**: 在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-20
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -121,11 +121,13 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 
 ### 显式内容与默认槽位
 
-- 直系 `Frame as="leading" row` / `Frame as="trailing" row` 支持复杂结构。
+- 直系 `Frame as="leading"` / `Frame as="trailing"` 支持复杂结构；图形与短标签并排时使用 `singleLine` 和 `Text lines={1}`，内部单行与最小间距由附件 Frame 管理。
 - Select 根布局为 `leading: auto`、`trigger: minmax(0, 1fr)`、`trailing: auto`。
 - 存在自定义直系 `as="trailing"` 时，默认 indicator 隐藏，由自定义 trailing 替换末位槽。
 
 ### 槽位组合边界
+
+复杂附件需要为可编辑／可选内容保留宽度；下例显式设置最小240 CSS px，并用ScrollArea在更窄容器中局部横向滚动。
 
 - 支持直系复杂 `leading` / `trailing` 槽位。
 - 自定义 trailing 替换默认 indicator。
@@ -258,20 +260,22 @@ Select 的根布局固定按 Leading / Trigger / Trailing 三段组织：
 </Select>
 
 <!-- 复杂 leading / trailing；自定义 trailing 替换默认箭头 -->
-<Select placeholder="Tags">
-  <Frame as="leading" row>
-    <Icon icon={Resource.Tag} />
-    <span>Tags</span>
+<ScrollArea axis="horizontal" ariaLabel="Select with attachments" width="100%">
+<Select minWidth={240} placeholder="Tags">
+  <Frame as="leading" singleLine>
+    <Icon as="leading" icon={Resource.Tag} />
+    <Text lines={1}>Tags</Text>
   </Frame>
-  <Frame as="trailing" row>
-    <span class="text-black-40">Multi-Select</span>
-    <Icon icon={Resource.CaretRight} class="text-black-20" />
+  <Frame as="trailing" singleLine>
+    <Text class="text-black-40" lines={1}>Multi-Select</Text>
+    <Icon as="trailing" icon={Resource.CaretRight} class="text-black-20" />
   </Frame>
   <Listbox>
-    <MenuItem value="design">Design</MenuItem>
-    <MenuItem value="code">Code</MenuItem>
+    <MenuItem as="item" value="design">Design</MenuItem>
+    <MenuItem as="item" value="code">Code</MenuItem>
   </Listbox>
 </Select>
+</ScrollArea>
 ```
 
 <a id="与通用逻辑的关系"></a>
@@ -574,6 +578,8 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 ---
 
 ## 更新日志
+
+- 2026-10-23：复杂附件中的图形／短标签示例复用Frame单行与Text全文缩略；仅文档修订，宿主、清除和选择协议保持。
 
 ### v3.3.0 (2026-10-23)
 
