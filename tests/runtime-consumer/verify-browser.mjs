@@ -381,5 +381,22 @@ for(const font of[16,8])for(const override of['0px','24px']){
 assert.equal(await page.getByTestId('package-gap-action-selected').textContent(),'archive:menu;'.repeat(4));await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
 console.log('PASS: tarball OverflowActions 4px group floor and larger override at 16/8px, real 80px overflow, open-menu freeze, full recovery and exactly-once menu actions');
 
+
+const packageSliderWidth=page.locator('[data-package-slider-width]');
+for(const font of[16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ for(const width of[320,180,120,80,320]){
+  await packageSliderWidth.evaluate((n,w)=>n.style.width=`${w}px`,width);
+  for(const root of await page.locator('.package-gap-slider,.package-gap-range-slider').all()){
+   const q=await root.evaluate(n=>{const t=n.querySelector('.snowui-slider-title').getBoundingClientRect(),v=n.querySelector('.snowui-slider-labels').getBoundingClientRect();return getComputedStyle(n).direction==='rtl'?t.left-v.right:v.left-t.right;});assert.ok(q>=4,String(q));
+   assert.equal(await root.locator('.snowui-slider-labels .snowui-text-single-line-visible').textContent(),await root.evaluate(n=>n.classList.contains('package-gap-range-slider')?'85%–100%':'65%'));
+  }
+  if(width===80){const title=page.locator('.package-gap-slider .snowui-slider-title').first();await page.waitForFunction(()=>document.querySelector('.package-gap-slider .snowui-slider-title')?.dataset.truncated==='true');await title.scrollIntoViewIfNeeded();await title.hover();await page.getByRole('tooltip').filter({hasText:'Complete notification volume setting'}).waitFor();await page.mouse.move(900,10);}
+ }
+}
+assert.equal(await page.locator('.package-gap-slider .package-owned-slider-text').count(),8);assert.equal(await page.locator('.package-explicit-slider .package-owned-slider-text').count(),1);assert.ok(!(await page.locator('.package-explicit-label').getAttribute('class')).includes('package-owned-slider-text'));
+const packageSliderInput=page.getByRole('slider',{name:'Package solid ltr volume',exact:true});await packageSliderInput.press('End');assert.equal(await packageSliderInput.inputValue(),'100');await page.waitForFunction(()=>document.querySelector('.package-gap-slider .snowui-slider-labels .snowui-text-single-line-visible')?.textContent==='100%');await page.getByRole('slider',{name:'Package business volume',exact:true}).press('End');assert.equal((await page.locator('.package-explicit-label').textContent()).trim(),'Business label');await page.getByRole('slider',{name:'Package ordinary value',exact:true}).press('ArrowRight');await page.waitForFunction(()=>document.querySelector('.package-ordinary-slider .snowui-text-single-line-visible')?.textContent==='13');
+await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball Slider horizontal title/value budgets at 16/8px, LTR/RTL, single/range narrow/recovery, complete title tooltip, unified owned Text and explicit-label isolation, native values and ordinary slider');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

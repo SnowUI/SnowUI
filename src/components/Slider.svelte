@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Slider 滑动输入组件
-  v1.4.3
+  v1.4.4
 
   文档: ./Slider.md
 -->
@@ -10,12 +10,12 @@
 <script lang="ts">
     import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import type { Snippet } from "svelte";
+    import type { Snippet, ComponentProps } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Text from "./Text.svelte";
     import {resolveSnowUIColor, type SnowUIColor} from "../lib/color";
     import {splitFrameHostProps} from "../logic/frame-prop-filter";
-    import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    import { mergeComponentPartProps, type ComponentPartsOf } from "../logic/component-parts.svelte";
     import {GENERIC_DISAPPEAR_MOTION, GENERIC_SCALE_APPEAR_MOTION} from "../motion/presets/generic";
     import {motionMsVar} from "../motion/presets/utils";
     import {MOTION_DURATION_STANDARD_APPEAR_MS, MOTION_DURATION_STANDARD_DISAPPEAR_MS, MOTION_EASING_STANDARD} from "../motion/tokens";
@@ -81,6 +81,7 @@
     }: Props = $props();
 
     const resolvedTitle = $derived(title ?? localeContext.t("slider.title"));
+    const titleTextProps = $derived(mergeComponentPartProps<ComponentProps<typeof Text>>(parts?.Text, { class: "snowui-slider-title" }));
 
     let controlRef = $state<HTMLElement>();
     let labelsRef = $state<HTMLElement>();
@@ -203,7 +204,7 @@
     );
 
     $effect(() => {
-        if (!labelsRef) return;
+        if (!children || !labelsRef) return;
         const labels = Array.from(labelsRef.children) as HTMLElement[];
         labels.forEach((label, index) => {
             if (
@@ -333,7 +334,7 @@
         onpointercancel={handlePointerUp}
     >
         {#if isBarVariant && resolvedTitle}
-            <Text class="snowui-slider-title">{resolvedTitle}</Text>
+            <Text lines={1} {...titleTextProps}>{resolvedTitle}</Text>
         {/if}
 
         {#if children || showLabel}
@@ -342,7 +343,11 @@
                     {@render children()}
                 {:else}
                     {#each (combinedRangeLabel ? [resolvedValues[0]] : resolvedValues) as _, index (`label-${index}`)}
-                        <Text {...parts?.Text} as="label" />
+                        <Text lines={1} {...parts?.Text} as="label">{combinedRangeLabel
+                            ? resolvedValues.map(item => `${Math.round(toPercent(item))}%`).join("–")
+                            : isBarVariant
+                                ? `${Math.round(toPercent(resolvedValues[index] ?? minValue))}%`
+                                : String(resolvedValues[index] ?? minValue)}</Text>
                     {/each}
                 {/if}
             </div>
@@ -445,6 +450,12 @@
     }
 
     :global(:where(.snowui-slider-bar[data-orientation="horizontal"] .snowui-slider-control)) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
+        column-gap: max(4px, var(--gap-1));
+        box-sizing: border-box;
+        padding-inline: var(--padding-2);
+        container-type: inline-size;
         height: 100%;
         min-height: 0;
     }
@@ -690,8 +701,13 @@
     }
 
     :global(:where(.snowui-slider-bar[data-orientation="horizontal"] .snowui-slider-labels)) {
-        inset: 0;
+        position: relative;
+        inset: auto;
+        grid-column: 2;
+        grid-row: 1;
         z-index: 3;
+        display: flex;
+        justify-content: flex-end;
         min-width: 0;
         overflow: hidden;
     }
@@ -717,15 +733,17 @@
     }
 
     :global(:where(.snowui-slider-bar[data-orientation="horizontal"]) .snowui-slider-labels > *) {
-        position: absolute;
-        inset: 0;
+        position: relative;
+        inset: auto;
         box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        width: 100%;
+        width: max-content;
+        min-width: 0;
+        max-width: 100%;
         height: 100%;
-        padding-inline: var(--padding-2);
+        padding-inline: 0;
         overflow: hidden;
         opacity: 0.4;
         color: transparent;
@@ -843,6 +861,43 @@
                 var(--snowui-slider-end, 0%),
             var(--black-100, #000000) var(--snowui-slider-end, 0%) 100%
         );
+    }
+
+    :global(:where(.snowui-slider-bar[data-orientation="horizontal"]) .snowui-slider-title) {
+        display: flex;
+        position: relative;
+        inset: auto;
+        grid-column: 1;
+        grid-row: 1;
+        pointer-events: auto;
+        padding-inline: 0;
+        min-width: 0;
+    }
+    :global(:where(.snowui-slider-bar[data-orientation="horizontal"]) .snowui-slider-title),
+    :global(:where(.snowui-slider-bar[data-orientation="horizontal"]) .snowui-slider-labels > *) {
+        background-size: calc(100cqw + var(--padding-2) * 2) 100%;
+        background-repeat: no-repeat;
+        background-position: left calc(-1 * var(--padding-2)) center;
+    }
+    :global(:where(.snowui-slider-bar[data-orientation="horizontal"]) .snowui-slider-labels > *) {
+        background-position: right calc(-1 * var(--padding-2)) center;
+    }
+    :global(:where(.snowui-slider-bar[data-orientation="horizontal"]:dir(rtl)) .snowui-slider-title) {
+        background-position: right calc(-1 * var(--padding-2)) center;
+    }
+    :global(:where(.snowui-slider-bar[data-orientation="horizontal"]:dir(rtl)) .snowui-slider-labels > *) {
+        background-position: left calc(-1 * var(--padding-2)) center;
+    }
+
+    @supports not (width: 1cqw) {
+        :global(:where(.snowui-slider-bar[data-orientation="horizontal"]) .snowui-slider-title),
+        :global(:where(.snowui-slider-bar[data-orientation="horizontal"]) .snowui-slider-labels > *) {
+            background-image: none;
+            background-color: var(--background-1, #ffffff);
+            background-clip: border-box;
+            -webkit-background-clip: border-box;
+            -webkit-text-fill-color: var(--black-100, #000000);
+        }
     }
 
     :global(:where(.snowui-slider-bar:not([data-disabled="true"]):hover) .snowui-slider-labels > *),

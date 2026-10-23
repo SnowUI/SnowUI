@@ -58,7 +58,7 @@ export const examples = [
   <Slider value={100} variant="solid" title="Text" showLabel aria-label="一百百分比" />
 </div>`,
         expected: {
-            render: "默认 32px 高、8px 圆角；内置标题位于左侧，showLabel 生成的百分比 label 位于右侧，填充的左右两端均为圆角。",
+            render: "默认 32px 高、8px 圆角；内置标题与showLabel百分比label分配独立单行预算，至少4 CSS px间隔，长标题可悬停查看全文；填充的左右两端均为圆角。",
             interaction: "数值 label 使用 100% 基色与独立 opacity：常态 40%，hover、focus 与拖动时 80%；填充边缘内侧 4px 的全圆角 Static White/100% 指示器以中心点为基准渐显、短变长、细变粗，退出时反向消失。",
         },
         logic: ["variant", "title", "showLabel", "solid", "indicator-motion", "percentage"],
