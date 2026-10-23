@@ -1,6 +1,6 @@
 /**
  * AccordionItem.test.ts
- * v1.3.1
+ * v1.3.3
  *
  * AccordionItem 需要放在 Accordion 内使用，本文件提供设计稿形态的最小组合验证。
  */
@@ -10,17 +10,17 @@ export const examples = [
         code: `A1
 <Accordion defaultValue="shipping" style="width: min(100%, 32rem);">
     <AccordionItem value="order">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.FourLeafClover /></Icon>
-            如何提交订单？
+            <Text lines={1}>如何提交订单？</Text>
         </Frame>
         <Frame as="content" row>订单提交后会进入确认流程。</Frame>
     </AccordionItem>
 
     <AccordionItem value="shipping">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.WinkingFace /></Icon>
-            可以修改配送信息吗？
+            <Text lines={1}>可以修改配送信息吗？</Text>
         </Frame>
         <Frame as="content" row>可以在发货前修改地址、联系人与备注信息。</Frame>
     </AccordionItem>
@@ -39,17 +39,17 @@ export const examples = [
         code: `B1
 <Accordion variant="filled" defaultValue="payment" style="width: min(100%, 32rem);">
     <AccordionItem value="payment">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.Star /></Icon>
-            支持哪些付款方式？
+            <Text lines={1}>支持哪些付款方式？</Text>
         </Frame>
         <Frame as="content" row>支持银行卡、账户余额与企业付款。</Frame>
     </AccordionItem>
 
     <AccordionItem value="invoice" disabled>
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.CreditCard /></Icon>
-            发票信息
+            <Text lines={1}>发票信息</Text>
         </Frame>
         <Frame as="content" row>禁用项不会响应展开与收起。</Frame>
     </AccordionItem>

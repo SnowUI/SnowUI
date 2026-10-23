@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   AccordionItem 组件：Accordion 内部单个折叠项容器
-  v1.3.2
+  v1.3.3
 
   外层 AccordionItem 负责一整项的背景、圆角、分隔线与展开高度。
   内部通过直系 Frame as="title" / Frame as="content" 承载标题与内容三槽位布局。
@@ -295,10 +295,10 @@
                 var(--snowui-accordion-padding-x)
             );
         align-items: center;
-        gap: var(
+        gap: max(4px, var(
             --snowui-accordion-trigger-gap-override,
             var(--snowui-accordion-trigger-gap)
-        );
+        ));
         font: inherit;
         font-size: var(
             --snowui-accordion-font-size-override,
@@ -328,14 +328,14 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: var(
+        width: max(12px, var(
             --snowui-accordion-icon-size-override,
             var(--snowui-accordion-icon-size)
-        );
-        height: var(
+        ));
+        height: max(12px, var(
             --snowui-accordion-icon-size-override,
             var(--snowui-accordion-icon-size)
-        );
+        ));
         color: var(--black-100, #000000ff);
         opacity: var(--snowui-state-opacity, 0.4);
         transform: rotate(0deg);

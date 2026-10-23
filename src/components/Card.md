@@ -32,9 +32,9 @@
 
 <div style="display: flex; justify-content: center; width: 100%;">
 	<Card style="background-color: var(--background-1);" padding={4} radius={5} width={286} height={84}>
-		<Frame row>
-			<Text style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">Component views</Text>
-			<Text as="trailing" style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">+11.01%</Text>
+		<Frame singleLine>
+			<Text lines={1} style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">Component views</Text>
+			<Text lines={1} as="trailing" style="font-size: var(--text-14); line-height: var(--leading-14); color: var(--black-100);">+11.01%</Text>
 		</Frame>
 		<Text style="font-size: var(--text-18); line-height: var(--leading-18); font-weight: 600; color: var(--black-100);">7,265</Text>
 	</Card>

@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.3.2
+> **版本**: v1.3.3
 > **职责**: 定义 Accordion 中的一项折叠内容，将标题与正文组合起来，并随父级统一管理展开状态。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -33,13 +33,13 @@
 
 <Accordion defaultValue="installation" style="width: min(100%, 36rem);">
 	<AccordionItem value="installation">
-		<Frame as="title" row><Icon as="leading"><Package /></Icon>Install the component package</Frame>
+		<Frame as="title" singleLine><Icon as="leading"><Package /></Icon><Text lines={1}>Install the component package</Text></Frame>
 		<Frame as="content" column><Text>Add Components and Resource packages with your package manager.</Text><Link variant="arrow" href="/components/quick-start">Open Quick Start</Link></Frame>
 	</AccordionItem>
-	<AccordionItem value="catalog"><Frame as="title" row><Icon as="leading"><BookOpen /></Icon>Explore the component catalog</Frame><Frame as="content" row>Review live previews, public APIs, and copy-ready examples for every component.</Frame></AccordionItem>
-	<AccordionItem value="themes"><Frame as="title" row><Icon as="leading"><Palette /></Icon>Apply a SnowUI theme</Frame><Frame as="content" row>Use the shared semantic color contract across light and dark interfaces.</Frame></AccordionItem>
-	<AccordionItem value="compose"><Frame as="title" row><Icon as="leading"><Code /></Icon>Compose title and content slots</Frame><Frame as="content" row>Build each item with title and content Frames, including optional leading or trailing content.</Frame></AccordionItem>
-	<AccordionItem value="quality"><Frame as="title" row><Icon as="leading"><ShieldCheck /></Icon>Verify interaction quality</Frame><Frame as="content" row>Confirm keyboard control, focus state, motion, and responsive layout in the browser.</Frame></AccordionItem>
+	<AccordionItem value="catalog"><Frame as="title" singleLine><Icon as="leading"><BookOpen /></Icon><Text lines={1}>Explore the component catalog</Text></Frame><Frame as="content" row>Review live previews, public APIs, and copy-ready examples for every component.</Frame></AccordionItem>
+	<AccordionItem value="themes"><Frame as="title" singleLine><Icon as="leading"><Palette /></Icon><Text lines={1}>Apply a SnowUI theme</Text></Frame><Frame as="content" row>Use the shared semantic color contract across light and dark interfaces.</Frame></AccordionItem>
+	<AccordionItem value="compose"><Frame as="title" singleLine><Icon as="leading"><Code /></Icon><Text lines={1}>Compose title and content slots</Text></Frame><Frame as="content" row>Build each item with title and content Frames, including optional leading or trailing content.</Frame></AccordionItem>
+	<AccordionItem value="quality"><Frame as="title" singleLine><Icon as="leading"><ShieldCheck /></Icon><Text lines={1}>Verify interaction quality</Text></Frame><Frame as="content" row>Confirm keyboard control, focus state, motion, and responsive layout in the browser.</Frame></AccordionItem>
 </Accordion>
 ```
 <!-- /quick-start:generated -->
@@ -97,8 +97,8 @@
 ```svelte
 <Accordion defaultValue="profile">
     <AccordionItem value="profile">
-        <Frame as="title" row>
-            Profile
+        <Frame as="title" singleLine>
+            <Text lines={1}>Profile</Text>
             <Icon as="trailing"><Resource.Plus /></Icon>
         </Frame>
         <Frame as="content" row>Profile content</Frame>
@@ -156,6 +156,11 @@ AccordionItem 必须放在 [Accordion.svelte](Accordion.svelte) 内使用，通�
 ---
 
 ## 更新日志
+
+### v1.3.3 (2026-10-23)
+
+- 标题内部间距在根字号／gap缩放后仍至少4 CSS px，保留更大公开覆盖值；默认指示器宿主至少12px，与其既有图标下限一致，避免外框过小。图形、比例、切换状态与正文间距保持。
+- 显式标题示例使用Frame单行组合与Text单行全文能力；展开正文继续原有换行。
 
 - 2026-09-28：只有标题可切换；移除 hover 背景；默认图标不换形，只旋转为 ×，旧 minus 模式仍可选。正文默认字号与标题一致。
 

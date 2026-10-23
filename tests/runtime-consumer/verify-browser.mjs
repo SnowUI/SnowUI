@@ -215,5 +215,31 @@ for(const reducedMotion of ['no-preference','reduce']) {
  assert.equal(await page.getByText(/^Package revision /).count(),0);
 }
 console.log('PASS: tarball Pagination 8 lifecycle combinations / 24 teardown-remount cycles; Toast 6 positions / 2 motion modes, exit cleanup, next enqueue, push-out and exact dismissal callbacks');
+// 仅使用真实tarball和随包默认图标；不从资源包或兄弟源码补入实现。
+assert.ok(html.includes('Package accordion body remains ordinary prose'));
+const packageAccordion=page.locator('.package-builtin-accordion');
+const packageAccordionTitle=packageAccordion.getByRole('button',{name:'Complete package accordion installation and delivery settings',exact:true});
+await packageAccordionTitle.waitFor();
+assert.equal(await packageAccordion.locator('.snowui-accordion-title-item > .package-accordion-label').count(),2);
+assert.equal(await page.locator('.package-explicit-accordion .package-accordion-must-not-leak').count(),0);
+for(const font of [16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ for(const width of [320,180,120,320]){
+  await page.locator('.package-builtin-accordion, .package-explicit-accordion, .package-minus-accordion').evaluateAll((nodes,width)=>nodes.forEach(n=>n.style.width=`${width}px`),width);
+  await page.waitForFunction(()=>[...document.querySelectorAll('.package-builtin-accordion .snowui-accordion-title-item, .package-explicit-accordion .snowui-accordion-title-item, .package-minus-accordion .snowui-accordion-title-item')].every(title=>{
+   const rects=[...title.children].filter(n=>!['STYLE','SCRIPT'].includes(n.tagName)&&getComputedStyle(n).position!=='absolute').map(n=>{const r=n.getBoundingClientRect();if(!n.classList.contains('snowui-accordion-default-indicator'))return r;const c=getComputedStyle(n),w=parseFloat(c.width),h=parseFloat(c.height),x=(r.left+r.right)/2,y=(r.top+r.bottom)/2;return{left:x-w/2,right:x+w/2,top:y-h/2,bottom:y+h/2,width:w,height:h};}).filter(r=>r.width>0&&r.height>0).sort((a,b)=>a.left-b.left);
+   const text=title.querySelector(':scope > .snowui-text'),indicator=getComputedStyle(title.querySelector('.snowui-accordion-default-indicator'));
+   return rects.length>=2&&rects.slice(1).every((r,i)=>r.left-rects[i].right>=4)&&rects.every(r=>Math.abs(r.top+r.bottom-rects[0].top-rects[0].bottom)<1)&&parseFloat(indicator.width)>=12&&parseFloat(indicator.height)>=12&&text.getBoundingClientRect().height<=parseFloat(getComputedStyle(text).lineHeight)+.5;
+  }));
+  assert.equal(await packageAccordionTitle.getAttribute('aria-expanded'),'true');
+ }
+}
+const packagePlus=await packageAccordion.locator('.snowui-accordion-default-indicator svg').first().evaluate(n=>{const box=n.getBBox();return {viewBox:n.getAttribute('viewBox'),box:[box.x,box.y,box.width,box.height]};});
+assert.deepEqual(packagePlus,{viewBox:'0 0 32 32',box:[4,4,24,24]});
+const packageMinus=await page.locator('.package-minus-accordion .snowui-accordion-default-indicator svg').evaluate(n=>{const box=n.getBBox();return {viewBox:n.getAttribute('viewBox'),box:[box.x,box.y,box.width,box.height]};});
+assert.deepEqual(packageMinus,{viewBox:'0 0 32 32',box:[4,15,24,2]});
+await packageAccordionTitle.click();await page.waitForFunction(()=>document.querySelector('[data-testid="package-accordion-state"]')?.textContent==='/1');await packageAccordionTitle.press('Enter');await page.waitForFunction(()=>document.querySelector('[data-testid="package-accordion-state"]')?.textContent==='0/2');await packageAccordion.locator('.snowui-accordion-content').first().click({position:{x:4,y:4}});assert.equal(await packageAccordionTitle.getAttribute('aria-expanded'),'true');assert.equal(await page.getByTestId('package-accordion-state').textContent(),'0/2');
+await page.evaluate(()=>document.documentElement.style.fontSize='16px');
+console.log('PASS: tarball Accordion built-in title Text part, explicit ownership, 16/8px and 320/180/120/recovery, complete names, 4px/12px layout floors, original plus/minus geometry, binding callbacks and prose click isolation');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

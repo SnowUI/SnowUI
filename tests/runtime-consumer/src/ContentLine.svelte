@@ -1,11 +1,13 @@
 <script lang="ts">
-import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge} from '@snowui-design-system/components';
+import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem} from '@snowui-design-system/components';
 let calls=$state(0);
 let checkboxValues=$state<string[]>([]);
 let radioValue=$state<string|null|undefined>(null);
 let switchValue=$state(false);
 let captionCalls=$state(0);
 let fieldActionCalls=$state(0);
+let accordionValue=$state<string|string[]|undefined>('0');
+let accordionChangeCalls=$state(0);
 </script>
 {#snippet graphic()}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" aria-hidden="true"><path d="m3 10 4 4 10-10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
@@ -66,4 +68,13 @@ let fieldActionCalls=$state(0);
 <SidebarItem id="package-sidebar-button" label="Complete package navigation title" icon="user" updated actions={[{id:'more',label:'Package item More',icon:'three-dots'}]}>{#snippet tags()}<Badge variant="border" count="New" />{/snippet}</SidebarItem>
 <SidebarItem id="package-sidebar-link" href="#package-content-line" label="Complete linked package navigation title" icon="user" updated>{#snippet tags()}<Badge variant="border" count="New" />{/snippet}</SidebarItem>
 <SidebarSection id="package-sidebar-section" title="Complete package section title" actions={[{id:'more',label:'Package section More',icon:'three-dots'},{id:'add',label:'Package section Add',icon:'plus'}]}><Text>Package section body</Text></SidebarSection>
+</section>
+
+<section aria-label="Package accordion owners">
+<Accordion class="package-builtin-accordion" bind:value={accordionValue} onValueChange={()=>accordionChangeCalls++} style="width:260px" parts={{Text:{class:'package-accordion-label'}}} items={[{title:'Complete package accordion installation and delivery settings',content:'Package accordion body remains ordinary prose and may wrap across several lines.'},{title:'Other package section',content:'Another package body.'}]}/>
+<output data-testid="package-accordion-state">{accordionValue}/{accordionChangeCalls}</output>
+<Accordion class="package-explicit-accordion" defaultValue="explicit" style="width:260px" parts={{Text:{class:'package-accordion-must-not-leak'}}}>
+<AccordionItem value="explicit"><Frame as="title" singleLine><Icon as="leading" size={20}>{@render graphic()}</Icon><Text lines={1}>Complete explicit package section title</Text></Frame><Frame as="content" row>Explicit package prose remains independent.</Frame></AccordionItem>
+</Accordion>
+<Accordion class="package-minus-accordion" indicatorVariant="minus" defaultValue="0" style="width:260px" items={[{title:'Package legacy minus mode',content:'Legacy expansion mode remains available.'}]}/>
 </section>

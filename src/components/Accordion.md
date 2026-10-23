@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.6.2
+> **版本**: v1.7.0
 > **职责**: 将相关内容组织为可展开、收起的分组，适合常见问题、设置和分段说明，支持单项或多项同时展开。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-12
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -17,7 +17,7 @@
 适合 FAQ、设置分组和可折叠说明。需要切换同一区域的内容面板时使用 Tab；AccordionItem 应放在 Accordion 中。
 
 - `type="single"` 使用字符串值，`multiple` 使用数组；`bind:value` 同步展开项，`defaultValue` 只提供初始状态。
-- `items` 模式使用索引字符串作为值；显式 children 替换 items，子项自行配置，不读取默认子项的 parts。
+- `items` 模式使用索引字符串作为值，内置标题默认单行缩略并保留全文名称；`parts.Text` 配置该标题文字。显式 children 替换 items，子项自行配置，不读取默认子项的 parts。
 - Accordion 内的 `Icon as="leading"` 在未显式指定 `size` 时继承 Accordion 图标尺寸：sm/md/lg 分别为 16/20/24；未声明 leading 的 Icon 不参与这项继承，显式 `size` 优先。
 <!-- usage-guide:end -->
 
@@ -28,29 +28,29 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { Accordion, AccordionItem, Frame, Icon } from '@snowui-design-system/components';
+	import { Accordion, AccordionItem, Frame, Icon, Text } from '@snowui-design-system/components';
 	import { BookOpen, Package, Palette, Rocket, ShieldCheck } from '@snowui-design-system/resource-svelte';
 </script>
 
 <Accordion type="multiple" defaultValue={['installation', 'themes']} variant="filled" size="md" style="width: min(100%, 36rem);">
 	<AccordionItem value="installation">
-		<Frame as="title" row><Icon as="leading"><Package /></Icon>How do I install SnowUI?</Frame>
+		<Frame as="title" singleLine><Icon as="leading"><Package /></Icon><Text lines={1}>How do I install SnowUI?</Text></Frame>
 		<Frame as="content" row>Install @snowui-design-system/components and import its styles. The Resource package is optional for examples that use its icons.</Frame>
 	</AccordionItem>
 	<AccordionItem value="components">
-		<Frame as="title" row><Icon as="leading"><BookOpen /></Icon>Where can I explore every component?</Frame>
+		<Frame as="title" singleLine><Icon as="leading"><BookOpen /></Icon><Text lines={1}>Where can I explore every component?</Text></Frame>
 		<Frame as="content" row>Open the Components catalog for live previews, copy-ready code, API details, and source links.</Frame>
 	</AccordionItem>
 	<AccordionItem value="themes">
-		<Frame as="title" row><Icon as="leading"><Palette /></Icon>Does SnowUI support light and dark themes?</Frame>
+		<Frame as="title" singleLine><Icon as="leading"><Palette /></Icon><Text lines={1}>Does SnowUI support light and dark themes?</Text></Frame>
 		<Frame as="content" row>Yes. Components use the same semantic theme contract in applications and isolated documentation previews.</Frame>
 	</AccordionItem>
 	<AccordionItem value="quality">
-		<Frame as="title" row><Icon as="leading"><ShieldCheck /></Icon>How are components verified?</Frame>
+		<Frame as="title" singleLine><Icon as="leading"><ShieldCheck /></Icon><Text lines={1}>How are components verified?</Text></Frame>
 		<Frame as="content" row>Public behavior is checked with type validation, accessibility coverage, and real browser previews.</Frame>
 	</AccordionItem>
 	<AccordionItem value="pro">
-		<Frame as="title" row><Icon as="leading"><Rocket /></Icon>When do I need a paid license?</Frame>
+		<Frame as="title" singleLine><Icon as="leading"><Rocket /></Icon><Text lines={1}>When do I need a paid license?</Text></Frame>
 		<Frame as="content" row>Source is available under the Free license. Publishing a real product or delivering it to a client requires Pro or Team; project and developer limits also apply.</Frame>
 	</AccordionItem>
 </Accordion>
@@ -73,7 +73,7 @@
 | role | `string` | `"presentation"` | 根容器的 ARIA role；默认仅作展示分组，标题触发器与内容 region 的语义仍由 AccordionItem 管理。 |
 | items | `AccordionEntry[]` | `[]` | 默认内置模式的数据；内部 value 使用数组索引字符串。 |
 | children | `Snippet` | — | 显式组合内容；存在时替换内置 items。 |
-| parts | `ComponentPartsOf<{ AccordionItem: typeof AccordionItem; Frame: typeof Frame; }>` | — | 仅配置 items 模式内建的 AccordionItem 与标题、正文 Frame；显式 children 不读取这些默认子项配置。 |
+| parts | `ComponentPartsOf<{ AccordionItem: typeof AccordionItem; Frame: typeof Frame; Text: typeof Text; }>` | — | 仅配置 items 模式内建的 AccordionItem、标题／正文 Frame 和标题 Text；显式 children 不读取这些默认子项配置。 |
 | onValueChange | `(value: AccordionValue) => void` | — | 用户切换展开项后回调；single 返回当前项字符串（全部收起时为空字符串），multiple 返回展开项数组。可配合 bind:value 同步页面状态。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
@@ -84,7 +84,7 @@
 
 ### 功能概览
 
-- 默认内置模式通过 `items` 渲染内容；每项只包含 `title` 与 `content`，内部自动生成 AccordionItem 和 `Frame as="title|content"`。
+- 默认内置模式通过 `items` 渲染内容；每项只包含 `title` 与 `content`，内部自动生成 AccordionItem、`Frame as="title|content"` 与标题 Text。标题默认使用 `singleLine`／`Text lines={1}`，正文不强制单行；可通过 `parts.Frame`／`parts.Text` 显式配置，复杂内容仍优先显式组合。
 - 显式 children 存在时替换内置 items，用于自定义 AccordionItem 结构。
 - 支持单开与多开两种模式。
 - 支持非受控 `defaultValue` 与受控 `value`。
@@ -195,15 +195,15 @@ hover 归属：标题 hover 仅改变默认指示图标的透明度，不创建�
 
 <Accordion defaultValue="basic">
     <AccordionItem value="basic">
-        <Frame as="title" row>
-            基础设置
+        <Frame as="title" singleLine>
+            <Text lines={1}>基础设置</Text>
         </Frame>
         <Frame as="content" row>基础内容。</Frame>
     </AccordionItem>
 
     <AccordionItem value="advanced">
-        <Frame as="title" row>
-            高级设置
+        <Frame as="title" singleLine>
+            <Text lines={1}>高级设置</Text>
             <Icon as="trailing"><Resource.Plus /></Icon>
         </Frame>
         <Frame as="content" row>外部 trailing 图标会替换默认箭头。</Frame>
@@ -265,6 +265,13 @@ hover 归属：标题 hover 仅改变默认指示图标的透明度，不创建�
 ---
 
 ## 更新日志
+
+### v1.7.0 (2026-10-23)
+
+- 默认items标题复用Frame单行组合与Text单行缩略／全文名称，新增强类型parts.Text以保留内置文字配置入口；显式children仍自行配置，不读取默认parts。
+- 标题与默认指示器宿主复用AccordionItem的4px／12px下限，正文与原有展开状态不变。
+
+- 2026-10-23：显式标题示例接入Frame单行组合与Text单行全文；展开正文与默认状态保持，仅文档和示例修订。
 
 - 2026-09-28：取消 hover 背景与正文点击收起；默认加号旋转为 ×，新增 indicatorVariant="minus" 保留旧模式；各尺寸正文与标题字号一致。continuousHover 保留为无效兼容参数。
 

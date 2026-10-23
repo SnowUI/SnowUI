@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Accordion 组件：可展开 / 收起的内容容器
-  v1.6.2
+  v1.7.0
 
   布局模型：复合管理布局。根层为 Frame，仅提供分组状态与 AccordionContext。
   内部内容由 AccordionItem 容器组成，单项内部使用 Frame as="title|content"。
@@ -20,6 +20,7 @@
     import { setContext } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import AccordionItem from "./AccordionItem.svelte";
+    import Text from "./Text.svelte";
     import { getSize, type AccordionValue, type AccordionType } from "../context";
     import { ACCORDION_CONTEXT_KEY } from "../keys";
     import { RESIZE_MOTION_STYLE } from "../motion/presets/resize";
@@ -50,6 +51,7 @@
         parts?: ComponentPartsOf<{
             AccordionItem: typeof AccordionItem;
             Frame: typeof Frame;
+            Text: typeof Text;
         }>;
         onValueChange?: (value: AccordionValue) => void;
         [key: string]: any;
@@ -195,11 +197,12 @@
                     {...parts?.Frame}
                     as="title"
                     row
+                    singleLine={parts?.Frame?.singleLine ?? true}
                     enableResponsive={false}
                     enableContext={true}
                     enableScaleObserver={false}
                 >
-                    {item.title}
+                    <Text {...parts?.Text} lines={parts?.Text?.lines ?? 1}>{item.title}</Text>
                 </Frame>
                 <Frame
                     {...parts?.Frame}

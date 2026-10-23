@@ -1,66 +1,66 @@
 /**
  * Accordion.test.ts
- * v1.6.1
+ * v1.7.0
  *
  * 测试覆盖：对齐 Figma 设计稿的 2 种类型 × 3 种尺寸示例。
  */
 
 const items = `
     <AccordionItem value="order">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.FourLeafClover /></Icon>
-            如何创建新的订单？
+            <Text lines={1}>如何创建新的订单？</Text>
         </Frame>
         <Frame as="content" row>选择商品后进入结算页，确认信息即可提交订单。</Frame>
     </AccordionItem>
     <AccordionItem value="shipping">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.WinkingFace /></Icon>
-            可以修改收货信息吗？
+            <Text lines={1}>可以修改收货信息吗？</Text>
         </Frame>
         <Frame as="content" row>订单发货前都可以修改地址、手机号和收件人姓名。</Frame>
     </AccordionItem>
     <AccordionItem value="payment">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.Star /></Icon>
-            支持哪些支付方式？
+            <Text lines={1}>支持哪些支付方式？</Text>
         </Frame>
         <Frame as="content" row>支持银行卡、余额和企业账户支付。</Frame>
     </AccordionItem>
     <AccordionItem value="invoice">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.CreditCard /></Icon>
-            发票什么时候开具？
+            <Text lines={1}>发票什么时候开具？</Text>
         </Frame>
         <Frame as="content" row>订单完成后可以在账单中心申请电子发票。</Frame>
     </AccordionItem>`;
 
 const disabledItems = `
     <AccordionItem value="order">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.FourLeafClover /></Icon>
-            如何创建新的订单？
+            <Text lines={1}>如何创建新的订单？</Text>
         </Frame>
         <Frame as="content" row>选择商品后进入结算页，确认信息即可提交订单。</Frame>
     </AccordionItem>
     <AccordionItem value="shipping">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.WinkingFace /></Icon>
-            可以修改收货信息吗？
+            <Text lines={1}>可以修改收货信息吗？</Text>
         </Frame>
         <Frame as="content" row>订单发货前都可以修改地址、手机号和收件人姓名。</Frame>
     </AccordionItem>
     <AccordionItem value="payment" disabled>
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.Star /></Icon>
-            支持哪些支付方式？
+            <Text lines={1}>支持哪些支付方式？</Text>
         </Frame>
         <Frame as="content" row>支持银行卡、余额和企业账户支付。</Frame>
     </AccordionItem>
     <AccordionItem value="invoice">
-        <Frame as="title" row>
+        <Frame as="title" singleLine>
             <Icon as="leading"><Resource.CreditCard /></Icon>
-            发票什么时候开具？
+            <Text lines={1}>发票什么时候开具？</Text>
         </Frame>
         <Frame as="content" row>订单完成后可以在账单中心申请电子发票。</Frame>
     </AccordionItem>`;
