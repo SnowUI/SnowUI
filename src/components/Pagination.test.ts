@@ -1,6 +1,6 @@
 /**
  * Pagination.test.ts
- * v1.6.3
+ * v1.6.4
  * 变更记录 (2026-05-26): 新增 Pagination 角色模板式示例。
  */
 export const examples = [

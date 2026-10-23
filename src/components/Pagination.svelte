@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Pagination 组件：页码导航容器
-  v1.6.3
+  v1.6.4
 
   职责：
   - 读取直系 Button 作为 current / page / prev / next 角色样式模板。
@@ -1064,10 +1064,10 @@
             --snowui-pagination-row-gap-override,
             var(--snowui-pagination-row-gap, var(--gap-1))
         );
-        column-gap: var(
+        column-gap: max(4px, var(
             --snowui-pagination-column-gap-override,
             var(--snowui-pagination-column-gap, var(--gap-1))
-        );
+        ));
     }
 
     :global(:where(.snowui-pagination-width-hug)) {
@@ -1086,13 +1086,13 @@
         display: inline-flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: var(
+        gap: max(4px, var(
             --snowui-pagination-page-size-gap,
             var(
                 --snowui-pagination-column-gap-override,
                 var(--snowui-pagination-column-gap, var(--gap-1))
             )
-        );
+        ));
         max-width: 100%;
     }
 
@@ -1105,13 +1105,13 @@
         display: inline-flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: var(
+        gap: max(4px, var(
             --snowui-pagination-controls-gap,
             var(
                 --snowui-pagination-column-gap-override,
                 var(--snowui-pagination-column-gap, var(--gap-1))
             )
-        );
+        ));
         min-width: 0;
     }
 

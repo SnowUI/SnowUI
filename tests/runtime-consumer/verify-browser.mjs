@@ -453,5 +453,22 @@ for(const font of [16,8]){
 }
 await page.evaluate(()=>document.documentElement.style.fontSize='');
 console.log('PASS: actual tarball CopyLink and Textarea glyph gaps at 16/8px, LTR/RTL, narrow/recovery, standalone/Field/segment, full URL keyboard copy and native form data');
+let paginationCalls=0;
+for(const font of [16,8]){
+ await page.evaluate(font=>document.documentElement.style.fontSize=`${font}px`,font);
+ for(const host of await page.locator('.package-pagination-width').all()){
+  const root=host.locator('.package-pagination-gap'),profile=await host.getAttribute('data-profile');
+  for(const width of [1024,390,320,180,120,80,1024]){
+   await host.evaluate((node,width)=>node.style.width=`${width}px`,width);
+   await page.waitForFunction(node=>{const controls=node.querySelector('.snowui-pagination-controls'),selector=node.querySelector('.snowui-pagination-page-size');if(!controls)return false;const gap=selector?parseFloat(getComputedStyle(node.querySelector('.snowui-pagination-items')).columnGap)||0:0;return controls.scrollWidth+(selector?.getBoundingClientRect().width??0)+gap<=node.getBoundingClientRect().width+1;},await root.elementHandle());
+   const gaps=await root.evaluate(node=>{const rtl=getComputedStyle(node).direction==='rtl',controls=node.querySelector('.snowui-pagination-controls'),rects=[...controls.children].map(child=>child.getBoundingClientRect());const items=node.querySelector('.snowui-pagination-items'),parts=[...items.children].map(child=>child.getBoundingClientRect());return {controls:rects.slice(1).map((r,i)=>rtl?rects[i].left-r.right:r.left-rects[i].right),outer:parts.length===2?(rtl?parts[0].left-parts[1].right:parts[1].left-parts[0].right):null};});
+   assert.ok(gaps.controls.length>0&&gaps.controls.every(gap=>gap>=(profile==='large'?23.9:3.9)),JSON.stringify(gaps));if(gaps.outer!==null)assert.ok(gaps.outer>=(profile==='large'?47.9:3.9),JSON.stringify(gaps));
+  }
+  await root.locator('.snowui-pagination-controls [data-as="next"]').click();paginationCalls++;
+  await page.waitForFunction(expected=>document.querySelector('[data-package-page-events]').textContent===`3:${expected}`,paginationCalls);
+ }
+}
+await page.evaluate(()=>document.documentElement.style.fontSize='');
+console.log('PASS: actual tarball Pagination default/zero/large effective gaps, 16/8px, LTR/RTL, real width-stage recovery, persistent previous/next and exactly-once page events');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

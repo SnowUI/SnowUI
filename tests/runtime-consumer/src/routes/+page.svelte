@@ -9,6 +9,7 @@ import SliderContentLine from '../SliderContentLine.svelte';
 import DialogContentLine from '../DialogContentLine.svelte';
 import ChartPanelContentLine from '../ChartPanelContentLine.svelte';
 import CopyTextareaContentLine from '../CopyTextareaContentLine.svelte';
+import PaginationContentLine from '../PaginationContentLine.svelte';
 import FrameCoordination from "../FrameCoordination.svelte";
 import NotificationLifecycle from '../NotificationLifecycle.svelte';
 import {LocaleProvider, Image, Button, Frame, Input, NumericText, BarChart, Sidebar, SidebarItem, SidebarSection, Separator, DataTable, Table, TableHeader, TableRow, TableHead, TableBody, TableCell, TableToolbar, type DataTableRenderState} from '@snowui-design-system/components';
@@ -57,3 +58,5 @@ const messages=$derived(overrideLabels?{'sidebar.navigation':'Package navigation
 <ChartPanelContentLine/>
 
 <CopyTextareaContentLine/>
+
+<PaginationContentLine/>

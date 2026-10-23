@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.6.3
+> **版本**: v1.6.4
 > **职责**: 提供页码导航，帮助用户在多页数据之间切换，适合表格、列表和搜索结果。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-22
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -71,10 +71,10 @@
 | variant | `PaginationVariant` | `"outline"` | 普通页与前后页的按钮样式；当前页使用对应的强调搭配 |
 | responsive | `PaginationResponsive` | `"auto"` | `auto` 根据容器宽度自动选择完整页码、省略页码与最小前后页；`none` 保持静态页码窗口与原有换行行为 |
 | widthMode | `PaginationWidthMode` | `"fill"` | `auto` 在完整页码可容纳时按剩余空间判断，`hug` 保持内容宽度，`fill` 始终等宽填充；fill 模式含省略号时也填满可用宽度；hug 保持内容宽度 |
-| gap | `string \| number` | — | 页码、prev、next 之间的间距；数字按 px 处理 默认行为：4px。 |
+| gap | `string \| number` | — | 页码、prev、next 之间的首选间距；数字按 px 处理，有效下限为 4 CSS px，较大值保留。默认使用 gap-1。 |
 | pageSize | `number` | `20` | 当前每页条数；选择后组件自行更新绑定值，仅在 `pageSizeOptions` 非空时显示选择器 |
 | pageSizeOptions | `number[]` | `[]` | 可选的每页条数；非正数会被忽略，重复项会被去重 |
-| pageSizeGap | `string \| number` | `16` | pageSize 与分页按钮组之间的独立间距；数字按 px 处理 |
+| pageSizeGap | `string \| number` | `16` | pageSize 与分页按钮组之间的独立首选间距；数字按 px 处理，有效下限为 4 CSS px，较大值保留 |
 | pageSizeAriaLabel | `string` | `LocaleProvider` | 每页条数选择器的无障碍名称；默认随 LocaleProvider 使用中文“每页条数”或英文“Items per page” |
 | onPageChange | `(page: number) => void` | — | 可点击页码变化时触发 |
 | onPageSizeChange | `(pageSize: number) => void` | — | 每页条数变化时触发 |
@@ -94,7 +94,7 @@
 - `parts.MenuItem`：统一配置 pageSize 选项。
 - 具体结构差异继续通过现有 `as` 模板/外置选择器协议完成；外置显式 Props 高于 part。
 
-> **版本**: v1.6.3
+> **版本**: v1.6.4
 > **职责**: 提供页码导航容器。
 > **设计稿**: [Workshop / Pagination](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12078-21567&t=nY2VC3oisn12OH01-4)
 
@@ -251,7 +251,7 @@ Pagination 内部将页码与 prev / next 组织为一个分页按钮组。`page
 
 - `gap`：页码、prev、next 的组内间距。
 - `pageSizeGap`：pageSize 与整个分页按钮组之间的间距。
-- 数字按 px 解析；也可传 `"0.75rem"`、`"clamp(...)"` 等 CSS 长度。
+- 数字按 px 解析；也可传 `"0.75rem"`、`"clamp(...)"` 等 CSS 长度。两处有效渲染间距至少 4 CSS px，显式 0 值与小根字号也不能移除下限；较大值保留。
 
 根节点 inline style 遵循 [StyleSpec §2.6](../../../specs/maintainers/StyleSpec.md) 的 Level 6 最高优先级，并由 Pagination 映射到当前有效区域：
 
@@ -263,7 +263,7 @@ Pagination 内部将页码与 prev / next 组织为一个分页按钮组。`page
 <Pagination gap={4} style="gap: 12px;" ... />
 ```
 
-因此间距优先级为：`inline style gap > 对应显式 Prop > Pagination 默认值`。有 pageSize 时 inline gap 不覆盖组内 `gap`，因为两者控制不同层级。
+在上述 4 CSS px 下限内，首选间距优先级仍为：`inline style gap > 对应显式 Prop > Pagination 默认值`。有 pageSize 时 inline gap 不覆盖组内 `gap`，因为两者控制不同层级。
 
 Pagination 只识别直系角色模板。不要用 `div` 包裹 `Button as="current"` / `Button as="page"` 来制造左右布局；嵌套模板会被忽略并回退到默认页码。调整 pageSize 左右位置应直接改变直系模板顺序。
 
@@ -593,6 +593,10 @@ Root Frame(nav)
 ---
 
 ## 更新日志
+
+### v1.6.4 (2026-10-23)
+
+- 页码按钮组与 pageSize／按钮组间距保留 4 CSS px 下限，覆盖小根字号及显式零值；较大值和 inline 首选优先级保留，原收纳／展开冻结／页码与子按钮视觉不变。
 
 ### v1.6.3 (2026-10-22)
 
