@@ -1,6 +1,6 @@
 /**
  * Popover.test.ts
- * v3.0.1
+ * v3.1.1
  *
  * 新 Popover 采用"模版 + ID 激活"模式(参考 Toast TS-10):
  * - <Popover template id="X"> 注册模版,触发按钮通过 data-popover-target="X" 关联
@@ -343,9 +343,9 @@ export const examples = [
     {
         name: "POP-32:内嵌模式 - 任意宿主(Frame 包裹)",
         code: `POP-32
-<Frame row class="gap-4 items-center p-8 rounded-12 bg-black-4">
-    <Icon><Bell /></Icon>
-    <Text>点击我</Text>
+<Frame singleLine gap={1} class="p-8 rounded-12 bg-black-4">
+    <Icon as="leading"><Bell /></Icon>
+    <Text lines={1}>点击我</Text>
     <Popover as="popover" placement="top">
         <Text>宿主为 Frame,父元素整块区域均为触发器</Text>
     </Popover>
