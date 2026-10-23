@@ -408,5 +408,29 @@ for(const font of[16,8])for(const size of['sm','md','lg']){
 }
 await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
 console.log('PASS: tarball Dialog footer 4px at 16/8px and all sizes, original wrap and direct item size context, larger override, public inline style and close');
+// Shared internal chart owner must also survive actual package installation.
+for(const font of [16,8]) {
+ await page.evaluate(font=>document.documentElement.style.fontSize=`${font}px`,font);
+ for(const root of await page.locator('.package-chart-panel').all()) {
+  await root.locator('[tabindex="0"]').first().focus();
+  await root.locator('.snowui-chart-hover-panel').waitFor({state:'visible'});
+  for(const profile of ['zero','default','large']) {
+   await root.evaluate((node,profile)=>{for(const [key,value]of [['--gap-1','12px'],['--gap-2','24px']]){if(profile==='default')node.style.removeProperty(key);else node.style.setProperty(key,profile==='large'?value:'0px');}},profile);
+   for(const width of [320,80,320]) {
+    await root.evaluate((node,width)=>node.style.width=`${width}px`,width);
+    const value=await root.locator('.snowui-chart-hover-panel').evaluate(node=>{
+     const row=node.querySelector('.snowui-chart-hover-panel-row');const rect=selector=>row.querySelector(selector).getBoundingClientRect();
+     const dot=rect('.snowui-chart-hover-panel-dot'),name=rect('.snowui-chart-hover-panel-name'),value=rect('.snowui-chart-hover-panel-value'),rtl=getComputedStyle(node).direction==='rtl';
+     return {dot:rtl?dot.left-name.right:name.left-dot.right,value:rtl?name.left-value.right:value.left-name.right,marker:dot.width,hidden:node.getAttribute('aria-hidden'),pointer:getComputedStyle(node).pointerEvents};
+    });
+    assert.ok(Math.abs(value.dot-(profile==='large'?12:4))<.1,JSON.stringify(value));
+    assert.ok(Math.abs(value.value-(profile==='large'?24:profile==='default'?Math.max(4,font/2):4))<.1,JSON.stringify(value));
+    assert.ok(Math.abs(value.marker-font*3/8)<.1);assert.equal(value.hidden,'true');assert.equal(value.pointer,'none');
+   }
+  }
+ }
+}
+await page.evaluate(()=>document.documentElement.style.fontSize='');
+console.log('PASS: actual tarball five chart families, 16/8px, LTR/RTL, zero/default/large gaps and narrow/recovery');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

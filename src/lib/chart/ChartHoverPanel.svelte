@@ -500,7 +500,7 @@
         border-radius: 9999px;
         background: var(--snowui-chart-hover-panel-dot-color);
         opacity: var(--snowui-chart-hover-panel-dot-opacity);
-        margin-right: var(--gap-1);
+        margin-inline-end: max(4px, var(--gap-1));
     }
 
     :global(:where(.snowui-chart-hover-panel-name)) {
@@ -510,6 +510,6 @@
     :global(:where(.snowui-chart-hover-panel-value)) {
         color: var(--snowui-chart-hover-panel-value-color);
         text-align: right;
-        margin-left: var(--gap-2);
+        margin-inline-start: max(4px, var(--gap-2));
     }
 </style>
