@@ -1,3 +1,4 @@
+// v1.4.1：首次连接的 SSR 节点保留与初始化后的重连由 scramble-text-initial-dom 浏览器回归验证。
 // motionColor 的全文索引、回落顺序及快速更新由 Playground text-motion-color-sequence 浏览器回归验证。
 export const examples = [
     {

@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   ScrambleText 代码文字扰动动效组件
-  v1.4.0
+  v1.4.1
 
   职责：提供 字符扰动后归位的文本动效。
   文档：./ScrambleText.md
@@ -88,7 +88,10 @@
         };
 
         connectedCallback() {
-            this.renderText(this.value);
+            // 首次连接保留 SSR 内容和框架边界；已初始化的重连恢复目标文字。
+            if (this.textNode || this.colorNodes.length > 0) {
+                this.renderText(this.value);
+            }
         }
 
         disconnectedCallback() { this.cancel(); }
