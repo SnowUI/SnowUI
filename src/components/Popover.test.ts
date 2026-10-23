@@ -1,6 +1,7 @@
 /**
  * Popover.test.ts
  * v3.1.1
+ * 示例修订：2026-10-24，POP-21元信息单行与局部滚动。
  *
  * 新 Popover 采用"模版 + ID 激活"模式(参考 Toast TS-10):
  * - <Popover template id="X"> 注册模版,触发按钮通过 data-popover-target="X" 关联
@@ -274,15 +275,18 @@ export const examples = [
     <Frame column class="gap-8">
         <Text class="text-16 text-black-100">SnowUI Popover</Text>
         <Text class="text-14 text-black-80">通用浮层容器,合并 QuickAction 与 SearchPopup,支持模版 + ID 激活模式。</Text>
-        <Frame row class="gap-8 pt-4">
-            <Badge>v3.0.0</Badge>
-            <Badge>Basic</Badge>
-        </Frame>
+        <ScrollArea axis="horizontal" ariaLabel="Popover metadata" style="width: 100%;">
+            <Frame singleLine gap={2} class="pt-4" style="width: max-content; min-width: 100%;">
+                <Badge>v3.0.0</Badge>
+                <Badge>Basic</Badge>
+            </Frame>
+        </ScrollArea>
     </Frame>
 </Popover>
 <Button data-popover-target="pop-21">悬停查看详情</Button>`,
         expected: {
             render: "悬停 600ms 后浮层出现,中尺寸 padding 16 / radius 24,适合放置富文本信息卡",
+            metadata: "版本与分类同排，间距至少4 CSS px；极窄宽度局部横向滚动，徽标内容与样式保留。",
         },
         logic: ["Hover", "MediumSize", "InfoCard"],
     },

@@ -5,7 +5,7 @@
 > **版本**: v1.0.0
 > **职责**: 以紧凑的按键标签展示快捷键或键盘操作提示，帮助用户快速识别可用操作。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-24
 
 ## 组件介绍
 
@@ -18,6 +18,7 @@
 
 - children 只表示按键文字，variant 选择 border 或填充外观。
 - 将快捷键提示放在对应操作旁；快捷键事件由页面或拥有该操作的组件注册。
+- 多个按键组成一个快捷键时，使用 Frame singleLine 保持一行及至少 4 CSS px 间距；极窄容器由外层横向 ScrollArea 保留完整按键。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -27,17 +28,19 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { Kbd } from '@snowui-design-system/components';
+	import { Frame, Kbd, ScrollArea } from '@snowui-design-system/components';
 </script>
 
 <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--gap-4) var(--gap-3);">
 	<Kbd variant="border">⌘K</Kbd>
 	<Kbd variant="solid">⌘K</Kbd>
-	<div aria-label="Shift plus K" style="display: flex; align-items: center; gap: var(--gap-1);">
+	<ScrollArea axis="horizontal" ariaLabel="Shift plus K" style="width: max-content; max-width: 100%;">
+		<Frame singleLine gap={1} style="width: max-content;">
 		<Kbd style="font-size: var(--text-18); line-height: var(--leading-18);">Shift</Kbd>
 		<span aria-hidden="true">+</span>
 		<Kbd style="font-size: var(--text-18); line-height: var(--leading-18);">K</Kbd>
-	</div>
+		</Frame>
+	</ScrollArea>
 </div>
 ```
 <!-- /quick-start:generated -->
@@ -87,9 +90,13 @@
 #### 组合键
 
 ```svelte
-<Kbd>⌘</Kbd>
-<span>+</span>
-<Kbd>K</Kbd>
+<ScrollArea axis="horizontal" ariaLabel="Command plus K" style="width: max-content; max-width: 100%;">
+    <Frame singleLine gap={1} style="width: max-content;">
+        <Kbd>⌘</Kbd>
+        <span aria-hidden="true">+</span>
+        <Kbd>K</Kbd>
+    </Frame>
+</ScrollArea>
 ```
 
 
@@ -141,6 +148,8 @@
 ---
 
 ## 更新日志
+
+- 2026-10-24：快速开始组合键接入公开单行布局与局部横向滚动，保留按键外观；仅示例与文档修订，不改变组件 API。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
