@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Dialog 通用模态对话框
- v1.1.0
+ v1.1.1
 
  职责:
  - 面板模式: <Dialog bind:open>
@@ -597,7 +597,7 @@
         flex-wrap: wrap;
         justify-content: flex-end;
         align-items: center;
-        gap: var(--snowui-dialog-footer-gap-override, var(--snowui-dialog-footer-gap));
+        gap: max(4px, var(--snowui-dialog-footer-gap-override, var(--snowui-dialog-footer-gap)));
         min-width: 0;
         order: 1;
     }

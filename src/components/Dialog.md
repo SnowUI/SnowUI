@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.1.0
+> **版本**: v1.1.1
 > **职责**: 在模态对话框中呈现需要关注的内容或操作，提供遮罩、焦点管理与背景滚动锁定，适合确认和表单任务。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -195,7 +195,7 @@ Dialog 的外置替换统一使用 `as`；不提供 title / closeIcon / footer �
 
 ### 底部操作区角色
 
-推荐通过 children 中直系 `<Frame as="footer">` 声明操作区，原生元素使用 `data-as="footer"`。Dialog 提供右对齐、垂直居中、自动换行与 sm/md/lg 的 8/12/12px gap；调用方的直接 Props / inline style 可覆盖默认布局，不消费 parts。显式操作区与正文块沿用面板的 12/16/20px 间距；需要正文内部 8px 间距时，将多个正文块放入自己的容器。
+推荐通过 children 中直系 `<Frame as="footer">` 声明操作区，原生元素使用 `data-as="footer"`。Dialog 提供右对齐、垂直居中、自动换行与 sm/md/lg 首选8/12/12px gap；操作之间至少保留4 CSS px，较大 `--snowui-dialog-footer-gap-override` 继续生效。调用方的直接 Props / inline style 可覆盖默认布局，不消费 parts。显式操作区与正文块沿用面板的 12/16/20px 间距；需要正文内部 8px 间距时，将多个正文块放入自己的容器。
 
 仅该操作区的直系 `Button as="item"` 接收 sm/md/md 尺寸 Context，显式 size 优先；按钮内容、variant、业务事件和嵌套布局仍由调用方拥有。未入约的正文、嵌套 Frame 中的 item 不接收此默认值。
 
@@ -269,6 +269,10 @@ Dialog 是通用模态容器。面板视觉复用 `.snowui-quick-action-panel`,�
 - 样式覆盖入口:`--snowui-dialog-padding-override`、`--snowui-dialog-radius-override`、`--snowui-dialog-font-size-override`、`--snowui-dialog-line-height-override`、`--snowui-dialog-max-width-override`、`--snowui-dialog-gap-override`、`--snowui-dialog-content-gap-override`、`--snowui-dialog-footer-gap-override`、`--snowui-dialog-text-padding-override`
 
 ## 更新日志
+
+### v1.1.1 (2026-10-23)
+
+- Footer操作间距在小字号／gap-scale下保留4 CSS px下限；较大首选值及调用方显式inline布局继续生效。面板／正文间距、原换排规则、直系item尺寸Context、角色与关闭流程不变。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

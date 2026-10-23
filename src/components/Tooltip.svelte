@@ -1,7 +1,7 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
- Tooltip 文字提示组件 v1.24.4
+ Tooltip 文字提示组件 v1.24.5
  变更 (2026-10-23): 连续时间线进度限制0到1，避免提前帧时间产生负进度及NaN内容坐标。
  变更 (2026-10-12): 共享浮层卸载时安全读取延迟 Props，避免关闭提示后的空值错误。
  变更 (2026-09-20): 连续切换按平滑鼠标速度缩短协调时程，显示期单例采样并在隐藏时释放。
@@ -81,10 +81,11 @@
     const TOOLTIP_CONTENT_TRACK_GAP_PX = 16;
     const TOOLTIP_CONTENT_TRACK_MAX_TARGET_GAP_PX = 4;
     let nextTooltipId = 0;
-    let overlayHost: { id: string; setHost: (value: boolean) => void } | undefined;
+    let overlayHost: { id: string; setHost: (value: boolean) => void; releaseContent: (sourceId: string) => void } | undefined;
     const overlayHostCandidates = new Set<{
         id: string;
         setHost: (value: boolean) => void;
+        releaseContent: (sourceId: string) => void;
     }>();
 
     function createTooltipId() {
@@ -95,8 +96,9 @@
     function registerOverlayHostCandidate(
         id: string,
         setHost: (value: boolean) => void,
+        releaseContent: (sourceId: string) => void,
     ) {
-        const candidate = { id, setHost };
+        const candidate = { id, setHost, releaseContent };
         overlayHostCandidates.add(candidate);
 
         if (!overlayHost) {
@@ -483,6 +485,22 @@
         switchPhase = "idle";
         switchHandoffActive = false;
         switchRetargeting = false;
+    }
+
+    function releaseSourceContent(sourceId: string) {
+        untrack(() => {
+            if (renderedOverlay?.id === sourceId) {
+                clearOverlayLifecycleTimers();
+                overlayWasVisible = false;
+                renderedOverlay = null;
+                portalLifecycleState = "Idle";
+                resetMotionBaseline();
+            } else if (outgoingOverlay?.id === sourceId) {
+                cancelSwitchMotion();
+                finishSwitchMotion(switchMotionRevision);
+                schedulePositionUpdate();
+            }
+        });
     }
 
     function getMovementUnit(
@@ -1578,7 +1596,7 @@
     onMount(() => {
         unregisterOverlayHost = registerOverlayHostCandidate(tooltipId, (value) => {
             isOverlayHost = value;
-        });
+        }, releaseSourceContent);
 
         if (placeholderRef) {
             triggerEl = resolveTriggerElement(placeholderRef);
@@ -1646,6 +1664,8 @@
         clearHoverShowTimer();
         clearOverlayLifecycleTimers();
         cancelPositionUpdate();
+        // The shared host must release borrowed Snippets before their source effect dies.
+        overlayHost?.releaseContent(tooltipId);
         const wasActive = hideTooltipOverlay(tooltipId);
         unregisterOverlayHost?.();
         if (open === undefined && wasActive) {
