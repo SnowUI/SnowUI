@@ -256,5 +256,21 @@ await packagePanel.locator('.snowui-side-panel-toolbar-top .snowui-side-panel-to
 await packagePanel.locator('.snowui-side-panel-toolbar-top .snowui-side-panel-toolbar-group .snowui-button').first().click();await page.waitForFunction(()=>document.querySelector('.package-side-panel')?.dataset.placement==='floating');assert.equal(await packagePanelDraft.inputValue(),'Unsaved tarball panel draft');await packagePanel.locator('.snowui-side-panel-close').click();await packagePanel.waitFor({state:'detached'});
 await page.evaluate(()=>{document.documentElement.style.fontSize='16px';document.documentElement.style.removeProperty('--gap-scale');});
 console.log('PASS: tarball SidePanel title/close 4px and 12px at 16/8px, larger 24px override, complete panel name, stable portal identity and unsaved draft across placement and close');
+
+await page.emulateMedia({reducedMotion:'reduce'});await page.locator('#package-tooltip-trigger').hover();
+const packageTooltip=page.locator('.snowui-tooltip-portal');await packageTooltip.waitFor();const packageTooltipRow=packageTooltip.locator('.package-tooltip-row');await packageTooltipRow.waitFor();
+for(const font of [16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ const badgeSize=await packageTooltipRow.locator('.snowui-badge').evaluate(n=>n.getBoundingClientRect().width);
+ for(const width of [320,180,120,80,320]){
+  await packageTooltipRow.evaluate((n,width)=>n.style.width=`${width}px`,width);
+  await page.waitForFunction(()=>{const row=document.querySelector('.package-tooltip-row'),a=row.querySelector('.package-tooltip-label').getBoundingClientRect(),b=row.querySelector('.snowui-badge').getBoundingClientRect(),line=parseFloat(getComputedStyle(row.querySelector('.package-tooltip-label')).lineHeight);return b.left-a.right>=4&&a.width>0&&a.height<=line+.5&&Math.abs(a.top+a.bottom-b.top-b.bottom)<1;});
+  assert.ok(Math.abs(await packageTooltipRow.locator('.snowui-badge').evaluate(n=>n.getBoundingClientRect().width)-badgeSize)<.5);
+  const packageTooltipLabel=packageTooltipRow.locator('.package-tooltip-label');assert.equal(await packageTooltipLabel.evaluate(n=>{const clone=n.cloneNode(true);clone.querySelectorAll('[aria-hidden="true"],script,style').forEach(n=>n.remove());return clone.textContent.trim();}),'Complete package build status');
+  if(width===80){await packageTooltipLabel.hover();await page.waitForTimeout(500);assert.equal(await packageTooltipRow.isVisible(),true);assert.equal(await packageTooltip.locator('.package-tooltip-prose').isVisible(),true);}
+ }
+}
+await page.mouse.move(0,0);await packageTooltip.waitFor({state:'detached'});await page.emulateMedia({reducedMotion:'no-preference'});await page.evaluate(()=>{document.documentElement.style.fontSize='16px';document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball Tooltip rich-label composition keeps 4px, Badge canvas, complete accessible text, original prose and stable content hover at 16/8px and 320/180/120/80/recovery without registering a duplicate Text tooltip');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

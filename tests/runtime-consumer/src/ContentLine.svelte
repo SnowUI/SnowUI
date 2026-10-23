@@ -1,5 +1,5 @@
 <script lang="ts">
-import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel} from '@snowui-design-system/components';
+import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip} from '@snowui-design-system/components';
 let calls=$state(0);
 let checkboxValues=$state<string[]>([]);
 let radioValue=$state<string|null|undefined>(null);
@@ -84,4 +84,8 @@ let packagePanelDraft=$state('Package draft');
 <section aria-label="Package SidePanel owner">
 <Button id="package-show-side-panel" onclick={()=>packagePanelOpen=true}>Package panel</Button>
 <SidePanel class="package-side-panel" bind:open={packagePanelOpen} showTitle closeOnOutside={false} title="Complete package panel installation and delivery settings" width={320}><Input aria-label="Package panel draft" bind:value={packagePanelDraft}/></SidePanel>
+</section>
+
+<section aria-label="Package Tooltip content ownership">
+<Button id="package-tooltip-trigger">Package tooltip<Tooltip><Frame column gap={1}><Frame class="package-tooltip-row" singleLine gap={2}><Text class="package-tooltip-label" lines={1} tooltip={false}>Complete package build status</Text><Badge as="trailing" variant="border" count="Ready" /></Frame><Text class="package-tooltip-prose">Package tooltip prose stays in its original multiline layout.</Text></Frame></Tooltip></Button>
 </section>

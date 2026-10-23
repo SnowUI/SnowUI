@@ -1,6 +1,6 @@
 /**
  * Tooltip.test.ts
- * v1.11.2
+ * v1.24.3
  */
 export const examples = [
     {
@@ -62,9 +62,9 @@ export const examples = [
         Complex Tooltip
         <Tooltip>
             <Frame column class="items-start gap-4">
-                <Frame class="items-center gap-8">
-                    <Text>构建已完成</Text>
-                    <Badge variant="border" count="Ready" />
+                <Frame singleLine gap={2}>
+                    <Text lines={1} tooltip={false}>构建已完成</Text>
+                    <Badge as="trailing" variant="border" count="Ready" />
                 </Frame>
                 <Text class="text-12 text-48">所有检查均已通过</Text>
             </Frame>
@@ -187,9 +187,9 @@ export const examples = [
         状态
         <Tooltip>
             <Frame column class="items-start gap-4">
-                <Frame class="items-center gap-8">
-                    <Text>部署状态</Text>
-                    <Badge variant="border" count="Ready" />
+                <Frame singleLine gap={2}>
+                    <Text lines={1} tooltip={false}>部署状态</Text>
+                    <Badge as="trailing" variant="border" count="Ready" />
                 </Frame>
                 <Text class="text-12 text-48">生产环境运行正常</Text>
             </Frame>
@@ -198,9 +198,9 @@ export const examples = [
     <Button>
         快捷键
         <Tooltip>
-            <Frame class="items-center gap-8">
-                <Text>打开命令面板</Text>
-                <Kbd>⌘ K</Kbd>
+            <Frame singleLine gap={2}>
+                <Text lines={1} tooltip={false}>打开命令面板</Text>
+                <Kbd as="trailing">⌘ K</Kbd>
             </Frame>
         </Tooltip>
     </Button>
@@ -209,9 +209,9 @@ export const examples = [
         <Tooltip>
             <Frame column class="items-start gap-4">
                 <Text>设计系统团队</Text>
-                <Frame class="items-center gap-8">
-                    <Badge count="8" />
-                    <Text class="text-12 text-48">3 人正在编辑</Text>
+                <Frame singleLine gap={2}>
+                    <Badge as="leading" count="8" />
+                    <Text lines={1} tooltip={false} class="text-12 text-48">3 人正在编辑</Text>
                 </Frame>
             </Frame>
         </Tooltip>
