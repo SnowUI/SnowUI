@@ -5,7 +5,7 @@
 > **版本**: v1.1.2
 > **职责**: 以条形或圆形反馈任务进度，支持明确进度与不确定状态，适合上传、处理和加载过程。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -35,9 +35,9 @@
 
 <div style="display: flex; flex-direction: column; align-items: stretch; gap: var(--gap-4); width: min(100%, 32rem); min-width: 0;">
 	<Progress value={progress} aria-label="Documentation generation progress">
-		<Frame as="label" row style="justify-content: space-between;">
-			<Text>{status}</Text>
-			<Text as="trailing">{progress}%</Text>
+		<Frame as="label" singleLine style="justify-content: space-between;">
+			<Text lines={1}>{status}</Text>
+			<Text as="trailing" lines={1}>{progress}%</Text>
 		</Frame>
 	</Progress>
 	<div style="display: flex; justify-content: center; gap: var(--gap-2);">
@@ -86,9 +86,9 @@
 
 ```svelte
 <Progress value={60}>
-  <Frame as="label" row class="justify-between">
-    <Text>Loading</Text>
-    <Text>60%</Text>
+  <Frame as="label" singleLine class="justify-between">
+    <Text lines={1}>Loading</Text>
+    <Text as="trailing" lines={1}>60%</Text>
   </Frame>
 </Progress>
 
@@ -122,6 +122,8 @@
 - 空的直系 `as="label"` 由组件自动写入实时值；显式内容不被改写。
 
 ## 更新日志
+
+- 2026-10-23：并列状态／百分比示例显式使用Frame单行组合与Text全文缩略，保留进度更新、圆环及不确定态；仅文档和示例修订。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

@@ -4,9 +4,9 @@ export const examples = [
         code: `A1
 <div class="flex-col gap-12" style="width: 240px;">
   <Progress value={60}>
-    <Frame as="label" row class="justify-between">
-      <Text>Loading</Text>
-      <Text>60%</Text>
+    <Frame as="label" singleLine class="justify-between">
+      <Text lines={1}>Loading</Text>
+      <Text as="trailing" lines={1}>60%</Text>
     </Frame>
   </Progress>
   <Progress value={60} thickness={8} />
