@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.8.1
+> **版本**: v1.8.2
 > **职责**: 清晰展示可复制的代码，支持语法着色、行号、全屏查看和尺寸调整，适合文档与开发工具。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-15
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -64,8 +64,8 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.8.1
-> **更新**: 2026-09-08
+> **版本**: v1.8.2
+> **更新**: 2026-10-23
 > **职责**: 展示代码、基础语法着色与行号，并提供复制、全屏和可选尺寸调整能力。
 > **布局模型**: 默认态为复合管理布局；`singleLine` 为槽位宿主布局
 > **文档**: ./CodeBlock.md
@@ -111,7 +111,7 @@
 | Content | Fill / `min-width: 0` | 单行高亮代码；超宽时仅横向滚动 |
 | Trailing | Hug | 外置 `as="trailing"`，否则为默认内置 CopyButton |
 
-单行态固定隐藏语言、行号和全屏按钮；`visibleLines`、`showLanguage`、`showLineNumbers`、`showExpandButton` 在该变体中不产生对应结构。根层不生成 Indicator，不接受拖拽高度，也不创建纵向 scrollbar / fade；内容横向溢出时默认常显 Overlay 横向滚动条，也可通过 `horizontalScrollbarVisibility="hover"` 改为仅在鼠标移入代码块时显示。默认 padding 与 Input 标准态一致：上下 `--padding-3`（12px）、左右 `--padding-4`（16px）；gap 为 `--gap-2`（8px），圆角为 `--radius-4`（16px）。
+单行态固定隐藏语言、行号和全屏按钮；`visibleLines`、`showLanguage`、`showLineNumbers`、`showExpandButton` 在该变体中不产生对应结构。根层不生成 Indicator，不接受拖拽高度，也不创建纵向 scrollbar / fade；内容横向溢出时默认常显 Overlay 横向滚动条，也可通过 `horizontalScrollbarVisibility="hover"` 改为仅在鼠标移入代码块时显示。默认 padding 与 Input 标准态一致：上下 `--padding-3`（12px）、左右 `--padding-4`（16px）；gap 首选 `--gap-2`（8px），有效间距至少4 CSS px并保留更大覆盖；复用Frame singleLine保持方向，Content继续Fill，附件不压缩；显式开启响应式时，继续按Frame原协议压缩／恢复首选间距。圆角为 `--radius-4`（16px）。
 
 ```svelte
 <CodeBlock
@@ -177,7 +177,7 @@
 
 默认态与全屏态的右上 CopyButton / ExpandButton 仍使用 `bare emphasis="muted"` 的图标强调与复制反馈；每个按钮独立使用上下 4px、左右 8px 的 padding、8px 圆角、半透明代码块语义背景及 20px backdrop blur，hover 时继续由 Button 将强调度提升到 100%。键盘焦点有可见轮廓。`singleLine` 的行内 trailing 复制按钮不使用这组右上视觉。
 
-工具栏使用内部 Pin 布局固定到 `pin-top-right`，距上边缘 8px、右边缘 4px；过长语言标签在可用宽度内省略。代码内容和纵向滚动条从工具栏下方开始，不被按钮覆盖。右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
+语言标签与动作组之间的有效间距至少4 CSS px；普通态与全屏态一致，纯图标组和代码字符／行号间距不由本规则改写。工具栏使用内部 Pin 布局固定到 `pin-top-right`，距上边缘 8px、右边缘 4px；过长语言标签在可用宽度内省略。代码内容和纵向滚动条从工具栏下方开始，不被按钮覆盖。右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
 
 ---
 
@@ -185,7 +185,7 @@
 
 ### 内置 Icon
 
-组件内置 SVG 图标，无需外部 Icon 组件依赖：
+默认图标由真实CopyButton／ExpandButton子组件拥有并经内部ComponentIcon解析；调用方无需额外import这些内部依赖：
 
 | 图标 | 用途 |
 |:---|:---|
@@ -264,7 +264,7 @@ CodeBlock 的默认态、全屏态和 `singleLine` 都由 `useOverlayScrollbar` 
 
 | Frame 能力 | 接入层 | 说明 |
 |:---|:---|:---|
-| 普通 Frame | 根 Frame | 容器不触发默认 hover 动效；`singleLine` 固定启用 row + Auto Layout 三槽协议 |
+| 普通 Frame | 根 Frame | 容器不触发默认 hover 动效；`singleLine` 固定复用 Frame singleLine + Auto Layout 三槽协议 |
 | `enableResponsive` | 根 Frame | 默认 `false`（代码块本身不需要容器断点响应） |
 | `enableContext` | 根 Frame | 默认 `false` |
 | `enableScaleObserver` | 根 Frame | 默认 `false` |
@@ -272,7 +272,7 @@ CodeBlock 的默认态、全屏态和 `singleLine` 都由 `useOverlayScrollbar` 
 | `stateContent` | 复制按钮内部 Frame | 驱动 Copy ↔ Check 图标交叉淡化 |
 | 共享元素布局转场 | 根 Frame / 全屏覆盖层 Frame | 捕获普通态矩形，并使用 `strategy: "layout"` 实际过渡位置和尺寸；避免 `scale()` 缩放代码 |
 | `Appear` | 全屏覆盖层 Frame | 提供布局转场时序桥接变量 |
-| Icon 按钮 | `<button>` 直接渲染 | 不使用 Button 组件（内置 Icon 规范 §2.7） |
+| Icon 按钮 | CopyButton／ExpandButton的真实Button宿主 | 通过公开Props与parts配置，显式配件保持自身输入（内置Icon规范§2.7） |
 
 ---
 
@@ -356,6 +356,10 @@ pnpm build`}
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 ## 更新日志
+
+### v1.8.2 (2026-10-23)
+
+- 单行代码与附件、普通／全屏语言标签与动作组保持至少4 CSS px；更大首选覆盖依原响应式协议压缩／恢复。单行变体复用Frame singleLine并标记Fill内容槽，防止响应方向改为列或短代码使trailing丢失位置。代码、行号、原滚动／复制／格式化和全屏行为保持。
 
 - 2026-09-28：同步 Indicator 的统一命中与状态视觉；Corner 默认同时调整宽高，显式单轴配置继续生效。
 

@@ -10,7 +10,7 @@ export const examples = [
         { id: "github", label: "GitHub", icon: "github-logo" },
     ]}
 />`,
-        expected: { render: "宽度足够时三个 Icon + Text Button 完整显示。", layout: "操作按 8px gap 单行排列。", interaction: "每个按钮保持真实 Button 行为。", performance: "自测量模式复用全局 ResizeObserver。", responsive: "跟随真实容器宽度依次进入 compact 与 More 菜单。" },
+        expected: { render: "宽度足够时三个 Icon + Text Button 完整显示。", layout: "操作首选 8px gap 单行排列，小字体／gap-scale 下仍至少4 CSS px。", interaction: "每个按钮保持真实 Button 行为。", performance: "自测量模式复用全局 ResizeObserver。", responsive: "跟随真实容器宽度依次进入 compact 与 More 菜单。" },
         logic: ["Items", "Full", "AutoWidth", "Responsive"],
     },
     {

@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   CodeBlock 组件：代码块显示，支持行号、复制、全屏放大
-  v1.8.1
+  v1.8.2
 
   布局模型：默认态为复合管理布局；singleLine 变体为槽位宿主布局
 
@@ -634,6 +634,7 @@
     enableDefaultMotion={true}
     enableAutoLayout={isSingleLine}
     row={isSingleLine}
+    singleLine={isSingleLine}
     bind:element={hostElement}
     class={[
         "snowui-code-block",
@@ -664,6 +665,7 @@
         <div
             bind:this={codeViewportElement}
             class="snowui-code-block-single-line-content snowui-overlay-scrollbar-viewport"
+            data-as="content"
             data-scroll-axis="horizontal"
         >
             <pre class="snowui-code-block-pre"><code
@@ -1036,10 +1038,10 @@
         --snowui-code-block-padding-x: var(--padding-4);
         --snowui-code-block-padding-y: var(--padding-3);
 
-        gap: var(
+        gap: max(4px, var(
             --snowui-code-block-gap-override,
             var(--snowui-code-block-gap)
-        );
+        ));
         box-sizing: border-box;
         height: auto;
     }
@@ -1096,7 +1098,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: var(--gap-2);
+        gap: max(4px, var(--gap-2));
         max-width: calc(100% - var(--size-3));
         z-index: 3;
     }

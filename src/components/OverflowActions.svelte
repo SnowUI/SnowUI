@@ -635,7 +635,7 @@
         display: inline-flex;
         align-items: center;
         flex-wrap: nowrap;
-        gap: var(--snowui-overflow-actions-gap-override, var(--gap-2, 0.5rem));
+        gap: max(4px, var(--snowui-overflow-actions-gap-override, var(--gap-2, 0.5rem)));
         width: 100%;
         min-width: 0;
         max-width: 100%;
