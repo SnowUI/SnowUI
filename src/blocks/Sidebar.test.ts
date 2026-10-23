@@ -36,9 +36,9 @@ export const examples = [
         code: `SB-02
 <Frame style="width: 220px; height: 28rem; align-items: flex-start;">
     <Sidebar activeItemId="dashboard">
-        <Frame as="logo" row class="items-center gap-8">
+        <Frame as="logo" singleLine gap={2}>
             <SnowUILogo as="logo-icon" variant="icon" />
-            <Text>Workshop</Text>
+            <Text lines={1}>Workshop</Text>
         </Frame>
         <SidebarItem id="explore" label="Explore" icon="compass" updated />
         <Separator />
@@ -101,10 +101,10 @@ export const examples = [
         <SidebarItem id="favorites" label="Favorites" icon="bookmark" />
         <SidebarItem id="analytics" label="Analytics" icon="gauge" />
         <Frame
-            as="footer"
+            as="footer" singleLine
         >
-            <Avatar aria-label="Current user" />
-            <Text>Yuan</Text>
+            <Avatar as="leading" aria-label="Current user" />
+            <Text lines={1}>Yuan</Text>
         </Frame>
     </Sidebar>
 </Frame>`,

@@ -272,5 +272,24 @@ for(const font of [16,8]){
 }
 await page.mouse.move(0,0);await packageTooltip.waitFor({state:'detached'});await page.emulateMedia({reducedMotion:'no-preference'});await page.evaluate(()=>{document.documentElement.style.fontSize='16px';document.documentElement.style.removeProperty('--gap-scale');});
 console.log('PASS: tarball Tooltip rich-label composition keeps 4px, Badge canvas, complete accessible text, original prose and stable content hover at 16/8px and 320/180/120/80/recovery without registering a duplicate Text tooltip');
+
+const packageSidebar=page.locator('[data-package-sidebar]'),packageFooter=packageSidebar.locator('.snowui-sidebar-footer > [data-as="footer"]');
+for(const font of [16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ const avatar=packageFooter.locator(':scope > .snowui-avatar'),width=await avatar.evaluate(n=>n.getBoundingClientRect().width);
+ for(const size of [180,120,80,60,180]){
+  await packageFooter.evaluate((n,size)=>n.style.width=`${size}px`,size);
+  const q=await packageFooter.evaluate(n=>{const a=n.querySelector(':scope > .snowui-avatar').getBoundingClientRect(),b=n.querySelector(':scope > .snowui-text').getBoundingClientRect(),r=n.getBoundingClientRect();return{gap:b.left-a.right,sameRow:Math.abs(a.top+a.bottom-b.top-b.bottom)<1,inside:a.left>=r.left-.5&&b.right<=r.right+.5,width:b.width};});assert.ok(q.gap>=4&&q.sameRow&&q.inside&&q.width>0,JSON.stringify(q));
+  assert.ok(Math.abs(await avatar.evaluate(n=>n.getBoundingClientRect().width)-width)<.5);
+  const text=await packageFooter.locator(':scope > .snowui-text').evaluate(n=>{const c=n.cloneNode(true);c.querySelectorAll('[aria-hidden="true"],script,style').forEach(n=>n.remove());return c.textContent.trim();});assert.equal(text,'Complete package current user name');
+ }
+ await packageSidebar.evaluate(n=>n.style.setProperty('--snowui-sidebar-footer-gap-override','24px'));
+ assert.equal(await packageFooter.evaluate(n=>parseFloat(getComputedStyle(n).columnGap)),24);
+ await packageSidebar.evaluate(n=>n.style.removeProperty('--snowui-sidebar-footer-gap-override'));
+}
+await packageFooter.evaluate(n=>n.style.removeProperty('width'));
+await packageSidebar.hover();await packageSidebar.getByRole('button',{name:'收起侧边栏',exact:true}).click();await packageSidebar.waitFor({state:'visible'});assert.equal(await packageSidebar.getAttribute('data-collapsed'),'true');assert.equal(await packageSidebar.locator('.snowui-sidebar-footer').getAttribute('aria-hidden'),'true');await packageSidebar.hover();await packageSidebar.getByRole('button',{name:'展开侧边栏',exact:true}).click();assert.equal(await packageSidebar.getAttribute('data-collapsed'),'false');
+await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball Sidebar explicit footer 4px, stable Avatar, complete truncated user name, 16/8px and 180/120/80/60/recovery, 24px override and original collapse/reopen');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }

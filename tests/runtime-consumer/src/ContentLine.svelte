@@ -1,5 +1,5 @@
 <script lang="ts">
-import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip} from '@snowui-design-system/components';
+import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip, Sidebar, Avatar} from '@snowui-design-system/components';
 let calls=$state(0);
 let checkboxValues=$state<string[]>([]);
 let radioValue=$state<string|null|undefined>(null);
@@ -88,4 +88,11 @@ let packagePanelDraft=$state('Package draft');
 
 <section aria-label="Package Tooltip content ownership">
 <Button id="package-tooltip-trigger">Package tooltip<Tooltip><Frame column gap={1}><Frame class="package-tooltip-row" singleLine gap={2}><Text class="package-tooltip-label" lines={1} tooltip={false}>Complete package build status</Text><Badge as="trailing" variant="border" count="Ready" /></Frame><Text class="package-tooltip-prose">Package tooltip prose stays in its original multiline layout.</Text></Frame></Tooltip></Button>
+</section>
+
+<section aria-label="Package single-line sidebar footer" style="height:300px;width:240px">
+<Sidebar data-package-sidebar ariaLabel="Package footer navigation area" persistence={false} resizable={false}>
+<SidebarItem id="package-footer-navigation" label="Package footer navigation" />
+<Frame as="footer" singleLine><Avatar as="leading" aria-label="Package current user" /><Text lines={1}>Complete package current user name</Text></Frame>
+</Sidebar>
 </section>

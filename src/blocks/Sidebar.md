@@ -2,10 +2,10 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v1.9.4
+> **版本**: v1.9.5
 > **职责**: 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-20
+> **文档修订**: 2026-10-23
 
 ## 组件介绍
 
@@ -88,9 +88,9 @@
 
 ```svelte
 <Sidebar activeItemId="dashboard" persistenceKey="workspace-primary">
-  <Frame as="logo" row>
+  <Frame as="logo" singleLine>
     <BrandIcon as="logo-icon" />
-    <Text>Brand</Text>
+    <Text lines={1}>Brand</Text>
   </Frame>
   <SidebarItem id="dashboard" label="Dashboard" icon="dashboard" updated />
   <Separator />
@@ -124,7 +124,7 @@
 - 折叠开始时，Sidebar 宽度、Item 文字与 Section 标题同时开始变化：宽度收窄，Item 文字和标题消费 Frame color bridge 渐隐；Item leading Icon 保持原横向位置。标题透明度归零后，标题高度、padding 与 Section gap 才消费 Frame size bridge 收起，Item 随后上移。展开时按同一组 bridge 平滑恢复。
 - 折叠按钮不内置 Tooltip，通过随状态更新的 `aria-label` 保留“展开 / 折叠侧边栏”可访问名称。其余内置 Tooltip（折叠态 Item label、Item action、Section action）统一位于对应元素右侧（`position="right"`）。Section 标题默认可折叠但不显示 Tooltip。
 - 默认不设置背景色。
-- Footer 只内置底部覆盖区域，不内置业务文案；区域默认使用 Figma Auto Layout 的 Align top left：内容整体位于容器左上方，内部横向排列并在同一水平线上垂直居中，内容 gap 为 `8px`；区域全宽贴底，内边距上 `12px`、下 `16px`、左右 `20px`。区域无圆角，不绘制背景色，也不使用背景模糊，避免覆盖宿主边框及拖宽时的模糊重绘。直接子节点 `as="footer"` 提供业务内容。折叠 / 展开期间 Footer 固定使用展开态内容宽度与底部位置，不跟随根宽度收缩或位移，只使用与 Sidebar 宽度时间轴一致的 opacity 渐隐 / 渐显；折叠态通过 `inert`、`aria-hidden` 与 `pointer-events: none` 退出交互。
+- Footer 只内置底部覆盖区域，不内置业务文案；区域默认使用 Figma Auto Layout 的 Align top left：内容整体位于容器左上方，内部横向排列并在同一水平线上垂直居中，内容 gap 为 `8px`；显式`singleLine`的Footer内容组合保留至少4 CSS px横向间距，较大现有覆盖保持；普通Footer间距不改。区域全宽贴底，内边距上 `12px`、下 `16px`、左右 `20px`。区域无圆角，不绘制背景色，也不使用背景模糊，避免覆盖宿主边框及拖宽时的模糊重绘。直接子节点 `as="footer"` 提供业务内容。折叠 / 展开期间 Footer 固定使用展开态内容宽度与底部位置，不跟随根宽度收缩或位移，只使用与 Sidebar 宽度时间轴一致的 opacity 渐隐 / 渐显；折叠态通过 `inert`、`aria-hidden` 与 `pointer-events: none` 退出交互。
 - 存在 Footer 时，Sidebar 通过共享 `resizeManager` 跟踪 Footer 实际高度；滚动内容延伸至 Sidebar 底部，使用 alpha 遮罩还原 Footer 覆盖渐变：Footer 顶部内容保留 100%，向下 20% 高度时保留 20%，到 40% 时完全不可见。Footer 自身内容不参与遮罩，深浅主题均不需要叠加背景色。导航尾部保留 Footer 高度 + 12px 安全区，保证滚到底时最后一项完整位于 Footer 上方。高度由声明式样式维护，拖宽时不中断；Logo 区域使用同一曲线的垂直镜像。
 
 ---
@@ -203,6 +203,10 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 - **规范**: `../../../specs/maintainers/LayoutProtocol.md`、`../../../specs/maintainers/ComponentGuidelines.md`
 
 ## 更新日志
+
+### v1.9.5 (2026-10-23)
+- 显式singleLine的Footer内容组合保留4 CSS px横向间距，保留较大公开覆盖；普通Footer布局、默认Logo图形及折叠／滚动渐隐不变。
+- 自定义品牌名与底部头像姓名示例复用Frame单行和Text全文缩略，沿用既有logo-icon／leading角色。
 
 - 2026-10-20：导航及滚动区默认名称、内置折叠按钮（含text浮层展开按钮）随LocaleProvider更新；显式ariaLabel优先于Provider消息。
 
