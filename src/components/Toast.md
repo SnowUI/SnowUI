@@ -2,7 +2,7 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v2.3.2
+> **版本**: v2.3.3
 > **职责**: 用短暂通知反馈操作结果或状态变化，支持图标、操作和富内容，适合保存成功、错误与提醒。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
@@ -17,7 +17,7 @@
 用于短暂的操作结果反馈，配合 Toaster 管理展示。通知历史、活动记录使用常驻内容列表，不使用 Toast。
 
 - 调用 toast 发送短暂反馈，由 Toaster 管理队列；独立渲染时页面负责关闭后的移除。
-- as="toast" 可接入宿主点击触发；leading / trailing 组合附属内容，parts 只配置默认关闭按钮。
+- as="toast" 可接入宿主点击触发；leading / trailing 组合附属内容，parts 只配置默认关闭按钮。短标签使用继承的 singleLine 与 Text lines={1}；内部有效间距至少4 CSS px，rich 多行正文保持原布局。
 <!-- usage-guide:end -->
 
 ## 快速开始
@@ -27,13 +27,13 @@
 <!-- quick-start:generated -->
 ```svelte
 <script lang="ts">
-	import { Toast, Button } from '@snowui-design-system/components';
+	import { Toast, Button, Text } from '@snowui-design-system/components';
 </script>
 
 <div style="display: flex; flex-direction: column; align-items: center; gap: var(--gap-4); max-width: 100%;">
-	<Toast>Draft saved</Toast>
-	<Toast positive>Changes published</Toast>
-	<Toast positive={false}>Connection lost</Toast>
+	<Toast singleLine><Text lines={1}>Draft saved</Text></Toast>
+	<Toast positive singleLine><Text lines={1}>Changes published</Text></Toast>
+	<Toast positive={false} singleLine><Text lines={1}>Connection lost</Text></Toast>
 </div>
 ```
 <!-- /quick-start:generated -->
@@ -61,10 +61,10 @@
 
 ### Toaster 内置组件双模式
 
-- `Toaster.parts.Toast`：统一配置 Toaster 直接生成的 Toast。
+- `Toaster.parts.Toast`：统一配置 Toaster 直接生成的 Toast；`Toaster.parts.Text` 只配置 text 字符串生成的标签，不接管自定义 children。
 - Toast 队列状态、position 与关闭事件由 Toaster 控制；外置显式 Props 高于 part。
 
-> **版本**: v2.3.2
+> **版本**: v2.3.3
 > **状态**: 已实现
 > **职责**: 全局浮层通知，支持命令式 API、6 位置堆叠、内置/外置图标三槽位与 rich 富文本变体
 
@@ -126,7 +126,7 @@ showToast("saved-template");                          // 触发 <Toast template 
 | 参数 | 类型 | 默认值 | 说明 |
 | :--- | :--- | :--- | :--- |
 | `positive` | `boolean` | — | 语义判定：`true`=积极(CheckCircle)；`false`=问题(Warning)；不传则不显示内置图标 |
-| `text` | `string` | — | 命令式快捷文案；渲染为简单 span |
+| `text` | `string` | — | 命令式快捷文案；Toaster 使用 Text 默认单行截断并提供全文提示 |
 | `children` | `Snippet` | — | 自定义正文内容；优先级高于 `text` |
 | `leading` | `Snippet` | — | 自定义 Leading 槽 Snippet |
 | `trailing` | `Snippet` | — | 自定义 Trailing 槽（rich 变体常用于放 Button） |
@@ -453,6 +453,10 @@ Toast 动效拆成 4 类原子动效：
 ---
 
 ## 更新日志
+
+### v2.3.3 (2026-10-23)
+
+- 通知内部图文和独立文字区域的有效间距至少4 CSS px，根字号及间距缩小时仍保留下限；已有更大间距保持。短标签组合可通过继承的 `singleLine` 与 `Text lines={1}` 保持单行并提供截断全文；rich 的复杂多行正文不自动转成单行。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 

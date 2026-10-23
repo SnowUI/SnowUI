@@ -15,6 +15,7 @@
     import Listbox from "./Listbox.svelte";
     import MenuItem from "./MenuItem.svelte";
     import Tooltip from "./Tooltip.svelte";
+    import {useOverlayScrollbar} from "../lib/overlay-scrollbar.svelte";
     import { getTableContext, type TableSortDirection } from "../lib/table-context.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
@@ -147,6 +148,16 @@
         },
     });
 
+    let toolbarElement = $state<HTMLElement>();
+    let toolbarTrackElement = $state<HTMLElement>();
+    const toolbarScrollbar = useOverlayScrollbar(() => toolbarElement, () => toolbarTrackElement, "horizontal");
+    function syncToolbarThumb(node: HTMLElement) {
+        $effect(() => {
+            node.style.width = `${toolbarScrollbar.thumbSize}px`;
+            node.style.transform = `translate3d(${toolbarScrollbar.thumbOffset}px,0,0)`;
+        });
+    }
+
     $effect(() => setFilter(filterValue));
 
     function setQuery(value: string) {
@@ -199,8 +210,9 @@
     }
 </script>
 
-<Frame tag="div" role="toolbar" aria-label={resolvedAriaLabel}
-    class={`snowui-table-toolbar snowui-rounded-rectangle ${userClass}`} data-bulk-pending={pendingAction}
+<Frame bind:element={toolbarElement} tag="div" role="toolbar" aria-label={resolvedAriaLabel}
+    class={`snowui-table-toolbar snowui-rounded-rectangle snowui-overlay-scrollbar-host snowui-overlay-scrollbar-viewport ${userClass}`} data-bulk-pending={pendingAction}
+    data-horizontal-track-position="self" data-horizontal-overflow={toolbarScrollbar.hasOverflow ? "true" : undefined}
     aria-busy={pendingAction !== undefined ? "true" : undefined} row gap={2}
     enableResponsive={enableResponsive} enableContext={enableContext}
     enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
@@ -231,12 +243,11 @@
                 <span class="snowui-table-toolbar-bulk-action" data-pending={pendingAction === "delete" ? "true" : undefined}>
                     {#if pendingAction === "delete"}
                         <Spinner size={12} aria-label={resolvedDeletingLabel} />
-                    {:else}
-                        <Button bare emphasis={builtInBareEmphasis} aria-label={resolvedDeleteLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("delete")}>
+                    {/if}
+                        <Button class="snowui-table-toolbar-delete-button" data-pending={pendingAction === "delete" ? "true" : undefined} bare emphasis={builtInBareEmphasis} aria-label={resolvedDeleteLabel} disabled={pendingAction !== undefined} onclick={() => void runDefaultBulkAction("delete")}>
                             <ComponentIcon name="trash" aria-hidden="true" />
                             <Tooltip as="tooltip">{resolvedDeleteLabel}</Tooltip>
                         </Button>
-                    {/if}
                 </span>
             {/if}
             {#if bulkActions}<span class="snowui-table-toolbar-extra-bulk-actions" inert={pendingAction !== undefined}><ComponentPartsBoundary>{@render bulkActions(resolvedSelectedCount)}</ComponentPartsBoundary></span>{/if}
@@ -279,16 +290,22 @@
     {/if}
 
     {#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}
+    <div bind:this={toolbarTrackElement} class="snowui-table-toolbar-built-in snowui-table-toolbar-scrollbar snowui-overlay-scrollbar" data-axis="horizontal" data-visible={toolbarScrollbar.hasOverflow ? "true" : "false"} style={`--snowui-overlay-scrollbar-scroll-offset:${toolbarScrollbar.scrollOffset}px`} aria-hidden="true">
+        <div class="snowui-overlay-scrollbar-thumb" use:syncToolbarThumb></div>
+    </div>
 </Frame>
 
 <style>
-    :global(:where(.snowui-table-toolbar)) { box-sizing:border-box; display:flex; flex-flow:row nowrap; align-items:center; width:100%; min-width:0; height:var(--size-10,2.5rem); padding:var(--snowui-table-toolbar-padding-override,var(--padding-1,.25rem) var(--padding-3,.75rem)); overflow:hidden; border:0; border-radius:var(--snowui-table-toolbar-radius-override,var(--radius-3,.75rem)); background:var(--snowui-table-toolbar-background-override,var(--black-4,#0000000a)); }
+    :global(:where(.snowui-table-toolbar)) { box-sizing:border-box; display:flex; flex-flow:row nowrap; align-items:center; width:100%; min-width:0; height:calc(var(--size-10,2.5rem) + var(--snowui-overlay-scrollbar-layout-space,0px)); position:relative; padding:var(--snowui-table-toolbar-padding-override,var(--padding-1,.25rem) var(--padding-3,.75rem)); overflow-x:auto; overflow-y:hidden; border:0; border-radius:var(--snowui-table-toolbar-radius-override,var(--radius-3,.75rem)); background:var(--snowui-table-toolbar-background-override,var(--black-4,#0000000a)); }
+    :global(:where(.snowui-table-toolbar > :not(.snowui-table-toolbar-scrollbar))) { margin-block-end:var(--snowui-overlay-scrollbar-layout-space,0px); }
+    :global(:where(.snowui-table-toolbar-scrollbar)) { z-index:1; }
     :global(:where(.snowui-table-toolbar-search)) { order:0; flex:1 1 0; min-width:0; }
-    :global(:where(.snowui-table-toolbar-bulk)) { order:1; display:inline-flex; align-items:center; gap:var(--gap-2); flex:0 0 auto; }
+    :global(:where(.snowui-table-toolbar-bulk)) { order:1; display:inline-flex; align-items:center; gap:max(4px,var(--gap-2)); flex:0 0 auto; }
     :global(:where(.snowui-table-toolbar-resident-separator)) { order:2; }
     :global(:where(.snowui-table-toolbar-picker)), :global(:where(.snowui-table-toolbar)>:not(.snowui-table-toolbar-built-in):not([data-as="search"]):not([data-as="bulk"])) { order:3; flex:0 0 auto; }
     :global(:where(.snowui-table-toolbar-selection)) { color:var(--black-60,#0009); font-size:var(--text-12); line-height:var(--leading-12); white-space:nowrap; }
     :global(:where(.snowui-table-toolbar-bulk-action)) { display:inline-flex; align-items:center; justify-content:center; }
+    :global(:where(.snowui-table-toolbar-delete-button[data-pending="true"])) { display:none; }
     :global(:where(.snowui-table-toolbar-picker)) { overflow:visible; }
     :global(:where(.snowui-table-toolbar-picker[data-as="filter"]:not([data-placeholder-visible="true"]))) { color:var(--black-100,#000); }
     :global(:where(.snowui-table-toolbar):has(>[data-as="search"]:not(.snowui-table-toolbar-built-in))>.snowui-table-toolbar-search),

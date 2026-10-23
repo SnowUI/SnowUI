@@ -1,5 +1,5 @@
 <script lang="ts">
-import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip, Sidebar, Avatar, SnowUILogo, Tag, ScrollArea} from '@snowui-design-system/components';
+import {Frame, Text, Icon, Button, MenuItem, Chip, Link, Table, TableHeader, TableHead, TableBody, TableRow, TableCell, Tab, Segmented, Checkbox, Radio, Switch, Input, Field, Select, SearchInput, Listbox, SearchBox, Breadcrumb, Kbd, SidebarItem, SidebarSection, Badge, Accordion, AccordionItem, SidePanel, Tooltip, Sidebar, Avatar, SnowUILogo, Tag, ScrollArea, Toast, TableToolbar, DataTable} from '@snowui-design-system/components';
 let calls=$state(0);
 let packageTagVisible=$state(true);
 let checkboxValues=$state<string[]>([]);
@@ -11,6 +11,9 @@ let accordionValue=$state<string|string[]|undefined>('0');
 let accordionChangeCalls=$state(0);
 let packagePanelOpen=$state(false);
 let packagePanelDraft=$state('Package draft');
+let packageToolbarSelected=$state<(string|number)[]>([1,2]);
+let packageToolbarCopies=$state(0);
+let packageToolbarDeletes=$state(0);
 </script>
 {#snippet graphic()}
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" aria-hidden="true"><path d="m3 10 4 4 10-10" fill="none" stroke="currentColor" stroke-width="2"/></svg>
@@ -111,4 +114,20 @@ let packagePanelDraft=$state('Package draft');
 {#if packageTagVisible}<Tag shape="left-arrow" closable onClose={()=>packageTagVisible=false} style="box-sizing:content-box;width:113.375px;height:21.375px;padding:3.25px 5.125px">Closable</Tag>{/if}
 </Frame></ScrollArea>
 <Button onclick={()=>packageTagVisible=true}>Reset package tags</Button>
+</section>
+
+<section aria-label="Package toast content">
+<Toast class="package-line-toast" singleLine positive size="sm" style="width:120px"><Text lines={1}>Complete package toast notification 完整通知名称</Text></Toast>
+<Toast class="package-rich-toast" variant="rich" positive><Frame column><Text>Package rich heading</Text><Text>Package rich body remains on another line.</Text></Frame></Toast>
+</section>
+
+<section aria-label="Package sort header" style="width:120px">
+<Table horizontalScroll minWidth={0} columnWidths={{title:120}} ariaLabel="Package sortable title"><TableHeader><TableRow><TableHead columnId="title" class="package-sort-head" sortDirection="ascending" resizable minWidth={32}>Complete package sortable title</TableHead></TableRow></TableHeader><TableBody><TableRow><TableCell columnId="title">A</TableCell></TableRow></TableBody></Table>
+</section>
+
+<section aria-label="Package narrow toolbar" style="width:320px">
+<DataTable rows={[{id:1,name:'Alpha'},{id:2,name:'Beta'}]} rowKey={row=>row.id} selection bind:selectedRowIds={packageToolbarSelected}>
+<TableToolbar class="package-narrow-toolbar" ariaLabel="Package bulk controls" search={false} sort={false} filter={false} clearLabel="Package clear selection" copyLabel="Package copy selection" deleteLabel="Package delete selection" onCopy={()=>{packageToolbarCopies++;}} onDelete={()=>{packageToolbarDeletes++;}}/>
+</DataTable>
+<output data-testid="package-toolbar-results">{packageToolbarCopies}/{packageToolbarDeletes}/{packageToolbarSelected.length}</output>
 </section>

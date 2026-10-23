@@ -1,6 +1,6 @@
 <script lang="ts">
 import { flushSync } from 'svelte';
-import { Button, Pagination, Toaster, toast, dismissAllToasts } from '@snowui-design-system/components';
+import { Button, Frame, Text, Pagination, Toaster, toast, dismissAllToasts } from '@snowui-design-system/components';
 
 let composition = $state('built-in');
 let responsive = $state<'auto' | 'none'>('auto');
@@ -26,6 +26,7 @@ function stack() {
 }
 </script>
 
+{#snippet complexNotification()}<Frame column><Text>Explicit package heading</Text><Text>Explicit package multiline body</Text></Frame>{/snippet}
 <section aria-label="Package lifecycle fixture" style="width:600px;max-width:100%;padding:24px">
     <h2>Package lifecycle fixture</h2>
     <label>Composition <select aria-label="Package pagination composition" bind:value={composition}><option>built-in</option><option>explicit</option></select></label>
@@ -54,5 +55,7 @@ function stack() {
     <button onclick={stack}>Package four notifications</button>
     <button onclick={() => dismissAllToasts()}>Package clear notifications</button>
     <output data-testid="package-notification-dismissed">{dismissed}</output>
-    <Toaster maxVisible={3}/>
+    <button onclick={() => toast({text:'Complete package notification with a long result 完整通知结果',positive:true,variant:'rich',duration:0,class:'package-long-notification'})}>Package long notification</button>
+    <button onclick={() => toast({children:complexNotification,positive:true,variant:'rich',duration:0,class:'package-explicit-notification'})}>Package complex notification</button>
+    <Toaster maxVisible={3} parts={{Text:{class:'package-generated-notification-label'}}}/>
 </section>

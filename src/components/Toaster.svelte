@@ -2,7 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Toaster 全局 Toast 容器
-  v1.0.2
+  v1.0.3
 
   职责：
   - 在 <body> 上挂载 6 个固定位置的 Toast 栈（Portal）
@@ -24,6 +24,7 @@
     import type { MotionConfig } from "../logic/motion-config";
     import {toastStore, dismissToast, pushOutToast, type ToastItem, type ToastPosition} from "../logic/toast.svelte";
     import Toast from "./Toast.svelte";
+    import Text from "./Text.svelte";
     import {provideComponentParts, type ComponentPartsOf} from "../logic/component-parts.svelte";
 
     interface Props {
@@ -45,7 +46,7 @@
         stackEasing?: string;
         /** Toast 区域宽度，单位 px 或 CSS 值；默认内容自适应 */
         width?: number | string;
-        parts?: ComponentPartsOf<{ Toast: typeof Toast }>;
+        parts?: ComponentPartsOf<{ Toast: typeof Toast; Text: typeof Text }>;
     }
 
     let {
@@ -60,7 +61,8 @@
         width = undefined,
         parts = undefined,
     }: Props = $props();
-    provideComponentParts(() => parts);
+    // 字符串标签直接配置；不能将其Text part传给调用方显式内容。
+    provideComponentParts(() => ({ Toast: parts?.Toast }));
 
     const POSITIONS: ToastPosition[] = [
         "top",
@@ -335,6 +337,7 @@
                     {@const stackOpacity = stackOpacityForIndex(indexFromFront)}
                     {#key `${item.id}:${item.exiting ? item.exitKind ?? "dismiss" : "active"}`}
                     <Toast
+                        singleLine={item.children ? parts?.Toast?.singleLine : parts?.Toast?.singleLine ?? true}
                         class={`snowui-toaster-slot${item.class ? ` ${item.class}` : ""}`}
                         data-frontmost={frontmost && !item.exiting ? "true" : "false"}
                         data-state={state}
@@ -366,7 +369,7 @@
                         {#if item.children}
                             {@render item.children()}
                         {:else if item.text !== undefined}
-                            <span>{item.text}</span>
+                            <Text lines={1} {...parts?.Text}>{item.text}</Text>
                         {/if}
                         {#if item.trailing}{@render item.trailing()}{/if}
                     </Toast>

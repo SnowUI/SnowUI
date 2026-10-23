@@ -1,7 +1,8 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
- Tooltip 文字提示组件 v1.24.3
+ Tooltip 文字提示组件 v1.24.4
+ 变更 (2026-10-23): 连续时间线进度限制0到1，避免提前帧时间产生负进度及NaN内容坐标。
  变更 (2026-10-12): 共享浮层卸载时安全读取延迟 Props，避免关闭提示后的空值错误。
  变更 (2026-09-20): 连续切换按平滑鼠标速度缩短协调时程，显示期单例采样并在隐藏时释放。
  变更 (2026-09-20): 默认 360px 换行与四边 16px 可视区避让；支持悬停阅读、超高内容滚动和 Escape 关闭。
@@ -519,7 +520,7 @@
 
     function getMotionProgress(elapsed: number, duration: number) {
         if (duration <= 0) return 1;
-        return Math.min(elapsed / duration, 1);
+        return Math.max(0, Math.min(elapsed / duration, 1));
     }
 
     function getContinuousDuration(distance: number, retargeting: boolean) {

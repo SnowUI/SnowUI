@@ -1,6 +1,6 @@
 /**
  * Toaster.test.ts
- * v1.0.1
+ * v1.0.3
  * 覆盖全局挂载、队列触发和位置分组的公开消费路径。
  */
 export const examples = [
@@ -10,7 +10,7 @@ export const examples = [
 <Toaster />
 <Button onclick={() => toast("Saved")}>Show Toast</Button>`,
         expected: {
-            render: "点击后在默认位置显示 Saved Toast；应用只挂载一个 Toaster。",
+            render: "点击后在默认位置显示 Saved Toast；字符串标签单行，空间不足时截断并可查看全文；应用只挂载一个 Toaster。",
             interaction: "新 Toast 进入全局队列，达到 duration 后自动退出；hover 可暂停当前可见栈计时。",
             accessibility: "Portal 根使用 aria-live=polite，只有最前方活动 Toast 进入 Tab 顺序。",
         },

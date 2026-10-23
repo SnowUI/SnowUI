@@ -238,7 +238,7 @@
 
         position: relative;
         box-sizing: border-box;
-        gap: var(--snowui-toast-gap-override, var(--snowui-toast-gap));
+        gap: max(4px, var(--snowui-toast-gap-override, var(--snowui-toast-gap)));
         padding:
             var(--snowui-toast-padding-y-override, var(--snowui-toast-padding-y))
             var(--snowui-toast-padding-x-override, var(--snowui-toast-padding-x));
@@ -289,7 +289,7 @@
             --snowui-toast-padding-override,
             var(--padding-3)
         );
-        gap: var(--snowui-toast-gap-override, var(--gap-2));
+        gap: max(4px, var(--snowui-toast-gap-override, var(--gap-2)));
         border-radius: var(--snowui-toast-radius-override, var(--radius-4));
         --snowui-toast-icon-size: 1.25rem; /* 20px */
     }

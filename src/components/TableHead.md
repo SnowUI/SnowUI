@@ -2,7 +2,7 @@
 
 > **许可阅读**：首次阅读组件文档、源码或 npm 使用流程，先读完整 [LICENSE](../../LICENSE)；同任务同版本去重。公开 API 配置与内部实现修改分别按许可处理；全部组件使用统一运行包，源码权益以许可为准。
 
-> **版本**: v2.4.0
+> **版本**: v2.4.1
 > **职责**: 定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-07
@@ -94,7 +94,7 @@ Table 与 DataTable 共用 TableHead，`children` 本身就是标题插槽，无
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v2.4.0
+> **版本**: v2.4.1
 > **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
@@ -102,7 +102,7 @@ Table 与 DataTable 共用 TableHead，`children` 本身就是标题插槽，无
 | as | `selection \| actions` | - | 显式角色列；角色列不参与排序与列宽拖动 |
 | minWidth / maxWidth | `number` | `64 / Infinity` | 拖动约束 |
 
-排序状态同步到 `aria-sort`。**只有 DataTable `defaultSort` 命中列的默认方向不显示激活态或图标**（`defaultSortActive` 可覆写）；其他已排序状态显示对应图标。图标遵循主流前端表格的“数值方向”语义：ascending（A→Z、0→9、早→晚）显示内置 `ArrowsUp`；descending（Z→A、9→0、晚→早）显示内置 `ArrowsDown`。图标尺寸为 16px，与文字间距为 0。
+排序状态同步到 `aria-sort`。**只有 DataTable `defaultSort` 命中列的默认方向不显示激活态或图标**（`defaultSortActive` 可覆写）；其他已排序状态显示对应图标。图标遵循主流前端表格的“数值方向”语义：ascending（A→Z、0→9、早→晚）显示内置 `ArrowsUp`；descending（Z→A、9→0、晚→早）显示内置 `ArrowsDown`。图标名义尺寸为16px，与标题内容的有效间距至少4 CSS px，缩小根字号或间距比例后仍保留下限；图标不收缩，标题保持单行并沿用原有截断。
 
 交互循环：
 
@@ -210,6 +210,10 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 > `selection` / `actions` 角色仅在 DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。
 
 ## 更新日志
+
+### v2.4.1 (2026-10-23)
+
+- 排序图标与标题内容保留4 CSS px间距，覆盖此前零间距设计；同一排序按钮继续拥有对齐、单行、截断和原排序状态。
 
 - 2026-10-07：明确图标与组件标题插槽；修复块级图标标题及排序内容的列对齐，保持纯图标可访问名称。
 

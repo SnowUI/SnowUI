@@ -11,6 +11,7 @@ type ElementGetter<T extends HTMLElement = HTMLElement> = () => T | undefined | 
 
 export interface OverlayScrollbarState {
     readonly hasOverflow: boolean;
+    readonly scrollOffset: number;
     readonly thumbSize: number;
     readonly thumbOffset: number;
     readonly thumbHeight: number;
@@ -26,6 +27,7 @@ export function useOverlayScrollbar(
     axis: OverlayScrollbarAxis = "vertical",
 ): OverlayScrollbarState {
     let hasOverflow = $state(false);
+    let viewportScrollOffset = $state(0);
     let thumbHeight = $state(0);
     let thumbY = $state(0);
 
@@ -42,6 +44,7 @@ export function useOverlayScrollbar(
         const scrollbar = getScrollbar();
         if (!viewport || !scrollbar) {
             hasOverflow = false;
+            viewportScrollOffset = 0;
             thumbHeight = 0;
             thumbY = 0;
             return;
@@ -51,6 +54,7 @@ export function useOverlayScrollbar(
         const clientSize = axis === "vertical" ? viewport.clientHeight : viewport.clientWidth;
         const trackSize = axis === "vertical" ? scrollbar.clientHeight : scrollbar.clientWidth;
         const scrollOffset = axis === "vertical" ? viewport.scrollTop : viewport.scrollLeft;
+        viewportScrollOffset = scrollOffset;
         const overflow = scrollSize > clientSize + 1 && trackSize > 0;
 
         hasOverflow = overflow;
@@ -219,6 +223,9 @@ export function useOverlayScrollbar(
     return {
         get hasOverflow() {
             return hasOverflow;
+        },
+        get scrollOffset() {
+            return viewportScrollOffset;
         },
         get thumbHeight() {
             return thumbHeight;

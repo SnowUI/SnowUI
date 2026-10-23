@@ -3,7 +3,7 @@ export const examples = [
         name: "A1: DataTable 排序与列宽",
         code: `A1
 <Table><TableHeader><TableRow><TableHead columnId="price" defaultSort="descending" defaultSortActive minWidth={64}>价格</TableHead></TableRow></TableHeader></Table>`,
-        expected: { render: "渲染 th 与 aria-sort；defaultSortActive 使默认方向也显示激活态和图标；ascending 使用 ArrowsUp，descending 使用 ArrowsDown。", layout: "图标 16px、与文间距 0；右侧 Indicator 为 1px × 16px 居中。", interaction: "defaultSortActive 列按默认 → 反向 → none → 默认；其他列按 none → ascending → descending → none。", performance: "排序状态由上层 context 持有。", responsive: "受 min/max 限制。" },
+        expected: { render: "渲染 th 与 aria-sort；defaultSortActive 使默认方向也显示激活态和图标；ascending 使用 ArrowsUp，descending 使用 ArrowsDown。", layout: "图标名义16px、与标题有效间距至少4 CSS px；右侧 Indicator 为 1px × 16px 居中。", interaction: "defaultSortActive 列按默认 → 反向 → none → 默认；其他列按 none → ascending → descending → none。", performance: "排序状态由上层 context 持有。", responsive: "受 min/max 限制。" },
         logic: ["Sort", "Resize"],
     },
     {

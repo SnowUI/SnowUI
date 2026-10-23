@@ -13,11 +13,11 @@ export const examples = [
         name: "TS-01：默认形态（default + 全部尺寸 + positive 判定）",
         code: `TS-01
 <Frame class="flex-col gap-8 items-start">
-    <Toast positive>Done</Toast>
-    <Toast positive={false}>Something Wrong</Toast>
-    <Toast size="sm" positive>Done</Toast>
-    <Toast size="sm" positive={false}>Something Wrong</Toast>
-    <Toast>No Icon</Toast>
+    <Toast positive singleLine><Text lines={1}>Done</Text></Toast>
+    <Toast positive={false} singleLine><Text lines={1}>Something Wrong</Text></Toast>
+    <Toast size="sm" positive singleLine><Text lines={1}>Done</Text></Toast>
+    <Toast size="sm" positive={false} singleLine><Text lines={1}>Something Wrong</Text></Toast>
+    <Toast singleLine><Text lines={1}>No Icon</Text></Toast>
 </Frame>`,
         expected: {
             render: "深色玻璃 pill；md 档字号 14、内置图标 20px；sm 档字号 12、内置图标 16px；positive=true → 绿色 CheckCircle，positive=false → 黄色 Warning；未传 positive 不渲染内置图标",
@@ -44,8 +44,8 @@ export const examples = [
     {
         name: "TS-03：rich 变体 + Trailing Button",
         code: `TS-03
-<Toast variant="rich" positive style="width: 15rem;">
-    <Text>Text</Text>
+<Toast variant="rich" positive singleLine style="width: 15rem;">
+    <Text lines={1}>Text</Text>
     <Button as="trailing" variant="gray">Button</Button>
 </Toast>`,
         expected: {
@@ -57,9 +57,9 @@ export const examples = [
     {
         name: "TS-04：外置 Icon 替换内置图标（as 示例）",
         code: `TS-04
-<Toast positive>
+<Toast positive singleLine>
     <Icon as="leading"><Heart /></Icon>
-    收藏成功
+    <Text lines={1}>收藏成功</Text>
 </Toast>`,
         expected: {
             render: "Leading 槽显示 Heart 图标，内置 CheckCircle 不再渲染",

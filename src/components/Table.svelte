@@ -133,8 +133,10 @@
                 });
                 cell.append(copy);
                 const style = getComputedStyle(cell);
-                const sortIcon = cell.querySelector(".snowui-table-sort")
-                    ? Math.max(12, parseFloat(getComputedStyle(document.documentElement).fontSize)) : 0;
+                const sortButton = cell.querySelector<HTMLElement>(".snowui-table-sort");
+                const sortIcon = sortButton
+                    ? Math.max(12, parseFloat(getComputedStyle(document.documentElement).fontSize))
+                        + (parseFloat(getComputedStyle(sortButton).columnGap) || 0) : 0;
                 preferred = Math.max(preferred, copy.getBoundingClientRect().width
                     + parseFloat(style.paddingLeft) + parseFloat(style.paddingRight) + sortIcon);
                 copy.remove();

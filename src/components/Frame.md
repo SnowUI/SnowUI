@@ -757,11 +757,13 @@ SnowUI 组件内部若拥有明确默认视觉，应直接引用组件族 preset
 - 仍然需要有一个明确的加载信号来源，但它通常只出现在页面根或区块根
 
 ```svelte
-<Frame loading={pageLoading}>
-    <Avatar src={user.avatar} />
-    <Text>{user.name}</Text>
-    <Button>提交</Button>
+<ScrollArea axis="horizontal" ariaLabel="Profile actions" width="100%">
+<Frame singleLine minWidth="max-content" loading={pageLoading}>
+    <Avatar as="leading" src={user.avatar} />
+    <Text lines={1}>{user.name}</Text>
+    <Button as="trailing">提交</Button>
 </Frame>
+</ScrollArea>
 ```
 
 ```svelte

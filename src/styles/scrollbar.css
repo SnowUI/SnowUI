@@ -314,3 +314,16 @@
     height: var(--snowui-overlay-scrollbar-size);
     background-color: var(--black-20, rgba(0, 0, 0, 0.2));
 }
+
+/* 保留直接角色子项的复合viewport：轨道抵消同一宿主的内容滚动。 */
+:where(.snowui-overlay-scrollbar-host[data-horizontal-track-position="self"]) {
+    --snowui-overlay-scrollbar-layout-space: 0px;
+}
+:where(.snowui-overlay-scrollbar-host[data-horizontal-track-position="self"][data-horizontal-overflow="true"]) {
+    --snowui-overlay-scrollbar-layout-space: calc(var(--snowui-overlay-scrollbar-size, 8px) + var(--snowui-scrollbar-edge-gap, 4px) * 2);
+}
+:where(.snowui-overlay-scrollbar-host[data-horizontal-track-position="self"] > .snowui-overlay-scrollbar[data-axis="horizontal"]) {
+    right: auto;
+    width: calc(100% - var(--snowui-scrollbar-edge-gap) * 2);
+    transform: translate3d(var(--snowui-overlay-scrollbar-scroll-offset, 0px), 0, 0);
+}

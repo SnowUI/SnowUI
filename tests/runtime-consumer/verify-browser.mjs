@@ -197,22 +197,22 @@ for(const reducedMotion of ['no-preference','reduce']) {
   await page.getByRole('combobox',{name:'Package notification position',exact:true}).selectOption(position);
   await page.getByRole('button',{name:'Package timed',exact:true}).click();
   await page.mouse.move(1,1);
-  await page.getByText('Package timed notification',{exact:true}).waitFor({state:'detached'});
+  await page.locator('.snowui-toaster-slot').filter({hasText:'Package timed notification'}).waitFor({state:'detached'});
   await page.getByTestId('package-notification-dismissed').filter({hasText:new RegExp(`^${++callbacks}$`)}).waitFor();
   await page.getByRole('button',{name:'Package persistent',exact:true}).click();
-  await page.getByText('Package persistent notification',{exact:true}).waitFor();
+  await page.locator('.snowui-toaster-slot').filter({hasText:'Package persistent notification'}).waitFor();
   await page.getByRole('button',{name:'Package clear notifications',exact:true}).click();
-  await page.getByText('Package persistent notification',{exact:true}).waitFor({state:'detached'});
+  await page.locator('.snowui-toaster-slot').filter({hasText:'Package persistent notification'}).waitFor({state:'detached'});
   await page.getByTestId('package-notification-dismissed').filter({hasText:new RegExp(`^${++callbacks}$`)}).waitFor();
  }
  await page.getByRole('button',{name:'Package four notifications',exact:true}).click();
- await page.getByText(`Package revision ${serial+4}`,{exact:true}).waitFor();
- await page.getByText(`Package revision ${serial+1}`,{exact:true}).waitFor({state:'detached'});
+ await page.locator('.snowui-toaster-slot').filter({hasText:`Package revision ${serial+4}`}).waitFor();
+ await page.locator('.snowui-toaster-slot').filter({hasText:`Package revision ${serial+1}`}).waitFor({state:'detached'});
  await page.getByTestId('package-notification-dismissed').filter({hasText:new RegExp(`^${++callbacks}$`)}).waitFor();
  await page.getByRole('button',{name:'Package clear notifications',exact:true}).click();
  callbacks+=3;serial+=4;
  await page.getByTestId('package-notification-dismissed').filter({hasText:new RegExp(`^${callbacks}$`)}).waitFor();
- assert.equal(await page.getByText(/^Package revision /).count(),0);
+ assert.equal(await page.locator('.snowui-toaster-slot').filter({hasText:/Package revision /}).count(),0);
 }
 console.log('PASS: tarball Pagination 8 lifecycle combinations / 24 teardown-remount cycles; Toast 6 positions / 2 motion modes, exit cleanup, next enqueue, push-out and exact dismissal callbacks');
 // 仅使用真实tarball和随包默认图标；不从资源包或兄弟源码补入实现。
@@ -312,5 +312,56 @@ for(const font of[16,8]){
 const toggled=packageTags.first();await toggled.scrollIntoViewIfNeeded();await toggled.click();assert.equal(await toggled.getAttribute('aria-pressed'),'true');await toggled.click();assert.equal(await toggled.getAttribute('aria-pressed'),'false');const closed=packageTags.last();await closed.scrollIntoViewIfNeeded();await closed.hover();await closed.getByRole('button',{name:'关闭标签',exact:true}).click();assert.equal(await packageTags.count(),2);await packageTagGroup.getByRole('button',{name:'Reset package tags',exact:true}).click();assert.equal(await packageTags.count(),3);
 await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
 console.log('PASS: tarball Tag groups keep 4px outside and zero inside, exact fractional arrow canvases including content-box, horizontal narrow/recovery, toggle, close and reset');
+const packageToast=page.locator('.package-line-toast');
+for(const font of[16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ for(const width of[320,180,120,80,320]){
+  await packageToast.evaluate((n,width)=>n.style.width=`${width}px`,width);
+  const q=await packageToast.evaluate(n=>{const a=n.querySelector('.snowui-toast-builtin-icon').getBoundingClientRect(),b=n.querySelector(':scope > .snowui-text').getBoundingClientRect();return{gap:b.left-a.right,sameRow:Math.abs(a.top+a.bottom-b.top-b.bottom)<1,contained:b.right<=n.getBoundingClientRect().right+.5};});assert.ok(q.gap>=4&&q.sameRow&&q.contained,JSON.stringify(q));
+ }
+ await packageToast.evaluate(n=>n.style.setProperty('--snowui-toast-gap-override','24px'));assert.equal(await packageToast.evaluate(n=>parseFloat(getComputedStyle(n).columnGap)),24);await packageToast.evaluate(n=>n.style.removeProperty('--snowui-toast-gap-override'));
+}
+const richTexts=page.locator('.package-rich-toast > .snowui-frame > .snowui-text');assert.equal(await richTexts.count(),2);assert.ok((await richTexts.nth(1).boundingBox()).y>(await richTexts.nth(0).boundingBox()).y);
+await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball Toast single-line 4px, complete text, narrow/recovery, 24px override and original rich multiline body');
+const packageSort=page.locator('.package-sort-head .snowui-table-sort');
+for(const font of[16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ const q=await packageSort.evaluate(n=>{const a=n.querySelector('.snowui-table-head-content').getBoundingClientRect(),b=n.querySelector('.snowui-table-sort-icon').getBoundingClientRect();return{gap:b.left-a.right,sameRow:Math.abs(a.top+a.bottom-b.top-b.bottom)<1,contained:b.right<=n.getBoundingClientRect().right+.5};});assert.ok(q.gap>=4&&q.sameRow&&q.contained,JSON.stringify(q));
+ await page.locator('.package-sort-head .snowui-table-head-indicator').dblclick();assert.ok(await packageSort.evaluate(n=>{const t=n.querySelector('.snowui-table-head-content');return t.scrollWidth<=t.clientWidth+1;}));
+}
+await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball TableHead effective 4px sort gap, single-line title and Table double-click fit without truncation at 16/8px');
+await page.getByRole('button',{name:'Package long notification',exact:true}).click();const longNotification=page.locator('.package-long-notification');await longNotification.waitFor();
+for(const font of[16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ for(const width of[320,180,120,80,320]){
+  await longNotification.evaluate((n,width)=>n.style.width=`${width}px`,width);
+  const q=await longNotification.evaluate(n=>{const a=n.querySelector('.snowui-toast-builtin-icon').getBoundingClientRect(),t=n.querySelector('.package-generated-notification-label'),b=t.getBoundingClientRect();return{gap:b.left-a.right,sameRow:Math.abs(a.top+a.bottom-b.top-b.bottom)<1,height:b.height,lineHeight:parseFloat(getComputedStyle(t).lineHeight),contained:b.right<=n.getBoundingClientRect().right+.5};});assert.ok(q.gap>=4&&q.sameRow&&q.height<=q.lineHeight+.5&&q.contained,JSON.stringify(q));
+ }
+}
+await longNotification.evaluate(n=>n.style.width='80px');await longNotification.locator('.package-generated-notification-label').hover();await page.getByRole('tooltip').filter({hasText:'Complete package notification with a long result 完整通知结果'}).waitFor();await page.mouse.move(0,0);
+await page.getByRole('button',{name:'Package complex notification',exact:true}).click();const explicitNotification=page.locator('.package-explicit-notification');await explicitNotification.waitFor();assert.equal(await explicitNotification.getAttribute('data-single-line'),null);assert.equal(await explicitNotification.locator('.package-generated-notification-label').count(),0);const explicitTexts=explicitNotification.locator(':scope > .snowui-frame > .snowui-text');assert.equal(await explicitTexts.count(),2);assert.ok((await explicitTexts.nth(1).boundingBox()).y>(await explicitTexts.nth(0).boundingBox()).y);
+await page.getByRole('button',{name:'Package clear notifications',exact:true}).click();await explicitNotification.waitFor({state:'detached'});await longNotification.waitFor({state:'detached'});await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball Toaster generated Text part, long string single-line fit and tooltip at 80px, original explicit multiline children isolated from parts.Text and unchanged queue lifecycle');
+const packageToolbar=page.locator('.package-narrow-toolbar');
+for(const font of[16,8]){
+ await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ for(const width of[320,180,120,80,320]){
+  await packageToolbar.evaluate((n,width)=>n.style.width=`${width}px`,width);
+  const q=await packageToolbar.evaluate(n=>{const a=n.querySelector('.snowui-table-toolbar-selection').getBoundingClientRect(),b=n.querySelector('.snowui-table-toolbar-bulk > .snowui-button').getBoundingClientRect();return{gap:b.left-a.right,sameRow:Math.abs(a.top+a.bottom-b.top-b.bottom)<1};});assert.ok(q.gap>=4&&q.sameRow,JSON.stringify(q));
+ }
+}
+await packageToolbar.evaluate(n=>{n.style.width='80px';n.scrollLeft=n.scrollWidth;});await page.waitForFunction(()=>{const n=document.querySelector('.package-narrow-toolbar'),t=n.querySelector('.snowui-table-toolbar-scrollbar'),r=n.getBoundingClientRect(),b=t.getBoundingClientRect();return n.scrollLeft>0&&t.dataset.visible==='true'&&Math.abs(b.left-r.left-4)<1&&b.right<=r.right+.5;});
+const packageTrack=packageToolbar.locator('.snowui-table-toolbar-scrollbar');assert.ok((await packageTrack.boundingBox()).y>=(await packageToolbar.locator('.snowui-table-toolbar-bulk').boundingBox()).y+(await packageToolbar.locator('.snowui-table-toolbar-bulk').boundingBox()).height+4);
+for(const label of['Package copy selection','Package delete selection']){const control=page.getByRole('button',{name:label,exact:true});await control.scrollIntoViewIfNeeded();await control.click();}
+assert.equal(await page.getByTestId('package-toolbar-results').textContent(),'1/1/2');const packageClear=page.getByRole('button',{name:'Package clear selection',exact:true});await packageClear.scrollIntoViewIfNeeded();await packageClear.click();await page.waitForFunction(()=>document.querySelector('[data-testid="package-toolbar-results"]').textContent==='1/1/0');await page.waitForFunction(()=>document.querySelector('.package-narrow-toolbar .snowui-table-toolbar-scrollbar').dataset.visible==='false');
+await page.evaluate(()=>{document.documentElement.style.removeProperty('font-size');document.documentElement.style.removeProperty('--gap-scale');});
+console.log('PASS: tarball TableToolbar 4px count/action gap, native local scrolling at 80px, pinned shared track below controls, 16/8px recovery and copy/delete/clear exactly once');
+await page.emulateMedia({reducedMotion:'no-preference'});
+await page.locator('[data-package-time-trigger="status"]').hover();await page.locator('.snowui-tooltip-portal [data-package-time-content="status"]').waitFor({state:'visible'});await page.waitForFunction(()=>{const el=document.querySelector('.snowui-tooltip-portal');return el&&el.getAnimations({subtree:true}).every(a=>a.playState!=='running');});
+await page.evaluate(()=>{window.__packageTimelineSamples=[];window.__packageNativeRaf=window.requestAnimationFrame.bind(window);window.requestAnimationFrame=callback=>window.__packageNativeRaf(timestamp=>{callback(timestamp-50);queueMicrotask(()=>{const shell=document.querySelector('.snowui-tooltip-motion-shell');if(shell?.dataset.switchPhase!=='moving')return;const layers=[...document.querySelectorAll('.snowui-tooltip-content-layer')];window.__packageTimelineSamples.push({layers:layers.length,values:[shell.style.getPropertyValue('--snowui-tooltip-motion-x'),shell.style.getPropertyValue('--snowui-tooltip-motion-y'),...layers.flatMap(n=>[n.style.getPropertyValue('--snowui-tooltip-layer-x'),n.style.getPropertyValue('--snowui-tooltip-layer-y')])]});});});});
+try{await page.locator('[data-package-time-trigger="shortcut"]').hover();await page.waitForFunction(()=>window.__packageTimelineSamples.length>0);await page.waitForFunction(()=>document.querySelector('.snowui-tooltip-motion-shell')?.dataset.switchPhase==='idle');const samples=await page.evaluate(()=>window.__packageTimelineSamples);assert.ok(samples.some(s=>s.layers===2),'必须实际覆盖新旧两层移动帧');assert.deepEqual(samples.filter(s=>s.values.some(v=>!Number.isFinite(parseFloat(v)))),[],'提前帧时间不能生成NaN坐标');assert.equal(await page.locator('.snowui-tooltip-portal [data-tooltip-layer="outgoing"]').count(),0);}finally{await page.evaluate(()=>{window.requestAnimationFrame=window.__packageNativeRaf;delete window.__packageNativeRaf;delete window.__packageTimelineSamples;});}
+console.log('PASS: tarball Tooltip early animation-frame timestamps retain finite shell/content coordinates and complete the original joined-content lifecycle');
 assert.deepEqual(errors,[]);console.log('PASS: actual tarball SSR, hydration, Frame identity, Snippet, Input binding, Button event, DataTable/Toolbar Context chart/sidebar render, keyboard activation, animated numeric update and light/dark theme');
 } finally { await browser.close(); }
