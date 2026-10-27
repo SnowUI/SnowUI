@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import net from 'node:net';
+import {stripVTControlCharacters} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {execFileSync,spawn} from 'node:child_process';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -18,7 +19,7 @@ run(['install','--no-frozen-lockfile']);run(['check']);run(['build']);run(['exec
 if(process.env.CI)run(['exec','playwright','install','--with-deps','chromium']);
 let ownPreviewReady=false;let previewOutput='';
 const server=spawn(process.execPath,[path.join(fixture,'node_modules/vite/bin/vite.js'),'preview','--host','127.0.0.1','--port',port,'--strictPort'],{cwd:fixture,stdio:['ignore','pipe','inherit']});
-server.stdout.on('data',chunk=>{process.stdout.write(chunk);previewOutput=(previewOutput+chunk.toString()).slice(-4096);if(previewOutput.includes(url.slice(0,-1)))ownPreviewReady=true;});
+server.stdout.on('data',chunk=>{process.stdout.write(chunk);previewOutput=(previewOutput+chunk.toString()).slice(-4096);if(stripVTControlCharacters(previewOutput).includes(url.slice(0,-1)))ownPreviewReady=true;});
 try{
  let ready=false;for(let i=0;i<80;i++){if(server.exitCode!==null)throw Error(`候选包预览提前退出：${server.exitCode}`);if(ownPreviewReady){try{if((await fetch(url)).ok){ready=true;break;}}catch{}}await new Promise(r=>setTimeout(r,250));}
  if(!ready)throw Error('候选包预览未能启动');
