@@ -257,10 +257,13 @@ await packagePanel.locator('.snowui-side-panel-toolbar-top .snowui-side-panel-to
 await page.evaluate(()=>{document.documentElement.style.fontSize='16px';document.documentElement.style.removeProperty('--gap-scale');});
 console.log('PASS: tarball SidePanel title/close 4px and 12px at 16/8px, larger 24px override, complete panel name, stable portal identity and unsaved draft across placement and close');
 
-await page.emulateMedia({reducedMotion:'reduce'});await page.locator('#package-tooltip-trigger').hover();
-const packageTooltip=page.locator('.snowui-tooltip-portal');await packageTooltip.waitFor();const packageTooltipRow=packageTooltip.locator('.package-tooltip-row');await packageTooltipRow.waitFor();
+await page.emulateMedia({reducedMotion:'reduce'});
+const packageTooltip=page.locator('.snowui-tooltip-portal');const packageTooltipRow=packageTooltip.locator('.package-tooltip-row');
 for(const font of [16,8]){
+ // 根字号变化会移动触发器和浮层；每个字号从真实重新悬停开始，不把离开后的关闭当作悬停失败。
+ await page.mouse.move(0,0);await packageTooltip.waitFor({state:'detached'});
  await page.evaluate(font=>{document.documentElement.style.fontSize=`${font}px`;document.documentElement.style.setProperty('--gap-scale','.25');},font);
+ await page.locator('#package-tooltip-trigger').hover();await packageTooltip.waitFor();await packageTooltipRow.waitFor();
  const badgeSize=await packageTooltipRow.locator('.snowui-badge').evaluate(n=>n.getBoundingClientRect().width);
  for(const width of [320,180,120,80,320]){
   await packageTooltipRow.evaluate((n,width)=>n.style.width=`${width}px`,width);
