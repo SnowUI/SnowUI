@@ -1,7 +1,7 @@
 {
   "license": "SEE LICENSE IN LICENSE",
   "name": "@snowui-design-system/components",
-  "version": "0.3.0-alpha.11",
+  "version": "0.3.0-alpha.12",
   "private": false,
   "type": "module",
   "exports": {
