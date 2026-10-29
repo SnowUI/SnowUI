@@ -60,11 +60,11 @@
 
 ## 参考来源
 
-- 本地参考源码：`../../../../github/ui/animations-master/`（相对于本文档），其中 Blur Reveal 示例位于 `src/lib/components/spell/blur-reveal/blur-reveal.svelte`。
+- 参考项目 Svelte Animations 中的 Blur Reveal 示例位于 `src/lib/components/spell/blur-reveal/blur-reveal.svelte`；该路径相对于参考项目，不属于 SnowUI 组件包或源码归档。
 - 原站示例：[Svelte Animations · Blur Reveal](https://sv-animations.vercel.app/spell/blur-reveal)。
 - 参考网站：[Text Motion Observatory · References](https://text-motion-observatory.farewelltowind.chatgpt.site/references)（需要登录 ChatGPT；此补充参考不是使用组件的前提）。
 
-本地源码用于核对模糊揭示动效；参考网站作为补充案例入口。参考仓库不参与 SnowUI 构建或运行时依赖。
+参考项目用于核对模糊揭示动效；参考网站作为补充案例入口。参考项目不参与 SnowUI 构建或运行时依赖。
 
 ## AI Zone
 
