@@ -127,7 +127,7 @@
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -135,7 +135,7 @@
 
 ### 布局模型
 
-主布局模型：**槽位宿主布局**。定义见 `../../../specs/maintainers/LayoutProtocol.md`。
+主布局模型：**槽位宿主布局**。定义见 `../../../docs/standards/LayoutProtocol.md`。
 
 搜索图标、原生输入和清除按钮的间距由 Input 统一解析，至少为 4 CSS px。空值折叠直接使用 Input 的实际内容状态，不另存一份输入值或清除状态；defaultValue、未绑定输入、外部绑定、disabled、readonly 与 clearable={false} 都采用同一内容判断。borderless 才为真实清除按钮增加共享 resizeManager 尺寸订阅，读取未变换的实际宽度，卸载或条件变化时清理；默认外观不增加该订阅，不支持 ResizeObserver 时保留首次测量与原生编辑。
 
@@ -143,7 +143,7 @@
 
 ### 样式数值
 
-样式数值登记在 `../../../specs/reference/ComponentStyleSheet.md`。`SearchInput` 默认与 `Input 标准` 保持一致，不另建通用颜色体系；内置默认 `Search` 作为搜索输入的专属视觉，静止态使用 Black/20，`:focus-within` 激活态使用 Black/40。该规则限定在 `.snowui-input.snowui-search-input .snowui-search-input-default-icon`，不影响通用 `Icon` 或外置 leading。
+样式数值登记在 `../../../docs/reference/ComponentStyleSheet.md`。`SearchInput` 默认与 `Input 标准` 保持一致，不另建通用颜色体系；内置默认 `Search` 作为搜索输入的专属视觉，静止态使用 Black/20，`:focus-within` 激活态使用 Black/40。该规则限定在 `.snowui-input.snowui-search-input .snowui-search-input-default-icon`，不影响通用 `Icon` 或外置 leading。
 
 ### 开发者关键字
 

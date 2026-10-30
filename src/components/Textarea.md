@@ -306,7 +306,7 @@
 - **共享逻辑**: [../logic/frame-field-control.ts](../logic/frame-field-control.ts)
 - **Props 分发**: [../logic/frame-prop-filter.ts](../logic/frame-prop-filter.ts)
 - **字段上下文**: [../context.ts](../context.ts)
-- **关联规范**: [../../../specs/maintainers/HTMLSpec.md](../../../specs/maintainers/HTMLSpec.md)
+- **关联规范**: [../../../docs/standards/HTMLSpec.md](../../../docs/standards/HTMLSpec.md)
 
 ---
 

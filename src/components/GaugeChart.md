@@ -181,7 +181,7 @@ interface GaugeChartItem {
 - 不接入三槽位协议，不承担通用子元素排列。
 - 根层显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`，并透传 `class`、`style` 与未声明属性。
 
-详见 [LayoutProtocol.md §12.7](../../../specs/maintainers/LayoutProtocol.md)。
+详见 [LayoutProtocol.md §12.7](../../../docs/standards/LayoutProtocol.md)。
 
 ---
 

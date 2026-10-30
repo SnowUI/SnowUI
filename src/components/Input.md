@@ -169,7 +169,7 @@
 
 ### 布局模型
 
-主布局模型：**槽位宿主布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md)。
+主布局模型：**槽位宿主布局**。定义见 [../../../docs/standards/LayoutProtocol.md §12.3](../../../docs/standards/LayoutProtocol.md)。
 
 根宿主固定采用单行内容协议，Leading / Control / Trailing 之间的有效间距至少为 4 CSS px；显式 gap={0}、根字号或间距缩放不会压低该下限，较大的原有首选间距保持。Field 只编排外部区域与连续字段表面，不改写 Input 自己的内部布局或附件间距。日期分段、颜色文本与绘制结构的内部零间距不受影响。
 
@@ -321,7 +321,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 
 ### 展示可打开、可复制的链接
 
-“链接输入框 / 链接 input / 可复制链接”不是可编辑输入。使用 [CopyLink](CopyLink.md)，无边框和输入框 hover 动效；链接文字 hover 显示下划线、点击在新标签页打开，其余区域点击复制。完整组合约定见 [自然语言映射](../../../specs/reference/NaturalLanguageToSnowUI.md)。Input 保留给需要编辑地址或只读选择值的场景。
+“链接输入框 / 链接 input / 可复制链接”不是可编辑输入。使用 [CopyLink](CopyLink.md)，无边框和输入框 hover 动效；链接文字 hover 显示下划线、点击在新标签页打开，其余区域点击复制。完整组合约定见 [自然语言映射](../../../docs/reference/NaturalLanguageToSnowUI.md)。Input 保留给需要编辑地址或只读选择值的场景。
 
 ### 无障碍与表单建议
 
@@ -375,7 +375,7 @@ Input 的根布局固定按 Leading / Control / Trailing 三段组织：
 
 > **2026-09-12 v1.1.4**：输入表面显式使用 `align-content: center`。带 leading / trailing 的单行 Grid 在指定 height / min-height 时整体垂直居中，避免通用自动布局的 flex-start 将剩余空间堆到下方；SearchInput 同步继承此修复，默认自适应高度不变。
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
 
 
 > **2026-09-11 修复**：分段键盘输入保留未完成草稿，组件自产的 input 通知不重新解析为空值；默认 loading 骨架使用输入表面的完整高度，不重复叠加内容 padding。
@@ -692,7 +692,7 @@ invalid=true + !hasCustomTrailing
 - **共享逻辑**: [../logic/frame-field-control.ts](../logic/frame-field-control.ts)
 - **Props 分发**: [../logic/frame-prop-filter.ts](../logic/frame-prop-filter.ts)
 - **字段上下文**: [../context.ts](../context.ts)
-- **关联规范**: [../../../specs/maintainers/HTMLSpec.md](../../../specs/maintainers/HTMLSpec.md)
+- **关联规范**: [../../../docs/standards/HTMLSpec.md](../../../docs/standards/HTMLSpec.md)
 
 ---
 

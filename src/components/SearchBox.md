@@ -135,7 +135,7 @@
 使用现有 `useLocale()`，key：`searchBox.placeholder`、`searchBox.clear`。默认占位和清除名称随 LocaleProvider 切换；显式 placeholder（含空字符串）与 aria-label 优先，查询值保持原样。Provider messages 可覆盖缺省文案。
 
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
 
 
 
@@ -149,7 +149,7 @@
 
 ### 布局模型
 
-主布局模型：**槽位宿主布局**。定义见 `../../../specs/maintainers/LayoutProtocol.md`。
+主布局模型：**槽位宿主布局**。定义见 `../../../docs/standards/LayoutProtocol.md`。
 
 `SearchBox` 使用 `Frame row singleLine` 固定启用内部自动布局协议；外部 `enableAutoLayout={false}` 不关闭该搜索触发器的三槽位布局。图标、内容与快捷键／清除附件之间的有效间距至少为 4 CSS px，根字号或间距缩放和 gap={0} 不压低下限，较大的首选间距保留。单行内容不响应 column 方向降级；图标退化态仍只显示原有 leading，不插入文字或空槽。原始文本流继续保留完整可访问名称，外置 children 与弹层仍由原组合协议拥有：
 
@@ -161,7 +161,7 @@
 
 ### 样式数值
 
-样式数值登记在 `../../../specs/reference/ComponentStyleSheet.md`。
+样式数值登记在 `../../../docs/reference/ComponentStyleSheet.md`。
 
 默认触发器数值来自 Figma：
 

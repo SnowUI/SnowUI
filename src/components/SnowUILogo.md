@@ -96,7 +96,7 @@ SnowUILogo 只负责品牌视觉，不内置 `href`、路由或打开方式。�
 
 ### 闲置动效
 
-- 默认关闭，通过 `idleMotion={true}` 显式开启；Site 的启用位置与滚动切换时机由 [主页规则](../../../site/docs/SiteRequirements.md#31-home) 维护，组件不判断路由或 Header 状态。开关不影响 hover 问候；运行中关闭会恢复静态品牌位置。
+- 默认关闭，通过 `idleMotion={true}` 显式开启；Site 的启用位置与滚动切换时机由 [主页规则](../../../site/docs/standards/SiteRequirements.md#31-home) 维护，组件不判断路由或 Header 状态。开关不影响 hover 问候；运行中关闭会恢复静态品牌位置。
 
 - 品牌 icon 整体顺时针匀速旋转，16 秒一圈；同时以 5.8 秒周期上下飘浮，曲线 `cubic-bezier(.45, 0, .55, 1)`，上移幅度为图标边长的 1/7（参考站云朵 84px 对应 12px）。
 - 两层动效仅作用于品牌图形，字标与命中框保持静止；进入 hover 时暂停退出中的品牌图形，Emoji 不旋转、不飘浮；恢复品牌时从原位渐显并重新开始闲置循环。

@@ -4,7 +4,7 @@
 
 `components/src/blocks/` 存放可复用区块，不按购买档位分类。区块由基础组件、复合组件、布局协议和区域级逻辑组合而成，面向真实产品场景，页面继续负责路由、数据请求、权限与业务副作用。
 
-使用、修改或交付前阅读本仓库根目录 [LICENSE](../../LICENSE)；完整商业与交付规则见 [商业策略](../../../specs/commercial/CommercialStrategy.md)。全部组件与区块通过统一预编译运行包 `@snowui-design-system/components` 使用。
+使用、修改或交付前阅读本仓库根目录 [LICENSE](../../LICENSE)；完整商业与交付规则见 [商业策略](../../../docs/standards/commercial/CommercialStrategy.md)。全部组件与区块通过统一预编译运行包 `@snowui-design-system/components` 使用。
 
 ## 使用入口
 

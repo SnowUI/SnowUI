@@ -204,7 +204,7 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 列宽手柄使用 `tableHead.resizeColumn`（传入显式 `label`）或 `tableHead.resizeColumnGeneric`（未传可读名称）；`label` 属于调用方业务文案，保留原文。`columnId` 仅供内部列识别及既有 TableToolbar 回退，不写入手柄的可访问名称。
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 
 > `selection` / `actions` 角色仅在 DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。

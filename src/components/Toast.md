@@ -45,7 +45,7 @@
 | parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置内置关闭 Button 的外观；事件、关闭语义和 ARIA 由 Toast 管理 |
 | id | `string` | — | 静态使用时透传为 DOM id；`template` 模式下作为模板 id，供 `showToast(id)` 激活 |
 | template | `boolean` | `false` | **模版模式**:只注册为命令式 Toast 模板，不直接渲染；用于"一段 Toast 代码 + 一个触发按钮"的写法 |
-| as | `"toast" \| undefined` | — | **内嵌模式**(v1.1.0):`as="toast"` 启用 Inline 模式,自动发现宿主父元素并绑定 click 事件触发 Toast。遵循 [ComponentGuidelines.md §5](../../../specs/maintainers/ComponentGuidelines.md) 三激活模式规范 |
+| as | `"toast" \| undefined` | — | **内嵌模式**(v1.1.0):`as="toast"` 启用 Inline 模式,自动发现宿主父元素并绑定 click 事件触发 Toast。遵循 [ComponentGuidelines.md §5](../../../docs/standards/ComponentGuidelines.md) 三激活模式规范 |
 | positive | `boolean` | — | 语义判定：`true`=积极(CheckCircle)；`false`=问题(Warning)；不传则不渲染内置图标 |
 | variant | `ToastVariant` | `"default"` | 视觉变体 |
 | size | `ToastSize` | `"md"` | 仅 default 变体生效 |
@@ -236,7 +236,7 @@ showToast("saved-template");                          // 触发 <Toast template 
 
 ### 内嵌模式 (v1.1.0,`as="toast"`)
 
-Toast 作为宿主子节点,点击宿主即触发,无需 id、无需手动 `showToast`。遵循 [ComponentGuidelines.md §5 浮层组件三激活模式规范](../../../specs/maintainers/ComponentGuidelines.md)。
+Toast 作为宿主子节点,点击宿主即触发,无需 id、无需手动 `showToast`。遵循 [ComponentGuidelines.md §5 浮层组件三激活模式规范](../../../docs/standards/ComponentGuidelines.md)。
 
 ```svelte
 <Toaster />
@@ -381,7 +381,7 @@ Toast 动效拆成 4 类原子动效：
 
 #### 技术职责归属
 
-该归属按 `specs/GUIDELINES.md`、`specs/maintainers/ComponentGuidelines.md §0.5` 与 `components/src/components/Frame.md §1` 的作用半径原则执行：
+该归属按 `AGENTS.md`、`docs/standards/ComponentGuidelines.md §0.5` 与 `components/src/components/Frame.md §1` 的作用半径原则执行：
 
 | 能力 | 归属 | 原因 |
 | :--- | :--- | :--- |
@@ -418,10 +418,10 @@ Toast 动效拆成 4 类原子动效：
 - 已完成：当前堆叠阶段仍由 `indexFromFront` 映射视觉状态；文档保留显式状态迁移模型作为后续维护目标。
 
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
 
 
-> **2026-09-10 浮层内边框**：rich 变体复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/maintainers/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+> **2026-09-10 浮层内边框**：rich 变体复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../docs/standards/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
 
 <a id="开发者指南-ai"></a>
 
@@ -480,7 +480,7 @@ Toast 动效拆成 4 类原子动效：
 
 #### 新增
 
-- **内嵌模式 `as="toast"`**:Toast 作为宿主子节点(如 Button),自动发现父元素并绑定 click 事件触发,无需 id 与手动 `showToast`。遵循 [ComponentGuidelines.md §5 浮层组件三激活模式规范](../../../specs/maintainers/ComponentGuidelines.md)。Toast 三模式齐备:面板 / 内嵌 / 模版。
+- **内嵌模式 `as="toast"`**:Toast 作为宿主子节点(如 Button),自动发现父元素并绑定 click 事件触发,无需 id 与手动 `showToast`。遵循 [ComponentGuidelines.md §5 浮层组件三激活模式规范](../../../docs/standards/ComponentGuidelines.md)。Toast 三模式齐备:面板 / 内嵌 / 模版。
 - 新增 TS-30 / TS-31 示例覆盖 Inline 模式 default / rich 变体。
 
 ### v2.1.0 (2026-05-11)

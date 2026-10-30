@@ -96,7 +96,7 @@
 - 组件持有字符目标与进度，连续更新只替换正在播放字符的终点；仅显式重播或配置变化重新启动。一个运行中的循环驱动全部字符，结束或卸载时释放。
 - 自定义输出元素首次连接时保留服务端文字与框架水合边界，交由所属组件初始化；已初始化元素断开再连接时恢复目标文字。
 
-- 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../specs/maintainers/TextMotionSpec.md#2-统一排版与颜色)。
+- 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../docs/standards/TextMotionSpec.md#2-统一排版与颜色)。
 
 - 主布局模型为内禀原子布局，根层为 `Frame`。
 - 根 `Frame` 的 `enableDefaultMotion` 默认保持 `true`；扰动动画只更新内部输出层，显式 `while*` 与父级编排可继续控制组件整体。
@@ -130,7 +130,7 @@
 
 ### v1.3.2 (2026-09-09)
 
-- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../specs/maintainers/TextMotionSpec.md#21-motioncolor)。
+- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../docs/standards/TextMotionSpec.md#21-motioncolor)。
 - 字符变化效果保持原有规则；未设置颜色、关闭动画（适用时）或减少动效生效时显示最终原色。连续更新重新编排颜色序列，卸载清理颜色动画。
 
 

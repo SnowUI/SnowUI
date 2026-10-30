@@ -126,7 +126,7 @@ gap 归属：原生表格列之间无通用 gap，视觉间距来自 Cell paddin
 
 普通 Table 的 TableHead 默认不允许拖动修改列宽；需要时显式传入 `resizable`。DataTable 的普通列保持默认可拖动，显式 `resizable={false}` 可关闭。该默认能力只负责列宽，不会让普通 Table 自动拥有数据排序规则。
 
-DataTable selection 角色中，TableHead 的全选 Checkbox 与 TableCell 的行 Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`，即 17×17px。额外的 `0.0625rem` 是 [StyleSpec.md §2.2.2](../../../specs/maintainers/StyleSpec.md) 登记的 Table 视觉居中特例，不借用任何边框 Token，也不改变 Checkbox 组件自身的 16px 默认值；可通过 `--snowui-table-selection-checkbox-size-override` 覆盖。
+DataTable selection 角色中，TableHead 的全选 Checkbox 与 TableCell 的行 Checkbox 默认使用 `calc(var(--size-4) + 0.0625rem)`，即 17×17px。额外的 `0.0625rem` 是 [StyleSpec.md §2.2.2](../../../docs/standards/StyleSpec.md) 登记的 Table 视觉居中特例，不借用任何边框 Token，也不改变 Checkbox 组件自身的 16px 默认值；可通过 `--snowui-table-selection-checkbox-size-override` 覆盖。
 
 首次加载列协议：TableHead 通过 Table Context 显式注册列结构；TableBody 在 `loading` 生效时按该结构生成真实 `tr / td` Skeleton rows。首次加载只消费同一语义表格内部的列注册；响应式布局另由 Table 私有控制器测量所拥有的原生表格网格。DataTable 可通过继承的同一 Context 提供“首次加载且 rows 为空”状态与规范化后的 `pageSize`；独立 Table 也可由 TableBody 显式启用；已知数据数量时传入 `rowCount`，未知时按外部容器可见高度估算，详见 TableBody 文档。
 
@@ -231,7 +231,7 @@ TableCell 默认 `lines={1}`，原始文字不需要再包一层 Text。行 hove
 
 响应式收列停留恢复：宽度 1s 不再变化后，仍显示的列恢复其原有透明度（包括表头的默认弱化透明度），位移自然完成。再次缩窄从当前透明度接续，已经收起的列保持隐藏；DataTable 复用同一规则。
 
-渐隐计算与 OverflowActions 共用 [responsive-exit](../lib/responsive-exit.md)，统一动效边界见 [响应式项目收起](../../../specs/maintainers/MotionPresetSpec.md#23-响应式项目收起)。
+渐隐计算与 OverflowActions 共用 [responsive-exit](../lib/responsive-exit.md)，统一动效边界见 [响应式项目收起](../../../docs/standards/MotionPresetSpec.md#23-响应式项目收起)。
 
 Table 是 Table / DataTable 的唯一布局计算入口，依据自身容器可用宽度和实际列内容，不使用设备断点。
 

@@ -70,7 +70,7 @@
 
 ### 布局模型
 
-主布局模型：**内联外壳布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.4](../../../specs/maintainers/LayoutProtocol.md)。
+主布局模型：**内联外壳布局**。定义见 [../../../docs/standards/LayoutProtocol.md §12.4](../../../docs/standards/LayoutProtocol.md)。
 
 Badge 的根节点是 inline-level 定位外壳，内容整体 Hug：
 

@@ -514,7 +514,7 @@
 /* === 悬浮操作层（Floating Action Overlay）通用基类 ===
    语义：让操作控件（删除 X / 操作按钮 / 复选框等）浮在内容之上，容器 hover 或内部聚焦时显现；
    配合「内容边缘渐隐」（同文件 .snowui-scroll-mask 或 lib/edge-fade.ts）让控件下方内容朝控件一侧渐隐，
-   保证控件清晰可读、内容不被硬切。规范：specs/maintainers/StyleSpec.md §2.4；能力：components/src/lib/edge-fade.md。
+   保证控件清晰可读、内容不被硬切。规范：docs/standards/StyleSpec.md §2.4；能力：components/src/lib/edge-fade.md。
    用法：宿主加 .snowui-overlay-action-host（建立定位上下文），浮动控件加 .snowui-overlay-action 并自行声明
    inset / 贴哪条边 / 尺寸。简单就地浮动（如 Tag 删除 X）用本类即可；需要随行 sticky / fixed 跟踪
    （如 Table 数据行操作列）的复杂定位由组件自管，不走本类。 */
@@ -668,7 +668,7 @@
  * 仅含视觉规则（背景、毛玻璃、圆角、阴影、边框、内边距），
  * 定位（position/z-index）和结构（overflow/animation）由各组件自行声明。
  * 当前引用：Listbox.svelte、Popover.svelte（v3.0.0 起合并 QuickAction / SearchPopup）
- * 规范：specs/maintainers/StyleSpec.md §2.6.3 第 4 类（跨组件共享视觉基类）
+ * 规范：docs/standards/StyleSpec.md §2.6.3 第 4 类（跨组件共享视觉基类）
  */
 /* 共享默认低于组件自有规则，不依赖动态样式注入顺序。 */
 @layer snowui-shared-visual {

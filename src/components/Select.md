@@ -183,7 +183,7 @@ Select 内的 Listbox 默认 `search=false`。显式组合时使用 `<Listbox se
 
 ### 布局模型
 
-主布局模型：**槽位宿主布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md)。
+主布局模型：**槽位宿主布局**。定义见 [../../../docs/standards/LayoutProtocol.md §12.3](../../../docs/standards/LayoutProtocol.md)。
 
 普通字段模式的根宿主固定采用单行内容协议，选中值可收缩，图标与标签的有效间距至少为 4 CSS px；gap={0}、根字号或间距缩放不压低下限，较大首选间距保持。buttonTrigger 模式由真实 Button 拥有图文内容，Select 的无视觉定位外壳不增加空白间距。自定义 children 保留原结构，弹层与表单协议不变。
 
@@ -350,7 +350,7 @@ Select (Frame row)
 
 
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="样式规范-style-spec"></a>
 
@@ -406,7 +406,7 @@ Listbox 浮层遵循 **Quick Action 通用样式规范**，与 Popover / Context
 | 背景 | `rgba(255, 255, 255, 0.9)` / `Background/3` | `var(--snowui-background-quick-action)` |
 | 圆角 | `16px` | `var(--radius-4)` |
 | 内边距 | `8px` | `var(--padding-2)` |
-| 阴影 | 参见 `../../../specs/reference/StyleGuide.md` Quick Action 浮层风格规范 | `var(--snowui-shadow-quick-action)` |
+| 阴影 | 参见 `../../../docs/reference/StyleGuide.md` Quick Action 浮层风格规范 | `var(--snowui-shadow-quick-action)` |
 | 边框 | `none` | `var(--snowui-border-quick-action)` |
 | 毛玻璃模糊 | `blur(40px)` | `var(--snowui-backdrop-quick-action)` |
 | 选项圆角 | `12px` | `var(--radius-3)` |
@@ -572,8 +572,8 @@ Select 有 `as="segment"` 时自持 `padding: 12px 16px`，icon 作为 Select �
 - **Props 分发**: [../logic/frame-prop-filter.ts](../logic/frame-prop-filter.ts)
 - **字段上下文**: [../context.ts](../context.ts) — `ListboxOwnerContext`
 - **Context Key**: [../keys.ts](../keys.ts) — `LISTBOX_OWNER_CONTEXT_KEY`
-- **关联规范**: [../../../specs/maintainers/HTMLSpec.md](../../../specs/maintainers/HTMLSpec.md)
-- **自动布局协议**: [../../../specs/maintainers/LayoutProtocol.md](../../../specs/maintainers/LayoutProtocol.md)
+- **关联规范**: [../../../docs/standards/HTMLSpec.md](../../../docs/standards/HTMLSpec.md)
+- **自动布局协议**: [../../../docs/standards/LayoutProtocol.md](../../../docs/standards/LayoutProtocol.md)
 
 ---
 

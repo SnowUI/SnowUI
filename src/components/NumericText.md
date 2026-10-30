@@ -98,7 +98,7 @@
 
 - NumericText 保留原有替换关键帧与中断方式，不启用 FlowText 的叠加布局路径。格式化缓存和生命周期优化由共享层提供。
 
-- 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../specs/maintainers/TextMotionSpec.md#2-统一排版与颜色)。
+- 排版默认继承容器，基线与同字体、字号的普通文字对齐；滚动层和裁切边界遵循 [TextMotionSpec §2](../../../docs/standards/TextMotionSpec.md#2-统一排版与颜色)。
 
 - 主布局模型为内禀原子布局，根层为 `Frame`。
 - 根 `Frame` 的 `enableDefaultMotion` 默认保持 `true`；字符 diff 动画只作用于内部输出层，显式 `while*` 与父级编排可继续控制组件整体。
@@ -130,7 +130,7 @@
 
 ### v1.7.2 (2026-09-09)
 
-- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../specs/maintainers/TextMotionSpec.md#21-motioncolor)。
+- `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../docs/standards/TextMotionSpec.md#21-motioncolor)。
 - 字符变化效果保持原有规则；未设置颜色、关闭动画（适用时）或减少动效生效时显示最终原色。连续更新重新编排颜色序列，卸载清理颜色动画。
 
 

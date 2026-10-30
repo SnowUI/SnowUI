@@ -180,7 +180,7 @@ Use the documented locale and formatting options of date and number components f
 
 ### AI Zone
 
-- 实现位于 `components/src/components/LocaleProvider.svelte`，Context 解析复用 `../i18n/locale.svelte.ts`，完整协议见 [LocalizationSpec.md](../../../specs/maintainers/LocalizationSpec.md)。
+- 实现位于 `components/src/components/LocaleProvider.svelte`，Context 解析复用 `../i18n/locale.svelte.ts`，完整协议见 [LocalizationSpec.md](../../../docs/standards/LocalizationSpec.md)。
 - LocaleProvider 是无视觉 Provider：不渲染 Frame、DOM 外壳或样式，不参与 LayoutProtocol / ComponentStyleSheet / Skeleton；只设置 `LOCALE_CONTEXT_KEY` 并渲染 children。
 - Context 优先级：组件显式文案 Prop > `messages` > 当前 locale catalog > `zh-CN` catalog > key。
 - 内置 catalog 当前含 `zh-CN` 与 `en-US`；未知 locale 先回退语言主标签，再回退 `zh-CN`。

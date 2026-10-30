@@ -146,7 +146,7 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 
 `fill={true}` 时,横向子项使用 `flex: 1 1 0` 等宽填满容器可用宽度。通常配合 `style="width: ..."` / 宽度工具类使用;未定义容器宽度时仍按内容自然宽度布局。
 
-详见 [LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md)。
+详见 [LayoutProtocol.md §12.3](../../../docs/standards/LayoutProtocol.md)。
 
 ---
 

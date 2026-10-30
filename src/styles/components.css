@@ -4,7 +4,7 @@
  * SnowUI Components Styles — 外部样式覆盖入口
  *
  * 外部覆盖意义：
- *   本文件与 specs/reference/ComponentStyleSheet.md §3 共同构成「外部样式覆盖体系」。
+ *   本文件与 docs/reference/ComponentStyleSheet.md §3 共同构成「外部样式覆盖体系」。
  *   用户无需修改任何组件源文件，只需取消对应注释并赋值，即可覆盖单一组件的局部样式。
  *   · 变量名的权威来源 → 运行时代码实际消费的 --snowui-*-override；ComponentStyleSheet §3 为生成索引
  *   · 变量含义与默认值 → 对应组件源码与公开组件文档；本文件注释用于发现和快速参考
@@ -20,7 +20,7 @@
  *   1. 同步对应组件公开文档与本文件的名称 / 快速参考；
  *   2. 在 specs/ 执行 `node scripts/generate-spec-index.mjs` 刷新 ComponentStyleSheet §3；
  *   3. 在工作区根执行 `node scripts/check-standards.js`，双向核对运行时名称、生成索引和本文件注释入口。
- *   详见 specs/maintainers/StyleSpec.md §2.3.1、§2.9.2 与 specs/reference/ComponentStyleSheet.md §1。
+ *   详见 docs/standards/StyleSpec.md §2.3.1、§2.9.2 与 docs/reference/ComponentStyleSheet.md §1。
  */
 
 :root {
@@ -440,7 +440,7 @@
 
     /* ─────────────────────────────────────────
        补充覆盖入口（尺寸 / 背景 / 边框 / 动效 / 状态等）
-       名称由运行时代码决定，并生成到 specs/reference/ComponentStyleSheet.md §3。
+       名称由运行时代码决定，并生成到 docs/reference/ComponentStyleSheet.md §3。
        具体默认值见对应组件 .svelte 源码。
     ───────────────────────────────────────── */
 
@@ -732,7 +732,7 @@
     /* ─────────────────────────────────────────
        共享 X 清除/关闭图标按钮基类（.snowui-clear-icon-btn）
        被 Input / Tag / MenuItem / SearchBox / Toast 共用；改这里全局生效。
-       规范：specs/maintainers/StyleSpec.md §2.6.3 第 5 类
+       规范：docs/standards/StyleSpec.md §2.6.3 第 5 类
     ───────────────────────────────────────── */
     /* --snowui-clear-icon-size-override: ; */            /* 尺寸（默认 var(--size-4) = 16px） */
     /* --snowui-clear-icon-color-override: ; */           /* 图标颜色（默认 var(--black-100)） */

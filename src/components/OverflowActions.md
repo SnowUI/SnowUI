@@ -111,7 +111,7 @@
    - `all`：全部操作转入菜单。
    - `progressive`：按 `overflowFrom="start" | "end"` 从一侧逐个转入菜单。
 
-宽度接近按钮收纳阈值时，即将进入 More 的按钮在 `--size-5` 的固定宽度区间内渐隐；连续拖动时反向拖宽按当前宽度恢复，更多按钮和整组背景不参与渐隐。首次出现 More 可能同时收起多个按钮，它们同步渐隐。 有效宽度（优先 availableWidth）停止变化 1s 后，保留按钮使用共享恢复控制器恢复原透明度；恢复中或恢复后再次缩窄从当前透明度接续。已收纳按钮保持隐藏，More 与保留按钮的位移自然完成。菜单展开只冻结收纳布局，不阻止透明度恢复。仅 full → compact 时不淡出整颗按钮。减少动效设置下直接切换。规则与 Table 共用 [响应式项目收起](../../../specs/maintainers/MotionPresetSpec.md#23-响应式项目收起)。
+宽度接近按钮收纳阈值时，即将进入 More 的按钮在 `--size-5` 的固定宽度区间内渐隐；连续拖动时反向拖宽按当前宽度恢复，更多按钮和整组背景不参与渐隐。首次出现 More 可能同时收起多个按钮，它们同步渐隐。 有效宽度（优先 availableWidth）停止变化 1s 后，保留按钮使用共享恢复控制器恢复原透明度；恢复中或恢复后再次缩窄从当前透明度接续。已收纳按钮保持隐藏，More 与保留按钮的位移自然完成。菜单展开只冻结收纳布局，不阻止透明度恢复。仅 full → compact 时不淡出整颗按钮。减少动效设置下直接切换。规则与 Table 共用 [响应式项目收起](../../../docs/standards/MotionPresetSpec.md#23-响应式项目收起)。
 
 响应式收纳改变可见按钮集合时，保留按钮与 More 以原生 Flex 对齐位置为终点，使用 `RESIZE_MOTION` 做水平平移；连续宽度变化不重复启动，反向收纳从当前视觉位置接续。私有适配器位于 `src/lib/overflow-actions-motion.ts`，不缩放按钮内容；减少动效时直接完成布局。
 
@@ -152,7 +152,7 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 

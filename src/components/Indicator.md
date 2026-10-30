@@ -148,7 +148,7 @@ Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize �
 - Indicator 将 handle 元素直接交给 resizable；pointerdown / keyboard 从手柄本身起始，并使用 pointer capture + window capture 持续跟踪 move / up / cancel。禁止父组件复制 pointer / keyboard 算法。
 - resizable action 的创建 effect 只跟踪 target / handle / axis；`value`、边界和 callback 使用独立 effect 调用 `action.update()`。创建时必须使用 `untrack()` 读取 options，禁止尺寸写回触发 action destroy，导致拖拽在第一次 pointermove 后中断。
 - width 对应 resizable horizontal axis 与 ARIA vertical orientation；height 对应相反组合。
-- corner 遵守 [内置 Icon 规范](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)，使用随包图形回退和可选 IconProvider；不在组件中复制或重画 path。
+- corner 遵守 [内置 Icon 规范](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)，使用随包图形回退和可选 IconProvider；不在组件中复制或重画 path。
 - 不接入 Skeleton：手柄没有加载占位意义。
 
 ## 更新日志

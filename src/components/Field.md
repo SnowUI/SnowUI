@@ -176,7 +176,7 @@
 
 ### 布局模型
 
-主布局模型：**槽位宿主布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md)。
+主布局模型：**槽位宿主布局**。定义见 [../../../docs/standards/LayoutProtocol.md §12.3](../../../docs/standards/LayoutProtocol.md)。
 
 Field 只拥有外部 Leading / Content / Trailing、区域编排、连续字段表面和分割线；内部 Input / Select 或显式 singleLine 内容行继续拥有自己的布局、对齐与间距。Field 自身启用 singleLine，或直接组合 leading / trailing 附件时，图文有效间距至少为 4 CSS px；普通 row / col / segment 的结构性零间距与多行说明保持。
 

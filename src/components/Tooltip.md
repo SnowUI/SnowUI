@@ -100,7 +100,7 @@
 
 ### 布局模型
 
-主布局模型：**内联外壳布局**。定义见 [../../../specs/maintainers/LayoutProtocol.md §12.4](../../../specs/maintainers/LayoutProtocol.md)。
+主布局模型：**内联外壳布局**。定义见 [../../../docs/standards/LayoutProtocol.md §12.4](../../../docs/standards/LayoutProtocol.md)。
 
 Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内容本身按内联外壳布局管理：
 
@@ -164,7 +164,7 @@ Tooltip 的 Portal、定位、碰撞翻转属于组件行为；可见气泡内�
 ### 4) 滤镜与阴影
 - Backdrop 保留完全透明的渐变绘制面，避免浏览器省略无背景绘制层的滤镜合成；颜色与生命周期动效仍由 Foreground 持有。
 - 保留毛玻璃：`backdrop-filter: blur(1.25rem)`（含 `-webkit-backdrop-filter`）。
-- Portal 必须保持在应用根节点隔离层之外，且自身不得被全局根节点选择器误加 `isolation: isolate`；否则毛玻璃虽有计算值，但无法采样应用根节点内的页面内容。根节点隔离规则见 [StyleSpec.md §2.6.4](../../../specs/maintainers/StyleSpec.md#264-全局根层隔离与-portal-背景采样)。
+- Portal 必须保持在应用根节点隔离层之外，且自身不得被全局根节点选择器误加 `isolation: isolate`；否则毛玻璃虽有计算值，但无法采样应用根节点内的页面内容。根节点隔离规则见 [StyleSpec.md §2.6.4](../../../docs/standards/StyleSpec.md#264-全局根层隔离与-portal-背景采样)。
 - 当前版本已移除阴影，不使用 `box-shadow`。
 
 ### 5) 显隐与连续切换动效

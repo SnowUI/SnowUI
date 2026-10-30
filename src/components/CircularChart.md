@@ -245,7 +245,7 @@ interface CircularChartGradient {
 - 图表尺寸由 `size` 与 SVG 几何算法决定；作为外部布局子项时表现为 Hug。
 - 不接入三槽位协议，不承担通用子元素排列。
 
-详见 [LayoutProtocol.md §12.3](../../../specs/maintainers/LayoutProtocol.md)。
+详见 [LayoutProtocol.md §12.3](../../../docs/standards/LayoutProtocol.md)。
 
 ---
 

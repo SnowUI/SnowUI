@@ -130,7 +130,7 @@
 
 ### 专业艺术色例外
 
-Gradient 的六组固定 SVG palette、中心色与 Avatar 模式多色 Overlay 已在 [StyleSpec §2.1.3](../../../specs/maintainers/StyleSpec.md#213-专业艺术色例外强制) 单独登记为专业艺术色例外。它们共同构成经设计确认的生成式矢量视觉资产，因此不映射到 SnowUI 语义 Token，也不能作为按钮、文字、状态、表面或其他组件的通用颜色来源。
+Gradient 的六组固定 SVG palette、中心色与 Avatar 模式多色 Overlay 已在 [StyleSpec §2.1.3](../../../docs/standards/StyleSpec.md#213-专业艺术色例外强制) 单独登记为专业艺术色例外。它们共同构成经设计确认的生成式矢量视觉资产，因此不映射到 SnowUI 语义 Token，也不能作为按钮、文字、状态、表面或其他组件的通用颜色来源。
 
 例外只覆盖 Gradient 画面及其 Avatar 视觉分支。组件根的尺寸、圆角、外部 `class` / `style` 覆盖、无障碍与 reduced-motion 仍遵守现行 StyleSpec；新增 palette 或将颜色用于新的语义前必须重新登记。
 

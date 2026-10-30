@@ -25,7 +25,7 @@ resolveSnowUIColor(color: SnowUIColor | string): string
 ## 开发者指南 (AI)
 
 - **实现**: [./color.ts](color.ts)
-- **规范**: [../../../specs/maintainers/StyleSpec.md §2.1.2](../../../specs/maintainers/StyleSpec.md)
+- **规范**: [../../../docs/standards/StyleSpec.md §2.1.2](../../../docs/standards/StyleSpec.md)
 - 项目所有者手工同步修改 `../styles/themes.css` 与仓库外 `styles/snowui-themes.css` 后，如新增颜色 Token，必须同步增加映射。AI 和自动脚本不得修改或互相覆盖两份主题文件。
 
 ## 更新日志 (Changelog)

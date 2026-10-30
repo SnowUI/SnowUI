@@ -340,7 +340,7 @@ pnpm build`}
 
 ### 布局模型
 
-默认态主布局模型：**复合管理布局**（参见 [LayoutProtocol.md §12.6](../../../specs/maintainers/LayoutProtocol.md)）。`singleLine` 改用**槽位宿主布局**，根层直接管理 Leading / Content / Trailing，且不生成下列默认态的滚动、全屏与 resize 子树。
+默认态主布局模型：**复合管理布局**（参见 [LayoutProtocol.md §12.6](../../../docs/standards/LayoutProtocol.md)）。`singleLine` 改用**槽位宿主布局**，根层直接管理 Leading / Content / Trailing，且不生成下列默认态的滚动、全屏与 resize 子树。
 
 组件内部包含：
 - 工具栏区域（固定在顶部，不随代码滚动）
@@ -353,7 +353,7 @@ pnpm build`}
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 ## 更新日志
 

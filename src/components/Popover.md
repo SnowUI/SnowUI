@@ -328,7 +328,7 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 组件�
 
 ## AI Zone
 
-> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../specs/maintainers/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../docs/standards/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
 
 
 > **更新日志 (2026-05-15)**: 旧 Popover 定义全部废弃,合并 QuickAction(小尺寸)、取代 SearchPopup(中尺寸)。

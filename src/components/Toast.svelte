@@ -4,7 +4,7 @@
   Toast 全局通知(视觉单元)
   v1.1.0(2026-05-15: 新增 Inline 模式 as="toast")
 
-  三种模式(遵循 specs/maintainers/ComponentGuidelines.md §5):
+  三种模式(遵循 docs/standards/ComponentGuidelines.md §5):
   - 面板模式 (Panel, 默认): <Toast positive>...</Toast> 作为静态单体直接渲染
   - 内嵌模式 (Inline): <Button>Save<Toast as="toast" positive>Saved</Toast></Button>
     点击宿主即触发 showToast(自动生成 id);anchor 不参与定位

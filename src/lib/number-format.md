@@ -31,7 +31,7 @@ mergeNumberFormatOptions(...options)
 ## 开发者指南 (AI)
 
 - **实现**: [./number-format.ts](number-format.ts)
-- **规范**: [../../../specs/reference/NumberFormats.md](../../../specs/reference/NumberFormats.md)
+- **规范**: [../../../docs/reference/NumberFormats.md](../../../docs/reference/NumberFormats.md)
 - Chart、Table、Metric 等数据展示组件不得平行维护默认小数位、空值兜底和 compact notation。
 
 ## 更新日志 (Changelog)

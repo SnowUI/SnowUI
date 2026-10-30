@@ -143,7 +143,7 @@ pointer 位于标题时共享层隐藏，不把标题当作相邻 Item 间隙。
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 
 
@@ -200,7 +200,7 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 - **子组件**: SidebarSection、SidebarItem
 - **依赖**: Frame、ScrollArea、SnowUILogo、Button、Indicator、ResourceIcon、SidePanel motion preset
-- **规范**: `../../../specs/maintainers/LayoutProtocol.md`、`../../../specs/maintainers/ComponentGuidelines.md`
+- **规范**: `../../../docs/standards/LayoutProtocol.md`、`../../../docs/standards/ComponentGuidelines.md`
 
 ## 更新日志
 

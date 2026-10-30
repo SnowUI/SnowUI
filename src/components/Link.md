@@ -183,7 +183,7 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 
 ## AI Zone
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../specs/maintainers/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -198,8 +198,8 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 ### 关联关系
 
 - **基础**：基于 Frame `row` 接入三槽位自动布局协议。
-- **替换协议**：遵循 [ComponentGuidelines.md §2.7.1](../../../specs/maintainers/ComponentGuidelines.md) 内置 Icon 替换规则。
-- **样式规范**：[StyleSpec.md §2.4.4](../../../specs/maintainers/StyleSpec.md)。
+- **替换协议**：遵循 [ComponentGuidelines.md §2.7.1](../../../docs/standards/ComponentGuidelines.md) 内置 Icon 替换规则。
+- **样式规范**：[StyleSpec.md §2.4.4](../../../docs/standards/StyleSpec.md)。
 - **通用截断**：复用 [`frame-truncation.svelte.ts`](../logic/frame-truncation.svelte.ts) 的 `TruncationController`；与 Text / TableCell 共用截断检测和 `resizeManager`。
 - **迁移**：原 `<Button variant="link">` 已移除；按钮式跳转继续使用 `<Button href>`。
 

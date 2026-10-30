@@ -4,7 +4,7 @@
  * SnowUI 主题唯一来源：components/src/styles/themes.css。
  * 维护AI与脚本可修改此源；禁止手工维护第二份主题。
  * 应用主题入口由工作区同步脚本自动生成，不单独编辑。
- * 生成：node specs/scripts/sync-themes.mjs --write；检查：同命令 --check。
+ * 生成：node docs/scripts/sync-themes.mjs --write；检查：同命令 --check。
  * 源码许可路径以下方 notice 的权威源位置为准；生成不改变适用许可。
  */
 

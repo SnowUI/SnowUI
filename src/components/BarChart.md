@@ -269,7 +269,7 @@ interface BarChartItem {
 - 响应式收窄时先压缩柱粗细至 `2px`；同分类并排柱间距和相邻分类柱间距都保留至少 `4px`。横坐标和常驻顶部数值分别按自身文本需求抽稀，柱体数量、数据 domain、命中 cell 和动效顺序保持完整。
 - 不接入三槽位协议，不承担通用子元素排列。
 
-详见 [LayoutProtocol.md §12.7](../../../specs/maintainers/LayoutProtocol.md)。
+详见 [LayoutProtocol.md §12.7](../../../docs/standards/LayoutProtocol.md)。
 
 ---
 
