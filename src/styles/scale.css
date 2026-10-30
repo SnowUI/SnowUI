@@ -12,7 +12,7 @@
  * - 支持 height / width / mixed / aspect 四种计算依据
  */
 
-:global(:where(.snowui-scale)) {
+:where(.snowui-scale) {
   /* 基础输入变量（组件设置） */
   --snowui-scale-height-resolved: var(--snowui-scale-height,
       var(--snowui-scale-height-runtime, 2.5rem));
@@ -61,8 +61,8 @@
   /* 注意：以下仅计算变量，不直接覆盖视觉属性。视觉属性在 apply 模式下才生效。 */
 }
 
-:global(:where(.snowui-scale[data-scale-apply="true"])),
-:global(:where(.snowui-scale.snowui-scale-apply)) {
+:where(.snowui-scale[data-scale-apply="true"]),
+:where(.snowui-scale.snowui-scale-apply) {
   padding-inline: var(--snowui-scale-padding-x, var(--snowui-scale-padding-x-default));
   padding-block: var(--snowui-scale-padding-y, var(--snowui-scale-padding-y-default));
   gap: var(--snowui-scale-gap, var(--snowui-scale-gap-default));
@@ -75,32 +75,32 @@
   box-sizing: border-box;
 }
 
-:global(:where(.snowui-scale[data-scale-basis="width"])) {
+:where(.snowui-scale[data-scale-basis="width"]) {
   --snowui-scale-basis-size-default: var(--snowui-scale-width-resolved);
 }
 
-:global(:where(.snowui-scale[data-scale-basis="mixed"])) {
+:where(.snowui-scale[data-scale-basis="mixed"]) {
   --snowui-scale-basis-size-default: calc((var(--snowui-scale-height-resolved) * var(--snowui-scale-mix-height-weight-resolved)) + (var(--snowui-scale-width-resolved) * var(--snowui-scale-mix-width-weight-resolved)));
 }
 
-:global(:where(.snowui-scale[data-scale-basis="aspect"])) {
+:where(.snowui-scale[data-scale-basis="aspect"]) {
   --snowui-scale-basis-size-default: calc(var(--snowui-scale-height-resolved) * (var(--snowui-scale-aspect-ratio-resolved) / var(--snowui-scale-aspect-base-ratio-resolved)));
 }
 
-:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(svg)),
-:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(img)),
-:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(.snowui-icon-wrapper)),
-:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(.snowui-icon)),
-:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(svg)),
-:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(img)),
-:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(.snowui-icon-wrapper)),
-:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(.snowui-icon)) {
+:where(.snowui-scale[data-scale-apply="true"]) :where(svg),
+:where(.snowui-scale[data-scale-apply="true"]) :where(img),
+:where(.snowui-scale[data-scale-apply="true"]) :where(.snowui-icon-wrapper),
+:where(.snowui-scale[data-scale-apply="true"]) :where(.snowui-icon),
+:where(.snowui-scale.snowui-scale-apply) :where(svg),
+:where(.snowui-scale.snowui-scale-apply) :where(img),
+:where(.snowui-scale.snowui-scale-apply) :where(.snowui-icon-wrapper),
+:where(.snowui-scale.snowui-scale-apply) :where(.snowui-icon) {
   width: max(12px, var(--snowui-scale-icon-size, var(--snowui-scale-icon-size-default)));
   height: max(12px, var(--snowui-scale-icon-size, var(--snowui-scale-icon-size-default)));
 }
 
-:global(:where(.snowui-scale[data-scale-apply="true"])) :global(:where(.snowui-avatar)),
-:global(:where(.snowui-scale.snowui-scale-apply)) :global(:where(.snowui-avatar)) {
+:where(.snowui-scale[data-scale-apply="true"]) :where(.snowui-avatar),
+:where(.snowui-scale.snowui-scale-apply) :where(.snowui-avatar) {
   --snowui-scale-avatar-size-resolved: var(--snowui-scale-avatar-size,
       var(--snowui-scale-avatar-size-default));
   width: var(--snowui-scale-avatar-size-resolved);
