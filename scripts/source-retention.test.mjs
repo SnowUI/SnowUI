@@ -30,6 +30,16 @@ test('选择两个实现导出保留完整许可、路径、原字节及来源�
  for(const file of files){const relative=sourceNotice(file).match(/LICENSE [\d.]+: (.+)\n/)[1];assert.equal(path.resolve(out,path.dirname(file),relative),path.join(out,'LICENSE'));}
  assert.match(fs.readFileSync(path.join(out,'COPYING.md'),'utf8'),/未自动解析/);
 });
+test('选择 NumberFlow 导出保留其第三方作者与 MIT 授权全文',t=>{
+ const out=path.join(temp(t),'vendor','snowui');
+ copySource(['src/components/NumberFlow.svelte'],out);
+ const notice=fs.readFileSync(path.join(out,'THIRD_PARTY_NOTICES.md'),'utf8');
+ const numberFlow=notice.split('## Number Flow 0.6.2')[1];
+ assert.ok(numberFlow,'缺少 Number Flow 的独立声明');
+ assert.match(numberFlow,/Copyright \(c\) 2024 Maxwell Barvian/);
+ assert.match(numberFlow,/Permission is hereby granted, free of charge/);
+ assert.match(numberFlow,/THE SOFTWARE IS PROVIDED "AS IS"/);
+});
 test('已有项目及许可不覆盖，越界、测试文件和缺失说明均拒绝',t=>{
  const dir=temp(t),out=path.join(dir,'existing');fs.mkdirSync(out);fs.writeFileSync(path.join(out,'LICENSE'),'my-license');
  assert.throws(()=>copySource(['src/components/Button.svelte'],out),/新目录/);
