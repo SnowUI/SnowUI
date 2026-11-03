@@ -127,7 +127,7 @@
 6. **交互意图 vs 实际打开**: `resolvedInteractive`(决定 hover 视觉)与 `resolvedCanOpen`(决定点击是否真打开)分离。默认 `previewMode="window"` 下,**所有有 src 的 Image 都视为有交互意图**(获得 hover + cursor),但**只有字符串图片/视频能在新窗口打开**(Component src 因为无法获取 URL,点击无实际动作);传 `previewMode="none"` 且没有 `onclick / onOpen` 时显式 opt-out,不提供 hover 变色、手形指针或键盘 button 语义。
 7. **视频缩略态**: 当 `src` 为字符串视频地址时，组件改为渲染 `<video>`；hover 时自动播放，离开后暂停并回到起始帧。
 8. **字符串图片加载**: 字符串图片不再通过额外的 JS 预加载器探测，而是直接交给原生 `<img>` 加载；组件只通过 `load/error` 事件更新内部状态。
-9. **真实加载骨架**: 当 `src` 是字符串图片或字符串视频时，媒体真实加载阶段会在组件内部显示 `Skeleton` 占位；加载完成后 Skeleton 消失，媒体再显示出来。
+9. **真实加载骨架**: 当 `src` 是字符串图片或字符串视频时，从初始渲染起在媒体真实加载阶段自动显示 `Skeleton` 占位；加载完成后 Skeleton 消失，媒体再显示出来。已在交互初始化前完成加载的媒体会根据实际状态退出占位，失败时显示回退。
 10. **Viewer 模式**: 页面存在自动模式 `ImageViewer` 且未显式声明 previewMode 时，自动接入页面级 Viewer；显式 `previewMode="viewer"` 仍可强制表达该意图。
 11. **Window 模式**: `previewMode="window"` 时，字符串图片/视频会直接在新窗口打开。
 12. **None 模式**: `previewMode="none"` 时，当前 `Image` 不提供打开动作。

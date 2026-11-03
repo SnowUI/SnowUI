@@ -90,7 +90,7 @@
 - 支持非受控 `defaultValue` 与受控 `value`。
 - 支持 `variant="filled" | "divided"` 两种视觉形态。
 - 支持 `size="sm" | "md" | "lg"` 三档密度。
-- 展开正文默认使用主题自适应的 `Black/40%` 次要文字色；标题继续继承宿主前景色。
+- 展开正文默认使用主题自适应的 `Black/100%` 文字色；标题继续继承宿主前景色。
 - hover 不显示背景，只改变标题内默认指示图标的颜色。
 - 仅标题可点击展开或收起；正文文字、空白和交互后代均不触发切换。
 - 默认 `indicatorVariant="cross"` 复用同一个 ComponentIcon plus，仅旋转 45° 得到 ×；`indicatorVariant="minus"` 保留旧 plus/minus 切换和半圈旋转。外置 trailing 继续替换默认图标。
@@ -154,7 +154,7 @@ hover 归属：标题 hover 仅改变默认指示图标的透明度，不创建�
 | `--snowui-accordion-line-height` | `var(--leading-16)` | md 标题行高；sm/lg 分别映射 `--leading-14` / `--leading-18` |
 | `--snowui-accordion-content-font-size` | 标题字号 | sm/md/lg 正文与标题均为 14/16/18px；保留正文显式覆盖入口 |
 | `--snowui-accordion-content-line-height` | 标题行高 | 默认随同尺寸标题行高 |
-| `--snowui-accordion-content-color` | `var(--black-40)` | 正文默认使用 40% 黑色语义 Token；Dark 主题自动映射为 40% 白色 |
+| `--snowui-accordion-content-color` | `var(--black-100)` | 正文默认使用主题前景色；Dark 主题自动映射为白色 |
 | `--snowui-accordion-content-color-override` | - | 局部覆盖正文文字颜色；不影响标题 |
 | `--snowui-accordion-padding-y` | `var(--padding-3)` | md Title 纵向 padding |
 | `--snowui-accordion-padding-x` | `var(--padding-2)` | divided md Title 横向 padding；filled md 覆写为 `--padding-4` |

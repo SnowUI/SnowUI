@@ -194,6 +194,7 @@ export const examples = [
     <Button variant="borderless" disabled>Borderless</Button>
 </div>`,
 
+        expected: { interaction: "禁用按钮及其文字和图标区域均为普通鼠标指针，不出现手型。" },
         logic: ["State"],
     },
     {

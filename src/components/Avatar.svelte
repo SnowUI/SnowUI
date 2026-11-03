@@ -29,12 +29,14 @@
     } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
+    import Skeleton from "./Skeleton.svelte";
     import Gradient, {
         getStaticGradientSource,
         type GradientVariant,
     } from "./Gradient.svelte";
     import {
         AVATAR_CONTEXT_KEY,
+        getSkeleton,
         getSizeContext,
         getSize,
         type ResourceSize,
@@ -119,37 +121,32 @@
     const textUnitFactor = $derived((resolvedContainerSize * INNER_RATIO) / 16);
     // 1. 图片加载逻辑
     let imageStatus = $state<"idle" | "loading" | "loaded" | "error">("idle");
+    let imageElement = $state<HTMLImageElement>();
     let showFallback = $state(false);
+    const skeletonContext = getSkeleton();
 
     $effect(() => {
-        if (src) {
-            if (typeof src === "string") {
-                imageStatus = "loading";
-                const img = new Image();
-                img.src = src;
-                img.onload = () => (imageStatus = "loaded");
-                img.onerror = () => (imageStatus = "error");
-            } else {
-                imageStatus = "loaded";
-            }
-        } else {
-            imageStatus = "error";
-        }
-    });
-
-    // 延迟显示回退，避免闪烁
-    const FALLBACK_DELAY_MS = 600;
-    $effect(() => {
-        if (imageStatus === "loading") {
-            const timer = setTimeout(
-                () => (showFallback = true),
-                FALLBACK_DELAY_MS,
-            );
-            return () => clearTimeout(timer);
-        } else {
+        if (typeof src !== "string" || !src) {
+            imageStatus = src ? "loaded" : "error";
             showFallback = true;
+        } else {
+            imageStatus = "loading";
+            showFallback = false;
         }
     });
+    $effect(() => {
+        const image = imageElement;
+        if (image?.complete) {
+            imageStatus = image.naturalWidth > 0 ? "loaded" : "error";
+            if (imageStatus === "error") showFallback = true;
+        }
+    });
+    const mediaLoading = $derived.by(() => {
+        const source = src;
+        const status = imageStatus;
+        return typeof source === "string" && !!source && (status === "idle" || status === "loading");
+    });
+    const showMediaSkeleton = $derived(mediaLoading && (rest.skeleton ?? skeletonContext?.skeleton ?? true));
 
     const avatarInstanceId = $props.id();
     const avatarColorFilterId = `snowui-avatar-color-${avatarInstanceId}`;
@@ -439,12 +436,18 @@
                     </defs>
                 </svg>
             {/if}
-            {#if imageStatus === "loaded" && src}
-                <div class="snowui-avatar-visual">
+            {#if typeof src === "string" && mediaLoading && !showMediaSkeleton}
+                <img bind:this={imageElement} {src} alt="" hidden onload={() => imageStatus = "loaded"} onerror={() => { imageStatus = "error"; showFallback = true; }} />
+            {/if}
+            {#if src && (typeof src !== "string" || imageStatus === "loaded" || showMediaSkeleton)}
+                <div class="snowui-avatar-visual" class:snowui-avatar-visual-loading={showMediaSkeleton}>
                     {#if typeof src === "string"}
                         <img
+                            bind:this={imageElement}
                             {src}
                             alt=""
+                            onload={() => imageStatus = "loaded"}
+                            onerror={() => { imageStatus = "error"; showFallback = true; }}
                             class={[
                                 "snowui-avatar-visual-media",
                                 usesAvatarColorFilter
@@ -548,6 +551,11 @@
                     {/if}
                 </div>
             {/if}
+            {#if showMediaSkeleton}
+                <div class="snowui-avatar-loading-layer" aria-hidden="true">
+                    <Skeleton componentClass="snowui-avatar" renderHints={avatarRenderHints} />
+                </div>
+            {/if}
         </div>
         <!-- Children (Badge/Icon) rendered OUTSIDE masked container -->
         {#if badgeChildren}
@@ -638,6 +646,9 @@
         z-index: 1;
         /* 继承根部 font-size，此处无需重复计算 */
     }
+
+    :global(:where(.snowui-avatar-visual-loading)) { opacity: 0; }
+    :global(:where(.snowui-avatar-loading-layer)) { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 
     :global(:where(.snowui-avatar-visual-foreground)) {
         z-index: 3;

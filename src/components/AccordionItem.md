@@ -76,7 +76,7 @@
 - AccordionItem 外层根为 `Frame tag="div" column`，负责整项背景、圆角、分隔线与展开状态。
 - 直系 `Frame as="title" row` 作为标题触发器，固定启用三槽位布局；直系 `as="leading"`、普通内容与直系 `as="trailing"` 分别落入三槽位。
 - 直系 `Frame as="content" row` 作为内容区，同样固定启用三槽位布局；折叠时保持宽度，使用向下高度收起与透明度渐隐。
-- title 继承父级 Accordion 或外层容器的 `color`；content 默认消费父 Accordion 的 `--snowui-accordion-content-color`，使用主题自适应 `Black/40%` 次要文字色。
+- title 继承父级 Accordion 或外层容器的 `color`；content 默认消费父 Accordion 的 `--snowui-accordion-content-color`，使用主题自适应 `Black/100%` 文字色。
 - 默认通过 ComponentIcon plus 渲染同一图形，展开时旋转 45° 成为 ×；父 Accordion 的 indicatorVariant="minus" 保留 plus/minus 替换及半圈旋转。外置 trailing 优先。
 - 无 hover 背景；只有标题 hover 时默认指示图标颜色变化。
 - 仅 title 可切换展开状态，正文区域的点击不收起。所有尺寸的正文默认与标题字号、行高一致。
@@ -88,7 +88,7 @@
 | 变量 | 默认值 | 用途 |
 | :--- | :--- | :--- |
 | `--snowui-accordion-item-content-block-size-override` | `--snowui-accordion-content-max-block-size-override` / 测量高度 | 单个 content 展开最大高度覆盖入口 |
-| `--snowui-accordion-content-color-override` | `var(--black-40)` | 局部覆盖 content 文字颜色，不影响 title |
+| `--snowui-accordion-content-color-override` | `var(--black-100)` | 局部覆盖 content 文字颜色，不影响 title |
 
 <a id="使用示例"></a>
 

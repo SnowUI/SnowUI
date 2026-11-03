@@ -28,7 +28,7 @@ export const examples = [
         expected: {
             render: "默认 trailing 指示器正常显示，展开项内容可见；正文使用主题自适应 Black/40%。",
             layout: "title/content 三槽 Host 的 computed display 为 grid；默认 trailing 指示器占据最右侧独立轨道。内容区从测量高度展开，收起后不占用内容高度。",
-            interaction: "点击可用 title 时展开；正文所有区域点击均不收起；无 hover 背景，仅标题内图标颜色变化。内容高度、padding 与透明度按 RESIZE_MOTION 过渡，指示器同步旋转；减少动效时立即提交相同最终状态。",
+            interaction: "点击可用 title 时展开；正文默认 Black/100%，可局部覆盖颜色；正文所有区域点击均不收起；无 hover 背景，仅标题内图标颜色变化。内容高度、padding 与透明度按 RESIZE_MOTION 过渡，指示器同步旋转；减少动效时立即提交相同最终状态。",
             performance: "展开高度由共享 ResizeObserver 测量，不轮询布局。",
             responsive: "宽度变化后重新测量内容高度，展开结果保持完整。",
         },

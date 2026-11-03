@@ -253,4 +253,12 @@ export const examples = [
     </div>
 </section>`,
         logic: ["UserCreated"],
+    },
+    {
+        name: "自动媒体骨架",
+        code: `8
+<Avatar size={40} src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Crect width='40' height='40' fill='gray'/%3E%3C/svg%3E" />
+<Avatar size={40} src="data:image/png;base64,invalid" />`,
+        expected: { render: "字符串图片在加载时自动显示圆形骨架，成功后显示图片，失败时恢复回退头像。无需在使用页面编写 Skeleton。" },
+        logic: ["AutomaticMediaSkeleton", "MediaErrorFallback"],
     },] as const;

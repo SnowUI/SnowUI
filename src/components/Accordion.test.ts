@@ -133,7 +133,7 @@ export const examples = [
 </Accordion>`,
         expected: {
             render: "展开使用减号；默认模式则为加号旋转成 ×。",
-            interaction: "仅标题点击可切换，正文点击不收起；hover 只有指示图标颜色变化。",
+            interaction: "仅标题点击可切换，正文点击不收起；hover 只有指示图标颜色变化。展开正文默认使用 Black/100%，支持局部颜色覆盖。",
         },
         logic: ["IndicatorVariant", "TitleOnly"],
     },

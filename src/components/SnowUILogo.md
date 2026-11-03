@@ -41,6 +41,7 @@
 | variant | `SnowUILogoVariant` | `"horizontal"` | 图标、字标或两种组合方向 |
 | scale | `number` | `1` | 等比缩放图标、字标和组合间距；非有限值或非正数回退为 `1` |
 | compactProgress | `number` | `0` | 仅 vertical：0 为完整纵向标识，1 为 28×28 图标，中间值连续收拢字标与间距；范围 0–1，非有限值回退 0，可与 scale 组合用于滚动品牌过渡 |
+| hoverMotion | `boolean` | `false` | 开启悬停时图标与字标轮换；关闭时恢复静态品牌，不影响闲置动效与鼠标事件 |
 | textMotion | `"greetings" \| "variants"` | `"greetings"` | 选择文字 hover 方案：原版多语言问候或第二版 SnowUI 矢量字形轮换；icon 变体忽略此项，图标 Emoji 轮换保持一致 |
 | idleMotion | `boolean` | `false` | 开启品牌 icon 的闲置旋转与上下飘浮；不影响 hover 问候，减少动效偏好下不播放 |
 | decorative | `boolean` | `false` | 设为 `true` 时从无障碍树隐藏 |
@@ -105,7 +106,7 @@ SnowUILogo 只负责品牌视觉，不内置 `href`、路由或打开方式。�
 ### 第二版字形动效
 
 ```svelte
-<SnowUILogo textMotion="variants" scale={2} />
+<SnowUILogo hoverMotion textMotion="variants" scale={2} />
 ```
 
 - `textMotion="greetings"` 保留原版多语言问候；`variants` 参考 Apple Mac mini 首屏同词异形的表现，始终呈现 SnowUI 字母，轮换圆线、像素、轮廓、斜体、条纹和加粗六种固定矢量表现，不加载外部字体、图片或视频。
@@ -116,6 +117,8 @@ SnowUILogo 只负责品牌视觉，不内置 `href`、路由或打开方式。�
 
 ### Hover 动效（原版）
 
+默认关闭；通过 `hoverMotion={true}` 显式开启。运行中关闭时停止轮换并恢复品牌。
+
 - 图标与文字按静态节点顺序同步轮换，目标启动间隔为 1000ms；每次必须等待图标和全部字母的实际过渡结束，再显示至少一帧稳定节点，繁忙帧不追赶或补播。图标用 320ms 缩小至 45%、模糊、淡出；新图标从同样状态放大、清晰、淡入。
 - 文字按 grapheme 拆分，保留相同前后缀，变化中段从左到右交错进入 / 退出；550ms 位移 0.35em、缩放至 60%、旋转 2°、模糊 0.1em，交错总窗口为 550ms × 0.3。字形按自然宽度定位；相同字符的位置平滑过渡，品牌字母进出时保持各自固定横坐标。
 - 字号用当前字体 `snowui` 的实际字形高度校准为矢量字标高度，字宽保留字体自身比例；所有问候使用同一校准字号。字体加载完成后重新测量，位置与字号以字标高度的 em 比例表示，随 scale / compactProgress 等比变化。纵向字标不裁切下伸部、重音和出入场模糊；长词允许超出固定外框，不自动缩小。
@@ -124,7 +127,7 @@ SnowUILogo 只负责品牌视觉，不内置 `href`、路由或打开方式。�
 - 动态图形不参与指针命中，悬停范围由稳定的 Logo 外框拥有；文字溢出、缩放和旧字形卸载不会改变命中范围。
 - `icon` 只显示表情，`text` 只显示问候；组合变体同步轮换。过渡过程中移入 / 移出只更新最后一次 hover 意图，不取消、重播或跳过当前变化；节点完成后，仍 hover 则继续轮换，已移出则恢复品牌。恢复品牌的过程同样不可被 hover 打断，重新移入会在品牌恢复完成后续播。
 - 移出后 10 秒内保留最近完成的问候节点，恢复品牌不覆盖记录：例如到达 B 后移出，再 hover 为 Logo → C；超过 10 秒重新从 A 开始。多个快速 hover 事件只保留最终意图，不积累播放请求。
-- Emoji 使用系统字形，按实际着色像素边界等比适配品牌 icon 的 32×32 viewBox 并居中；最长边与 icon 相同，不拉伸非正方形表情。随 scale / compactProgress 一起缩放。不同操作系统的图形细节可能不同。问候只改变装饰画面，可访问名称始终为 SnowUI，不逐帧播报。
+- Emoji 使用系统字形，在首次需要对应表情时测量并缓存实际着色像素边界，按边界等比适配品牌 icon 的 32×32 viewBox 并居中；最长边与 icon 相同，不拉伸非正方形表情。随 scale / compactProgress 一起缩放。不同操作系统的图形细节可能不同。问候只改变装饰画面，可访问名称始终为 SnowUI，不逐帧播报。
 - `prefers-reduced-motion: reduce` 下保留静态品牌，不启动循环；偏好切换、页面隐藏和卸载均停止循环。
 - 这是用户批准的 品牌专用实现，不依赖 NumericText 或通用文字动效运行时，不提供通用文字动画 API；后续维护不会自动跟随 NumericText。
 

@@ -27,6 +27,7 @@ export const examples = [
 <Icon src="/icon-40.svg" size={40} />
 <Icon src="/icon-48.svg" size={48} />
 <Icon src="/icon-80.svg" size={80} />`,
+        expected: { render: "图片地址真实加载期间自动显示对应尺寸骨架，成功或失败后退出；skeleton=false 不显示占位。" },
     },
     {
         name: "3: 徽标组合与尺寸",

@@ -25,6 +25,7 @@
     scale?: number;
     compactProgress?: number;
     idleMotion?: boolean;
+    hoverMotion?: boolean;
     textMotion?: "greetings" | "variants";
     decorative?: boolean;
     [key: string]: any;
@@ -35,6 +36,7 @@
     scale = 1,
     compactProgress = 0,
     idleMotion = false,
+    hoverMotion = false,
     textMotion = "greetings",
     decorative = false,
     role = undefined,
@@ -142,6 +144,7 @@
 
   $effect(() => {
     textMotion;
+    hoverMotion;
     stopCycle();
   });
 
@@ -166,6 +169,7 @@
     armed = false;
     const run = ++generation;
     nodeStartedAt = performance.now();
+    if (index >= 0) emojiMetrics[index] = measureLogoEmoji(greetings[index][0]);
     greetingIndex = index;
     // 等 Svelte 提交所有字母和图标后，再由实际 transition end 判断完成。
     await tick();
@@ -196,7 +200,7 @@
   }
 
   function handleMouseEnter(event: MouseEvent) {
-    if (!prefersReducedMotion()) {
+    if (hoverMotion && !prefersReducedMotion()) {
       hovered = true;
       resumeRequested = performance.now() <= resumeUntil;
       reconcileHover();
@@ -213,7 +217,6 @@
   }
 
   onMount(() => {
-    emojiMetrics = greetings.map(([emoji]) => measureLogoEmoji(emoji));
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     reducedMotion = preference.matches;
     const syncPreference = () => { reducedMotion = preference.matches; stopCycle(); };

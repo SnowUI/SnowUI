@@ -381,7 +381,7 @@
         );
         color: var(
             --snowui-accordion-content-color-override,
-            var(--snowui-accordion-content-color, var(--black-40, #00000066))
+            var(--snowui-accordion-content-color, var(--black-100, #000000))
         );
         opacity: 0;
         pointer-events: none;

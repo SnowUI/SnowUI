@@ -10,12 +10,12 @@
 
 <Frame column class="gap-16">
   <Frame class="items-start justify-center" style="width: 240px; height: 200px;">
-    <SnowUILogo variant="vertical" compactProgress={progress} scale={logoScale} />
+    <SnowUILogo hoverMotion variant="vertical" compactProgress={progress} scale={logoScale} />
   </Frame>
   <Slider bind:value={progress} minValue={0} maxValue={1} step={0.01} aria-label="Logo compact progress" />
   <Slider bind:value={logoScale} minValue={0.5} maxValue={4} step={0.1} aria-label="Logo scale" />
   <Frame column class="gap-16 items-center">
-    <SnowUILogo variant="text" scale={logoScale} />
+    <SnowUILogo hoverMotion variant="text" scale={logoScale} />
     <span style={`display:block;position:relative;width:${71 / 16 * logoScale}rem;height:${12 / 16 * logoScale}rem;font-size:calc(var(--text-12) * ${logoScale});`}>
       <LogoWordmark greeting="snowui" id="logo-calibration-reference" />
     </span>

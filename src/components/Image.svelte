@@ -161,6 +161,7 @@
 
     let imageStatus = $state<"idle" | "loading" | "loaded" | "error">("idle");
     let videoRef = $state<HTMLVideoElement>();
+    let imageRef = $state<HTMLImageElement>();
     let viewerAvailable = $state(false);
     let previewRegistration: {
         dispose: () => void;
@@ -218,6 +219,14 @@
         imageStatus = "loading";
     });
 
+    // 资源可能在事件绑定前已完成；节点卸载不能重新启动失败的加载。
+    $effect(() => {
+        const image = imageRef;
+        const video = videoRef;
+        if (image?.complete) imageStatus = image.naturalWidth > 0 ? "loaded" : "error";
+        else if (video && video.readyState >= 1) imageStatus = "loaded";
+    });
+
     const resolvedPreviewMode = $derived.by(() => {
         return (
             previewMode ??
@@ -228,7 +237,7 @@
     const canRenderMedia = $derived(!!src && imageStatus !== "error");
     const hasLoadedMedia = $derived(imageStatus === "loaded" && !!src);
     const showLoadingSkeleton = $derived(
-        typeof src === "string" && imageStatus === "loading",
+        typeof src === "string" && !!src && (imageStatus === "idle" || imageStatus === "loading"),
     );
     const canOpenInViewer = $derived(
         resolvedPreviewMode === "viewer" && viewerAvailable,
@@ -425,6 +434,7 @@
                             ></video>
                         {:else}
                             <img
+                                bind:this={imageRef}
                                 {src}
                                 alt={alt ?? ""}
                                 class="snowui-image-media"

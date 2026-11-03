@@ -225,7 +225,7 @@
         --snowui-accordion-line-height: var(--leading-14);
         --snowui-accordion-content-font-size: var(--snowui-accordion-font-size-override, var(--snowui-accordion-font-size));
         --snowui-accordion-content-line-height: var(--snowui-accordion-line-height-override, var(--snowui-accordion-line-height));
-        --snowui-accordion-content-color: var(--black-40, #00000066);
+        --snowui-accordion-content-color: var(--black-100, #000000);
         --snowui-accordion-padding-y: var(--padding-2);
         --snowui-accordion-padding-x: var(--padding-2);
         --snowui-accordion-content-padding-y: var(--padding-2);

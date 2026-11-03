@@ -44,7 +44,7 @@ export const examples = [
         code: `4
 <Image src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='gray'/%3E%3C/svg%3E" size={80} mediaLoading="eager" alt="立即加载" />
 <Image src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect width='80' height='80' fill='gray'/%3E%3C/svg%3E" size={80} mediaLoading="lazy" alt="懒加载" />`,
-        expected: { render: "原生图片分别输出 eager / lazy，mediaLoading 不泄漏到根 DOM", performance: "使用原生请求，保持 load/error 与 Skeleton 状态" },
+        expected: { render: "原生图片分别输出 eager / lazy；初始及加载期间自动显示骨架，加载成功显示图片，失败显示回退；mediaLoading 不泄漏到根 DOM", performance: "使用原生请求，保持 load/error 与 Skeleton 状态" },
         logic: ["4"],
     },
 ] as const;

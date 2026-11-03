@@ -824,7 +824,7 @@
     position: absolute;
   }
 
-  :global(:where(.snowui-button) > :not(.snowui-disabled)) {
+  :global(:where(.snowui-button:not(:disabled):not([aria-disabled="true"]):not(.snowui-disabled)) > :not(.snowui-disabled)) {
     cursor: pointer;
   }
 

@@ -25,6 +25,7 @@
     import { getContext, setContext, type Component, type Snippet } from "svelte";
     import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
     import Frame, { type FrameProps } from "./Frame.svelte";
+    import Skeleton from "./Skeleton.svelte";
     import { FRAME_CONTEXT_KEY } from "../keys";
     import type { StateValueMap } from "../logic/frame-types";
     import {
@@ -38,6 +39,7 @@
         getIcon,
         getImage,
         getImageViewer,
+        getSkeleton,
         getSizeContext,
         getSize,
     } from "../context";
@@ -282,6 +284,20 @@
         height: userRenderHints?.height ?? iconSkeletonSize,
         radius: userRenderHints?.radius ?? bgConfig.radius,
     });
+    const skeletonContext = getSkeleton();
+    let mediaStatus = $state<"idle" | "loading" | "loaded" | "error">("idle");
+    let mediaElement = $state<HTMLImageElement>();
+    $effect(() => { mediaStatus = src ? "loading" : "idle"; });
+    $effect(() => {
+        const image = mediaElement;
+        if (image?.complete) mediaStatus = image.naturalWidth > 0 ? "loaded" : "error";
+    });
+    const mediaPending = $derived.by(() => {
+        const source = src;
+        const status = mediaStatus;
+        return !!source && (status === "idle" || status === "loading");
+    });
+    const showMediaSkeleton = $derived(mediaPending && (rest.skeleton ?? skeletonContext?.skeleton ?? true));
     const resolvedIcon = $derived(
         resolveParentStateValue(stateIcon, parentFrameCtx, icon),
     );
@@ -327,7 +343,8 @@
         {#snippet children()}
             <div class="snowui-icon-content">
                 {#if src}
-                    <img {src} alt="" class="snowui-icon-image" />
+                    <img bind:this={mediaElement} {src} alt="" class="snowui-icon-image" class:snowui-icon-image-loading={showMediaSkeleton} onload={() => mediaStatus = "loaded"} onerror={() => mediaStatus = "error"} />
+                    {#if showMediaSkeleton}<div class="snowui-icon-loading" aria-hidden="true"><Skeleton componentClass="snowui-icon" renderHints={{ variant: "rect", width: userRenderHints?.width ?? sizeRem, height: userRenderHints?.height ?? sizeRem, radius: userRenderHints?.radius ?? bgConfig.radius }} /></div>{/if}
                 {:else if resolvedIcon}
                     <!-- svelte-ignore svelte_component_deprecated -->
                     <svelte:component
@@ -425,6 +442,7 @@
     }
 
     :global(:where(.snowui-icon-content)) {
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -463,6 +481,8 @@
     :global(:where(.snowui-icon-image)) {
         object-fit: contain;
     }
+    :global(:where(.snowui-icon-image-loading)) { opacity: 0; }
+    :global(:where(.snowui-icon-loading)) { position: absolute; inset: 0; pointer-events: none; }
 
     :global(:where(.snowui-icon-default)) {
         width: 100%;
