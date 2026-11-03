@@ -3,7 +3,7 @@
 > **版本**: v1.0.0
 > **职责**: 提供 Dialog / Modal 内容面板与遮罩 preset。
 
-`MODAL_DIALOG_APPEAR_MOTION` 与 `MODAL_DIALOG_DISAPPEAR_MOTION` 用于 Dialog 内容面板。`DIALOG_BACKDROP_*` 用于 Dialog 遮罩 opacity。
+`MODAL_DIALOG_*` 提供模态面板出现与消失 preset，`DIALOG_BACKDROP_*` 提供遮罩 opacity preset。Dialog 为保证面板毛玻璃首帧可见，打开时不使用出现 preset；关闭时仍使用消失 preset。
 
 ## 来源
 
@@ -11,7 +11,7 @@
 
 ## 使用规则
 
-1. Dialog 内容面板引用 modal dialog preset。
+1. Dialog 内容面板只在关闭时引用 modal dialog 消失 preset；打开时立即显示。
 2. Dialog 遮罩通过 `DIALOG_BACKDROP_MOTION_STYLE` 注入 CSS 变量。
 3. 如果未来参考实现中遮罩与内容数值完全一致，可合并；不一致则继续拆分。
 

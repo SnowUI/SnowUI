@@ -12,7 +12,7 @@ export const examples = [
 </Dialog>
 <Button data-dialog-target="dialog-sm">打开 sm</Button>`,
         "expected": {
-            "render": "默认标题、关闭按钮、正文、操作区；sm 无分割线，md/lg 有分割线；opaque 遮罩",
+            "render": "默认标题、关闭按钮、正文、操作区；sm 无分割线，md/lg 有分割线；opaque 遮罩，打开首帧面板背景模糊",
             "interaction": "关闭请求沿用 Dialog 原有状态、焦点与键盘协议"
         },
         "logic": [

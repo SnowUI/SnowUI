@@ -36,7 +36,6 @@
     } from "../logic/overlay-presence.svelte";
     import {
         DIALOG_BACKDROP_MOTION_STYLE,
-        MODAL_DIALOG_APPEAR_MOTION,
         MODAL_DIALOG_DISAPPEAR_MOTION,
     } from "../motion/presets/dialog";
     import { getMotionTotalDurationMs } from "../motion/presets/utils";
@@ -397,8 +396,7 @@
                 tag="div"
                 column
                 enableAutoLayout={false}
-                currentState={presence.closing ? "Disappear" : "Appear"}
-                whileAppear={MODAL_DIALOG_APPEAR_MOTION}
+                currentState={presence.closing ? "Disappear" : undefined}
                 whileDisappear={MODAL_DIALOG_DISAPPEAR_MOTION}
                 tabindex="-1"
                 {role}
@@ -475,7 +473,15 @@
         pointer-events: none;
     }
 
+    /* 保持打开时遮罩祖先完全可见，避免淡入削弱面板毛玻璃。 */
+    :global(:where(.snowui-dialog-backdrop)[data-open="true"]) {
+        opacity: 1;
+        transition: none;
+    }
+
     :global(:where(.snowui-dialog)) {
+        backdrop-filter: var(--snowui-backdrop-quick-action, blur(var(--size-10, 40px)));
+        -webkit-backdrop-filter: var(--snowui-backdrop-quick-action, blur(var(--size-10, 40px)));
         width: min(100%, var(--snowui-dialog-max-width));
         max-height: calc(100vh - var(--size-16));
         overflow: auto;
@@ -491,7 +497,6 @@
         --snowui-dialog-close-offset: var(--padding-4);
         --snowui-dialog-footer-gap: var(--gap-3);
         transform-origin: center;
-        will-change: transform, opacity;
         font-size: var(--snowui-dialog-font-size-override, var(--text-14));
         line-height: var(
             --snowui-dialog-line-height-override,
@@ -515,6 +520,7 @@
 
     :global(:where(.snowui-dialog[data-closing="true"])) {
         pointer-events: none;
+        will-change: transform, opacity;
     }
 
     @media (prefers-reduced-motion: reduce) {

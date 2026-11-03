@@ -12,8 +12,8 @@
 | `DROPDOWN_OVERLAY_APPEAR_MOTION` / `DROPDOWN_OVERLAY_DISAPPEAR_MOTION` | Popover、Listbox、Menu dropdown，仅 opacity | Tooltip、Dialog、普通内容替换 | SnowUI dropdown overlay |
 | `TOOLTIP_APPEAR_MOTION` / `getTooltipAppearMotion()` / `TOOLTIP_DISAPPEAR_MOTION` | Tooltip Foreground 的 opacity + scale 与按最终 placement 定向滑入；不得用于 Portal、size shell 或 Backdrop | Dropdown、Dialog、承载 backdrop-filter 的祖先 | transitions.dev Tooltip + SnowUI backdrop-filter 合成约束 |
 | `TOOLTIP_CONTINUOUS_*_DURATION_*` / `TOOLTIP_CONTINUOUS_*_CONTENT_LAG` | 普通连续 Tooltip 使用 `180–360ms` 正弦协调时间线；默认快速重定向使用 `90–160ms` cubic ease-out 与 `0.02` 内容滞后，关闭 `rapidRetarget` 后中断继续使用普通时间线 | Tooltip 首次出现、远距离直接定位、reduced-motion | 参考视频协调交接 + 高频 hover 与复杂 Snippet 验证 |
-| `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION` | Dialog / Modal 内容面板 | Tooltip、Dropdown | transitions.dev Modal open / close |
-| `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION` | Dialog 遮罩 opacity | 内容面板 scale | SnowUI Dialog 当前遮罩行为 |
+| `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION` | Modal 内容面板；Dialog 打开即时显示，仅关闭使用消失 preset | Tooltip、Dropdown | transitions.dev Modal open / close |
+| `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION` | 共享遮罩 opacity；Dialog 打开即时显示，仅关闭渐出 | 内容面板 scale | SnowUI 遮罩行为 |
 | `REPLACEMENT_APPEAR_MOTION` | Icon / Text / CodeBlock 等内容替换 | Overlay、Dialog | SnowUI replacement default |
 | `RESIZE_MOTION` | Accordion、Card、Panel 及后续组件的宽高、padding 等尺寸变化 | 生命周期进入、内容替换 | transitions.dev Card resize |
 | `TAB_INDICATOR_MOTION` | Tab、Segmented 共享 indicator 的位置与尺寸变化 | 普通容器 resize、生命周期进入 | transitions.dev Tabs sliding |

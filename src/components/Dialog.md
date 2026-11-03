@@ -230,7 +230,7 @@ footer 为单例，识别范围与 close 相同，不扫描嵌套容器。多个
 | `blur` | 10% 黑色遮罩 + 20px 背景模糊 |
 | `transparent` | 透明遮罩,仅阻止背景交互 |
 
-opaque 与 blur 挂载时从 opacity 0 渐入到设定的遮罩效果；关闭时渐出，关闭途中重新打开从当前透明度接续。时长与曲线使用 Dialog backdrop preset；减少动效偏好下直接显示或隐藏，不播放透明度过渡。
+Dialog 打开时遮罩与面板立即以完整透明度显示，使面板毛玻璃及 blur 遮罩从可见首帧生效；关闭时使用 Dialog backdrop preset 渐出。减少动效偏好下直接显示或隐藏，不播放透明度过渡。
 
 <a id="无障碍"></a>
 
@@ -257,7 +257,7 @@ opaque 与 blur 挂载时从 opacity 0 渐入到设定的遮罩效果；关闭�
 
 
 
-Dialog 是通用模态容器。面板视觉复用 `.snowui-quick-action-panel`,内容面板出现 / 消失动效使用 `MODAL_DIALOG_APPEAR_MOTION` / `MODAL_DIALOG_DISAPPEAR_MOTION`，遮罩 opacity 使用 `DIALOG_BACKDROP_APPEAR_MOTION` / `DIALOG_BACKDROP_DISAPPEAR_MOTION`。具体 duration / easing / scale 以 motion preset catalog 为准，关闭时保留面板到 disappear preset 完成后再卸载。
+Dialog 是通用模态容器。面板视觉复用 `.snowui-quick-action-panel`，打开时立即显示，关闭动效使用 `MODAL_DIALOG_DISAPPEAR_MOTION`，遮罩关闭使用 `DIALOG_BACKDROP_DISAPPEAR_MOTION`。具体 duration / easing / scale 以 motion preset catalog 为准，关闭时保留面板到 disappear preset 完成后再卸载。
 
 <a id="ai-zone"></a>
 

@@ -4,6 +4,6 @@ Dialog、SidePanel 与 ImageViewer 共用 `BackdropVariant` 和 `styles/backdrop
 
 共享视觉与 CSS 渐隐，不创建独立组件、不增加 Frame Props。Portal、z-index、尺寸、焦点、滚动锁定、关闭条件和卸载时机仍由消费者负责。CSS 只匹配 snowui-backdrop；组件隐藏不挂载遮罩，无监听器、Observer 或 JavaScript 运行开销。类型导入构建后擦除；共享样式随包内样式入口提供，不依赖 Site。
 
-ImageViewer 保留 snowui-image-viewer-background-override 背景覆盖入口；覆盖色不改变 backdrop 的模糊状态。所有消费者注入 `DIALOG_BACKDROP_MOTION_STYLE`，挂载时从 opacity 0 淡入到 1；背景色和 blur 目标值保持不变。支持关闭过渡的宿主通过 `data-closing` 淡出并从当前进度反向接续；减少动效时立即显示。ImageViewer 使用独立遮罩层，只淡入背景，媒体切换与关闭仍立即完成。
+ImageViewer 保留 snowui-image-viewer-background-override 背景覆盖入口；覆盖色不改变 backdrop 的模糊状态。消费者注入 `DIALOG_BACKDROP_MOTION_STYLE`；Dialog 打开时遮罩立即显示，以免削弱面板的背景模糊，其他消费者继续使用共享淡入。支持关闭过渡的宿主通过 `data-closing` 淡出；减少动效时立即显示。ImageViewer 使用独立遮罩层，只淡入背景，媒体切换与关闭仍立即完成。
 
 来源：2026-09-15 用户授权判断通用化，并要求本次实现让 ImageViewer 复用 Dialog backdrop。
