@@ -48,7 +48,7 @@
 | selectionFollowsFocus | `boolean` | `false` | 方向键是否直接激活;Tab 默认 `false`(仅切焦点 + Enter 激活),Segmented 默认 `true` |
 | role | `string` | `"tablist"` | ARIA 容器 role |
 | itemRole | `string` | — | 写入子项的 ARIA role；未传时保留 Button 自身语义。选项卡示例显式传 tab；传 radio 时同步 aria-checked，其余情况同步 aria-selected。 |
-| children | `Snippet` | — | 无参数的显式子项内容，使用 Button as="item" 并设置唯一 value；替代 items，子项 Props 直接配置。 |
+| children | `Snippet` | — | 无参数的显式子项内容，使用 Button 或 CopyButton 的 as="item" 并设置唯一 value；替代 items，子项 Props 直接配置。 |
 | items | `TabItem[]` | `[]` | 内置子项数据，每项必填唯一 value 和可读 label，可选 icon 组件及 disabled；icon 生成 Icon + Text，禁用项跳过键盘选择。children 存在时忽略 items。 |
 | parts | `ComponentPartsOf<{ Button: typeof Button; Icon: typeof Icon; Text: typeof Text; }>` | — | 批量配置默认生成的 Button、Icon 与 Text，例如 parts.Button.scaleOnHover；显式 children 不消费这些默认子项配置。 |
 
@@ -89,7 +89,7 @@
 
 ### 2.2 子项约定
 
-子项必须是 `<Button as="item">`,在 Button 上声明:
+显式子项使用 `<Button as="item">`，也可使用以 Button 为宿主的 `<CopyButton as="item">`；在子项上声明:
 
 - `value="xxx"` —— 必填,项标识值(通过 Button rest-spread 落到根 `<button>` 元素的 `value` 属性)
 - 可选 `disabled` —— 禁用单项

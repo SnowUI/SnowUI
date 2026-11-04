@@ -43,7 +43,7 @@
 | code | `string` | `""` | 要显示的代码字符串 |
 | language | `string` | `""` | 语言标识，同时选择格式化解析器；支持 svelte、js/javascript、jsx、ts/typescript、tsx、html、css/scss/less、json/jsonc、yaml/yml、markdown/md、graphql/gql。空值根据代码识别 Svelte/HTML、JSON 或 JS/TS；未知的显式语言保留原文。 |
 | format | `boolean` | `true` | 默认按 language 格式化代码；普通态、全屏、行号与复制共享格式化结果。设为 false 保留原文；singleLine 始终保留原文。解析失败、未知语言或输入超过 200,000 字符时保留原文。 |
-| showLanguage | `boolean` | `true` | 是否显示语言标识 |
+| showLanguage | `boolean` | `true / prompt: false` | 默认显示语言标识；`language="prompt"` 默认隐藏，显式传值可覆盖。 |
 | showLineNumbers | `boolean` | `false` | 是否显示代码行号；普通态与全屏态保持一致，避免切换末帧发生代码横向跳变 |
 | showCopyButton | `boolean` | `true` | 是否显示复制按钮 |
 | showExpandButton | `boolean` | `true` | 是否显示全屏放大按钮 |
@@ -171,13 +171,15 @@
 | 字符串 | `#3fa4ff` |
 | 变量 | `#c478ff` |
 
+`language="prompt"` 用于提示词：正文使用默认前景色，HTTP(S) 链接使用 `--black-40`，不将普通英文单词识别为关键字；默认不显示语言标签，显式 `showLanguage` 可覆盖。提示词原文和复制内容不因着色改变。
+
 外置 `style` 的 `background` / `background-*` 声明在普通态、全屏进入、全屏展示和退出期间保持生效。全屏层同步这些声明及其依赖的外置 CSS 变量，保留 Token 解析与动态更新；普通态的宽高、定位和内边距不随之带入全屏。未设置外置背景时继续使用默认 Background/2。
 
 代码块根容器默认设置 `font-size: var(--text-12)` 与 `line-height: var(--leading-12)`；内部行号、`pre`、`code`、代码行全部继承根容器排版。`font-family` 默认继承外部上下文，不设置具体字体族，忽略设计稿中的字体设置。
 
-默认态与全屏态的右上 CopyButton / ExpandButton 仍使用 `bare emphasis="muted"` 的图标强调与复制反馈；每个按钮独立使用上下 4px、左右 8px 的 padding、8px 圆角、半透明代码块语义背景及 20px backdrop blur，hover 时继续由 Button 将强调度提升到 100%。键盘焦点有可见轮廓。`singleLine` 的行内 trailing 复制按钮不使用这组右上视觉。
+默认态与全屏态的右上 CopyButton / ExpandButton 仍使用 `bare emphasis="muted"` 的图标强调与复制反馈；工具栏整体使用透明背景模糊，按钮保持 bare 外观，hover 时继续由 Button 将强调度提升到 100%。键盘焦点有可见轮廓。`singleLine` 的行内 trailing 复制按钮不使用这组右上视觉。
 
-语言标签与动作组之间的有效间距至少4 CSS px；普通态与全屏态一致，纯图标组和代码字符／行号间距不由本规则改写。工具栏使用内部 Pin 布局固定到 `pin-top-right`，距上边缘 8px、右边缘 4px；过长语言标签在可用宽度内省略。代码内容和纵向滚动条从工具栏下方开始，不被按钮覆盖。右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
+语言标签与动作组之间的有效间距至少4 CSS px；普通态与全屏态一致，纯图标组和代码字符／行号间距不由本规则改写。工具栏使用内部 Pin 布局固定到 `pin-top-right`，距上边缘 8px、右边缘 4px；过长语言标签在可用宽度内省略。代码内容可从工具栏后方滚动，工具栏模糊后方内容。右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
 
 ---
 
@@ -244,7 +246,7 @@
 
 消费方可通过 `style` 提供初始高度；首次拖拽后，交互产生的手动高度优先于初始 `style` 中的 `height`，避免外部初始值持续覆盖拖拽写回。其余用户样式仍保持最高合并优先级。
 
-当代码区发生垂直滚动时，顶部和尾部会显示透明渐隐。渐隐复用 `layout.css` 的 `.snowui-scroll-mask` 通用能力（即「内容渐隐层」基础共享能力的 CSS 静态形态，能力总览见 [`../lib/edge-fade.md`](../lib/edge-fade.md)），通过 `mask-image` 只改变内容 alpha，不绘制可见色块。滚动条复用 `scrollbar.css` 的通用浮层滚动条：
+普通态和全屏态的右上角工具栏使用透明背景模糊后方内容；按钮距上、右边缘为 12px，模糊层与工具栏区域同尺寸。当代码区发生垂直滚动时，顶部和尾部会显示透明渐隐。渐隐复用 `layout.css` 的 `.snowui-scroll-mask` 通用能力（即「内容渐隐层」基础共享能力的 CSS 静态形态，能力总览见 [`../lib/edge-fade.md`](../lib/edge-fade.md)），通过 `mask-image` 只改变内容 alpha，不绘制可见色块。滚动条复用 `scrollbar.css` 的通用浮层滚动条：
 
 | 结构 | 说明 |
 |:---|:---|

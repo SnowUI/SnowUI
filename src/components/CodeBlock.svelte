@@ -166,7 +166,7 @@
         code = "",
         language = "",
         format = true,
-        showLanguage = true,
+        showLanguage = undefined,
         showLineNumbers = false,
         showCopyButton = true,
         showExpandButton = true,
@@ -220,17 +220,19 @@
 
     /* ─── 计算属性 ─── */
     const isSingleLine = $derived(variant === "singleLine");
+    const isPrompt = $derived(language.trim().toLowerCase() === "prompt");
+    const resolvedShowLanguage = $derived(showLanguage ?? !isPrompt);
     const rawCode = $derived(code || childCode);
     let formatted = $state<{ source: string; language: string; output: string }>();
     const resolvedCode = $derived(
-        format && !isSingleLine && formatted?.source === rawCode && formatted.language === language
+        format && !isPrompt && !isSingleLine && formatted?.source === rawCode && formatted.language === language
             ? formatted.output
             : rawCode,
     );
     $effect(() => {
         const source = rawCode;
         const currentLanguage = language;
-        if (!format || isSingleLine) return;
+        if (!format || isPrompt || isSingleLine) return;
         let disposed = false;
         void formatCodeBlock(source, currentLanguage).then((output) => {
             if (!disposed) formatted = { source, language: currentLanguage, output };
@@ -327,6 +329,20 @@
     }
 
     function highlightLine(line: string): CodeToken[] {
+        // 提示词使用正文色，只将链接识别为灰色；不把所有英文单词当成代码关键字。
+        if (isPrompt) {
+            const tokens: CodeToken[] = [];
+            const pattern = /https?:\/\/[^\s<>"`，。；！？、（）【】]+/g;
+            let cursor = 0;
+            for (const match of line.matchAll(pattern)) {
+                const start = match.index!;
+                if (start > cursor) tokens.push({ text: line.slice(cursor, start), kind: "plain" });
+                tokens.push({ text: match[0], kind: "comment" });
+                cursor = start + match[0].length;
+            }
+            if (cursor < line.length) tokens.push({ text: line.slice(cursor), kind: "plain" });
+            return tokens.length ? tokens : [{ text: " ", kind: "plain" }];
+        }
         // 文本内容不解释 JS 注释；URL 后的正文保持默认色。
         if (["text", "plain", "plaintext", "txt"].includes(language.trim().toLowerCase())) {
             const tokens: CodeToken[] = [];
@@ -643,7 +659,7 @@
         className,
     ].filter(Boolean).join(" ")}
     data-variant={variant}
-    data-top-actions={!isSingleLine && ((showLanguage && language) || showCopyButton || showExpandButton || hasCustomTrailing) ? "true" : undefined}
+    data-top-actions={!isSingleLine && ((resolvedShowLanguage && language) || showCopyButton || showExpandButton || hasCustomTrailing) ? "true" : undefined}
     data-resized={!isSingleLine && resizeHeight !== undefined ? "true" : undefined}
     style={rootStyle}
     renderHints={{
@@ -712,7 +728,7 @@
         data-as="pin-top-right"
         style="--pin-offset-y: var(--padding-2); --pin-offset-x: var(--padding-1);"
     >
-        {#if showLanguage && language}
+        {#if resolvedShowLanguage && language}
             <span class="snowui-code-block-lang">{language}</span>
         {/if}
 
@@ -859,7 +875,7 @@
             data-as="pin-top-right"
             style="--pin-offset-y: var(--padding-2); --pin-offset-x: var(--padding-1);"
         >
-            {#if showLanguage && language}
+            {#if resolvedShowLanguage && language}
                 <span class="snowui-code-block-lang">{language}</span>
             {/if}
             <div class="snowui-code-block-actions">
@@ -1100,7 +1116,22 @@
         justify-content: space-between;
         gap: max(4px, var(--gap-2));
         max-width: calc(100% - var(--size-3));
+        padding: var(--padding-1) var(--padding-2);
+        border-radius: var(--radius-2);
+        isolation: isolate;
         z-index: 3;
+    }
+
+    /* 模糊层与工具栏同尺寸，只影响其后方内容。 */
+    :global(:where(.snowui-code-block-toolbar))::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        pointer-events: none;
+        z-index: -1;
     }
 
     :global(:where(.snowui-code-block-lang)) {
@@ -1122,15 +1153,10 @@
         );
     }
 
-    /* 默认态与全屏态各按钮独立拥有背景与命中区；singleLine 保留行内 trailing。 */
+    /* 工具栏按钮沿用 bare 外观。 */
     :global(:where(.snowui-code-block-toolbar button).snowui-code-block-btn) {
         --snowui-field-focus-ring-width: 0;
-        --snowui-button-padding-override: var(--padding-1) var(--padding-2);
-        --snowui-button-radius-override: var(--radius-2);
-        --snowui-button-background-override: var(--black-20, #00000033);
         color: var(--snowui-code-block-btn-fg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
         transition:
             color var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
@@ -1305,19 +1331,6 @@
                     var(--snowui-code-block-padding-x)
                 )
         );
-    }
-
-    :global(:where(.snowui-code-block[data-top-actions="true"])),
-    :global(:where(.snowui-code-block-fullscreen)) {
-        padding-top: calc(
-            var(--snowui-code-block-padding-y-override, var(--snowui-code-block-padding-y))
-            + var(--padding-4)
-        );
-    }
-
-    /* 全屏工具栏与普通态保持一致：距上/右 8px。 */
-    :global(:where(.snowui-code-block-toolbar-fullscreen)) {
-        padding: 0;
     }
 
     :global(:where(.snowui-code-block-body-fullscreen)) {
