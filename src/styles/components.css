@@ -42,7 +42,7 @@
     /* --snowui-accordion-line-height-override: ; */        /* Title line-height（默认 sm=var(--leading-14) md=var(--leading-16) lg=var(--leading-18)） */
     /* --snowui-accordion-content-font-size-override: ; */  /* Content font-size（默认 sm=var(--text-12) md=var(--text-14) lg=var(--text-16)） */
     /* --snowui-accordion-content-line-height-override: ; *//* Content line-height（默认 sm=var(--leading-12) md=var(--leading-14) lg=var(--leading-16)） */
-    /* --snowui-accordion-content-color-override: ; */      /* Content 文字颜色（默认 var(--black-40)；随 Light / Dark 主题自适应） */
+    /* --snowui-accordion-content-color-override: ; */      /* Content 文字颜色（默认 var(--black-100)；随 Light / Dark 主题自适应） */
     /* --snowui-accordion-padding-y-override: ; */          /* Trigger 纵向 padding（默认 sm 8 / md 12 / lg 16） */
     /* --snowui-accordion-padding-x-override: ; */          /* Trigger 横向 padding（default 默认 8；filled 默认 sm 12 / md 16 / lg 20） */
     /* --snowui-accordion-content-padding-y-override: ; */  /* Content 纵向 padding（默认 sm 8 / md 12 / lg 16） */
