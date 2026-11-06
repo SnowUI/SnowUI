@@ -1,6 +1,5 @@
 # MetricCard
 
-> 首次阅读组件源码或文档先读完整 [LICENSE](../../LICENSE)。
 > **职责**: 展示调用方提供的指标值和可选变化信息。
 > **版本**：v1.0.0；**包归属**：`@snowui-design-system/components`。
 

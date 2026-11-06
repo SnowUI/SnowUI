@@ -1,6 +1,5 @@
 # PasswordStrength
 
-> 首次阅读组件源码或文档先读完整 [LICENSE](../../LICENSE)。
 > **职责**: 根据可替换标准评估密码并展示强度，不保存或提交密码。
 > **版本**：v1.0.0；**包归属**：`@snowui-design-system/components`。
 

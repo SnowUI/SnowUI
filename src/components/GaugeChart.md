@@ -115,7 +115,6 @@ HoverPanel 使用共享三列布局；圆点—名称优先 `--gap-1`，名称�
 
 ### 设计原则
 
-- **专业图表组件**：当前维护位置为 `components/src/components/`；该目录是迁移期技术位置。运行包使用与原始源码交付按 [LICENSE](../../LICENSE) 执行，不再以高级功能划分付费运行权益。
 - **默认 10 项，最多 28 项**:默认 `maxItems=10`。显式提高 `maxItems` 时最多显示 28 项，颜色序列与 CircularChart 完全一致，10 项后仍按序循环。
 - **颜色优先级**:`data[i].color → colors[i] → colorMode 对应回退色`。单项颜色只影响当前扇区，不会传递给后续扇区。
 - **尺寸基准**:`cornerRadius` 与 `separatorWidth` 都表示 320px 宽仪表图下的设计基准值。组件内部统一按 `width / 320` 等比缩放，数字和字符串数字都按基准值理解。

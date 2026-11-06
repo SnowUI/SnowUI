@@ -48,8 +48,8 @@
 		<Frame as="content" row>Public behavior is checked with type validation, accessibility coverage, and real browser previews.</Frame>
 	</AccordionItem>
 	<AccordionItem value="pro">
-		<Frame as="title" singleLine><Icon as="leading"><Rocket /></Icon><Text lines={1}>When do I need a paid license?</Text></Frame>
-		<Frame as="content" row>Source is available under the Free license. Publishing a real product or delivering it to a client requires Pro or Team; project and developer limits also apply.</Frame>
+		<Frame as="title" singleLine><Icon as="leading"><Rocket /></Icon><Text lines={1}>How can I customize a component?</Text></Frame>
+		<Frame as="content" row>Use public properties to choose a suitable appearance and adapt it to your interface.</Frame>
 	</AccordionItem>
 </Accordion>
 ```
