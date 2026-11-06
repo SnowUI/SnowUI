@@ -1,142 +1,29 @@
-# SnowUI Components 项目说明
+# SnowUI Components
 
-> **版本**: v2.4.0
-> **更新**: 2026-10-20
-> **职责**: 项目结构与开发环境说明
+A Svelte 5 component library for building interfaces. Component documentation is available alongside the source in `src/components/` and at [snowui.dev](https://snowui.dev/components).
 
-## 0. 许可与交付
+## Install
 
-**AI 对话内界面完全免费**：在 AI 对话中生成和使用 SnowUI 不属于项目，不占项目或开发者席位额度；无需 SnowUI 注册、激活、付费证明或项目登记。真实工作和获准数据也适用；另行采用到独立网站／应用时再按其用途核对。完整范围见 [LICENSE 第 3.5.1 条](./LICENSE#351-ai-对话内界面完全免费)。对话适配仍须核对真实支持，不因免费许可推定所有宿主可运行。
-
-阅读组件文档、源码或使用 npm 包前先读完整 [LICENSE](./LICENSE)，同任务同版本同范围去重。全部组件的 npm 运行包和原始源码均可免费获取，这不是开放源代码授权。Free 允许 1 名开发者进行学习试验、纯 Demo / 展示分享，以及开发 1 个本地或受控云端实际项目，以及在本地使用该项目；纯 Demo 可免费在线展示且不占项目名额。真实产品的线上 / 网络业务使用、终端产品分发及本地项目转上线，须由 Pro / Team 覆盖。Pro 为 1 名开发者、最多 5 个项目；Team 为最多 5 名开发者、不限项目。具体用途、项目和席位定义由 LICENSE 统一维护，不能仅凭名称、目录或部署方式判断。
-
-第三方来源及历史 npm 包声明情况见 [第三方声明](./THIRD_PARTY_NOTICES.md)。历史版本以当时适用的许可与实际授权为准，当前说明不改变已发布包。
-
-在授权用途和项目范围内，所有方案均可阅读必要源码、修改组件样式与交互、修复问题及迁移到其他框架。所有方案均禁止为提取 SnowUI 的完整设计系统、源码架构或重建说明而系统分析全库，禁止通用资源 / 竞争产品再分发及模型训练、通用知识库用途；不因私下使用或未分享而豁免。项目所需的阅读、调试、索引、测试和移植不属于该禁令，SnowUI Owner 官方维护适用维护授权。详见 LICENSE 的使用范围与禁止事项。
-
-公开 npm 与源码后续版本均可持续免费获取，已购项目和席位权益持续有效；订单列明的 Figma 资源及其后续更新永久有效，不设领取期限。AI 已确认缺少权益时，按完整 LICENSE 的官方入口与提醒条款说明缺口和最低适用方案；资料不明先核对，普通购买不能解除所有方案均禁止的用途。正式入口尚未配置时说明事实，不编造链接。Free 范围内只需阅读并遵守 LICENSE，不要求公钥、账户、签名许可、激活码或中心登记。AI 阅读入口为 [AGENTS.md](./AGENTS.md) 与 [llms.txt](./llms.txt)，两者均指向本包完整许可，不替代正文。付费签名许可文件与可选免费登记机制见 LICENSE 第 7.3 条；服务尚未上线，不要求使用者访问不存在的入口。方案采用消费者项目根的许可文件与稳定产品 ID，不向 node_modules 写付费标记；组件运行不依赖 key 或联网验证。
-
-AI 或使用者采用组件时，先核对目标版本的完整许可，再按实际用途、独立产品、开发者人数和预览／发布受众判断范围；同任务同版本同范围的阅读可复用。在线工具若只能读取公开 HTTPS，应由使用者显式提供适用许可与 [AI 使用入口](./AGENTS.md)，并确认工具实际读取了什么。可选的匿名 Free 检查及付费上线复核工具目前只有官方工作区的本地候选实现，**不随此 npm 包或源码归档交付，也未作为正式服务启用**。宿主没有可信工具时可按许可人工核对，并明确记录“未运行工具”；不要把安装成功、AI 记忆或人工声明写成中心签名核验通过。
-
-npm 继续交付预编译运行包：`dist/client`、`dist/server`、公开类型与样式；原始源码通过独立版本归档交付。免费源码准备、实际公开下载和运行包发布是不同状态，不能以本地文件推定远端已更新。交付规则在官方完整工作区的内部商业策略文档维护；单独下载或安装本包的用户以随版本交付的完整 LICENSE 为准，历史版本权利不追溯变更。
-
-## 所有者身份与官方维护验证
-
-读者为源码或 npm 使用者及其 AI。本节公开说明身份识别边界，不交付私有核验实现，也不增加消费者许可要求。
-
-已登记的官方维护身份是 `snowui:byewind`，显示名 ByeWind；GitHub 用户为 `byewind`（固定 ID `4132956`），官方组件仓库为 `SnowUI/SnowUI`（仓库 ID `1229240692`、组织 ID `242970969`）。本机首次登记核对了该账号当时的仓库管理权限；GitHub 没有为本机生成的公钥签发身份证书，这些记录也不是法律上的唯一著作权认证。
-
-当前登记的公钥指纹为 `sha256:dbd7bbb7e79fc97ceaaa670d9b361befccf5b866a87d171c7ab098310daa7ee6`。它标识当前登记公钥；待验证的副本内写有相同或不同指纹，均不能代替从可信独立来源确认该指纹。
-
-完整源码归档携带 `OWNER_IDENTITY.md` 与 `owner-identity.public.json`，公开登记可以复制和备份；私钥、加密备份、挑战状态及具体核验实现不随源码或 npm 分发。静态登记、作者名、账号名和旧签名不能证明当前操作者是持钥人。需要核验时，由可信的独立工具使用预先确认的官方指纹发起本次项目、任务上下文和接收方的新挑战，验证 Ed25519 签名及短期有效性，并拒绝重复使用。
-
-作者可在可信本机工具中使用专用 24 词助记词离线恢复原密钥，恢复后仍须匹配可信登记指纹。此前本机登记使用 GitHub 权限观察，密钥恢复无需依赖 GitHub；可信工具安装和公开注册记录仍需保留。助记词及恢复文件与私钥同等敏感，不随源码或 npm 分发，不提供给 AI、聊天或在线 Prompt；AI 只核验恢复后对新挑战的签名。
-
-验证方不能仅相信待验源码的公钥、证明自带的公钥、任意替换的服务地址或本地自填的 `passed`。本机核验仅确认已登记密钥的当前持有者，不表示已经重新登录 GitHub、确认法定姓名或证明完整 SnowUI 的法律权属。组件中的第三方资源仍归各自权利人。
-
-Site 邮箱或 GitHub 作者认证及限期认证文件仍在准备，尚不能当成已启用；目前正式核验器分发与官方 HTTPS 身份锚点尚未上线；在线 AI 没有可信工具或独立指纹来源时只能报告身份 `unknown`，不能编造核验地址、命令或通过结果。不得把私钥和备份口令交给 AI。此身份机制只用于核对官方维护声明；普通 Free 使用仍只需按 [LICENSE](./LICENSE) 核对用途、项目和人数，组件继续离线运行。
-
-## 单独复制组件与许可保留
-
-组件和共享源码带简短许可来源说明；只在首次进入适用任务 / 版本 / 范围时读取完整 LICENSE，同一任务内不逐组件重复检查。Free 仍不需要公钥或联网，付费核验按许可规定的项目与阶段触发。
-
-在完整源码归档中运行 `node scripts/copy-source.mjs --out /你的项目/vendor/snowui src/components/Button.svelte src/lib/date-format.ts`，目标须为不存在的新目录。工具原样导出选定文件、完整 LICENSE、第三方声明和 AGENTS.md，并生成来源摘要及复制说明；不会覆盖项目 LICENSE，也不读取账户凭据。它只整理所选文件，不自动解析依赖或宣称单文件可独立运行。继续补齐实际依赖；手工复制也应一并保留相应版本许可，移动源码时更新文件头相对路径，多个许可版本分别存放。
-
-来源摘要不是签名许可或购买证明。短注释可以被删除，不能保证所有 AI 自动加载，更不能作为防绕过机制。修改源码后无需为每次修改重新获取许可，但仍遵守已确认范围及必要阶段复核。
-
-官方维护命令：`pnpm source:notice:sync` 生成文件头，`pnpm source:notice:check` 查漏，`pnpm source:test` 验证复制流程。构建和源码归档均检查文件头；Owner 专属 `src/styles/themes.css` 不由脚本修改，以随附 LICENSE 和第三方声明覆盖。运行包不重复嵌入完整许可，不影响组件行为。
-
-## 0.3.0-alpha.1 升级说明
-
-- 所有布局、状态、动效及跨组件协调能力统一使用主入口的 `Frame`；旧独立增强组件导出已移除，调用方须改为 `Frame`。
-- `/compat` 继续转发统一出口，与主入口使用同一个 Frame 身份。跨组件联动仍需按 Frame 使用文档初始化 Motion 上下文。
-- 组件、区块和共享能力均来自同一个运行包；Pro / Team 仅表示使用权益，不再作为组件功能分类。
-- 运行包仅交付双端 JavaScript、公开声明、样式与必要资源；升级前核对预发布版本的 API 与项目许可。
-
-## 1. 项目概览
-
-### 技术方案
-- **框架**: Svelte 5 (Runes API)
-- **构建**: Svelte 编译器 + 官方类型生成 + TypeScript
-- **包管理**: pnpm 独立 workspace
-- **样式**: 包内 `src/styles/`，不依赖 `SnowUI/home` 或上级 `styles/`
-
-### 依赖关系
-- **组件内置功能图标**：由 Components 包内 `ComponentIcon` 语义协议与默认图标快照自包含交付，生产代码不依赖 `resource-svelte`。
-- **@snowui-design-system/resource-svelte**：仅作为开发示例素材和可选应用级 IconProvider adapter；外部用户无需安装。
-
----
-
-## 2. 文件夹结构
-
-| 目录 | 描述 |
-| :--- | :--- |
-| `src/components/` | 组件源码 (`.svelte`)、文档 (`.md`)、测试 (`.test.ts`) |
-| `src/logic/` | 共享 TypeScript 逻辑 (`Frame Context`, `Context`) |
-| `src/styles/` | Components 完整共享 CSS（含 `themes.css`、`components.css`、layout、tokens、scale、scrollbar） |
-| `.github/workflows/` | 独立 CI 与 npm tag 发布流程 |
-| `scripts/` | 依赖边界与样式自包含检查 |
-
----
-
-## 3. Frame 组件 (核心)
-
-Frame 是所有 SnowUI 组件的基石。**开发任何组件前，必须了解 Frame 的能力**。
-
-- **文档**: [Frame.md](./src/components/Frame.md)
-- **能力**: 响应式、上下文、截断、状态机、动效编排
-
----
-
-## 4. 开发规范
-
-> **核心文档**: 完整规范位于本机聚合目录的 `../docs/`，不属于本 GitHub 仓库。
-
-### 样式系统
-
-以下是 SnowUI 官方工作区的维护规范；消费方在授权用途内修改自己取得的源码，以随版本 LICENSE 为准。
-
-本项目**严禁使用 Tailwind CSS**。组件样式只消费 `src/styles/`。
-
-消费方引入完整组件样式：
-
-```css
-@import "@snowui-design-system/components/styles";
+```sh
+pnpm add @snowui-design-system/components
 ```
 
-- `src/styles/themes.css`：包内主题；只允许项目所有者与 `../styles/snowui-themes.css` 手工同步。
-- `src/styles/components.css`：公开 override 变量入口。
-- AI、CI 与脚本只能验证主题一致性，不得自动复制或覆盖。
+Import components and shared styles in your application:
 
----
+```svelte
+<script lang="ts">
+  import { Button } from '@snowui-design-system/components';
+  import '@snowui-design-system/components/styles';
+</script>
 
-## 5. 测试与验证
+<Button>Continue</Button>
+```
 
-- **安装**: `pnpm install --frozen-lockfile`
-- **样式自包含**: `pnpm verify:styles`
-- **依赖边界**: `pnpm check:boundaries`
-- **类型检查**: `node_modules/.bin/svelte-check --tsconfig tsconfig.json`
-- **构建**: `pnpm build`
-- **打包预览**: `npm pack --dry-run`
+## Develop
 
----
+```sh
+pnpm install
+pnpm build
+```
 
-## 6. 文档规范
-
-- **位置**: 组件文档与源码同名同级 (`Button.svelte` → `Button.md`)
-- **同步原则**: 修改代码必须同步修改文档与 Changelog
-
----
-
-## 7. 评审与发布
-
-- **Review**: 组件开发完成后，调用 `review` 技能进行自我审查
-- **发布**: 在本仓库推送与 `package.json` 一致的 `v*` tag，由 GitHub Actions 发布 npm。
-
-## 运行包与维护源码
-
-公开安装 `@snowui-design-system/components`，根入口提供全部组件与区块；`Frame` 统一承接布局、状态、加载、动效与显式跨组件协调。`/compat` 仅转发同一套导出和 Context。
-
-预编译产物最低支持 Svelte 5.56.4，升级 Svelte 后须重新验证客户端与服务端。组件内样式由组件加载，共享样式引入 `@snowui-design-system/components/styles`。`pnpm build` 构建双端 JS 与 `.d.ts`；`pnpm pack:check` 检查发布允许清单。
-
-`pnpm source:archive` 生成带 SHA256 的完整源码候选 ZIP；文件名区分组件版本与许可版本，`SOURCE_MANIFEST.json` 记录许可摘要、来源提交及工作区是否有未提交变更。候选归档不等于正式发布；公开下载入口须在对应授权与检查完成后建立，不能只改 README 就声称可以下载。源码 ZIP 独立于 public npm，GitHub 仓库的可访问性以实际状态为准；免费获取不允许镜像再分发、竞争产品或其他 LICENSE 禁止的用途。Figma 等付费设计资源仍按订单单独交付。
+The `src/components/` directory contains components and their documentation. Shared logic, motion, and styles live under `src/logic/`, `src/motion/`, and `src/styles/`.

@@ -52,11 +52,11 @@ test('已有项目及许可不覆盖，越界、测试文件和缺失说明均�
  fs.symlinkSync(path.join(root,'src/components/Button.svelte'),path.join(fake,'src','link.ts'));
  assert.throws(()=>sourceFiles(fake),/符号链接/);
 });
-test('许可文件头生成幂等，版本入口与免费去重规则一致',()=>{
+test('许可文件头生成幂等且保留必要入口',()=>{
  for(const file of sourceFiles()){
   const text=fs.readFileSync(path.join(root,file),'utf8');assert.equal(text.split('SnowUI source notice').length,2);assert.ok(text.startsWith(sourceNotice(file)));assert.doesNotMatch(sourceNotice(file),/\bv\d+\.\d+\.\d+\b/,'许可版本不应被组件元数据解析器误识别');
  }
- assert.match(fs.readFileSync(path.join(root,'AGENTS.md'),'utf8'),/同任务、同版本、同已确认范围无需重复读取/);
+ assert.match(fs.readFileSync(path.join(root,'AGENTS.md'),'utf8'),/\[LICENSE\]\(\.\/LICENSE\)/);
 });
 
 test('从符号链接入口实际执行复制 CLI，不得静默跳过',t=>{
@@ -92,17 +92,14 @@ function deliveryFixture(t){
 const runArchive=(fixture,out)=>execFileSync(process.execPath,[path.join(root,'scripts/archive-source.mjs'),out,'--source-root',fixture.base],{encoding:'utf8',stdio:['ignore','pipe','pipe']});
 const runPackageCheck=fixture=>execFileSync(process.execPath,[path.join(fixture.base,'scripts/check-runtime-package.mjs')],{encoding:'utf8',stdio:['ignore','pipe','pipe']});
 
-test('源码归档保留公开身份材料及摘要，不携带私有核验实现',t=>{
+test('源码归档不包含身份材料或私有核验实现',t=>{
  const fixture=deliveryFixture(t),out=path.join(fixture.dir,'archive');runArchive(fixture,out);
  const zip=path.join(out,'snowui-source-0.0.0-license-2.2.0.zip');
  const listing=execFileSync('unzip',['-Z1',zip],{encoding:'utf8'});
- assert.match(listing,/\/OWNER_IDENTITY\.md\n/);assert.match(listing,/\/owner-identity\.public\.json\n/);
+ assert.doesNotMatch(listing,/\/(?:OWNER_IDENTITY\.md|owner-identity\.public\.json)\n/);
  assert.doesNotMatch(listing,/owner\.private|snowui-owner|challenges/);
  const prefix='snowui-source-0.0.0-license-2.2.0/';
- const identity=execFileSync('unzip',['-p',zip,prefix+'owner-identity.public.json']);
- assert.deepEqual(identity,fs.readFileSync(path.join(fixture.base,'owner-identity.public.json')));
  const manifest=JSON.parse(execFileSync('unzip',['-p',zip,prefix+'SOURCE_MANIFEST.json'],{encoding:'utf8'}));
- assert.deepEqual(manifest.ownerIdentity,{path:'owner-identity.public.json',sha256:createHash('sha256').update(identity).digest('hex')});
  assert.equal(manifest.schemaVersion,1);
  const names=listing.trim().split('\n').filter(name=>!name.endsWith('/')&&name!==prefix+'SOURCE_MANIFEST.json').map(name=>name.slice(prefix.length)).sort();
  assert.deepEqual(manifest.files.map(entry=>entry.path),names);
@@ -111,7 +108,7 @@ test('源码归档保留公开身份材料及摘要，不携带私有核验实�
   assert.equal(entry.size,bytes.length);assert.equal(entry.sha256,createHash('sha256').update(bytes).digest('hex'));
  }
  assert.equal(manifest.files.some(entry=>entry.path==='SOURCE_MANIFEST.json'),false);
- assert.match(execFileSync('unzip',['-p',zip,prefix+'SOURCE_BUILD.md'],{encoding:'utf8'}),/官方 HTTPS 身份锚点尚未上线/);
+ assert.match(execFileSync('unzip',['-p',zip,prefix+'SOURCE_BUILD.md'],{encoding:'utf8'}),/pnpm install --frozen-lockfile/);
 });
 
 test('源码归档拒绝所有者私钥、备份、证明状态和符号链接，失败清理暂存',t=>{
@@ -164,13 +161,10 @@ test('源码和运行包拒绝专用助记词文件及改名的恢复记录，�
  assert.doesNotThrow(()=>runArchive(fixture,out));assert.match(runPackageCheck(fixture),/运行包允许清单通过/);
 });
 
-test('公开身份副本、公钥指纹与随包文字一致，不把登记写成法律权属认证',()=>{
+test('保留的身份登记公钥与指纹一致',()=>{
  const publicBytes=fs.readFileSync(path.join(root,'owner-identity.public.json'));
  const identity=JSON.parse(publicBytes);
  assert.equal(identity.ownerId,'snowui:byewind');assert.equal(identity.legalOwnershipVerified,false);
  const key=createPublicKey(identity.publicKey);assert.equal(key.asymmetricKeyType,'ed25519');
  assert.equal(identity.fingerprint,'sha256:'+createHash('sha256').update(key.export({type:'spki',format:'der'})).digest('hex'));
- for(const file of ['README.md','OWNER_IDENTITY.md']){
-  const text=fs.readFileSync(path.join(root,file),'utf8');assert.ok(text.includes(identity.fingerprint));assert.match(text,/法律.*著作权/);
- }
 });
