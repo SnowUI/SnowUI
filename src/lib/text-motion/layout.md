@@ -2,6 +2,8 @@
 
 `layout.ts` 提供文字动效组件统一的 grapheme 拆分、LCP/LCS 三段 diff、DOM 几何捕获与水平 FLIP。
 
+`split.ts` provides `splitTextMotionWords(value, locale?)` and `splitTextMotionLines(node)`. Word segments include separators so joining them restores the input; word segmentation uses `Intl.Segmenter` when available and falls back to whitespace boundaries. Line segments are measured from a rendered `Text` node in horizontal writing mode. Measure again after changing text, font, or layout. The caller owns rendering, animation, accessibility, and measurement timing; neither function creates wrappers or observers. These are internal text-motion utilities, not package-root exports. The previous SplitText action and component are not compatibility aliases.
+
 - 新字符先按最终字体进入自然文档流。
 - 共享层只对区段或槽位承载元素做 `translateX` 补偿，不设置或动画单字符 `width`。
 - `TEXT_MOTION_LAYOUT_TRANSITION` 还原 NumericText 参考源码的 `550ms` 布局过渡。
