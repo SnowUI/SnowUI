@@ -90,7 +90,7 @@
 - corner 固定在右下角，仅在角点附近激活；默认 `axis="both"`，同时调整宽度和高度。
 - corner 默认使用 `nwse-resize` 对角双箭头；显式设置单轴时使用对应方向光标。
 - 定位：line 自管 absolute 贴边（不用 pin 居中）；corner 默认 `as="pin-bottom-right"` + `pinOffset="var(--padding-1)"` + `z-index: 6`。
-- 默认隐藏；宿主 hover、focus-visible 或 dragging 时显示；与同一 target 内 overlay scrollbar Thumb 重叠时保持显示及 Pointer、键盘命中。
+- 默认隐藏；宿主 hover、focus-visible 或 dragging 时显示；与同一 target 内可见 overlay scrollbar Thumb 重叠时隐藏并退出 Pointer 和键盘命中。
 - 视觉与命中区分层；line 命中带铺满所在边缘全高/全宽。
 - 动效消费与 overlay scrollbar 相同的 Frame color motion bridge。
 
@@ -138,7 +138,7 @@ Indicator 将原 WidthIndicator、HeightIndicator 与 ResizeHandle 合并为一�
 
 **命中带（line）**：视觉条与命中区分层。默认情况下 line **不使用 pin 居中**，根节点从**物理边缘 0** 起铺满全高/全宽，命中厚度 = `pinOffset + 8px`（含边框线，可从最外缘拖动）；视觉短条外缘距宿主边缘 `pinOffset`（默认 `var(--padding-1)`，基准 4px），默认 2×16 / 16×2。`hitAreaPadding` 只保留兼容输入，不再改变命中范围；任何位置进入所在整条边都会激活并允许拖动。corner 仍用 `pin-bottom-right` + 局部命中。
 
-Indicator 与同一 resize target 内的 overlay scrollbar 重叠时，Resize 命中区优先：手柄继续显示并接收 Pointer 与键盘操作，滚动条在未被手柄覆盖的区域继续响应拖动。组合宿主须保证手柄所在层高于滚动条，不以隐藏手柄或移除焦点来避让。
+Indicator 与同一 resize target 内的可见 overlay scrollbar Thumb 重叠时，滚动条优先：手柄隐藏并退出 Pointer 与键盘命中；不再重叠时恢复。适用于代码块、侧边栏及弹出面板等组合。
 
 <a id="开发者指南-ai"></a>
 

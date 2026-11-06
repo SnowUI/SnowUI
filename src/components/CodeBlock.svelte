@@ -659,6 +659,7 @@
         className,
     ].filter(Boolean).join(" ")}
     data-variant={variant}
+    data-formatting={format && !isPrompt && !isSingleLine && rawCode && (formatted?.source !== rawCode || formatted.language !== language) ? "true" : undefined}
     data-top-actions={!isSingleLine && ((resolvedShowLanguage && language) || showCopyButton || showExpandButton || hasCustomTrailing) ? "true" : undefined}
     data-resized={!isSingleLine && resizeHeight !== undefined ? "true" : undefined}
     style={rootStyle}
@@ -1344,20 +1345,12 @@
 
     /* 组件只声明轨道定位；视觉样式由 scrollbar.css 的 .snowui-overlay-scrollbar 承接。 */
     /* 滚动条提升到根容器（position:relative），绕开 scroll-shell 的 overflow:clip 裁切。 */
-    /* top/bottom 对齐 scroll-shell 上下边缘（即容器 padding-y 处），right: 4px 贴近右边缘。 */
+    /* 纵向轨道上下使用相同留白，right: 4px 贴近右边缘。 */
     :global(:where(.snowui-code-block-scrollbar[data-axis="vertical"])) {
-        top: var(
-            --snowui-code-block-padding-y-override,
-            var(--snowui-code-block-padding-y)
-        );
+        top: var(--snowui-code-block-footer-height);
         right: 4px;
         bottom: var(--snowui-code-block-footer-height);
-        z-index: 2;
-    }
-
-    :global(:where(.snowui-code-block[data-top-actions="true"] .snowui-code-block-scrollbar[data-axis="vertical"])),
-    :global(:where(.snowui-code-block-fullscreen .snowui-code-block-scrollbar[data-axis="vertical"])) {
-        top: calc(var(--padding-2) + var(--size-6) + var(--padding-1));
+        z-index: 4;
     }
 
     :global(:where(.snowui-code-block-accessories)) {

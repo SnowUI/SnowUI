@@ -234,8 +234,11 @@
                 resolvedValue === null ||
                 resolvedValue === ""),
     );
+    let passwordVisible = $state(false);
+    const isPasswordType = $derived(normalizedInputType === "password");
     const isClearableType = $derived(
         normalizedInputType !== "number" &&
+            !isPasswordType &&
             !isCustomColorType &&
             !isCustomTemporalType,
     );
@@ -1259,7 +1262,7 @@
 
         const update = () => {
             const hasRootTrailing = !!host.querySelector(
-                ':scope > [data-as="trailing"]:not(.snowui-input-warning-icon):not(.snowui-input-clear-btn)',
+                ':scope > [data-as="trailing"]:not(.snowui-input-warning-icon):not(.snowui-input-clear-btn):not(.snowui-input-password-toggle)',
             );
             const hasSiblingTrailing = Array.from(scope.children).some(
                 (child) => {
@@ -1297,7 +1300,7 @@
         const updateTrailing = () => {
             // 检测是否存在用户自定义的 trailing 元素 (排除内置的 stepper 按钮、Warning 和内置 clear 按钮)
             hasCustomTrailing = !!host.querySelector(
-                ':scope > [data-as="trailing"]:not(.snowui-input-warning-icon):not(.snowui-input-clear-btn)',
+                ':scope > [data-as="trailing"]:not(.snowui-input-warning-icon):not(.snowui-input-clear-btn):not(.snowui-input-password-toggle)',
             );
         };
 
@@ -1407,7 +1410,7 @@
             class="snowui-input-control snowui-native-control snowui-input-embedded-native snowui-horizontal-scroll-mask"
             data-scroll-mask-x={horizontalScrollMask}
             {id}
-            type={normalizedInputType}
+            type={isPasswordType && passwordVisible ? "text" : normalizedInputType}
             {name}
             {placeholder}
             {disabled}
@@ -1449,6 +1452,13 @@
             oncut={userOnCut}
         />
         {@render children?.()}
+        {#if isPasswordType && !hasCustomTrailing}
+            <Button bare emphasis="muted" size="sm" type="button" as="trailing" class="snowui-input-password-toggle" disabled={disabled}
+                aria-label={localeContext.t(passwordVisible ? "input.hidePassword" : "input.showPassword")}
+                aria-pressed={passwordVisible} onclick={() => passwordVisible = !passwordVisible}>
+                <ComponentIcon name={passwordVisible ? "eye-slash" : "eye"} aria-hidden="true" />
+            </Button>
+        {/if}
         {#if clearable && isClearableType && !disabled && !readonly}
             <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
@@ -1462,7 +1472,7 @@
                 <ComponentIcon name="x-circle" weight="fill" aria-hidden="true" />
             </Button>
         {/if}
-        {#if resolvedInvalid && !hasCustomTrailing}
+        {#if resolvedInvalid && !hasCustomTrailing && !isPasswordType}
             <span
                 class="snowui-input-warning-icon snowui-role-trailing text-secondary-red"
                 aria-hidden="true"
@@ -1658,7 +1668,7 @@
             class="snowui-input-control snowui-native-control snowui-horizontal-scroll-mask"
             data-scroll-mask-x={horizontalScrollMask}
             {id}
-            type={normalizedInputType}
+            type={isPasswordType && passwordVisible ? "text" : normalizedInputType}
             {name}
             {placeholder}
             {disabled}
@@ -1746,6 +1756,13 @@
         </div>
     {:else}
         {@render children?.()}
+        {#if isPasswordType && !hasCustomTrailing}
+            <Button bare emphasis="muted" size="sm" type="button" as="trailing" class="snowui-input-password-toggle" disabled={disabled}
+                aria-label={localeContext.t(passwordVisible ? "input.hidePassword" : "input.showPassword")}
+                aria-pressed={passwordVisible} onclick={() => passwordVisible = !passwordVisible}>
+                <ComponentIcon name={passwordVisible ? "eye-slash" : "eye"} aria-hidden="true" />
+            </Button>
+        {/if}
         {#if clearable && isClearableType && !disabled && !readonly}
             <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
@@ -1759,7 +1776,7 @@
                 <ComponentIcon name="x-circle" weight="fill" aria-hidden="true" />
             </Button>
         {/if}
-        {#if resolvedInvalid && !hasCustomTrailing}
+        {#if resolvedInvalid && !hasCustomTrailing && !isPasswordType}
             <span
                 class="snowui-input-warning-icon snowui-role-trailing text-secondary-red"
                 aria-hidden="true"

@@ -1,6 +1,6 @@
 <!-- SnowUI source notice | LICENSE 2.3.0: ../../LICENSE
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
-<!-- 通用可交互尺寸指示手柄；支持局部命中，重叠时优先调整尺寸。文档: ./Indicator.md -->
+<!-- 通用可交互尺寸指示手柄；与可见滚动条重叠时滚动条优先。文档: ./Indicator.md -->
 <script module lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     export type IndicatorAxis = "width" | "height" | "both";
@@ -13,6 +13,7 @@
     import ComponentIcon from "../internal/component-icon/ComponentIcon.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { resizable, type ResizableOptions } from "../lib/resizable";
+    import { resizeManager } from "../logic/observer.svelte";
     import { untrack } from "svelte";
     import { useLocale } from "../i18n/locale.svelte";
     import {
@@ -88,6 +89,7 @@
     const indicatorId = `snowui-indicator-${++indicatorSeed}`;
     let element = $state<HTMLElement>();
     let hostHovered = $state(false);
+    let scrollbarOverlap = $state(false);
     let focused = $state(false);
     let dragging = $state(false);
     let resizeActions: ReturnType<typeof resizable>[] = [];
@@ -111,7 +113,7 @@
     );
     const resolvedTarget = $derived(target ?? element?.parentElement ?? undefined);
     const resolvedRevealTarget = $derived(revealTarget ?? resolvedTarget);
-    const isVisible = $derived(hostHovered || focused || dragging);
+    const isVisible = $derived(!scrollbarOverlap && (hostHovered || focused || dragging));
     const resolvedAriaLabel = $derived(
         ariaLabel ??
             localeContext.t(resolvedAxis === "width"
@@ -232,6 +234,43 @@
         const host = resolvedTarget;
         const handle = element;
         if (!host || !handle) return;
+        let frame = 0;
+        const update = () => {
+            frame = 0;
+            const rect = handle.getBoundingClientRect();
+            scrollbarOverlap = Array.from(host.querySelectorAll<HTMLElement>('.snowui-overlay-scrollbar[data-visible="true"] .snowui-overlay-scrollbar-thumb')).some(thumb => {
+                const track = thumb.closest<HTMLElement>('.snowui-overlay-scrollbar');
+                if (!track || getComputedStyle(track).pointerEvents === 'none') return false;
+                const other = thumb.getBoundingClientRect();
+                return rect.left < other.right && rect.right > other.left && rect.top < other.bottom && rect.bottom > other.top;
+            });
+        };
+        const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+        const stopHostResize = resizeManager.watch(host, schedule);
+        const stopHandleResize = resizeManager.watch(handle, schedule);
+        const mutations = new MutationObserver(schedule);
+        mutations.observe(host, { subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'class', 'data-visible', 'data-dragging'] });
+        host.addEventListener('scroll', schedule, true);
+        host.addEventListener('pointermove', schedule, true);
+        host.addEventListener('pointerenter', schedule, true);
+        host.addEventListener('pointerleave', schedule, true);
+        host.addEventListener('transitionend', schedule, true);
+        schedule();
+        return () => {
+            cancelAnimationFrame(frame); stopHostResize(); stopHandleResize(); mutations.disconnect();
+            host.removeEventListener('scroll', schedule, true);
+            host.removeEventListener('pointermove', schedule, true);
+            host.removeEventListener('pointerenter', schedule, true);
+            host.removeEventListener('pointerleave', schedule, true);
+            host.removeEventListener('transitionend', schedule, true);
+            scrollbarOverlap = false;
+        };
+    });
+
+    $effect(() => {
+        const host = resolvedTarget;
+        const handle = element;
+        if (!host || !handle) return;
         const axes: ("width" | "height")[] =
             resolvedAxis === "both" ? ["width", "height"] : [resolvedAxis];
         resizeActions = axes.map((resizeAxis) =>
@@ -290,6 +329,7 @@
     data-visible={isVisible ? "true" : undefined}
     data-dragging={dragging ? "true" : undefined}
     data-disabled={disabled ? "true" : undefined}
+    data-scrollbar-overlap={scrollbarOverlap ? "true" : undefined}
     role="separator"
     aria-label={resolvedAriaLabel}
     aria-orientation={resolvedAxis === "width"
@@ -297,7 +337,7 @@
         : resolvedAxis === "height"
           ? "horizontal"
           : undefined}
-    tabindex={disabled ? -1 : 0}
+    tabindex={disabled || scrollbarOverlap ? -1 : 0}
     enableAutoLayout={false}
     enableResponsive={enableResponsive}
     enableContext={enableContext}
@@ -344,6 +384,8 @@
     :global(:where(.snowui-indicator-line)) {
         z-index: 5;
     }
+    :global(:where(.snowui-indicator[data-scrollbar-overlap="true"])) { pointer-events: none; }
+    :global(:where(.snowui-indicator)[data-scrollbar-overlap="true"] > .snowui-indicator-visual) { opacity: 0; }
 
     :global(:where(.snowui-indicator-line.snowui-indicator-width)) {
         cursor: col-resize;

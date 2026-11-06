@@ -95,7 +95,7 @@ export const examples = [
         name: "I-09：type=password",
         code: `I-09
 <Input type="password" placeholder="Password" style="width: 20rem;" />`,
-        logic: ["Type"],
+        logic: ["Type", "PasswordVisibility"],
     },
     {
         name: "I-10：type=search",

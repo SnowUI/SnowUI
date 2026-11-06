@@ -47,6 +47,14 @@ export type SnowUIMessageKey =
     | "pagination.page"
     | "otpInput.invalidCode"
     | "input.clear"
+    | "input.showPassword"
+    | "input.hidePassword"
+    | "passwordStrength.minimumLength"
+    | "passwordStrength.requirements"
+    | "passwordStrength.lowercase"
+    | "passwordStrength.uppercase"
+    | "passwordStrength.number"
+    | "passwordStrength.symbol"
     | "input.increment"
     | "input.decrement"
     | "input.openTime"
@@ -157,6 +165,14 @@ export const SNOWUI_MESSAGES: Record<
         "pagination.page": "第 {{page}} 页",
         "otpInput.invalidCode": "请输入 {{length}} 位数字验证码",
         "input.clear": "清除输入",
+        "input.showPassword": "显示密码",
+        "input.hidePassword": "隐藏密码",
+        "passwordStrength.minimumLength": "密码至少需要 {{length}} 个字符",
+        "passwordStrength.requirements": "密码还需包含：{{requirements}}",
+        "passwordStrength.lowercase": "小写字母",
+        "passwordStrength.uppercase": "大写字母",
+        "passwordStrength.number": "数字",
+        "passwordStrength.symbol": "特殊字符（例如 ! @ # $ %）",
         "input.increment": "增加数值",
         "input.decrement": "减少数值",
         "input.openTime": "打开时间选择",
@@ -260,6 +276,14 @@ export const SNOWUI_MESSAGES: Record<
         "pagination.page": "Page {{page}}",
         "otpInput.invalidCode": "Enter a {{length}}-digit verification code",
         "input.clear": "Clear input",
+        "input.showPassword": "Show password",
+        "input.hidePassword": "Hide password",
+        "passwordStrength.minimumLength": "Password must be at least {{length}} characters",
+        "passwordStrength.requirements": "Password must also include: {{requirements}}",
+        "passwordStrength.lowercase": "a lowercase letter",
+        "passwordStrength.uppercase": "an uppercase letter",
+        "passwordStrength.number": "a number",
+        "passwordStrength.symbol": "a special character (e.g. ! @ # $ %)",
         "input.increment": "Increase value",
         "input.decrement": "Decrease value",
         "input.openTime": "Open time picker",

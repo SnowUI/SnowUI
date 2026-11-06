@@ -179,7 +179,9 @@
 
 默认态与全屏态的右上 CopyButton / ExpandButton 仍使用 `bare emphasis="muted"` 的图标强调与复制反馈；工具栏整体使用透明背景模糊，按钮保持 bare 外观，hover 时继续由 Button 将强调度提升到 100%。键盘焦点有可见轮廓。`singleLine` 的行内 trailing 复制按钮不使用这组右上视觉。
 
-语言标签与动作组之间的有效间距至少4 CSS px；普通态与全屏态一致，纯图标组和代码字符／行号间距不由本规则改写。工具栏使用内部 Pin 布局固定到 `pin-top-right`，距上边缘 8px、右边缘 4px；过长语言标签在可用宽度内省略。代码内容可从工具栏后方滚动，工具栏模糊后方内容。右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
+代码异步格式化期间，根节点输出 `data-formatting="true"`，完成后移除；宿主可据此避免显示尚未格式化的正文。原始代码与格式化结果仍由 CodeBlock 处理。
+
+语言标签与动作组之间的有效间距至少4 CSS px；普通态与全屏态一致，纯图标组和代码字符／行号间距不由本规则改写。工具栏固定到 `pin-top-right`，工具栏距上边缘 8px、右边缘 4px，内部上下 4px、左右 8px；最右侧图标距上边缘和右边缘均为 12px，不随按钮数量变化。过长语言标签在可用宽度内省略。代码内容可从工具栏后方滚动，工具栏模糊后方内容；滚动条位于工具栏之上，纵向轨道上下边距相等。右下角尺寸手柄复用 `Indicator appearance="corner"`，仅角点附近可拖动，默认同时调整宽高；常态 2px / Black/10，自身 hover、focus 或 dragging 时变为 4px / Black/20。
 
 ---
 

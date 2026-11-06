@@ -31,6 +31,8 @@ const names = [
     "clock",
     "close",
     "copy",
+    "eye",
+    "eye-slash",
     "funnel-simple",
     "minus",
     "moon",

@@ -72,8 +72,10 @@
         if (!applyToDocument) return;
         if (nextMode === "apple") {
             document.documentElement.setAttribute("mode", "ios");
+            document.body?.setAttribute("mode", "ios");
         } else {
             document.documentElement.removeAttribute("mode");
+            document.body?.removeAttribute("mode");
         }
     }
 

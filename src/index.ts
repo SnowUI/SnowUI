@@ -329,3 +329,6 @@ export * from './lib/split-pane'
 export { default as SearchPopup, type SearchPopupItem } from "./blocks/SearchPopup.svelte";
 
 export { default as BlurText } from "./components/BlurText.svelte";
+
+export { default as MetricCard } from "./components/MetricCard.svelte";
+export { default as PasswordStrength, evaluatePasswordStrength, type PasswordStrengthLevel, type PasswordStrengthEvaluator } from "./components/PasswordStrength.svelte";

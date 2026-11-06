@@ -40,7 +40,7 @@
 | --- | --- | --- | --- |
 | mode | `SnowUIStyleMode` | — | 当前视觉风格，支持 bind:mode。挂载时优先于 defaultMode；点击更新该值，同步页面属性时也会跟随根节点变化。 |
 | defaultMode | `SnowUIStyleMode` | — | 挂载时的非受控初值；mode 优先。均未提供时读取页面根节点；applyToDocument=false 时回退为 snowui。 |
-| applyToDocument | `boolean` | `true` | 将当前状态同步到 document.documentElement：mode="ios"；SnowUI 时移除 mode。false 时不读写或观察页面属性，由调用方处理主题目标；不写入 storage。 |
+| applyToDocument | `boolean` | `true` | 将当前状态同步到 document.documentElement 和 body：Apple 时设置 mode="ios"，SnowUI 时移除 mode。false 时不读写或观察页面属性，由调用方处理主题目标；不写入 storage。 |
 | ariaLabel | `string` | — | 覆盖按钮的可访问名称；默认描述点击后切换到的状态，跟随 LocaleProvider。 |
 | snowuiLogo | `Snippet` | `—（内置图形）` | 替换当前为 snowui 时显示的 SnowUI Logo。仅改变图形，不接管切换逻辑。 |
 | appleLogo | `Snippet` | `—（内置图形）` | 替换当前为 apple 时显示的 Apple Logo。仅改变图形，不接管切换逻辑。 |

@@ -57,7 +57,7 @@
 | name | `string` | — | 原生表单字段名；FormData 使用该名称收集字段。 |
 | disabled | `boolean` | `false` | 禁止用户输入与交互，原生禁用字段不参与表单提交。 |
 | readonly | `boolean` | `false` | 保留聚焦、选择与提交，禁止编辑并隐藏清除入口；自定义 trailing 聚焦后仍保留，使用只读视觉。 |
-| clearable | `boolean` | `true` | 是否允许显示内置清除 X；false 时不渲染 X，不改变编辑、校验或自定义 trailing。适用于普通及 Field 内嵌 Input。 |
+| clearable | `boolean` | `true` | 是否允许显示内置清除 X；false 时不渲染 X，不改变编辑、校验或自定义 trailing。密码输入使用显示／隐藏按钮，不显示清除 X。适用于普通及 Field 内嵌 Input。 |
 | required | `boolean` | `false` | 参与浏览器原生必填校验；不自动产生业务错误文案。 |
 | autocomplete | `HTMLInputAttributes["autocomplete"]` | — | 透传浏览器自动填充字段语义，如 username、email、new-password；候选来自浏览器已有数据。 |
 | minlength | `number` | — | 适用文本输入的最小字符长度，由浏览器在适用的用户编辑和表单校验路径执行。 |
@@ -107,6 +107,7 @@
 - 基础节奏统一：`Field` 默认 `padding = 12 / 16`，`gap = 8`
 - `Input` 单独使用时：组件自身带 `12 / 16` padding 和 `8` gap
 - icon 位置由 `Input` 自己控制：leading / trailing icon 到最近可见内边界默认都是 `16px`
+- `type="password"` 默认在 trailing 提供显示／隐藏密码的眼睛按钮，不提供清除 X；调用方提供 trailing 内容时由调用方接管该区域。密码强度提示单独使用 `PasswordStrength`，不强制所有密码框显示。
 - 错误态内建 warning icon 也走同一条 trailing icon 规则，不额外使用 overlay 偏移
 - 放进 `Field` 后，先看有没有 `as="segment"`
 - 没有 `as="segment"`：由外层 `Field` 负责 `12 / 16` padding 与 `8` gap；`Input` 去掉自身 padding，但保留自身 gap

@@ -107,7 +107,7 @@
 
 - 展开默认宽度 `220px`，有图标模式折叠宽度 `60px`，text 模式折叠宽度 `0px`，高度 `100%`。`resizable={true}` 时，右侧边框全高均可在默认 `160px`～`480px` 范围内拖拽调整展开宽度，并通过 `width` / `bind:width` 与 `onWidthChange` 对外同步；边缘显示 Indicator 默认宽度调整指示器。设为 `false` 时不渲染整边调宽命中层。
 - 折叠与展开以 Sidebar 根宽度为主时间轴：展开宽度 → 折叠宽度（icon 为 60px，text 为 0px）使用 `SIDE_PANEL_DISAPPEAR_MOTION` 的临界阻尼 spring timing，折叠宽度 → 上次展开宽度使用 `SIDE_PANEL_APPEAR_MOTION` 的同系 timing；该 timing 复用 Frame 默认 move spring。拖拽期间临时关闭宽度 transition，使边缘与指针同步；`enableDefaultMotion={false}` 与系统 reduced motion 均关闭该过渡。
-- 右侧整边调宽命中层仅在 `resizable={true}` 且展开态存在，沿 Sidebar 右侧边框全高铺开，渲染 Indicator 默认短条。命中层与 Sidebar 的可见 overlay scrollbar Thumb 重叠时遵守 Indicator 的 Resize 优先规则，滚动条未被覆盖的区域继续响应。折叠不会覆盖已调整的展开宽度，再次展开时恢复该宽度。
+- 右侧整边调宽命中层仅在 `resizable={true}` 且展开态存在，沿 Sidebar 右侧边框全高铺开，渲染 Indicator 默认短条。命中层与 Sidebar 的可见 overlay scrollbar Thumb 重叠时遵守 Indicator 的滚动条优先规则。折叠不会覆盖已调整的展开宽度，再次展开时恢复该宽度。
 - 根容器默认 padding 为左右 `12px`（`var(--padding-3)`）、上下 `16px`（`var(--padding-4)`）；这是 Sidebar 组件默认值，不由使用方重复补 class 或 style。
 - Header 与 Footer 均为非滚动区；Footer 全宽贴底，`ScrollArea` 独立滚动并延伸至底部，在 Footer 区域内按设计渐隐。Sidebar 根的 Header / Body 默认 gap 为 `var(--gap-3)`（12px），即 Logo 区域与下方导航区域之间的默认间距；它与 Body 内相邻导航内容的 4px gap 是两个独立层级。
 - Body 纵向 overlay scrollbar 根据根横向 padding 自动外移，轨道右边缘始终距 Sidebar 右边框 `4px`；默认 12px 横向 padding 时其 `right` 偏移为 `-8px`。

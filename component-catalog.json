@@ -1218,6 +1218,38 @@
       "deprecated": false
     },
     {
+      "name": "MetricCard",
+      "canonical": "MetricCard",
+      "package": "@snowui-design-system/components",
+      "import": "import { MetricCard } from '@snowui-design-system/components';",
+      "runtime": "free-download",
+      "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/MetricCard.svelte",
+      "documentation": "src/components/MetricCard.md",
+      "description": "用于展示仪表盘中的单项指标及可选变化信息。组件不获取数据或计算变化率。",
+      "intents": [
+        "展示仪表盘指标和变化"
+      ],
+      "aliases": [
+        "指标卡"
+      ],
+      "whenToUse": "展示单项指标和变化",
+      "avoidWhen": "普通内容容器使用 Card",
+      "related": [
+        "Card"
+      ],
+      "deprecated": false
+    },
+    {
       "name": "NumberFlow",
       "canonical": "NumberFlow",
       "package": "@snowui-design-system/components",
@@ -1391,6 +1423,39 @@
       "whenToUse": null,
       "avoidWhen": null,
       "related": [],
+      "deprecated": false
+    },
+    {
+      "name": "PasswordStrength",
+      "canonical": "PasswordStrength",
+      "package": "@snowui-design-system/components",
+      "import": "import { PasswordStrength } from '@snowui-design-system/components';",
+      "runtime": "free-download",
+      "sourceEntitlement": [
+        "Free",
+        "Pro",
+        "Team"
+      ],
+      "productionEntitlement": [
+        "Pro",
+        "Team"
+      ],
+      "kind": "component",
+      "source": "src/components/PasswordStrength.svelte",
+      "documentation": "src/components/PasswordStrength.md",
+      "description": "即时评估密码并显示四段强度条及文字；不持久保存或发送密码，也不将密码放入 DOM 或事件结果。它不负责密码输入、账户政策校验或提交。",
+      "intents": [
+        "展示密码强度"
+      ],
+      "aliases": [
+        "密码强度指示器"
+      ],
+      "whenToUse": "评估并展示密码强度",
+      "avoidWhen": "任务进度使用 Progress",
+      "related": [
+        "Input",
+        "Progress"
+      ],
       "deprecated": false
     },
     {

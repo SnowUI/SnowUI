@@ -4,7 +4,6 @@
     import { onDestroy, type Snippet } from "svelte";
     import Text from "./Text.svelte";
     import { useLocale } from "../i18n/locale.svelte";
-    import { NUMBER_POP_APPEAR_MOTION } from "../motion/presets/effects";
     import { TAB_INDICATOR_MOTION_STYLE } from "../motion/presets/tab";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { splitFrameHostProps } from "../logic/frame-prop-filter";
@@ -27,6 +26,7 @@
         id?: string;
         title?: string;
         invalid?: boolean;
+        success?: boolean;
         error?: string | Snippet;
         oncomplete?: (value: string) => void;
         oninput?: (event: Event) => void;
@@ -53,6 +53,7 @@
         id,
         title,
         invalid = false,
+        success = $bindable(false),
         error,
         enableResponsive = true,
         enableContext = true,
@@ -75,8 +76,9 @@
     let focused = $state(false);
     let hoveredIndex = $state<number | undefined>();
     let pasteInvalid = $state(false);
+    let incompleteInvalid = $state(false);
     let errorTimer: ReturnType<typeof setTimeout> | undefined;
-    const resolvedInvalid = $derived(invalid || pasteInvalid);
+    const resolvedInvalid = $derived(invalid || pasteInvalid || incompleteInvalid);
     const errorContent = $derived(error ?? locale.t("otpInput.invalidCode", { length }));
     onDestroy(() => { if (errorTimer) clearTimeout(errorTimer); });
     let selectionIndex = $state(0);
@@ -89,10 +91,11 @@
     const frameRestProps = $derived(splitProps.frameProps);
     const inputRestProps = $derived(splitProps.hostProps);
 
-    const normalize = (raw: unknown) => String(raw ?? "").replace(/\D/g, "").slice(0, length);
+    // 空格仅表示尚未填写的格子；尾部空格不进入外部值。
+    const normalize = (raw: unknown) => String(raw ?? "").replace(/[^0-9 ]/g, "").slice(0, length).replace(/ +$/, "");
     const currentValue = $derived(normalize(value === undefined ? defaultValue : value));
-    const digits = $derived(Array.from({ length }, (_, index) => currentValue[index] ?? ""));
-    const activeIndex = $derived(Math.min(selectionIndex, currentValue.length, length - 1));
+    const digits = $derived(Array.from({ length }, (_, index) => currentValue[index] === " " ? "" : currentValue[index] ?? ""));
+    const activeIndex = $derived(Math.min(selectionIndex, length - 1));
     const groupLabel = $derived(inputRestProps["aria-label"]);
     const groupLabelledby = $derived(inputRestProps["aria-labelledby"]);
     const nativeInputProps = $derived.by(() => {
@@ -110,6 +113,12 @@
         if (normalized.length < length) lastUserCompletion = "";
     });
 
+    $effect(() => {
+        if (!success) return;
+        const timer = setTimeout(() => { success = false; }, 2000);
+        return () => clearTimeout(timer);
+    });
+
     function formReset(node: HTMLInputElement, formId: string | undefined) {
         let active = true;
         const reset = (event: Event) => {
@@ -121,7 +130,7 @@
                 value = normalize(event.defaultPrevented ? valueBeforeReset : initialValue);
                 if (inputElement) inputElement.value = value;
                 selectionIndex = value.length;
-                if (!event.defaultPrevented) { lastUserCompletion = ""; clearPasteError(); }
+                if (!event.defaultPrevented) { lastUserCompletion = ""; incompleteInvalid = false; clearPasteError(); }
             }, 0);
         };
         document.addEventListener("reset", reset, true);
@@ -138,12 +147,14 @@
         };
     }
 
-    function commitFromUser(raw: string) {
+    function commitFromUser(raw: string, filledLast = false) {
         const next = normalize(raw);
         const previous = currentValue;
         value = next;
         selectionIndex = inputElement?.selectionStart ?? next.length;
-        if (next.length === length && next !== previous && next !== lastUserCompletion) {
+        if (next.length < length || !next.includes(" ")) incompleteInvalid = false;
+        else if (filledLast) incompleteInvalid = true;
+        if (/^[0-9]+$/.test(next) && next.length === length && next !== previous && next !== lastUserCompletion) {
             lastUserCompletion = next;
             oncomplete?.(next);
         }
@@ -167,21 +178,44 @@
     }
 
     function moveCaret(index: number, select = false) {
-        const at = Math.max(0, Math.min(index, currentValue.length, length - 1));
+        const at = Math.max(0, Math.min(index, length - 1));
         selectionIndex = at;
+        if (inputElement && inputElement.value.length < at) inputElement.value = inputElement.value.padEnd(at, " ");
         inputElement?.setSelectionRange(at, select && at < currentValue.length ? at + 1 : at);
     }
 
     function handleInput(event: Event) {
         const target = event.currentTarget as HTMLInputElement;
         if (disabled || readonly) { target.value = currentValue; return; }
+        // 浏览器自动填充或整段替换包含非数字字符时按原有规则过滤；
+        // 仅数字和空格组成的值才保留逐格编辑产生的空位。
+        if (/[^0-9 ]/.test(target.value)) target.value = target.value.replace(/\D/g, "");
         const caret = normalize(target.value.slice(0, target.selectionStart ?? target.value.length)).length;
-        commitFromUser(target.value);
+        const filledLast = (event as InputEvent).inputType?.startsWith("insert") === true && (target.selectionStart ?? 0) >= length;
+        commitFromUser(target.value, filledLast);
         target.value = normalize(target.value);
         // Use the accepted digit count, not the raw text length, so filtering cannot skip a slot.
         target.setSelectionRange(caret, caret);
-        selectionIndex = Math.min(caret, target.value.length, length - 1);
+        selectionIndex = Math.min(caret, length - 1);
         oninput?.(event);
+    }
+
+    function handleBeforeInput(event: InputEvent) {
+        if (disabled || readonly || !event.inputType.startsWith("delete")) return;
+        const target = event.currentTarget as HTMLInputElement;
+        let start = target.selectionStart ?? selectionIndex;
+        let end = target.selectionEnd ?? start;
+        if (start === end) {
+            if (event.inputType === "deleteContentBackward") start = Math.max(0, start - 1);
+            else if (event.inputType === "deleteContentForward") end = Math.min(length, end + 1);
+            else return;
+        }
+        event.preventDefault();
+        const padded = currentValue.padEnd(length, " ");
+        target.value = normalize(padded.slice(0, start) + " ".repeat(end - start) + padded.slice(end));
+        target.setSelectionRange(Math.min(start, target.value.length), Math.min(start, target.value.length));
+        target.dispatchEvent(new Event("input", { bubbles: true }));
+        moveCaret(start);
     }
 
     function handlePaste(event: ClipboardEvent) {
@@ -189,14 +223,14 @@
         if (event.defaultPrevented || disabled || readonly) return;
         event.preventDefault();
         const pasted = event.clipboardData?.getData("text") ?? "";
-        const at = Math.min(selectionIndex, currentValue.length, length - 1);
+        const at = Math.min(selectionIndex, length - 1);
         if (!/^[0-9]+$/.test(pasted)) { rejectPaste(false); return; }
         let next: string;
         let caret: number;
         if (pasted.length === length) {
             next = pasted;
             caret = length;
-        } else if (at > 0 && pasted.length <= length - at) {
+        } else if (at > 0 && pasted.length <= length - at && /^[0-9]+$/.test(currentValue.slice(0, at)) && currentValue.slice(0, at).length === at) {
             // Interior paste may complete or partially fill the remaining contiguous suffix.
             next = currentValue.slice(0, at) + pasted + currentValue.slice(at + pasted.length);
             caret = at + pasted.length;
@@ -232,10 +266,8 @@
 
     function syncSelection() {
         if (!inputElement) return;
-        const index = Math.min(inputElement.selectionStart ?? currentValue.length, currentValue.length, length - 1);
+        const index = Math.min(inputElement.selectionStart ?? currentValue.length, length - 1);
         selectionIndex = index;
-        // A contiguous prefix is the only editable code; never activate a later empty slot.
-        if ((inputElement.selectionStart ?? 0) > currentValue.length) moveCaret(index);
     }
 
 </script>
@@ -249,6 +281,7 @@
     data-readonly={readonly ? "true" : undefined}
     data-invalid={resolvedInvalid ? "true" : undefined}
     data-focus={focused ? "true" : undefined}
+    data-success={success ? "true" : undefined}
     role="group"
     aria-label={groupLabel}
     aria-labelledby={groupLabelledby}
@@ -275,6 +308,7 @@
             minlength={length}
             aria-invalid={resolvedInvalid || undefined}
             oninput={handleInput}
+            onbeforeinput={handleBeforeInput}
             {onchange}
             onfocus={(event) => { focused = true; syncSelection(); onfocus?.(event); }}
             onblur={(event) => { focused = false; onblur?.(event); }}
@@ -287,19 +321,21 @@
         />
         {#each digits as digit, index}
             <span class="snowui-otp-slot snowui-field-bordered snowui-rounded-rectangle"
-                aria-hidden="true" data-active={focused && index === activeIndex || undefined}
-                data-field-hover={hoveredIndex === index && !disabled ? "true" : undefined}
+                aria-hidden="true" data-active={focused && !success && index === activeIndex || undefined}
+                data-field-hover={hoveredIndex === index && !disabled && !success ? "true" : undefined}
                 data-invalid={resolvedInvalid ? "true" : undefined} data-filled={!!digit || undefined}>
                 {#if digit}
                     {#key digit}
-                        <Frame tag="span" class="snowui-otp-digit" enableAutoLayout={false} enableContext={false}
-                            enableResponsive={false} enableScaleObserver={false} whileAppear={NUMBER_POP_APPEAR_MOTION}>{digit}</Frame>
+                        <span class="snowui-otp-digit">{digit}</span>
                     {/key}
+                {/if}
+                {#if focused && index === activeIndex && !disabled && !readonly && !success}
+                    <span class="snowui-otp-caret" aria-hidden="true"></span>
                 {/if}
             </span>
         {/each}
         <span aria-hidden="true" class="snowui-otp-indicator snowui-field-bordered snowui-rounded-rectangle"
-            data-field-focus={focused && !disabled ? "true" : undefined}
+            data-field-focus={focused && !disabled && !success ? "true" : undefined}
             data-invalid={resolvedInvalid ? "true" : undefined}
             style={`${TAB_INDICATOR_MOTION_STYLE}; --snowui-otp-input-active-index: ${activeIndex}`}></span>
     </span>
@@ -313,10 +349,10 @@
 <style>
     :global(:where(.snowui-otp-input)) {
         --snowui-otp-input-gap: var(--gap-2);
-        --snowui-otp-input-size: var(--size-10);
+        --snowui-otp-input-size: calc(var(--leading-18, 28px) + 2 * var(--padding-3, 12px));
         --snowui-otp-input-radius: var(--radius-4);
-        --snowui-otp-input-font-size: var(--text-16);
-        --snowui-otp-input-line-height: var(--leading-14);
+        --snowui-otp-input-font-size: var(--text-18);
+        --snowui-otp-input-line-height: var(--leading-18);
         position: relative;
         display: inline-flex;
         flex-direction: column;
@@ -338,13 +374,19 @@
         width: var(--snowui-otp-input-size-override, var(--snowui-otp-input-size, var(--size-10)));
         height: var(--snowui-otp-input-size-override, var(--snowui-otp-input-size, var(--size-10)));
         box-sizing: border-box;
+        padding: var(--padding-3, 12px) var(--padding-4, 16px);
         border: 0;
         border-radius: var(--snowui-otp-input-radius-override, var(--snowui-otp-input-radius, var(--radius-4)));
-        font-size: var(--snowui-otp-input-font-size-override, var(--snowui-otp-input-font-size, var(--text-16)));
-        line-height: var(--snowui-otp-input-line-height-override, var(--snowui-otp-input-line-height, var(--leading-14)));
+        font-size: var(--snowui-otp-input-font-size-override, var(--snowui-otp-input-font-size, var(--text-18, 18px)));
+        line-height: var(--snowui-otp-input-line-height-override, var(--snowui-otp-input-line-height, var(--leading-18, 28px)));
         font-variant-numeric: tabular-nums;
     }
-    :global(:where(.snowui-otp-slot)) { background: var(--surface-1, #ffffffcc); }
+    :global(:where(.snowui-otp-slot)) { position: relative; background: var(--surface-1, #ffffffcc); }
+    :global(:where(.snowui-otp-digit)) { display: inline-block; animation: snowui-otp-digit-appear 300ms cubic-bezier(0.34, 1.45, 0.64, 1) both; }
+    @keyframes snowui-otp-digit-appear { from { opacity: 0; transform: perspective(240px) translateY(6px) rotateX(-35deg); } to { opacity: 1; transform: perspective(240px) translateY(0) rotateX(0); } }
+    :global(:where(.snowui-otp-caret)) { position: absolute; width: calc(var(--size-1, 4px) / 4); height: var(--size-5, 20px); background: var(--black-100, #000000); animation: snowui-otp-caret-blink 1s step-end infinite; }
+    :global(:where(.snowui-otp-slot[data-filled="true"] .snowui-otp-caret)) { transform: translateX(8px); }
+    @keyframes snowui-otp-caret-blink { 50% { opacity: 0; } }
     :global(.snowui-otp-input :where(.snowui-otp-indicator)) {
         position: absolute;
         left: 0;
@@ -355,9 +397,11 @@
         transition: transform var(--snowui-frame-control-motion-duration) var(--snowui-frame-control-motion-easing), box-shadow var(--snowui-frame-control-motion-duration) var(--snowui-frame-control-motion-easing);
     }
     :global(.snowui-otp-input :where(.snowui-otp-indicator[data-field-focus="true"])) { opacity: 1; }
-    :global(:where(.snowui-otp-input[data-disabled="true"])) { cursor: not-allowed; opacity: 0.4; }
+    :global(.snowui-otp-input :where(.snowui-otp-indicator[data-field-focus="true"]:not([data-invalid="true"]))) { box-shadow: inset 0 0 0 2px var(--black-100, #000000); }
+    :global(:where(.snowui-otp-input[data-disabled="true"])) { cursor: default; opacity: 0.2; }
     :global(:where(.snowui-otp-input[data-readonly="true"])) { cursor: default; }
     :global(:where(.snowui-otp-input[data-readonly="true"] .snowui-otp-slot)) { background: var(--surface-2, #00000008); box-shadow: none; }
+    :global(:where(.snowui-otp-input[data-success="true"] .snowui-otp-slot)) { background: var(--surface-2, #00000008); box-shadow: none; }
     :global(.snowui-otp-input[data-readonly="true"] :where(.snowui-otp-indicator)) { opacity: 0; }
     :global(:where(.snowui-otp-native)) {
         position: absolute;
@@ -373,5 +417,7 @@
     }
     @media (prefers-reduced-motion: reduce) {
         :global(.snowui-otp-input :where(.snowui-otp-indicator)) { transition: none; }
+        :global(:where(.snowui-otp-caret)) { animation: none; }
+        :global(:where(.snowui-otp-digit)) { animation: none; }
     }
 </style>

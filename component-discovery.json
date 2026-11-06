@@ -407,6 +407,33 @@
         "MenuItem",
         "Kbd"
       ]
+    },
+    "MetricCard": {
+      "intents": [
+        "展示仪表盘指标和变化"
+      ],
+      "aliases": [
+        "指标卡"
+      ],
+      "whenToUse": "展示单项指标和变化",
+      "avoidWhen": "普通内容容器使用 Card",
+      "related": [
+        "Card"
+      ]
+    },
+    "PasswordStrength": {
+      "intents": [
+        "展示密码强度"
+      ],
+      "aliases": [
+        "密码强度指示器"
+      ],
+      "whenToUse": "评估并展示密码强度",
+      "avoidWhen": "任务进度使用 Progress",
+      "related": [
+        "Input",
+        "Progress"
+      ]
     }
   }
 }

@@ -183,7 +183,7 @@ export const examples = [
 </Frame>`,
         expected: {
             render: "Card 支持 contentHug 与 contentFill。",
-            layout: "contentHug 普通内容按内容宽度收缩；contentFill 普通内容填满 Card 内容区。",
+            layout: "contentHug 普通内容按内容宽度收缩；contentFill 的内容 viewport 和普通内容均填满 Card 内容区。",
             interaction: "无交互态。",
             performance: "内容宽度策略只作用在普通内容 viewport，不影响 pin-*。",
             responsive: "固定宽度 Card 内 contentFill 子项随容器宽度适配。",

@@ -877,3 +877,7 @@
    --snowui-search-popup-results-gap-override
    --snowui-search-popup-group-gap-override
 */
+
+/* PasswordStrength：四段指示条。 */
+/* --snowui-password-strength-segment-gap-override: ; */ /* default: var(--gap-2) */
+/* --snowui-password-strength-segment-radius-override: ; */ /* default: var(--radius-full) */

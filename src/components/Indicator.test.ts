@@ -64,13 +64,13 @@ export const examples = [
         logic: ["Corner", "BothAxes", "Pointer", "Keyboard"],
     },
     {
-        name: "IN-04: 整边命中与 Resize 优先",
+        name: "IN-04: 整边命中与滚动条优先",
         code: `IN-04
 <Frame style="position: relative; width: 10rem; height: 6rem;">
     <ScrollArea style="height: 100%;">
         <Frame column class="gap-8" style="height: 12rem;">
             <Text>滚动内容</Text>
-            <Text>重叠区域优先调整尺寸</Text>
+            <Text>重叠区域优先操作滚动条</Text>
         </Frame>
     </ScrollArea>
     <Indicator
@@ -80,9 +80,9 @@ export const examples = [
     />
 </Frame>`,
         expected: {
-            render: "鼠标进入宿主任意区域后显示 Indicator；与实际 Thumb 重叠时仍显示 Indicator。",
+            render: "鼠标进入宿主任意区域后显示 Indicator；与可见 Thumb 重叠时隐藏 Indicator。",
             layout: "短条视觉长度不变，整条右边缘均可激活并拖动。",
-            interaction: "重叠区域可拖动 Indicator 并使用键盘调整尺寸，Thumb 其余区域可滚动。",
+            interaction: "重叠时 Thumb 可拖动，Indicator 不接收指针或键盘操作；不重叠时恢复。",
             performance: "无需观察滚动条几何；拖动复用共享 resizable 的 rAF 合并。",
             responsive: "有无滚动溢出均遵守相同显隐和尺寸边界。",
         },

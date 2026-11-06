@@ -236,6 +236,8 @@
     data-scrollable={scrollable ? "true" : "false"}
     {disabled}
     {pinOffset}
+    contentFill={resolvedContentWidth === 'fill'}
+    contentHug={resolvedContentWidth === 'hug'}
     style={rootStyle}
     renderHints={cardRenderHints}
     enableAutoLayout={true}

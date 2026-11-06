@@ -132,7 +132,7 @@ Card 使用 `row` / `column`，与 Frame 方向关键字统一。
 内容宽度策略：
 
 - 默认自动判断：Card 有显式宽度（如 `style="width:..."`、`width` class、`w-full` / `size-full`）时普通内容为 Fill；Card 为 Hug 宽度时普通内容也为 Hug。
-- `contentFill` 强制普通内容 Fill。
+- `contentFill` 强制内容 viewport 和普通内容填满 Card 内容区，避免 viewport 本身按内容收缩。
 - `contentHug` 强制普通内容 Hug。
 - `contentFill` 与 `contentHug` 同时传入时，`contentFill` 优先。
 
