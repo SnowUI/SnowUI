@@ -34,7 +34,7 @@
 | evaluate | `PasswordStrengthEvaluator` | `evaluatePasswordStrength` | 同步评估函数；调用方负责返回有效等级 |
 | labels | `readonly [string, string, string, string, string]` | `请输入密码／弱／一般／较强／完美` | 分别对应等级 0–4 |
 | minimumLength | `number` | `8` | 最低长度提示的字符数，也用于默认评估。 |
-| minimumLengthMessage | `(length: number) => string` | 当前语言的长度提示 | 自定义长度不足时优先显示的文案。 |
+| minimumLengthMessage | `(length: number) => string` | 当前语言的长度提示 | 自定义非空且长度不足时优先显示的文案。 |
 | requireLowercase | `boolean` | `false` | 要求至少一个 ASCII 小写字母。 |
 | requireUppercase | `boolean` | `false` | 要求至少一个 ASCII 大写字母。 |
 | requireNumber | `boolean` | `false` | 要求至少一个数字 `0–9`。 |
@@ -44,7 +44,7 @@
 
 ## 使用边界与详细说明
 
-默认要求仅为至少 8 个字符，不要求字符种类。短于 `minimumLength` 时优先显示长度提示；达到长度后依次提示尚未满足的大小写、数字和特殊字符要求，全部满足后显示强度等级。要求提示独立于可覆盖的强度评估，不能代替服务端验证。四段高度为 4px、间距为 8px，间距可使用 `--snowui-password-strength-segment-gap-override` 覆盖，圆角使用 `--snowui-password-strength-segment-radius-override`（默认 `--radius-full`）。强度条及文字整体相对组件两边各缩进 4px；与上方输入框组合时由使用方设置 16px 间距。调用方负责输入框标签及通过 `aria-describedby` 关联结果；等级提示不能代替服务端密码政策或安全保证。无自有交互、计时器或动效，可在服务端渲染。自定义评估函数直接接收密码，调用方应确保其不保存或发送密码。
+默认要求仅为至少 8 个字符，不要求字符种类。空值显示对应等级文案；非空且短于 `minimumLength` 时优先显示长度提示；达到长度后依次提示尚未满足的大小写、数字和特殊字符要求，全部满足后显示强度等级。要求提示独立于可覆盖的强度评估，不能代替服务端验证。四段高度为 4px、间距为 8px，间距可使用 `--snowui-password-strength-segment-gap-override` 覆盖，圆角使用 `--snowui-password-strength-segment-radius-override`（默认 `--radius-full`）。强度条及文字整体相对组件两边各缩进 4px；与上方输入框组合时由使用方设置 16px 间距。调用方负责输入框标签及通过 `aria-describedby` 关联结果；等级提示不能代替服务端密码政策或安全保证。无自有交互、计时器或动效，可在服务端渲染。自定义评估函数直接接收密码，调用方应确保其不保存或发送密码。
 
 ## AI 对话使用
 

@@ -36,7 +36,7 @@
     requireNumber && !/[0-9]/.test(password) ? locale.t('passwordStrength.number') : '',
     requireSymbol && !/[^\p{L}\p{N}\s]/u.test(password) ? locale.t('passwordStrength.symbol') : ''
   ].filter(Boolean));
-  let message = $derived(password.length < minimumLength ? (minimumLengthMessage?.(minimumLength) ?? locale.t('passwordStrength.minimumLength', { length: minimumLength })) : missingRequirements.length ? locale.t('passwordStrength.requirements', { requirements: missingRequirements.join('、') }) : labels[level]);
+  let message = $derived(!password ? labels[level] : password.length < minimumLength ? (minimumLengthMessage?.(minimumLength) ?? locale.t('passwordStrength.minimumLength', { length: minimumLength })) : missingRequirements.length ? locale.t('passwordStrength.requirements', { requirements: missingRequirements.join('、') }) : labels[level]);
 </script>
 <Frame {...rest} row={false} column gap={2} enableAutoLayout={false} enableResponsive={enableResponsive} enableContext={enableContext} enableScaleObserver={enableScaleObserver} class={`snowui-password-strength ${userClass}`}>
   <div class="snowui-strength-track" aria-hidden="true">
