@@ -1180,6 +1180,8 @@ Call initMotion() during parent component initialization when using cross-compon
 
 ## AI Zone
 
+加载时由 Skeleton 接管的根会隐藏装饰伪元素，避免组件表面与骨架叠加；skeleton=false 和自定义 stateContent 保留原行为。
+
 ### 1.1 动效时序桥接变量 (Motion Timing Bridge)
 
 **关联文件**: `bridge.ts`

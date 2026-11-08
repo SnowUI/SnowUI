@@ -3,8 +3,9 @@
 <!-- ColorSchemeButton：以真实 Button 为宿主的页面亮色 / 暗色方案切换按钮。 -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import { onMount, type ComponentProps, type Snippet } from "svelte";
+    import { onMount, untrack, type ComponentProps, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
+    import { observeColorSchemePreference, saveColorSchemePreference } from "../logic/color-scheme-preference";
     import Frame from "./Frame.svelte";
     import Button from "./Button.svelte";
     import { CONTROL_BUTTON_REPLACEMENT_MOTION, CONTROL_BUTTON_MOTION_DURATION_MS, controlButtonMotionStyle } from "../motion/presets/replacement";
@@ -24,6 +25,7 @@
         scheme?: ColorScheme;
         defaultScheme?: ColorScheme;
         applyToDocument?: boolean;
+        systemPreference?: boolean;
         ariaLabel?: string;
         lightIcon?: Snippet;
         darkIcon?: Snippet;
@@ -40,6 +42,7 @@
     let {
         defaultScheme = undefined,
         applyToDocument = true,
+        systemPreference = true,
         ariaLabel = undefined,
         lightIcon,
         darkIcon,
@@ -75,6 +78,7 @@
 
     function applyDocumentScheme(nextScheme: ColorScheme) {
         if (!applyToDocument) return;
+        document.documentElement.style.colorScheme = nextScheme;
         if (nextScheme === "dark") {
             document.documentElement.setAttribute("theme", "dark");
         } else {
@@ -114,14 +118,29 @@
         applyDocumentScheme(scheme);
     });
 
-    function handleClick(event: MouseEvent) {
+    $effect(() => {
+        if (!mounted || !systemPreference) return;
+        return untrack(() => observeColorSchemePreference((next) => {
+            internalScheme = next;
+            scheme = next;
+            applyDocumentScheme(next);
+        }));
+    });
+
+    export function toggleScheme() {
         if (disabled) return;
-        onclick?.(event);
         const nextScheme = resolvedScheme === "dark" ? "light" : "dark";
         internalScheme = nextScheme;
         scheme = nextScheme;
+        if (systemPreference) saveColorSchemePreference(nextScheme);
         applyDocumentScheme(nextScheme);
         onSchemeChange?.(nextScheme);
+    }
+
+    function handleClick(event: MouseEvent) {
+        if (disabled) return;
+        onclick?.(event);
+        toggleScheme();
     }
 </script>
 

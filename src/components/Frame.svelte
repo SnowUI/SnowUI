@@ -298,6 +298,7 @@
     ondragend={nativeHandlers.ondragend}
     style={computedStyle}
     {...runtimeDataAttrs}
+    data-skeleton-active={shouldRenderSkeleton ? "true" : undefined}
 >
     {#if needsSkeletonProbe && frameProps.children}
         <div bind:this={skeletonProbe} aria-hidden="true" style="display: none;">
@@ -350,6 +351,12 @@
 </svelte:element>
 
 <style>
+    /* Skeleton owns the loading surface; component decoration must not stack behind it. */
+    :global([data-snowui-frame][data-skeleton-active="true"])::before,
+    :global([data-snowui-frame][data-skeleton-active="true"])::after {
+        display: none;
+    }
+
     @keyframes -global-snowui-frame-transform-motion {
         from {
             transform: var(--snowui-frame-transform-from, none);

@@ -268,10 +268,10 @@
             --snowui-search-box-background-override,
             var(--snowui-search-box-background)
         );
-        backdrop-filter: blur(
+        -webkit-backdrop-filter: blur(
             var(--snowui-search-box-background-blur-override, 1.25rem)
         );
-        -webkit-backdrop-filter: blur(
+        backdrop-filter: blur(
             var(--snowui-search-box-background-blur-override, 1.25rem)
         );
         /* StyleSpec §2.4.1 显式渐变 hover overlay 自行声明 */

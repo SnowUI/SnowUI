@@ -674,8 +674,8 @@
 @layer snowui-shared-visual {
     :where(.snowui-quick-action-panel) {
         background-color: var(--snowui-background-quick-action);
-        backdrop-filter: var(--snowui-backdrop-quick-action);
         -webkit-backdrop-filter: var(--snowui-backdrop-quick-action);
+        backdrop-filter: var(--snowui-backdrop-quick-action);
         border-radius: var(--radius-4);
         box-shadow: var(--snowui-shadow-quick-action);
         border: var(--snowui-border-quick-action);

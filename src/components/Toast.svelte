@@ -257,8 +257,8 @@
                 var(--static-white-10, rgba(255, 255, 255, 0.1))
             ),
             var(--static-black-100, #000);
-        backdrop-filter: blur(var(--size-10));
         -webkit-backdrop-filter: blur(var(--size-10));
+        backdrop-filter: blur(var(--size-10));
         color: var(--static-white-100, #ffffff);
         white-space: nowrap;
     }

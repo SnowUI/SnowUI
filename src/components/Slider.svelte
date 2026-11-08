@@ -586,8 +586,8 @@
                 --snowui-slider-thumb-shadow-override,
                 0 0.0625rem 0.125rem 0 rgba(0, 0, 0, 0.4)
             );
-        backdrop-filter: blur(calc(var(--size-4) / 8));
         -webkit-backdrop-filter: blur(calc(var(--size-4) / 8));
+        backdrop-filter: blur(calc(var(--size-4) / 8));
         opacity: 0;
         transform: translate(-50%, -50%);
         transition:
@@ -622,8 +622,8 @@
             var(--static-white-100, #ffffff)
         );
         box-shadow: none;
-        backdrop-filter: none;
         -webkit-backdrop-filter: none;
+        backdrop-filter: none;
         opacity: 0;
         transform: translate(-50%, -50%) scale(0.5, 0.5);
         transform-origin: center center;

@@ -480,8 +480,8 @@
     }
 
     :global(:where(.snowui-dialog)) {
-        backdrop-filter: var(--snowui-backdrop-quick-action, blur(var(--size-10, 40px)));
         -webkit-backdrop-filter: var(--snowui-backdrop-quick-action, blur(var(--size-10, 40px)));
+        backdrop-filter: var(--snowui-backdrop-quick-action, blur(var(--size-10, 40px)));
         width: min(100%, var(--snowui-dialog-max-width));
         max-height: calc(100vh - var(--size-16));
         overflow: auto;

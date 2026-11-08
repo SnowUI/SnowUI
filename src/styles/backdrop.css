@@ -5,8 +5,8 @@
     --snowui-backdrop-background: rgb(0 0 0 / 10%);
     --snowui-backdrop-filter: none;
     background: var(--snowui-backdrop-background-override, var(--snowui-backdrop-background));
-    backdrop-filter: var(--snowui-backdrop-filter);
     -webkit-backdrop-filter: var(--snowui-backdrop-filter);
+    backdrop-filter: var(--snowui-backdrop-filter);
 }
 
 :where(.snowui-backdrop[data-backdrop="blur"]) {

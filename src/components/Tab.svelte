@@ -381,8 +381,8 @@
             --snowui-tab-background-override,
             var(--snowui-tab-background)
         );
-        backdrop-filter: var(--snowui-tab-backdrop-filter);
         -webkit-backdrop-filter: var(--snowui-tab-backdrop-filter);
+        backdrop-filter: var(--snowui-tab-backdrop-filter);
         box-sizing: border-box;
     }
 

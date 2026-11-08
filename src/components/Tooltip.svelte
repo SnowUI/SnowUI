@@ -1999,8 +1999,8 @@
         z-index: 0;
         /* 透明绘制面确保浏览器合成实际 backdrop 像素，不改变 Foreground 的颜色与动效。 */
         background-image: linear-gradient(transparent, transparent);
-        backdrop-filter: blur(1.25rem);
         -webkit-backdrop-filter: blur(1.25rem);
+        backdrop-filter: blur(1.25rem);
         will-change: backdrop-filter;
     }
 

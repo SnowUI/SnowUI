@@ -392,6 +392,19 @@
         white-space: nowrap;
     }
 
+    /* Keep slotted content aligned before the client moves slots to the host. */
+    :global(:where(.snowui-link-label-text):has(> [data-as="leading"], > [data-as="trailing"])) {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: max(4px, var(--snowui-link-gap-override, var(--snowui-link-gap)));
+    }
+
+    :global(:where(.snowui-link-label-text) > [data-as="leading"]),
+    :global(:where(.snowui-link-label-text) > [data-as="trailing"]) {
+        flex-shrink: 0;
+    }
+
     :global(:where(.snowui-link-label-measure)) {
         visibility: hidden;
     }

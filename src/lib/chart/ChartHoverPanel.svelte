@@ -435,8 +435,8 @@
             ),
             var(--static-black-80, #000000cc);
         color: var(--static-white-100, #ffffffff);
-        backdrop-filter: blur(1.25rem);
         -webkit-backdrop-filter: blur(1.25rem);
+        backdrop-filter: blur(1.25rem);
         box-shadow: none;
     }
 
@@ -450,8 +450,8 @@
     :global(:where(.snowui-chart-hover-panel)[data-variant="surface"]) {
         background: var(--snowui-background-quick-action);
         color: var(--black-100, #000000ff);
-        backdrop-filter: var(--snowui-backdrop-quick-action);
         -webkit-backdrop-filter: var(--snowui-backdrop-quick-action);
+        backdrop-filter: var(--snowui-backdrop-quick-action);
         border: none;
         box-shadow: var(--snowui-shadow-quick-action);
     }

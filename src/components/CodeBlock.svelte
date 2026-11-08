@@ -1129,8 +1129,8 @@
         position: absolute;
         inset: 0;
         border-radius: inherit;
-        backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
         pointer-events: none;
         z-index: -1;
     }

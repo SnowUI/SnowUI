@@ -812,10 +812,10 @@
   }
 
   :global(:where(.snowui-button-background-blur)) {
-    backdrop-filter: blur(
+    -webkit-backdrop-filter: blur(
       var(--snowui-button-background-blur-override, 1.25rem)
     );
-    -webkit-backdrop-filter: blur(
+    backdrop-filter: blur(
       var(--snowui-button-background-blur-override, 1.25rem)
     );
   }

@@ -611,8 +611,8 @@
     /* 浮层的 glass 由带 transform 的 motion shell 承载，避免 backdrop 采样被祖先隔离。 */
     :global(:where(.snowui-side-panel-floating)) {
         background-color: transparent;
-        backdrop-filter: none;
         -webkit-backdrop-filter: none;
+        backdrop-filter: none;
         box-shadow: none;
         border: none;
     }
