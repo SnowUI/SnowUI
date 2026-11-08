@@ -45,11 +45,12 @@
 | height | `string \| number` | — | 显式高度；数字会自动转成 `rem` |
 | componentClass | `string` | — | 旧调用方兼容入口；仅在没有 `renderHints` 时匹配历史默认布局，新组件不得以此登记 |
 | renderHints | `FrameRenderHints` | — | 组件自注册协议，支持 `variant / width / height / radius / rows` |
-| loading | `boolean` | `true` | 是否显示骨架；为 `false` 时回退渲染 `children` |
+| group | `boolean` | `false` | 将 children 作为整体骨架；加载期间保持挂载与布局，隐藏内容和交互，完成后原位显示。 |
+| loading | `boolean` | `true` | 是否显示骨架；为 `false` 时显示 `children`，group 模式不重新挂载 |
 | responsive | `ResponsiveConfig` | — | 响应式宽高覆写 |
 | class | `string` | `""` | 外部类名；多项骨架时挂到布局容器，单项骨架时挂到骨架块本身 |
 | style | `string` | `""` | 行内样式；多项骨架时挂到布局容器，单项骨架时挂到骨架块本身 |
-| children | `Snippet` | — | 未显示骨架时渲染的真实子内容，无参数；骨架激活期间按组件骨架布局渲染。 |
+| children | `Snippet` | — | 真实子内容，无参数；默认仅在未加载时渲染，group 模式始终保持挂载。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 
@@ -61,6 +62,12 @@
 
 
 <a id="布局模型"></a>
+
+### 整体分组
+
+使用 `<Skeleton group loading={pending}>...</Skeleton>` 将背景与多个元素作为一个加载单元。分组只显示一块矩形骨架，不展开内部骨架；子内容持续挂载，输入与组件状态不会因加载切换丢失。`loading` 由调用方的真实就绪状态控制，组件不会自动等待所有子组件或网络请求。
+
+分组默认占满可用宽度，高度由内容决定；异步内容尚未存在时，用 `height` 或 `style` 的 `min-height` 预留最终尺寸。`renderHints.radius` 指定整体圆角，`class`／`style` 作用于分组根；`variant`、`rows` 与旧 `componentClass` 不拆分整体表面。分组保持正常文档流，不裁切浮层；移动到分组外的 Portal 不属于其隐藏边界。嵌套分组加载时只显示最外层的加载表面。
 
 ### 布局模型
 
@@ -197,7 +204,7 @@
 - 数字型 `width / height` 会统一转成 `rem`。
 - `Skeleton` 优先使用组件通过 `renderHints.width / height / radius / rows` 提供的最终几何。
 - 这意味着圆角矩形 Skeleton 在组件已经提供尺寸提示时，会跟随组件的最终宽高，而不是回退成通用短宽。
-- 当前没有启用“读取真实 DOM 实测尺寸”的通用机制。
+- 普通占位不读取真实 DOM；group 通过持续挂载的正常布局匹配整体尺寸，不复制内部轮廓。
 
 <a id="9-上下文与协议关系"></a>
 

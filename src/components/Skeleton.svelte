@@ -837,6 +837,8 @@
         componentClass?: string;
         renderHints?: FrameRenderHints;
         loading?: boolean;
+        /** Keep children mounted and represent the entire region with one surface. */
+        group?: boolean;
         responsive?: ResponsiveConfig;
         class?: string;
         style?: string;
@@ -851,6 +853,7 @@
         componentClass = undefined,
         renderHints = undefined,
         loading = true,
+        group = false,
         responsive = undefined,
         class: className = "",
         style = "",
@@ -883,6 +886,15 @@
             height: responsiveHeight,
         }),
     );
+
+    const groupStyle = $derived([
+        `width: ${toCssLength(responsiveWidth ?? renderHints?.width) ?? "100%"}`,
+        responsiveHeight !== undefined || renderHints?.height !== undefined
+            ? `height: ${toCssLength(responsiveHeight ?? renderHints?.height)}` : "",
+        `border-radius: ${toCssLength(renderHints?.radius) ?? "var(--radius-3, 0.75rem)"}`,
+        responsiveController.style,
+        style,
+    ].filter(Boolean).join(";"));
 
     const containerClass = $derived.by(() => {
         return [
@@ -949,7 +961,29 @@
     }
 </script>
 
-{#if loading}
+{#if group}
+    <div
+        {...rest}
+        use:responsiveController.connect
+        class={`snowui-skeleton-group ${className}`}
+        style={groupStyle}
+        data-skeleton-group="true"
+        data-skeleton-active={loading ? "true" : undefined}
+        data-skeleton-registered="true"
+        data-render-hint-variant="rect"
+        data-render-hint-width={toCssLength(responsiveWidth ?? renderHints?.width)}
+        data-render-hint-height={toCssLength(responsiveHeight ?? renderHints?.height)}
+        data-render-hint-radius={toCssLength(renderHints?.radius)}
+        aria-busy={loading}
+    >
+        <div class="snowui-skeleton-group-content" inert={loading} aria-hidden={loading ? "true" : undefined}>
+            {#if children}{@render children()}{/if}
+        </div>
+        {#if loading}
+            <div class="snowui-skeleton snowui-skeleton-group-surface snowui-rounded-rectangle" data-slot="skeleton" aria-hidden="true"></div>
+        {/if}
+    </div>
+{:else if loading}
     <div
         {...rest}
         use:responsiveController.connect
@@ -978,6 +1012,29 @@
 {/if}
 
 <style>
+    :global(:where(.snowui-skeleton-group)) {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        min-width: 0;
+    }
+    :global(:where(.snowui-skeleton-group-content)) {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        min-width: 0;
+        min-height: 0;
+        border-radius: inherit;
+    }
+    :global(:where(.snowui-skeleton-group[data-skeleton-active="true"] > .snowui-skeleton-group-content)) {
+        visibility: hidden;
+        opacity: 0;
+        pointer-events: none;
+    }
+    :global(:where(.snowui-skeleton-group-surface)) {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+    }
     @keyframes snowui-skeleton-pulse {
         50% {
             opacity: 0.5;

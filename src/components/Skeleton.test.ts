@@ -6,6 +6,23 @@
  */
 export const examples = [
     {
+        name: "G1：卡片与内容一起加载",
+        code: `G1
+<Frame column class="gap-16 w-full" Click={{ Idle: "Active", Active: "Idle" }}>
+    {#snippet children({ currentState })}
+    <Button>切换加载状态</Button>
+    <Skeleton group loading={currentState !== "Active"} renderHints={{ radius: 20 }}>
+        <Frame column class="bg-background-2 rounded-20 p-24 gap-16">
+            <Text size={20}>项目概览</Text>
+            <Input placeholder="加载时也保持挂载，输入不会丢失" />
+            <Button variant="filled">查看项目</Button>
+        </Frame>
+    </Skeleton>
+    {/snippet}
+</Frame>`,
+        logic: ["group", "loading", "mounted-content", "whole-surface"],
+    },
+    {
         name: "1: 基础排版骨架",
         code: `1
 <Button loading skeleton>提交按钮</Button>
