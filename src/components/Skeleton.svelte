@@ -897,7 +897,14 @@
     });
 
     const containerStyle = $derived.by(() => {
-        if (layout.items.length === 1) return undefined;
+        if (layout.items.length === 1) {
+            // Percentage hints need a containing block inside flex hosts.
+            const item = layout.items[0];
+            return [
+                item.width?.includes("%") ? "width: 100%;" : "",
+                item.height?.includes("%") ? "height: 100%;" : "",
+            ].filter(Boolean).join(" ") || undefined;
+        }
         return (
             [
                 layout.items[0]?.width

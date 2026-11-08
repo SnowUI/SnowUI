@@ -740,6 +740,7 @@ SnowUI 组件内部若拥有明确默认视觉，应直接引用组件族 preset
 - 未注册的普通 Frame 仍渲染通用 fallback；集中 class mapping 仅保留旧调用方兼容
 - 容器型 `Frame` 在存在 `children` 且未命中特定组件映射时，优先保留子树，让子组件各自渲染骨架
 - 叶子节点且未命中映射时，回退渲染通用矩形骨架
+- 直接渲染单块骨架时，骨架尺寸表示最终外框，宿主不再叠加 padding 或 border；探测多个子骨架的容器继续保留布局间距。全宽控件可用 `renderHints.width` 对齐其完成态宽度。
 - 加载期间根节点会自动输出 `aria-busy="true"` 与 `data-loading="true"`，并阻断交互
 
 ```svelte

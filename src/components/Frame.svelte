@@ -234,6 +234,7 @@
         getIdentityId: () => identity.id,
         getEffectiveLoading: () => effectiveLoading,
         getShouldRenderSkeleton: () => shouldRenderSkeleton,
+        getShouldRenderDirectSkeleton: () => shouldRenderDirectSkeleton,
         getResolvedStateStyle: () => resolvedStateStyle,
         getOrchestratedStyle: () =>
             identity.id && orchestrator ? orchestrator.getStyle(identity.id) : "",

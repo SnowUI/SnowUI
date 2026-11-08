@@ -53,6 +53,7 @@ export interface FrameInlineStyleRuntimeOptions {
     getIdentityId: () => string | undefined;
     getEffectiveLoading: () => boolean;
     getShouldRenderSkeleton: () => boolean;
+    getShouldRenderDirectSkeleton: () => boolean;
     getResolvedStateStyle: () => string;
     getOrchestratedStyle: () => string;
 }
@@ -509,6 +510,7 @@ export function createFrameInlineStyleRuntime(
                 shouldRenderSkeleton
                     ? "background: transparent; border-color: transparent; box-shadow: none; color: transparent; background-image: none;"
                     : "",
+                options.getShouldRenderDirectSkeleton() ? "padding: 0; border-width: 0;" : "",
                 toJsonCssVariable(
                     "--snowui-frame-while-appear",
                     resolvedWhile.whileAppear,
