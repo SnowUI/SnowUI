@@ -147,4 +147,15 @@ export const examples = [
 />`,
         logic: ["Parts", "Indicator", "Resize"],
     },
+    {
+        name: "Native validation：组件错误反馈",
+        code: `Native validation
+<form onsubmit={(event) => event.preventDefault()} style="display: grid; gap: 16px;">
+    <Textarea required minlength={8} aria-label="Required value" />
+    <Button type="submit">Submit</Button>
+    <Button type="reset">Reset</Button>
+</form>`,
+        expected: { render: "空值及格式／长度不符时阻止提交，错误显示在组件下方，不出现浏览器气泡。修正后错误消失，重置清除校验反馈。" },
+        logic: ["Validation", "Form"],
+    },
 ] as const;

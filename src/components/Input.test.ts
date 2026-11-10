@@ -564,4 +564,15 @@ export const examples = [
         expected: {render: "图标保持固有宽度，原生文字可编辑，附件间距至少 4 CSS px。"},
         logic: ["ContentLine", "Narrow", "Ownership"],
     },
+    {
+        name: "I-44：必填为空的激活态反馈",
+        code: `I-44
+<form onsubmit={(event) => event.preventDefault()} style="display: grid; gap: 16px; width: 20rem; max-width: 100%;">
+    <Input type="email" required aria-label="Email" placeholder="Email" />
+    <Input type="password" required aria-label="Password" placeholder="Password" />
+    <Button type="submit" variant="filled">Continue</Button>
+</form>`,
+        expected: { render: "空字段提交不显示浏览器必填气泡；第一个无效输入聚焦并显示激活态、消失、再出现，闪动期间边框为红色，外光圈沿用原聚焦颜色，布局不移动。填好邮箱后空密码同样反馈；再次提交重播，输入或失焦停止。必填、邮箱格式与长度错误显示在 Input 下方，均不出现浏览器气泡；提交仍被拦截。减少动效时仅聚焦。" },
+        logic: ["Required", "Validation", "Motion"],
+    },
 ] as const;

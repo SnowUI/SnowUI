@@ -56,7 +56,7 @@
 | disabled | `boolean` | `false` | 禁止用户输入与交互，原生禁用字段不参与表单提交。 |
 | readonly | `boolean` | `false` | 保留聚焦、选择与提交，禁止编辑并隐藏清除入口；自定义 trailing 聚焦后仍保留，使用只读视觉。 |
 | clearable | `boolean` | `true` | 是否允许显示内置清除 X；false 时不渲染 X，不改变编辑、校验或自定义 trailing。密码输入使用显示／隐藏按钮，不显示清除 X。适用于普通及 Field 内嵌 Input。 |
-| required | `boolean` | `false` | 参与浏览器原生必填校验；不自动产生业务错误文案。 |
+| required | `boolean` | `false` | 参与原生必填校验；空值提交显示内置错误文字及红色边框闪动，保留聚焦光圈颜色。 |
 | autocomplete | `HTMLInputAttributes["autocomplete"]` | — | 透传浏览器自动填充字段语义，如 username、email、new-password；候选来自浏览器已有数据。 |
 | minlength | `number` | — | 适用文本输入的最小字符长度，由浏览器在适用的用户编辑和表单校验路径执行。 |
 | maxlength | `number` | — | 适用文本输入的最大字符长度；浮层 as="search" 未显式设置时回退为 100。 |
@@ -77,7 +77,7 @@
 | title | `string` | — | 原生提示文字；日期时间与颜色输入同时为展示层提供相应提示，不替代 label。 |
 | id | `string` | — | 原生输入标识，可供 label 的 for 与原生关联属性引用。 |
 | invalid | `boolean` | `false` | 与 aria-invalid 汇总无效态，显示错误视觉；独立输入自动错误反馈，Field 内由 Field 汇总。 |
-| error | `string \| Snippet` | — | invalid 时生成下方内置错误 Text；字符串为文案，Snippet 无参数并提供错误内容，默认不生成。 |
+| error | `string \| Snippet` | — | 业务 invalid 时生成下方内置错误 Text；原生校验失败无需手工传入 error；字符串为文案，Snippet 无参数并提供错误内容，默认不生成。 |
 | parts | `ComponentPartsOf<{ Text: typeof Text; Button: typeof Button }>` | — | 通过 Text / Button 键配置内置错误文案或操作按钮的公开 Props，仅对组件生成的 Text 生效；显式子项自行声明 Props。 |
 | onclick | `(event: MouseEvent) => void` | — | 单击原生输入或相应展示层时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
 | ondblclick | `(event: MouseEvent) => void` | — | 双击时回调，参数为对应事件，无返回值；可取消的浏览器默认行为使用 event.preventDefault()，回调不用于撤销已经执行的组件内部值同步。 |
@@ -95,6 +95,10 @@
 | allowCustomValue | `boolean` | `false` | 仅 as="search" 位于 Listbox 时生效；无匹配时 Enter 将输入添加为自定义项并选中，支持删除自定义项。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 原生表单校验反馈
+
+原生必填、类型、长度和格式校验失败时，组件取消浏览器气泡，将 `validationMessage` 显示在组件下方，并保持原生无效提交拦截。首个无效字段获得焦点；输入修正后更新反馈，表单重置清除反馈。调用方业务校验继续使用 `invalid` 与 `error`，原生错误存在时优先显示原生反馈。原生消息语言由浏览器决定，不将校验状态等同服务端验证结果。
 
 ## 使用边界与详细说明
 

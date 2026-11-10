@@ -60,6 +60,10 @@
 
 公开样式覆盖：`--snowui-otp-input-gap-override`、`--snowui-otp-input-size-override`、`--snowui-otp-input-radius-override`、`--snowui-otp-input-font-size-override`、`--snowui-otp-input-line-height-override`。
 
+## 原生表单校验反馈
+
+原生必填、类型、长度和格式校验失败时，组件取消浏览器气泡，将 `validationMessage` 显示在组件下方，并保持原生无效提交拦截。首个无效字段获得焦点；输入修正后更新反馈，表单重置清除反馈。调用方业务校验继续使用 `invalid` 与 `error`，原生错误存在时优先显示原生反馈。原生消息语言由浏览器决定，不将校验状态等同服务端验证结果。
+
 ## 使用边界与详细说明
 
 - 单一真实 `<input type="text" inputmode="numeric">` 负责键盘、选择、删除、替换、自动填充、表单和辅助技术；根 `role="group"` 与 input 共享显式可访问名称，分格为 `aria-hidden` 视觉层。错误通过 aria-describedby 关联，并由 polite 状态区播报。

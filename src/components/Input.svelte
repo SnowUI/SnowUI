@@ -21,6 +21,8 @@
 -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
+    import { INPUT_REQUIRED_KEYFRAMES, INPUT_REQUIRED_TIMING } from "../motion/presets/input-required";
+    import { useNativeValidation } from "../logic/native-validation.svelte";
     import Button from "./Button.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Text from "./Text.svelte";
@@ -197,16 +199,21 @@
         controlType: normalizedInputType,
         skipTypes: ["file"],
     });
+    const validationInstanceId = $props.id();
+    const validationErrorId = `${validationInstanceId}-validation-error`;
     let didApplyAutofocus = false;
     let errorLayoutWidth = $state<string>();
 
+    let nativeInputElement = $state<HTMLInputElement | undefined>(undefined);
+    const nativeValidation = useNativeValidation(() => nativeInputElement);
     const resolvedValue = $derived(
         resolveFrameFieldValue(value, defaultValue, fieldControlOptions),
     );
     const resolvedInvalid = $derived(
-        resolveFrameFieldInvalid(invalid, inputRestProps),
+        resolveFrameFieldInvalid(invalid, inputRestProps) || !!nativeValidation.message,
     );
-    const hasBuiltInError = $derived(error !== undefined);
+    const hasBuiltInError = $derived(error !== undefined || required || ["email", "url", "number", "date", "month", "week", "time", "datetime-local"].includes(normalizedInputType) || !!pattern || minlength !== undefined || maxlength !== undefined || min !== undefined || max !== undefined || step !== undefined || !!nativeValidation.message);
+    const displayedError = $derived(nativeValidation.message || error);
 
     $effect(() => {
         if (!hasBuiltInError || !hostElement) {
@@ -286,7 +293,44 @@
         if (!isOverlaySearchHeader || !listboxHeaderPortal?.el || !hostElement) return;
         listboxHeaderPortal.el.appendChild(hostElement);
     });
-    let nativeInputElement = $state<HTMLInputElement | undefined>(undefined);
+    $effect(() => {
+        const input = nativeInputElement;
+        const host = hostElement;
+        if (!input || !host) return;
+        let feedback: Animation | undefined;
+        function stopFeedback() {
+            feedback?.cancel();
+            feedback = undefined;
+        }
+        function handleRequiredInvalid() {
+            if (!input!.validity.valueMissing) return;
+            // Keep native validation blocking submission; only replace its bubble.
+            const firstInvalid = input!.form
+                ? Array.from(input!.form.elements).find((control) => control.matches(":invalid"))
+                : input;
+            if (firstInvalid !== input) return;
+            stopFeedback();
+            if (isCustomTemporalType) {
+                focusDateSegment(getTemporalSegments(temporalInputType)[0]);
+            } else {
+                input!.focus();
+            }
+            const surface = host!.closest<HTMLElement>(".snowui-field-bordered") ?? host!;
+            if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+                feedback = surface.animate(INPUT_REQUIRED_KEYFRAMES, INPUT_REQUIRED_TIMING);
+            }
+        }
+        input.addEventListener("invalid", handleRequiredInvalid);
+        input.addEventListener("input", stopFeedback);
+        input.addEventListener("blur", stopFeedback);
+        return () => {
+            stopFeedback();
+            input.removeEventListener("invalid", handleRequiredInvalid);
+            input.removeEventListener("input", stopFeedback);
+            input.removeEventListener("blur", stopFeedback);
+        };
+    });
+
     let dateEditorFocused = $state(false);
     let dateDraft = $state<DateDraft>({
         year: "",
@@ -1435,6 +1479,7 @@
             {tabindex}
             {title}
             value={resolvedValue}
+            aria-describedby={[inputRestProps["aria-describedby"], resolvedInvalid && hasBuiltInError ? validationErrorId : undefined].filter(Boolean).join(" ") || undefined}
             aria-invalid={resolvedInvalid
                 ? "true"
                 : inputRestProps["aria-invalid"]}
@@ -1524,7 +1569,8 @@
                 {tabindex}
                 {title}
                 value={colorDisplayValue}
-                aria-invalid={resolvedInvalid
+                aria-describedby={[inputRestProps["aria-describedby"], resolvedInvalid && hasBuiltInError ? validationErrorId : undefined].filter(Boolean).join(" ") || undefined}
+            aria-invalid={resolvedInvalid
                     ? "true"
                     : inputRestProps["aria-invalid"]}
                 aria-readonly={readonly ? "true" : undefined}
@@ -1572,6 +1618,7 @@
             tabindex={-1}
             {title}
             value={resolvedValue}
+            aria-describedby={[inputRestProps["aria-describedby"], resolvedInvalid && hasBuiltInError ? validationErrorId : undefined].filter(Boolean).join(" ") || undefined}
             aria-invalid={resolvedInvalid
                 ? "true"
                 : inputRestProps["aria-invalid"]}
@@ -1693,6 +1740,7 @@
             {tabindex}
             {title}
             value={resolvedValue}
+            aria-describedby={[inputRestProps["aria-describedby"], resolvedInvalid && hasBuiltInError ? validationErrorId : undefined].filter(Boolean).join(" ") || undefined}
             aria-invalid={resolvedInvalid
                 ? "true"
                 : inputRestProps["aria-invalid"]}
@@ -1798,12 +1846,14 @@
         <Text
             {...parts?.Text}
             as="error"
+            id={validationErrorId}
+            role="alert"
             class={`snowui-input-error snowui-field-error-message${parts?.Text?.class ? ` ${parts.Text.class}` : ""}`}
         >
-            {#if typeof error === "function"}
-                {@render error()}
+            {#if typeof displayedError === "function"}
+                {@render displayedError()}
             {:else}
-                {error}
+                {displayedError}
             {/if}
         </Text>
     </div>

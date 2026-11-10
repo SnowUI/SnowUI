@@ -2,6 +2,7 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <script lang="ts">
     import { onDestroy, type Snippet } from "svelte";
+    import { useNativeValidation } from "../logic/native-validation.svelte";
     import Text from "./Text.svelte";
     import { useLocale } from "../i18n/locale.svelte";
     import { TAB_INDICATOR_MOTION_STYLE } from "../motion/presets/tab";
@@ -70,6 +71,7 @@
     }: Props = $props();
 
     let inputElement = $state<HTMLInputElement>();
+    const nativeValidation = useNativeValidation(() => inputElement);
     const locale = useLocale();
     const instanceId = $props.id();
     const errorId = `${instanceId}-error`;
@@ -78,8 +80,8 @@
     let pasteInvalid = $state(false);
     let incompleteInvalid = $state(false);
     let errorTimer: ReturnType<typeof setTimeout> | undefined;
-    const resolvedInvalid = $derived(invalid || pasteInvalid || incompleteInvalid);
-    const errorContent = $derived(error ?? locale.t("otpInput.invalidCode", { length }));
+    const resolvedInvalid = $derived(invalid || pasteInvalid || incompleteInvalid || !!nativeValidation.message);
+    const errorContent = $derived(nativeValidation.message || (error ?? locale.t("otpInput.invalidCode", { length })));
     onDestroy(() => { if (errorTimer) clearTimeout(errorTimer); });
     let selectionIndex = $state(0);
     let initialValue = "";

@@ -77,3 +77,8 @@
 - v1.2.0 (2026-06-18): 尺寸变化统一使用 `RESIZE_MOTION`，删除旧 Card 限定导出。
 - v1.1.0 (2026-06-18): 新增 transitions.dev 通用效果 preset 与自然语言选择规则。
 - v1.0.0 (2026-06-18): 新增 generic、overlay、tooltip、dialog、replacement preset catalog。
+
+
+### Input 必填错误提示
+
+`input-required.ts` 使用公共 emphasis duration 与 easing；红色边框伴随原聚焦光圈出现、消失、再出现，不改变布局。输入、失焦及卸载取消，减少动效时仅聚焦。

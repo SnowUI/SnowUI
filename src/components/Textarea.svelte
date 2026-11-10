@@ -9,6 +9,8 @@
 
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
+    import Text from "./Text.svelte";
+    import { useNativeValidation } from "../logic/native-validation.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Indicator, { type IndicatorAxis } from "./Indicator.svelte";
     import {getField} from "../context";
@@ -47,6 +49,7 @@
         id?: string;
         resize?: "none" | "vertical" | "horizontal" | "both";
         invalid?: boolean;
+        error?: string;
         parts?: ComponentPartsOf<{ Indicator: typeof Indicator }>;
         onclick?: (event: MouseEvent) => void;
         ondblclick?: (event: MouseEvent) => void;
@@ -89,6 +92,7 @@
         id = undefined,
         resize = "both",
         invalid = false,
+        error = undefined,
         parts = undefined,
         onclick: userOnClick = undefined,
         ondblclick: userOnDoubleClick = undefined,
@@ -115,9 +119,11 @@
     const frameRestProps = $derived(splitProps.frameProps);
     const textareaRestProps = $derived(splitProps.hostProps);
 
+    let textareaEl: HTMLTextAreaElement | undefined = $state(undefined);
+    const nativeValidation = useNativeValidation(() => textareaEl);
     const resolvedValue = $derived(resolveFrameFieldValue(value, defaultValue));
     const resolvedInvalid = $derived(
-        resolveFrameFieldInvalid(invalid, textareaRestProps),
+        resolveFrameFieldInvalid(invalid, textareaRestProps) || !!nativeValidation.message,
     );
     const fieldContext = getField();
     const isEmbedded = $derived(!!fieldContext);
@@ -155,7 +161,8 @@
         updateScrollFade();
     }
 
-    let textareaEl: HTMLTextAreaElement | undefined = $state(undefined);
+    const validationInstanceId = $props.id();
+    const validationErrorId = `${validationInstanceId}-validation-error`;
     let textareaHostEl: HTMLElement | undefined = $state(undefined);
     let scrollbarEl: HTMLDivElement | undefined = $state(undefined);
     let showTopFade = $state(false);
@@ -252,6 +259,7 @@
     });
 </script>
 
+{#snippet textareaSurface()}
 <Frame
     bind:element={textareaHostEl}
     tag="div"
@@ -299,6 +307,7 @@
         {tabindex}
         {title}
         value={resolvedValue}
+        aria-describedby={[textareaRestProps["aria-describedby"], (nativeValidation.message || (invalid && error)) ? validationErrorId : undefined].filter(Boolean).join(" ") || undefined}
         aria-invalid={resolvedInvalid
             ? "true"
             : textareaRestProps["aria-invalid"]}
@@ -351,6 +360,13 @@
         {/if}
     </div>
 </Frame>
+{/snippet}
+{#if error !== undefined || required || minlength !== undefined || maxlength !== undefined || nativeValidation.message}
+<div style="display: flex; flex-direction: column; min-width: 0; width: 100%; gap: var(--gap-2);">
+    {@render textareaSurface()}
+    {#if resolvedInvalid && (nativeValidation.message || error)}<Text id={validationErrorId} as="error" role="alert" class="snowui-field-error-message">{nativeValidation.message || error}</Text>{/if}
+</div>
+{:else}{@render textareaSurface()}{/if}
 
 <style>
     :global(:where(.snowui-textarea)) {

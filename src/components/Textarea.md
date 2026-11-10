@@ -44,10 +44,10 @@
 | name | `string` | — | 原生表单字段名，提交时按此名称读取文本；禁用字段不进入 FormData。 |
 | disabled | `boolean` | `false` | 禁用输入、原生表单提交与 Tab 聚焦，同时关闭缩放手柄；保留可见内容。 |
 | readonly | `boolean` | `false` | 只读，保留聚焦、选择、复制与具名表单提交；关闭缩放手柄，忽略 rows，并使用只读内容布局。 |
-| required | `boolean` | `false` | 启用原生必填校验；自定义反馈文案由调用方或 Field 提供。 |
+| required | `boolean` | `false` | 启用原生必填校验；失败时显示组件内置错误文字，自定义业务文案使用 error。 |
 | rows | `number` | `2` | 传给原生 textarea 的可见行数提示，使用正整数；readonly 时不传递。组件挂载、输入和外部值变化时还会按内容测高，因此它不锁定最终高度。 |
 | cols | `number` | — | 传给原生 textarea 的字符列数提示，使用正整数；组件默认占满容器宽度，因此它不直接决定外壳宽度。配合 wrap="hard" 可影响提交时的换行。 |
-| minlength | `number` | — | 原生最小文本长度约束，按 UTF-16 代码单元计数；不阻止输入。空值需要另设 required；浏览器约束校验与组件 invalid 独立。 |
+| minlength | `number` | — | 原生最小文本长度约束，按 UTF-16 代码单元计数；不阻止输入。空值需要另设 required；原生 invalid 事件自动接入组件错误反馈。 |
 | maxlength | `number` | — | 原生最大输入长度约束，按 UTF-16 代码单元计数；浏览器通常限制用户继续输入，但不会截断外部赋给 value / defaultValue 的文本。与 maxCount 分别控制输入限制和计数提示。 |
 | wrap | `HTMLTextareaAttributes["wrap"]` | — | 原生换行策略：soft 在视觉上换行但不为提交补换行；hard 可按列宽为提交内容补换行；off 不自动折行。未设置使用浏览器默认 soft；组件未提供水平滚动条，长行编辑优先使用 soft。 |
 | spellcheck | `boolean` | — | 传递浏览器拼写检查开关；未设置遵循浏览器与继承环境，实际词典由浏览器提供。 |
@@ -60,7 +60,8 @@
 | title | `string` | — | 原生提示文本；浏览器决定如何显示，不替代可见标签或错误信息。 |
 | id | `string` | — | 内部原生 textarea 的 id，用于 label for 和 ARIA 引用；同一文档内保持唯一。 |
 | resize | `"none" \| "vertical" \| "horizontal" \| "both"` | `"both"` | 缩放方向：none 隐藏手柄，vertical 调整高度，horizontal 调整宽度，both 同时调整两者。readonly / disabled 强制使用 none；手柄默认最小宽 120px、高 60px。手动设置高度后停止自动内容测高。 |
-| invalid | `boolean` | `false` | 与 aria-invalid 合并为组件错误态；不会自动检查 required / minlength / maxCount，也不会自动聚焦。嵌入 Field 后由 Field 汇总视觉反馈。 |
+| invalid | `boolean` | `false` | 业务错误态，与 aria-invalid 及原生校验反馈合并；仅设置本属性不触发校验或聚焦。maxCount 不触发原生校验，嵌入 Field 后由 Field 汇总视觉反馈。 |
+| error | `string` | — | 业务校验错误文字，与 invalid 配合显示在输入框下方；原生校验反馈自动接入。 |
 | parts | `ComponentPartsOf<{ Indicator: typeof Indicator }>` | — | 配置内置 Indicator，例如 step / largeStep 键盘步长、maxWidth / maxHeight 边界和 ariaLabel。只作用于组件生成的手柄；resize=none、readonly 或 disabled 时无手柄可配置。 |
 | onclick | `(event: MouseEvent) => void` | — | 单击内部原生文本域时触发。参数为原生事件，currentTarget 为内部 textarea；返回值被忽略，需要取消可取消的默认行为时调用 event.preventDefault()。 |
 | ondblclick | `(event: MouseEvent) => void` | — | 双击内部原生文本域时触发。参数为原生事件，currentTarget 为内部 textarea；返回值被忽略，需要取消可取消的默认行为时调用 event.preventDefault()。 |
@@ -76,6 +77,10 @@
 | oncut | `(event: ClipboardEvent) => void` | — | 剪切选中文字时触发，可通过 clipboardData 设置此次剪切内容。参数为原生事件，currentTarget 为内部 textarea；返回值被忽略，需要取消可取消的默认行为时调用 event.preventDefault()。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 原生表单校验反馈
+
+原生必填、类型、长度和格式校验失败时，组件取消浏览器气泡，将 `validationMessage` 显示在组件下方，并保持原生无效提交拦截。首个无效字段获得焦点；输入修正后更新反馈，表单重置清除反馈。调用方业务校验继续使用 `invalid` 与 `error`，原生错误存在时优先显示原生反馈。原生消息语言由浏览器决定，不将校验状态等同服务端验证结果。
 
 ## 使用边界与详细说明
 
