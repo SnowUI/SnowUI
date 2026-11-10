@@ -41,6 +41,9 @@
 | group | `any[]` | — | 多选值数组，配合 value 双向绑定 |
 | value | `any` | — | 表单值 |
 | size | `ResourceSize \| number` | — | 组件尺寸（像素，梯度与 Icon 一致：12/16/20/24/28/32/40/48/80） |
+| required | `boolean` | `false` | 是否必须选中；原生无效提交显示组件错误提示。 |
+| name | `string` | — | 内部原生 input 的表单字段名；Radio 使用同名分组。 |
+| form | `string` | — | 关联表单元素的 id。 |
 | disabled | `boolean` | `false` | 禁用状态 |
 | indeterminate | `boolean` | `false` | 不确定状态（双向绑定） |
 | onCheckedChange | `(checked: boolean) => void` | — | 原生复选状态变化后的回调 |
@@ -240,6 +243,14 @@ Checkbox 属于“控件视觉体 + label”的内联外壳子类：
   - `prefers-reduced-motion: reduce`: 取消视觉体、勾选与横线过渡，直接显示最终状态
 
 
+
+
+## 必填反馈
+
+显式设置 `required` 时，空值提交由组件显示错误文字，首个无效字段获得焦点并以红色边框闪动；外光圈保持原色，减少动效时不闪动。取消浏览器校验气泡但保留无效提交拦截；修正输入后更新提示，表单重置清除提示。
+
+`required`（boolean，默认 false）、`name`（string）和 `form`（string）传给内部原生 input。可选控件的未选中状态有效。
+必填针对当前复选框，不表示多选组中任选一项。
 
 ## AI Zone
 

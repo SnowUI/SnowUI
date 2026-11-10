@@ -3,6 +3,7 @@
 <script lang="ts">
     import { onDestroy, type Snippet } from "svelte";
     import { useNativeValidation } from "../logic/native-validation.svelte";
+    import { useRequiredFeedback } from "../logic/required-feedback.svelte";
     import Text from "./Text.svelte";
     import { useLocale } from "../i18n/locale.svelte";
     import { TAB_INDICATOR_MOTION_STYLE } from "../motion/presets/tab";
@@ -72,6 +73,8 @@
 
     let inputElement = $state<HTMLInputElement>();
     const nativeValidation = useNativeValidation(() => inputElement);
+    let requiredFeedbackSurface = $state<HTMLElement>();
+    useRequiredFeedback(() => inputElement, () => requiredFeedbackSurface);
     const locale = useLocale();
     const instanceId = $props.id();
     const errorId = `${instanceId}-error`;
@@ -336,7 +339,7 @@
                 {/if}
             </span>
         {/each}
-        <span aria-hidden="true" class="snowui-otp-indicator snowui-field-bordered snowui-rounded-rectangle"
+        <span bind:this={requiredFeedbackSurface} aria-hidden="true" class="snowui-otp-indicator snowui-field-bordered snowui-rounded-rectangle"
             data-field-focus={focused && !disabled && !success ? "true" : undefined}
             data-invalid={resolvedInvalid ? "true" : undefined}
             style={`${TAB_INDICATOR_MOTION_STYLE}; --snowui-otp-input-active-index: ${activeIndex}`}></span>

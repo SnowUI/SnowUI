@@ -21,7 +21,7 @@
 -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-    import { INPUT_REQUIRED_KEYFRAMES, INPUT_REQUIRED_TIMING } from "../motion/presets/input-required";
+    import { useRequiredFeedback } from "../logic/required-feedback.svelte";
     import { useNativeValidation } from "../logic/native-validation.svelte";
     import Button from "./Button.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
@@ -293,43 +293,14 @@
         if (!isOverlaySearchHeader || !listboxHeaderPortal?.el || !hostElement) return;
         listboxHeaderPortal.el.appendChild(hostElement);
     });
-    $effect(() => {
-        const input = nativeInputElement;
-        const host = hostElement;
-        if (!input || !host) return;
-        let feedback: Animation | undefined;
-        function stopFeedback() {
-            feedback?.cancel();
-            feedback = undefined;
-        }
-        function handleRequiredInvalid() {
-            if (!input!.validity.valueMissing) return;
-            // Keep native validation blocking submission; only replace its bubble.
-            const firstInvalid = input!.form
-                ? Array.from(input!.form.elements).find((control) => control.matches(":invalid"))
-                : input;
-            if (firstInvalid !== input) return;
-            stopFeedback();
-            if (isCustomTemporalType) {
-                focusDateSegment(getTemporalSegments(temporalInputType)[0]);
-            } else {
-                input!.focus();
-            }
-            const surface = host!.closest<HTMLElement>(".snowui-field-bordered") ?? host!;
-            if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-                feedback = surface.animate(INPUT_REQUIRED_KEYFRAMES, INPUT_REQUIRED_TIMING);
-            }
-        }
-        input.addEventListener("invalid", handleRequiredInvalid);
-        input.addEventListener("input", stopFeedback);
-        input.addEventListener("blur", stopFeedback);
-        return () => {
-            stopFeedback();
-            input.removeEventListener("invalid", handleRequiredInvalid);
-            input.removeEventListener("input", stopFeedback);
-            input.removeEventListener("blur", stopFeedback);
-        };
-    });
+    useRequiredFeedback(
+        () => nativeInputElement,
+        () => hostElement?.closest<HTMLElement>(".snowui-field-bordered") ?? hostElement,
+        () => {
+            if (isCustomTemporalType) focusDateSegment(getTemporalSegments(temporalInputType)[0]);
+            else nativeInputElement?.focus();
+        },
+    );
 
     let dateEditorFocused = $state(false);
     let dateDraft = $state<DateDraft>({

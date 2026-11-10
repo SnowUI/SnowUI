@@ -6,6 +6,19 @@
  */
 export const examples = [
     {
+        name: "Required: shared empty feedback",
+        code: `Required
+<form onsubmit={(event) => event.preventDefault()}>
+<Textarea name="message" required placeholder="Message" />
+<Button type="submit" variant="filled" skeleton={false}>Submit</Button>
+<button type="reset">Reset</button>
+</form>`,
+        expected: {
+            interaction: "空值提交不出现浏览器气泡；显示组件错误文字，首个无效控件聚焦并红边闪动，外光圈保持原色；重复提交可重播，修正输入或选择后清除错误，重置清除提示。",
+            render: "非必填控件维持原样；减少动效时仅保留错误提示。",
+        },
+    },
+    {
         name: "TA-01：空态占位符",
         code: `TA-01
 <Textarea placeholder="请输入更多说明" style="width: 22.5rem;" />`,

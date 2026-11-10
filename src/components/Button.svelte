@@ -45,6 +45,8 @@
     getBreadcrumb,
   } from "../context";
 
+  import Spinner from "./Spinner.svelte";
+
   interface Props extends Omit<FrameProps, "size"> {
     variant?: "gray" | "filled" | "outline" | "borderless";
     size?: "sm" | "md" | "lg";
@@ -146,8 +148,10 @@
     }
     return "gray";
   });
+  const spinnerCapable = $derived(rest.skeleton === false);
+  const spinnerLoading = $derived(spinnerCapable && rest.loading === true);
   const resolvedDisabled = $derived(
-    disabled || (isButtonGroupEmbedded && buttonGroupCtx?.disabled === true),
+    spinnerLoading || disabled || (isButtonGroupEmbedded && buttonGroupCtx?.disabled === true),
   );
   const resolvedScaleOnHover = $derived(
     scaleOnHover
@@ -354,7 +358,7 @@
     const clickMotionStyle = clickMotion
       ? `--snowui-button-click-transform-from: ${clickMotion.from}; --snowui-button-content-click-transform-from: ${clickMotion.contentFrom}`
       : "";
-    const styles = [`--snowui-button-icon-size: ${contextPixelSize / 16}rem`, `--snowui-button-content-gap: ${contentLineGap(gap ?? "var(--snowui-button-gap-override, var(--snowui-button-gap))", true)}`, defaultHoverMotionStyle, clickMotionStyle, hostStyle, userStyle]
+    const styles = [`--snowui-button-icon-size: ${contextPixelSize / 16}rem`, `--snowui-button-content-gap: ${contentLineGap(gap ?? "var(--snowui-button-gap-override, var(--snowui-button-gap))", true)}`, defaultHoverMotionStyle, clickMotionStyle, hostStyle, spinnerLoading ? "--snowui-button-opacity-override: 1" : "", userStyle]
       .filter(Boolean)
       .join("; ");
     return styles || undefined;
@@ -366,6 +370,11 @@
   const frameRestProps = $derived.by(() => {
     const next = { ...rest };
     delete next.Click;
+    if (spinnerCapable) {
+      next.whileLoad ??= false;
+      next.whileDisabled ??= false;
+      next["aria-busy"] = spinnerLoading || rest["aria-busy"];
+    }
     return next;
   });
   const layoutAs = $derived.by(() => {
@@ -648,6 +657,7 @@
   <span bind:this={contentElement} class="snowui-button-content" data-tooltip-anchor-decoration>
     {@render children?.()}
   </span>
+  {#if spinnerLoading}<span class="snowui-button-spinner" aria-hidden="true"><Spinner size={16} loading={false} skeleton={false} /></span>{/if}
 {/snippet}
 
 <Frame
@@ -662,6 +672,8 @@
   {target}
   {rel}
   data-variant={bare ? undefined : resolvedVariant}
+  data-spinner-capable={spinnerCapable ? "true" : undefined}
+  data-loading-spinner={spinnerLoading ? "true" : undefined}
   data-icon-only={iconOnly ? "true" : undefined}
   data-emphasis={bare ? emphasis : undefined}
   data-default-hover-scale={resolvedScaleOnHover && rest.whileHover === undefined ? "true" : undefined}
@@ -714,6 +726,16 @@
 />
 
 <style>
+  :global(:where(.snowui-button[data-loading-spinner="true"]) > .snowui-button-content) { opacity: 0; }
+  :global(:where(.snowui-button) > .snowui-button-spinner) {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
   /* Button 样式 */
   /* Level 2: Component Base (降权为 0) */
   :global(:where(.snowui-button)) {
@@ -923,7 +945,7 @@
     display: contents;
   }
 
-  :global(:where(.snowui-button[data-content-hover-scale="true"]) > .snowui-button-content) {
+  :global(:where(.snowui-button[data-content-hover-scale="true"], .snowui-button[data-spinner-capable="true"]) > .snowui-button-content) {
     display: flex;
     flex: 1 1 auto;
     align-self: stretch;

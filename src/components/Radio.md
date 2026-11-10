@@ -41,6 +41,9 @@
 | group | `any` | — | 同组 Radio 绑定同一状态并提供不同 value。初始值应为已选项值；无初始选择可设为 null。取消当前项后写入 undefined，后续组联动仍有效。 |
 | value | `any` | — | 当前选项对应的值，以严格相等与 group 比较；同组应使用唯一且稳定的值。 |
 | size | `ResourceSize \| number` | — | 控件占位尺寸，支持 12/16/20/24/28/32/40/48/80 及自定义数值；未传时优先继承尺寸上下文，否则为 16。图形占尺寸的 87.5%，不改变标签字号。 |
+| required | `boolean` | `false` | 是否必须选中；原生无效提交显示组件错误提示。 |
+| name | `string` | — | 内部原生 input 的表单字段名；Radio 使用同名分组。 |
+| form | `string` | — | 关联表单元素的 id。 |
 | disabled | `boolean` | `false` | 禁止点击与键盘切换，并移出 Tab 顺序；保留当前选中状态。 |
 | variant | `"outline" \| "filled"` | `"filled"` | filled 使用粗选中环，outline 使用细外框与中心点；两者具有相同的选择行为。 |
 | singleLine | `boolean` | `true` | 默认标签与控件保持单行，附件不压缩；窄宽时原始标签可省略显示并保留完整可访问名称，不复制 children。复杂多行内容可显式设为 false，由该内容拥有布局。需要全文提示时组合 Text lines={1}。 |
@@ -61,7 +64,7 @@
 |:---|:---|:---|:---|
 | `as` | `'badge'` | - | 角色化：作为 `Image` 角标挂件 |
 
-分组建议在外层提供带名称的 `role="radiogroup"`。使用 Tab 聚焦、Space 切换；当前组件通过绑定管理组值，不提供组内方向键导航。`name`、`required` 等剩余属性传递到外层 Frame，不等同于内层原生 input 的表单属性。
+分组建议在外层提供带名称的 `role="radiogroup"`。使用 Tab 聚焦、Space 切换；当前组件通过绑定管理组值，不提供组内方向键导航。原生表单分组使用相同 `name`，并通过 `bind:group` 同步组件值。
 
 <a id="布局模型"></a>
 
@@ -149,6 +152,14 @@ Radio 属于“控件视觉体 + label”的内联外壳子类：
 - 禁用状态下 `tabindex=-1`
 
 
+
+
+## 必填反馈
+
+显式设置 `required` 时，空值提交由组件显示错误文字，首个无效字段获得焦点并以红色边框闪动；外光圈保持原色，减少动效时不闪动。取消浏览器校验气泡但保留无效提交拦截；修正输入后更新提示，表单重置清除提示。
+
+`required`（boolean，默认 false）、`name`（string）和 `form`（string）传给内部原生 input。可选控件的未选中状态有效。
+同名单选项共享必填约束；选择组内任一项即可满足。
 
 ## AI Zone
 

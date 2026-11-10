@@ -8,6 +8,9 @@
 -->
 
 <script lang="ts">
+    import RequiredFeedback from "../logic/RequiredFeedback.svelte";
+    import { useNativeValidation } from "../logic/native-validation.svelte";
+    import { useRequiredFeedback } from "../logic/required-feedback.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { ComponentProps, Snippet } from "svelte";
     import {setContext} from "svelte";
@@ -164,7 +167,6 @@
     const resolvedValueStr = $derived(
         resolvedValue !== undefined ? String(resolvedValue) : undefined,
     );
-    const resolvedInvalid = $derived(resolveFrameFieldInvalid(invalid, {}));
 
     const fieldContext = getField();
     const isEmbedded = $derived(!!fieldContext);
@@ -178,6 +180,13 @@
     let selectEl = $state<HTMLElement | undefined>(undefined);
     let triggerEl = $state<HTMLButtonElement | undefined>(undefined);
     let hiddenInputEl = $state<HTMLInputElement | undefined>(undefined);
+
+    const validationRequired = $derived(required && selectionMode !== "action");
+    const feedbackId = `snowui-select-error-${uid}`;
+    function focusTrigger() { (triggerEl ?? selectEl?.querySelector<HTMLButtonElement>("button"))?.focus(); }
+    const nativeValidation = useNativeValidation(() => hiddenInputEl, focusTrigger);
+    const resolvedInvalid = $derived(resolveFrameFieldInvalid(invalid, {}) || !!nativeValidation.message);
+    useRequiredFeedback(() => hiddenInputEl, () => selectEl?.closest<HTMLElement>(".snowui-field-bordered") ?? selectEl, focusTrigger);
 
     // UI state
     let open = $state(false);
@@ -337,6 +346,7 @@
         else triggerEl?.focus();
         if (val !== prev) {
             // 触发 change 事件（通过 hidden input 桥接）
+            if (hiddenInputEl) hiddenInputEl.value = val;
             const ev = new Event("change", { bubbles: true });
             hiddenInputEl?.dispatchEvent(ev);
             userOnChange?.(ev);
@@ -390,6 +400,7 @@
     });
 </script>
 
+<RequiredFeedback enabled={validationRequired} message={nativeValidation.message} id={feedbackId}>
 <Frame
     bind:element={selectEl}
     tag="div"
@@ -414,10 +425,16 @@
     singleLine={!buttonTrigger}
 >
     <!-- 隐藏表单提交 input（替代原 hidden <select>） -->
-    {#if name}
+    {#if name || validationRequired}
         <input
             bind:this={hiddenInputEl}
-            type="hidden"
+            type={validationRequired ? "text" : "hidden"}
+            class="snowui-select-validation-proxy"
+            required={validationRequired}
+            {disabled}
+            {readonly}
+            tabindex="-1"
+            aria-hidden="true"
             {name}
             value={resolvedValueStr ?? ""}
             {form}
@@ -429,6 +446,8 @@
             class="snowui-select-button-trigger"
             bare={buttonBare}
             id={triggerId}
+            aria-invalid={resolvedInvalid ? "true" : undefined}
+            aria-describedby={nativeValidation.message ? feedbackId : undefined}
             aria-label={ariaLabel}
             aria-haspopup="listbox"
             aria-expanded={open}
@@ -465,6 +484,7 @@
         aria-controls={listboxId}
         aria-activedescendant={open && activeIndex >= 0 ? `${listboxId}-opt-${activeIndex}` : undefined}
         aria-invalid={resolvedInvalid ? "true" : undefined}
+        aria-describedby={nativeValidation.message ? feedbackId : undefined}
         aria-disabled={disabled || undefined}
         id={triggerId}
         {tabindex}
@@ -501,8 +521,10 @@
         />
     {/if}
 </Frame>
+</RequiredFeedback>
 
 <style>
+    :global(:where(.snowui-select-validation-proxy)) { position: absolute; width: calc(var(--size-1, 4px) / 4); height: calc(var(--size-1, 4px) / 4); padding: 0; border: 0; clip-path: inset(50%); overflow: hidden; pointer-events: none; }
     /* ── 宿主容器 ── */
     :global(:where(.snowui-select)) {
         position: relative;

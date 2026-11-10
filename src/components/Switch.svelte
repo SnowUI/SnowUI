@@ -20,6 +20,9 @@
 
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
+    import RequiredFeedback from "../logic/RequiredFeedback.svelte";
+    import { useNativeValidation } from "../logic/native-validation.svelte";
+    import { useRequiredFeedback } from "../logic/required-feedback.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { getSizeContext, getSize, type ResourceSize } from "../context";
     import {
@@ -33,6 +36,9 @@
         checked?: boolean;
         value?: any;
         size?: ResourceSize | number;
+        required?: boolean;
+        name?: string;
+        form?: string;
         disabled?: boolean;
         children?: Snippet;
         singleLine?: boolean;
@@ -47,6 +53,9 @@
         checked = $bindable(false),
         value,
         size = undefined,
+        required = false,
+        name,
+        form,
         disabled = false,
         children,
         singleLine = true,
@@ -110,8 +119,14 @@
         if (disabled) return;
         checked = !checked;
     }
+    let feedbackSurface = $state<HTMLElement>();
+    const feedbackUid = $props.id();
+    const feedbackId = `snowui-required-${feedbackUid}`;
+    const nativeValidation = useNativeValidation(() => inputRef);
+    useRequiredFeedback(() => inputRef, () => feedbackSurface);
 </script>
 
+<RequiredFeedback enabled={required} message={nativeValidation.message} id={feedbackId}>
 <Frame
     tag="label"
     {singleLine}
@@ -133,12 +148,17 @@
             aria-checked={checked}
             class="snowui-switch-sr-only"
             {checked}
+            {required}
+            {name}
+            {form}
+            aria-invalid={nativeValidation.message ? "true" : undefined}
+            aria-describedby={nativeValidation.message ? feedbackId : undefined}
             {value}
             {disabled}
             onclick={handleClick}
             tabindex={disabled ? -1 : 0}
         />
-        <span class="snowui-switch-track">
+        <span bind:this={feedbackSurface} data-required-invalid={nativeValidation.message ? "true" : undefined} class="snowui-switch-track">
             <span class="snowui-switch-thumb"></span>
         </span>
     </span>
@@ -148,6 +168,7 @@
         </span>
     {/if}
 </Frame>
+</RequiredFeedback>
 
 <style>
     /* Level 2: Component Base (降权为 0) */

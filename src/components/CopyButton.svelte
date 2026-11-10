@@ -121,6 +121,7 @@
 
 <Button
     {...rest}
+    loading={rest.loading || (rest.skeleton === false && status === "pending")}
     style={`${controlButtonMotionStyle(`var(--snowui-copy-button-motion-duration-override, ${CONTROL_BUTTON_MOTION_DURATION_MS}ms)`)} ${userStyle}`}
     iconOnly={!rest.bare && !showText}
     {disabled}

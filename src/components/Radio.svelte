@@ -21,6 +21,9 @@
 
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
+    import RequiredFeedback from "../logic/RequiredFeedback.svelte";
+    import { useNativeValidation } from "../logic/native-validation.svelte";
+    import { useRequiredFeedback } from "../logic/required-feedback.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import {
         getImage,
@@ -40,6 +43,9 @@
         group?: any;
         value?: any;
         size?: ResourceSize | number;
+        required?: boolean;
+        name?: string;
+        form?: string;
         disabled?: boolean;
         variant?: "outline" | "filled";
         children?: Snippet;
@@ -56,6 +62,9 @@
         group = $bindable(),
         value,
         size = undefined,
+        required = false,
+        name,
+        form,
         disabled = false,
         variant = "filled",
         children,
@@ -152,6 +161,10 @@
     function applySelection(nextChecked: boolean) {
         if (disabled) return;
         checked = nextChecked;
+        if (inputRef) {
+            inputRef.checked = nextChecked;
+            inputRef.dispatchEvent(new Event("change", { bubbles: true }));
+        }
         if (isGrouped) {
             group = nextChecked ? value : undefined;
         }
@@ -169,8 +182,14 @@
         applySelection(!checked);
     }
 
+    let feedbackSurface = $state<HTMLElement>();
+    const feedbackUid = $props.id();
+    const feedbackId = `snowui-required-${feedbackUid}`;
+    const nativeValidation = useNativeValidation(() => inputRef);
+    useRequiredFeedback(() => inputRef, () => feedbackSurface);
 </script>
 
+<RequiredFeedback enabled={required} message={nativeValidation.message} id={feedbackId}>
 <Frame
     tag="label"
     {singleLine}
@@ -193,13 +212,17 @@
             type="radio"
             class="snowui-radio-sr-only"
             {checked}
+            {required}
+            {name}
+            {form}
+            aria-describedby={nativeValidation.message ? feedbackId : undefined}
             {value}
             {disabled}
             onclick={handleClick}
             onkeydown={handleKeyDown}
             tabindex={disabled ? -1 : 0}
         />
-        <span class="snowui-radio-visual">
+        <span bind:this={feedbackSurface} data-required-invalid={nativeValidation.message ? "true" : undefined} class="snowui-radio-visual">
             <span class="snowui-radio-active-ring"></span>
             <span class="snowui-radio-hover-layer"></span>
             {#if variant === "outline"}
@@ -213,6 +236,7 @@
         </span>
     {/if}
 </Frame>
+</RequiredFeedback>
 
 <style>
     /* Level 2: Component Base (降权为 0) */

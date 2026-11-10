@@ -1,5 +1,13 @@
 export const examples = [
     {
+        name: "CB-Pending：异步复制 Spinner",
+        code: `CB-Pending
+<CopyButton variant="filled" skeleton={false} text="SnowUI" writeText={() => new Promise(resolve => setTimeout(resolve, 1200))}>Copy prompt</CopyButton>`,
+        expected: { render: "异步复制期间显示固定尺寸 Spinner 并禁用，完成后恢复原有复制反馈。" },
+        logic: ["Loading"],
+    },
+
+    {
         name: "CB-01: Button 全部变体",
         code: `CB-01
 <CopyButton text="SnowUI" variant="gray" size="sm" />

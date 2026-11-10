@@ -8,6 +8,7 @@
 -->
 
 <script lang="ts">
+    import { useRequiredFeedback } from "../logic/required-feedback.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import Text from "./Text.svelte";
     import { useNativeValidation } from "../logic/native-validation.svelte";
@@ -164,6 +165,7 @@
     const validationInstanceId = $props.id();
     const validationErrorId = `${validationInstanceId}-validation-error`;
     let textareaHostEl: HTMLElement | undefined = $state(undefined);
+    useRequiredFeedback(() => textareaEl, () => textareaHostEl?.closest<HTMLElement>(".snowui-field-bordered") ?? textareaHostEl);
     let scrollbarEl: HTMLDivElement | undefined = $state(undefined);
     let showTopFade = $state(false);
     let showBottomFade = $state(false);

@@ -30,6 +30,17 @@
  * 变更记录 (2026-03-02): 修复 examples 数组末尾缺少逗号导致的语法错误（esbuild: Expected "]" but found "{")。
  */
 export const examples = [
+  {
+    name: "BTN-Submit：固定尺寸 Spinner 提交",
+    code: `BTN-Submit
+<div class="flex flex-wrap gap-16">
+    <Button variant="filled" skeleton={false}>Continue</Button>
+    <Button variant="filled" loading skeleton={false}>Continue</Button>
+</div>`,
+    expected: { render: "提交状态内置 Spinner，保留标签占位与按钮尺寸、颜色；loading 自动禁用，普通状态可点击。" },
+    logic: ["Loading"],
+  },
+
     {
         name: "BTN-Gap: 单行图文最小间距",
         code: `BTN-Gap

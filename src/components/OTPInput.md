@@ -79,6 +79,11 @@
 - 调用方必须提供 `aria-label`、`aria-labelledby` 或关联 `<label>`。disabled 不提交，readonly 仍提交。
 - form reset 默认恢复 `defaultValue`，未提供时恢复首次 value；取消的 reset 保留当前值。监听按当前 `input.form` 判定，因此 `form` 改变后自动关联新表单。reset 的零延迟收尾 timer 在重复 reset 或卸载时清理。
 
+
+## 必填反馈
+
+显式设置 `required` 时，空值提交由组件显示错误文字，首个无效字段获得焦点并以红色边框闪动；外光圈保持原色，减少动效时不闪动。取消浏览器校验气泡但保留无效提交拦截；修正输入后更新提示，表单重置清除提示。
+
 ## AI Zone
 
 | 类别 | 关键字 | 处理位置 | 约束 |

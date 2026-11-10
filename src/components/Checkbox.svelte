@@ -21,6 +21,9 @@
 
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
+    import RequiredFeedback from "../logic/RequiredFeedback.svelte";
+    import { useNativeValidation } from "../logic/native-validation.svelte";
+    import { useRequiredFeedback } from "../logic/required-feedback.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import { getSizeContext, getSize, type ResourceSize } from "../context";
     import {
@@ -39,6 +42,9 @@
         group?: any[];
         value?: any;
         size?: ResourceSize | number;
+        required?: boolean;
+        name?: string;
+        form?: string;
         disabled?: boolean;
         indeterminate?: boolean;
         onCheckedChange?: (checked: boolean) => void;
@@ -62,6 +68,9 @@
         // Component props
         value,
         size = undefined,
+        required = false,
+        name,
+        form,
         disabled = false,
         onCheckedChange,
         ariaLabel = undefined,
@@ -158,8 +167,15 @@
         }
     }
 
+    let inputRef = $state<HTMLInputElement>();
+    let feedbackSurface = $state<HTMLElement>();
+    const feedbackUid = $props.id();
+    const feedbackId = `snowui-required-${feedbackUid}`;
+    const nativeValidation = useNativeValidation(() => inputRef);
+    useRequiredFeedback(() => inputRef, () => feedbackSurface);
 </script>
 
+<RequiredFeedback enabled={required} message={nativeValidation.message} id={feedbackId}>
 <Frame
     tag="label"
     {singleLine}
@@ -175,17 +191,23 @@
 >
     <span class="snowui-control-inset">
         <input
+            bind:this={inputRef}
             type="checkbox"
             class="snowui-checkbox-sr-only"
             bind:checked
             bind:indeterminate
+            {required}
+            {name}
+            {form}
+            aria-invalid={nativeValidation.message ? "true" : undefined}
+            aria-describedby={nativeValidation.message ? feedbackId : undefined}
             {value}
             {disabled}
             onchange={handleChange}
             tabindex={disabled ? -1 : 0}
             aria-label={ariaLabel}
         />
-        <span class="snowui-checkbox-visual snowui-rounded-rectangle">
+        <span bind:this={feedbackSurface} data-required-invalid={nativeValidation.message ? "true" : undefined} class="snowui-checkbox-visual snowui-rounded-rectangle">
             <span class="snowui-checkbox-hover-layer"></span>
             <svg
                 class="snowui-checkbox-icon"
@@ -212,6 +234,7 @@
         </span>
     {/if}
 </Frame>
+</RequiredFeedback>
 
 <style>
     /* 原生 input 覆盖整个 label 区域，透明但可点击 */

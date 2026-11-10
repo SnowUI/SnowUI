@@ -117,6 +117,10 @@ SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默
 
 
 
+## 提交与反馈
+
+持久选择模式继承 Select 的 required、name、form 与组件内置必填提示；action 模式不要求保留选中值。
+
 ## AI Zone
 
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
