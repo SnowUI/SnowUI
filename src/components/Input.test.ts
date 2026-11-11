@@ -572,7 +572,7 @@ export const examples = [
     <Input type="password" required aria-label="Password" placeholder="Password" />
     <Button type="submit" variant="filled">Continue</Button>
 </form>`,
-        expected: { render: "空字段提交不显示浏览器必填气泡；第一个无效输入聚焦并显示激活态、消失、再出现，闪动期间边框为红色，外光圈沿用原聚焦颜色，布局不移动。填好邮箱后空密码同样反馈；再次提交重播，输入或失焦停止。必填、邮箱格式与长度错误显示在 Input 下方，均不出现浏览器气泡；提交仍被拦截。减少动效时仅聚焦。" },
+        expected: { render: "空字段提交不显示浏览器必填气泡；第一个无效输入聚焦并显示激活态、消失、再出现，闪动期间边框为红色，外光圈沿用原聚焦颜色，布局不移动。填好邮箱后空密码同样反馈；再次提交重播，输入或失焦停止。空值必填只闪动并恢复原态、不显示文字；邮箱格式与长度错误显示在 Input 下方，均不出现浏览器气泡；提交仍被拦截。减少动效时仅聚焦。" },
         logic: ["Required", "Validation", "Motion"],
     },
 ] as const;

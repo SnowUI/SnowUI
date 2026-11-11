@@ -4,15 +4,15 @@ import { INPUT_REQUIRED_KEYFRAMES, INPUT_REQUIRED_TIMING } from "../motion/prese
 
 export function useRequiredFeedback(
     getInput: () => HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement | undefined,
-    getSurface: () => HTMLElement | undefined,
+    getSurface: () => HTMLElement | readonly HTMLElement[] | undefined,
     focus?: () => void,
 ) {
     $effect(() => {
         const input = getInput();
         const surface = getSurface();
         if (!input || !surface) return;
-        let feedback: Animation | undefined;
-        function stop() { feedback?.cancel(); feedback = undefined; }
+        let feedback: Animation[] = [];
+        function stop() { feedback.forEach(animation => animation.cancel()); feedback = []; }
         function invalid() {
             if (!input!.validity.valueMissing) return;
             const first = input!.form
@@ -22,8 +22,13 @@ export function useRequiredFeedback(
             stop();
             if (focus) focus(); else input!.focus();
             if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-                feedback = surface!.animate(INPUT_REQUIRED_KEYFRAMES, INPUT_REQUIRED_TIMING);
-                feedback.id = "snowui-required-feedback";
+                const current = getSurface();
+                const surfaces = Array.isArray(current) ? current : current ? [current as HTMLElement] : [];
+                feedback = surfaces.map(target => {
+                    const animation = target.animate(INPUT_REQUIRED_KEYFRAMES, INPUT_REQUIRED_TIMING);
+                    animation.id = "snowui-required-feedback";
+                    return animation;
+                });
             }
         }
         input.addEventListener("invalid", invalid);

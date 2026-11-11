@@ -74,7 +74,12 @@
     let inputElement = $state<HTMLInputElement>();
     const nativeValidation = useNativeValidation(() => inputElement);
     let requiredFeedbackSurface = $state<HTMLElement>();
-    useRequiredFeedback(() => inputElement, () => requiredFeedbackSurface);
+    let requiredFeedbackSlots = $state<HTMLElement>();
+    useRequiredFeedback(() => inputElement, () => {
+        if (!requiredFeedbackSlots || !requiredFeedbackSurface) return;
+        // The indicator covers the first empty slot; animate it once to avoid doubling its ring.
+        return [requiredFeedbackSurface, ...Array.from(requiredFeedbackSlots.querySelectorAll<HTMLElement>(".snowui-otp-slot")).slice(1)];
+    });
     const locale = useLocale();
     const instanceId = $props.id();
     const errorId = `${instanceId}-error`;
@@ -295,7 +300,7 @@
     enableContext={enableContext}
     enableScaleObserver={false}
 >
-    <span class="snowui-otp-slots">
+    <span bind:this={requiredFeedbackSlots} class="snowui-otp-slots">
         <!-- svelte-ignore a11y_autofocus -->
         <input
             use:formReset={form}

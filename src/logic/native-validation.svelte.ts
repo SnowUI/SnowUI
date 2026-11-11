@@ -11,11 +11,11 @@ export function useNativeValidation(getControl: () => Control | undefined, focus
         function invalid(event: Event) {
             if (event.defaultPrevented) return;
             event.preventDefault();
-            message = control!.validationMessage;
+            message = control!.validity.valueMissing ? "" : control!.validationMessage;
             const first = form ? Array.from(form.elements).find((item) => item.matches(":invalid")) : control;
             if (first === control) { if (focus) focus(); else control!.focus(); }
         }
-        function update() { if (message) message = control!.validationMessage; }
+        function update() { if (message) message = control!.validity.valueMissing ? "" : control!.validationMessage; }
         function reset() { message = ""; }
         control.addEventListener("invalid", invalid);
         control.addEventListener("input", update);

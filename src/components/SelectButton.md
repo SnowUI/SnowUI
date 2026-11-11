@@ -52,7 +52,7 @@
 | placeholder | `string` | — | 未选中时的提示文字；action 模式触发器始终显示该文字。没有 label、选项文字或 placeholder 时触发器文字为空。 |
 | name | `string` | — | 表单字段名；仅提供非空 name 时创建 hidden input，提交当前选中值的字符串形式。 |
 | form | `string` | — | hidden input 所属表单的 id，可关联组件外部表单；仅设置 name 生成输入后生效。 |
-| required | `boolean` | `false` | 传入 Select 的必填标记；当前实现未将其接入原生约束校验，也不会阻止空值提交，业务需自行验证。 |
+| required | `boolean` | `false` | 传入 Select 的必填标记；持久选择模式阻止空值提交并短暂红边闪动，无文字；action 模式不要求保留选中值。 |
 | disabled | `boolean` | `false` | 禁用触发按钮并阻止打开或切换选项；当前 hidden input 不随该标记禁用，已有值仍可随表单提交。 |
 | readonly | `boolean` | `false` | 阻止用户通过触发器打开或改变选项，保留显示与外部 value 更新；不会禁用 hidden input。 |
 | invalid | `boolean` | `false` | 将无效状态传给 Select wrapper；当前 Button 触发器不自动增加错误边框或 aria-invalid，不能代替业务校验与错误说明。 |

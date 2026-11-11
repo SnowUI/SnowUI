@@ -764,6 +764,7 @@
 
 /* Input and segmented fields share the same error text typography. */
 :where(.snowui-field-error-message) {
+    text-align: left;
     width: 100%;
     padding: 0;
     color: var(--secondary-red, #ff4747ff);

@@ -14,8 +14,8 @@ export const examples = [
 <button type="reset">Reset</button>
 </form>`,
         expected: {
-            interaction: "空值提交不出现浏览器气泡；显示组件错误文字，首个无效控件聚焦并红边闪动，外光圈保持原色；重复提交可重播，修正输入或选择后清除错误，重置清除提示。",
-            render: "非必填控件维持原样；减少动效时仅保留错误提示。",
+            interaction: "空值提交不出现浏览器气泡；不显示空值错误文字，首个无效控件聚焦并短暂红边闪动，外光圈保持原色，结束恢复原态；重复提交可重播，修正输入或选择后清除错误，重置清除提示。",
+            render: "非必填控件维持原样；减少动效时仅聚焦，不显示空值错误文字。",
         },
     },
     {
@@ -168,7 +168,7 @@ export const examples = [
     <Button type="submit">Submit</Button>
     <Button type="reset">Reset</Button>
 </form>`,
-        expected: { render: "空值及格式／长度不符时阻止提交，错误显示在组件下方，不出现浏览器气泡。修正后错误消失，重置清除校验反馈。" },
+        expected: { render: "空值及格式／长度不符时阻止提交，不出现浏览器气泡；空值仅短暂红边闪动并恢复原态，不显示文字；格式／长度错误仍在组件下方左对齐显示。修正后错误消失，重置清除校验反馈。" },
         logic: ["Validation", "Form"],
     },
 ] as const;

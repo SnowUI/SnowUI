@@ -88,7 +88,7 @@ export const examples = [
     <Button type="submit" variant="filled" skeleton={false}>Submit</Button>
     <Button type="reset">Reset</Button>
 </form>`,
-        expected: { render: "空值及格式／长度不符时阻止提交，错误显示在组件下方，不出现浏览器气泡。空值时聚焦首个格，沿用 Input 红边闪动且外光圈原色；重复提交重新闪动，减少动效不闪动。修正后错误消失，重置清除校验反馈。" },
+        expected: { render: "空值及格式／长度不符时阻止提交，不出现浏览器气泡；空值仅短暂红边闪动并恢复原态，不显示文字；格式／长度错误仍在组件下方左对齐显示。空值时聚焦首个格，全部输入格同时沿用 Input 红边闪动且外光圈原色，结束全部恢复原态；重复提交重新闪动，减少动效不闪动。修正后错误消失，重置清除校验反馈。" },
         logic: ["Validation", "Form"],
     },
 ] as const;
