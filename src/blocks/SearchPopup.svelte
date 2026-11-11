@@ -32,7 +32,7 @@
 {#snippet panel(modal: boolean)}
 <Popover {...rest} {size} closeOn={modal ? "manual" : closeOn} closeOnSelect={modal ? false : rest.closeOnSelect} open={modal ? true : open} template={modal ? false : template} id={modal ? undefined : id} as={modal ? undefined : as} closeOnEscape={modal ? false : closeOnEscape} onOpenChange={modal ? undefined : handleOpenChange} class={`snowui-search-popup${userClass ? ` ${userClass}` : ''}`}>
     {#if search}
-        <SearchInput {...parts?.SearchInput} as="content" showSearchIcon={false} bind:value class={`snowui-search-popup-input${parts?.SearchInput?.class ? ` ${parts.SearchInput.class}` : ''}`}><ComponentIcon as="leading" name="search" size={24} /></SearchInput>
+        <SearchInput variant="borderless" {...parts?.SearchInput} as="content" showSearchIcon={false} bind:value class={`snowui-search-popup-input${parts?.SearchInput?.class ? ` ${parts.SearchInput.class}` : ''}`}><ComponentIcon as="leading" name="search" size={24} /></SearchInput>
     {/if}
     <div class="snowui-search-popup-results">
         {#if children}
