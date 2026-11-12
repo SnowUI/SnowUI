@@ -94,7 +94,7 @@
                 {:else if iconSnippet}
                     {@render iconSnippet()}
                 {:else if iconName}
-                    <ComponentIcon name={iconName} collection={iconCollection} size="var(--size-5)" />
+                    <ComponentIcon name={iconName} collection={iconCollection} size="var(--size-4)" />
                 {/if}
                 {#if updated && collapsed}
                     <Badge
@@ -237,9 +237,9 @@
     :global(:where(.snowui-sidebar-item-leading)) {
         position: relative;
         display: inline-flex;
-        width: max(12px, var(--size-5));
-        height: max(12px, var(--size-5));
-        flex: 0 0 max(12px, var(--size-5));
+        width: max(12px, var(--size-4));
+        height: max(12px, var(--size-4));
+        flex: 0 0 max(12px, var(--size-4));
         align-items: center;
         justify-content: center;
         opacity: 1;

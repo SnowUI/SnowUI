@@ -405,7 +405,7 @@
             --snowui-textarea-min-height-override,
             var(--snowui-textarea-min-height)
         );
-        min-width: 0;
+        min-width: calc(1em + var(--snowui-textarea-padding-left) + var(--snowui-textarea-padding-right));
         gap: 0;
         border-radius: var(
             --snowui-textarea-radius-override,

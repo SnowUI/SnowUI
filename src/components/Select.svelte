@@ -544,7 +544,7 @@
         --snowui-select-indicator-size: var(--size-4);
         width: var(--snowui-select-width-override, var(--snowui-select-width));
         height: var(--snowui-select-height-override, var(--snowui-select-height));
-        min-width: 0;
+        min-width: min-content;
         gap: var(--snowui-select-gap-resolved);
         padding: var(--snowui-select-padding-y) var(--snowui-select-padding-x);
         border-radius: var(--snowui-select-radius-override, var(--snowui-select-radius));
@@ -642,7 +642,8 @@
     :global(:where(.snowui-select-trigger)) {
         display: block;
         width: 100%;
-        min-width: 0;
+        min-width: var(--snowui-select-font-size-override, var(--snowui-select-font-size));
+        contain: inline-size;
         min-height: var(--snowui-select-line-height-override, var(--snowui-select-line-height));
         padding: 0;
         border: 0;
@@ -658,7 +659,7 @@
 
     :global(:where(.snowui-select:has(> [data-as]) > .snowui-select-trigger)) {
         grid-row: 1;
-        min-width: 0;
+        min-width: var(--snowui-select-font-size-override, var(--snowui-select-font-size));
     }
 
     :global(:where(.snowui-select:has(> [data-as="leading"]) > .snowui-select-trigger)) {

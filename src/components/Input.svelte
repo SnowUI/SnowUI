@@ -1867,7 +1867,7 @@
             --snowui-input-height-override,
             var(--snowui-input-height)
         );
-        min-width: 0;
+        min-width: min-content;
         gap: var(--snowui-input-gap-resolved);
         padding: var(--snowui-input-padding-y) var(--snowui-input-padding-x);
         border-radius: var(
@@ -1889,9 +1889,13 @@
         box-sizing: border-box;
     }
 
+    :global(:where(.snowui-input:not([data-has-root-accessory="true"]):not([data-embedded="true"]))) {
+        min-width: calc(var(--snowui-input-font-size-override, var(--snowui-input-font-size)) + 2 * var(--snowui-input-padding-x));
+    }
+
     :global(:where(.snowui-input-error-layout)) {
         display: grid;
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: minmax(1em, 1fr);
         align-items: start;
         gap: 0;
         min-width: 0;
@@ -1975,7 +1979,7 @@
                 )
         ) {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(1em, 1fr) auto;
         align-items: stretch;
         gap: var(--snowui-input-gap-resolved);
         padding: 0; /* Stepper 场景下由内部控制 Padding */
@@ -1989,7 +1993,7 @@
                 )
         ) {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(1em, 1fr) auto;
         align-items: center;
         gap: var(--snowui-input-gap-resolved);
         box-sizing: border-box;
@@ -2043,7 +2047,7 @@
                 )
         ) {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: minmax(1em, 1fr) auto;
         align-items: center;
         gap: var(--snowui-input-gap-resolved);
         box-sizing: border-box;
@@ -2054,7 +2058,7 @@
                     :has(> .snowui-input-stepper)
                 ):has(> [data-as="leading"]):not(:has(> [data-as="trailing"]))
         ) {
-        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-columns: auto minmax(1em, 1fr);
         gap: var(--snowui-input-gap-resolved);
     }
 
@@ -2063,7 +2067,7 @@
                     :has(> .snowui-input-stepper)
                 ):has(> [data-as="leading"]):has(> [data-as="trailing"])
         ) {
-        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-columns: auto minmax(1em, 1fr) auto;
         gap: var(--snowui-input-gap-resolved);
     }
 
@@ -2251,7 +2255,8 @@
         position: relative;
         z-index: 0;
         width: 100%;
-        min-width: 0;
+        min-width: var(--snowui-input-font-size-override, var(--snowui-input-font-size));
+        contain: inline-size;
         height: auto;
         padding: var(
             --snowui-input-padding-override,
@@ -2711,7 +2716,7 @@
                         )
                 )
         ) {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: minmax(1em, 1fr);
         gap: 0;
     }
 
@@ -2732,7 +2737,7 @@
                         )
                 )
         ) {
-        grid-template-columns: auto minmax(0, 1fr);
+        grid-template-columns: auto minmax(1em, 1fr);
         gap: var(--snowui-input-gap-resolved);
     }
 

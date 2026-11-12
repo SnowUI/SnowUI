@@ -286,7 +286,7 @@
     {...frameRestProps}
     tag="div"
     class={`snowui-otp-input${resolvedInvalid ? " snowui-feedback-error-shake" : ""} ${userClass}`.trim()}
-    style={userStyle || undefined}
+    style={`--snowui-otp-input-length: ${length}; ${userStyle}`}
     data-disabled={disabled ? "true" : undefined}
     data-readonly={readonly ? "true" : undefined}
     data-invalid={resolvedInvalid ? "true" : undefined}
@@ -363,28 +363,42 @@
         --snowui-otp-input-radius: var(--radius-4);
         --snowui-otp-input-font-size: var(--text-18);
         --snowui-otp-input-line-height: var(--leading-18);
+        --snowui-otp-input-slot-min-width: calc(1ch + 2 * var(--padding-2));
+        font-size: var(--snowui-otp-input-font-size-override, var(--snowui-otp-input-font-size));
+        font-variant-numeric: tabular-nums;
         position: relative;
         display: inline-flex;
         flex-direction: column;
         align-items: flex-start;
         gap: var(--gap-2);
-        width: fit-content;
+        width: 100%;
+        min-width: calc(var(--snowui-otp-input-length) * var(--snowui-otp-input-slot-min-width) + (var(--snowui-otp-input-length) - 1) * var(--snowui-otp-input-gap-override, var(--snowui-otp-input-gap)));
         max-width: 100%;
         color: var(--black-100, #000000);
         cursor: text;
     }
+    :global(:where(.snowui-otp-input > .snowui-field-error-message)) {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+    }
     :global(:where(.snowui-otp-slots)) {
         position: relative;
         display: flex;
+        width: 100%;
+        min-width: 0;
         gap: var(--snowui-otp-input-gap-override, var(--snowui-otp-input-gap, var(--gap-2)));
     }
     :global(:where(.snowui-otp-slot, .snowui-otp-indicator)) {
         display: grid;
         place-items: center;
-        width: var(--snowui-otp-input-size-override, var(--snowui-otp-input-size, var(--size-10)));
+        width: calc((100% - (var(--snowui-otp-input-length) - 1) * var(--snowui-otp-input-gap-override, var(--snowui-otp-input-gap))) / var(--snowui-otp-input-length));
+        min-width: var(--snowui-otp-input-slot-min-width);
+        flex: 1 1 0;
         height: var(--snowui-otp-input-size-override, var(--snowui-otp-input-size, var(--size-10)));
         box-sizing: border-box;
-        padding: var(--padding-3, 12px) var(--padding-4, 16px);
+        padding: var(--padding-3, 12px) 0;
         border: 0;
         border-radius: var(--snowui-otp-input-radius-override, var(--snowui-otp-input-radius, var(--radius-4)));
         font-size: var(--snowui-otp-input-font-size-override, var(--snowui-otp-input-font-size, var(--text-18, 18px)));
@@ -403,7 +417,7 @@
         top: 0;
         pointer-events: none;
         opacity: 0;
-        transform: translateX(calc(var(--snowui-otp-input-active-index) * (var(--snowui-otp-input-size-override, var(--snowui-otp-input-size)) + var(--snowui-otp-input-gap-override, var(--snowui-otp-input-gap)))));
+        transform: translateX(calc(var(--snowui-otp-input-active-index) * (100% + var(--snowui-otp-input-gap-override, var(--snowui-otp-input-gap)))));
         transition: transform var(--snowui-frame-control-motion-duration) var(--snowui-frame-control-motion-easing), box-shadow var(--snowui-frame-control-motion-duration) var(--snowui-frame-control-motion-easing);
     }
     :global(.snowui-otp-input :where(.snowui-otp-indicator[data-field-focus="true"])) { opacity: 1; }

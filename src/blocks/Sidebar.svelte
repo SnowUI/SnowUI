@@ -562,6 +562,7 @@
                 aria-label="SnowUI"
             >
                 <SnowUILogo
+                    scale={24 / 28}
                     {...parts?.SnowUILogo}
                     as="logo-icon"
                     variant="icon"
