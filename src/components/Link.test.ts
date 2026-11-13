@@ -17,7 +17,7 @@ export const examples = [
 <Link href="#" color="Indigo" hoverColor={false}>Unchanged</Link>
 <Link href="#" color="Black100" hoverColor="Orange">Explicit hover</Link>
 </div>`,
-        expected: { interaction: "默认 Black40 → Black100；Black100 → Black40；其他颜色 → Black100；显式 hoverColor 或 false 优先。" },
+        expected: { layout: "图标与文字从首屏起复用Frame singleLine，窄宽不拆行；嵌套说明段落保留自身排版。", interaction: "默认 Black40 → Black100；Black100 → Black40；其他颜色 → Black100；显式 hoverColor 或 false 优先。" },
     },
     {
         name: "L-01: 默认样式与 Figma 变体",

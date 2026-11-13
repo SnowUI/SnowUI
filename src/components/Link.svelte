@@ -10,6 +10,8 @@
 -->
 
 <script lang="ts">
+  // Shared capability: Frame.singleLine; contract: docs/standards/LayoutProtocol.md §4.6.
+
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
@@ -78,7 +80,6 @@
 
     let hostElement = $state<HTMLElement>();
     let contentElement = $state<HTMLElement>();
-    let hasCustomLeading = $state(false);
     let hasCustomTrailing = $state(false);
     const truncation = new TruncationController(
         undefined,
@@ -178,7 +179,6 @@
                         });
                 }
             }
-            hasCustomLeading = !!host.querySelector(':scope > [data-as="leading"]');
             hasCustomTrailing = !!host.querySelector(
                 ':scope > [data-as="trailing"]:not(.snowui-link-default-trailing)',
             );
@@ -218,7 +218,7 @@
     bind:element={hostElement}
     tag="a"
     row
-    singleLine={resolvedLines === 1 || variant !== "default" || hasCustomLeading || hasCustomTrailing}
+    singleLine
     {href}
     {target}
     {rel}

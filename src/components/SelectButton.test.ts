@@ -71,17 +71,18 @@ export const examples = [
         logic: ["Compact", "Pagination"],
     },
     {
-        name: "SB-06: 自定义 label",
+        name: "SB-06: 长触发器与选中项恢复",
         code: `SB-06
 <SelectButton
     defaultValue="updated"
-    options={[{ value: "updated", label: "最近更新" }]}
+    options={[{ value: "created", label: "创建时间" }, { value: "updated", label: "最近更新" }, { value: "name", label: "名称" }]}
 >
     {#snippet label({ option, placeholder })}
         {option ? \`排序：\${option.label}\` : placeholder}
     {/snippet}
 </SelectButton>`,
-        logic: ["LabelSnippet"],
+        expected: { layout: "面板不窄于按钮，水平居中；选中项中心对齐触发器，视口不足时避让。", interaction: "选择另一项再打开，恢复该项高亮与滚动定位；定制label不丢失value。" },
+        logic: ["LabelSnippet", "SelectionRestore"],
     },
     {
         name: "SB-07: Indicator 控制",

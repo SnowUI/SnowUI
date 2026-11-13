@@ -84,7 +84,7 @@ export const examples = [
     <Frame class="flex items-center gap-16"><Frame class="w-80 text-12 text-black-40">Button</Frame><Button loading skeleton>按钮</Button></Frame>
     <Frame class="flex items-center gap-16"><Frame class="w-80 text-12 text-black-40">Text</Frame><Text loading skeleton>文本</Text></Frame>
     <Frame class="flex items-center gap-16"><Frame class="w-80 text-12 text-black-40">FlowText</Frame><FlowText loading skeleton value={1280} /></Frame>
-    <Frame class="flex items-center gap-16"><Frame class="w-80 text-12 text-black-40">Icon</Frame><Icon loading skeleton size={24} /></Frame>
+    <Frame singleLine gap={4}><Frame class="w-80 text-12 text-black-40">Icon</Frame><Icon loading skeleton size={24} /></Frame>
     <Frame class="flex items-center gap-16"><Frame class="w-80 text-12 text-black-40">Avatar</Frame><Avatar loading skeleton aria-label="A" /></Frame>
     <Frame class="flex items-center gap-16"><Frame class="w-80 text-12 text-black-40">AvatarGroup</Frame><AvatarGroup loading skeleton size={16}><Avatar as="item" aria-label="A" /><Avatar as="item" aria-label="B" /></AvatarGroup></Frame>
     <Frame class="flex items-center gap-16"><Frame class="w-80 text-12 text-black-40">Badge</Frame><Badge loading skeleton count={8} /></Frame>

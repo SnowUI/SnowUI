@@ -3,12 +3,12 @@ export const examples = [
         name: "TTB-01: DataTable 工具栏",
         code: `TTB-01
 <DataTable rows={[]}>
-    <TableToolbar />
+    <TableToolbar searchPlaceholder="名称、邮箱或记录 ID" parts={{ SearchInput: { error: "" } }} />
     <Table />
 </DataTable>`,
         expected: {
             render: "DataTable 内渲染搜索、排序与筛选工具栏。",
-            layout: "工具栏占满DataTable宽度；搜索填充剩余空间，单独筛选以及排序加筛选都靠右，替换as=search时保持相同规则。",
+            layout: "工具栏及筛选/排序按钮显式使用Frame singleLine，SSR首屏到加载完成保持图文同排；工具栏占满DataTable宽度；搜索填充剩余空间，单独筛选以及排序加筛选都靠右，替换as=search时保持相同规则；内置搜索存在错误提示外层时也填满剩余空间，不按内容宽度裁切。",
             interaction: "读写 DataTable 的查询、排序、筛选和选择状态。",
             performance: "通过共享 Context 协调，不扫描 DOM。",
             responsive: "窄宽度保持单行并收缩搜索区域。",

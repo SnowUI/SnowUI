@@ -2,6 +2,8 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 数据表格工具栏：内置搜索、批量操作、排序与筛选。文档: ./TableToolbar.md -->
 <script lang="ts">
+  // Shared capability: Frame.singleLine; contract: docs/standards/LayoutProtocol.md §4.6.
+
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
@@ -145,6 +147,7 @@
         Button: {
             ...parts?.Button,
             emphasis: builtInBareEmphasis,
+            singleLine: true,
         },
     });
 
@@ -210,7 +213,7 @@
 <Frame bind:element={toolbarElement} tag="div" role="toolbar" aria-label={resolvedAriaLabel}
     class={`snowui-table-toolbar snowui-rounded-rectangle snowui-overlay-scrollbar-host snowui-overlay-scrollbar-viewport ${userClass}`} data-bulk-pending={pendingAction}
     data-horizontal-track-position="self" data-horizontal-overflow={toolbarScrollbar.hasOverflow ? "true" : undefined}
-    aria-busy={pendingAction !== undefined ? "true" : undefined} row gap={2}
+    aria-busy={pendingAction !== undefined ? "true" : undefined} singleLine gap={2}
     enableResponsive={enableResponsive} enableContext={enableContext}
     enableScaleObserver={enableScaleObserver} componentParts={parts} {...rest}>
     {#if search}
@@ -293,10 +296,11 @@
 </Frame>
 
 <style>
-    :global(:where(.snowui-table-toolbar)) { box-sizing:border-box; display:flex; flex-flow:row nowrap; align-items:center; width:100%; min-width:0; height:calc(var(--size-10,2.5rem) + var(--snowui-overlay-scrollbar-layout-space,0px)); position:relative; padding:var(--snowui-table-toolbar-padding-override,var(--padding-1,.25rem) var(--padding-3,.75rem)); overflow-x:auto; overflow-y:hidden; border:0; border-radius:var(--snowui-table-toolbar-radius-override,var(--radius-3,.75rem)); background:var(--snowui-table-toolbar-background-override,var(--black-4,#0000000a)); }
+    :global(:where(.snowui-table-toolbar)) { box-sizing:border-box; width:100%; min-width:0; height:calc(var(--size-10,2.5rem) + var(--snowui-overlay-scrollbar-layout-space,0px)); position:relative; padding:var(--snowui-table-toolbar-padding-override,var(--padding-1,.25rem) var(--padding-3,.75rem)); overflow-x:auto; overflow-y:hidden; border:0; border-radius:var(--snowui-table-toolbar-radius-override,var(--radius-3,.75rem)); background:var(--snowui-table-toolbar-background-override,var(--black-4,#0000000a)); }
     :global(:where(.snowui-table-toolbar > :not(.snowui-table-toolbar-scrollbar))) { margin-block-end:var(--snowui-overlay-scrollbar-layout-space,0px); }
     :global(:where(.snowui-table-toolbar-scrollbar)) { z-index:1; }
-    :global(.snowui-table-toolbar > [data-as="search"]) { order:0; flex:1 1 0; min-width:0; margin-inline-end:auto; }
+    :global(.snowui-table-toolbar > [data-as="search"]),
+    :global(.snowui-table-toolbar > .snowui-input-error-layout:has(> [data-as="search"])) { order:0; flex:1 1 0; min-width:0; margin-inline-end:auto; }
     :global(:where(.snowui-table-toolbar-bulk)) { order:1; display:inline-flex; align-items:center; gap:max(4px,var(--gap-2)); flex:0 0 auto; }
     :global(:where(.snowui-table-toolbar-resident-separator)) { order:2; }
     :global(:where(.snowui-table-toolbar-picker)), :global(:where(.snowui-table-toolbar)>:not(.snowui-table-toolbar-built-in):not([data-as="search"]):not([data-as="bulk"])) { order:3; flex:0 0 auto; }

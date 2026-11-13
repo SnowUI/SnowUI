@@ -246,13 +246,14 @@ export class FrameResponsive {
         ) {
             this.#restoreSpacing(node);
             const computed = getComputedStyle(node);
+            const lineGapFloor = px(computed.getPropertyValue("--snowui-single-line-gap-floor") || "4px");
             let gap = px(computed.columnGap === "normal" ? "0" : computed.columnGap);
-            if (isSingleLineLayout(this.#getProps()) && gap < 4) {
-                gap = 4;
-                node.style.setProperty("gap", "4px");
+            if (isSingleLineLayout(this.#getProps()) && gap < lineGapFloor) {
+                gap = lineGapFloor;
+                node.style.setProperty("gap", `${lineGapFloor}px`);
             }
             const gapFloor = isSingleLineLayout(this.#getProps())
-                ? Math.max(4, resolveFloor(gap, this.config?.minGap))
+                ? Math.max(lineGapFloor, resolveFloor(gap, this.config?.minGap))
                 : resolveFloor(gap, this.config?.minGap);
             node.style.setProperty("gap", `${gapFloor}px`);
             for (const side of ["top", "right", "bottom", "left"] as const) {
@@ -272,6 +273,7 @@ export class FrameResponsive {
         this.#applyFallbackAttributes(node);
 
         const computed = getComputedStyle(node);
+        const lineGapFloor = px(computed.getPropertyValue("--snowui-single-line-gap-floor") || "4px");
         const direction = computed.flexDirection;
         const isFlex =
             computed.display === "flex" || computed.display === "inline-flex";
@@ -279,9 +281,9 @@ export class FrameResponsive {
             isFlex && (direction === "row" || direction === "row-reverse");
         const children = Array.from(node.children).filter(isMeasurableChild);
         let gap = px(computed.columnGap === "normal" ? "0" : computed.columnGap);
-        if (isSingleLineLayout(this.#getProps()) && gap < 4) {
-            gap = 4;
-            node.style.setProperty("gap", "4px");
+        if (isSingleLineLayout(this.#getProps()) && gap < lineGapFloor) {
+            gap = lineGapFloor;
+            node.style.setProperty("gap", `${lineGapFloor}px`);
         }
         const padding = {
             top: px(computed.paddingTop),
@@ -307,7 +309,7 @@ export class FrameResponsive {
         if (preferredWidth <= width + EPSILON) return;
 
         const gapFloor = isSingleLineLayout(this.#getProps())
-            ? Math.max(4, resolveFloor(gap, this.config?.minGap))
+            ? Math.max(lineGapFloor, resolveFloor(gap, this.config?.minGap))
             : resolveFloor(gap, this.config?.minGap);
         const paddingFloor = {
             top: resolvePaddingFloor(

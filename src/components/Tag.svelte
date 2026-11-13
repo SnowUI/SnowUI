@@ -22,6 +22,8 @@
 -->
 
 <script lang="ts">
+  // Shared capability: Frame.singleLine; contract: docs/standards/LayoutProtocol.md §4.6.
+
     import { useLocale } from "../i18n/locale.svelte";
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
@@ -247,6 +249,7 @@
 
 <Frame
     bind:element={hostElement}
+    singleLine
     enableResponsive={false}
     enableContext={true}
     enableScaleObserver={false}

@@ -23,14 +23,14 @@ export const examples = [
         <Icon as="leading" size={24} icon={Resource.Check} />
         <span>All components and blocks for your next project</span>
     </Frame>
-    <Frame row firstLine class="text-18 gap-8" style="width: 18rem;">
+    <Frame singleLine class="text-18 gap-8" style="width: 18rem;">
         <Icon as="leading" size={24} icon={Resource.Check} />
-        <span>1 developer seat</span>
+        <Text lines={1}>1 developer seat</Text>
         <Badge as="pin-top-right">New</Badge>
     </Frame>
 </Frame>`,
         expected: {
-            render: "单行与多行使用同一首行居中方式，附件保持原尺寸。",
+            render: "单行名称采用 singleLine，多行正文保留 firstLine，附件保持原尺寸。",
             layout: "三槽列与首行行框复用共享布局，Pin 脱离文档流。",
             interaction: "无新增交互或尺寸观察器。",
             responsive: "宽度变化只使正文换行，附件仍与首行居中。",

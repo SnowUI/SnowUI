@@ -82,7 +82,7 @@
         /** selected：选中项与 trigger 居中；bottom：从 trigger 下方展开。 */
         placementMode?: "selected" | "bottom";
         /** 浮层相对锚点的水平对齐方式。 */
-        align?: "start" | "end";
+        align?: "start" | "center" | "end";
         /** 是否为选中项预留并显示勾选图标。 */
         showCheck?: boolean;
         /** 选项间是否使用容器级连续 hover 背景。 */
@@ -298,7 +298,9 @@
         const resolvedWidth = matchTriggerWidth
             ? listboxEl.getBoundingClientRect().width
             : listboxEl.offsetWidth;
-        const idealLeft = align === "end" ? anchorRight - resolvedWidth : anchorLeft;
+        const idealLeft = align === "center"
+            ? anchorRect.left + (anchorRect.width - resolvedWidth) / 2
+            : align === "end" ? anchorRight - resolvedWidth : anchorLeft;
         listboxLeft = clampFloatingPosition(
             { left: idealLeft, top: 0 },
             { width: resolvedWidth, height: 0 },

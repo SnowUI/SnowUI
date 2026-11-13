@@ -37,7 +37,7 @@ export const examples = [
     <Button variant="filled" skeleton={false}>Continue</Button>
     <Button variant="filled" loading skeleton={false}>Continue</Button>
 </div>`,
-    expected: { render: "提交状态内置 Spinner，保留标签占位与按钮尺寸、颜色；loading 自动禁用，普通状态可点击。" },
+    expected: { layout: "图标与文字从首屏起复用Frame singleLine，窄宽不拆行；嵌套说明段落保留自身排版。", render: "提交状态内置 Spinner，保留标签占位与按钮尺寸、颜色；loading 自动禁用，普通状态可点击。" },
     logic: ["Loading"],
   },
 

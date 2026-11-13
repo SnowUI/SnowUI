@@ -132,10 +132,9 @@
             disabled={disabled}
             hoverColor={false}
             style="--snowui-link-color: inherit; --snowui-link-gap-override: var(--snowui-sidebar-item-gap-override, var(--gap-2));"
-            row
+            singleLine
             enableAutoLayout={true}
             contentFill
-            wrap={false}
             class="snowui-sidebar-item-main"
             aria-label={collapsed ? label : undefined}
             aria-current={active ? "page" : undefined}
@@ -149,10 +148,9 @@
             scaleOnHover={false}
             size="sm"
             disabled={disabled}
-            row
+            singleLine
             enableAutoLayout={true}
             contentFill
-            wrap={false}
             class="snowui-sidebar-item-main"
             aria-label={collapsed ? label : undefined}
             aria-current={active ? "page" : undefined}
@@ -213,8 +211,6 @@
         min-width: 0;
         min-height: var(--size-9);
         box-sizing: border-box;
-        flex-wrap: nowrap;
-        align-items: center;
         justify-content: flex-start;
         gap: max(4px, var(--snowui-sidebar-item-gap-override, var(--gap-2)));
         padding: var(--snowui-sidebar-item-padding-y-override, var(--padding-2))

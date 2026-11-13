@@ -127,7 +127,7 @@
     :global(:where(.snowui-chip)) {
         --snowui-chip-font-size: var(--text-12);
         --snowui-chip-line-height: var(--leading-12);
-        --snowui-chip-gap: var(--gap-1);
+        --snowui-chip-gap: 0px;
         --snowui-chip-icon-size: calc(var(--size-4) * 3 / 4); /* 12px */
         --snowui-chip-padding: 0;
         --snowui-chip-radius: 0;
@@ -152,7 +152,8 @@
             --snowui-chip-line-height-override,
             var(--snowui-chip-line-height)
         );
-        gap: max(4px, var(--snowui-chip-gap-override, var(--snowui-chip-gap)));
+        /* Shared capability: singleLine; LayoutProtocol §4.6 registers Chip as a zero-gap exception. */
+        gap: var(--snowui-chip-gap-override, var(--snowui-chip-gap));
         padding: var(
             --snowui-chip-padding-override,
             var(--snowui-chip-padding)

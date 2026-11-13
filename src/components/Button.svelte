@@ -19,6 +19,8 @@
  -->
 
 <script lang="ts">
+  // Shared capability: Frame.singleLine; contract: docs/standards/LayoutProtocol.md §4.6.
+
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
   import { onDestroy, setContext, type Snippet } from "svelte";
   import { OPTIONAL_RESOURCE_ICON_CONTEXT_KEY } from "../logic/component-icon";
@@ -165,7 +167,7 @@
   const hasContentMotion = $derived(
     hasDefaultBackgroundMotion && (contentScaleOnHover ?? resolvedScaleOnHover),
   );
-  let contentElement = $state<HTMLSpanElement | undefined>();
+  let contentElement = $state<HTMLElement | undefined>();
   let clickMotion = $state<{ phase: "a" | "b"; from: string; contentFrom: string } | undefined>();
   let lastClickPhase: "a" | "b" = "b";
 
@@ -653,15 +655,11 @@
   });
 </script>
 
-{#snippet buttonChildren()}
-  <span bind:this={contentElement} class="snowui-button-content" data-tooltip-anchor-decoration>
-    {@render children?.()}
-  </span>
-  {#if spinnerLoading}<span class="snowui-button-spinner" aria-hidden="true"><Spinner size={16} loading={false} skeleton={false} /></span>{/if}
-{/snippet}
+
 
 <Frame
   bind:element={buttonElement}
+  singleLine
   enableResponsive={false}
   enableContext={true}
   enableScaleObserver={false}
@@ -724,6 +722,13 @@
   {...frameRestProps}
   children={normalizeFrameSnippet(buttonChildren)}
 />
+
+{#snippet buttonChildren()}
+  <Frame tag="span" bind:element={contentElement} singleLine enableAutoLayout={rest.enableAutoLayout !== false} enableResponsive={false} enableContext={false} enableScaleObserver={false} enableDefaultMotion={false} class="snowui-button-content" data-tooltip-anchor-decoration>
+    {@render children?.()}
+  </Frame>
+  {#if spinnerLoading}<span class="snowui-button-spinner" aria-hidden="true"><Spinner size={16} loading={false} skeleton={false} /></span>{/if}
+{/snippet}
 
 <style>
   :global(:where(.snowui-button[data-loading-spinner="true"]) > .snowui-button-content) { opacity: 0; }

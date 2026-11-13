@@ -36,7 +36,7 @@ export const examples = [
     </div>
 </div>`,
         expected: {
-            layout: "closable Tag 非 hover 时隐藏 X 不占位，与同内容非 closable Tag 等宽",
+            layout: "图标与文字从首屏起复用Frame singleLine，窄宽不拆行；嵌套说明段落保留自身排版。closable Tag 非 hover 时隐藏 X 不占位，与同内容非 closable Tag 等宽",
             interaction: "hover 时 X 展开为 12px，移出后完全收起",
         },
         logic: ["EdgePadding", "HiddenCloseNoLayoutSpace", "CloseHoverExpansion"],

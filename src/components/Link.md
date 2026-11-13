@@ -5,6 +5,8 @@
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-22
 
+链接根默认复用 Frame `singleLine`；leading、文字与trailing始终同行，不再等待挂载后发现图标才启用。
+
 ## 组件介绍
 
 在正文、说明和导航中提供清晰的文字链接，支持箭头等视觉形式，表达可继续访问的内容。
@@ -106,7 +108,7 @@ Link 复用 通用 `TruncationController` 与 `fitTextToElement()`，不自行�
 
 主布局模型：**槽位宿主布局**（三槽位：leading / content / trailing）。
 
-通过 `<Frame row>` 输出 `data-auto-layout`，复用 [`auto-layout.css`](../styles/auto-layout.css) 的三槽位布局。默认文字作为 Content；`external` 变体的内置 `ArrowSquareOut` 作为 trailing。Snippet 中的外置直系 `as="leading"` / `as="trailing"` 会投影回 Link 根层，保持 Frame 对直系槽位的 Grid 落列、水平居中与统一 gap 规则。Link 根通过 `[data-auto-layout]` 组件级确权，将公共槽位 gap 保持为至少4 CSS px，默认首选 `var(--gap-1)`；含附件或单行截断时复用Frame singleLine，纯文字且未启用截断时保留原文字流。长标签显式使用 `lines={1}`，复用Link已有截断／全文提示。外置 Icon 保留自身尺寸，未传 `size` 时使用 Icon 默认的 16px。
+通过 `<Frame singleLine>` 输出 `data-auto-layout`，复用 [`auto-layout.css`](../styles/auto-layout.css) 的三槽位布局。默认文字作为 Content；`external` 变体的内置 `ArrowSquareOut` 作为 trailing。Snippet 中的外置直系 `as="leading"` / `as="trailing"` 会投影回 Link 根层，保持 Frame 对直系槽位的 Grid 落列、水平居中与统一 gap 规则。Link 根通过 `[data-auto-layout]` 组件级确权，将公共槽位 gap 保持为至少4 CSS px，默认首选 `var(--gap-1)`；链接默认复用Frame singleLine；需要多行正文时显式关闭singleLine并使用既有文字流能力。长标签显式使用 `lines={1}`，复用Link已有截断／全文提示。外置 Icon 保留自身尺寸，未传 `size` 时使用 Icon 默认的 16px。
 
 ### 内置图标与替换
 

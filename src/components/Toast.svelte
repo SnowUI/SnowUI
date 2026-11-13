@@ -174,9 +174,11 @@
         aria-hidden="true">&#8203;</span
     >
 {:else if mode === "panel"}
+    <!-- Shared capability: Frame.singleLine; contract: docs/standards/LayoutProtocol.md §4.6. Rich notifications retain a multiline body. -->
     <Frame
         bind:element={toastElement}
-        row
+        singleLine={!isRich}
+        row={isRich}
         whileAppear={GENERIC_SCALE_APPEAR_MOTION}
         id={id}
         data-variant={variant}

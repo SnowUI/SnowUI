@@ -52,7 +52,7 @@
 | scrollbar | `boolean` | `true` | 溢出时显示浮层滚动条；false 仅隐藏轨道，仍可通过滚轮和键盘滚动。 |
 | matchTriggerWidth | `boolean` | `true` | true 时以锚点实测宽度加固定 2px 为宽度基准，左右各覆盖 1px，内容需要更宽时允许扩展；false 时按选项内容 Hug，不添加补偿，仍受 minWidth 与视口约束。 |
 | placementMode | `"selected" \| "bottom"` | `"selected"` | selected 将选中项中心对齐触发器；bottom 从触发器下方展开。最终定位与高度受可用视口约束。 |
-| align | `"start" \| "end"` | `"start"` | 面板相对锚点左边缘或右边缘对齐；Hug 面板与锚点宽度不同时差异明显，最终位置受视口约束。 |
+| align | `"start" \| "center" \| "end"` | `"start"` | 面板相对锚点左边缘、水平中心或右边缘对齐；Hug 面板与锚点宽度不同时差异明显，最终位置受视口约束。 |
 | showCheck | `boolean` | `false` | 为选中项预留并显示 trailing 勾选；Select 默认提供 true。显式 MenuItem 可用自身 showCheck 覆盖，自定义 trailing 替换默认勾选。 |
 | continuousHover | `boolean` | `true` | 在直接 MenuItem 之间移动同一个高亮背景，键盘 active 共用该背景；false 恢复逐项即时背景，禁用和过滤项不作为目标。 |
 

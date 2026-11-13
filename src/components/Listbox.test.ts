@@ -13,7 +13,7 @@ export const examples = [
         name: "LB-01：嵌套在 Select 内（基础渲染）",
         code: `LB-01
 <Select placeholder="请选择城市" style="width: 20rem;">
-    <Listbox>
+    <Listbox align="center">
         <MenuItem as="item" value="shanghai">Shanghai</MenuItem>
         <MenuItem as="item" value="hangzhou">Hangzhou</MenuItem>
         <MenuItem as="item" value="shenzhen">Shenzhen</MenuItem>
@@ -21,7 +21,7 @@ export const examples = [
 </Select>`,
         expected: {
             render: "点击 Select 后，Listbox 浮层出现，带 Quick Action 背景色、毛玻璃模糊、圆角和阴影",
-            layout: "浮层宽度与 Select 等宽，选中项中心对齐 Trigger",
+            layout: "浮层至少与 Select 等宽，水平中心对齐锚点，选中项中心对齐 Trigger",
             interaction: "点击选项后浮层收起，Select 显示选中项文本",
         },
         logic: ["Basic", "Portal"],

@@ -13,5 +13,5 @@ export function contentLineGap(value: number | string | undefined, singleLine = 
     const preferred = value === 0 || value === "0" ? "0px" : typeof value === "number"
         ? `var(--gap-${value}, calc(4px * ${value} * var(--gap-scale, 1)))`
         : String(value);
-    return singleLine ? `max(4px, ${preferred})` : preferred;
+    return singleLine ? `max(var(--snowui-single-line-gap-floor, 4px), ${preferred})` : preferred;
 }

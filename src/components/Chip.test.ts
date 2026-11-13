@@ -6,13 +6,13 @@
  */
 export const examples = [
     {
-        name: "C3: 单行图文最小间距",
+        name: "C3: 单行图文零间距例外",
         code: `C3
 <Frame column style="width: 140px;">
     <Chip><Text lines={1}>Classification label 分类名称</Text></Chip>
     <Chip variant="background" showDot><Text lines={1}>Status label 状态名称</Text></Chip>
 </Frame>`,
-        expected: { layout: "Dot与文字至少4px；缩小根字号也不贴合；附件不压缩。" },
+        expected: { layout: "Dot与文字默认间距0px；各尺寸与背景变体保持singleLine不换行，附件不压缩。" },
     },
     // === A: 基础形态（尺寸全覆盖） ===
     {

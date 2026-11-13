@@ -13,15 +13,15 @@ export const examples = [
         name: "TS-01：默认形态（default + 全部尺寸 + positive 判定）",
         code: `TS-01
 <Frame class="flex-col gap-8 items-start">
-    <Toast positive singleLine><Text lines={1}>Done</Text></Toast>
-    <Toast positive={false} singleLine><Text lines={1}>Something Wrong</Text></Toast>
-    <Toast size="sm" positive singleLine><Text lines={1}>Done</Text></Toast>
-    <Toast size="sm" positive={false} singleLine><Text lines={1}>Something Wrong</Text></Toast>
-    <Toast singleLine><Text lines={1}>No Icon</Text></Toast>
+    <Toast positive><Text lines={1}>Done</Text></Toast>
+    <Toast positive={false}><Text lines={1}>Something Wrong</Text></Toast>
+    <Toast size="sm" positive><Text lines={1}>Done</Text></Toast>
+    <Toast size="sm" positive={false}><Text lines={1}>Something Wrong</Text></Toast>
+    <Toast><Text lines={1}>No Icon</Text></Toast>
 </Frame>`,
         expected: {
             render: "深色玻璃 pill；md 档字号 14、内置图标 20px；sm 档字号 12、内置图标 16px；positive=true → 绿色 CheckCircle，positive=false → 黄色 Warning；未传 positive 不渲染内置图标",
-            layout: "三槽位 row；Leading 内置图标(可选) + Content 文字",
+            layout: "图标与文字从首屏起复用Frame singleLine，窄宽不拆行；嵌套说明段落保留自身排版。三槽位 row；Leading 内置图标(可选) + Content 文字",
         },
         logic: ["Default", "Size", "Positive"],
     },
@@ -44,7 +44,7 @@ export const examples = [
     {
         name: "TS-03：rich 变体 + Trailing Button",
         code: `TS-03
-<Toast variant="rich" positive singleLine style="width: 15rem;">
+<Toast variant="rich" positive style="width: 15rem;">
     <Text lines={1}>Text</Text>
     <Button as="trailing" variant="gray">Button</Button>
 </Toast>`,
@@ -57,7 +57,7 @@ export const examples = [
     {
         name: "TS-04：外置 Icon 替换内置图标（as 示例）",
         code: `TS-04
-<Toast positive singleLine>
+<Toast positive>
     <Icon as="leading"><Heart /></Icon>
     <Text lines={1}>收藏成功</Text>
 </Toast>`,

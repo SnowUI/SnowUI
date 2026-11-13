@@ -112,7 +112,8 @@
         ...parts,
         Listbox: {
             search,
-            matchTriggerWidth: false,
+            matchTriggerWidth: true,
+            align: "center",
             showCheck: false,
             placementMode: selectionMode === "action" ? "bottom" : "selected",
             ...parts?.Listbox,

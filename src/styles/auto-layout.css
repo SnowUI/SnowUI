@@ -276,10 +276,15 @@
 }
 /* 显式单行组合与已有三槽／Text共用，不创建第二套文本截断或附件识别。 */
 :where([data-single-line="true"]) {
+    --snowui-single-line-gap-floor: 4px;
     flex-wrap: nowrap;
     white-space: nowrap;
     align-items: center;
-    column-gap: max(4px, var(--gap-2));
+    column-gap: max(var(--snowui-single-line-gap-floor), var(--gap-2));
+}
+/* LayoutProtocol §4.6: Chip and Tag retain their registered zero-gap exception. */
+:where([data-single-line="true"].snowui-chip, [data-single-line="true"].snowui-tag) {
+    --snowui-single-line-gap-floor: 0px;
 }
 :where([data-single-line="true"] > :not([data-as])) {
     flex: 0 1 auto;

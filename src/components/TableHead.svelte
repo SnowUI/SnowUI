@@ -2,6 +2,8 @@
 复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 可排序、可调整列宽的表头单元格。文档: ./TableHead.md -->
 <script lang="ts">
+  // Shared capability: Frame.singleLine; contract: docs/standards/LayoutProtocol.md §4.6.
+
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
      import { onDestroy, untrack, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
@@ -194,14 +196,14 @@
             <ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>
         </span>{/if}
     {:else if isSortable}
-        <button class="snowui-table-sort" type="button" data-active={isSortActive ? "true" : undefined} onclick={toggleSort}>
+        <Frame tag="button" singleLine enableResponsive={false} enableContext={false} enableScaleObserver={false} enableDefaultMotion={false} class="snowui-table-sort" type="button" data-active={isSortActive ? "true" : undefined} onclick={toggleSort}>
             <span class="snowui-table-head-content">{#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}</span>
             {#if isSortActive && direction === "ascending"}
                 <ComponentIcon name="arrows-up" class="snowui-table-sort-icon" size="var(--size-4)" aria-hidden="true" />
             {:else if isSortActive && direction === "descending"}
                 <ComponentIcon name="arrows-down" class="snowui-table-sort-icon" size="var(--size-4)" aria-hidden="true" />
             {/if}
-        </button>
+        </Frame>
     {:else}
         <span class="snowui-table-head-content snowui-table-head-content-static">{#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}</span>
     {/if}

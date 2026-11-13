@@ -73,6 +73,8 @@
 主布局模型：**槽位宿主布局**（三槽位：leading / content / trailing）。
 通过 `<Frame singleLine>` 输出 `data-auto-layout`，复用 [`auto-layout.css`](../styles/auto-layout.css) 的三槽位 grid 模板，子元素以 `data-as="leading" | "trailing"` 声明角色。
 
+Owner 2026-11-13：Chip内部图标（含内置Dot、外置leading/trailing）与文字默认间距为0px，登记为[LayoutProtocol §4.6](../../../docs/standards/LayoutProtocol.md#46-单行内容组合)的最小间距例外；继续复用singleLine，不允许拆行。例外不适用于Chip与外部文字、图标或其他Chip之间的间距。
+
 ### 默认 Leading 图标 (Built-in)
 
 `default` 默认带前置 Dot，`background` 默认不显示；可通过 `showDot` 显式控制：
@@ -122,7 +124,7 @@
 | :--- | :--- | :--- |
 | `--snowui-chip-font-size` | `var(--text-12)`（lg：`var(--text-14)`) | 文字字号 |
 | `--snowui-chip-line-height` | `var(--leading-12)`（lg：`var(--leading-14)`) | 文字行高 |
-| `--snowui-chip-gap` | `var(--gap-1)` | 单行图文间距；实际至少4 CSS px，保留更大首选间距。Tag内部例外不适用于Chip。 |
+| `--snowui-chip-gap` | `0px` | 内部图标／Dot与文字的默认间距为0；这是单行组合最小4px规则的明确例外，保留公开override。 |
 | `--snowui-chip-icon-size` | `12px`（sm）/ `16px`（lg） | 默认 Dot 尺寸 |
 | `--snowui-chip-padding` | `0`（default）/ `2px 8px`（sm+bg）/ `4px 12px`（lg+bg） | 内边距 |
 | `--snowui-chip-radius` | `0`（default）/ `9999px`（background） | 圆角 |
@@ -186,7 +188,7 @@
 | Color | `inherit`（继承父容器） |
 | Font Size | `var(--text-12)` |
 | Line Height | `var(--leading-12)` |
-| Gap | `max(4px, var(--snowui-chip-gap))` |
+| Gap | `var(--snowui-chip-gap-override, var(--snowui-chip-gap))`，默认0px |
 | Padding | `0` |
 | Background | `transparent` |
 | Border | `none` |
@@ -232,6 +234,9 @@
 ---
 
 ## 更新日志
+
+### 2026-11-13
+- 按Owner要求将内部图文默认间距改为0px，替代此前4px下限；保留singleLine与公开间距覆盖入口。
 
 ### v1.2.0 (2026-10-22)
 - 内部复用 Frame 单行预设，Dot／附件与文字保持至少4 CSS px间距；仅Tag内部继续原例外。颜色、图标替换和尺寸档位保持。
