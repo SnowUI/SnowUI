@@ -247,8 +247,8 @@
         opacity: var(--snowui-sidebar-item-content-opacity);
         visibility: visible;
         transition:
-            opacity var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out),
+            opacity var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s))
+                var(--snowui-sidebar-content-fade-easing, var(--snowui-frame-color-motion-easing, ease-out)),
             visibility 0s linear;
     }
     :global(:where(.snowui-sidebar-item-label)) {
@@ -292,10 +292,10 @@
         visibility: hidden;
         pointer-events: none;
         transition:
-            opacity var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out),
+            opacity var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s))
+                var(--snowui-sidebar-content-fade-easing, var(--snowui-frame-color-motion-easing, ease-out)),
             visibility 0s linear
-                var(--snowui-frame-color-motion-duration, 0.15s);
+                var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s));
     }
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-main)) {
         justify-content: flex-start;

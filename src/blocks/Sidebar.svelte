@@ -237,6 +237,9 @@
             `--snowui-sidebar-header-measured-height: ${measuredHeaderHeight}px`,
             `--snowui-sidebar-width-motion-duration: ${enableDefaultMotion ? widthMotionTiming.duration : 0}ms`,
             `--snowui-sidebar-width-motion-easing: ${widthMotionTiming.easing}`,
+            // Resolve the shared fade clock on the Sidebar, before child Frame overrides.
+            `--snowui-sidebar-content-fade-duration: ${enableDefaultMotion ? "var(--snowui-frame-color-motion-duration, 0.15s)" : "0s"}`,
+            `--snowui-sidebar-content-fade-easing: var(--snowui-frame-color-motion-easing, ease-out)`,
             userStyle,
         ].filter(Boolean).join("; "),
     );
@@ -818,8 +821,8 @@
     :global(:where(.snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))) {
         opacity: 1;
         transition: opacity
-            var(--snowui-sidebar-width-motion-duration, 500ms)
-            var(--snowui-sidebar-width-motion-easing, ease-out);
+            var(--snowui-sidebar-content-fade-duration, 0.15s)
+            var(--snowui-sidebar-content-fade-easing, ease-out);
     }
     /* Collapsed logo and navigation items share the center of the same content width. */
     :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="icon"] .snowui-sidebar-header > [data-as="logo"])) {
@@ -900,7 +903,10 @@
     :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-body)) {
         display: none;
     }
-    :global(:where(.snowui-sidebar-body > .snowui-scroll-area-scrollbar[data-axis="vertical"])) {
+    /* Keep the track outside fixed regions, regardless of ScrollArea style injection order. */
+    :global(.snowui-sidebar-body > :where(.snowui-scroll-area-scrollbar[data-axis="vertical"])) {
+        top: calc(var(--snowui-sidebar-header-region-height) + var(--snowui-scrollbar-edge-gap));
+        bottom: var(--snowui-scrollbar-edge-gap);
         right: calc(
             var(--snowui-scrollbar-edge-gap) -
                 var(
@@ -908,6 +914,9 @@
                     var(--snowui-sidebar-padding-x)
                 )
         );
+    }
+    :global(.snowui-sidebar[data-has-footer="true"]:not([data-collapsed="true"]) .snowui-sidebar-body > :where(.snowui-scroll-area-scrollbar[data-axis="vertical"])) {
+        bottom: calc(var(--snowui-sidebar-footer-measured-height, 0px) + var(--snowui-scrollbar-edge-gap));
     }
     :global(:where(.snowui-sidebar-navigation)) {
         padding-top: var(--snowui-sidebar-header-region-height);
@@ -1021,6 +1030,12 @@
         pointer-events: none;
     }
     @media (prefers-reduced-motion: reduce) {
+        :global(.snowui-sidebar) {
+            --snowui-sidebar-content-fade-duration: 0s !important;
+        }
+        :global(.snowui-sidebar .snowui-sidebar-section),
+        :global(.snowui-sidebar .snowui-sidebar-section-header),
+        :global(.snowui-sidebar .snowui-sidebar-item-content),
         :global(:where(.snowui-sidebar)),
         :global(:where(.snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))),
         :global(:where(.snowui-sidebar-footer)) {

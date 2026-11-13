@@ -165,8 +165,8 @@
         opacity: 1;
         visibility: visible;
         transition:
-            opacity var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out),
+            opacity var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s))
+                var(--snowui-sidebar-content-fade-easing, var(--snowui-frame-color-motion-easing, ease-out)),
             max-height var(--snowui-frame-size-motion-duration, 0.25s)
                 var(--snowui-frame-size-motion-easing, ease-out),
             min-height var(--snowui-frame-size-motion-duration, 0.25s)
@@ -232,7 +232,7 @@
     }
     :global(:where(.snowui-sidebar-section[data-sidebar-collapsed="true"])) {
         gap: 0;
-        transition-delay: var(--snowui-frame-color-motion-duration, 0.15s);
+        transition-delay: var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s));
     }
     :global(:where(.snowui-sidebar-section[data-sidebar-collapsed="true"] .snowui-sidebar-section-header)) {
         max-height: 0;
@@ -243,18 +243,18 @@
         visibility: hidden;
         pointer-events: none;
         transition:
-            opacity var(--snowui-frame-color-motion-duration, 0.15s)
-                var(--snowui-frame-color-motion-easing, ease-out),
+            opacity var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s))
+                var(--snowui-sidebar-content-fade-easing, var(--snowui-frame-color-motion-easing, ease-out)),
             max-height var(--snowui-frame-size-motion-duration, 0.25s)
                 var(--snowui-frame-size-motion-easing, ease-out)
-                var(--snowui-frame-color-motion-duration, 0.15s),
+                var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s)),
             min-height var(--snowui-frame-size-motion-duration, 0.25s)
                 var(--snowui-frame-size-motion-easing, ease-out)
-                var(--snowui-frame-color-motion-duration, 0.15s),
+                var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s)),
             padding-block var(--snowui-frame-size-motion-duration, 0.25s)
                 var(--snowui-frame-size-motion-easing, ease-out)
-                var(--snowui-frame-color-motion-duration, 0.15s),
+                var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s)),
             visibility 0s linear
-                var(--snowui-frame-color-motion-duration, 0.15s);
+                var(--snowui-sidebar-content-fade-duration, var(--snowui-frame-color-motion-duration, 0.15s));
     }
 </style>
