@@ -1,9 +1,9 @@
 export const examples = [
     {
-        name: "SB-01：默认数据模式与固定三区",
+        name: "SB-01：compact数据模式与固定三区",
         code: `SB-01
 <Frame style="width: 220px; height: 28rem; align-items: flex-start;">
-    <Sidebar
+    <Sidebar collapseMode="compact"
         activeItemId="dashboard"
         sections={[
             { id: "quick", items: [
@@ -35,7 +35,7 @@ export const examples = [
         name: "SB-02：显式组合与 Logo 替换",
         code: `SB-02
 <Frame style="width: 220px; height: 28rem; align-items: flex-start;">
-    <Sidebar activeItemId="dashboard">
+    <Sidebar collapseMode="compact" activeItemId="dashboard">
         <Frame as="logo" singleLine gap={2}>
             <SnowUILogo as="logo-icon" variant="icon" />
             <Text lines={1}>Workshop</Text>
@@ -66,7 +66,7 @@ export const examples = [
         name: "SB-03：60px 折叠态与折叠 Footer",
         code: `SB-03
 <Frame style="width: 220px; height: 28rem; align-items: flex-start;">
-    <Sidebar defaultCollapsed activeItemId="saved">
+    <Sidebar collapseMode="compact" defaultCollapsed activeItemId="saved">
         <SidebarItem id="saved" label="Saved" icon="bookmark" updated />
         <SidebarItem id="hot" label="Hot" icon="fire" />
         <Avatar as="footer" aria-label="Current user" />
@@ -85,7 +85,7 @@ export const examples = [
         name: "SB-04：长列表滚动与固定 Footer",
         code: `SB-04
 <Frame style="width: 220px; height: 28rem; align-items: flex-start;">
-    <Sidebar activeItemId="dashboard">
+    <Sidebar collapseMode="compact" activeItemId="dashboard">
         <SidebarItem id="saved" label="Saved" icon="bookmark" updated />
         <SidebarItem id="dashboard" label="Dashboard" icon="gauge" />
         <SidebarItem id="messages" label="Messages" icon="chat" />
@@ -121,7 +121,7 @@ export const examples = [
         name: "SB-05：无 Icon 导航变体",
         code: `SB-05
 <Frame style="width: 220px; height: 28rem; align-items: flex-start;">
-    <Sidebar navigationVariant="text" defaultCollapsed activeItemId="overview">
+    <Sidebar collapseMode="compact" navigationVariant="text" defaultCollapsed activeItemId="overview">
         <SidebarSection id="workspace" title="Workspace">
             <SidebarItem id="overview" label="Overview" />
             <SidebarItem id="projects" label="Projects" />
@@ -142,13 +142,13 @@ export const examples = [
         name: "SB-06：连续 Hover 与关闭开关",
         code: `SB-06
 <Frame style="width: 220px; height: 20rem;">
-    <Sidebar activeItemId="overview">
+    <Sidebar collapseMode="compact" activeItemId="overview">
         <SidebarItem id="overview" label="Overview" />
         <SidebarItem id="projects" label="Projects" />
         <SidebarItem id="settings" label="Settings" />
     </Sidebar>
 </Frame>
-<Sidebar continuousHover={false}>
+<Sidebar collapseMode="compact" continuousHover={false}>
     <SidebarItem id="fallback" label="Fallback" />
 </Sidebar>`,
         expected: {
@@ -164,7 +164,7 @@ export const examples = [
         name: "SB-07：状态记忆与 active 定位",
         code: `SB-07
 <Frame style="width: 220px; height: 20rem;">
-    <Sidebar>
+    <Sidebar collapseMode="compact">
         <SidebarSection id="top" title="Top">
             <SidebarItem id="overview" label="Overview" />
             <SidebarItem id="projects" label="Projects" />
@@ -198,7 +198,7 @@ export const examples = [
         code: `SB-08
 {#snippet statusTag()}<Tag>New</Tag>{/snippet}
 <Frame style="width: 220px; height: 20rem;">
-    <Sidebar
+    <Sidebar collapseMode="compact"
         resizable={false}
         persistence={false}
         sections={[
@@ -220,8 +220,8 @@ export const examples = [
     {
         name: "导航多语言：默认简中与英文",
         code: `<Frame row gap={16} style="height: 320px;">
-<Sidebar persistence={false} resizable={false}><SidebarItem id="default" label="业务名称" icon="gauge" updated /></Sidebar>
-<LocaleProvider locale="en-US"><Sidebar persistence={false} resizable={false}><SidebarItem id="english" label="Business label" icon="gauge" updated /></Sidebar></LocaleProvider>
+<Sidebar collapseMode="compact" persistence={false} resizable={false}><SidebarItem id="default" label="业务名称" icon="gauge" updated /></Sidebar>
+<LocaleProvider locale="en-US"><Sidebar collapseMode="compact" persistence={false} resizable={false}><SidebarItem id="english" label="Business label" icon="gauge" updated /></Sidebar></LocaleProvider>
 </Frame>`,
         expected: {
             accessibility: "默认主导航／收起侧边栏／已更新，英文Primary navigation／Collapse sidebar／Updated；业务label不翻译，折叠状态与名称同步",
@@ -230,10 +230,10 @@ export const examples = [
         logic: ["Sidebar.Locale"],
     },
     {
-        name: "SB-09：完全隐藏与窄屏抽屉",
+        name: "SB-09：默认完全隐藏与窄屏抽屉",
         code: `SB-09
 <Frame row gap={0} style="width: 100%; height: 28rem; align-items: stretch;">
-    <Sidebar collapseMode="hidden" persistence={false} resizable={false}
+    <Sidebar persistence={false} resizable={false}
         style="background: var(--background-1);"
         sections={[{ id: "pages", title: "Pages", items: [
             { id: "home", label: "Home", icon: "house" },
@@ -244,7 +244,7 @@ export const examples = [
     <Frame column fill padding={16}><Text>Collapse the sidebar to hide the entire panel.</Text></Frame>
 </Frame>`,
         expected: {
-            render: "默认模式仍为compact；hidden模式保持完整导航布局，不生成图标栏。",
+            render: "不传collapseMode时默认hidden；保持完整导航布局，不生成图标栏。",
             interaction: "点击收起后整栏向左退出且释放占位，仅保留固定展开按钮；再次展开恢复；键盘焦点随按钮交接，隐藏导航不可聚焦。",
             responsive: "800px及以下整栏默认隐藏，展开为浮层；遮罩及Escape关闭；切回宽屏恢复桌面状态，不改写折叠记忆。",
             performance: "收起复用SidePanel退出时长与spring曲线，展开保留220ms ease；内部文字、Item和Footer不执行compact折叠序列；减少动效直接切换。",

@@ -57,7 +57,7 @@
 | --- | --- | --- | --- |
 | sections | `SidebarSectionData[]` | `[]` | 分类数组，每项必填唯一 id，可选 title、collapsible、defaultCollapsed、actions、items、content；content 优先于 items。items 使用 SidebarItemData 的 id、label、icon、href 等字段。 |
 | navigationVariant | `"icon" \| "text"` | `"icon"` | 导航结构变体；`text` 表示无图标导航，折叠后根宽度与 padding 为零，只保留位于当前页面可视区域左上方的展开按钮；不自动扫描内容推断图标 |
-| collapseMode | `"compact" \| "hidden"` | `"compact"` | compact保留原折叠轨道；hidden整体滑出并保留浮动展开按钮，内部导航不压缩。 |
+| collapseMode | `"compact" \| "hidden"` | `"hidden"` | compact保留原折叠轨道；hidden整体滑出并保留浮动展开按钮，内部导航不压缩。 |
 | collapsed | `boolean` | — | 受控折叠状态，支持 bind:collapsed；未传时从 defaultCollapsed 初始化内部状态。 |
 | defaultCollapsed | `boolean` | `false` | 非受控初始折叠状态 |
 | width | `number` | `220` | 展开宽度，支持 `bind:width`；拖拽右侧边框时实时更新 |
@@ -152,7 +152,7 @@ pointer 位于标题时共享层隐藏，不把标题当作相邻 Item 间隙。
 
 ### 整体隐藏模式
 
-`collapseMode="hidden"` 与默认compact二选一。隐藏时整体向左滑出并释放布局占位；展开按钮停在展开态Logo图形中心。自定义Logo必须以`as="logo-icon"`标记实际图形，不应标记整个图文组合。浮动按钮跟随面板移动后停住，支持键盘焦点交接与减少动效。
+`collapseMode` 默认 `"hidden"`；显式 `"compact"` 保留图标折叠轨道，二者互斥。已有消费者升级后如需保留图标栏，必须显式指定 `collapseMode="compact"`。隐藏时整体向左滑出并释放布局占位；展开按钮停在展开态Logo图形中心。自定义Logo必须以`as="logo-icon"`标记实际图形，不应标记整个图文组合。浮动按钮跟随面板移动后停住，支持键盘焦点交接与减少动效。
 
 800px及以下使用独立移动端抽屉状态，初始隐藏，打开时有遮罩；点击遮罩、Escape或选择导航项关闭。不覆盖桌面持久化折叠状态。宿主无需另建重复展开按钮，仍需为Sidebar确定高度。
 

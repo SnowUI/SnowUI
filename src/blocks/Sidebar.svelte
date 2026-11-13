@@ -47,7 +47,7 @@
     interface Props extends Omit<FrameProps, "children" | "width"> {
         sections?: SidebarSectionData[];
         navigationVariant?: "icon" | "text";
-        /** Keep the compact rail, or slide the entire sidebar out of view. */
+        /** Slide the entire sidebar out of view by default; compact keeps the rail. */
         collapseMode?: "compact" | "hidden";
         collapsed?: boolean;
         defaultCollapsed?: boolean;
@@ -82,7 +82,7 @@
     let {
         sections = [],
         navigationVariant = "icon",
-        collapseMode = "compact",
+        collapseMode = "hidden",
         collapsed = $bindable<boolean | undefined>(undefined),
         defaultCollapsed = false,
         width = $bindable(220),
