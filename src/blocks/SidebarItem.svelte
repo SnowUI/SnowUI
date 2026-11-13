@@ -4,7 +4,7 @@
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
-    import {Badge, Button, Link, Tooltip, type FrameProps} from "../index";
+    import {Badge, Button, Tooltip, type FrameProps} from "../index";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import {ComponentIcon} from "../internal/component-icon/index";
     import Frame from "../components/Frame.svelte";
@@ -126,39 +126,24 @@
         {#if collapsed}<Tooltip as="tooltip" position="right">{label}</Tooltip>{/if}
     {/snippet}
 
-    {#if href}
-        <Link
-            href={disabled ? undefined : href}
-            disabled={disabled}
-            hoverColor={false}
-            style="--snowui-link-color: inherit; --snowui-link-gap-override: var(--snowui-sidebar-item-gap-override, var(--gap-2));"
-            singleLine
-            enableAutoLayout={true}
-            contentFill
-            class="snowui-sidebar-item-main"
-            aria-label={collapsed ? label : undefined}
-            aria-current={active ? "page" : undefined}
-            onclick={select}
-        >
-            {@render mainContent()}
-        </Link>
-    {:else}
-        <Button
-            bare
-            scaleOnHover={false}
-            size="sm"
-            disabled={disabled}
-            singleLine
-            enableAutoLayout={true}
-            contentFill
-            class="snowui-sidebar-item-main"
-            aria-label={collapsed ? label : undefined}
-            aria-current={active ? "page" : undefined}
-            onclick={select}
-        >
-            {@render mainContent()}
-        </Button>
-    {/if}
+    <!-- Keep one navigation host across collapse so label fading does not remount. -->
+    <Button
+        href={disabled ? undefined : href}
+        iconOnly={collapsed}
+        bare
+        scaleOnHover={false}
+        size="sm"
+        disabled={disabled}
+        singleLine
+        enableAutoLayout={true}
+        contentFill
+        class="snowui-sidebar-item-main"
+        aria-label={collapsed ? label : undefined}
+        aria-current={active ? "page" : undefined}
+        onclick={select}
+    >
+        {@render mainContent()}
+    </Button>
 
     {#if actionsSnippet || actionList.length}
         <div
@@ -313,11 +298,12 @@
                 var(--snowui-frame-color-motion-duration, 0.15s);
     }
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-main)) {
-        justify-content: center;
+        justify-content: flex-start;
         gap: 0;
         --snowui-button-content-gap: 0px;
-        --snowui-link-gap-override: 0px;
-        padding-inline: 0;
+        /* The navigation item owns its spacing even when Button uses bare + iconOnly. */
+        --snowui-button-icon-only-padding-override: var(--snowui-sidebar-item-padding-y-override, var(--padding-2)) var(--snowui-sidebar-item-padding-x-override, var(--padding-2));
+        padding-inline: var(--snowui-sidebar-item-padding-x-override, var(--padding-2));
         overflow: hidden;
     }
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-actions)) {

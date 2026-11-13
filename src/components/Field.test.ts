@@ -114,11 +114,11 @@ export const examples = [
 <Field style="width: 20rem;">
     <Text as="label">Due Date</Text>
     <Icon as="leading" icon={Resource.CalendarBlank} size={20} />
-    <Input type="date" defaultValue="2026-02-01" aria-label="Due Date" />
+    <Input type="date" name="dueDate" defaultValue="2026-02-01" aria-label="Due Date" />
     <Button as="trailing" bare aria-label="Date options"><Icon icon={Resource.ArrowLineUpDown} size={16} /></Button>
 </Field>`,
         expected: {
-            layout: "标签保留上行，外部 leading、原生日期控件与 trailing 保持同排；有效图文间距至少4 CSS px，图形不收缩；无附件时控件填满可用区域。",
+            layout: "标签保留上行，带内置校验的日期 Input 与外部 leading、trailing 保持同排，不重复显示内置日期触发器，leading/trailing附件无字段分割线；有效图文间距至少4 CSS px，图形不收缩；无附件时控件填满可用区域。",
             responsive: "16px／8px根字号、gap缩放及窄宽恢复不改变三列归属，内部日期分段仍为连续文字结构。",
         },
         logic: ["DefaultFieldControlPlacement", "singleLineOwner"],

@@ -709,7 +709,8 @@
 <style>
     :global(:where(.snowui-sidebar)) {
         --snowui-sidebar-width: 220px;
-        --snowui-sidebar-collapsed-width: 60px;
+        /* Match the expanded icon axis: outer padding + item padding + half icon. */
+        --snowui-sidebar-collapsed-width: calc(2 * var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x)) + 2 * var(--snowui-sidebar-item-padding-x-override, var(--padding-2)) + var(--size-4));
         --snowui-sidebar-padding-x: var(--padding-3);
         --snowui-sidebar-padding-y: var(--padding-4);
         --snowui-sidebar-gap: var(--gap-3);
@@ -820,7 +821,15 @@
             var(--snowui-sidebar-width-motion-duration, 500ms)
             var(--snowui-sidebar-width-motion-easing, ease-out);
     }
+    /* Collapsed logo and navigation items share the center of the same content width. */
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="icon"] .snowui-sidebar-header > [data-as="logo"])) {
+        position: relative;
+        min-width: 0;
+        justify-content: flex-start;
+        gap: 0;
+    }
     :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="icon"] .snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))) {
+        position: absolute;
         opacity: 0;
         pointer-events: none;
     }
@@ -846,6 +855,13 @@
         flex: 0 0 var(--size-6);
         align-items: center;
         justify-content: center;
+    }
+    /* The collapsed rail reserves its header width for the logo; the toggle sits outside it. */
+    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="icon"] .snowui-sidebar-collapse-button-host)) {
+        position: absolute;
+        inset-inline-start: calc(100% + var(--gap-1));
+        top: 50%;
+        transform: translateY(-50%);
     }
     :global(:where(.snowui-sidebar[data-collapsed="false"] .snowui-sidebar-collapse-button-host)) {
         margin-right: var(--padding-1);

@@ -45,7 +45,7 @@
 | icon | `string \| Snippet` | — | ResourceIcon 名称或自定义 leading 内容 |
 | iconCollection | `string` | — | `icon` 的 ResourceIcon collection；存在同名 SnowUI 图标时传入 `"snowui"` |
 | depth | `0 \| 1` | `0` | 导航层级；`1` 表示二级 Item，由组件在 leading 槽绘制 L 形层级连接线并替换普通 Icon |
-| href | `string` | — | 存在时主操作渲染 Link，否则渲染 Button |
+| href | `string` | — | 主操作统一使用 Button；存在时由 Button 输出链接语义 |
 | updated | `boolean` | `false` | 内置 Badge dot；展开态位于外部 tags 之后，折叠态跟随 leading icon |
 | tags | `Snippet` | — | label 后、updated 前的自定义状态/分类标签；推荐使用 `Badge variant="border"` |
 | disabled | `boolean` | `false` | 禁用主操作 |
@@ -65,7 +65,7 @@
 
 ### API 参考
 
-主操作与标签／updated 之间的有效间距至少为 4 CSS px，缩小根字号或 gap scale 时仍保留；较大首选间距保持不变。长文字先缩略，Link 与 Button 都遵守可用宽度；末尾操作独立预留空间，不覆盖状态标签。leading 槽不小于内置图标既有的 12px 下限，默认 20px 与层级连接线对齐保持不变。
+主操作与标签／updated 之间的有效间距至少为 4 CSS px，缩小根字号或 gap scale 时仍保留；较大首选间距保持不变。长文字先缩略，Link 与 Button 都遵守可用宽度；末尾操作独立预留空间，不覆盖状态标签。leading 槽不小于内置图标既有的 12px 下限，默认 16px 与层级连接线对齐保持不变。
 
 提供 href 时导航内容使用链接，否则使用按钮。附属 actions 与主导航操作独立；tags 显示在 label 与 updated 提示之间。折叠后保留图标，内置 Tooltip 提供完整标签。组件负责折叠过渡、标签布局与操作位置，页面只需提供数据和业务回调。
 
@@ -78,13 +78,13 @@
 
 ### 2026-11-13 行为同步
 
-折叠模式下图标后的文字、附件与占位间距隐藏，仅保留图标自身的居中布局；展开时保留原内容组合。
+折叠模式下图标后的文字、附件与占位间距隐藏，保留原横向 padding 与图标横坐标，由 Sidebar 折叠宽度使最终左右留白对称；展开时保留原内容组合。
 
 ## AI Zone
 
 ### 导航项布局维护
 
-主导航操作与末尾操作是并列节点，不产生交互元素嵌套。`href` 存在时主操作使用 Link，否则使用 Button；SidebarItem 会把 Link 的内部 gap override 绑定到自身首选的 `var(--gap-2)`（有效值不低于 4 CSS px），因此两条路径的 leading icon 与 content 间距一致。`tags` 是外部状态 / 分类标签入口，固定渲染在 label 与内置 updated 之间；因此使用方传入 New 等标签时，顺序由 SidebarItem 统一保持为 label → tags → updated。`updated` prop 始终使用 `<Badge as="badge" dot />`，默认尺寸为 6px × 6px；展开态位于外部 tags 之后，折叠态跟随 leading icon。折叠态 label 与末尾 action 的 Tooltip 均由 SidebarItem 内置设置为 `position="right"`，默认显示在对应元素右侧，不要求使用方逐项配置。整体 Sidebar 折叠时，label、tags 与展开态 updated Badge 保留在 DOM 中并消费 Frame color bridge 渐隐，leading Icon 始终保持原 padding 与横向位置；主操作保持单行且在折叠态裁切已隐藏内容，因此默认 Item 高度稳定为 `var(--size-9)`（默认 36px），不会因隐藏文字换行而增高。渐隐结束后文字进入 `visibility: hidden`，不截获交互。主项属于 Sidebar 导航复合控件，使用 Button 时关闭 scale hover，只显示统一背景高亮；leading Icon 与 label 不变色。末尾操作仍是独立动作，显式使用 `Button bare emphasis="muted"`，保留 40% → hover 100% 与默认 scale 的次级反馈。
+主导航操作与末尾操作是并列节点，不产生交互元素嵌套。主操作统一使用 Button，`href` 保留链接语义，折叠时消费 `iconOnly`；同一宿主保留文字渐隐，不在动效中重建。折叠时通过 Button 的 padding override 保留 Item 默认上下、左右各 8px 留白。`tags` 是外部状态 / 分类标签入口，固定渲染在 label 与内置 updated 之间；因此使用方传入 New 等标签时，顺序由 SidebarItem 统一保持为 label → tags → updated。`updated` prop 始终使用 `<Badge as="badge" dot />`，默认尺寸为 6px × 6px；展开态位于外部 tags 之后，折叠态跟随 leading icon。折叠态 label 与末尾 action 的 Tooltip 均由 SidebarItem 内置设置为 `position="right"`，默认显示在对应元素右侧，不要求使用方逐项配置。整体 Sidebar 折叠时，label、tags 与展开态 updated Badge 保留在 DOM 中并消费 Frame color bridge 渐隐，leading Icon 始终保持原 padding 与横向位置；主操作保持单行且在折叠态裁切已隐藏内容，因此 Item 高度由图标与上下 padding 决定，不会因隐藏文字换行而增高。渐隐结束后文字进入 `visibility: hidden`，不截获交互。主项属于 Sidebar 导航复合控件，使用 Button 时关闭 scale hover，只显示统一背景高亮；leading Icon 与 label 不变色。末尾操作仍是独立动作，显式使用 `Button bare emphasis="muted"`，保留 40% → hover 100% 与默认 scale 的次级反馈。
 
 注意：源码引用 --size-9，但当前基础 tokens.css 未声明该变量；不得据此对用户承诺固定 36px 高度。接入文档只描述实际折叠行为。
 

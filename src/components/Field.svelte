@@ -1250,6 +1250,7 @@
         box-shadow: none;
     }
 
+    /* Leading/trailing accessories are not field segments and do not receive segment dividers. */
     /* 横向分割线仅适用于纵向堆叠的 Field（column 方向）；row 方向 Field 的分隔由 :not(:last-child) 右侧 inset 与 segment 专属规则负责，避免与 row 段落顶部边框叠加产生加深的伪双层描边（FM-02 / FM-09 的可见瑕疵）。 */
     :global(
             :where(
@@ -1302,7 +1303,7 @@
                     .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-direction-row-reverse,
                     .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-direction-column,
                     .snowui-field:not(.snowui-direction-row):not(.snowui-direction-row-reverse) > .snowui-direction-column-reverse:not(.snowui-field-host) + .snowui-direction-column-reverse
-                )
+                ):where(:not(.snowui-role-leading):not(.snowui-role-trailing):not([data-as="leading"]):not([data-as="trailing"]):not(.snowui-role-leading + *):not(.snowui-role-trailing + *):not([data-as="leading"] + *):not([data-as="trailing"] + *))
         ) {
         box-shadow: inset 0 var(--border-1) 0 var(--black-20, #00000033);
     }

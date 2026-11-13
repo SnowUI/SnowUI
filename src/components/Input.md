@@ -639,6 +639,11 @@ invalid=true + !hasCustomTrailing
 
 - **Input 组件**: [./Input.svelte](Input.svelte)
 
+
+### Field 内的校验布局
+
+Input 嵌入 Field 时由 Field 直接编排控件及 leading/trailing 附件；内置校验不增加包围控件的布局外壳。错误反馈作为 Field 的独立整行显示。独立 Input 保留原校验外壳与宽度跟随行为。
+
 ## 更新日志
 
 - 2026-10-23：复杂附件中的图形／短标签示例复用Frame单行与Text全文缩略；仅文档修订，宿主、清除和选择协议保持。

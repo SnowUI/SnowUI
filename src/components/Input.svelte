@@ -216,7 +216,7 @@
     const displayedError = $derived(nativeValidation.message || error);
 
     $effect(() => {
-        if (!hasBuiltInError || !hostElement) {
+        if (isEmbedded || !hasBuiltInError || !hostElement) {
             errorLayoutWidth = undefined;
             return;
         }
@@ -1808,25 +1808,32 @@
 {/if}
 {/snippet}
 
-{#if hasBuiltInError}
-    <div
-        class="snowui-input-error-layout"
-        style:width={errorLayoutWidth}
+{#snippet inputError()}
+    <Text
+        {...parts?.Text}
+        as="error"
+        id={validationErrorId}
+        role="alert"
+        class={`snowui-input-error snowui-field-error-message${parts?.Text?.class ? ` ${parts.Text.class}` : ""}`}
     >
+        {#if typeof displayedError === "function"}
+            {@render displayedError()}
+        {:else}
+            {displayedError}
+        {/if}
+    </Text>
+{/snippet}
+
+{#if hasBuiltInError && isEmbedded}
+    <!-- Field owns control/accessory placement and full-width feedback rows. -->
+    {@render inputSurface()}
+    {#if resolvedInvalid}
+        {@render inputError()}
+    {/if}
+{:else if hasBuiltInError}
+    <div class="snowui-input-error-layout" style:width={errorLayoutWidth}>
         {@render inputSurface()}
-        <Text
-            {...parts?.Text}
-            as="error"
-            id={validationErrorId}
-            role="alert"
-            class={`snowui-input-error snowui-field-error-message${parts?.Text?.class ? ` ${parts.Text.class}` : ""}`}
-        >
-            {#if typeof displayedError === "function"}
-                {@render displayedError()}
-            {:else}
-                {displayedError}
-            {/if}
-        </Text>
+        {@render inputError()}
     </div>
 {:else}
     {@render inputSurface()}
