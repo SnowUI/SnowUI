@@ -884,3 +884,5 @@
 /* PasswordStrength：四段指示条。 */
 /* --snowui-password-strength-segment-gap-override: ; */ /* default: var(--gap-2) */
 /* --snowui-password-strength-segment-radius-override: ; */ /* default: var(--radius-full) */
+
+/* --snowui-avatar-background-blur-override: ; */ /* default: 20px when backgroundBlur is enabled */

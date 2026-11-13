@@ -124,6 +124,20 @@ export const PAGE_SLIDE_FROM_LEFT_MOTION: MotionConfig = {
     x: [-MOTION_DISTANCE_PAGE_SLIDE_X_PX, 0],
 };
 
+// Panel exit timing shared by SidePanel and Sidebar hidden mode.
+// Keep direction, distance, entrance timing and toggle behavior in each consumer.
+// Contract: docs/standards/MotionPresetSpec.md, section 5 (SnowUI workspace).
+export const PANEL_EXIT_TIMING: Pick<MotionConfig,
+    "type" | "duration" | "easing" | "stiffness" | "damping" | "mass"
+> = {
+    type: MOVE_RIGHT_MOTION.type,
+    duration: MOVE_RIGHT_MOTION.duration ?? MOTION_DURATION_PANEL_DISAPPEAR_MS,
+    easing: MOVE_RIGHT_MOTION.easing,
+    stiffness: MOVE_RIGHT_MOTION.stiffness,
+    damping: MOVE_RIGHT_MOTION.damping,
+    mass: MOVE_RIGHT_MOTION.mass,
+};
+
 /** 右侧抽屉 / SidePanel 浮层与内嵌模式：复用 Frame 默认位移动效时序。 */
 export const SIDE_PANEL_APPEAR_MOTION: MotionConfig = {
     ...MOVE_LEFT_MOTION,
@@ -134,8 +148,8 @@ export const SIDE_PANEL_APPEAR_MOTION: MotionConfig = {
 /** 右侧抽屉 / SidePanel 浮层与内嵌模式：复用 Frame 默认位移动效时序。 */
 export const SIDE_PANEL_DISAPPEAR_MOTION: MotionConfig = {
     ...MOVE_RIGHT_MOTION,
+    ...PANEL_EXIT_TIMING,
     x: [0, "calc(100% + var(--padding-4))"],
-    duration: MOVE_RIGHT_MOTION.duration ?? MOTION_DURATION_PANEL_DISAPPEAR_MS,
 };
 
 export const TEXT_REVEAL_APPEAR_MOTION: MotionConfig = {

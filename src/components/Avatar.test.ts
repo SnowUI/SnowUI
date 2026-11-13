@@ -261,4 +261,11 @@ export const examples = [
 <Avatar size={40} src="data:image/png;base64,invalid" />`,
         expected: { render: "字符串图片在加载时自动显示圆形骨架，成功后显示图片，失败时恢复回退头像。无需在使用页面编写 Skeleton。" },
         logic: ["AutomaticMediaSkeleton", "MediaErrorFallback"],
+    },
+    {
+        name: "背景模糊",
+        code: `9
+<Avatar size={40} variant="empty" backgroundBlur />
+<Avatar size={40} variant="empty" backgroundBlur={false} />`,
+        expected: { render: "开启实例使用与Button相同的20px背景模糊；关闭实例保持原样，默认关闭。" },
     },] as const;

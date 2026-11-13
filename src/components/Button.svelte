@@ -699,7 +699,7 @@
     resolvedScaleOnHover && rest.whileHover === undefined && !bare && !isButtonGroupEmbedded
       ? "snowui-button-background-scale-surface"
       : "",
-    backgroundBlur ? "snowui-button-background-blur" : "",
+    backgroundBlur ? "snowui-control-background-blur snowui-button-background-blur" : "",
     isButtonGroupEmbedded ? "snowui-button-embedded-button-group" : "",
     iconOnly ? "snowui-button-icon-only" : "",
     bare && iconOnly
@@ -838,14 +838,7 @@
       );
   }
 
-  :global(:where(.snowui-button-background-blur)) {
-    -webkit-backdrop-filter: blur(
-      var(--snowui-button-background-blur-override, 1.25rem)
-    );
-    backdrop-filter: blur(
-      var(--snowui-button-background-blur-override, 1.25rem)
-    );
-  }
+
 
   :global(:where(.snowui-button[data-as^="pin-"])) {
     position: absolute;

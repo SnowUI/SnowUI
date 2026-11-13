@@ -8,6 +8,8 @@
     import {useOverlayPresence} from "../logic/overlay-presence.svelte";
     import {resizeManager} from "../logic/observer.svelte";
     import {useOverlayScrollbar} from "../lib/overlay-scrollbar.svelte";
+    // Exit timing uses PANEL_EXIT_TIMING in effects.ts, shared with Sidebar hidden mode.
+    // SidePanel retains its own travel distance and lifecycle; see MotionPresetSpec section 5.
     import {SIDE_PANEL_APPEAR_MOTION, SIDE_PANEL_DISAPPEAR_MOTION} from "../motion/presets/effects";
     import {DIALOG_BACKDROP_MOTION_STYLE} from "../motion/presets/dialog";
     import {getMotionTotalDurationMs} from "../motion/presets/utils";

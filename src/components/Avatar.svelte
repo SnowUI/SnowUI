@@ -71,6 +71,7 @@
         fallbackSeed?: string | number;
         variant?: AvatarVariant;
         gradientMotion?: boolean;
+        backgroundBlur?: boolean;
         children?: Snippet;
         badgePosition?: "top" | "bottom";
         [key: string]: any;
@@ -87,6 +88,7 @@
         fallbackSeed = undefined,
         variant = "default",
         gradientMotion = false,
+        backgroundBlur = false,
         badgePosition = "top",
         class: className = "",
         style: userStyle = "",
@@ -368,6 +370,7 @@
     enableScaleObserver={false}
     class={[
         "snowui-avatar",
+        backgroundBlur ? "snowui-control-background-blur snowui-avatar-background-blur" : "",
         isInteractive ? "snowui-avatar-interactive" : "",
         isInteractive && hasGradientFallback
             ? "snowui-media-hoverable snowui-media-hoverable-has-visual"
@@ -565,6 +568,8 @@
 </Frame>
 
 <style>
+
+
     :global(:where(.snowui-avatar)) {
         display: inline-flex;
         align-items: center;

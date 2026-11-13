@@ -6,6 +6,9 @@
     import {onDestroy, onMount, setContext, tick, untrack, type Snippet} from "svelte";
     import {Button, Indicator, ScrollArea, SnowUILogo, ContinuousHoverController, resizeManager, type FrameProps} from "../index";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
+    // Hidden-mode exit timing shares PANEL_EXIT_TIMING with SidePanel through this CSS adapter.
+    // Sidebar owns slide geometry and toggle tracking; see MotionPresetSpec section 5.
+    import {SIDEBAR_DRAWER_STYLE} from "../motion/presets/sidebar-drawer";
     import {SIDE_PANEL_APPEAR_MOTION, SIDE_PANEL_DISAPPEAR_MOTION} from "../motion/presets/effects";
     import {resolveMotionCssTiming} from "../motion/spring";
     import {CONTINUOUS_HOVER_MOTION_STYLE} from "../motion/presets/continuous-hover";
@@ -44,6 +47,8 @@
     interface Props extends Omit<FrameProps, "children" | "width"> {
         sections?: SidebarSectionData[];
         navigationVariant?: "icon" | "text";
+        /** Keep the compact rail, or slide the entire sidebar out of view. */
+        collapseMode?: "compact" | "hidden";
         collapsed?: boolean;
         defaultCollapsed?: boolean;
         width?: number;
@@ -77,6 +82,7 @@
     let {
         sections = [],
         navigationVariant = "icon",
+        collapseMode = "compact",
         collapsed = $bindable<boolean | undefined>(undefined),
         defaultCollapsed = false,
         width = $bindable(220),
@@ -116,11 +122,22 @@
     }
     let isCollapsed = $state(untrack(readInitialCollapsed));
     // Synchronize a bound value before the first client render.
-    if (typeof window !== "undefined") collapsed = isCollapsed;
+    if (typeof window !== "undefined") collapsed = untrack(() => isCollapsed);
     $effect.pre(() => {
         if (collapsed !== undefined) isCollapsed = collapsed;
     });
-    const fullyCollapsed = $derived(isCollapsed && navigationVariant === "text");
+    let narrow = $state(typeof window !== "undefined" && window.matchMedia("(max-width: 800px)").matches);
+    let mobileOpen = $state(false);
+    const contentCollapsed = $derived(collapseMode === "compact" && isCollapsed);
+    const hidden = $derived(collapseMode === "hidden" && (narrow ? !mobileOpen : isCollapsed));
+    const fullyCollapsed = $derived(hidden || (contentCollapsed && navigationVariant === "text"));
+    onMount(() => {
+        const media = window.matchMedia("(max-width: 800px)");
+        const adapt = () => { narrow = media.matches; mobileOpen = false; };
+        adapt();
+        media.addEventListener("change", adapt);
+        return () => media.removeEventListener("change", adapt);
+    });
     let floatingToggleHost: HTMLElement | undefined;
     let restoreToggleFocus = $state(false);
     let toggleVisible = $state(false);
@@ -143,6 +160,7 @@
         floatingToggleHost = node;
         document.body.appendChild(node);
         if (typeof node.showPopover === "function") node.showPopover();
+        void tick().then(syncDrawerToggleStop);
         if (restoreToggleFocus) node.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
         return { destroy() {
             if (typeof node.hidePopover === "function" && node.matches(":popover-open")) node.hidePopover();
@@ -150,6 +168,11 @@
             floatingToggleHost = undefined;
         } };
     }
+    $effect(() => {
+        if (collapseMode === "hidden" && fullyCollapsed && restoreToggleFocus) {
+            void tick().then(() => floatingToggleHost?.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true }));
+        }
+    });
     let internalActiveItemId = $state<string | undefined>(undefined);
     let activeItemSectionId = $state<string | undefined>(undefined);
     const resolvedActiveItemId = $derived(
@@ -159,9 +182,68 @@
     let persistenceReady = $state(false);
     let rootElement = $state<HTMLElement>();
     let headerElement = $state<HTMLElement>();
+    let drawerSlot = $state<HTMLDivElement>();
     let previousFullyCollapsed: boolean | undefined;
     let toggleMove: Animation | undefined;
     let toggleMoveRevision = 0;
+    let toggleFollowFrame = 0;
+    let toggleFollowing = $state(false);
+
+    // Anchor to the logo artwork's expanded center, including a translated drawer.
+    function syncDrawerToggleStop() {
+        if (collapseMode !== "hidden" || !rootElement || !floatingToggleHost) return;
+        const icon = headerElement?.querySelector<HTMLElement>('[data-as="logo-icon"]');
+        if (!icon) return;
+        const rect = icon.getBoundingClientRect();
+        const transform = getComputedStyle(rootElement).transform;
+        const matrix = transform === "none" ? new DOMMatrixReadOnly() : new DOMMatrixReadOnly(transform);
+        floatingToggleHost.style.left = `${rect.left + rect.width / 2 - matrix.m41 - floatingToggleHost.offsetWidth / 2}px`;
+        floatingToggleHost.style.top = `${rect.top + rect.height / 2 - matrix.m42 - floatingToggleHost.offsetHeight / 2}px`;
+    }
+
+    // The slot owns layout space; Frame owns the panel transform. Both use one clock.
+    function syncDrawerSlot() {
+        if (!rootElement || !drawerSlot) return;
+        const computed = getComputedStyle(rootElement);
+        drawerSlot.style.setProperty("--snowui-sidebar-slot-width", `${rootElement.offsetWidth}px`);
+        for (const name of ["duration", "easing", "close-duration", "close-easing"]) {
+            const property = `--snowui-sidebar-drawer-${name}`;
+            drawerSlot.style.setProperty(property, computed.getPropertyValue(property));
+        }
+    }
+
+    // Follow the panel's actual transform, then clamp at the fixed reopen position.
+    // This shares its velocity and easing, including interrupted transitions.
+    function followDrawerToggle() {
+        cancelAnimationFrame(toggleFollowFrame);
+        const host = headerElement?.querySelector<HTMLElement>(".snowui-sidebar-collapse-button-host");
+        const floating = floatingToggleHost;
+        if (!host || !floating || !rootElement) return;
+        floating.style.transform = "";
+        syncDrawerToggleStop();
+        const stop = floating.getBoundingClientRect();
+        const timing = getComputedStyle(rootElement).getPropertyValue(hidden ? "--snowui-sidebar-drawer-close-duration" : "--snowui-sidebar-drawer-duration").trim();
+        const duration = parseFloat(timing) * (timing.endsWith("ms") ? 1 : 1000);
+        const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (!enableDefaultMotion || reduced || !duration) { toggleFollowing = false; return; }
+        toggleFollowing = true;
+        const started = performance.now();
+        const follow = () => {
+            const position = host.getBoundingClientRect();
+            floating.style.transform = `translateX(${Math.max(0, position.left - stop.left)}px)`;
+            if (performance.now() - started < duration) {
+                toggleFollowFrame = requestAnimationFrame(follow);
+            } else {
+                floating.style.transform = "";
+                toggleFollowing = false;
+                if (!fullyCollapsed && restoreToggleFocus) {
+                    host.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
+                    restoreToggleFocus = false;
+                }
+            }
+        };
+        follow();
+    }
 
     // 在 Header 与顶层浮动按钮交接前保留可见位置，复用侧栏宽度动效的时间曲线。
     $effect.pre(() => {
@@ -169,13 +251,17 @@
         const previous = previousFullyCollapsed;
         previousFullyCollapsed = next;
         if (previous === undefined || previous === next) return;
+        if (untrack(() => collapseMode === "hidden")) {
+            untrack(followDrawerToggle);
+            return;
+        }
         const origin = (next
             ? headerElement?.querySelector<HTMLElement>(".snowui-sidebar-collapse-button-host")
             : floatingToggleHost)?.getBoundingClientRect();
         const revision = ++toggleMoveRevision;
         toggleMove?.cancel();
         toggleMove = undefined;
-        const enabled = untrack(() => enableDefaultMotion && navigationVariant === "text");
+        const enabled = untrack(() => enableDefaultMotion && collapseMode === "compact" && navigationVariant === "text");
         if (!origin || !enabled || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         void tick().then(() => {
             if (revision !== toggleMoveRevision) return;
@@ -192,6 +278,7 @@
     });
     onDestroy(() => {
         toggleMoveRevision++;
+        if (typeof window !== "undefined") window.cancelAnimationFrame(toggleFollowFrame);
         toggleMove?.cancel();
         clearTimeout(toggleHideTimer);
     });
@@ -240,18 +327,27 @@
             // Resolve the shared fade clock on the Sidebar, before child Frame overrides.
             `--snowui-sidebar-content-fade-duration: ${enableDefaultMotion ? "var(--snowui-frame-color-motion-duration, 0.15s)" : "0s"}`,
             `--snowui-sidebar-content-fade-easing: var(--snowui-frame-color-motion-easing, ease-out)`,
+            SIDEBAR_DRAWER_STYLE,
+            !enableDefaultMotion ? "--snowui-sidebar-drawer-duration: 0ms; --snowui-sidebar-drawer-close-duration: 0ms" : "",
             userStyle,
         ].filter(Boolean).join("; "),
     );
 
+    $effect(() => {
+        rootStyle;
+        drawerSlot;
+        untrack(syncDrawerSlot);
+    });
+
     const context: SidebarContext = {
         get collapsed() {
-            return isCollapsed;
+            return contentCollapsed;
         },
         get activeItemId() {
             return resolvedActiveItemId;
         },
         select(itemId: string) {
+            if (collapseMode === "hidden" && narrow) mobileOpen = false;
             internalActiveItemId = itemId;
             activeItemSectionId = findItemSectionId(itemId);
             onActiveItemChange?.(itemId);
@@ -283,12 +379,16 @@
             toggleVisible = isToggleHovered();
         }, 1000);
         restoreToggleFocus = !!(rootElement?.contains(document.activeElement) || floatingToggleHost?.contains(document.activeElement));
-        const next = !isCollapsed;
-        collapsed = next;
-        isCollapsed = next;
-        onCollapsedChange?.(next);
+        const next = collapseMode === "hidden" ? !hidden : !isCollapsed;
+        if (collapseMode === "hidden" && narrow) {
+            mobileOpen = !next;
+        } else {
+            collapsed = next;
+            isCollapsed = next;
+            onCollapsedChange?.(next);
+        }
         await tick();
-        if (!next && restoreToggleFocus) {
+        if (!next && restoreToggleFocus && !toggleFollowing) {
             headerElement?.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
             restoreToggleFocus = false;
         }
@@ -381,7 +481,7 @@
         if (!bodyViewport) return;
         bodyViewport.classList.add("snowui-scroll-mask");
         const top = bodyViewport.scrollTop > 1;
-        const bottom = (footerContent || hasExternalFooter) && !isCollapsed;
+        const bottom = (footerContent || hasExternalFooter) && !contentCollapsed;
         if (top || bottom) {
             bodyViewport.dataset.scrollMask = top && bottom ? "both" : top ? "top" : "bottom";
         } else {
@@ -433,7 +533,7 @@
         const viewportRect = bodyViewport.getBoundingClientRect();
         const itemRect = item.getBoundingClientRect();
         const headerOcclusion = parseFloat(getComputedStyle(navigationElement!).paddingTop) || 0;
-        const visibleHeight = Math.max(itemRect.height, viewportRect.height - headerOcclusion - ((footerContent || hasExternalFooter) && !isCollapsed ? measuredFooterHeight : 0));
+        const visibleHeight = Math.max(itemRect.height, viewportRect.height - headerOcclusion - ((footerContent || hasExternalFooter) && !contentCollapsed ? measuredFooterHeight : 0));
         const itemCenterInContent =
             bodyViewport.scrollTop +
             itemRect.top -
@@ -556,11 +656,13 @@
         const handleResize = () => {
             syncBodyScrollMask();
             syncFooterSafeArea();
+            syncDrawerSlot();
+            if (!toggleFollowing) syncDrawerToggleStop();
         };
         if (navigationElement) observer.observe(navigationElement, { childList: true });
         if (headerElement) observer.observe(headerElement, { childList: true });
         if (footerElement) observer.observe(footerElement, { childList: true });
-        const resizeCleanups = [bodyViewport, navigationElement, footerElement, headerElement]
+        const resizeCleanups = [rootElement, bodyViewport, navigationElement, footerElement, headerElement]
             .filter((element): element is HTMLElement => Boolean(element))
             .map((element) => resizeManager.watch(element, handleResize));
         scheduleFooterSafeAreaSync();
@@ -577,6 +679,11 @@
     });
 </script>
 
+<svelte:window onkeydown={(event) => {
+    if (event.key === "Escape" && collapseMode === "hidden" && narrow && mobileOpen) void toggleCollapsed();
+}} />
+
+{#snippet sidebarPanel()}
 <Frame
     bind:element={rootElement}
     tag="aside"
@@ -584,7 +691,11 @@
     enableAutoLayout={false}
     class={["snowui-sidebar", userClass].filter(Boolean).join(" ")}
     style={rootStyle}
-    data-collapsed={isCollapsed ? "true" : "false"}
+    data-collapsed={contentCollapsed ? "true" : "false"}
+    data-collapse-mode={collapseMode}
+    data-hidden={hidden ? "true" : "false"}
+    data-toggle-following={toggleFollowing ? "true" : undefined}
+    data-mobile-open={mobileOpen ? "true" : "false"}
     aria-hidden={fullyCollapsed ? "true" : undefined}
     inert={fullyCollapsed}
     data-navigation-variant={navigationVariant}
@@ -628,12 +739,12 @@
                 />
             </div>
         {/if}
-        <span class="snowui-sidebar-collapse-button-host" onpointerenter={revealToggle} onpointerleave={leaveToggleRegion}>
+        <span role="group" class="snowui-sidebar-collapse-button-host" onpointerenter={revealToggle} onpointerleave={leaveToggleRegion}>
             <Button
                 iconOnly
                 size="sm"
                 class="snowui-sidebar-collapse-button"
-                aria-label={localeContext.t(isCollapsed ? "sidebar.expand" : "sidebar.collapse")}
+                aria-label={localeContext.t((collapseMode === "hidden" ? hidden : isCollapsed) ? "sidebar.expand" : "sidebar.collapse")}
                 onclick={toggleCollapsed}
             >
                 <ComponentIcon name="rightbar" aria-hidden="true" />
@@ -676,11 +787,11 @@
         bind:this={footerElement}
         class="snowui-sidebar-footer"
         data-has-footer={(footerContent || hasExternalFooter) ? "true" : undefined}
-        aria-hidden={isCollapsed ? "true" : undefined}
-        inert={isCollapsed}
+        aria-hidden={contentCollapsed ? "true" : undefined}
+        inert={contentCollapsed}
     >{#if footerContent}{@render footerContent()}{/if}</footer>
 
-    {#if !isCollapsed && resizable}
+    {#if !fullyCollapsed && !contentCollapsed && resizable && !(collapseMode === "hidden" && narrow)}
         <Indicator
             {...parts?.Indicator}
             target={rootElement}
@@ -700,16 +811,81 @@
         />
     {/if}
 </Frame>
+{/snippet}
 
-{#if fullyCollapsed}
-    <div use:floatingToggle popover="manual" class="snowui-sidebar-floating-toggle" data-toggle-visible={toggleVisible ? "true" : undefined} onpointerenter={revealToggle} onpointerleave={leaveToggleRegion} onfocusin={revealFocusedToggle}>
+{#if collapseMode === "hidden"}
+    <div bind:this={drawerSlot} class="snowui-sidebar-slot" data-hidden={hidden ? "true" : "false"}
+        style={`--snowui-sidebar-slot-width: ${resolvedWidth}px; ${SIDEBAR_DRAWER_STYLE}; ${!enableDefaultMotion ? "--snowui-sidebar-drawer-duration: 0ms; --snowui-sidebar-drawer-close-duration: 0ms" : ""}`}>
+        {@render sidebarPanel()}
+    </div>
+{:else}
+    {@render sidebarPanel()}
+{/if}
+
+{#if fullyCollapsed || collapseMode === "hidden"}
+    <div role="group" data-collapse-mode={collapseMode} data-visible={fullyCollapsed || toggleFollowing ? "true" : "false"} data-mobile-open={mobileOpen ? "true" : "false"} inert={!fullyCollapsed && !toggleFollowing} use:floatingToggle popover="manual" class="snowui-sidebar-floating-toggle" data-toggle-visible={toggleVisible ? "true" : undefined} onpointerenter={revealToggle} onpointerleave={leaveToggleRegion} onfocusin={revealFocusedToggle}>
         <Button iconOnly size="sm" class="snowui-sidebar-collapse-button" aria-label={localeContext.t("sidebar.expand")} onclick={toggleCollapsed}>
             <ComponentIcon name="rightbar" aria-hidden="true" />
         </Button>
     </div>
 {/if}
 
+{#if collapseMode === "hidden" && narrow && mobileOpen}
+    <button class="snowui-sidebar-drawer-scrim" aria-label={localeContext.t("sidebar.collapse")} onclick={toggleCollapsed}></button>
+{/if}
+
 <style>
+    :global(.snowui-sidebar[data-toggle-following="true"]) {
+        --snowui-sidebar-toggle-host-visibility: hidden;
+        --snowui-sidebar-toggle-host-pointer-events: none;
+    }
+    /* Frame's shared motion layer writes transform/transition (StyleSpec §2.14). */
+    :global(.snowui-sidebar[data-collapse-mode="hidden"]) {
+        --snowui-sidebar-root-transform: translateX(0);
+        --snowui-sidebar-root-flex-shrink: 0;
+        --snowui-sidebar-root-transition: transform var(--snowui-sidebar-drawer-duration) var(--snowui-sidebar-drawer-easing), visibility 0s;
+    }
+    :global(.snowui-sidebar[data-collapse-mode="hidden"][data-hidden="true"]) {
+        --snowui-sidebar-root-transform: translateX(-100%);
+        --snowui-sidebar-root-visibility: hidden;
+        --snowui-sidebar-root-pointer-events: none;
+        --snowui-sidebar-root-transition: transform var(--snowui-sidebar-drawer-close-duration) var(--snowui-sidebar-drawer-close-easing), visibility 0s var(--snowui-sidebar-drawer-close-duration);
+    }
+    :global(.snowui-sidebar-floating-toggle[data-collapse-mode="hidden"][data-visible="false"]) {
+        --snowui-sidebar-floating-visibility: hidden;
+        --snowui-sidebar-floating-pointer-events: none;
+    }
+    :where(.snowui-sidebar-slot) {
+        position: relative;
+        flex-shrink: 0;
+        height: 100%;
+        min-height: 0;
+        width: var(--snowui-sidebar-slot-size, var(--snowui-sidebar-slot-width));
+        transition: width var(--snowui-sidebar-slot-duration, var(--snowui-sidebar-drawer-duration)) var(--snowui-sidebar-slot-easing, var(--snowui-sidebar-drawer-easing));
+    }
+    .snowui-sidebar-slot[data-hidden="true"] {
+        --snowui-sidebar-slot-size: 0px;
+        --snowui-sidebar-slot-duration: var(--snowui-sidebar-drawer-close-duration);
+        --snowui-sidebar-slot-easing: var(--snowui-sidebar-drawer-close-easing);
+    }
+    :where(.snowui-sidebar-drawer-scrim) {
+        position: fixed; inset: 0; z-index: 25; border: 0;
+        background: rgba(0, 0, 0, 0.16);
+    }
+    @media (max-width: 800px) {
+        .snowui-sidebar-slot { --snowui-sidebar-slot-size: 0px; }
+        :global(.snowui-sidebar[data-collapse-mode="hidden"]) {
+            --snowui-sidebar-root-position: fixed;
+            --snowui-sidebar-root-inset: 0 auto 0 0;
+            --snowui-sidebar-root-z-index: 30;
+            --snowui-sidebar-root-height: 100dvh;
+            --snowui-sidebar-root-background: var(--background-1);
+        }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        :where(.snowui-sidebar-slot) { transition: none; }
+    }
+
     :global(:where(.snowui-sidebar)) {
         --snowui-sidebar-width: 220px;
         /* Match the expanded icon axis: outer padding + item padding + half icon. */
@@ -719,10 +895,17 @@
         --snowui-sidebar-gap: var(--gap-3);
         --snowui-sidebar-separator-padding-x: var(--padding-2);
         --snowui-sidebar-separator-padding-y: var(--padding-2);
-        position: relative;
+        --snowui-frame-component-transform: var(--snowui-sidebar-root-transform, none);
+        --snowui-frame-component-transition: var(--snowui-sidebar-root-transition, width var(--snowui-sidebar-width-motion-duration, 500ms) var(--snowui-sidebar-width-motion-easing, ease-out));
+        position: var(--snowui-sidebar-root-position, relative);
+        inset: var(--snowui-sidebar-root-inset, auto);
+        z-index: var(--snowui-sidebar-root-z-index, auto);
+        visibility: var(--snowui-sidebar-root-visibility, visible);
+        pointer-events: var(--snowui-sidebar-root-pointer-events, auto);
+        flex-shrink: var(--snowui-sidebar-root-flex-shrink, 1);
         display: flex;
         width: var(--snowui-sidebar-width-override, var(--snowui-sidebar-width));
-        height: 100%;
+        height: var(--snowui-sidebar-root-height, 100%);
         min-height: 0;
         box-sizing: border-box;
         flex-direction: column;
@@ -730,10 +913,7 @@
         padding: var(--snowui-sidebar-padding-y-override, var(--snowui-sidebar-padding-y))
             var(--snowui-sidebar-padding-x-override, var(--snowui-sidebar-padding-x));
         color: var(--black-100, #000);
-        background: transparent;
-        transition: width
-            var(--snowui-sidebar-width-motion-duration, 500ms)
-            var(--snowui-sidebar-width-motion-easing, ease-out);
+        background: var(--snowui-sidebar-root-background, transparent);
     }
     :global(:where(.snowui-sidebar[data-collapsed="true"])) {
         /* The toggle extends beyond the rail and must remain above page headers. */
@@ -748,6 +928,8 @@
         flex-shrink: 0;
     }
     :global(:where(.snowui-sidebar-floating-toggle)) {
+        visibility: var(--snowui-sidebar-floating-visibility, visible);
+        pointer-events: var(--snowui-sidebar-floating-pointer-events, auto);
         position: fixed;
         inset: var(--padding-4) auto auto var(--padding-3);
         width: var(--size-6);
@@ -771,8 +953,8 @@
     @supports not selector(:popover-open) {
         :global(:where(.snowui-sidebar-floating-toggle)) { display: flex; }
     }
-    :global(:where(.snowui-sidebar[data-resizing="true"])) {
-        transition: none;
+    :global(.snowui-sidebar[data-resizing="true"]) {
+        --snowui-sidebar-root-transition: none;
     }
     :global(:where(.snowui-sidebar-header)) {
         position: relative;
@@ -851,7 +1033,8 @@
     :global(:where(.snowui-sidebar-collapse-button-host)) {
         position: relative;
         z-index: 2;
-        pointer-events: auto;
+        visibility: var(--snowui-sidebar-toggle-host-visibility, visible);
+        pointer-events: var(--snowui-sidebar-toggle-host-pointer-events, auto);
         display: inline-flex;
         width: var(--size-6);
         height: var(--size-6);
@@ -877,6 +1060,7 @@
         --snowui-frame-component-transition: opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
     }
     :global(:where(.snowui-sidebar[data-toggle-visible="true"], .snowui-sidebar-floating-toggle[data-toggle-visible="true"]) .snowui-sidebar-collapse-button),
+    :global(:where(.snowui-sidebar-floating-toggle[data-collapse-mode="hidden"]) .snowui-sidebar-collapse-button),
     :global(:where(.snowui-sidebar-collapse-button:focus-visible)) {
         opacity: 1;
         --snowui-button-opacity-override: 1;

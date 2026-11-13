@@ -332,3 +332,5 @@ export { default as BlurText } from "./components/BlurText.svelte";
 
 export { default as MetricCard } from "./components/MetricCard.svelte";
 export { default as PasswordStrength, evaluatePasswordStrength, type PasswordStrengthLevel, type PasswordStrengthEvaluator } from "./components/PasswordStrength.svelte";
+
+export { SIDEBAR_DRAWER_STYLE } from "./motion/presets/sidebar-drawer";

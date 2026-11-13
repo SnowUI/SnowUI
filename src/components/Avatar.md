@@ -53,6 +53,7 @@
 | fallbackColor | `GradientVariant` | — | 显式选择默认 Gradient 的具名艺术配色；优先级高于 `fallbackSeed` 和名称回退。 |
 | fallbackSeed | `string \| number` | — | 稳定身份种子，推荐传入 `user.id`；组件以确定性哈希映射到六种具名配色，相同 seed 始终得到相同颜色，无需持久化颜色字段。 |
 | variant | `AvatarVariant` | `"default"` | 默认样式使用稳定身份 seed 或显式具名颜色的 Gradient 配色；空头像样式使用灰色背景与默认用户图标。 |
+| backgroundBlur | `boolean` | `false` | 开启头像背景模糊，与Button共享20px默认强度，仅作用于背景，不模糊头像内容。 |
 | gradientMotion | `boolean` | `false` | 是否常驻运行默认 Gradient fallback 的四层基础矢量形变；为 false 时 Gradient 仍会在 hover 期间按需运行水波形变和多色 Overlay |
 | children | `Snippet` | — | 头像附属内容；as="badge" 声明角标，as="avatar-image" 声明外置头像视觉并覆盖默认回退层。 |
 | badgePosition | `"top" \| "bottom"` | `"top"` | as="badge" 子内容定位在头像右上或右下；Dot 角标同时参与头像切割。 |
@@ -139,6 +140,10 @@
 图片与普通组件 fallback 的六色 hover Overlay 是 [StyleSpec §2.1.3](../../../docs/standards/StyleSpec.md#213-专业艺术色例外强制) 为 Avatar 单独登记的专业艺术色例外：颜色由 Avatar 私有 hover 视觉拥有，不映射为 SnowUI 通用 Token。默认 Gradient 画面的固定配色由 [Gradient](Gradient.md#专业艺术色例外) 自己的例外登记拥有；作为 fallback 使用 [GradientMotion](GradientMotion.md#专业艺术色例外) 时，其 shader 画面颜色同样由 GradientMotion 自己拥有。三项例外都不扩展到 Avatar 的尺寸、排版、常规背景、状态、公开通用颜色入口或样式优先级。
 
 
+
+### 背景模糊
+
+`<Avatar variant="empty" backgroundBlur />` 可用于覆盖滚动内容的顶部栏。与Button一样默认关闭，显式开启后使用共享控制项模糊样式；默认20px，可通过`--snowui-avatar-background-blur-override`覆盖。实色图片会遮住其后模糊效果。
 
 ## AI Zone
 

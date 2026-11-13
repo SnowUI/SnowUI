@@ -229,4 +229,26 @@ export const examples = [
         },
         logic: ["Sidebar.Locale"],
     },
+    {
+        name: "SB-09：完全隐藏与窄屏抽屉",
+        code: `SB-09
+<Frame row gap={0} style="width: 100%; height: 28rem; align-items: stretch;">
+    <Sidebar collapseMode="hidden" persistence={false} resizable={false}
+        style="background: var(--background-1);"
+        sections={[{ id: "pages", title: "Pages", items: [
+            { id: "home", label: "Home", icon: "house" },
+            { id: "settings", label: "Settings", icon: "gear" },
+        ] }]}>
+        {#snippet footer()}<Text>Fixed footer</Text>{/snippet}
+    </Sidebar>
+    <Frame column fill padding={16}><Text>Collapse the sidebar to hide the entire panel.</Text></Frame>
+</Frame>`,
+        expected: {
+            render: "默认模式仍为compact；hidden模式保持完整导航布局，不生成图标栏。",
+            interaction: "点击收起后整栏向左退出且释放占位，仅保留固定展开按钮；再次展开恢复；键盘焦点随按钮交接，隐藏导航不可聚焦。",
+            responsive: "800px及以下整栏默认隐藏，展开为浮层；遮罩及Escape关闭；切回宽屏恢复桌面状态，不改写折叠记忆。",
+            performance: "收起复用SidePanel退出时长与spring曲线，展开保留220ms ease；内部文字、Item和Footer不执行compact折叠序列；减少动效直接切换。",
+        },
+        logic: ["Sidebar.HiddenMode"],
+    },
 ] as const;
