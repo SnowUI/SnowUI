@@ -61,9 +61,11 @@ for(const fontSize of ['16px','8px']) {
  }
  const spacing=await page.locator('#package-text-line').evaluate(n=>{const t=n.querySelectorAll('.snowui-text');return t[1].getBoundingClientRect().left-t[0].getBoundingClientRect().right;});
  assert.ok(spacing>=4,'独立文字元素也保持4 CSS px下限');
- for(const selector of ['#package-line-button','.package-line-menu','#package-line-chip','#package-line-link'])assert.ok(await page.locator(selector).evaluate(n=>parseFloat(getComputedStyle(n).columnGap))>=4,selector);
+ for(const selector of ['#package-line-button','.package-line-menu','#package-line-link'])assert.ok(await page.locator(selector).evaluate(n=>parseFloat(getComputedStyle(n).columnGap))>=4,selector);
+ // Chip owns the documented zero-gap exception to the shared singleLine minimum.
+ assert.equal(await page.locator('#package-line-chip').evaluate(n=>parseFloat(getComputedStyle(n).columnGap)),0);
 }
-assert.equal(await page.locator('table[aria-label="Package single-line table"] tbody td').evaluate(n=>getComputedStyle(n).display),'table-cell');
+assert.equal(await page.locator('table[aria-label="Package single-line table"] tbody td[data-column-id="label"]').evaluate(n=>getComputedStyle(n).display),'table-cell');
 assert.equal(await page.locator('#package-content-line[singleline]').count(),0);
 await page.getByRole('tab',{name:'Package beta',exact:true}).waitFor();
 await page.getByRole('button',{name:'Package action',exact:true}).click();

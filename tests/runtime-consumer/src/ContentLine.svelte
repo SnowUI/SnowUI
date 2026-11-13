@@ -95,7 +95,7 @@ let packageToolbarDeletes=$state(0);
 </section>
 
 <section aria-label="Package single-line sidebar footer" style="height:300px;width:240px">
-<Sidebar data-package-sidebar ariaLabel="Package footer navigation area" persistence={false} resizable={false}>
+<Sidebar collapseMode="compact" data-package-sidebar ariaLabel="Package footer navigation area" persistence={false} resizable={false}>
 <SidebarItem id="package-footer-navigation" label="Package footer navigation" />
 <Frame as="footer" singleLine><Avatar as="leading" aria-label="Package current user" /><Text lines={1}>Complete package current user name</Text></Frame>
 </Sidebar>
