@@ -198,6 +198,10 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 
 
+### 2026-11-13 行为同步
+
+表头列在SSR渲染TableBody前注册，骨架直接使用最终列数与列布局，避免每个单元格独占一行。无数据或搜索结果为空时所有变体显示Black 20表头底线；它是Black 10通用分隔线规则的例外。
+
 ## AI Zone
 
 列宽手柄使用 `tableHead.resizeColumn`（传入显式 `label`）或 `tableHead.resizeColumnGeneric`（未传可读名称）；`label` 属于调用方业务文案，保留原文。`columnId` 仅供内部列识别及既有 TableToolbar 回退，不写入手柄的可访问名称。

@@ -306,6 +306,7 @@
         pointer-events: auto;
     }
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-content)) {
+        position: absolute;
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
@@ -316,6 +317,11 @@
                 var(--snowui-frame-color-motion-duration, 0.15s);
     }
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-main)) {
+        justify-content: center;
+        gap: 0;
+        --snowui-button-content-gap: 0px;
+        --snowui-link-gap-override: 0px;
+        padding-inline: 0;
         overflow: hidden;
     }
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-actions)) {

@@ -74,6 +74,8 @@ export type SnowUIMessageKey =
     | "imageViewer.next"
     | "imageViewer.close"
     | "toast.close"
+    | "table.noData"
+    | "table.loadMore"
     | "table.scrollRegion"
     | "table.scrollRegionNamed"
     | "tableHead.selectAll"
@@ -192,6 +194,8 @@ export const SNOWUI_MESSAGES: Record<
         "imageViewer.next": "下一张",
         "imageViewer.close": "关闭图片预览",
         "toast.close": "关闭通知",
+        "table.noData": "暂无数据",
+        "table.loadMore": "加载更多",
         "table.scrollRegion": "可横向滚动的表格",
         "table.scrollRegionNamed": "{{name}}，可横向滚动",
         "tableHead.selectAll": "选择全部当前行",
@@ -303,6 +307,8 @@ export const SNOWUI_MESSAGES: Record<
         "imageViewer.next": "Next image",
         "imageViewer.close": "Close image viewer",
         "toast.close": "Close notification",
+        "table.noData": "No data",
+        "table.loadMore": "Load more",
         "table.scrollRegion": "Scrollable table",
         "table.scrollRegionNamed": "{{name}}, horizontally scrollable",
         "tableHead.selectAll": "Select all current rows",

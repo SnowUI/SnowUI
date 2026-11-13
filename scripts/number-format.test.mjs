@@ -26,10 +26,10 @@ test("formatPercentLabel preserves explicitly requested precision", () => {
 });
 
 test("formatPercentLabel returns empty values without a percent suffix", () => {
-  assert.equal(formatPercentLabel(null), "—");
-  assert.equal(formatPercentLabel(undefined), "—");
-  assert.equal(formatPercentLabel(Number.NaN), "—");
-  assert.equal(formatPercentLabel(Number.POSITIVE_INFINITY), "—");
+  assert.equal(formatPercentLabel(null), "-");
+  assert.equal(formatPercentLabel(undefined), "-");
+  assert.equal(formatPercentLabel(Number.NaN), "-");
+  assert.equal(formatPercentLabel(Number.POSITIVE_INFINITY), "-");
   assert.equal(formatPercentLabel(null, { emptyValue: "N/A" }), "N/A");
 });
 

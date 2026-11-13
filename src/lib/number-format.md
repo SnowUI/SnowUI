@@ -3,6 +3,8 @@
 > **版本**: v1.0.1
 > **职责**: 为数据展示组件提供统一的数字 label 格式化、英文紧凑缩写和空值兜底。
 
+组件与页面共同遵守[缺失数据规则](../../../docs/reference/NumberFormats.md#missing-data)；本工具处理数值空值，字符串展示边界由消费组件按同一规则处理，保留真实0与0%。
+
 ## 规则
 
 - 默认数据 label 小数位数为 2 位。
@@ -12,7 +14,7 @@
 - 非整数默认补齐到 2 位。
 - 显式传入 `fractionDigits` / `valueLabelFractionDigits` 时，按指定小数位固定补齐尾随 0。
 - 默认启用千分位。
-- `null` / `undefined` / `NaN` / `Infinity` 默认显示为 `—`；百分比空值不追加 `%`。
+- `null` / `undefined` / `NaN` / `Infinity` 默认显示为 `-`；百分比空值不追加 `%`。
 - 长数字缩写使用英文 compact notation：`k` / `m` / `b` / `t`。
 - 默认 `notation: "standard"` 不缩写；`notation: "auto"` 达到 `1,000,000` 后缩写；`notation: "compact"` 达到 `1,000` 后缩写。
 

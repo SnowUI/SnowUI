@@ -17,6 +17,7 @@
     import { onDestroy, setContext, tick, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
+    import { getTableContext } from "../lib/table-context.svelte";
     import Button from "./Button.svelte";
     import Listbox from "./Listbox.svelte";
     import MenuItem from "./MenuItem.svelte";
@@ -28,6 +29,7 @@
     import { useLocale } from "../i18n/locale.svelte";
 
     type PageToken = number | "ellipsis";
+    const tableContext = getTableContext();
     type PaginationRole = "current" | "page" | "prev" | "next" | "pageSize";
     type PaginationLayoutToken = "pages" | "prev" | "next" | "pageSize";
     export type PaginationWidthMode = "auto" | "hug" | "fill";
@@ -969,6 +971,7 @@
     });
 </script>
 
+{#if total > 0 && !tableContext.isEmpty()}
 <Frame
     tag="nav"
     enableResponsive={enableResponsive}
@@ -1051,6 +1054,7 @@
         </Listbox>
     {/if}
 </Frame>
+{/if}
 
 <style>
     :global(:where(.snowui-pagination)) {

@@ -4,6 +4,7 @@
   import type { ComponentProps } from 'svelte';
   import Card from './Card.svelte';
   import Text from './Text.svelte';
+  import { DEFAULT_NUMBER_EMPTY_VALUE } from '../lib/number-format';
   interface Props extends Omit<ComponentProps<typeof Card>, 'children' | 'contentFill' | 'contentHug' | 'scrollable'> {
     label: string;
     value: string;
@@ -12,19 +13,21 @@
     trend?: 'positive' | 'negative' | 'neutral';
     [key: string]: any;
   }
-  let { label, value, change = undefined, emphasis = 'change', trend = 'neutral', class: userClass = '', ...rest }: Props = $props();
-  let sign = $derived(change && /^[+−-]/.test(change) ? change[0] : '');
-  let changeText = $derived(sign ? change?.slice(1) : change);
+  let { label, value, change = undefined, emphasis = 'change', trend = 'neutral', class: userClass = '', style: userStyle = '', ...rest }: Props = $props();
+  let displayedValue = $derived(value?.trim() || DEFAULT_NUMBER_EMPTY_VALUE);
+  let displayedChange = $derived(change === undefined ? undefined : change.trim() || DEFAULT_NUMBER_EMPTY_VALUE);
+  let sign = $derived(displayedChange && /^[+−-]\d/.test(displayedChange) ? displayedChange[0] : '');
+  let changeText = $derived(sign ? displayedChange?.slice(1) : displayedChange);
 </script>
 
-<Card {...rest} class={`snowui-metric-card ${userClass}`} contentFill scrollable={false}>
+<Card {...rest} class={`snowui-metric-card ${userClass}`} style={`--snowui-card-background-override: var(--snowui-metric-card-background-override, var(--background-3)); ${userStyle}`} contentFill scrollable={false}>
   <Text class="snowui-metric-label">{label}</Text>
   <div class="snowui-metric-values">
     {#if emphasis === 'change' && change !== undefined}
       <Text class="snowui-metric-primary"><span class={`snowui-metric-sign snowui-metric-${trend}`}>{sign}</span>{changeText}</Text>
-      <Text class="snowui-metric-secondary">{value}</Text>
+      <Text class="snowui-metric-secondary">{displayedValue}</Text>
     {:else}
-      <Text class="snowui-metric-primary">{value}</Text>
+      <Text class="snowui-metric-primary">{displayedValue}</Text>
       {#if change !== undefined}<Text class="snowui-metric-secondary"><span class={`snowui-metric-sign snowui-metric-${trend}`}>{sign}</span>{changeText}</Text>{/if}
     {/if}
   </div>

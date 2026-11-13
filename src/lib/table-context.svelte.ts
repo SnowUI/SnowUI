@@ -74,6 +74,7 @@ export interface TableContext {
     setFilters: (filters: Record<string, unknown>) => void;
     getVariant: () => "striped" | "divided" | undefined;
     getLoading: () => boolean;
+    isEmpty: () => boolean;
     getLoadingMore: () => boolean;
     getLoadingRowCount: () => number;
     getLoadingSpinner: () => boolean;
@@ -146,6 +147,7 @@ const fallback: TableContext = {
     setFilters: () => {},
     getVariant: () => undefined,
     getLoading: () => false,
+    isEmpty: () => false,
     getLoadingMore: () => false,
     getLoadingRowCount: () => 10,
     getLoadingSpinner: () => false,

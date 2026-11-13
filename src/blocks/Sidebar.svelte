@@ -28,6 +28,7 @@
 
     interface PersistedSidebarState {
         version: 1;
+        collapsed?: boolean;
         activeItemId?: string;
         activeItemSectionId?: string;
         collapsedSections: Record<string, boolean>;
@@ -62,6 +63,8 @@
         onWidthChange?: (width: number) => void;
         onActiveItemChange?: (itemId: string) => void;
         children?: Snippet;
+        /** Render fixed footer content in place, including during SSR. */
+        footer?: Snippet;
         parts?: ComponentPartsOf<{
             Indicator: typeof Indicator;
             SnowUILogo: typeof SnowUILogo;
@@ -89,6 +92,7 @@
         onWidthChange = undefined,
         onActiveItemChange = undefined,
         children,
+        footer: footerContent,
         parts = undefined,
         class: userClass = "",
         style: userStyle = "",
@@ -101,13 +105,38 @@
     const localeContext = useLocale();
 
     // 可绑定 Prop 负责输入/回传，本地 state 保持连续交互时的显示状态。
-    let isCollapsed = $state(untrack(() => collapsed ?? defaultCollapsed));
+    function readInitialCollapsed() {
+        if (typeof window !== "undefined" && persistence && persistenceKey) {
+            try {
+                const stored = JSON.parse(window.localStorage.getItem(`snowui:sidebar:${persistenceKey}`) ?? "null") as PersistedSidebarState | null;
+                if (stored?.version === 1 && typeof stored.collapsed === "boolean") return stored.collapsed;
+            } catch { /* Keep the supplied initial state when storage is unavailable. */ }
+        }
+        return collapsed ?? defaultCollapsed;
+    }
+    let isCollapsed = $state(untrack(readInitialCollapsed));
+    // Synchronize a bound value before the first client render.
+    if (typeof window !== "undefined") collapsed = isCollapsed;
     $effect.pre(() => {
         if (collapsed !== undefined) isCollapsed = collapsed;
     });
     const fullyCollapsed = $derived(isCollapsed && navigationVariant === "text");
     let floatingToggleHost: HTMLElement | undefined;
     let restoreToggleFocus = $state(false);
+    let toggleVisible = $state(false);
+    let toggleHideTimer: ReturnType<typeof setTimeout> | undefined;
+    function revealToggle() { toggleVisible = true; }
+    function isToggleHovered() {
+        return !!(headerElement?.querySelector('.snowui-sidebar-collapse-button-host')?.matches(':hover')
+            || floatingToggleHost?.matches(':hover'));
+    }
+    function leaveToggleRegion() {
+        if (toggleHideTimer === undefined && !isToggleHovered()) toggleVisible = false;
+    }
+    function revealFocusedToggle(event: FocusEvent) {
+        if ((event.target as HTMLElement)?.matches(':focus-visible')) revealToggle();
+    }
+
 
     // 脱离侧栏的布局与裁切；支持时进入浏览器顶层，按钮仍由 Sidebar 拥有。
     function floatingToggle(node: HTMLElement) {
@@ -164,6 +193,7 @@
     onDestroy(() => {
         toggleMoveRevision++;
         toggleMove?.cancel();
+        clearTimeout(toggleHideTimer);
     });
 
     let bodyViewport = $state<HTMLElement>();
@@ -243,6 +273,12 @@
     setContext(SIDEBAR_CONTEXT_KEY, context);
 
     async function toggleCollapsed() {
+        clearTimeout(toggleHideTimer);
+        toggleVisible = true;
+        toggleHideTimer = setTimeout(() => {
+            toggleHideTimer = undefined;
+            toggleVisible = isToggleHovered();
+        }, 1000);
         restoreToggleFocus = !!(rootElement?.contains(document.activeElement) || floatingToggleHost?.contains(document.activeElement));
         const next = !isCollapsed;
         collapsed = next;
@@ -306,6 +342,7 @@
     }
 
     function syncExternalFooter() {
+        if (footerContent) return;
         if (!footerElement || !navigationElement) return;
         let footer = footerElement.querySelector<HTMLElement>(
             ':scope > [data-as="footer"]',
@@ -341,7 +378,7 @@
         if (!bodyViewport) return;
         bodyViewport.classList.add("snowui-scroll-mask");
         const top = bodyViewport.scrollTop > 1;
-        const bottom = hasExternalFooter && !isCollapsed;
+        const bottom = (footerContent || hasExternalFooter) && !isCollapsed;
         if (top || bottom) {
             bodyViewport.dataset.scrollMask = top && bottom ? "both" : top ? "top" : "bottom";
         } else {
@@ -393,7 +430,7 @@
         const viewportRect = bodyViewport.getBoundingClientRect();
         const itemRect = item.getBoundingClientRect();
         const headerOcclusion = parseFloat(getComputedStyle(navigationElement!).paddingTop) || 0;
-        const visibleHeight = Math.max(itemRect.height, viewportRect.height - headerOcclusion - (hasExternalFooter && !isCollapsed ? measuredFooterHeight : 0));
+        const visibleHeight = Math.max(itemRect.height, viewportRect.height - headerOcclusion - ((footerContent || hasExternalFooter) && !isCollapsed ? measuredFooterHeight : 0));
         const itemCenterInContent =
             bodyViewport.scrollTop +
             itemRect.top -
@@ -431,6 +468,11 @@
         }
 
         if (restored?.version === 1) {
+            if (typeof restored.collapsed === "boolean") {
+                isCollapsed = restored.collapsed;
+                collapsed = restored.collapsed;
+                onCollapsedChange?.(restored.collapsed);
+            }
             const restoredCollapsedSections =
                 restored.collapsedSections ?? {};
             collapsedSections = restoredCollapsedSections;
@@ -477,6 +519,7 @@
         if (!storageKey || !persistenceReady) return;
         const persistedState: PersistedSidebarState = {
             version: 1,
+            collapsed: isCollapsed,
             activeItemId: resolvedActiveItemId,
             activeItemSectionId: resolvedActiveItemId
                 ? findItem(resolvedActiveItemId)
@@ -485,6 +528,8 @@
                 : undefined,
             collapsedSections,
         };
+        // Mirror only layout state for hosts that render the initial shell on the server.
+        document.cookie = `snowui-sidebar-collapsed-${encodeURIComponent(persistenceKey)}=${isCollapsed ? "1" : "0"}; Path=/; Max-Age=31536000; SameSite=Lax${window.location.protocol === "https:" ? "; Secure" : ""}`;
         try {
             window.localStorage.setItem(
                 storageKey,
@@ -543,7 +588,7 @@
     data-restore-toggle-focus={!isCollapsed && restoreToggleFocus ? "true" : undefined}
     data-resizable={resizable ? "true" : "false"}
     data-resizing={resizing ? "true" : undefined}
-    data-has-footer={hasExternalFooter ? "true" : undefined}
+    data-has-footer={(footerContent || hasExternalFooter) ? "true" : undefined}
     data-persistence-ready={persistence && persistenceKey && persistenceReady
         ? "true"
         : undefined}
@@ -552,6 +597,10 @@
     enableScaleObserver={enableScaleObserver}
     enableDefaultMotion={enableDefaultMotion}
     {...rest}
+    data-toggle-visible={toggleVisible ? "true" : undefined}
+    onpointerenter={(event: PointerEvent) => { revealToggle(); rest.onpointerenter?.(event); }}
+    onpointerleave={(event: PointerEvent) => { leaveToggleRegion(); rest.onpointerleave?.(event); }}
+    onfocusin={(event: FocusEvent) => { revealFocusedToggle(event); rest.onfocusin?.(event); }}
 >
     <header bind:this={headerElement} class="snowui-sidebar-header">
         {#if !hasExternalLogo}
@@ -576,7 +625,7 @@
                 />
             </div>
         {/if}
-        <span class="snowui-sidebar-collapse-button-host">
+        <span class="snowui-sidebar-collapse-button-host" onpointerenter={revealToggle} onpointerleave={leaveToggleRegion}>
             <Button
                 iconOnly
                 size="sm"
@@ -623,10 +672,10 @@
     <footer
         bind:this={footerElement}
         class="snowui-sidebar-footer"
-        data-has-footer={hasExternalFooter ? "true" : undefined}
+        data-has-footer={(footerContent || hasExternalFooter) ? "true" : undefined}
         aria-hidden={isCollapsed ? "true" : undefined}
         inert={isCollapsed}
-    ></footer>
+    >{#if footerContent}{@render footerContent()}{/if}</footer>
 
     {#if !isCollapsed && resizable}
         <Indicator
@@ -650,8 +699,8 @@
 </Frame>
 
 {#if fullyCollapsed}
-    <div use:floatingToggle popover="manual" class="snowui-sidebar-floating-toggle">
-        <Button iconOnly size="sm" aria-label={localeContext.t("sidebar.expand")} onclick={toggleCollapsed}>
+    <div use:floatingToggle popover="manual" class="snowui-sidebar-floating-toggle" data-toggle-visible={toggleVisible ? "true" : undefined} onpointerenter={revealToggle} onpointerleave={leaveToggleRegion} onfocusin={revealFocusedToggle}>
+        <Button iconOnly size="sm" class="snowui-sidebar-collapse-button" aria-label={localeContext.t("sidebar.expand")} onclick={toggleCollapsed}>
             <ComponentIcon name="rightbar" aria-hidden="true" />
         </Button>
     </div>
@@ -683,6 +732,8 @@
             var(--snowui-sidebar-width-motion-easing, ease-out);
     }
     :global(:where(.snowui-sidebar[data-collapsed="true"])) {
+        /* The toggle extends beyond the rail and must remain above page headers. */
+        z-index: 30;
         width: var(--snowui-sidebar-collapsed-width-override, var(--snowui-sidebar-collapsed-width));
     }
     :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"])) {
@@ -786,6 +837,9 @@
         display: none;
     }
     :global(:where(.snowui-sidebar-collapse-button-host)) {
+        position: relative;
+        z-index: 2;
+        pointer-events: auto;
         display: inline-flex;
         width: var(--size-6);
         height: var(--size-6);
@@ -798,19 +852,22 @@
     }
     :global(:where(.snowui-sidebar-collapse-button)) {
         flex: 0 0 auto;
-        visibility: hidden;
+        opacity: 0;
+        --snowui-button-opacity-override: 0;
         pointer-events: none;
+        --snowui-frame-component-transition: opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
     }
-    :global(:where(.snowui-sidebar:hover, .snowui-sidebar:focus-within, .snowui-sidebar[data-restore-toggle-focus="true"], .snowui-sidebar-collapse-button-host:hover) .snowui-sidebar-collapse-button) {
-        visibility: visible;
+    :global(:where(.snowui-sidebar[data-toggle-visible="true"], .snowui-sidebar-floating-toggle[data-toggle-visible="true"]) .snowui-sidebar-collapse-button),
+    :global(:where(.snowui-sidebar-collapse-button:focus-visible)) {
+        opacity: 1;
+        --snowui-button-opacity-override: 1;
         pointer-events: auto;
     }
     :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-collapse-button-host)) {
         margin-inline: auto;
     }
-    :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-collapse-button)) {
-        visibility: visible;
-        pointer-events: auto;
+    @media (prefers-reduced-motion: reduce) {
+        :global(:where(.snowui-sidebar-collapse-button)) { --snowui-frame-component-transition: none; }
     }
     :global(:where(.snowui-sidebar-body)) {
         --snowui-sidebar-header-region-height: calc(

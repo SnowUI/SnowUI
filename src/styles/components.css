@@ -24,6 +24,8 @@
  */
 
 :root {
+    /* MetricCard */
+    /* --snowui-metric-card-background-override: ; */ /* default: var(--background-3) */
     /* OTPInput */
     /* --snowui-otp-input-gap-override: ; */ /* default: var(--gap-2) */
     /* --snowui-otp-input-size-override: ; */ /* default: var(--size-10) */
@@ -305,7 +307,8 @@
        继承 Input 覆盖入口；默认样式与 Input 标准一致。
        padding-y=12px padding-x=16px gap=8px radius=16px
     ───────────────────────────────────────── */
-    /* SearchInput 使用 --snowui-input-* 覆盖入口，不新增平行变量。 */
+    /* SearchInput inherits Input layout overrides; this color applies only to its owned icon. */
+    /* --snowui-search-input-icon-color-override: ; */ /* default: opaque theme color; opacity owns dimming */
 
 
     /* ─────────────────────────────────────────

@@ -9,6 +9,9 @@
     import {provideTableContext, type TableColumnRegistration, type TableContext, type TableRoleLayout, type TableRoleOverlayBlurMode, type TableSortState} from "../lib/table-context.svelte";
     import type { FrameProps } from "../logic/frame-types";
     import Frame from "./Frame.svelte";
+    import Button from "./Button.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
+    const locale = useLocale();
     import {paginateDataTableRows, sortDataTableRows} from "../lib/data-table";
 
     export type DataTableMode = "client" | "server";
@@ -575,6 +578,7 @@
         isActionsResizable: () => actionsConfig?.resizable === true,
         getVariant: () => variant,
         getLoading: () => loading && visibleRows.length === 0,
+        isEmpty: () => !loading && !refreshing && error === undefined && visibleRows.length === 0,
         getLoadingMore: () => loadingMore,
         getLoadingRowCount: () => resolvedPageSize,
         getLoadingSpinner: () => showLoadingSpinner || ((loading || refreshing) && visibleRows.length > 0),
@@ -713,6 +717,11 @@
     {...rest}
 >
     {#if children}{@render children(renderState)}{/if}
+    {#if loadMoreMode === "manual" && loadMoreSource !== undefined && resolvedHasMore && !loading && !refreshing && !loadingMore}
+        <Frame row class="snowui-data-table-load-more">
+            <Button variant="outline" onclick={() => void runLoadMore()}>{locale.t("table.loadMore")}</Button>
+        </Frame>
+    {/if}
     {#if loadMoreMode === "auto" && loadMoreSource !== undefined && resolvedHasMore}
         <span
             bind:this={autoLoadSentinel}
@@ -725,5 +734,6 @@
 
 <style>
     :global(:where(.snowui-data-table)) { position: relative; width: 100%; min-width: 0; gap: var(--gap-3, .75rem); }
+    :global(:where(.snowui-data-table-load-more)) { width: 100%; justify-content: center; }
     :global(:where(.snowui-data-table-auto-load-sentinel)) { position: absolute; right: 0; bottom: 0; left: 0; height: 1px; pointer-events: none; }
 </style>

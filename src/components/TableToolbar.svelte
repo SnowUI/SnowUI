@@ -118,7 +118,7 @@
     const table = getTableContext();
     type DefaultBulkAction = "copy" | "delete";
     let pendingAction = $state<DefaultBulkAction | undefined>();
-    let query = $state(table.getQuery());
+    const query = $derived(table.getQuery());
     const sortValue = $derived.by(() => {
         const current = table.getSort();
         return current ? `${current.columnId}:${current.direction}` : "default";
@@ -130,7 +130,7 @@
             : "default";
     }
 
-    let filterValue = $state(resolveInitialFilterValue());
+    const filterValue = $derived(resolveInitialFilterValue());
 
     const resolvedSelectedCount = $derived(
         selectedCount ?? table.getSelectedRowIds().length,
@@ -158,10 +158,7 @@
         });
     }
 
-    $effect(() => setFilter(filterValue));
-
     function setQuery(value: string) {
-        query = value;
         table.setQuery(value);
     }
 
@@ -274,7 +271,7 @@
 
     {#if filter}
         <Select class="snowui-table-toolbar-built-in snowui-table-toolbar-picker" as="filter"
-            bind:value={filterValue} buttonTrigger buttonBare ariaLabel={resolvedFilterLabel} parts={pickerParts}
+            bind:value={() => filterValue, setFilter} buttonTrigger buttonBare ariaLabel={resolvedFilterLabel} parts={pickerParts}
             data-placeholder-visible={filterValue === "default" ? "true" : undefined}>
             {#snippet triggerContent()}
                 <ComponentIcon name="funnel-simple" aria-hidden="true" />
@@ -299,7 +296,7 @@
     :global(:where(.snowui-table-toolbar)) { box-sizing:border-box; display:flex; flex-flow:row nowrap; align-items:center; width:100%; min-width:0; height:calc(var(--size-10,2.5rem) + var(--snowui-overlay-scrollbar-layout-space,0px)); position:relative; padding:var(--snowui-table-toolbar-padding-override,var(--padding-1,.25rem) var(--padding-3,.75rem)); overflow-x:auto; overflow-y:hidden; border:0; border-radius:var(--snowui-table-toolbar-radius-override,var(--radius-3,.75rem)); background:var(--snowui-table-toolbar-background-override,var(--black-4,#0000000a)); }
     :global(:where(.snowui-table-toolbar > :not(.snowui-table-toolbar-scrollbar))) { margin-block-end:var(--snowui-overlay-scrollbar-layout-space,0px); }
     :global(:where(.snowui-table-toolbar-scrollbar)) { z-index:1; }
-    :global(:where(.snowui-table-toolbar-search)) { order:0; flex:1 1 0; min-width:0; }
+    :global(.snowui-table-toolbar > [data-as="search"]) { order:0; flex:1 1 0; min-width:0; margin-inline-end:auto; }
     :global(:where(.snowui-table-toolbar-bulk)) { order:1; display:inline-flex; align-items:center; gap:max(4px,var(--gap-2)); flex:0 0 auto; }
     :global(:where(.snowui-table-toolbar-resident-separator)) { order:2; }
     :global(:where(.snowui-table-toolbar-picker)), :global(:where(.snowui-table-toolbar)>:not(.snowui-table-toolbar-built-in):not([data-as="search"]):not([data-as="bulk"])) { order:3; flex:0 0 auto; }
@@ -307,6 +304,8 @@
     :global(:where(.snowui-table-toolbar-bulk-action)) { display:inline-flex; align-items:center; justify-content:center; }
     :global(:where(.snowui-table-toolbar-delete-button[data-pending="true"])) { display:none; }
     :global(:where(.snowui-table-toolbar-picker)) { overflow:visible; }
+    :global(.snowui-table-toolbar > .snowui-table-toolbar-picker) { margin-inline-start:auto; }
+    :global(.snowui-table-toolbar > .snowui-table-toolbar-picker ~ .snowui-table-toolbar-picker) { margin-inline-start:0; }
     :global(:where(.snowui-table-toolbar-picker[data-as="filter"]:not([data-placeholder-visible="true"]))) { color:var(--black-100,#000); }
     :global(:where(.snowui-table-toolbar):has(>[data-as="search"]:not(.snowui-table-toolbar-built-in))>.snowui-table-toolbar-search),
     :global(:where(.snowui-table-toolbar):has(>[data-as="bulk"]:not(.snowui-table-toolbar-built-in))>.snowui-table-toolbar-bulk),

@@ -3,7 +3,7 @@
 export const DEFAULT_NUMBER_VALUE_LABEL_FRACTION_DIGITS = 2;
 export const DEFAULT_NUMBER_PERCENT_FRACTION_DIGITS = 1;
 export const DEFAULT_NUMBER_COMPACT_THRESHOLD = 1_000_000;
-export const DEFAULT_NUMBER_EMPTY_VALUE = "—";
+export const DEFAULT_NUMBER_EMPTY_VALUE = "-";
 export const DEFAULT_NUMBER_LOCALE = "en-US";
 
 export type NumberNotation = "standard" | "compact" | "auto";

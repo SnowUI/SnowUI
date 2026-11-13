@@ -3,7 +3,7 @@
 <!-- 可排序、可调整列宽的表头单元格。文档: ./TableHead.md -->
 <script lang="ts">
   // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
-     import { untrack, type Snippet } from "svelte";
+     import { onDestroy, untrack, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Indicator from "./Indicator.svelte";
@@ -67,11 +67,19 @@
         get role() { return isSelectionRole ? "selection" : isActionsRole ? "actions" : undefined; },
         get align() { return align; },
     };
-    // registerColumn 会读写 registeredColumns；必须 untrack，否则 $effect 自触发死循环
+    // Register before the body renders so SSR skeletons use the real columns.
+    let registeredHidden = untrack(() => isRoleColumnHidden);
+    let unregisterColumn = untrack(() => registeredHidden ? undefined : table.registerColumn(columnRegistration));
     $effect(() => {
-        if (isRoleColumnHidden) return;
-        return untrack(() => table.registerColumn(columnRegistration));
+        const hidden = isRoleColumnHidden;
+        if (hidden === registeredHidden) return;
+        untrack(() => {
+            unregisterColumn?.();
+            unregisterColumn = hidden ? undefined : table.registerColumn(columnRegistration);
+            registeredHidden = hidden;
+        });
     });
+    onDestroy(() => unregisterColumn?.());
     const tableVariant = $derived(table.getVariant());
     const resolvedRoleLayout = $derived(roleLayout && roleLayout !== "auto" ? roleLayout : table.getRoleLayout());
     const hasSelectionOverlay = $derived(
@@ -239,7 +247,7 @@
     :global(:where(.snowui-table-head.snowui-table-cell-visible-first)) { --snowui-table-head-padding-start: max(var(--padding-2), var(--snowui-table-responsive-cell-padding-inline, var(--padding-3))); }
     :global(:where(.snowui-table-head.snowui-table-cell-visible-last)) { --snowui-table-head-padding-end: max(var(--padding-2), var(--snowui-table-responsive-cell-padding-inline, var(--padding-3))); }
 
-    :global(:where(.snowui-table-head)) { position: relative; box-sizing: border-box; height: var(--size-10, 2.5rem); padding: var(--snowui-table-head-padding-override, var(--padding-2) var(--snowui-table-head-padding-end, var(--snowui-table-responsive-cell-padding-inline, var(--padding-3))) var(--padding-2) var(--snowui-table-head-padding-start, var(--snowui-table-responsive-cell-padding-inline, var(--padding-3)))); border-bottom: var(--border-1, .5px) solid var(--black-20, #0003); color: var(--black-100, #000); font-size: var(--text-12, .75rem); line-height: var(--leading-12, 1rem); font-weight: 400; vertical-align: middle; overflow: visible; }
+    :global(:where(.snowui-table-head)) { position: relative; box-sizing: border-box; height: var(--size-10, 2.5rem); padding: var(--snowui-table-head-padding-override, var(--padding-2) var(--snowui-table-head-padding-end, var(--snowui-table-responsive-cell-padding-inline, var(--padding-3))) var(--padding-2) var(--snowui-table-head-padding-start, var(--snowui-table-responsive-cell-padding-inline, var(--padding-3)))); border-bottom: var(--border-1, .5px) solid var(--black-20, #00000033); color: var(--black-100, #000); font-size: var(--text-12, .75rem); line-height: var(--leading-12, 1rem); font-weight: 400; vertical-align: middle; overflow: visible; }
     :global(:where(.snowui-table-head[data-as="selection"])) { width: var(--size-10); padding: var(--snowui-table-head-selection-padding-override, var(--padding-2) var(--snowui-table-head-padding-end, var(--snowui-table-responsive-cell-padding-inline, var(--padding-3))) var(--padding-2) var(--snowui-table-head-padding-start, var(--snowui-table-responsive-cell-padding-inline, var(--padding-3)))); }
     :global(:where(.snowui-table-head[data-as="actions"])) { width: var(--size-10); padding: var(--snowui-table-head-actions-padding-override, var(--padding-2) var(--snowui-table-head-padding-end, var(--snowui-table-responsive-cell-padding-inline, var(--padding-3))) var(--padding-2) var(--snowui-table-head-padding-start, var(--snowui-table-responsive-cell-padding-inline, var(--padding-3)))); text-align: end; }
     :global(:where(.snowui-table-selection-control)) { display: flex; width: 100%; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity var(--snowui-frame-color-motion-duration, .15s) var(--snowui-frame-color-motion-easing, ease-out); }

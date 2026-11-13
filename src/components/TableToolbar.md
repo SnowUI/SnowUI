@@ -129,6 +129,10 @@
 
 
 
+### 2026-11-13 行为同步
+
+搜索与筛选直接响应所属DataTable状态，外部更新query/filters后同步显示。搜索占据可用空间，筛选等工具保持右侧排列；不在页面重复查询、刷新或计数控件。
+
 ## AI Zone
 
 DataTable 专用工具栏，内置搜索、排序、筛选、选择计数与批量操作。它读取 DataTable Context，不支持独立搭配普通 Table。公开入口为 `@snowui-design-system/components`。

@@ -64,13 +64,14 @@
 | maxWidth | `number` | `480` | 可拖拽展开宽度上限 |
 | resizable | `boolean` | `true` | 是否启用右侧边框调宽命中层 |
 | activeItemId | `string` | — | 外部控制的选中项 id；未传时使用内部选择或恢复的持久化值。仅选择状态，不自动替宿主进行路由。 |
-| persistence | `boolean` | `true` | 是否记忆 active item 与各 Section 折叠状态 |
+| persistence | `boolean` | `true` | 是否记忆侧栏折叠、active item 与各 Section 折叠状态 |
 | persistenceKey | `string` | `"default"` | localStorage 实例命名空间；同一页面存在多个 Sidebar 时必须分别设置 |
 | ariaLabel | `string` | `locale 文案` | 导航及其滚动区域的可访问名称；省略时随 LocaleProvider 更新，显式值优先，多实例应提供可区分的名称。 |
 | continuousHover | `boolean` | `true` | 是否在可用导航项之间移动共享 hover 背景；关闭后恢复逐项 hover，选中状态不受影响。 |
 | onCollapsedChange | `(collapsed: boolean) => void` | — | 用户点击内置按钮切换后调用，参数为新折叠状态，不可取消。 |
 | onWidthChange | `(width: number) => void` | — | 用户调宽时调用，参数为夹取到 minWidth/maxWidth 的整数像素宽度。 |
 | onActiveItemChange | `(itemId: string) => void` | — | 导航选择或恢复合法持久化选中项时调用，参数为选中项 id；宿主处理内容与路由。 |
+| footer | `Snippet` | — | 固定底部内容，SSR原位渲染，优先于as="footer"内容。 |
 | children | `Snippet` | — | 无参数显式内容，与 sections 同时渲染；直属 as="logo" 替换 Header Logo，as="footer" 放入固定 Footer，其余内容进入导航区。 |
 | parts | `ComponentPartsOf<{ Indicator: typeof Indicator; SnowUILogo: typeof SnowUILogo; SidebarSection: typeof SidebarSection; SidebarItem: typeof SidebarItem; }>` | — | 配置调宽交互层使用的 Indicator，以及默认生成的 SnowUILogo / SidebarSection / SidebarItem；Indicator 复用默认状态视觉 |
 
@@ -142,6 +143,10 @@ hover 到 active 项时两个背景叠加形成更深颜色。Section 标题属�
 pointer 位于标题时共享层隐藏，不把标题当作相邻 Item 间隙。设为 `false` 恢复逐项 hover。
 
 
+
+### 2026-11-13 行为同步
+
+折叠状态与选中项、分组折叠状态一同按persistenceKey保存。浏览器初次渲染读取保存状态；组件同时写入snowui-sidebar-collapsed-<编码后的key>布局Cookie（1/0），SSR宿主可读取并传入collapsed以避免骨架先展开后收起。页面路由仍由宿主拥有，应同步URL中的当前分区。footer Snippet在SSR时原位渲染固定底部内容，优先于旧as="footer"移动方式。Sidebar高度由宿主在加载前确定。鼠标进入侧栏或折叠按钮所在位置时渐显；点击后1秒尝试渐隐，鼠标仍悬停按钮时保持显示，离开后隐藏。复用共享颜色动效时长与减少动效设置。
 
 ## AI Zone
 

@@ -515,6 +515,10 @@ Root Frame(nav)
 
 
 
+### 2026-11-13 行为同步
+
+作为Table/DataTable分页角色使用时，无数据或筛选结果为空会隐藏分页；独立Pagination的total为0时同样隐藏；正数总量保留原分页行为。
+
 ## AI Zone
 
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。

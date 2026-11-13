@@ -247,8 +247,8 @@
         /* placeholder 文本色:对齐 Input 的 --snowui-input-placeholder-color */
         --snowui-search-box-placeholder-color: var(--black-20, #00000033);
         /* 默认搜索图标色:静止 Black/20%,hover 加深到 Black/40% */
-        --snowui-search-box-icon-color: var(--black-20, #00000033);
-        --snowui-search-box-icon-hover-color: var(--black-40, #00000066);
+        --snowui-search-box-icon-color: var(--black-100, #000000ff);
+        --snowui-search-box-icon-hover-color: var(--black-100, #000000ff);
         --snowui-search-box-trailing-color: var(--black-20, #00000033);
 
         width: var(--snowui-search-box-width-override, auto);
@@ -319,7 +319,7 @@
             background-color
                 var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out),
-            color var(--snowui-frame-color-motion-duration, 0.15s)
+            opacity var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
 
@@ -409,8 +409,9 @@
             --snowui-search-box-icon-color-override,
             var(--snowui-search-box-icon-color)
         );
+        opacity: 0.2;
         transition:
-            color var(--snowui-frame-color-motion-duration, 0.15s)
+            opacity var(--snowui-frame-color-motion-duration, 0.15s)
                 var(--snowui-frame-color-motion-easing, ease-out);
     }
 
@@ -425,6 +426,7 @@
             --snowui-search-box-icon-hover-color-override,
             var(--snowui-search-box-icon-hover-color)
         );
+        opacity: 0.4;
     }
 
     /* LayoutProtocol §4.1.5: 外置 leading 存在时隐藏直系默认 Search。 */

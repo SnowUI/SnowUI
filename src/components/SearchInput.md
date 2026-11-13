@@ -123,6 +123,10 @@
 
 
 
+### 2026-11-13 行为同步
+
+默认搜索图标静止opacity为0.2，focus时为0.4；颜色为不透明主题色，通过所属图标的公开style传入，避免Input通用leading附件的20%色再次叠加。外置leading图标不受此规则影响。`--snowui-search-input-icon-color-override`可覆盖默认图标颜色，应传入不透明颜色；透明度仍由组件状态控制。
+
 ## AI Zone
 
 > **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
@@ -141,7 +145,7 @@
 
 ### 样式数值
 
-样式数值登记在 `../../../docs/reference/ComponentStyleSheet.md`。`SearchInput` 默认与 `Input 标准` 保持一致，不另建通用颜色体系；内置默认 `Search` 作为搜索输入的专属视觉，静止态使用 Black/20，`:focus-within` 激活态使用 Black/40。该规则限定在 `.snowui-input.snowui-search-input .snowui-search-input-default-icon`，不影响通用 `Icon` 或外置 leading。
+样式数值登记在 `../../../docs/reference/ComponentStyleSheet.md`。`SearchInput` 默认与 `Input 标准` 保持一致，不另建通用颜色体系；内置默认 `Search` 作为搜索输入的专属视觉，静止态使用不透明主题色＋opacity 0.2，`:focus-within` 激活态使用opacity 0.4，避免两次透明度叠加。该规则限定在 `.snowui-input.snowui-search-input .snowui-search-input-default-icon`，不影响通用 `Icon` 或外置 leading。
 
 ### 开发者关键字
 

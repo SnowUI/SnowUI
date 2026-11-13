@@ -84,4 +84,10 @@ export const examples = [
         expected: { render: "同一标题插槽显示文本、Chip 组件与美元图标。", interaction: "图标具有美元金额的可访问名称。", responsive: "内容参与原生列宽与对齐。" },
         logic: ["Children", "Icon", "Composition"],
     },
+    {
+        name: "初次渲染的多列骨架",
+        code: `<DataTable rows={[]} loading actions roleLayout="column"><Table><TableHeader><TableRow><TableHead columnId="email">账户</TableHead><TableHead columnId="subjects">授权主体</TableHead><TableHead columnId="sessions">有效会话</TableHead><TableHead as="actions">操作</TableHead></TableRow></TableHeader><TableBody /></Table></DataTable>`,
+        expected: { render: "SSR和客户端首次渲染的每条骨架行均包含四个单元格，匹配表头。", layout: "各列横向对齐，不先显示单列骨架；挂载后列登记不重复。", interaction: "列隐藏/重新显示及销毁时同步登记。" },
+        logic: ["SSR", "ColumnRegistration", "Skeleton"],
+    },
 ];

@@ -328,12 +328,27 @@
         );
     }
 
+    /* Keep the backdrop surface opaque; dim only content for blurred items. */
+    :global(:where(.snowui-breadcrumb-item.snowui-button-background-blur:not(.snowui-breadcrumb-current):not(.snowui-disabled):not(:disabled))) {
+        --snowui-button-opacity-override: 1;
+        opacity: 1;
+    }
+
+    :global(:where(.snowui-breadcrumb-item.snowui-button-background-blur:not(.snowui-breadcrumb-current):not(.snowui-disabled):not(:disabled)) > .snowui-button-content) {
+        opacity: var(--snowui-breadcrumb-inactive-opacity-override, var(--snowui-breadcrumb-inactive-opacity, 0.4));
+        transition: opacity var(--snowui-frame-color-motion-duration, 0.15s) var(--snowui-frame-color-motion-easing, ease-out);
+    }
+
+    :global(:where(.snowui-breadcrumb-item.snowui-button-background-blur:not(.snowui-breadcrumb-current):hover:not(.snowui-disabled):not(:disabled)) > .snowui-button-content) {
+        opacity: var(--snowui-breadcrumb-inactive-hover-opacity-override, var(--snowui-breadcrumb-inactive-hover-opacity, 1));
+    }
+
     :global(:where(.snowui-breadcrumb-current)) {
         opacity: 1;
     }
 
     :global(:where(.snowui-breadcrumb-separator)) {
-        opacity: 0.5;
+        opacity: 1;
         color: var(
             --snowui-breadcrumb-separator-color-override,
             var(--snowui-breadcrumb-separator-color, var(--black-10, rgba(0, 0, 0, 0.1)))

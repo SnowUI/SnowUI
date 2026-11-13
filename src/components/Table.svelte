@@ -250,6 +250,8 @@
 </Frame>
 
 <style>
+    :global(.snowui-table:has(> .snowui-table-body > .snowui-table-empty-row):not(:has(> .snowui-table-body > tr:not(.snowui-table-empty-row):not([hidden]))) .snowui-table-head) { border-bottom: var(--border-1, .5px) solid var(--black-20, #00000033); }
+
     :global(:where(.snowui-table .snowui-table-responsive-hidden)) { display: none; }
     :global(:where(.snowui-table-viewport)) {
         width: 100%;

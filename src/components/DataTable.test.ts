@@ -72,10 +72,10 @@ export const examples = [
     }}
 >
     {#snippet children(state)}
-        <Table><TableHeader><TableRow><TableHead>名称</TableHead></TableRow></TableHeader><TableBody>{#each state.rows as row, index}<TableRow rowId={state.getRowKey(row, index)}><TableCell>{row.name}</TableCell></TableRow>{/each}{#if state.hasMore && !state.loadingMore}<TableRow><TableCell><Button onclick={() => void state.loadMore()}>加载更多</Button></TableCell></TableRow>{/if}</TableBody></Table>
+        <Table><TableHeader><TableRow><TableHead>名称</TableHead></TableRow></TableHeader><TableBody>{#each state.rows as row, index}<TableRow rowId={state.getRowKey(row, index)}><TableCell>{row.name}</TableCell></TableRow>{/each}</TableBody></Table>
     {/snippet}
 </DataTable>`,
-        expected: { render: "组件内部逐条追加 async generator 返回的数据。", layout: "请求阶段使用跨列 Spinner 行，数据行保持原表格结构；首次加载前锁定当前自然列宽。", interaction: "state.loadMore() 防止并发；第一条新行开始渐显时隐藏 Spinner；selection/actions 控件保持完整 opacity。", performance: "按内部展示间隔挂载行，普通 TableCell 独立执行纯 Frame opacity 动效且不缩放，不等待上一行动效完成；间隔为 0 时同批提交；新内容不重排已有列宽。", responsive: "增量行沿用锁定列宽，显式 columnWidths 仍优先。" },
+        expected: { render: "组件默认显示居中的outline加载更多按钮，无需消费方手写；内部逐条追加async generator返回的数据。", layout: "请求阶段使用跨列 Spinner 行，数据行保持原表格结构；首次加载前锁定当前自然列宽。", interaction: "按钮在请求和逐行追加时隐藏，完成且仍有更多时恢复，耗尽后消失；state.loadMore() 防止并发；第一条新行开始渐显时隐藏 Spinner；selection/actions 控件保持完整 opacity。", performance: "按内部展示间隔挂载行，普通 TableCell 独立执行纯 Frame opacity 动效且不缩放，不等待上一行动效完成；间隔为 0 时同批提交；新内容不重排已有列宽。", responsive: "增量行沿用锁定列宽，显式 columnWidths 仍优先。" },
         logic: ["LoadMore", "AsyncIterable", "ColumnWidthLock", "ProgressiveRows", "RowAppear", "Abort"],
     },
     {
@@ -142,4 +142,6 @@ export const examples = [
         expected: { render: "宽容器常驻显示 Checkbox 与操作。", responsive: "缩窄先转 hover 浮层，再缩左右间距，再从右向左收列；第一普通列和角色功能始终保留。", interaction: "宽窄切换保留选择与键盘操作；当前可见末列接管圆角。" },
         logic: ["Responsive", "Selection", "OverlayRoleLayout"],
     },
+    { name: "统一无数据状态", code: `<DataTable rows={[]} variant="striped"><Table><TableHeader><TableRow><TableHead columnId="name">Name</TableHead><TableHead columnId="plan">Plan</TableHead></TableRow></TableHeader><TableBody /></Table><Pagination total={1} /></DataTable>
+<Table><TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Plan</TableHead></TableRow></TableHeader><TableBody /></Table>`, expected: { render: "两种组合都保留表头，首行左侧显示本地化No data；DataTable分页不显示。", layout: "空行40px高、12px/16px文字、Black40、水平12px名义padding；无空行底线或条纹背景；空态表头始终显示Black20底线，覆盖striped/divided。", interaction: "搜索筛选变空同样显示；有数据恢复后空提示隐藏、分页恢复；加载时不显示空提示。", responsive: "跟随表格可见列宽与跨列，不产生独立窄卡片。" }, logic: ["Empty", "FilteredEmpty", "Pagination", "Variants"] },
 ];

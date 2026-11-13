@@ -200,7 +200,7 @@
 | refreshing | `boolean` | `false` | 后台刷新状态，保留现有数据并通过渲染状态提供。 |
 | loadMore | `DataTableLoadMore<T>` | — | 增量数据源；request 包含 offset、limit 和 AbortSignal |
 | loadMoreSize | `number` | `5` | 每次增量加载的最大行数 |
-| loadMoreMode | `DataTableLoadMoreMode` | `"manual"` | 手动调用 `state.loadMore()`，或由内部表尾哨兵自动触发 默认行为：manual。 |
+| loadMoreMode | `DataTableLoadMoreMode` | `"manual"` | manual内置居中加载更多按钮，也可调用state.loadMore；auto由内部表尾哨兵触发。 |
 | loadMoreThreshold | `number` | `80` | auto 模式越过表格底部后继续滚动多少 px 才触发 |
 | loadMoreThrottleMs | `number` | `500` | auto 模式首次进入触发区后的确认等待时间，同时作为连续请求的最小间隔；首次等待期间离开触发区则取消 |
 | hasMore | `boolean` | — | 显式覆盖是否仍可加载；否则优先按 totalRows 推导，再按返回数量推断 默认行为：自动推导。 |
@@ -369,6 +369,10 @@ DataTable 的工具栏、Table 和 Pagination 默认区域间距为 12px。`stri
 actions配置新增maxVisible（缺省3）、buttonProps、parts和moreLabel，类型复用OverflowActions；单项支持target／rel／buttonProps／parts。缺省progressive从末端收纳，显式all、compact与方向保持。组级样式只作用于默认生成组，单项buttonProps优先于单项parts.Button。显式children替换默认内容；其中OverflowActions共享本表布局预算，不继承默认生成组的视觉。
 
 操作区先按本表实际可见viewport的20%、14rem及显式／拖动列宽上限取小，并预留选择和受保护数据宽度；总预算包含padding、More及渐隐覆盖。More最小命中尺寸优先，极窄冲突时局部滚动，不缩小字体／控件或为保操作先隐藏数据。
+
+### 2026-11-13 行为同步
+
+manual增量加载模式由组件内置居中的outline“加载更多”按钮，调用方不再重复放置按钮；仍可通过state.loadMore调用相同数据源。正在加载、刷新、追加或没有更多数据时不重复显示可点击按钮。空表与无搜索结果由TableBody显示本地化空文案，隐藏分页，所有变体保留Black 20表头底线；表体分隔线仍为Black 10。
 
 ## AI Zone
 

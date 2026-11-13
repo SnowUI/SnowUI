@@ -19,7 +19,7 @@ export const examples = [
             ] },
         ]}
     >
-        <Text as="footer" class="text-black-40">© 2026 SnowUI</Text>
+        {#snippet footer()}<Text as="footer" class="text-black-40">© 2026 SnowUI</Text>{/snippet}
     </Sidebar>
 </Frame>`,
         expected: {
@@ -130,7 +130,7 @@ export const examples = [
     </Sidebar>
 </Frame>`,
         expected: {
-            render: "默认初值、显式 collapsed 与外部绑定均支持反复折叠/展开并恢复焦点；text 变体折叠后只显示内置展开按钮，不显示 Logo、导航 Item 或 Footer",
+            render: "默认初值、显式 collapsed 与外部绑定均支持反复折叠/展开并恢复焦点；text 变体折叠后只保留内置展开按钮区域，不显示 Logo、导航 Item 或 Footer；按钮区域伸出折叠侧栏时仍高于页面固定顶部栏，直接hover按钮位置或侧栏均淡入，点击后1秒淡出；鼠标仍hover按钮区域时保持显示，满1秒后移出再淡出，键盘焦点保持可见",
             layout: "text 折叠按钮从当前 Header 位置连续移动到左上角，展开时反向交接，复用侧栏 spring timing；reduced motion 下直接定位。text 折叠根宽度与 padding 为零，展开按钮在当前可视区域左上角，左边距12px、上边距16px（随 Token 缩放）；有图标模式仍为60px",
             interaction: "折叠状态无需 hover 即可看到顶层展开按钮；键盘切换后焦点恢复，反复展开/折叠只存在一个浮层按钮，卸载后无浮层残留；展开后标题默认可折叠且无 Tooltip",
             performance: "不扫描 children 或 sections 判断是否存在 Icon，变体完全由 navigationVariant 显式决定",
@@ -188,7 +188,7 @@ export const examples = [
             render: "刷新后恢复各 Section 的展开 / 折叠状态与最后选中的 active item。",
             layout: "列表可滚动时，恢复后的 active item 尽量位于Body 实际可视中心；首尾按滚动边界夹紧。",
             interaction: "若当前 active item 所属 Section 上次被折叠，刷新后该 Section 自动展开；当前 active item 已位于无分类位置时不沿用旧分类 ID，其他分类仍保持折叠；hover Section 标题或两个折叠标题之间的空隙时共享 hover 层隐藏，不点亮下方最近 Item；整体折叠后 Item 仍显示连续 hover 背景，直接进入折叠按钮预期位置也会显示按钮。",
-            performance: "默认使用 snowui:sidebar:default 命名空间读写 localStorage；恢复后进行即时与动效结束后的两次定位校正。多实例通过不同 persistenceKey 隔离。",
+            performance: "默认使用 snowui:sidebar:default 命名空间读写 localStorage，保存整体折叠状态、当前item和分组状态，刷新及重新打开恢复；客户端首帧同步读取折叠状态，SSR宿主从折叠Cookie传入初值，骨架不得先展开再折叠；旧记录无整体折叠字段时保留初始值；恢复后进行即时与动效结束后的两次定位校正。多实例通过不同 persistenceKey 隔离。",
             responsive: "Section 内容折叠时卸载；active item 的 Section 归属由 Sidebar 独立记忆。",
         },
         logic: ["Persistence", "ActiveReveal", "SectionRecovery", "HoverBlocker"],

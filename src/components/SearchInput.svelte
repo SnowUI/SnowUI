@@ -137,6 +137,7 @@
             as="leading"
             size="var(--size-4)"
             class="snowui-search-input-default-icon"
+            style="color: var(--snowui-search-input-icon-color-override, var(--snowui-search-input-resolved-icon-color));"
             aria-hidden="true"
         />
     {/if}
@@ -247,23 +248,25 @@
     /* SearchInput 专属默认 Search 颜色；只影响内置图标，不影响通用 Icon 或外置 leading。 */
     :global(
             :where(.snowui-input.snowui-search-input)
-                .snowui-search-input-default-icon
         ) {
-        color: var(
+        --snowui-search-input-resolved-icon-color: var(
             --snowui-search-input-icon-color,
-            var(--black-20, #00000033)
+            var(--black-100, #000000ff)
         );
     }
 
+    :global(:where(.snowui-input.snowui-search-input) .snowui-search-input-default-icon) { opacity: 0.2; }
+
     :global(
             :where(.snowui-input.snowui-search-input):focus-within
-                .snowui-search-input-default-icon
         ) {
-        color: var(
+        --snowui-search-input-resolved-icon-color: var(
             --snowui-search-input-active-icon-color,
-            var(--black-40, #00000066)
+            var(--black-100, #000000ff)
         );
     }
+
+    :global(:where(.snowui-input.snowui-search-input):focus-within .snowui-search-input-default-icon) { opacity: 0.4; }
 
     /* LayoutProtocol §4.1.5: 外置 leading 存在时隐藏直系默认 Search。 */
     :global(

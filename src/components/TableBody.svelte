@@ -8,6 +8,7 @@
     import TableRow from "./TableRow.svelte";
     import TableCell from "./TableCell.svelte";
     import Spinner from "./Spinner.svelte";
+    import { useLocale } from "../i18n/locale.svelte";
     import { resizeManager } from "../logic/observer.svelte";
     import { getTableContext, type TableColumnRegistration } from "../lib/table-context.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
@@ -31,6 +32,7 @@
     }
     let { rowCount = undefined, loading = undefined, loadingSpinner = undefined, continuousHover = true, children, parts = undefined, class: userClass = "", style: userStyle = "", enableResponsive = false, enableContext = false, enableScaleObserver = false, ...rest }: Props = $props();
     const table = getTableContext();
+    const localeContext = useLocale();
     const fallbackColumns: readonly TableColumnRegistration[] = [{ align: "start" }];
     const resolvedLoading = $derived(loading ?? table.getLoading());
     const resolvedLoadingSpinner = $derived(
@@ -79,7 +81,7 @@
         if (!overlayHost) return;
         continuousHoverController ??= new ContinuousHoverController();
         return continuousHoverController.attach(bodyElement, {
-            selector: ":scope > .snowui-table-row",
+            selector: ":scope > .snowui-table-row:not([data-empty])",
             layerClass: "snowui-table-continuous-hover-layer",
             axis: "y",
             geometryMode: "direct",
@@ -108,6 +110,11 @@
         {/each}
     {:else}
         {#if children}<ComponentPartsBoundary>{@render children()}</ComponentPartsBoundary>{/if}
+        {#if !resolvedLoadingSpinner}
+            <tr class="snowui-table-empty-row" data-empty="true">
+                <td colspan={Math.max(1, skeletonColumns.length)} class="snowui-table-empty-cell">{localeContext.t("table.noData")}</td>
+            </tr>
+        {/if}
         {#if resolvedLoadingSpinner}
             <TableRow data-loading-spinner="true">
                 <TableCell
@@ -127,6 +134,9 @@
 </Frame>
 
 <style>
+    :global(.snowui-table-body:has(> tr:not([data-empty]):not([data-loading-spinner]):not([hidden])) > .snowui-table-empty-row) { display: none; }
+    :global(:where(.snowui-table-empty-cell)) { height: var(--size-10, 2.5rem); box-sizing: border-box; padding: var(--padding-2, .5rem) var(--snowui-table-responsive-cell-padding-inline, var(--padding-3, .75rem)); color: var(--black-40, #00000066); font-size: var(--text-12, .75rem); line-height: var(--leading-12, 1rem); text-align: start; vertical-align: middle; border: 0; background: transparent; }
+
     :global(:where(.snowui-table-loading-cell)) { text-align: center; }
     :global(:where(.snowui-table-loading-indicator)) { display: flex; width: 100%; align-items: center; justify-content: center; font-size: var(--text-12); line-height: var(--leading-12); }
     :global(:where(.snowui-table-row[data-loading-spinner="true"] > .snowui-table-cell)) { border-radius: 0; border-bottom-color: var(--black-10, #0000001a); background: transparent; }

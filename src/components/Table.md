@@ -250,6 +250,10 @@ DataTable 的配置由 Context 下发；显式 Table 配置优先。普通 Table
 
 DataTable操作列按本表局部viewport计算20%／14rem／显式及拖动列宽上限的最小预算，先收操作再执行角色列、padding和原有数据响应式规则。预算包含padding与浮层渐隐覆盖；More最小可用尺寸优先，极窄滚动兜底。菜单展开冻结布局、关闭后更新；统一观察器和字体／Token失效触发重测，不新增逐行ResizeObserver。
 
+### 2026-11-13 行为同步
+
+所有样式变体在无数据或搜索结果为空时复用TableBody内置空态；空态表头保留Black 20底线，分页隐藏。表体普通分隔线继续为Black 10。
+
 ## AI Zone
 
 内置滚动区域文案使用 `table.scrollRegion` / `table.scrollRegionNamed`；`ariaLabel` 是调用方业务文案，不由组件翻译。Provider 的 `messages` 可覆盖滚动提示模板，普通表格与 DataTable 内的 Table 共用同一行为。

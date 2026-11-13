@@ -167,6 +167,10 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 
 
 
+### 2026-11-13 行为同步
+
+配置Button背景模糊时，非当前项只降低内容透明度，不降低整个按钮及背景模糊层；hover恢复内容透明度。分隔符使用Black 10且不额外叠加透明度。
+
 ## AI Zone
 
 > **设计稿**: [Workshop / Breadcrumb](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12046-1772&t=nY2VC3oisn12OH01-4)
