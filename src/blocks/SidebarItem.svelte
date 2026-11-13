@@ -286,8 +286,8 @@
         opacity: 1;
         pointer-events: auto;
     }
+    /* Match the live sidebar: fade content in its original singleLine slot. */
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-content)) {
-        position: absolute;
         opacity: 0;
         visibility: hidden;
         pointer-events: none;
@@ -299,8 +299,6 @@
     }
     :global(:where(.snowui-sidebar-item[data-collapsed="true"] .snowui-sidebar-item-main)) {
         justify-content: flex-start;
-        gap: 0;
-        --snowui-button-content-gap: 0px;
         /* The navigation item owns its spacing even when Button uses bare + iconOnly. */
         --snowui-button-icon-only-padding-override: var(--snowui-sidebar-item-padding-y-override, var(--padding-2)) var(--snowui-sidebar-item-padding-x-override, var(--padding-2));
         padding-inline: var(--snowui-sidebar-item-padding-x-override, var(--padding-2));
