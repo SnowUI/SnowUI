@@ -5,6 +5,18 @@
  */
 export const examples = [
     {
+        name: "A0: 无页与单页",
+        code: `A0
+<Pagination total={0} />
+<Pagination total={1} />`,
+        expected: {
+            render: "无页和单页均不渲染分页导航。",
+            layout: "隐藏的分页不占据布局空间。",
+            interaction: "不产生不可用的页码焦点。",
+        },
+        logic: ["Empty", "SinglePage"],
+    },
+    {
         name: "A1: 短页数",
         code: `A1
 <Pagination page={1} total={5}>
@@ -13,7 +25,7 @@ export const examples = [
 </Pagination>`,
         expected: {
             render: "渲染 1 2 3 4 5 和内置 prev / next 箭头。",
-            layout: "Pagination 为 Hug 宽度时，所有元素保持 Hug。",
+            layout: "默认 fill 撑满容器，可见按钮均分可用宽度。",
             interaction: "当前页和上一页不可点击，其余页码和下一页可点击。",
             performance: "只使用 current / page 两个模板生成全部页码。",
             responsive: "内容过长时先收缩按钮，再减少页码窗口；分页控件不换行。",

@@ -14,7 +14,8 @@
 <!-- usage-guide:start -->
 用于多页内容导航。DataTable 场景与其渲染状态连接；页码变化与数据请求是不同责任，不能假定组件自动发请求。
 
-- page 从 1 开始，total 表示总页数，不是数据条数；onPageChange 连接页面状态。
+- page 从 1 开始，total 表示总页数，不是数据条数；onPageChange 连接页面状态。总页数不超过 1 时不显示分页，表格空态同样隐藏。
+- 默认使用 outline 样式与 fill 宽度，撑满所在容器；分页内容默认居中。表格消费方不应覆盖为 fit-content。
 - pageSizeOptions 配置每页条数选择，pageSize 可绑定；数据请求和总页数计算由页面或 DataTable 负责。
 - 根导航默认名称随LocaleProvider更新，显式ariaLabel优先；不改变页码、每页条数与业务请求责任。
 <!-- usage-guide:end -->
@@ -517,7 +518,7 @@ Root Frame(nav)
 
 ### 2026-11-13 行为同步
 
-作为Table/DataTable分页角色使用时，无数据或筛选结果为空会隐藏分页；独立Pagination的total为0时同样隐藏；正数总量保留原分页行为。
+作为Table/DataTable分页角色使用时，无数据或筛选结果为空会隐藏分页；总页数不超过1时同样隐藏，只有多于1页时显示。
 
 ## AI Zone
 

@@ -971,7 +971,7 @@
     });
 </script>
 
-{#if total > 0 && !tableContext.isEmpty()}
+{#if total > 1 && !tableContext.isEmpty()}
 <Frame
     tag="nav"
     enableResponsive={enableResponsive}
@@ -1088,6 +1088,7 @@
 
     :global(:where(.snowui-pagination-items)) {
         display: inline-flex;
+        justify-content: center;
         flex-wrap: wrap;
         align-items: center;
         gap: max(4px, var(
