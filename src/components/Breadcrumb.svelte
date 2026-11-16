@@ -298,7 +298,7 @@
 <style>
     :global(:where(.snowui-breadcrumb)) {
         display: inline-flex;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
         row-gap: max(4px, var(--snowui-breadcrumb-row-gap-override, var(--snowui-breadcrumb-row-gap, var(--gap-1))));
         column-gap: max(4px, var(--snowui-breadcrumb-column-gap-override, var(--snowui-breadcrumb-column-gap, var(--gap-1))));

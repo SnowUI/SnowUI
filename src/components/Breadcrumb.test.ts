@@ -14,10 +14,10 @@ export const examples = [
 </Breadcrumb>`,
         expected: {
             render: "渲染 Dashboards / Default 面包屑，最后一个 item 为当前页。",
-            layout: "根容器 inline-flex 横向排列，item 与 separator 间距为 4px，支持换行。",
+            layout: "根容器 inline-flex 横向排列，item 与 separator 间距为 4px，默认不换行。",
             interaction: "Dashboards 默认 40% 透明度，hover 时恢复 100%；Default 不响应 hover 与点击。",
             performance: "仅观察直系子节点角色变化，无额外深层遍历。",
-            responsive: "窄容器下按 row-gap 换行。",
+            responsive: "窄容器下路径仍保持单行。",
         },
         logic: ["A1", "Current", "Composition"],
     },
@@ -38,7 +38,7 @@ export const examples = [
             layout: "所有直系 item / separator 保持同一行视觉中心。",
             interaction: "前三项可点击，最后一项自动成为当前页。",
             performance: "当前项识别只基于最后一个 data-as=item。",
-            responsive: "长路径允许换行。",
+            responsive: "长路径默认保持单行。",
         },
         logic: ["Composition", "Separator"],
     },
@@ -100,7 +100,7 @@ export const examples = [
         logic: ["Disabled", "Current"],
     },
     {
-        name: "A6: 长路径换行",
+        name: "A6: 长路径保持单行",
         code: `A6
 <div style="width: 14rem;">
     <Breadcrumb>
@@ -114,13 +114,13 @@ export const examples = [
     </Breadcrumb>
 </div>`,
         expected: {
-            render: "窄容器中路径自然换行。",
-            layout: "换行行距为 Breadcrumb row-gap，列距为 column-gap。",
-            interaction: "换行不改变当前项与 hover 规则。",
+            render: "窄容器中路径保持单行。",
+            layout: "根容器 flex-wrap 为 nowrap，路径间距仍使用 column-gap。",
+            interaction: "单行布局不改变当前项与 hover 规则。",
             performance: "仅使用 flex-wrap。",
-            responsive: "容器宽度变化时自动重排。",
+            responsive: "容器宽度缩小时不产生第二行，不自动隐藏路径项。",
         },
-        logic: ["Wrap", "Layout"],
+        logic: ["NoWrap", "Layout"],
     },
     {
         name: "A7: 当前项不可交互",
@@ -164,10 +164,10 @@ export const examples = [
         logic: ["Locale.DefaultNames"],
     },
     {
-        name: "A9: 路径间距下限与既有换行",
+        name: "A9: 路径间距下限与默认单行",
         code: `A9
 <Breadcrumb gap={0} style="width: 14rem;" items={[{label: "Parent workspace"}, {label: "Current component page"}]} />`,
-        expected: {render: "独立路径元素保持至少4 CSS px间距，较窄时按原合同换行，当前页仍不可交互。"},
-        logic: ["ContentSpacing", "Wrap", "Current"],
+        expected: {render: "独立路径元素保持至少4 CSS px间距，较窄时仍保持单行，当前页仍不可交互。"},
+        logic: ["ContentSpacing", "NoWrap", "Current"],
     },
 ] as const;
