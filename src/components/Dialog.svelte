@@ -180,9 +180,9 @@
     setContext(BUTTON_SIZE_CONTEXT_KEY, {
         present: true,
         get scaleOnHover() { return parentButtonSize?.scaleOnHover; },
-        get size() { return resolvedSize === "sm" ? "sm" : "md"; },
+        get size() { return resolvedSize; },
         resolveSize(element: HTMLElement | undefined) {
-            if (externalFooter && element?.parentElement === externalFooter) return resolvedSize === "sm" ? "sm" : "md";
+            if (externalFooter && element?.parentElement === externalFooter) return resolvedSize;
             return parentButtonSize?.resolveSize ? parentButtonSize.resolveSize(element) : parentButtonSize?.size;
         },
     });
@@ -548,10 +548,11 @@
             --snowui-dialog-max-width-override,
             40rem
         );
-        --snowui-dialog-padding: var(--padding-6);
-        --snowui-dialog-radius: var(--radius-7);
-        --snowui-dialog-gap: var(--gap-5);
-        --snowui-dialog-close-offset: var(--padding-5);
+        --snowui-dialog-padding: var(--padding-10);
+        --snowui-dialog-radius: var(--radius-8);
+        --snowui-dialog-gap: var(--gap-6);
+        --snowui-dialog-title-font-size: var(--text-24);
+        --snowui-dialog-title-line-height: var(--leading-24);
     }
     :global(:where(.snowui-dialog-title, .snowui-dialog > [data-as="title"], .snowui-dialog > .snowui-dialog-content > [data-as="title"])) {
         order: -3;

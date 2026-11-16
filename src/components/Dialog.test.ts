@@ -53,6 +53,7 @@ export const examples = [
 <Button data-dialog-target="dialog-lg">打开 lg</Button>`,
         "expected": {
             "render": "默认标题、关闭按钮、正文、操作区；sm 无分割线，md/lg 有分割线；opaque 遮罩",
+            "layout": "lg 标题 24/32px，内边距 40px，主间距 24px，圆角 32px，操作区按钮默认 lg；关闭按钮上／右偏移 16px，与 sm/md 一致",
             "interaction": "关闭请求沿用 Dialog 原有状态、焦点与键盘协议"
         },
         "logic": [
