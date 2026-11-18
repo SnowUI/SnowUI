@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 /**
  * Responsive Controller
  * 响应式控制器：管理组件的响应式能力和断点检测。
@@ -118,3 +116,4 @@ export class ResponsiveController {
         };
     };
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

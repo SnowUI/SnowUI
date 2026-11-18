@@ -1,8 +1,5 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- ColorSchemeButton：以真实 Button 为宿主的页面亮色 / 暗色方案切换按钮。 -->
 <script lang="ts">
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { onMount, untrack, type ComponentProps, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import { observeColorSchemePreference, saveColorSchemePreference } from "../logic/color-scheme-preference";
@@ -174,3 +171,4 @@
     {/key}
     {@render children?.()}
 </Button>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

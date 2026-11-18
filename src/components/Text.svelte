@@ -1,5 +1,3 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
      Text 组件：智能文本显示与截断组件 v3.5.4
 
@@ -7,7 +5,6 @@
 -->
 
 <script lang="ts">
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { getContext, setContext, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
@@ -907,3 +904,4 @@
         line-clamp: 3;
     }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

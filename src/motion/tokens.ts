@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 /**
  * tokens.ts
  * v1.7.0
@@ -118,3 +116,4 @@ export const MOTION_DISTANCE_BADGE_OFFSET_Y_PX = 12.4;
 export const MOTION_BLUR_SMALL_PX = 2;
 export const MOTION_BLUR_PAGE_PX = 3;
 export const MOTION_BLUR_SUCCESS_CHECK_PX = 10;
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

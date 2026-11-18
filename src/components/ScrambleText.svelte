@@ -1,5 +1,3 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   ScrambleText 代码文字扰动动效组件
   v1.4.1
@@ -9,7 +7,6 @@
 -->
 
 <script module lang="ts">
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import {animateTextMotionColorSequence, cancelTextMotionColor} from "../lib/text-motion/color";
     import {shouldReduceTextMotion} from "../lib/text-motion/preference";
     import type { TextMotionColor } from "../lib/text-motion/types";
@@ -393,3 +390,4 @@
         white-space: inherit;
     }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 // 内容边缘渐隐遮罩（Edge Fade Mask）共享能力。
 //
 // 用途：当“悬浮操作层”（覆盖在内容之上的按钮 / 复选框 / 操作块）浮在内容之上时，
@@ -55,3 +53,4 @@ export function createEdgeFadeMaskStyle(options: EdgeFadeMaskOptions): string {
     const image = createEdgeFadeMaskImage(options);
     return `-webkit-mask-image:${image};mask-image:${image};`;
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

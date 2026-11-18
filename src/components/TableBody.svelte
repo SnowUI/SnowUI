@@ -1,8 +1,5 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- Table 表体语义容器。文档: ./TableBody.md -->
 <script lang="ts">
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { untrack, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import TableRow from "./TableRow.svelte";
@@ -145,3 +142,4 @@
         background: var(--snowui-table-row-hover-background-override, var(--black-4, #0000000a));
     }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

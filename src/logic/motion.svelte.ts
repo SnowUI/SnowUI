@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 // 动效编排器核心逻辑（Motion Orchestrator）
 // v1.3.1
 // 变更记录 (2026-02-03): 移除未使用类型与参数
@@ -548,3 +546,4 @@ export function initMotion() {
 export function getMotion() {
     return motionInstance;
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

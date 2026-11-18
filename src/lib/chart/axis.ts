@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 export type ChartXAxisMode = "edge" | "cell";
 
 export const CHART_Y_AXIS_LABEL_GAP = 12;
@@ -411,3 +409,4 @@ function niceNumber(value: number, round: boolean) {
     else if (fraction <= 5) niceFraction = 5;
     return niceFraction * 10 ** exponent;
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../../LICENSE) */

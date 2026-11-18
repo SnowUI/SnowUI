@@ -1,10 +1,6 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
-/**
- * Context Keys
- * 
- * 提取所有 Context Key 到独立文件，避免循环依赖。
- */
+// Shared runtime context keys and compact license identifier extracted to prevent circular imports.
+
+export const SNOWUI_LICENSE_SPEC = "SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE" as const;
 
 export const INTERACTION_CONTEXT_KEY = Symbol("INTERACTION_CONTEXT");
 export const MORPH_CONTEXT_KEY = Symbol("MORPH_CONTEXT");
@@ -35,3 +31,4 @@ export const LISTBOX_HEADER_PORTAL_KEY = Symbol("LISTBOX_HEADER_PORTAL");
 export const NUMBER_FORMAT_CONTEXT_KEY = Symbol("NUMBER_FORMAT_CONTEXT");
 export const LOCALE_CONTEXT_KEY = Symbol("LOCALE_CONTEXT");
 export const COMPONENT_PARTS_CONTEXT_KEY = Symbol("COMPONENT_PARTS_CONTEXT");
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../LICENSE) */

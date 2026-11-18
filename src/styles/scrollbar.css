@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 /* Scrollbar Styles */
 /* v1.5.0 */
 /* Log (2026-04-17): 从 Textarea 组件提炼为通用共享样式，任何可滚动元素挂 .snowui-scrollbar 即生效。 */
@@ -327,3 +325,4 @@
     width: calc(100% - var(--snowui-scrollbar-edge-gap) * 2);
     transform: translate3d(var(--snowui-overlay-scrollbar-scroll-offset, 0px), 0, 0);
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

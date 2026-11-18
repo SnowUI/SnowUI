@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 // 品牌专用：以系统 emoji 的实际着色像素边界匹配 32×32 图标，保持原始比例。
 export const LOGO_EMOJI_FONT = '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
 export type EmojiMetrics = { size: number; x: number; y: number };
@@ -31,3 +29,4 @@ export function measureLogoEmoji(value: string): EmojiMetrics {
   cache.set(value, result);
   return result;
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../../LICENSE) */

@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 /**
  * 搜索过滤工具 (Search Filter Utilities)
  * v1.0.0
@@ -57,3 +55,4 @@ export function filterBySearch<T extends { label: string }>(
     if (!query) return items;
     return items.filter((item) => matchesSearch(item.label, query));
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

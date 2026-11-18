@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 /**
  * Text 截断模块（历史文件名：frame-truncation.svelte.ts）
  * 由 Text 组件在 lines 存在时启用
@@ -179,3 +177,4 @@ export class TruncationController {
 // 兼容旧引用；Text 与 TableCell 实际共享同一控制器。
 export { TruncationController as TextTruncation };
 export { TruncationController as FrameTruncation };
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

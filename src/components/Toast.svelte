@@ -1,5 +1,3 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
   Toast 全局通知(视觉单元)
   v1.1.0(2026-05-15: 新增 Inline 模式 as="toast")
@@ -24,7 +22,6 @@
 -->
 
 <script lang="ts">
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import { Button } from "../index";
     import { onMount, onDestroy, type Snippet } from "svelte";
@@ -331,3 +328,4 @@
         pointer-events: none;
     }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

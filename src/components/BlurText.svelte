@@ -1,8 +1,5 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- BlurText 逐字模糊揭示组件 v1.0.0；文档：./BlurText.md -->
 <script lang="ts">
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import {onMount, onDestroy, tick, untrack} from "svelte";
     import type { FrameProps } from "../logic/frame-types";
     import type { SnowUIColor } from "../lib/color";
@@ -181,3 +178,4 @@
         white-space: pre;
     }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

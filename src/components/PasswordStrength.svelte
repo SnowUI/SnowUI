@@ -1,5 +1,4 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
+<!-- PasswordStrength：即时评估密码强度并展示提示。v1.0.0；文档：./PasswordStrength.md -->
 <script lang="ts" module>
   export type PasswordStrengthLevel = 0 | 1 | 2 | 3 | 4;
   export type PasswordStrengthEvaluator = (password: string) => PasswordStrengthLevel;
@@ -53,3 +52,4 @@
   :global(:where(.snowui-strength-track .snowui-strength-active.snowui-strength-level-strong)) { background: var(--secondary-green, #71DD8CFF); }
   :global(:where(.snowui-password-strength .snowui-strength-label)) { color: var(--black-40, #00000066); font-size: var(--text-12, 12px); line-height: var(--leading-12, 16px); min-width: 0; width: 100%; white-space: normal; overflow-wrap: anywhere; }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

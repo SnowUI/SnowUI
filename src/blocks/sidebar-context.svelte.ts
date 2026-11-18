@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 import { getContext, type Snippet } from "svelte";
 
 export const SIDEBAR_CONTEXT_KEY = Symbol("snowui-sidebar");
@@ -37,3 +35,4 @@ export interface SidebarItemData {
     tags?: Snippet;
     actions?: SidebarActionData[];
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

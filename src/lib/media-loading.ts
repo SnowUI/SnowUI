@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 import { getContext, setContext } from "svelte";
 import { MEDIA_LOADING_CONTEXT_KEY } from "../keys";
 
@@ -16,3 +14,4 @@ export function provideMediaLoading(value: MediaLoading | MediaLoadingGetter): v
 export function useMediaLoading(): MediaLoadingGetter {
     return getContext<MediaLoadingGetter | undefined>(MEDIA_LOADING_CONTEXT_KEY) ?? (() => "lazy");
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

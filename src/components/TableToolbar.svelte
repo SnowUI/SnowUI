@@ -1,10 +1,7 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 数据表格工具栏：内置搜索、批量操作、排序与筛选。文档: ./TableToolbar.md -->
 <script lang="ts">
   // Shared capability: Frame.singleLine; contract: docs/standards/LayoutProtocol.md §4.6.
 
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import type { Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
@@ -316,3 +313,4 @@
     :global(:where(.snowui-table-toolbar):has(>[data-as="sort"]:not(.snowui-table-toolbar-built-in))>.snowui-table-toolbar-picker[data-as="sort"]),
     :global(:where(.snowui-table-toolbar):has(>[data-as="filter"]:not(.snowui-table-toolbar-built-in))>.snowui-table-toolbar-picker[data-as="filter"]) { display:none; }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

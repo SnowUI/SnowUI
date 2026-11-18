@@ -1,5 +1,3 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!--
  Tooltip 文字提示组件 v1.24.5
  变更 (2026-10-23): 连续时间线进度限制0到1，避免提前帧时间产生负进度及NaN内容坐标。
@@ -75,7 +73,6 @@
 -->
 
 <script module lang="ts">
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     const TOOLTIP_MOVE_MAX_DISTANCE_PX = 240;
     const TOOLTIP_MOVE_MAX_VIEWPORT_RATIO = 0.25;
     const TOOLTIP_CONTENT_TRACK_GAP_PX = 16;
@@ -2086,3 +2083,4 @@
         }
     }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

@@ -1,5 +1,3 @@
-/* SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 */
 /**
  * Motion Timeline
  * 动效时间轴：负责管理一组动效节点的执行序列。
@@ -157,3 +155,4 @@ export class Timeline {
         this.onRelease(this.id);
     }
 }
+/*! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) */

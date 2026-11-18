@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { compile, compileModule } from 'svelte/compiler';
-import {sourceNotice} from './source-notices.mjs';
+import {withSourceNotice} from './source-notices.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 process.chdir(root);
@@ -45,11 +45,12 @@ for(const mode of ['client','server']){
   outputRel=outputRel.replaceAll('.svelte.js','.js').replaceAll('.svelte.d.ts','.d.ts');
   if(outputRel.endsWith('.d.ts')) code=code.toString().replace(/(["'])([^"']+)\.svelte(?:\.js)?\1/g,'$1$2.js$1');
   const dest=path.join('dist',mode,outputRel);
-  // 保留的源码许可说明需指向安装包根 LICENSE，不能沿用 src 的层级。
-  if(code.toString().startsWith('/* SnowUI source notice'))code=code.toString().replace(/^\/\* SnowUI source notice[\s\S]*?\*\/\n/,sourceNotice(dest));
+  // Ensure every compiled JS, declaration, and CSS artifact ends with package-root-relative @license metadata.
+  if(/\.(?:js|mjs|d\.ts|css)$/.test(dest))code=withSourceNotice(code.toString(),dest);
   fs.mkdirSync(path.dirname(dest),{recursive:true});fs.writeFileSync(dest,code);
  }
 }
-fs.writeFileSync('dist/client/styles/index.d.ts','export {};\n');
+const styleTypes='dist/client/styles/index.d.ts';
+fs.writeFileSync(styleTypes,withSourceNotice('export {};\n',styleTypes));
 fs.rmSync(staging,{recursive:true,force:true});
 console.log('客户端、服务端、公开类型与样式已生成；未输出原始组件及 source map。');

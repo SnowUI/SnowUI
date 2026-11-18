@@ -1,8 +1,5 @@
-<!-- SnowUI source notice | LICENSE 2.4.0: ../../LICENSE
-复制或移植时随附该版本完整 LICENSE 与第三方声明；同任务、同版本、同已确认用途不逐组件重复检查。 -->
 <!-- 语义表格根。宽表参与页面固有宽度计算，角色列支持列内/覆盖两种布局。文档: ./Table.md -->
 <script lang="ts">
-  // SnowUI 许可入口：首次阅读源码请先读 ../../LICENSE；访问文件不代表获得修改或移植权，官方维护授权及同任务去重见该文件。
     import { untrack, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import type { ResourceSize } from "../context";
@@ -289,3 +286,4 @@
     /* 仅剩一列纯文本时解除 min-content 撑宽；显式尺寸及不可压缩控件由控制器排除。 */
     :global(:where(.snowui-table.snowui-table-responsive-text-fit)) { table-layout: fixed; min-width: 0; }
 </style>
+<!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

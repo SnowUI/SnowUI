@@ -5,13 +5,14 @@ import {execFileSync} from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
 import {createHash,createPublicKey} from 'node:crypto';
-import {root,sourceFiles,checkNotices,sourceNotice} from './source-notices.mjs';
+import {root,sourceFiles,checkNotices,sourceNotice,withSourceNotice} from './source-notices.mjs';
 import {copySource} from './copy-source.mjs';
 const temp=t=>{const dir=fs.mkdtempSync(path.join(os.tmpdir(),'snowui-retention-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));return dir;};
-test('所有可复制实现含主题权威源均带许可入口',()=>{
+test('所有可复制实现含主题权威源均带许可入口与共享标识常量',()=>{
  assert.deepEqual(checkNotices(),[]);
  assert.ok(sourceFiles().length>200);
- assert.ok(fs.readFileSync(path.join(root,'src/styles/themes.css'),'utf8').startsWith(sourceNotice('src/styles/themes.css')));
+ assert.ok(fs.readFileSync(path.join(root,'src/styles/themes.css'),'utf8').endsWith(sourceNotice('src/styles/themes.css')));
+ assert.match(fs.readFileSync(path.join(root,'src/keys.ts'),'utf8'),/export const SNOWUI_LICENSE_SPEC = "SnowUI-Commercial-[\d.]+ https:\/\/snowui\.dev\/LICENSE"/);
 });
 test('内置 Phosphor 图标的独立版权与许可随源码复制材料保留',()=>{
  const icons=fs.readFileSync(path.join(root,'src/internal/component-icon/builtin-icon-data.ts'),'utf8');
@@ -27,7 +28,7 @@ test('选择两个实现导出保留完整许可、路径、原字节及来源�
  for(const file of [...files,'LICENSE','THIRD_PARTY_NOTICES.md','AGENTS.md'])assert.deepEqual(fs.readFileSync(path.join(out,file)),fs.readFileSync(path.join(root,file)));
  const manifest=JSON.parse(fs.readFileSync(path.join(out,'SOURCE_SELECTION.json')));
  assert.equal(manifest.licenseSha256,createHash('sha256').update(fs.readFileSync(path.join(out,'LICENSE'))).digest('hex'));
- for(const file of files){const relative=sourceNotice(file).match(/LICENSE [\d.]+: (.+)\n/)[1];assert.equal(path.resolve(out,path.dirname(file),relative),path.join(out,'LICENSE'));}
+ for(const file of files){const relative=sourceNotice(file).match(/https:\/\/snowui\.dev\/LICENSE \(([^)]+)\)/)[1];assert.equal(path.resolve(out,path.dirname(file),relative),path.join(out,'LICENSE'));}
  assert.match(fs.readFileSync(path.join(out,'COPYING.md'),'utf8'),/未自动解析/);
 });
 test('选择 NumberFlow 导出保留其第三方作者与 MIT 授权全文',t=>{
@@ -52,9 +53,13 @@ test('已有项目及许可不覆盖，越界、测试文件和缺失说明均�
  fs.symlinkSync(path.join(root,'src/components/Button.svelte'),path.join(fake,'src','link.ts'));
  assert.throws(()=>sourceFiles(fake),/符号链接/);
 });
-test('许可文件头生成幂等且保留必要入口',()=>{
+test('许可尾注生成幂等、无行首遮挡且保留必要入口',()=>{
  for(const file of sourceFiles()){
-  const text=fs.readFileSync(path.join(root,file),'utf8');assert.equal(text.split('SnowUI source notice').length,2);assert.ok(text.startsWith(sourceNotice(file)));assert.doesNotMatch(sourceNotice(file),/\bv\d+\.\d+\.\d+\b/,'许可版本不应被组件元数据解析器误识别');
+  const text=fs.readFileSync(path.join(root,file),'utf8');
+  assert.equal(text.split('@license SnowUI-Commercial-').length,2,file);
+  assert.ok(text.endsWith(sourceNotice(file)),file);
+  assert.doesNotMatch(text,/SnowUI source notice|SnowUI 许可入口：/,file);
+  assert.doesNotMatch(sourceNotice(file),/\bv\d+\.\d+\.\d+\b/,'License version must not collide with v-prefixed component metadata parsers');
  }
  assert.match(fs.readFileSync(path.join(root,'AGENTS.md'),'utf8'),/\[LICENSE\]\(\.\/LICENSE\)/);
 });
@@ -81,10 +86,10 @@ function deliveryFixture(t){
  for(const file of ['pnpm-lock.yaml','pnpm-workspace.yaml','tsconfig.json','tsconfig.node.json','svelte.config.js','vite.config.ts','THIRD_PARTY_NOTICES.md','component-discovery.json','component-catalog.json'])write(file,'{}\n');
  write('OWNER_IDENTITY.md','合成公开身份；不认证法律著作权。\n');
  write('owner-identity.public.json',JSON.stringify({schemaVersion:1,fixture:true,publicKey:'synthetic-public-data'})+'\n');
- write('src/a.js',sourceNotice('src/a.js',base)+'export {};\n');
+ write('src/a.js',withSourceNotice('export {};\n','src/a.js',base));
  fs.copyFileSync(path.join(root,'scripts/source-notices.mjs'),path.join(base,'scripts/source-notices.mjs'));
  fs.copyFileSync(path.join(root,'scripts/check-runtime-package.mjs'),path.join(base,'scripts/check-runtime-package.mjs'));
- for(const file of ['dist/client/index.js','dist/server/index.js','dist/client/index.d.ts'])write(file,'export {};\n');
+ for(const file of ['dist/client/index.js','dist/server/index.js','dist/client/index.d.ts'])write(file,withSourceNotice('export {};\n',file,base));
  execFileSync('git',['init','--quiet',base]);
  execFileSync('git',['-C',base,'-c','user.name=Delivery Fixture','-c','user.email=fixture@example.invalid','-c','commit.gpgsign=false','commit','--quiet','--allow-empty','-m','fixture']);
  return {dir,base,write};
@@ -138,6 +143,10 @@ test('运行包允许正常交付并拒绝 dist 中伪装的所有者材料和�
  fs.rmSync(path.join(fixture.base,'dist/client/innocent.js'));
  fixture.write('dist/server/innocent.json',JSON.stringify({challenge:{purpose:'snowui-owner-maintenance',nonce:'synthetic'},used:false}));
  assert.throws(()=>runPackageCheck(fixture),/含所有者私有材料或私钥/);
+ fs.rmSync(path.join(fixture.base,'dist/server/innocent.json'));
+ fixture.write('dist/client/unlicensed.js','export const missing = true;\n');
+ assert.throws(()=>runPackageCheck(fixture),/缺少或过期的运行产物许可注释/);
+ fs.rmSync(path.join(fixture.base,'dist/client/unlicensed.js'));
 });
 
 test('源码和运行包拒绝专用助记词文件及改名的恢复记录，公开元数据仍可交付',t=>{
