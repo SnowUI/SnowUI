@@ -75,16 +75,10 @@
 
 其他兼容视觉、链接与事件入口参见 [Button](Button.md)。ExpandButton 接管 children、onclick 和 aria-expanded；继承 disabled 阻止用户切换。
 
-> 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
 ---
 
-
-
-
 ## AI Zone
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -101,11 +95,15 @@
 - 图标属于内部基础设施，不提供 parts。
 - 作为父组件的默认内置依赖时，可消费 `parts.ExpandButton`。
 
+### 状态按钮动效时长
+
+默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。
+
 ## 更新日志
 
-- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
 ### v1.0.2 (2026-09-02)
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
@@ -116,7 +114,3 @@
 ### v1.0.0 (2026-07-03)
 
 - 首次实现 Button 宿主特化、展开语义与图标替换动效。
-
-### 状态按钮动效时长
-
-默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。

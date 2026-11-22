@@ -88,8 +88,6 @@
 <a id="2-输入协议"></a>
 
 
-
-
 ### 2.2 `renderHints` 规则
 
 单块骨架的百分比宽高相对外部宿主解析；内部布局层为百分比提供包含块，避免在 flex 控件内收缩为零。固定尺寸的 Hug 行为保持不变。
@@ -129,13 +127,6 @@
 
 ### 4.2 布局容器样式
 
-| 规则 | 值 |
-| :--- | :--- |
-| 布局模式 | `display: flex` |
-| 默认对齐 | `align-items: center` |
-| 默认间距 | `var(--gap-2)` |
-| 字号变量 | `--snowui-skeleton-font-size: var(--text-14)` |
-| 行高变量 | `--snowui-skeleton-line-height: var(--leading-14)` |
 
 补充规则：
 
@@ -211,20 +202,20 @@
 ### 使用示例
 
 ```svelte
-<!-- 直接显示 Skeleton，用于查看默认样式 -->
+<!-- Standalone Skeleton preview -->
 <div class="flex flex-col gap-8">
     <Skeleton variant="text" width="12rem" />
     <Skeleton variant="circular" width={40} height={40} />
     <Skeleton variant="rectangular" width="16rem" height="6rem" />
 </div>
 
-<!-- 页面或区块根使用 loading，子组件自动继承骨架态 -->
+<!-- Root loading state propagates skeletons to descendants -->
 <Frame loading={pageLoading}>
     <Button>提交</Button>
     <Text>加载中的文本</Text>
 </Frame>
 
-<!-- Frame 只渲染第一层组件 Skeleton -->
+<!-- Frame probes first-level child skeletons -->
 <Frame loading skeleton>
     <Button variant="filled">
         <Icon />
@@ -232,14 +223,14 @@
     </Button>
 </Frame>
 
-<!-- Text 按第一层段落数渲染多条 Skeleton -->
+<!-- Text renders skeleton lines matching paragraph count -->
 <Text loading skeleton class="w-full">
     <div>段落一</div>
     <div>段落二</div>
     <div>段落三</div>
 </Text>
 
-<!-- 禁用骨架，只保留真实组件的加载态动效 -->
+<!-- Keep live content during loading with skeleton={false} -->
 <Frame
     loading={pageLoading}
     skeleton={false}
@@ -248,7 +239,6 @@
     <Button>提交</Button>
 </Frame>
 ```
-
 
 ## AI Zone
 
@@ -269,7 +259,6 @@
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
 <a id="使用示例"></a>
 
@@ -285,11 +274,6 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 `COMPONENT_CLASS_MAPPING` 与 `getSkeletonComponentKey()` 只为旧版直接传 `componentClass` 的调用方保留。SnowUI 新组件与新骨架布局不得新增 class 映射；应在组件根提供 hints，并在组件文档说明动态几何来源。
 
 <a id="6-文本骨架规则"></a>
-
-
-
-> **更新日志 (2026-08-15)**: `renderHints` 升级为组件自注册协议并优先于 class 映射；Frame 首层探测只收集已注册 child；完整消费 `radius`；集中 class 映射降级为兼容层。
-> **更新日志 (2026-04-28)**: 标注主布局模型为内禀原子布局，明确多项骨架只是内部渲染布局，不注册为通用宿主布局。
 
 
 `Skeleton.svelte` 是独立骨架原语，不继承 `Frame`。它只负责“骨架长什么样”，而“何时进入骨架态”由 [Frame.svelte](Frame.svelte) 的 `loading + skeleton` 协议负责。
@@ -320,9 +304,9 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 
 ## 更新日志
 
-- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
 ### v1.4.0 (2026-08-15)
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 组件通过根 Frame `renderHints` 自注册，不再要求维护集中 class mapping。
 - Frame 首层 probe 只收集 `data-skeleton-registered="true"` 的 child。
@@ -337,67 +321,4 @@ Frame DOM runtime 在存在 hints 时输出 `data-skeleton-registered="true"` �
 
 - Gradient 默认骨架回退尺寸同步调整为 `355 × 355` 正方形；显式 `renderHints` 仍优先。
 
-### v1.3.7 (2026-07-20)
-
-- 登记 Gradient 根类名与默认矩形布局；实际 loading 尺寸由 Gradient 的 `renderHints` 覆盖。
-
-### v1.3.6 (2026-03-14)
-
-#### 样式
-- Input Skeleton 默认高度同步为 `1.25rem` (20px)，代表内容区域高度。配合 Frame 的 12px 上下 padding，总高度维持在 44px。
-
-### v1.3.5 (2026-03-07)
-
-#### 文档
-- 系统补齐 Skeleton 当前全部规则文档，明确：
-  - 形状别名
-  - 默认尺寸
-  - 圆角与动画规则
-  - 组件映射表
-  - `Text` 多条骨架布局与尾行宽度规则
-  - 第一层组件渲染规则
-  - `renderHints` 与尺寸继承规则
-
-### v1.3.4 (2026-03-07)
-
-#### 文本骨架布局
-- `Text` 多条 Skeleton 改为上下排列，不再并排显示。
-- `Text` 多条 Skeleton 中，前置行默认宽度占满文本容器，最后一条固定为文本容器宽度的 `30%`。
-
-#### 尺寸约束
-- 圆角矩形 Skeleton 继续优先跟随组件通过 `renderHints` 提供的最终宽高，不额外压缩为通用短宽样式。
-
-### v1.3.3 (2026-03-07)
-
-#### 渲染逻辑
-- 骨架渲染规则收敛为“只看第一层组件”。
-- `Frame` 在骨架态下优先渲染第一层直接子组件的 Skeleton；只有当第一层没有组件时才回退为自身文字骨架。
-- `Text` 在骨架态下新增第一层段落统计逻辑：按第一层块级段落节点数量生成多条文字 Skeleton，并默认占满文本容器宽度。
-
-### v1.3.2 (2026-03-07)
-
-#### 样式调整
-- 除圆形骨架外，其他 Skeleton 默认圆角统一为 `12`。
-- `text / line` Skeleton 默认高度调整为 `20px`（`1.25rem`）。
-
-### v1.3.1 (2026-03-07)
-
-#### 样式调整
-- 矩形骨架默认圆角明确为 `12`（`--radius-3`，fallback `0.75rem`）。
-
-### v1.3.0 (2026-03-07)
-
-#### 架构重构
-- 释放 `whileLoad` 关键字：Skeleton 改用 `loading` 控制显隐，配合 Frame 的 `loading / skeleton / whileLoad` 协议分层。
-
-### v1.2.1 (2026-03-07)
-
-#### 新功能
-- 补齐 `frame / test` 的 Skeleton 映射与布局声明，配合 standards 检查实现组件目录 Skeleton 覆盖完整性校验。
-
-### v1.2.0 (2026-03-07)
-
-#### 架构重构
-- Skeleton 改为不依赖 `Frame` 的独立骨架原语组件，供 `Frame` 默认加载协议与测试示例共同复用。
-- 骨架形状收敛为 `line / circle / rect` 三类。
-- 新增基于组件根类名的集中骨架分配逻辑。
+完整历史见 [更新日志归档](../../docs/history/changelogs/Skeleton.history.md)。

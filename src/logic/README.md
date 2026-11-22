@@ -96,7 +96,7 @@
 | `image-preview.ts` | 页面级图片预览事件总线，协调 `Image / ImageGroup / ImageViewer` | 图片预览、viewer presence、window fallback |
 | `wc-adapter.ts` | Web Components 适配层 | 只在自定义元素/宿主集成场景需要 |
 | `../lib/floating-position.ts` | 浮层边缘碰撞、边界夹取和反向方位计算 | Tooltip、Chart hover panel、后续浮层定位 |
-| `../lib/tooltip-delay.ts` | Tooltip hover warmup / cooldown 协调器 | 多个 Tooltip 之间共享首次延迟与快速切换窗口；Popover 复用 `600ms` 基础延迟常量 |
+| `../lib/tooltip-delay.ts` | Tooltip hover warmup / cooldown 协调器 | 多个 Tooltip 之间共享首次延迟与快速切换窗口；Popover 复用 `450ms` 首次 hover 出现延迟 |
 | `../lib/resizable.ts` | 通用容器尺寸拖动 action 与 clamp 内核 | TableHead、普通容器与 SplitPane 共用 |
 
 ### 7. 工具与兼容项
@@ -142,18 +142,12 @@
 
 ### 3. 组件开发前的最低检查清单
 
-- 是否已经有匹配的 `CSS 行为`？
-- 是否已经有共享状态/观察器/编排器可以复用？
-- 是否只是需要在 `Frame` 外再包一层原生宿主元素？
-- 是否属于 `Text`、`ImageViewer`、Motion 默认资源已经覆盖的能力？
-- 是否会和 `Skeleton`、`renderHints`、`Frame` 默认动效重复实现？
-
-如果其中任一问题答案是“是”，先复用现有逻辑，再写新代码。
+- 是否已经有匹配的共享样式行为类（`.snowui-hoverable` / `.snowui-field-bordered`）？
 
 ---
 
-## 目录文档规则
+## 更新日志
 
-- 每个逻辑文件应尽量有同名 `.md` 文档，说明职责、关键字、依赖与更新日志。
-- `README.md` 负责给“新组件作者”做入口地图，不代替每个模块的细节文档。
-- 当新增共享逻辑时，必须同步更新本 README，避免后续组件继续重复造轮子。
+### v1.7.0 (2026-08-17)
+
+- 同步 `Frame` 运行时拆分模块、`observer.svelte.ts` 单例边界与 `Popover` `450ms` 悬停延迟说明。

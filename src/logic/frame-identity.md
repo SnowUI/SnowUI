@@ -1,4 +1,4 @@
-# identity.svelte.ts 文档
+# identity
 
 > **版本**: v2.1.0
 > **职责**: 管理组件的身份标识属性。
@@ -20,10 +20,10 @@
 当组件需要参与动效编排但用户未提供 `id` 时，系统会自动生成确定性 ID。
 
 ```typescript
-// 使用模块级计数器确保 ID 唯一且可预测
+// Module-level counter for deterministic unique IDs
 let idCounter = 0;
 
-// 生成格式: snowui-auto-1, snowui-auto-2, ...
+// Generated format: snowui-auto-1, snowui-auto-2, ...
 const autoId = `snowui-auto-${++idCounter}`;
 ```
 
@@ -56,7 +56,7 @@ const autoId = `snowui-auto-${++idCounter}`;
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v2.1.0 (2026-01-20)
 - **修复**: ID 生成使用确定性计数器 (`idCounter`) 替代 `Math.random()`
@@ -64,5 +64,3 @@ const autoId = `snowui-auto-${++idCounter}`;
 
 ### v1.3.0
 - 新增联动控制支持
-
-

@@ -56,7 +56,7 @@
 - 根提供最终文本的稳定 aria-label；内部逐字视觉层 aria-hidden。语义标题使用 tag="h2" 等标签；默认 span 使用 img 角色表达完整文字，不逐字朗读。
 - 换行由浏览器的 inline 排版决定，中文、英文单词、空格、显式换行不通过单字固定宽度或额外 margin 模拟。字体连字等最终效果由浏览器塑形决定。
 
-## 参考来源
+### 参考来源
 
 - 参考项目 Svelte Animations 中的 Blur Reveal 示例位于 `src/lib/components/spell/blur-reveal/blur-reveal.svelte`；该路径相对于参考项目，不属于 SnowUI 组件包或源码归档。
 - 原站示例：[Svelte Animations · Blur Reveal](https://sv-animations.vercel.app/spell/blur-reveal)。

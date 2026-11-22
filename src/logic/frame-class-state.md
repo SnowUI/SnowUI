@@ -1,4 +1,4 @@
-# frame-class-state.svelte.ts
+# frame-class-state
 
 > **版本**: v1.0.0
 > **职责**: 统一解析 Frame 的 `stateVars/stateClass/stateStyle`、`childrenRenderContext` 与 `computedClass`。
@@ -14,7 +14,7 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.0.0 (2026-03-09)
 

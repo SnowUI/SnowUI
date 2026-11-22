@@ -1,4 +1,4 @@
-# overlay-trigger-timing.ts 文档
+# overlay-trigger-timing
 
 > **版本**: v1.4.0
 > **职责**: 统一管理 Tooltip / Popover 等浮层延迟触发时间。
@@ -10,7 +10,9 @@
 | `OVERLAY_TRIGGER_HOVER_DELAY_MS` | `450ms` | Tooltip 首次 hover；Popover 延迟触发 |
 | `OVERLAY_TRIGGER_SKIP_DELAY_DURATION_MS` | `300ms` | Tooltip 快速切换暖场窗口 |
 
-## 变更记录
+## 更新日志
+
+### v1.4.0 (2026-08-21)
 
 - v1.3.0 (2026-08-21): 用 180ms 连续切换节奏替代瞬时指针速度；首次相邻切换始终保留裁切，burst 后续目标直达。
 - v1.2.0 (2026-08-20): 用指针快速穿越阈值替代固定 100ms 意图延迟，保持 warm Tooltip 即时响应。

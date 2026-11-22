@@ -125,7 +125,7 @@
 
 `Field` 自身仍然是一个 `Frame` 封装，因此保留：
 
-- `responsive / stateStyle / customStates / variants / CSS 行为 / styles`
+- `responsive / stateStyle / customStates / variants / styles`
 - `Hover / Click / Focus / whileAppear / timeline / orchestrate`
 - `loading / skeleton / renderHints`
 - `as / use / layoutId / itemId / scope / access`
@@ -133,16 +133,6 @@
 也就是说，`Field` 不是写死的表单盒子，而是带字段语义的 `Frame` 容器。
 
 <a id="关键字-keyword"></a>
-
-### 关键字 (Keyword)
-
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| enableResponsive | `boolean` | `false` | 响应式能力开关 |
-| enableContext | `boolean` | `true` | 上下文能力开关 |
-| enableScaleObserver | `boolean` | `false` | 尺寸观察能力开关 |
-
-<a id="容器协议"></a>
 
 ### 容器协议
 
@@ -247,7 +237,7 @@ Field 是字段表面的槽位宿主特化：
 ### 使用示例
 
 ```svelte
-<!-- 单个输入 -->
+<!-- Single input -->
 <Field>
   <Input placeholder="请输入内容" />
 </Field>
@@ -258,14 +248,14 @@ Field 是字段表面的槽位宿主特化：
   <Text as="error">请输入有效邮箱。</Text>
 </Field>
 
-<!-- 显式组合模式仍然支持 -->
+<!-- Explicit child composition mode -->
 <Field invalid>
   <Text as="label">Email</Text>
   <Input type="email" placeholder="name@example.com" />
   <Text as="error">请输入有效邮箱。</Text>
 </Field>
 
-<!-- Select 默认箭头 -->
+<!-- Select with built-in indicator -->
 <Field>
   <Text as="label">Country</Text>
   <Select defaultValue="us">
@@ -274,7 +264,7 @@ Field 是字段表面的槽位宿主特化：
   </Select>
 </Field>
 
-<!-- Date + 自定义日期按钮（简单结构） -->
+<!-- Date input with custom trailing trigger -->
 <Field>
   <Input type="date" />
   <Button bare iconOnly as="trailing" aria-label="打开日期选择">
@@ -282,7 +272,7 @@ Field 是字段表面的槽位宿主特化：
   </Button>
 </Field>
 
-<!-- Date + 自定义日期按钮（复杂结构） -->
+<!-- Date input with custom trigger in nested row -->
 <Field>
   <Frame as="row" row>
     <Input type="date" />
@@ -292,13 +282,13 @@ Field 是字段表面的槽位宿主特化：
   </Frame>
 </Field>
 
-<!-- 分段组合 -->
+<!-- Segmented field composition -->
 <Field row>
   <Input as="segment" placeholder="City" />
   <Input as="segment" placeholder="ZIP" />
 </Field>
 
-<!-- 根节点 column 简写 -->
+<!-- Root column shorthand -->
 <Field column>
   <Input placeholder="First Name" />
   <Frame as="row" row>
@@ -334,169 +324,11 @@ Field 是字段表面的槽位宿主特化：
 
 ---
 
-
-
-
 ## AI Zone
 
-**2026-05-06 补充**: `Field row > Input/Select as="segment"` 这类直接横向分段宿主必须保留自身 `12 / 16` padding；只有 `Field row > Frame as="segment" > Input/Select` 这类嵌套在 segment 容器内的宿主，才由外层 segment 容器持有 padding，内部 host 归零。
-**2026-04-25 补充**: `Field` 内嵌非 `segment` 的 `Textarea` 时，右侧内容留白由外层 `Field` 的 `padding-right: 16px` 单独负责；`Textarea` 自身不再额外保留右侧 padding，只保留底部 resize/footer 保留区，确保与独立 `Textarea` 的右侧视觉间距一致。
-**2026-04-04 补充**: 参考 Figma `9996:17631`，`as="segment"` 是 `Field` 里处理 padding、gap 和分割线的唯一主语义。没标 `segment` 时，由外层 `Field` 负责默认 `padding = 12 / 16` 与 `gap = 8`，`Input / Select / Textarea` 去掉组件自身 padding，但保留组件自身 gap；标了 `segment` 时保留组件自身的 padding 与 gap，并参与连续字段表面的分割线。`label / description / error` 只负责文字样式，不再参与 padding、gap、分割线判断。
-**2026-04-09 图标规则补充**: `Field` 负责字段外壳、分割线与 segment 切角，但不重新定义 `Input` 内 icon 的最终定位。`Input` 内的 leading / trailing / invalid warning icon 间距由 `Input` 自身控制；进入 `Field` 后只允许继承，不允许二次改写。若 `Input as="segment"` 处于连续字段表面中，icon 到最近边框或分割线的距离仍保持 `16px`。
-**2026-03-24 补充**: 当 `Field` 里只有一个嵌入态 `Input / Select / Textarea` 宿主时，根容器会退回 block 容器，不再保留多列 grid 轨道；同时这类嵌入宿主不再继承 `Field` 面向普通 host 的 `display:flex / align-items / min-height` 注入，避免按钮区和内容区尺寸与独立组件继续偏离。
-
-**继承**: 复用 Frame.svelte 的所有通用能力（状态、动效、响应式、Skeleton、样式编排）。
-**默认能力开关**: `enableResponsive=false`, `enableContext=true`, `enableScaleObserver=false`。
-
-<a id="样式规范-style-spec"></a>
-
-### 样式规范 (Style Spec)
-
-### 1. 容器基础视觉
-
-| 项目 | 值 |
-| :--- | :--- |
-| 默认背景 | `var(--surface-1)` |
-| 默认圆角 | `var(--radius-4)` |
-| 默认边框 | 由 `field-bordered 工具类` 提供：`Black/20%` |
-| Focus | 由 `field-bordered 工具类` 提供：`Black/40%` + `Black/4%` 的 `4px` ring |
-| Label 字重 | `var(--font-weight-regular, 400)` |
-
-Field 与独立 Input 使用相同的默认背景 `surface-1`。普通、横向分段与纵向分段均由 Field 统一绘制背景；嵌入的 Input 根及原生输入控件保持透明，避免重复叠加半透明背景。只读态继续由 Field 统一承接 `surface-2`。
-
-### 2. 组合规则
-
-| 区域 | 规则 |
-| :--- | :--- |
-| 非 `segment` 的直接字段宿主 | 由外层 `Field` 统一负责 `12 / 16` padding 与 `8` gap；组件去掉自身 padding，但保留组件自身 gap |
-| `segment` 字段宿主 | 保留组件自身的 padding 与 gap |
-| `label / description / error` | 只是内容元素，不负责 padding、gap、分割线 |
-| `Field row` | 根节点直接作为横向组合容器，复用 `row` 的宿主与分隔线规则 |
-| `Field column` | 根节点直接作为竖向组合容器，复用 `col` 的宿主与横向分隔线规则 |
-| `Field` 内的 `Text / Input / Frame / Select / Textarea` | 进入字段表面后默认退掉自身边框、背景与圆角；未标 `segment` 的输入宿主去掉自身 padding（由 Field 统一负责），标了 `segment` 的输入宿主保留自身 padding 与 gap |
-| `row` 行容器 | 只在多个输入宿主或显式 `segment` 共同组成一张连续字段表面时才加纵向分隔线；单个 host 配 `leading / trailing` 不加分隔线 |
-| `column / col` 连续字段 | 只在多段输入宿主共同组成一张连续字段表面时才加横向分隔线；相邻两段之间只能有一条线，分隔线归属必须固定在其中一段，不能叠线 |
-| 多段字段之间的横线 | 与 Field 外边框使用同样的颜色与粗细 |
-| `leading / trailing` 的 `bare` Button | 不使用槽位分隔线，并通过外侧 margin 保留与边框的安全距离，垂直居中显示 |
-| `label / description / error` | 不再单独占据新外壳，而是作为容器内容的一部分 |
-
-### 3. 以示例归纳的规则
-
-| 示例 | 结构类型 | padding 归属 | 分割线规则 |
-| :--- | :--- | :--- | :--- |
-| `FM-01` 地址复合字段 | `Field column > Select as="segment" + Input as="segment" + Select as="segment" + Frame as="segment" row > Input as="segment" + Input as="segment"` | 每一段 `segment` 宿主自己持有 `12 / 16` 内容 inset；外层 `Field` 统一绘制背景，不再统一包一层 padding | 顶部三段和底部双列属于同一张连续表面；段与段之间只允许一条横线，底部双列之间只允许一条竖线 |
-| `FM-02` 信用卡三段 | `Field row > segment + segment + segment` | 每个 `segment` 段容器持有 `12 / 16` padding，内部 `gap = 0`；外层 `Field` 负责整张表面的外壳与分割线组织 | 三段共用同一张外壳，段与段之间使用纵向分割线 |
-| `FM-03` 通知方式 | `Field > label + row(Checkbox + Checkbox)` | 外层 `Field` 持有 `12 / 16` padding；checkbox 行自己的间距要在 `Frame` 上显式声明 | 内部是并排选项，不是连续输入表面，因此不加任何内部分割线 |
-
-### 4. segment 场景几何规范
-
-#### 外层 Field
-
-| 项目 | 值 |
-| :--- | :--- |
-| padding | `0`（不统一包一层 padding，由 segment 自持） |
-| gap | `0`（segment 间不靠 gap 分开） |
-| 圆角 | `var(--radius-4)` |
-| 边框 | `inset 0 0 0 var(--border-1) var(--black-20, rgba(0,0,0,0.2))` |
-
-#### 列向 segment（直接子项）
-
-| 项目 | 值 |
-| :--- | :--- |
-| padding | `var(--padding-3) var(--padding-4)`（12px / 16px，由 segment 宿主自持） |
-| 水平分割线 | `inset 0 var(--border-1) 0 var(--black-20, rgba(0,0,0,0.2))`（`+ [data-as="segment"]` 相邻时添加） |
-| 字号 | `var(--text-14)` |
-| 行高 | `var(--leading-14)` |
-
-#### 行向嵌套 segment（列 segment 内的 `<Frame as="segment" row>`）
-
-| 项目 | 值 |
-| :--- | :--- |
-| 外层行 Frame padding | `var(--padding-3) var(--padding-4)` |
-| 内部 Input/Select padding | `0`（由外层行 Frame 统一持有 padding） |
-| 竖向分割线 | `inset calc(var(--border-1) * -1) 0 0 var(--black-20, rgba(0,0,0,0.2))`（`:not(:last-child)` 时添加） |
-
-### 5. 外部 Icon 规范
-
-参考 Figma `10379-18362`（FM-02, FM-05）。图标到最近可见外边框始终为 **16px**，由各层 padding 保障，无需额外 style 覆写。图标尺寸不在表单组件层约束，由 Icon 组件自身默认尺寸决定。
-
-外部 Icon 有两种放置层级，取决于是否使用 segment 模式：
-
-| 模式 | 适用条件 | Icon 放置位置 |
-| :--- | :--- | :--- |
-| **非 segment 模式** | Field 内无 `as="segment"` 子项 | `Field` 的直接子项 |
-| **segment 模式** | Field 内有 `as="segment"` 子段 | `Input` 或 `Select`（Listbox）的直接子项 |
-
-#### Field 级图标（非 segment 模式）
-
-图标作为 Field 直接子项，Field 的 `padding: 12px 16px` 提供与外边框的间距。
-
-| 项目 | Leading | Trailing |
-| :--- | :--- | :--- |
-| prop | `as="leading"` | `as="trailing"` |
-| 到外边框距离 | **16px**（`Field padding-left`） | **16px**（`Field padding-right`） |
-| 默认颜色 | `var(--black-40)` — Field CSS 自动注入 | `var(--black-40)` — Field CSS 自动注入 |
-| 布局 | Field `display: grid; columns: auto 1fr auto`，icon 占列 1 | icon 占列 3 |
-
-典型示例（FM-05）：
-```svelte
-<Field>
-    <Icon as="leading"><CalendarBlank /></Icon>
-    <Input type="date" name="dueDate" />
-    <Button as="trailing" bare iconOnly aria-label="打开日期选择"><Icon size={16}><ArrowLineUpDown /></Icon></Button>
-</Field>
-```
-
-#### segment 宿主级图标（Input / Select 的直接子项）
-
-图标作为 `Input as="segment"` 或 `Select as="segment"`（Listbox）的直接子项，宿主自身的 `padding: 12px 16px` 提供与外边框的间距。
-
-| 项目 | Leading | Trailing |
-| :--- | :--- | :--- |
-| prop | `as="leading"` | `as="trailing"` |
-| 到外边框距离 | **16px**（宿主 `padding-left`） | **16px**（宿主 `padding-right`） |
-| 默认颜色 | 继承宿主文字色（`currentColor`） | 继承宿主文字色（`currentColor`） |
-| ⚠️ Select trailing 与 Indicator | — | trailing 存在时，Indicator 被 CSS 自动隐藏 |
-| ⚠️ Input trailing 限制 | — | `invalid` 时错误图标出现，CSS 自动隐藏外部 trailing；恢复正常态后重新显示 |
-
-**segment 内部 grid 布局（CSS 自动切换）：**
-
-| 图标配置 | `grid-template-columns` |
-| :--- | :--- |
-| 仅 leading | `auto 1fr` |
-| 仅 trailing | `1fr auto` |
-| leading + trailing | `auto 1fr auto` |
-
-典型示例（FM-02）：
-```svelte
-<Field row>
-    <Input as="segment">
-        <Icon as="leading"><CreditCard /></Icon>
-    </Input>
-</Field>
-```
-
-<a id="开发者指南-ai"></a>
-
-### 开发者指南 (AI)
-
-### 模块索引 (Module Index)
-
-- **Field 组件**: [./Field.svelte](Field.svelte)
-
-### 关联关系
-
-- **父组件**: [Frame.svelte](Frame.svelte)
-- **字段宿主**: [./Input.svelte](Input.svelte), [./Textarea.svelte](Textarea.svelte), [./Select.svelte](Select.svelte)
-- **共享协议**: `context.ts`（@snowui-design-system/components/context）, `keys.ts`（@snowui-design-system/components/keys）
-- **角色类映射**: [../logic/frame-class-state.svelte.ts](../logic/frame-class-state.svelte.ts)
-
----
-
-
-### 外部附件与分割线
-
-leading/trailing 是同一字段的附件，不是独立字段段，不绘制字段分割线。日期 Input 即使启用内置校验，也与外部附件保持同排；外部日期触发器存在时不重复显示内置触发器。
+- **宿主与默认能力开关**：[Field.svelte](Field.svelte) 基于 [Frame.svelte](Frame.svelte) 封装（默认 `enableResponsive=false`、`enableContext=true`、`enableScaleObserver=false`），通过共享表单 Context 协调 [Input.svelte](Input.svelte)、[Textarea.svelte](Textarea.svelte) 与 [Select.svelte](Select.svelte)。
+- **容器与分段几何约束**：默认表面使用 `--surface-1`（只读 `--surface-2`）、`--radius-4` 与 `field-bordered` 边框/聚焦环。单嵌入宿主且无 `segment` 时退回块级容器避免多余 grid 轨道干扰；`Field row > Input/Select as="segment"` 直接分段宿主自持 `12px / 16px` padding，而 `<Frame as="segment" row>` 嵌套行段由外层行 Frame 统一持有 `12px / 16px` padding、内部 host padding 归零。内嵌非 `segment` 的 `Textarea` 右侧留白由外层 Field 单独负责，仅保留底部 resize/footer 区域。
+- **附件与分割线边界**：非 `segment` 模式下 `as="leading" | "trailing"` 作为 Field 直系附件（默认 `--black-40`），不生成字段分割线；`segment` 模式下附件作为各段 Input / Select 的直系子项（Select 存在外部 trailing 时自动隐藏默认 Indicator；Input 进入 `invalid` 时优先显示内置警告图标并临时隐藏外部 trailing）。日期 Input 存在外部日期触发器时不重复显示原生触发图标。
 
 ## 更新日志
 
@@ -521,81 +353,4 @@ leading/trailing 是同一字段的附件，不是独立字段段，不绘制字
 - 分段 Field 的内置错误提示移到连续输入外框下方，采用正常文档流的 `surface + error` 布局。
 - 分段场景由 `Field.error` 统一持有错误文案；内部 Input / Select / Textarea 只声明 invalid，不在各 segment 内重复生成错误提示。
 
-### v1.2.0 (2026-07-05)
-
-#### 新功能
-- 新增默认关闭的 `error` 内置模式；仅在 invalid 时生成 F-02 同款 `<Text as="error">`。
-- `parts.Text` 同时用于配置内置 label 与 error，显式组合模式保持不变。
-
-### v1.1.0 (2026-07-05)
-
-#### 新功能
-- **FD-BuiltIn.1** 新增默认关闭的 `label` 内置模式，支持字符串或 Snippet，并生成既有样式的 `<Text as="label">`。
-- **FD-BuiltIn.2** 新增 `parts.Text` 配置入口；原有显式 `<Text as="label">` 组合模式保持不变。
-
-### v1.0.14 (2026-05-06)
-
-#### 修复
-- **FD-Fix.3** 修复 `Field row > Input/Select as="segment"` 横向分段宿主的 padding 被后续嵌套宿主规则清零，导致 F-04 双输入并排示例中文字贴边的问题；现在直接 segment 宿主保留自身 `12 / 16` 内容 inset，嵌套在 segment 容器内的 host 仍由外层容器持有 padding。
-
-### v1.0.13 (2026-04-25)
-
-#### 修复
-- **FD-Fix.2** 修复 `Field` 内嵌非 `segment` 的 `Textarea` 右侧留白过大：外层 `Field` 已提供右侧 `16px` padding，Textarea control 不再额外叠加右侧 padding，仅保留底部 `resize/footer` 区域。
-
-### v1.0.10 (2026-04-02)
-
-#### 调整
-- **FD-Doc.1** 文档补充最新字段组合规则：移除最小高度表述，明确 `label -> 内容` 默认纵向间距为 `8px`，并强调 `Text / Input / Frame / Select / Textarea` 进入 `Field` 后由外层统一控制边框、背景、圆角与 padding。
-- **FD-Doc.2** 文档收敛分割线判定：只有多个输入宿主或显式分段组成连续字段表面时才使用分割线；`leading + Input + trailing` 这类配件型结构不使用分割线，并更新了 `Select + trailing` 示例写法。
-
-### v1.0.9 (2026-03-24)
-
-#### 修复
-- **FD-Fix.1** 当 `Field` 中嵌入的宿主本身是 `Input` 时，容器不再复用通用 host 布局；改为让嵌入态 `Input` 继续使用自身的三列 grid、gap、padding 与 number stepper 对齐链路。若 `Field` 内只有这一个 `Input` 宿主，则 `Field` 根退成普通块容器、宿主跨满整行，保证 `<Field><Input /></Field>` 与独立 `<Input />` 在右侧留白和按钮尺寸上完全一致。
-
-### v1.0.8 (2026-03-16)
-
-#### 新功能
-- **FD-Layout.9** 新增根节点 `row / column` 简写：`Field row` 和 `Field column` 现在可直接复用原有局部 `row / col` 容器规则，无需再额外包一层 `Frame`。
-
-### v1.0.7 (2026-03-16)
-
-#### 新功能
-- **FD-Layout.8** 新增 `col` 局部容器协议：`Field > Frame as="col" column` 现在可作为字段内部的竖向组合容器，复用宿主 padding、横向分隔线和嵌套 `row` 的组合规则。
-
-### v1.0.6 (2026-03-16)
-
-#### 调整
-- **FD-Layout.7** 多段字段内容之间的横向分割线改为与 Field 外边框一致的颜色与粗细，避免复杂结构示例里中间分割线过浅。
-
-### v1.0.5 (2026-03-16)
-
-#### 修复
-- **FD-Layout.6** `leading / trailing` 的 `Button bare` 改为通过外侧 margin 保留与 Field 边框的间距，并显式垂直居中，避免日期示例里的按钮贴到右上角。
-
-### v1.0.4 (2026-03-16)
-
-#### 修复
-- **FD-Layout.5** `row` 内部的通用兄弟分隔线不再作用于与 `Button bare` 相邻的节点，避免复杂结构里的 trailing 无外壳按钮继续显示边框。
-
-### v1.0.3 (2026-03-16)
-
-#### 修复
-- **FD-Layout.4** 当 `leading / trailing` 角色本身是 `Button bare` 时，移除槽位分隔线，避免无外壳按钮在 Field 示例中出现额外边框。
-
-### v1.0.2 (2026-03-16)
-
-#### 调整
-- **FD-Layout.3** 日期触发器不再依赖额外行为 prop；复杂结构中的日期按钮也统一只使用 `as="trailing"`，并要求位于可识别的局部容器中。
-
-### v1.0.1 (2026-03-15)
-
-#### 新功能
-- **FD-Layout.1** 新增直接组合规则：`Field > host + trailing` 现在可直接形成一行字段表面，无需额外 `Frame as="row"`。
-- **FD-Layout.2** Field 根布局升级为三列网格：`leading / host / trailing`，任意未声明角色的复杂子块默认跨满整行。
-
-### v1.0.0 (2026-03-15)
-
-#### 新功能
-- **FD-Feat.1** 新增表单容器组件，负责承接字段视觉外壳与组合式布局协议。
+完整历史见 [更新日志归档](../../docs/history/changelogs/Field.history.md)。

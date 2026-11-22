@@ -168,11 +168,6 @@
 <a id="2-api"></a>
 
 
-### 2.1 Props
-
-
-其余未声明属性会透传给根层 `Frame`。
-
 ### 2.2 组件方法
 
 | 方法 | 描述 |
@@ -247,150 +242,19 @@ interface BarChartItem {
 
 ---
 
-<a id="4-布局模型"></a>
+### 布局模型、无障碍与动效
 
-### 布局模型
+主布局模型：**内禀原子布局**（详见 [LayoutProtocol.md §12.7](../../../docs/standards/LayoutProtocol.md)）。根层 `Frame` 直接观察最终实测宽高重算单 SVG 几何（支持 `width="100%"` Fill）。
 
-主布局模型:**内禀原子布局**。
-
-- 根层为 `Frame`，内部为单个 SVG 绘图区。
-- 根层 CSS 尺寸由 `width` / `height` 决定，SVG 坐标算法使用根层最终实测尺寸；`width="100%"` 可直接 Fill，无需页面监听容器后回传像素宽度。
-- `orientation="vertical"` 时分类轴为横向 cell，柱位于 cell 中心；`orientation="horizontal"` 时分类轴为纵向 cell。
-- Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘与绘图区起点间距固定为 `12px`。
-- 自动 domain 上限直接使用当前数据最大值；nice ticks 只生成到不高于该值的最后一个易读刻度。最高柱可以高于最后一条网格线，顶部仅由 `8px / 16px` 内容安全区控制。显式 `yMax` 或 `yTicks` 不受此自动规则改写。
-- 绘图区顶部由共享内容感知规则计算：普通柱 `8px`，纵向数值 Y 轴 `16px`；二者取最大值。数值 label 不增加该值，继续保持柱顶上方 `4px` 的位置，必要时可溢出绘图区顶边。横向柱的数值 label 位于柱右侧，同样不额外增加顶部安全区。有 X 轴时 `bottom=24px`，只包含 `8px` label 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
-- 单元内部规则：
-  - `single`: 一个单元一根柱。
-  - `stack`: 一个单元一根多段柱；`segmentGap=0` 时中间段无间隔并只在整体首尾保留圆角；`segmentGap>0` 时每段独立圆角；数值 label 只属于最顶段，内容为所有分段总和。
-  - `overlay`: 一个单元两层同轴柱，后层 10%，前层 100%。
-  - `group`: 一个单元多根并排柱，粗细统一，颜色可逐根定义。
-- 响应式收窄时先压缩柱粗细至 `2px`；同分类并排柱间距和相邻分类柱间距都保留至少 `4px`。横坐标和常驻顶部数值分别按自身文本需求抽稀，柱体数量、数据 domain、命中 cell 和动效顺序保持完整。
-- 不接入三槽位协议，不承担通用子元素排列。
-
-详见 [LayoutProtocol.md §12.7](../../../docs/standards/LayoutProtocol.md)。
-
----
-
-<a id="5-无障碍与-frame-集成"></a>
-
-### 无障碍与 Frame 集成
-
-- 交互根使用 `role="group"` 和 `aria-label="柱状图"`（zh-CN 默认，随 locale 切换），让内部命中项保留独立语义。
-- 每根柱 / 每个分段有独立透明命中层，使用 `role="button"`、`tabindex="0"` 和包含名称与数值的 `aria-label`。
-- 独立使用或接入 `ChartGroup` 时均支持 `hoverMode="cell"`；cell 命中区按分类中心左右半格覆盖绘图区，同一分类单元的所有单柱、多段、相叠层或并排柱一起响应 hover。
-- `loading` 保留完整画布与坐标结构，只把柱体恢复到出现动效起点；根 Frame 明确关闭 Skeleton。显式空 `data={[]}` 不回退默认演示数据，可配合 `xLabels`、`yMin`、`yMax` 先建立最终坐标。
-- 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
-- `class`、`style` 与未声明属性透传到根层 Frame。
-
----
-
-<a id="6-图层与动效"></a>
-
-### 图层与动效
-
-SVG 图层从下到上为：
-
-1. `defs`: 颜色渐变。
-2. grid / axis layer: 网格线和 x 轴基线。
-3. base layer: `showBaseLayer=true` 时绘制最终尺寸占位柱，`fill-opacity=0.04`；默认不渲染。
-4. series layer: 真实柱体。
-5. hit layer: 完整命中区域。
-6. axis label layer: X / Y 轴文本。
-
-出现动效 API 与 `ChartSpec.md §9` 保持一致。所有柱共享同一张图表级时间轴，分类单元按顺序启动；单元内部的并排柱、堆叠段或相叠层使用同一局部进度。柱体出现形式为高度 / 宽度补齐：纵向柱先显示目标高度的 `80%`，再从顶部向上补齐到 `100%`；横向柱先显示目标宽度的 `80%`，再向右补齐到 `100%`。相邻分类单元的启动间隔固定；整条时间轴先应用 `easeOut` 缓动；单元升高持续时长按分类顺序逐步拉长，让越靠右的单元升高速度越慢。`stack` 模式中，一个分类单元内的所有分段共享同一个局部进度，因此 BC-02 / BC-03 不会出现每段分别启动的节奏；在任意时刻，底段 / 中段 / 顶段都按各自目标高度的同一比例同步变高。`segmentGap` 只作用在相邻分段边界上，动效过程中保持固定像素值；`segmentGap=0` 时相邻分段始终贴合无间距。`appearanceDuration` 仍可覆盖整段时间轴的播放速度。常显或 hover label 的数值直接使用当前柱高比例计算；`stack` 使用整柱总值，从总值的当前比例补到最终总值。
-
----
-
-<a id="7-共享逻辑边界"></a>
-
+- **坐标与安全区**：Y 轴标签区宽度等于可见最宽标签实测渲染宽度，右缘距绘图区固定 `12px`；自动 domain 上限取实际最大值，顶部安全区为普通柱 `8px`、带纵向数值 Y 轴 `16px`；有 X 轴时 `bottom=24px`（`8px` 间距 + `16px` 标签高）。
+- **无障碍与命中**：根使用 `role="group"`，每根柱/分段提供独立 `role="button"` 透明命中层与 `aria-label`；`hoverMode="cell"` 按分类中心左右半格联动整单元。`loading` 保留完整画布与坐标结构并将柱体固定在动效起点（关闭 Skeleton）。
+- **图层与出现时间轴**：SVG 从下到上依次为 `defs`、网格/基线、可选 `showBaseLayer`（4% 透明度）、真实柱体、命中层、坐标文本。出现动效共享图表级时间轴（`easeOut`）：各分类单元从目标尺寸 `80%` 依次补齐到 `100%`（基准单柱 `300ms`，越靠右单元时长递增；`stack` 同单元所有分段同步变高并保持固定像素 `segmentGap`）。
 
 ## AI Zone
 
-### 内置文案与语言
-
-使用现有 `useLocale()`，key：`barChart.name`、`barChart.cells`。显式根 `aria-label` 保持优先；业务数据名、坐标标签与格式化数值不进入翻译表。
-
-
-以下章节保留源码维护约束，不属于应用接入步骤。
-
-### 共享逻辑边界
-
-来自 `components/src/lib/chart/`：
-
-- `colors.ts`: Chart 默认色序、SnowUI 语意色解析、单色透明度梯度。
-- `gradients.ts`: CSS `linear-gradient(...)` 与渐变对象解析。
-- `geometry.ts`: 数值、CSS 长度与 clamp。
-- `axis.ts`: Y 轴可见标签实际渲染宽度测量。
-- Frame 默认 morph 时序: BarChart 出现动效的单柱升高基准时长来源。
-- `pointer.ts`: HoverPanel 指针坐标按绘制帧合并，每帧最多读取一次根层布局。
-
-保留在组件内：
-
-- 纵向 / 横向坐标映射。
-- 单元内部 `single` / `stack` / `overlay` / `group` 几何。
-- 矩形圆角 path 与起点 / 终点圆角规则。
-- 坐标轴 label、网格线与命中层 SVG 结构。
-
----
-
-<a id="自适应黑白对比接入"></a>
-
-
-### 自适应黑白对比接入
-
-使用 [Adaptive Contrast](../lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
-
-
-
-
-> **状态**: 已实现
-
-
-
----
-
-<a id="3-样式-token-详表"></a>
-
-### 样式 Token 详表
-
-| 属性 | 默认值 | Token / 变量 |
-| :--- | :--- | :--- |
-| 整体宽度 | 800px | `--snowui-bar-chart-width` |
-| 整体高度 | 400px | `--snowui-bar-chart-height` |
-| 柱粗细 | 32px | `--snowui-bar-chart-bar-width` |
-| 并排柱间距 | 4px | `--snowui-bar-chart-bar-gap` |
-| 分类单元预留间距 | 20px | `--snowui-bar-chart-group-gap` |
-| 多段间隔 | 0px | `--snowui-bar-chart-segment-gap` |
-| 柱圆角 | 8px | `--snowui-bar-chart-corner-radius` |
-| 坐标轴字号 | 12px | `--snowui-bar-chart-axis-font-size` |
-| 坐标轴行高 | 16px | `--snowui-bar-chart-axis-line-height` |
-| 坐标轴颜色 | 40% 黑色 | `--snowui-bar-chart-axis-color` |
-| 网格线颜色 | 10% 黑色 | `--snowui-bar-chart-grid-color` |
-| x 轴基线颜色 | 40% 黑色 | `--snowui-bar-chart-axis-line-color` |
-| hover label 颜色 | Black/100% | `--snowui-bar-chart-hover-label-color` |
-
-### 3.1 Override 入口
-
-| 变量 | 用途 |
-| :--- | :--- |
-| `--snowui-bar-chart-width-override` | 整体宽度 |
-| `--snowui-bar-chart-height-override` | 整体高度 |
-| `--snowui-bar-chart-axis-font-size-override` | 坐标轴标签字号 |
-| `--snowui-bar-chart-axis-color-override` | 坐标轴标签颜色 |
-| `--snowui-bar-chart-grid-color-override` | 网格线颜色 |
-| `--snowui-bar-chart-axis-line-color-override` | x 轴基线颜色 |
-| `--snowui-bar-chart-hover-label-color-override` | 强制覆盖 hover label 的默认 Black/100% 颜色 |
-
----
-
-<a id="8-ai-zone"></a>
-
-
-### User Notes
-
-- 保留。
-
-数值标签按所在位置的实际背景明暗显示静态黑色或白色；主题切换刷新背景遮罩，跨越重叠柱体时按覆盖区域反白。
+- **多语言与自适应对比**：通过 `useLocale()` 读取 `barChart.name`、`barChart.cells`；默认接入共享 [Adaptive Contrast](../lib/adaptive-contrast.md)（按局部背景与同原点柱体明暗自动反白黑色数值标签）。
+- **共享与私有边界**：颜色、渐变、基础几何、Y 轴文本测量与逐帧 pointer 合并复用 `components/src/lib/chart/`；纵横坐标映射、`single / stack / overlay / group` 单元几何与圆角矩形 path 由组件维护。
+- **公开覆盖变量**：`--snowui-bar-chart-width-override`、`--snowui-bar-chart-height-override`、`--snowui-bar-chart-axis-font-size-override`、`--snowui-bar-chart-axis-color-override`、`--snowui-bar-chart-grid-color-override`、`--snowui-bar-chart-axis-line-color-override`、`--snowui-bar-chart-hover-label-color-override`。
 
 ## 更新日志
 
@@ -409,34 +273,4 @@ SVG 图层从下到上为：
 
 - 出现时间轴的分类起始偏移改为常量时间计算；HoverPanel pointer 原始事件不再同步读取布局，坐标换算按绘制帧合并。公开 API、柱体几何、时长、视觉和交互语义不变。
 
-### v1.4.0 (2026-09-03)
-
-- 新增 `showBaseLayer=false`，按需开启最终尺寸的同色轮廓；真实图形和出现动效保持原有行为。
-- `adaptiveContrast` 改为默认开启，保留显式关闭与子图覆盖。
-
-### v1.3.0 (2026-09-03)
-
-- `adaptiveContrast` 接入 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
-
-### v1.2.0 (2026-09-02)
-
-- overlay 复用 `bars` 表达两项独立对比数据，自动 domain、颜色、数字格式、命中和面板统一消费相同数据；支持后层逐项变化和前层超过后层。
-- 保留旧字段兼容，未命名后层回退分类名，移除 `Background` 硬编码；缺少后层值时不再复制前层数据。
-
-### v1.1.4 (2026-09-02)
-
-- 新增可选的 `data[].backgroundName`，用于业务化命名 overlay 后层；未提供时保留原名称，几何、颜色与 hover 行为不变。
-
-### v1.1.3 (2026-09-02)
-
-- HoverPanel 默认定位改为 `pointer`，随鼠标移动；区域 hover 默认保持 `cell`，显式的 placement / hoverMode 配置继续优先。
-
-- 2026-09-02 — HoverPanel 改为默认开启，默认外观保持 light。
-- 2026-09-02 v1.1.2 — `stack` 数值 label 改为仅在最顶段显示一次并展示全部分段总和，颜色恢复默认 Black/100%；稀疏 X label 自动忽略空项抽稀；HoverPanel 保留 label 与数值行区域 `2px` 间距，名称与数值间距改为 `8px`。
-- 2026-09-02 v1.1.1 — 顶部数值 label 不再把安全区增至 `28px`，仍保持柱顶上方 `4px` 并允许溢出绘图区顶边。
-- 2026-09-01 v1.1.0 — BarChart 改为按根层最终显示尺寸自行响应；柱宽下限为 `2px`，柱间距下限为 `4px`；修复短横坐标 label 在 cell 小于 `20px` 时仍被误判为可容纳的问题；横坐标抽稀不再删除柱体，并为常驻顶部数值增加独立自动抽稀。
-- 2026-09-01 v1.0.4 — 自动 domain 上限改为实际最大数据值，最高 nice tick 不再超过最大值；无 Y 轴场景也不再因向上取整的 domain 产生额外顶部空白。
-- 2026-08-31 v1.0.3 — 顶部改为内容感知安全区，并收紧自动 nice domain，避免最高柱、Y 轴顶刻度或数值 label 贴边，同时减少过大的标尺上方空白。
-- 2026-08-31 v1.0.2 — 移除笛卡尔绘图区顶部和底部的额外留白；底部仅保留 X 轴标签自身所需的 `24px`。
-- 2026-08-31 v1.0.1 — Y 轴改为按最宽可见标签的实际渲染宽度自适应，标签与绘图区之间固定保留 `12px`。
-- 2026-06-05 v1.0.0 — 新增 BarChart，支持纵向 / 横向、单柱、多段、相叠、多柱并排、坐标轴与 Chart 出现动效；出现动效采用 80% 初始高度、固定分类间隔、Frame morph 基准时长与单柱独立缓动的逐柱升高形式，label 数值可随柱高补间变化。
+完整历史见 [更新日志归档](../../docs/history/changelogs/BarChart.history.md)。

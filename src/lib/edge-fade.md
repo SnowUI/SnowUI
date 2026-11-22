@@ -26,8 +26,8 @@
 ### JS 生成器 API
 
 ```ts
-createEdgeFadeMaskImage(options): string   // 返回 linear-gradient(...) 字符串
-createEdgeFadeMaskStyle(options): string   // 返回 "-webkit-mask-image:...;mask-image:...;" 内联声明串
+createEdgeFadeMaskImage(options): string   // Returns linear-gradient(...) value
+createEdgeFadeMaskStyle(options): string   // Returns inline "-webkit-mask-image:...;mask-image:...;" declaration
 ```
 
 | 参数 | 必填 | 说明 |
@@ -61,11 +61,11 @@ createEdgeFadeMaskStyle(options): string   // 返回 "-webkit-mask-image:...;mas
 ## 组合用法（悬浮 + 渐隐）
 
 ```svelte
-<!-- 宿主 + 浮动控件 + 内容朝控件一侧渐隐 -->
+<!-- Host with floating action and directional edge fade -->
 <span class="snowui-overlay-action-host" style={`--edge-fade:${createEdgeFadeMaskImage({ direction: "to left", fadeStart: "0", fadeEnd: "2rem" })}`}>
   <span class="content">……内容……</span>
   <button class="snowui-overlay-action" style="inset-inline-end: 0; inset-block: 0;">×</button>
-  <!-- 组件 CSS：:where(.snowui-overlay-action-host:hover) .content { mask-image: var(--edge-fade); -webkit-mask-image: var(--edge-fade); } -->
+  <!-- Component CSS applies --edge-fade mask on hover -->
 </span>
 ```
 
@@ -95,7 +95,9 @@ createEdgeFadeMaskStyle(options): string   // 返回 "-webkit-mask-image:...;mas
 
 > 以上组件除 Table 外当前**未接入本统一能力封装**（仍各自直接用 `.snowui-scroll-mask`）；本能力已就绪，可按需逐步接入，渐隐部分接入为零性能差异。
 
-## Changelog
+## 更新日志
+
+### v1.2.0 (2026-07-05)
 
 - 2026-07-05：v1.2.0，新增 `.snowui-horizontal-scroll-mask` 与 `data-scroll-mask-x`，供 Input 系单行输入按真实横向滚动状态显示 left/right/both 渐隐；Input 清除 X 的右侧渐隐参数与 Table 表头 checkbox 对齐。
 - 2026-06-27：v1.1.0，扩展为「内容渐隐层 + 悬浮操作层」统一能力：纳入 `.snowui-scroll-mask`（静态 CSS 渐隐形态）与新增 `.snowui-overlay-action` / `.snowui-overlay-action-host`（就地悬浮基类）；补充两种渐隐形态选型、性能说明与消费者清单。明确随行 sticky/fixed 跟踪定位为组件职责、不纳入通用基类。

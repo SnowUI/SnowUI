@@ -1,4 +1,4 @@
-# floating-position.ts 文档
+# floating-position
 
 > **职责**: 提供浮层边缘碰撞、边界夹取和反向方位计算的 公共能力。
 > **依赖方**: `Tooltip.svelte`、`ChartHoverPanel.svelte`

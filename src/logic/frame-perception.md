@@ -1,4 +1,4 @@
-# perception.svelte.ts 文档
+# perception
 
 > **版本**: v1.3.0
 > **职责**: 管理组件的上下文感知能力，支持子组件感知父组件状态和联动控制。
@@ -27,9 +27,9 @@
 
 ```typescript
 interface LinkageControl {
-    target: string;                      // 目标组件 ID
-    action: 'play' | 'reset' | 'pause';  // 动作类型
-    reverse?: boolean;                   // 是否反向执行
+    target: string;                      // Target component ID
+    action: 'play' | 'reset' | 'pause';  // Action type
+    reverse?: boolean;                   // Reverse playback
 }
 ```
 

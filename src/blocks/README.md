@@ -1,22 +1,17 @@
 # SnowUI 可复用区块
 
-`components/src/blocks/` 存放可复用区块，不按购买档位分类。区块由基础组件、复合组件、布局协议和区域级逻辑组合而成，面向真实产品场景，页面继续负责路由、数据请求、权限与业务副作用。
+`components/src/blocks/` 存放面向产品区域场景的可复用区块。区块由基础组件、复合组件、布局协议和区域级逻辑组合而成；页面继续负责路由、数据请求、权限与业务副作用。
 
-使用、修改或交付前阅读本仓库根目录 [LICENSE](../../LICENSE)；完整商业与交付规则见 [商业策略](../../../docs/standards/commercial/CommercialStrategy.md)。全部组件与区块通过统一预编译运行包 `@snowui-design-system/components` 使用。
+使用、修改或交付前请阅读 [LICENSE](../../LICENSE)。全部组件与区块统一通过 `@snowui-design-system/components` 导入。
 
 ## 使用入口
 
-- [Sidebar](Sidebar.md)：应用导航外壳。
-- [SidebarSection](SidebarSection.md)：导航分组。
-- [SidebarItem](SidebarItem.md)：导航条目。
+- [Sidebar](Sidebar.md)：应用导航外壳，支持折叠、抽屉与宽度调整。
+- [SidebarSection](SidebarSection.md)：侧边栏导航分组与可选标题操作。
+- [SidebarItem](SidebarItem.md)：侧边栏导航条目，支持激活态、图标、二级层级线与状态提示。
+- [SearchPopup](SearchPopup.md)：可组合搜索面板，统一搜索输入、可选标题、结果分组与间距。
 
-使用这些真实导出的组件组合导航；不要按分类示例推断不存在的导出。统一从 `@snowui-design-system/components` 导入组件，调用公开 Props / Snippets / events 与修改组件实现分别按 LICENSE 核对。
-
-## 阅读与源码边界
-
-Free、Pro 和 Team 的完整权益以 LICENSE 与商业策略为准，不在此复制价格或项目／席位规则。全部组件运行包与原始源码均可免费获取，Free 的测试、Demo 与单个本地项目，以及 Pro / Team 的生产使用分别按 LICENSE 核对；免费获取不等于开放源代码许可。
-
-源码归档覆盖全部组件及必要共享能力。所有方案均可为授权用途修改样式、交互、修复问题和迁移框架；取得源码不授权系统提取全库设计系统 / 架构、模型训练、通用资源再分发或竞争产品。按授权交付终端产品与分发独立组件资源是不同用途。
+使用这些真实导出的区块组合导航与搜索区域；不要按分类示例推断不存在的导出。统一从 `@snowui-design-system/components` 导入，调用公开 Props、Snippets、events 与 `parts`。
 
 ## AI Zone
 
@@ -24,18 +19,16 @@ Free、Pro 和 Team 的完整权益以 LICENSE 与商业策略为准，不在此
 
 - 每个区块使用 PascalCase 命名。
 - 源码、文档、测试同目录放置：`<Name>.svelte`、`<Name>.md`、`<Name>.test.ts`。
-- 文档头说明实际技术包、区块类型、职责与 LICENSE 阅读入口；不使用购买档位推断运行能力。
-- 全部组件源码在 `components/` 仓库维护，运行包与免费源码归档按商业策略和发布规范执行。
+- 文档头说明包归属、区块类型与职责。
 
 ### 技术分类
 
 | 类型 | 说明 | 示例 |
 | --- | --- | --- |
-| 导航区块 | 提供稳定导航区域，路由与业务内容由页面拥有 | Sidebar 及其配套子项 |
-| 通用组合区块 | 组合公开组件并提供可跨产品复用的区域契约 | 当前目录未提供此类独立公开条目 |
-| 页面模板 | 页面或多页面结构、演示数据与应用编排 | 后续独立交付；不从本目录名称推断已包含 |
+| 导航区块 | 提供稳定导航区域，路由与业务内容由页面拥有 | Sidebar、SidebarSection、SidebarItem |
+| 通用组合区块 | 组合公开组件并提供可跨产品复用的区域契约 | SearchPopup |
 
 ## 更新日志
 
-- 2026-10-09（商业策略）：取消仅区块可交付付费源码的旧限制，分离技术分类与商业权益，增加许可阅读和迁移期事实边界；未迁移源码或发布包。
-- 2026-09-21（文档）：列出实际组件入口，移除未提供的 SearchPanel 示例，将仓库维护规则归入 AI Zone。
+- 2026-11-22：登记 `SearchPopup` 公开入口，移除与技术职责无关的商业档位叙述（Owner 2026-11-07）。
+- 2026-09-21：列出实际组件入口，将仓库维护规则归入 AI Zone。

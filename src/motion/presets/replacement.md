@@ -1,4 +1,4 @@
-# replacement.ts 文档
+# replacement
 
 > **版本**: v1.1.0
 > **职责**: 提供内容替换类进入 preset。
@@ -12,7 +12,9 @@
 3. 后续如内容替换需要独立于 generic 的数值，可只调整本 preset。
 4. 本 preset 复用 `GENERIC_SCALE_APPEAR_MOTION` 的 opacity + scale + 标准时序；generic appear 收敛为仅 opacity 后，内容替换视觉保持不变。
 
-## 变更记录
+## 更新日志
+
+### v1.1.0 (2026-06-30)
 
 - v1.2.0 (2026-06-30): 改为复用显式 generic scale opt-in preset，减少重复通道组合。
 - v1.1.0 (2026-06-30): 显式声明 replacement scale，不再依赖 generic appear 的旧缩放通道。

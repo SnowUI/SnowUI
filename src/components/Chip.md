@@ -88,16 +88,16 @@ Owner 2026-11-13：Chip内部图标（含内置Dot、外置leading/trailing）�
 遵循 [ComponentGuidelines.md §2.7.1](../../../docs/standards/ComponentGuidelines.md)。当外部传入 `data-as="leading"`（原生 HTML）或 `as="leading"`（SnowUI 大写组件）的子元素时，组件自动隐藏内置 Dot：
 
 ```svelte
-<!-- 默认：内置 Dot -->
+<!-- Default: built-in dot -->
 <Chip>Label</Chip>
 
-<!-- 替换 leading -->
+<!-- Custom leading slot -->
 <Chip>
     <Icon as="leading"><CheckCircle /></Icon>
     Label
 </Chip>
 
-<!-- 同时使用 trailing -->
+<!-- Combined with trailing slot -->
 <Chip>
     Label
     <Icon as="trailing"><X /></Icon>
@@ -120,55 +120,43 @@ Owner 2026-11-13：Chip内部图标（含内置Dot、外置leading/trailing）�
 
 ### 布局变量链
 
-| 变量 | 默认来源 | 用途 |
-| :--- | :--- | :--- |
-| `--snowui-chip-font-size` | `var(--text-12)`（lg：`var(--text-14)`) | 文字字号 |
-| `--snowui-chip-line-height` | `var(--leading-12)`（lg：`var(--leading-14)`) | 文字行高 |
-| `--snowui-chip-gap` | `0px` | 内部图标／Dot与文字的默认间距为0；这是单行组合最小4px规则的明确例外，保留公开override。 |
-| `--snowui-chip-icon-size` | `12px`（sm）/ `16px`（lg） | 默认 Dot 尺寸 |
-| `--snowui-chip-padding` | `0`（default）/ `2px 8px`（sm+bg）/ `4px 12px`（lg+bg） | 内边距 |
-| `--snowui-chip-radius` | `0`（default）/ `9999px`（background） | 圆角 |
-| `--snowui-chip-bg` | `transparent` / `color-mix(... 10%)` | 背景 |
-| `--snowui-chip-shadow` | `none` / `inset 0 0 0 0.5px color-mix(... 20%)` | 描边 |
 
 <a id="用法示例"></a>
 
 ### 用法示例
 
 ```svelte
-<!-- 默认（仅 Dot + 文字） -->
+<!-- Default: dot and label -->
 <Chip>Label</Chip>
 
-<!-- 大尺寸 -->
+<!-- Large size -->
 <Chip size="lg">Label</Chip>
 
-<!-- 背景变体 -->
+<!-- Background variant -->
 <Chip variant="background">Label</Chip>
 
-<!-- 背景变体开启 Dot -->
+<!-- Background variant with dot indicator -->
 <Chip variant="background" showDot>Label</Chip>
 
-<!-- 大尺寸 + 背景 -->
+<!-- Large size with background -->
 <Chip variant="background" size="lg">Label</Chip>
 
-<!-- 通过外部 class 改变颜色（背景与边框同步） -->
+<!-- Custom color class -->
 <Chip variant="background" class="text-purple">Purple</Chip>
 <Chip variant="background" class="text-red">Red</Chip>
 
-<!-- 替换 leading -->
+<!-- Custom leading slot -->
 <Chip>
     <Icon as="leading"><Star /></Icon>
     Featured
 </Chip>
 
-<!-- 添加 trailing -->
+<!-- Trailing slot -->
 <Chip variant="background">
     Filter
     <Icon as="trailing"><X /></Icon>
 </Chip>
 ```
-
-
 
 ## AI Zone
 
@@ -215,7 +203,6 @@ Owner 2026-11-13：Chip内部图标（含内置Dot、外置leading/trailing）�
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
 <a id="开发者指南-ai"></a>
 
@@ -233,19 +220,17 @@ Owner 2026-11-13：Chip内部图标（含内置Dot、外置leading/trailing）�
 
 ---
 
-## 更新日志
-
 ### 2026-11-13
 - 按Owner要求将内部图文默认间距改为0px，替代此前4px下限；保留singleLine与公开间距覆盖入口。
+
+## 更新日志
 
 ### v1.2.0 (2026-10-22)
 - 内部复用 Frame 单行预设，Dot／附件与文字保持至少4 CSS px间距；仅Tag内部继续原例外。颜色、图标替换和尺寸档位保持。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
-### 文档补全 (2026-09-07)
-
-- 补齐 `children` 的公开说明，澄清 size Context 回退和 showDot 的解析与替换优先级；运行时行为不变。
+- 2026-09-07（文档）：- 补齐 `children` 的公开说明，澄清 size Context 回退和 showDot 的解析与替换优先级；运行时行为不变。
 
 ### v1.1.0 (2026-06-21)
 

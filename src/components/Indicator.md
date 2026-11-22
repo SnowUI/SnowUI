@@ -122,9 +122,6 @@
 
 ---
 
-
-
-
 ## AI Zone
 
 > **更新**: 2026-09-15
@@ -149,6 +146,10 @@ Indicator 与同一 resize target 内的可见 overlay scrollbar Thumb 重叠时
 - corner 遵守 [内置 Icon 规范](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)，使用随包图形回退和可选 IconProvider；不在组件中复制或重画 path。
 - 不接入 Skeleton：手柄没有加载占位意义。
 
+### 2026-09-15 边缘间距修正
+
+line 的默认 pinOffset 从 0 修正为 padding-1，并从短条中心定位改为外缘定位；显式 pinOffset 也按外缘计算。普通、hover、focus 和拖动均保持基准 4px 可见间距；命中带仍从物理边缘 0 开始。显式偏移的 line 消费方会比旧中心定位向内移动半个条宽；corner 不变。
+
 ## 更新日志
 
 ### v1.4.0 (2026-09-28)
@@ -167,26 +168,4 @@ Indicator 与同一 resize target 内的可见 overlay scrollbar Thumb 重叠时
 - 将默认 Black/10 与交互态 Black/20 的颜色归属收敛到实际 visual 层，避免 Frame 根层 `color: inherit` 因样式加载顺序覆盖手柄颜色。
 - 保持 `--snowui-indicator-color-override` 与 `--snowui-indicator-active-color-override` 的既有覆盖能力。
 
-### v1.2.0 (2026-07-28)
-
-- 保持 reveal host 任意区域 hover 即显示 Indicator。
-- 重叠检测由整条 scrollbar 轨道改为实际 Thumb，并响应 ScrollArea hover、滚动、Thumb 拖动与 opacity transition。
-- Indicator 与可见 Thumb 重叠时完全退出 Pointer、hover、拖拽和键盘命中，确保滚动条获得唯一交互优先级。
-
-### v1.1.0 (2026-07-28)
-
-- line 新增 `hitAreaPadding`，允许消费方把全边命中带收窄为视觉条附近的局部范围。
-- Indicator 与同一 resize target 内的可见 SnowUI overlay scrollbar 重叠时自动隐藏并停止截获指针。
-
-### v1.0.1 (2026-07-12)
-
-- line 命中带默认铺满所在边缘全高（width）/ 全宽（height）：改为 absolute + top/bottom 或 left/right 贴边，不再用 pin 居中；视觉短条与命中带分层。
-
-### v1.0.0 (2026-06-21)
-
-- 合并 WidthIndicator、HeightIndicator 与 ResizeHandle。
-- 新增宿主 hover 显隐、line / corner 视觉、Pointer / 键盘 / ARIA 完整协议。
-
-### 2026-09-15 边缘间距修正
-
-line 的默认 pinOffset 从 0 修正为 padding-1，并从短条中心定位改为外缘定位；显式 pinOffset 也按外缘计算。普通、hover、focus 和拖动均保持基准 4px 可见间距；命中带仍从物理边缘 0 开始。显式偏移的 line 消费方会比旧中心定位向内移动半个条宽；corner 不变。
+完整历史见 [更新日志归档](../../docs/history/changelogs/Indicator.history.md)。

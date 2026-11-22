@@ -1,4 +1,4 @@
-# motion-types.ts 文档
+# motion-types
 
 > **版本**: v1.3.0
 > **职责**: 定义动效系统的核心类型接口，作为各模块间的契约。
@@ -10,13 +10,13 @@
 
 ```typescript
 export interface MotionExecutionParams {
-    delay?: number;          // 延迟 (ms)
-    duration?: number;       // 持续时间 (ms)
-    easing?: EasingFunction; // 缓动函数
-    type?: "tween" | "spring"; // 动效类型
-    stiffness?: number;      // 弹簧刚度
-    damping?: number;        // 弹簧阻尼
-    mass?: number;           // 弹簧质量
+    delay?: number;          // Delay (ms)
+    duration?: number;       // Duration (ms)
+    easing?: EasingFunction; // Easing function
+    type?: "tween" | "spring"; // Motion type
+    stiffness?: number;      // Spring stiffness
+    damping?: number;        // Spring damping
+    mass?: number;           // Spring mass
 }
 ```
 

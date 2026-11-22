@@ -61,34 +61,6 @@
 
 <a id="关键字速查"></a>
 
-### 关键字速查
-
-| 类别 | 关键字 |
-|:---|:---|
-| **布局** | `row`, `column`, `wrap`, `scrollable` |
-| **状态** | `active`, `selected`, Frame `data-state="Active"` |
-| **交互** | `interactive`, `disabled` |
-| **Pin** | `pinOffset`, `pinOffsetX`, `pinOffsetY`, 子节点 `as="pin-*"` |
-| **内容** | `children` |
-| **Frame 透传** | `class`, `style`, `data-*`, 事件、动效关键字等 `...rest` |
-
----
-
-<a id="props"></a>
-
-### Props
-
-| 关键字 | 类型 | 默认值 | 描述 |
-|:---|:---|:---|:---|
-| `pinOffset` | `number \| string` | `12` | Pin 内容统一偏移，数字按 px 处理 |
-| `pinOffsetX` | `number \| string` | - | Pin 水平偏移，优先级高于 `pinOffset` |
-| `pinOffsetY` | `number \| string` | - | Pin 垂直偏移，优先级高于 `pinOffset` |
-| `...rest` | `FrameProps` | - | 透传至根 Frame |
-
----
-
-<a id="外观"></a>
-
 ### 外观
 
 Card 默认外观来自 Figma Card 组件：
@@ -219,24 +191,6 @@ Pin 内容不参与普通内容滚动流，仍以 Card 根容器为定位参照�
 
 <a id="样式变量"></a>
 
-### 样式变量
-
-| 变量 | 用途 |
-|:---|:---|
-| `--snowui-card-background-override` | 背景 |
-| `--snowui-card-padding-y-override` | 上下 padding |
-| `--snowui-card-padding-x-override` | 左右 padding |
-| `--snowui-card-radius-override` | 圆角 |
-| `--snowui-card-gap-row-override` | 横向内容 gap |
-| `--snowui-card-gap-column-override` | 纵向内容 gap |
-| `--snowui-card-pin-offset-override` | Pin 默认偏移 |
-| `--snowui-card-hover-border-color-override` | hover 内置边框颜色 |
-| `--snowui-card-active-border-color-override` | active 内置边框颜色 |
-
----
-
-
-
 ## AI Zone
 
 > **更新**: 2026-05-26
@@ -260,11 +214,11 @@ Card 是通用容器组件，只负责外壳视觉、内容排列、Pin 承载�
 
 ## 更新日志
 
+### v1.0.1 (2026-09-02)
+
 - 2026-10-23：既有名称／数值、状态和任务附件示例接入Frame单行组合；保留正文／统计分组与Card自身行为，仅文档和示例修订。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
-### v1.0.1 (2026-09-02)
 
 - 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 

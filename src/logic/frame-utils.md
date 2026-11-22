@@ -1,4 +1,4 @@
-# frame-utils.ts 文档
+# frame-utils
 
 > **版本**: v1.0.0
 > **职责**: 提供 Frame 组件逻辑所需的通用工具函数。

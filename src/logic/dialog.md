@@ -1,4 +1,4 @@
-# dialog.svelte.ts
+# dialog
 
 > **版本**: v1.0.0
 > **职责**: 提供 Dialog 的模版注册、命令式显示关闭与声明式触发委托。
@@ -25,6 +25,8 @@
 - 落地文件: `./dialog.svelte.ts`
 - 组件消费: `../components/Dialog.svelte`
 
-## Changelog
+## 更新日志
+
+### v1.0.0
 
 - v1.0.0: 新增 Dialog store、注册 API、命令式 API 与声明式触发委托。

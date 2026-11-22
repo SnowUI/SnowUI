@@ -2,12 +2,12 @@
 
 > **版本**: v1.0.0
 > **职责**: 统一搜索面板的输入、可选标题、分组与结果间距。
-> **包归属**: 区块
+> **包归属**: `@snowui-design-system/components`
 > **区块类型**: Composite Block
 
 ## 组件介绍
 
-可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容。运行时依赖 @snowui-design-system/components 和 Components；不包含搜索算法、最近浏览、热度或业务路由规则。
+可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容；不包含搜索算法、最近浏览、热度或业务路由规则。
 
 ## 使用选择
 
@@ -30,7 +30,7 @@
 
 ## API
 
-| 关键字 | 类型 | 默认值 | 描述 |
+| 属性 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | backdrop | `BackdropVariant \| false` | `false` | false 保持原静态或锚定模式；opaque、blur、transparent 启用 Dialog 共享模态遮罩。 |
 | closeOnOutside | `boolean` | `true` | 模态模式点击遮罩关闭；与遮罩视觉独立。 |
@@ -42,7 +42,7 @@
 | children | `Snippet` | — | 替换全部默认结果与标题；不再读取 items / title / showGroupTitles。 |
 | parts | `ComponentPartsOf<{ SearchInput: typeof SearchInput; MenuItem: typeof MenuItem; Text: typeof Text }>` | — | 配置实际生成的输入、结果和标题；value、children、身份、disabled 由所属数据控制。 |
 
-兼容属性继承 Popover；默认 size=md、closeOn=manual，标准静态搜索面板宽度名义 480px。显式使用浮层时设置 template/id 或 as="popover"，并按需要设置 closeOn。外层 class 和 style 透传真实 Popover 宿主。模态模式复用 Dialog，不新增模态、定位、滚动和动效系统；class/style 与 parts 仍作用于内部搜索面板，模态外壳使用面板默认宽度。
+宿主继承能力：透传 `Popover` 的 `open`、`onOpenChange`、`template`、`id`、`as`、`closeOnEscape`、`size`（默认 `'md'`，名义宽 480px）、`closeOn`（默认 `'manual'`）及外层 `class` / `style`。启用 `backdrop` 时复用内部 `Dialog` 外壳，`class`、`style` 与 `parts` 仍作用于内部搜索面板。
 
 ## 使用边界与详细说明
 
@@ -54,12 +54,12 @@
 
 ## AI Zone
 
-主布局为复合管理布局，主要宿主为真实 Popover（内部 Frame），启用 backdrop 时组合 Dialog，不额外包装 Frame。输入与结果共同使用 Popover 的滚动 body，显式 as="content" 不进入固定搜索 header。results wrapper 拥有分隔线下方间距，group-title 拥有组间间距。根 class snowui-search-popup；私有结果 class 不作为外部接口，显式组合只按公开 as 角色识别。
-
-公开 override：--snowui-search-popup-results-gap-override、--snowui-search-popup-group-gap-override；默认分别为 gap-3 与 gap-2（后者加行间距 gap-1 后形成 12px 组间距）。根几何继承 Popover 的覆盖入口，不复制。输入与项的默认视觉只通过公开组件 class 传入自有样式，不穿透其私有 DOM。
+- **布局与依赖**：主布局为复合管理布局，宿主为 `Popover`（启用 `backdrop` 时组合 `Dialog`），组合子组件为 `SearchInput`、`MenuItem`、`Text`。
+- **内置图标**：搜索图标由 `SearchInput` 通过 `ComponentIcon` 的 `search` 提供，支持应用级 `IconProvider` 统一替换。
+- **公开覆盖变量**：`--snowui-search-popup-results-gap-override`（默认 `var(--gap-3)`）、`--snowui-search-popup-group-gap-override`（默认 `var(--gap-2)`）。
 
 ## 更新日志
 
-- 2026-10-07：以 Composite Block 提供搜索面板组合；原 SearchPopup 浮层容器的历史删除仍成立，新的区块不恢复旧浮层实现。
+### v1.0.0 (2026-10-07)
 
-内置搜索图标复用 ComponentIcon 的 search，24px 画布，原始资源 resource-base/raw-assets/icons/snowui/Search.svg；viewBox 0 0 32 32，未改路径、留白或比例；可由 IconProvider 统一替换。
+- 以 Composite Block 提供可组合搜索面板，统一输入、分组标题与结果间距。

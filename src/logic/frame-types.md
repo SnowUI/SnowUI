@@ -1,4 +1,4 @@
-# frame-types.ts 文档
+# frame-types
 
 > **版本**: v1.8.0
 > **职责**: 定义 Frame 组件的核心类型接口，确保类型安全和代码提示。
@@ -9,18 +9,18 @@
 
 ```typescript
 export type CoreState =
-    | "StartLoad"   // 开始加载
-    | "Load"        // 加载完成
-    | "Reload"      // 重新加载
-    | "Appear"      // 出现
-    | "Disappear"   // 消失
-    | "Idle"        // 空闲
-    | "Active"      // 激活
-    | "Disabled"    // 禁用
-    | "Validating"  // 验证中
-    | "Uploading"   // 上传中
-    | "Editing"     // 编辑中
-    | (string & {}); // 支持自定义状态字符串
+    | "StartLoad"   // Start loading
+    | "Load"        // Loaded
+    | "Reload"      // Reload
+    | "Appear"      // Appear
+    | "Disappear"   // Disappear
+    | "Idle"        // Idle
+    | "Active"      // Active
+    | "Disabled"    // Disabled
+    | "Validating"  // Validating
+    | "Uploading"   // Uploading
+    | "Editing"     // Editing
+    | (string & {}); // Custom state names
 ```
 
 ## 2. 状态转变与联动 (Transitions & Linkage)
@@ -37,11 +37,11 @@ export type StateTransition = CoreState | [CoreState, "auto"];
 
 ```typescript
 export interface LinkageControl {
-    target: string | object;             // 目标组件 ID 或 实例引用
-    action: "play" | "reset" | "pause";  // 动作类型
-    reverse?: boolean;                   // 是否反向执行
-    stop?: boolean;                      // 阻止冒泡
-    prevent?: boolean;                   // 阻止默认行为
+    target: string | object;             // Target component ID or instance ref
+    action: "play" | "reset" | "pause";  // Action type
+    reverse?: boolean;                   // Reverse playback
+    stop?: boolean;                      // Stop propagation
+    prevent?: boolean;                   // Prevent default action
 }
 ```
 
@@ -121,7 +121,7 @@ export type EventTrigger = CoreState | LinkageControl;
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.8.0 (2026-03-07)
 
@@ -145,14 +145,4 @@ export type EventTrigger = CoreState | LinkageControl;
 #### 文档
 - **FT.7** 明确 Scale 配置优先级：`class > props > default`
 
-### v1.5.0 (2026-02-07)
-
-#### 新功能
-- **FT.3** 新增 `scaleWidthVar` 与 `scaleAspectRatioVar` 配置项
-- **FT.4** 新增 `scaleBasis`、`scaleMixHeightWeight`、`scaleAspectBaseRatio` 配置项
-
-### v1.4.0 (2026-02-07)
-
-#### 新功能
-- **FT.1** 新增 `enableScaleObserver` 能力开关
-- **FT.2** 新增 `scaleHeightVar` 与 `scaleObserverTarget` 配置项
+完整历史见 [更新日志归档](../../docs/history/changelogs/logic-frame-types.history.md)。

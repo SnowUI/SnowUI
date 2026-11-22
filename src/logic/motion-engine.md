@@ -1,4 +1,4 @@
-# motion-engine.ts 文档
+# motion-engine
 
 > **版本**: v1.4.0
 > **职责**: 负责具体的动画执行逻辑，包括 Tween 和 Spring 动画的计算与应用。它是无状态的，只负责"执行"。

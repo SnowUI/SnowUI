@@ -123,11 +123,6 @@ HoverPanel 使用共享三列布局；圆点—名称优先 `--gap-1`，名称�
 <a id="2-api"></a>
 
 
-### 2.1 Props
-
-
-其余未声明属性会透传给根层 `Frame`。
-
 ### 2.2 组件方法
 
 | 方法 | 描述 |
@@ -211,156 +206,19 @@ Marker 说明：
 
 ---
 
-<a id="4-布局模型"></a>
+### 布局模型、无障碍与动效
 
-### 布局模型
+主布局模型：**内禀原子布局**（详见 [LayoutProtocol.md §12.7](../../../docs/standards/LayoutProtocol.md)）。根层 `Frame` 直接观察最终实测宽高重算单 SVG 坐标。
 
-主布局模型:**内禀原子布局**。
-
-- 根层为 `Frame`，内部为单个 SVG 绘图区。
-- 根层直接观察最终显示尺寸并重算 SVG 坐标；`width="100%"` / `height="100%"` 不要求页面回传容器尺寸。
-- 横向分类轴按 `max(xLabels.length, ...series.data.length)` 计算点位数量；`cell` 模式节点位置为 `bounds.left + (plotWidth / count) * (index + 0.5)`，`edge` 模式节点位置为 `bounds.left + (plotWidth / (count - 1)) * index`，单点时居中。
-- X 轴 label 使用当前点位间距作为 cell 宽度，文字居中且单行省略；整体高度为 `16px`。
-- `edge` 模式下首尾 label 的中心与首尾数据点同 x 坐标，label cell 允许向绘图区外侧延伸。
-- X 轴 label 自动显示规则：按最终字体实测完整文字宽度与当前 `xAxisMode` 的原始数据位置判断，相邻可见文字至少间隔 `4px`。抽稀只减少 label，不删除或重排数据点、折线路径、marker、guide 与命中 cell。保留索引必须形成等差步数；若首尾两个完整 label 仍放不下，则隐藏全部 X label。
-- Y 轴 label 抽稀规则：自动生成刻度时优先通过 `yTickCount` / `yMaxLabelCount` 生成合适数量；显式传入 `yTicks` 或纵向空间不足时，按首尾保留、等步数的规则减少显示 label，水平网格线跟随可见 Y label。
-- X 轴 label cell 顶部到最下面 x 轴基线的间距为 `8px`。
-- 绘图区顶部由共享内容感知规则计算：线条宽度的一半或当前最大 marker 半径作为图形向上溢出量；普通图形保持 `8px` 安全距离，Y 轴顶刻度至少需要 `16px`。顶部数值 label 不增加该值，继续保持节点上方 `4px` 并可溢出绘图区顶边；marker 的溢出量始终计入，不依赖 label 是否显示。有 X 轴时 `bottom=24px`，只包含上述 `8px` 间距和 `16px` label 高度；无 X 轴时 `bottom=0`。
-- Y 轴标签区宽度由全部可见 Y label 中最宽文本的实际 SVG 渲染宽度决定，不使用固定 bounds 或字符数量估算；label 右边缘到绘图区线段起点的间距固定为 `12px`。例如 formatter 输出 `100000` 时，绘图区只按该文本比短刻度新增的实际宽度缩小，固定间距不变。
-- 不接入三槽位协议，不承担通用子元素排列。
-
-详见 [LayoutProtocol.md §12.7](../../../docs/standards/LayoutProtocol.md)。
-
----
-
-<a id="5-无障碍与-frame-集成"></a>
-
-### 无障碍与 Frame 集成
-
-- 交互根使用 `role="group"` 和 `aria-label="折线图"`（zh-CN 默认，随 locale 切换），让内部命中项保留独立语义。
-- 每个 marker 使用独立 `aria-label`，内容包含序列名、横坐标标签和值。
-- marker 内部包含透明命中圆，保证键盘焦点与鼠标命中不只依赖可见圆点半径。
-- marker 可见层不接管 pointer events，白色中心、黑色外圈与透明命中圆统一由命中圆触发；默认命中区域不小于 `16x16`。
-- 独立使用或接入 `ChartGroup` 时均支持 `hoverMode="cell"`；cell 命中区按分类点位中心左右半格覆盖绘图区，对应分类点位的 marker 响应 hover，marker 自身命中区仍独立保留。
-- `loading` 保留完整画布与坐标结构，只把折线、面积和 marker 恢复到出现动效起点；根 Frame 明确关闭 Skeleton。空 `series={[]}` 可配合 `xLabels`、`yMin`、`yMax` 先建立最终坐标。
-- 显式传入 `enableResponsive` / `enableContext` / `enableScaleObserver` / `enableDefaultMotion`。
-- `class`、`style` 与未声明属性透传到根层 Frame。
-
----
-
-<a id="6-图层与动效"></a>
-
-### 图层与动效
-
-SVG 图层从下到上为：
-
-1. `defs`: 颜色渐变、Area 渐变、序列 reveal clipPath。
-2. grid / axis layer: 水平网格线和 x 轴基线。
-3. base layer: `showBaseLayer=true` 时绘制完整 Area 与折线路径的同色 4% 占位层，不参与出现动效；默认不渲染。
-4. area layer: 真实 Area 路径，按对应序列 clipPath 从左到右揭示。
-5. guide layer: 节点垂直辅助线，跟随对应序列进度显隐。
-6. series layer: 真实折线路径，按对应序列 clipPath 从左到右揭示。
-7. marker layer: 节点点、hover 竖线与透明命中圆，在线条 reveal 到对应点位时立即显隐。
-8. axis label layer: 横纵坐标文本。
-
-出现动效沿用 Chart 通用 API：
-
-- `appearMotion={false}` 时直接显示完整图表。
-- 默认进入视口后自动播放，播放顺序按 `series` 数组顺序。
-- 每条序列使用 `appearance-timeline.ts` 的 `fillProgress` 与 `opacityProgress`。
-- 每条序列自身绘制时长固定为 `1000ms`，与 CircularChart 一致。
-- 多序列默认相隔 `360ms` 启动；第一条序列立即出现，后续序列依次延迟启动。
-- `fillProgress` 控制从左到右的 reveal clip 宽度，并使用缓出；LineChart 当前使用 `easeOut` power `6`。
-- `opacityProgress` 控制真实线、Area 和辅助线的透明度，并使用同一缓出。
-- marker 不消费 `opacityProgress`；线条 reveal 边界到达该点 x 坐标时立即出现。
-- 支持 `appearanceProgress` 受控时间轴、滚动时间轴和 `replay()` / `resetAppearance()` / `reverseAppearance()` 方法。
-
----
-
-
-<a id="自适应黑白对比接入"></a>
-
+- **坐标与抽稀**：横向分类轴按 `edge`（默认，首尾点对齐绘图区两端）或 `cell`（分类格中心）排布；X 轴标签按实测完整文字宽度保持至少 `4px` 间距并等差步数抽稀（首尾放不下时全部隐藏，不删减数据点或路径）。Y 轴标签区取最宽可见标签实测宽度并右留 `12px`；顶部安全区计入半线宽或最大 marker 半径（普通 `8px`、带 Y 轴至少 `16px`），有 X 轴时 `bottom=24px`。
+- **无障碍与命中**：根使用 `role="group"`；每个 marker 内含不小于 `16×16` 的透明命中圆并提供包含序列名、横坐标与数值的 `aria-label`；支持 `hoverMode="cell"` 整格联动。`loading` 保留坐标结构并将序列固定在出现动效起点（关闭 Skeleton）。
+- **图层与出现时间轴**：SVG 从下到上依次为 `defs`、网格/基线、可选 `showBaseLayer`（4% 透明度）、Area 路径、垂直辅助线、折线路径、marker 层、坐标文本。每条序列自身绘制 `1000ms`（`easeOut` power `6` 控制从左到右 reveal clip 与透明度），多序列间隔 `360ms` 依次启动，marker 在 reveal 到达点位时立即显示。
 
 ## AI Zone
 
-### 内置文案与语言
-
-使用现有 `useLocale()`，key：`lineChart.name`、`lineChart.cells`。显式根 `aria-label` 保持优先；业务数据名、坐标标签与格式化数值不进入翻译表。
-
-
-以下章节保留源码维护约束，不属于应用接入步骤。
-
-### 自适应黑白对比接入
-
-使用 [Adaptive Contrast](../lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
-
-
-
-
-> **状态**: 已实现
-
-
-> **参考**: Figma Workshop 节点 `12617:1780`。
-
----
-
-<a id="3-样式-token-详表"></a>
-
-### 样式 Token 详表
-
-| 属性 | 默认值 | Token / 变量 |
-| :--- | :--- | :--- |
-| 整体宽度 | 800px | `--snowui-line-chart-width` |
-| 整体高度 | 400px | `--snowui-line-chart-height` |
-| 轴标签字号 | 12px | `--snowui-line-chart-axis-font-size` |
-| 轴标签行高 | 16px | `--snowui-line-chart-axis-line-height` |
-| 轴标签颜色 | 40% 黑色 | `--snowui-line-chart-axis-color` |
-| 网格线颜色 | 10% 黑色 | `--snowui-line-chart-grid-color` |
-| 垂直辅助线颜色 | 10% 黑色 | `--snowui-line-chart-guide-color` |
-| x 轴基线颜色 | 40% 黑色 | `--snowui-line-chart-axis-line-color` |
-| 默认线宽 | 1px | `--snowui-line-chart-stroke-width` |
-| 默认 marker 尺寸 | 8px | `--snowui-line-chart-marker-size` |
-| hover label 颜色 | Black/100% | `--snowui-line-chart-hover-label-color` |
-
-### 3.1 Override 入口
-
-| 变量 | 用途 |
-| :--- | :--- |
-| `--snowui-line-chart-width-override` | 整体宽度 |
-| `--snowui-line-chart-height-override` | 整体高度 |
-| `--snowui-line-chart-axis-font-size-override` | 坐标轴标签字号 |
-| `--snowui-line-chart-axis-color-override` | 坐标轴标签颜色 |
-| `--snowui-line-chart-grid-color-override` | 网格线颜色 |
-| `--snowui-line-chart-axis-line-color-override` | x 轴基线颜色 |
-| `--snowui-line-chart-hover-label-color-override` | hover label 强制颜色 |
-
----
-
-<a id="开发者指南-ai"></a>
-
-### 开发者指南 (AI)
-
-### 模块索引
-
-| 模块 | 文件 | 职责 |
-| :--- | :--- | :--- |
-| LineChart | [./LineChart.svelte](LineChart.svelte) | 主组件 |
-| LineChart 示例 | [./LineChart.test.ts](LineChart.test.ts) | Test 示例 |
-| Chart 共享逻辑 | [../lib/chart/](../lib/chart) | 颜色、渐变、基础几何 helper、Y 轴标签宽度测量、线性 appearance 时间表与逐帧 pointer 坐标合并 |
-
-### 关键字映射
-
-| 关键字 | 处理方式 | 说明 |
-| :--- | :--- | :--- |
-| `series` | SVG path + marker | 多序列折线 |
-| `strokeStyle` | `stroke-dasharray` | solid / dashed |
-| `cornerRadius` | rounded path 几何 | 0 时为直线 |
-| `markers` / `point.marker` | SVG circle group | 序列控制颜色和尺寸；单点仅控制尺寸 / 显隐 |
-| `area` | SVG closed path | 序列面积填充，可与虚线组合 |
-| `appearMotion` / `appearanceProgress` | reveal clipPath + timeline | 复用 Chart appearance timeline |
-| `xLabels` / `yTicks` | SVG text | 坐标轴标签 |
-
----
+- **多语言与自适应对比**：通过 `useLocale()` 读取 `lineChart.name`、`lineChart.cells`；默认接入共享 [Adaptive Contrast](../lib/adaptive-contrast.md)（随纯色宿主背景与 ChartGroup 同原点柱体明暗切换黑色折线、黑白节点与数值标签）。
+- **共享模块**：颜色、渐变、基础几何、Y 轴标签测量、线性 appearance 时间表与逐帧 pointer 合并复用 `components/src/lib/chart/`。
+- **公开覆盖变量**：`--snowui-line-chart-width-override`、`--snowui-line-chart-height-override`、`--snowui-line-chart-axis-font-size-override`、`--snowui-line-chart-axis-color-override`、`--snowui-line-chart-grid-color-override`、`--snowui-line-chart-axis-line-color-override`、`--snowui-line-chart-hover-label-color-override`。
 
 ## 更新日志
 
@@ -379,79 +237,4 @@ SVG 图层从下到上为：
 
 - 多序列 appearance 每帧改为一次线性时间表计算；HoverPanel pointer 原始事件不再同步读取布局，坐标换算按绘制帧合并。公开 API、路径、marker、时长、视觉和交互语义不变。
 
-### v1.6.0 (2026-09-03)
-
-- 新增 `showBaseLayer=false`，按需开启最终尺寸的同色轮廓；真实图形和出现动效保持原有行为。
-- `adaptiveContrast` 改为默认开启，保留显式关闭与子图覆盖。
-
-### v1.5.0 (2026-09-03)
-
-- `adaptiveContrast` 接入 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
-
-### v1.4.2 (2026-09-02)
-
-- HoverPanel 默认定位改为 `pointer`，随鼠标移动；区域 hover 默认保持 `cell`，显式的 placement / hoverMode 配置继续优先。
-
-### 2026-09-02
-
-- HoverPanel 改为默认开启，默认外观保持 light。
-
-### v1.4.1 (2026-09-02)
-
-#### 调整
-- 顶部数值 label 不再增加安全区，仍保持节点上方 `4px` 并可溢出绘图区顶边；默认颜色为 Black/100%。
-
-### v1.3.5 (2026-09-01)
-
-#### 调整
-- 自动 domain 上限改为实际最大数据值，最高 nice tick 不再超过最大值；顶部只由内容安全区决定。
-
-### v1.3.4 (2026-08-31)
-
-#### 调整
-- 顶部改为内容感知安全区，按 Y 轴、hover label、线宽和 marker 半径动态计算；自动 nice domain 同步收紧。
-
-### v1.3.3 (2026-08-31)
-
-#### 调整
-- 移除笛卡尔绘图区顶部和底部的额外留白；底部仅保留 X 轴标签自身所需的 `24px`。
-
-### v1.3.2 (2026-08-31)
-
-#### 调整
-- Y 轴改为按最宽可见标签的实际渲染宽度自适应，标签与绘图区之间固定保留 `12px`。
-
-### v1.3.1 (2026-06-07)
-
-#### 调整
-- marker 改为两层圆结构：下层 8x8 Black/100% 圆，上层 4x4 White/100% 圆，并移除节点阴影。
-- marker hover / focus 增加反色状态，并在节点后方显示 0.5px Black/100% 圆头竖线。
-
-### v1.3.0 (2026-06-04)
-
-#### 新功能
-- 新增 Chart 通用 `colorMode`：`sequence`、`monochromeFade`、`monochrome`。
-- 新增 `color` 主色以及 `monochromeColor` / `mutedMonochromeColor` 细分入口；三种颜色模式均支持 `series[i].color` 与 `colors[i]` 指定序列自定义颜色。
-
-### v1.2.0 (2026-06-03)
-
-#### 调整
-- 移除组件内部示例数据默认值，`series` 与 `xLabels` 默认改为 `[]`。
-- `LC-01` 与 `LC-09` 示例显式传入月度数据；`LC-09` 改为完整坐标图，展示真实图表形态下的圆角转折线。
-- 横坐标支持 `cell` / `edge` 两种点位模型；`edge` 下首尾数据点和辅助线对齐到绘图区两端，首尾 label box 可向绘图区内部移动以完整显示。label 过长时只抽稀文字，全部数据点与交互仍位于原始索引位置。
-- 只保留圆角转折线，删除 `curve` API；`cornerRadius=0` 时为直线。
-- 纵坐标刻度改为根据数据自动生成 nice ticks；默认色序回到 ChartSpec；折线默认线宽改为 1px。
-- Area API 收敛为 `area: boolean`，固定使用当前线色渐变到 0% 透明度；marker 默认尺寸改为 12px，单点不允许改色。
-
-### v1.1.0 (2026-06-03)
-
-#### 新功能
-- 支持 Chart 通用出现动效 API、滚动时间轴、受控进度和 `replay()` / `resetAppearance()` / `reverseAppearance()` 方法。
-- 补充完整 base layer 与 marker 透明命中圆，让图层和交互更贴近 ChartSpec。
-- 支持 `cornerRadius`，实现直线段为主、折点局部圆角的线形；后续已收敛为唯一线形 API。
-
-### v1.0.0 (2026-06-03)
-
-#### 新功能
-- 初始版本，支持多序列、实线 / 虚线、横坐标、纵坐标、水平网格与可定制 marker。
-- 支持 `series[].area`，Area 填充可与实线 / 虚线组合。
+完整历史见 [更新日志归档](../../docs/history/changelogs/LineChart.history.md)。

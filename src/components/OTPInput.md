@@ -1,7 +1,7 @@
 # OTPInput
 
-> **版本**: v1.1.0<br>
-> **职责**: 提供 4–8 位数字一次性验证码输入，并保留原生表单、自动填充、键盘与无障碍语义。<br>
+> **版本**: v1.1.0
+> **职责**: 提供 4–8 位数字一次性验证码输入，并保留原生表单、自动填充、键盘与无障碍语义。
 > **包归属**: `@snowui-design-system/components`
 
 ## 组件介绍
@@ -31,7 +31,7 @@
 
 ## API
 
-| 关键字 | 类型 | 默认值 | 描述 |
+| 属性 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | value | `string` | `""` | 支持 `bind:value`；未完整值用空格表示中间空位，完整值只包含数字。外部更新会同步显示。 |
 | defaultValue | `string` | — | 未提供 value 时的初始值，也是原生表单 reset 的恢复值；同时提供两者时 value 决定当前显示，defaultValue 决定 reset 基线。 |
@@ -56,19 +56,20 @@
 | onblur | `(event: FocusEvent) => void` | — | 真实 input 失去焦点、隐藏激活框后回调。 |
 | onkeydown | `(event: KeyboardEvent) => void` | — | 原生按键处理前回调，可通过 preventDefault 取消默认行为。 |
 | onpaste | `(event: ClipboardEvent) => void` | — | 校验粘贴内容前回调；preventDefault 可取消整次组件粘贴处理。 |
-| class / style / Frame Props | `FrameProps` | — | 适用能力应用于公开根 Frame；tag、children 和 F-03B enableScaleObserver 不公开，合法原生属性由共享分流器只传给 input。 |
 
-公开样式覆盖：`--snowui-otp-input-gap-override`、`--snowui-otp-input-size-override`、`--snowui-otp-input-radius-override`、`--snowui-otp-input-font-size-override`、`--snowui-otp-input-line-height-override`。
+宿主继承与样式覆盖：适用 [Frame](Frame.md) 能力（如 `class`、`style` 等）应用于公开根 Frame，`tag`、`children` 与 `enableScaleObserver` 不公开，合法原生属性由共享分流器传给内部 `<input>`。公开样式覆盖变量：`--snowui-otp-input-gap-override`、`--snowui-otp-input-size-override`、`--snowui-otp-input-radius-override`、`--snowui-otp-input-font-size-override`、`--snowui-otp-input-line-height-override`。
 
-## 原生表单校验反馈
+## 使用边界与详细说明
 
-原生校验失败时取消浏览器气泡，并保持无效提交拦截。空值必填只短暂闪动红边、不显示文字，结束恢复原态；非空类型、长度和格式错误将 `validationMessage` 显示在组件下方。首个无效字段获得焦点；输入修正后更新反馈，表单重置清除反馈。调用方业务校验继续使用 `invalid` 与 `error`，原生错误存在时优先显示原生反馈。原生消息语言由浏览器决定，不将校验状态等同服务端验证结果。
+### 原生表单校验与必填反馈
 
-## 尺寸边界
+原生校验失败时取消浏览器气泡，并保持无效提交拦截。显式设置 `required` 时，空值提交只让首个无效字段聚焦并使全部验证码格同步短暂闪动红色边框，外光圈保持原色，结束恢复原态，不显示空值错误文字（减少动效时仅聚焦）。非空类型、长度和格式错误将 `validationMessage` 显示在组件下方（左对齐，不继承外层居中）；输入修正或表单重置后清除反馈。调用方业务校验继续使用 `invalid` 与 `error`，原生错误存在时优先显示原生反馈。
+
+### 尺寸边界
 
 整体与错误提示填满父区域，4–8 格均分可用宽度。单格最小宽度为 1ch 加两侧 padding-2；整体下限为各格下限与全部 gap 之和。size override 只控制高度，宽度由容器均分；不足时由消费布局换行、改列或提供横向滚动。
 
-## 使用边界与详细说明
+### 输入、粘贴与键盘行为
 
 - 单一真实 `<input type="text" inputmode="numeric">` 负责键盘、选择、删除、替换、自动填充、表单和辅助技术；根 `role="group"` 与 input 共享显式可访问名称，分格为 `aria-hidden` 视觉层。错误通过 aria-describedby 关联，并由 polite 状态区播报。
 - 点击任意格会选择对应字符，因此下一次键入替换该格；活动格跟随 input 的真实 selection。原生方向键、Home、End、Backspace、Delete、选择替换与撤销行为保持可用。
@@ -83,13 +84,6 @@
 - 调用方必须提供 `aria-label`、`aria-labelledby` 或关联 `<label>`。disabled 不提交，readonly 仍提交。
 - form reset 默认恢复 `defaultValue`，未提供时恢复首次 value；取消的 reset 保留当前值。监听按当前 `input.form` 判定，因此 `form` 改变后自动关联新表单。reset 的零延迟收尾 timer 在重复 reset 或卸载时清理。
 
-
-错误文字与 Input 一致左对齐，不继承外层居中。空值时全部验证码格同步闪动红边，保留外光圈原色，结束全部恢复原态。
-
-## 必填反馈
-
-显式设置 `required` 时，空值提交只让首个无效字段聚焦并短暂闪动红色边框，外光圈保持原色；结束恢复原态，不显示空值错误文字。减少动效时仅聚焦。取消浏览器校验气泡但保留无效提交拦截；非空格式错误与业务错误继续显示文字，修正输入或重置清除提示。
-
 ## AI Zone
 
 | 类别 | 关键字 | 处理位置 | 约束 |
@@ -99,18 +93,20 @@
 | 视觉层 | `.snowui-otp-slots` | `aria-hidden` | 不建立第二套输入或可访问语义。 |
 | 状态 | `data-focus` / `data-disabled` / `data-readonly` / `data-invalid` | 根 Frame | 只反映真实交互状态。 |
 
-## 多语言与共享视觉
+### 多语言与共享视觉
 
-`otpInput.invalidCode` 通过 `useLocale()` 提供 zh-CN / en-US 默认文案，`error` 显式覆盖优先。`.snowui-field-bordered` 统一拥有 hover / focus / invalid 的边框与聚焦环；OTP 的委托视觉节点通过 `data-field-hover` / `data-field-focus` 反映真实输入状态，不在组件复制色值或 ring 参数。`.snowui-field-error-message` 与 Input 共用错误文字排版。
+`otpInput.invalidCode` 通过 `useLocale()` 提供 zh-CN / en-US 默认文案，`error` 显式覆盖优先。`.snowui-field-bordered` 统一拥有 hover / focus / invalid 的边框与聚焦环；OTP 的委托视觉节点通过 `data-field-hover` / `data-field-focus` 反映真实输入状态，不在组件复制色值或 ring 参数。`.snowui-field-error-message` 与 Input 共用错误文字排版。第三方许可声明见包根 `THIRD_PARTY_NOTICES.md`。
 
-UI Lab OTPInput 是交互与动效参考，SnowUI 的 API、Token、Frame、表单与粘贴规则由本组件拥有。第三方许可见包根 THIRD_PARTY_NOTICES.md。Test 仅保留 `OTPInput-Demo` 单组件入口，原 XERJ 对照指标属于历史实验，不是当前行为契约。
+### 组合与边界
 
-## 组合与边界
-
-OTPInput 是基础组件，不生成公开子组件、parts、短信发送或验证服务。没有默认动效、Portal 或 Observer；reset 监听与短 timer 只在 action 挂载后的浏览器端建立并在卸载时清理，模块导入和 SSR 不读取浏览器全局。`prefers-reduced-motion` 无特殊分支。
+OTPInput 是基础组件，不生成公开子组件、parts、短信发送或验证服务。reset 监听与短 timer 只在 action 挂载后的浏览器端建立并在卸载时清理，模块导入和 SSR 不读取浏览器全局。
 
 ## 更新日志
 
-- v1.0.0：首次公开，覆盖 4–8 位数字输入、粘贴过滤、表单、重置、自动填充和仅用户新完成触发。
+### v1.1.0 (2026-10-15)
 
-- v1.1.0：统一 Input 状态样式，补充顺序激活、严格/补入粘贴校验、2 秒错误恢复、数字与激活框动效；删除 Test 平行实验实现。
+- 统一 Input 状态样式，补充顺序激活、严格/补入粘贴校验、2 秒错误恢复、数字与激活框动效。
+
+### v1.0.0 (2026-10-10)
+
+- 首次公开，覆盖 4–8 位数字输入、粘贴过滤、表单、重置、自动填充和仅用户新完成触发。

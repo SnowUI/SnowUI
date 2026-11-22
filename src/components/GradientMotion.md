@@ -163,9 +163,6 @@ GradientMotion 的内置 glimm cosine palette、WebGL 不可用时的 CSS fallba
 
 ---
 
-
-
-
 ## AI Zone
 
 GradientMotion 是一个 动效组件。它输出 glimm.dev 同款 WebGL 扫光带：单条 gaussian band 按方向穿过画布，使用 cosine palette、边缘 wave/ripple、fresnel 与 specular 高光形成虹彩薄膜效果。
@@ -176,13 +173,6 @@ GradientMotion 是一个 动效组件。它输出 glimm.dev 同款 WebGL 扫光�
 
 ### 开发者关键字
 
-| 类别 | 关键字 | 描述 |
-| :--- | :--- | :--- |
-| CSS 类名 | `snowui-gradient-motion` | 根元素类名 |
-| CSS 类名 | `snowui-gradient-motion-canvas` | WebGL 渐变渲染 canvas |
-| CSS 类名 | `snowui-gradient-motion-fallback` | WebGL 不可用时的 CSS 降级扫光带 |
-| CSS 变量 | `--snowui-gradient-motion-radius` | 圆角 |
-| CSS 变量 | `--snowui-gradient-motion-width` / `--snowui-gradient-motion-height` | 尺寸 |
 
 ### 模块索引
 
@@ -214,13 +204,11 @@ GradientMotion 是一个 动效组件。它输出 glimm.dev 同款 WebGL 扫光�
 
 ## 更新日志
 
+### v4.0.1 (2026-08-15)
+
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
-### 圆角边缘修复（2026-09-16）
-
-- 根层按最终 `radius` 使用单一 `clip-path` 与 alpha mask 裁切完整 WebGL 合成结果，canvas 不再重复应用圆角；同时移除 shader 横切轴两端额外的透明渐隐，避免浅色底层在轮廓内侧形成白色细边。扫光带自身的透明合成、palette 与运动算法保持不变。
-
-### v4.0.1 (2026-08-15)
+- 2026-09-16（圆角边缘修复）：- 根层按最终 `radius` 使用单一 `clip-path` 与 alpha mask 裁切完整 WebGL 合成结果，canvas 不再重复应用圆角；同时移除 shader 横切轴两端额外的透明渐隐，避免浅色底层在轮廓内侧形成白色细边。扫光带自身的透明合成、palette 与运动算法保持不变。
 
 - 将内置 shader palette、CSS fallback palette 与专用 `colors` 四色艺术输入正式登记为专业艺术色例外，并明确例外不扩展到组件其他样式和动效契约。
 
@@ -237,27 +225,4 @@ GradientMotion 是一个 动效组件。它输出 glimm.dev 同款 WebGL 扫光�
 #### Neat Blob
 - 新增 `variant="neatBlob"`，效果名称由 SnowUI 侧命名，参数来源为 `repos/neat-main/editor/src/components/presets.ts` 的 `BLOB_PRESET`。
 
-### v3.2.0 (2026-06-13)
-
-#### 预设还原
-- 移除旧取色体系，改为完全使用 `meerbahadin/gradflow` 的 8 个内置预设。
-
-### v3.1.0 (2026-06-13)
-
-#### 视觉重写
-- 参考 `meerbahadin/gradflow` 的 Wave shader，将渐变主算法重写为三色 smoothstep 混色 + 多层正弦波 / silk / smoke / stripe / conic 流动。
-
-### v3.0.0 (2026-06-13)
-
-#### 视觉重写
-- 渐变效果彻底重写为内置 WebGL shader。
-
-### v2.0.0 (2026-06-12)
-
-#### 破坏性变更（仅视觉）
-- 渐变效果彻底重写为 orbit + morph + glow 三层有机流体渐变。
-
-### v1.0.0 (2026-06-10)
-
-#### 新功能
-- 新增 GradientMotion 组件，支持 6 种渐变预设、随机预设、速度控制、头像与背景场景。
+完整历史见 [更新日志归档](../../docs/history/changelogs/GradientMotion.history.md)。

@@ -1,4 +1,4 @@
-# frame-responsive.svelte.ts 文档
+# frame-responsive
 
 > **版本**: v3.0.0
 > **职责**: 根据 Frame 的当前容器宽度，压缩可用间距并在内容放不下时启用显式回退布局。
@@ -19,9 +19,9 @@
 使用 `WeakMap` 替代 `Map` 存储订阅者回调，允许元素被垃圾回收时自动清理订阅关系。
 
 ```typescript
-// 使用 WeakMap 防止内存泄漏
+// Use WeakMap to avoid memory leaks
 const subscribers = new WeakMap<Element, (width: number) => void>();
-// 配合 Set 管理元素生命周期 (WeakMap 不可遍历)
+// Track live elements via Set alongside WeakMap
 const observedElements = new Set<Element>();
 ```
 
@@ -55,7 +55,7 @@ const observedElements = new Set<Element>();
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v3.0.0 (2026-09-02)
 - **新增**: 基于实际内容宽度的 gap / padding 压缩与结构回退

@@ -1,4 +1,4 @@
-# dialog.ts 文档
+# dialog
 
 > **版本**: v1.0.0
 > **职责**: 提供 Dialog / Modal 内容面板与遮罩 preset。
@@ -15,6 +15,8 @@
 2. Dialog 遮罩通过 `DIALOG_BACKDROP_MOTION_STYLE` 注入 CSS 变量。
 3. 如果未来参考实现中遮罩与内容数值完全一致，可合并；不一致则继续拆分。
 
-## 变更记录
+## 更新日志
+
+### v1.0.0 (2026-06-18)
 
 - v1.0.0 (2026-06-18): 新增 Dialog 内容与 backdrop preset。

@@ -54,11 +54,6 @@
 - 默认内置模式（推荐）：`items` 交给 Tab 生成 Button；`parts.Button` 沿默认生成链路显式转发。
 - 显式组合模式：显式书写 `<Button as="item">`，逐项 Props 直接配置。
 
-> **版本**: v1.3.0
-> **状态**: 已实现
-> **职责**: RadioGroup 的视觉变体,在多个互斥选项之间切换"过滤器/参数"。视觉系统
-> 与 [Tab](Tab.md) 完全共享,在 ARIA 语义、键盘行为、Form 接入上区分。
-> **设计稿**: Figma node `11838-19967`
 
 ---
 
@@ -91,20 +86,6 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 <a id="2-api"></a>
 
 
-### 2.1 Props
-
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `variant` | `'pill' \| 'solid' \| 'underline' \| 'icon-toggle' \| 'bare'` | `'pill'` | pill 为带背景滑块，solid 为实色选中项，underline 为下划线，icon-toggle 仅展开选中项文字，bare 仅通过透明度区分。icon-toggle 子项需包含 Icon 与 Text，或在 items 中同时提供 icon 与 label。 |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'sm'` | 控制容器 padding、radius、gap，并作为 Button 子项默认尺寸；子项优先级为 style > class > Button size > Segmented size。 |
-| `row` | `boolean` | `false` | 显式横向排列；row 与 column 都未启用时仍按横向显示，两者同时为 true 时 row 优先。 |
-| `column` | `boolean` | `false` | 纵向排列，方向键改为上下切换；仅在 row 未启用时生效。 |
-| `fill` | `boolean` | `false` | 容器有明确宽度时，让横向子项等宽填满；未限定宽度时按内容布局。 |
-| `onChange` | `(value: string) => void` | — | 用户激活不同的可用选项后调用，参数为新 value；与绑定值同步，不可取消选择。重复激活当前项不触发。 |
-| `enableDefaultMotion` | `boolean` | `true` | 传递给宿主的默认动效开关；关闭默认 Frame 动效，不改变选择值、键盘或表单语义。 |
-| `items` | `TabItem[]` | `[]` | 默认内置选项。每项必填唯一 value 与可读 label，可选 icon 组件与 disabled；禁用项不可选择。提供 children 时改用显式内容，不渲染 items。 |
-| 其余兼容 Props | `ComponentProps<typeof Tab>` | 同 Tab | 直接传递给 Tab 宿主；role、itemRole、selectionFollowsFocus 由 Segmented 固定，不可作为普通 Tab 参数改写。 |
-
 ### 2.2 子项约定
 
 同 [Tab.md §2.2](Tab.md):子项必须是 `<Button as="item" value="...">`。
@@ -122,7 +103,7 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
     <Button as="item" value="mobile">Mobile</Button>
   </Segmented>
 </Form>
-<!-- 提交后:{ device: "web" } -->
+<!-- Submitted FormData: { device: "web" } -->
 ```
 
 实现:当传入 `name` 时,Segmented 在 Tab 根节点之后追加 `<input type="hidden" name={name} value={value}>`,通过原生表单提交机制把当前 value 暴露给 Form。
@@ -164,7 +145,7 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
   <Button as="item" value="mobile"><Icon><Star /></Icon>Mobile</Button>
 </Segmented>
 
-<!-- Figma fill 宽度 -->
+<!-- Fill container width -->
 <Segmented fill style="width: calc(var(--size-20) * 4)" value="web">
   <Button as="item" value="web">Web</Button>
   <Button as="item" value="mobile">Mobile</Button>
@@ -176,7 +157,7 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
   <Button as="item" value="random" iconOnly aria-label="收藏"><Icon><Star /></Icon></Button>
 </Segmented>
 
-<!-- 接入 Form -->
+<!-- Native form submission -->
 <form>
   <Segmented name="device" value="web" variant="solid">
     <Button as="item" value="web">Web</Button>
@@ -186,8 +167,6 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 ```
 
 ---
-
-
 
 ## AI Zone
 
@@ -205,6 +184,8 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 
 ## 更新日志
 
+### v1.3.0 (2026-09-21)
+
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 ### v1.2.2 (2026-08-14)
@@ -215,57 +196,4 @@ Segmented 继承 Tab 的复合控件 hover 规则：item 默认不放大，保�
 
 - 默认 `pill` 变体继承 Tab 与 SearchBox 同级的 20px 背景模糊及公开 override。
 
-### v1.2.0 (2026-07-05)
-
-#### 架构调整
-- 正式改为 Tab 宿主组件特化模式，兼容 Tab Props 从宿主类型推导并平铺。
-- 移除 `parts.Tab`；默认内置 Button 继续使用 `parts.Button`，显式 Button 直接配置 Props。
-- 修复 items 模式被空 children snippet 截断、导致 Tab 不生成内置 Button 的问题。
-- Form hidden input 移到 Tab 根之后，保持 Tab 作为主要宿主。
-
-### v1.1.1 (2026-06-23)
-
-#### 与 Tab 同步
-- Item 尺寸样式优先级同步为 `style > class > Button size > Tab size`。
-
-### v1.1.0 (2026-06-23)
-
-#### 与 Tab 同步
-- 继承 `variant="bare"`、12/16/20px gap、无 indicator 视觉及文字 / Icon 内容支持。
-- 继承 Tab size → Button Item size context；Segmented 不复制 Button 尺寸定义。
-
-### v1.0.5 (2026-06-21)
-
-#### 动效与组合契约
-- 继承 Tab icon-toggle indicator 移动修复；尺寸变化统一消费 Frame 默认 size motion bridge。
-- 显式透传 `enableDefaultMotion`，默认开启。
-- 所有 Test 示例的 Button 子项补齐 `as="item"`。
-
-### v1.0.4 (2026-06-18)
-
-#### 动效还原
-- 当时随 Tab 使用专用 Tabs sliding 时序；v1.0.5 起已迁移到 Frame transform / size motion bridge。
-
-### v1.0.3 (2026-05-31)
-
-#### 样式调整
-- 继承 Tab v1.0.3：active Text / Icon 在 pill / icon-toggle 使用 `--static-black-100`，在 underline 使用 `--primary`，在 solid 保持 Button 默认颜色链；inactive 统一使用 `--black-100 × opacity: 0.4`。
-- 背景滑块复用 Tab 的 transitions.dev Tabs sliding 时序：位置与宽高均使用 250ms、`cubic-bezier(0.22, 1, 0.36, 1)`，首次定位与 resize 不播放动效。
-- 四种 variant 测试展示示例均补充 Icon，便于观察与 Tab 一致的颜色继承。
-
-### v1.0.2 (2026-05-31)
-
-#### 样式调整
-- 继承 Tab v1.0.2：inactive Text / Icon 保持 Button 默认 `--black-100`，active Text / Icon 使用 `--static-black-100`；inactive 的 40% 视觉仍由整体 `opacity: 0.4` 表达。
-
-### v1.0.1 (2026-05-31)
-
-#### 样式调整
-- 继承 Tab v1.0.1：移除 inactive Item 的 40% 颜色值路径，改用 `opacity: 0.4`，hover / active 使用 `opacity: 1`。
-
-### v1.0.0 (2026-05-20)
-
-#### 新功能
-- 初始实现:基于 Tab 的薄封装,固定 `role="radiogroup"` / `itemRole="radio"` / `selectionFollowsFocus=true`
-- 支持 `name` 属性接入 Form,内部渲染 hidden input 暴露 value 给原生表单提交
-- 支持 `fill` Figma fill 宽度,与 Tab 共享等宽子项样式
+完整历史见 [更新日志归档](../../docs/history/changelogs/Segmented.history.md)。

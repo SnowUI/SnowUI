@@ -1,4 +1,4 @@
-# frame-skeleton-runtime.svelte.ts
+# frame-skeleton-runtime
 
 > **版本**: v1.1.0
 > **职责**: 统一处理 Frame 的 Skeleton probe、子骨架探测与加载渲染前判定。
@@ -15,7 +15,7 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.1.0 (2026-08-15)
 

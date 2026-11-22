@@ -1,4 +1,4 @@
-# frame-dom-runtime.svelte.ts
+# frame-dom-runtime
 
 > **版本**: v1.0.0
 > **职责**: 统一拼装 Frame 根节点的 DOM props、事件包装器与运行时 `data-*` 属性。
@@ -12,7 +12,7 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.0.0 (2026-03-09)
 

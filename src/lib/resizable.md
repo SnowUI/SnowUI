@@ -31,11 +31,12 @@
 </Frame>
 ```
 
-> **以下内容供 AI 阅读，不展示在文档站点**
 
 - 组件不得私有复制 pointer、keyboard 或 clamp 算法。
 - 业务持久化只监听 onResizeEnd，不属于 action。
 
-## Changelog
+## 更新日志
+
+### v1.0.0 (2026-06-19)
 
 - 2026-06-19：v1.0.0，新增共享 action、帧合并和 SplitPane clamp 复用。

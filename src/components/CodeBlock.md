@@ -62,14 +62,8 @@
 - `parts.Indicator`：配置内置 resize Indicator。
 - 需要替换手柄结构时使用文档既有 Indicator `as` 职责；外置显式 Props 高于 part。
 
-> **版本**: v1.8.2
-> **更新**: 2026-10-23
-> **职责**: 展示代码、基础语法着色与行号，并提供复制、全屏和可选尺寸调整能力。
-> **布局模型**: 默认态为复合管理布局；`singleLine` 为槽位宿主布局
-> **文档**: ./CodeBlock.md
 
 代码块组件，支持语法显示、基础语法着色、行号、复制到剪贴板与全屏放大。全屏放大/缩小使用共享元素转场的 `layout` 策略：实际过渡位置与尺寸，不缩放代码字形；图标切换动效使用 `REPLACEMENT_APPEAR_MOTION`，避免继承浮层类动效语义。
-
 
 
 ---
@@ -352,14 +346,11 @@ pnpm build`}
 ---
 
 
-
 ### 2026-11-13 行为同步
 
 复制按钮独立背景模糊默认20px（1.25rem），不改变Button全局默认。
 
 ## AI Zone
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 ## 更新日志
 

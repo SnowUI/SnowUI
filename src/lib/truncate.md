@@ -1,4 +1,4 @@
-# truncate.ts 文档
+# truncate
 
 > **版本**: v1.3.0
 > **职责**: 文本截断 Svelte Action。

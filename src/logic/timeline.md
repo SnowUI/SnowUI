@@ -1,4 +1,4 @@
-# timeline.svelte.ts 文档
+# timeline
 
 > **版本**: v1.2.0
 > **职责**: 时间轴管理。

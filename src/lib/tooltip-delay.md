@@ -1,4 +1,4 @@
-# tooltip-delay.ts
+# tooltip-delay
 
 > **版本**: v1.4.0
 > **职责**: 协调页面内所有 Tooltip 的 hover warmup / cooldown 时序。
@@ -33,7 +33,9 @@ cooldown 窗口为 `300ms`。该规则参考 Radix Tooltip 的 `delayDuration` /
 - `open` 受控模式由外部状态决定显隐，不读写 warmup / cooldown 状态。
 - Popover 复用 `OVERLAY_TRIGGER_HOVER_DELAY_MS` / `TOOLTIP_HOVER_SHOW_DELAY_MS` 作为 hover 显示延迟，但不参与 Tooltip 的 warmup / cooldown 状态。
 
-## 变更记录
+## 更新日志
+
+### v1.4.0 (2026-08-21)
 
 - v1.4.0 (2026-08-21): 明确 warm 切换始终立即提交；视觉积累由 Tooltip 可打断时间线解决，不使用 burst 或第二层触发延迟。
 - v1.3.0 (2026-08-20): 移除固定 100ms 切换延迟；warm Tooltip 恢复立即响应，快速扫过由组件跳过连续裁切。

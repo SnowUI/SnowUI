@@ -2,22 +2,21 @@
   "schemaVersion": 1,
   "components": {
     "Button": {
+      "description": "Trigger actions or navigation with text, icons, loading, and disabled states, from primary actions to compact tools.",
       "intents": [
-        "触发操作",
-        "默认按钮",
-        "图标按钮",
-        "无背景按钮"
+        "trigger action",
+        "default button",
+        "icon button",
+        "borderless button"
       ],
       "aliases": [
-        "按钮默认样式",
-        "Icon 按钮",
-        "只有图标的按钮",
-        "bare并有hover",
-        "bare 并有 hover",
-        "bare 按钮要有 hover"
+        "button default style",
+        "icon-only button",
+        "bare button with hover",
+        "muted bare button"
       ],
-      "whenToUse": "触发即时操作；bare 且需要透明度 hover 时使用 emphasis=muted。",
-      "avoidWhen": "互斥参数选择使用 Segmented；内容面板切换使用 Tab。",
+      "whenToUse": "Trigger immediate actions; use bare with emphasis=\"muted\" when an unframed button needs opacity hover feedback.",
+      "avoidWhen": "Use Segmented for mutually exclusive parameter selection; use Tab to switch content panels.",
       "related": [
         "ButtonGroup",
         "OverflowActions",
@@ -25,13 +24,15 @@
       ]
     },
     "ButtonGroup": {
+      "description": "Combine related buttons into one action group, with optional dividers for split buttons and compact toolbars.",
       "intents": [
-        "按钮组合",
-        "相邻操作组"
+        "button group",
+        "adjacent action group"
       ],
       "aliases": [
-        "一组按钮",
-        "按钮之间带分隔"
+        "grouped buttons",
+        "buttons with dividers",
+        "split button"
       ],
       "related": [
         "Button",
@@ -39,17 +40,18 @@
       ]
     },
     "OverflowActions": {
+      "description": "Keep actions accessible in limited space by moving those that do not fit into a More menu.",
       "intents": [
-        "响应式操作集合",
-        "操作溢出",
-        "更多菜单"
+        "responsive action bar",
+        "action overflow",
+        "more menu"
       ],
       "aliases": [
-        "宽度变窄时逐个隐藏",
-        "从左边开始逐个隐藏",
-        "放不下时收进 More"
+        "hide items one by one on narrow width",
+        "collapse from left into More",
+        "overflow toolbar"
       ],
-      "whenToUse": "一组操作需要从完整态退化为 icon-only，并把剩余操作逐项或全部转入 More。",
+      "whenToUse": "Collapse a row of actions to icon-only and move remaining items into a More menu when horizontal space shrinks.",
       "related": [
         "OverflowAction",
         "Separator",
@@ -57,26 +59,28 @@
       ]
     },
     "Separator": {
+      "description": "Separate content and actions horizontally or vertically to clarify information hierarchy.",
       "intents": [
-        "区域分割",
-        "横向分割线",
-        "纵向分割线"
+        "section divider",
+        "horizontal divider",
+        "vertical divider"
       ],
       "aliases": [
-        "分割线",
-        "竖向分隔线",
-        "横线"
+        "divider line",
+        "vertical rule",
+        "horizontal rule"
       ],
-      "avoidWhen": "图表坐标线、网格线和路径不使用 Separator。"
+      "avoidWhen": "Do not use Separator for chart axis lines, grid lines, or breadcrumb paths."
     },
     "ColorSchemeButton": {
+      "description": "Switch between light and dark themes with an icon that reflects the current scheme.",
       "intents": [
-        "明暗模式切换",
-        "主题方案切换"
+        "light dark mode toggle",
+        "color scheme switch"
       ],
       "aliases": [
-        "明暗切换按钮",
-        "主题按钮",
+        "theme toggle button",
+        "dark mode button",
         "ThemeButton"
       ],
       "related": [
@@ -85,13 +89,14 @@
       ]
     },
     "CopyButton": {
+      "description": "Copy text or code to the clipboard and briefly confirm success, useful for links, identifiers, and install commands.",
       "intents": [
-        "复制内容",
-        "复制代码"
+        "copy content",
+        "copy code"
       ],
       "aliases": [
-        "复制按钮",
-        "复制代码按钮"
+        "copy button",
+        "copy to clipboard button"
       ],
       "related": [
         "Button",
@@ -99,13 +104,14 @@
       ]
     },
     "ExpandButton": {
+      "description": "Switch between expanded and collapsed states with consistent button feedback.",
       "intents": [
-        "展开内容",
-        "全屏预览"
+        "expand content",
+        "fullscreen preview"
       ],
       "aliases": [
-        "展开按钮",
-        "全屏按钮"
+        "expand toggle button",
+        "fullscreen button"
       ],
       "related": [
         "Button",
@@ -113,13 +119,14 @@
       ]
     },
     "SelectButton": {
+      "description": "Choose one dropdown option from a button, suited to toolbars and compact filters.",
       "intents": [
-        "按钮触发选择菜单",
-        "按钮触发命令菜单"
+        "button dropdown menu",
+        "button command menu"
       ],
       "aliases": [
-        "下拉按钮",
-        "带菜单的按钮"
+        "dropdown button",
+        "menu button"
       ],
       "related": [
         "Button",
@@ -128,28 +135,31 @@
       ]
     },
     "SearchInput": {
+      "description": "Provide a single-line search field with an icon for filtering lists, pages, and toolbar content.",
       "intents": [
-        "搜索输入",
-        "可折叠搜索框"
+        "search input",
+        "collapsible search field"
       ],
       "aliases": [
-        "搜索输入框",
-        "窄屏只显示搜索图标"
+        "search bar",
+        "icon-only search on narrow width"
       ],
       "related": [
         "Input"
       ]
     },
     "CodeBlock": {
+      "description": "Display copyable code with syntax highlighting, line numbers, fullscreen viewing, and resizing.",
       "intents": [
-        "代码展示",
-        "代码复制",
-        "代码展开",
-        "代码格式化"
+        "code display",
+        "code copy",
+        "code fullscreen",
+        "code formatting"
       ],
       "aliases": [
-        "代码块",
-        "单行代码条"
+        "code snippet",
+        "single-line code strip",
+        "syntax highlighter"
       ],
       "related": [
         "CopyButton",
@@ -159,18 +169,23 @@
     "ThemeButton": {
       "deprecated": true,
       "canonical": "ColorSchemeButton",
+      "description": "Switch between light and dark themes with an icon that reflects the current scheme.",
+      "intents": [
+        "legacy theme toggle"
+      ],
       "aliases": [
-        "旧主题按钮"
+        "legacy theme button"
       ]
     },
     "CopyLink": {
+      "description": "Show a link that opens from its text and copies its address from the rest of the control.",
       "intents": [
-        "展示并复制链接地址"
+        "display and copy link URL"
       ],
       "aliases": [
-        "链接输入框",
-        "链接 input",
-        "可复制链接"
+        "link copy field",
+        "copyable URL",
+        "share link control"
       ],
       "related": [
         "Link",
@@ -179,49 +194,53 @@
       ]
     },
     "Segmented": {
+      "description": "Switch quickly among a small set of exclusive filters or parameters, with keyboard and form support.",
       "intents": [
-        "互斥参数选择",
-        "过滤器单选",
-        "响应式节点选择"
+        "mutually exclusive parameter switch",
+        "single-select filter",
+        "responsive breakpoint selector"
       ],
       "aliases": [
-        "节点选择",
-        "Mobile Tablet Desktop 选择",
-        "分段选择器"
+        "segmented control",
+        "Mobile Tablet Desktop switch",
+        "option pill switch"
       ],
-      "whenToUse": "多个互斥参数或过滤器之间单选，使用 radiogroup 语义。",
-      "avoidWhen": "切换内容面板时使用 Tab。",
+      "whenToUse": "Select one option among mutually exclusive parameters or filters using radiogroup semantics.",
+      "avoidWhen": "Use Tab when switching between distinct content panels.",
       "related": [
         "Tab",
         "Button"
       ]
     },
     "Tab": {
+      "description": "Switch between views or content panels, with generated or custom tabs and keyboard navigation.",
       "intents": [
-        "内容面板切换",
-        "视图切换"
+        "content panel switch",
+        "view switcher"
       ],
       "aliases": [
-        "Tab 切换",
-        "Preview Code 切换",
-        "标签页"
+        "tabs",
+        "Preview Code switch",
+        "tab bar"
       ],
-      "whenToUse": "选项对应不同内容区域或视图。",
-      "avoidWhen": "只改变参数或过滤器时使用 Segmented。",
+      "whenToUse": "Switch between distinct content panels or views.",
+      "avoidWhen": "Use Segmented when changing a parameter or filter without switching panels.",
       "related": [
         "Segmented",
         "Button"
       ]
     },
     "Sidebar": {
+      "description": "Organize brand entry, grouped navigation, and footer actions with collapse and independent scrolling.",
       "intents": [
-        "文档侧边导航",
-        "可折叠侧栏",
-        "可调宽侧栏"
+        "app navigation sidebar",
+        "collapsible sidebar",
+        "resizable sidebar"
       ],
       "aliases": [
-        "左侧导航",
-        "侧边栏"
+        "left navigation",
+        "navigation drawer",
+        "side navigation"
       ],
       "related": [
         "SidebarSection",
@@ -229,14 +248,15 @@
       ]
     },
     "SearchBox": {
+      "description": "Open a search popup from a fully clickable search entry, optionally with a shortcut hint.",
       "intents": [
-        "站点搜索",
-        "带快捷键的搜索框",
-        "响应式搜索框"
+        "site search trigger",
+        "search trigger with shortcut",
+        "responsive search button"
       ],
       "aliases": [
-        "顶部搜索",
-        "窄屏搜索按钮"
+        "header search box",
+        "narrow-screen search trigger"
       ],
       "related": [
         "SearchInput",
@@ -245,21 +265,25 @@
       ]
     },
     "DataTable": {
+      "description": "Coordinate querying, sorting, and pagination with composable toolbar, table, and pagination controls.",
       "intents": [
-        "数据表格",
-        "排序分页表格",
-        "带操作的数据列表",
-        "文件列表",
-        "文件管理",
-        "勾选",
-        "分页",
-        "搜索",
-        "批量操作"
+        "data table",
+        "sortable paginated table",
+        "actionable data list",
+        "file list",
+        "file management",
+        "selection",
+        "row selection",
+        "pagination",
+        "search",
+        "bulk actions"
       ],
       "aliases": [
-        "高级表格",
-        "数据表"
+        "advanced table",
+        "data grid"
       ],
+      "whenToUse": "Display data lists requiring search, sorting, filtering, row selection, action columns, or pagination by composing TableToolbar, Table, and Pagination.",
+      "avoidWhen": "Use Table when only semantic headers and data rows are needed.",
       "related": [
         "TableToolbar",
         "Table",
@@ -269,17 +293,16 @@
         "TableRow",
         "TableCell",
         "Pagination"
-      ],
-      "whenToUse": "数据列表需要搜索、排序、筛选、勾选、操作列或分页；组合 TableToolbar、Table 与 Pagination。",
-      "avoidWhen": "只展示表头和数据行时使用 Table。"
+      ]
     },
     "TableToolbar": {
+      "description": "Add search, sort, filter, bulk actions, and selection status to DataTable.",
       "intents": [
-        "表格工具栏",
-        "表格搜索筛选操作"
+        "table toolbar",
+        "table search filter and bulk actions"
       ],
       "aliases": [
-        "Table 顶部操作区"
+        "table top action bar"
       ],
       "related": [
         "DataTable",
@@ -287,27 +310,29 @@
       ]
     },
     "SidePanel": {
+      "description": "Show details or supporting content from the right in overlay or inline mode while retaining page context.",
       "intents": [
-        "侧边详情面板",
-        "行预览面板",
-        "浮动编辑面板"
+        "side detail panel",
+        "row preview drawer",
+        "floating inspector panel"
       ],
       "aliases": [
-        "右侧面板",
-        "详情抽屉"
+        "right drawer",
+        "detail sheet"
       ],
       "related": [
         "DataTable"
       ]
     },
     "Field": {
+      "description": "Combine an input, label, icon, and validation feedback into a consistent form field.",
       "intents": [
-        "表单字段组合",
-        "标签帮助错误信息"
+        "form field composition",
+        "label helper and validation error"
       ],
       "aliases": [
-        "表单项",
-        "带 label 的输入"
+        "form item",
+        "labeled input field"
       ],
       "related": [
         "Input",
@@ -316,14 +341,15 @@
       ]
     },
     "ImageViewer": {
+      "description": "Preview images or videos at page level with previous, next, and close controls.",
       "intents": [
-        "图片预览",
-        "图片全屏查看",
-        "图片组导航"
+        "image preview",
+        "fullscreen media viewer",
+        "gallery navigation"
       ],
       "aliases": [
-        "图片查看器",
-        "灯箱"
+        "lightbox",
+        "media viewer"
       ],
       "related": [
         "Image",
@@ -331,74 +357,85 @@
       ]
     },
     "NumberFlow": {
+      "description": "Animate changing numbers digit by digit with width transitions while preserving currency, grouping, and decimals.",
       "intents": [
-        "数字滚动",
-        "数值变化动画"
+        "rolling number counter",
+        "animated numeric value"
       ],
       "aliases": [
-        "数字流动",
-        "数字滚轮动画"
+        "number ticker",
+        "odometer number transition"
       ],
       "related": [
         "NumericText"
       ]
     },
     "BarChart": {
-      "aliases": [
-        "图表反白",
-        "黑白自适应",
-        "adaptiveContrast"
-      ],
+      "description": "Compare categories with horizontal, vertical, grouped, or stacked bars, axes, and interactive details.",
       "intents": [
-        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+        "adaptive monochrome contrast for chart foreground on light and dark surfaces",
+        "categorical bar chart"
+      ],
+      "aliases": [
+        "adaptiveContrast",
+        "chart adaptive contrast",
+        "grouped stacked bar chart"
       ]
     },
     "LineChart": {
-      "aliases": [
-        "图表反白",
-        "黑白自适应",
-        "adaptiveContrast"
-      ],
+      "description": "Plot trends with multiple series, area fill, solid or dashed lines, axes, grids, and point styling.",
       "intents": [
-        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+        "adaptive monochrome contrast for chart foreground on light and dark surfaces",
+        "trend line and area chart"
+      ],
+      "aliases": [
+        "adaptiveContrast",
+        "chart adaptive contrast",
+        "multi-series line chart"
       ]
     },
     "ChartGroup": {
-      "aliases": [
-        "图表反白",
-        "黑白自适应",
-        "adaptiveContrast"
-      ],
+      "description": "Coordinate multiple charts in one area with shared category hover, layered rendering, and aligned axes.",
       "intents": [
-        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+        "adaptive monochrome contrast for chart foreground on light and dark surfaces",
+        "synchronized multi-chart group"
+      ],
+      "aliases": [
+        "adaptiveContrast",
+        "chart adaptive contrast",
+        "composite chart"
       ]
     },
     "GaugeChart": {
+      "description": "Show several proportions in a semicircle or half pie with segments, gradients, ring thickness, and reveal motion.",
       "intents": [
-        "半环比例图",
-        "半饼图",
-        "分段占比"
+        "semicircular proportion chart",
+        "half-pie chart",
+        "segmented ratio"
       ],
       "aliases": [
-        "半圆占比"
+        "half-donut chart",
+        "semicircle breakdown"
       ],
-      "whenToUse": "以半环或半饼展示多项正数占比，分母为实际显示项之和。",
-      "avoidWhen": "单指标 min/max 仪表没有对应公开 API；任务完成百分比用 Progress。",
+      "whenToUse": "Display multiple positive proportions in a semicircle or half-pie where the denominator is the sum of visible segments.",
+      "avoidWhen": "No public single-metric min/max speedometer API is provided; use Progress for task completion percentages.",
       "related": [
         "CircularChart",
         "Progress"
       ]
     },
     "SearchPopup": {
+      "description": "Compose a search panel with SearchInput and optional results, groups, and custom content; search logic and routing stay with the host.",
       "intents": [
-        "搜索面板",
-        "搜索结果分组"
+        "search panel",
+        "grouped search results"
       ],
       "aliases": [
-        "搜索弹窗"
+        "search dialog",
+        "command search panel"
       ],
-      "whenToUse": "需要统一搜索输入、分组标题和结果间距的产品区块。",
-      "avoidWhen": "纯浮层容器用 Popover；网站历史与热度由宿主提供。",
+      "whenToUse": "Provide a unified search input, group headings, and result spacing as a composable block.",
+      "avoidWhen": "Use Popover for generic floating surfaces; search ranking, history, and routing stay with the host.",
       "related": [
         "SearchBox",
         "SearchInput",
@@ -409,31 +446,209 @@
       ]
     },
     "MetricCard": {
+      "description": "Display one dashboard metric and an optional change; the application supplies the data and calculates comparisons.",
       "intents": [
-        "展示仪表盘指标和变化"
+        "display dashboard metric and delta"
       ],
       "aliases": [
-        "指标卡"
+        "KPI card",
+        "stat card"
       ],
-      "whenToUse": "展示单项指标和变化",
-      "avoidWhen": "普通内容容器使用 Card",
+      "whenToUse": "Present a single KPI metric and optional period-over-period change.",
+      "avoidWhen": "Use Card for general-purpose content containers.",
       "related": [
         "Card"
       ]
     },
     "PasswordStrength": {
+      "description": "Evaluate password strength locally with a four-segment indicator and labels; the component does not persist, send, or submit passwords.",
       "intents": [
-        "展示密码强度"
+        "display password strength"
       ],
       "aliases": [
-        "密码强度指示器"
+        "password meter",
+        "password complexity indicator"
       ],
-      "whenToUse": "评估并展示密码强度",
-      "avoidWhen": "任务进度使用 Progress",
+      "whenToUse": "Evaluate and display local password strength across four segments.",
+      "avoidWhen": "Use Progress for general task or upload completion.",
       "related": [
         "Input",
         "Progress"
       ]
+    },
+    "Accordion": {
+      "description": "Organize related content into expandable sections for FAQs, settings, and step-by-step explanations, with single or multiple sections open."
+    },
+    "AccordionItem": {
+      "description": "Define one collapsible section within an Accordion, combining a heading and content under the parent expansion state."
+    },
+    "Avatar": {
+      "description": "Display a person or team avatar with image, text, and gradient fallbacks for lists, comments, and member details."
+    },
+    "AvatarGroup": {
+      "description": "Arrange or stack multiple avatars and show the count of hidden members in team and collaborator lists."
+    },
+    "Badge": {
+      "description": "Show unread counts and status with compact numbers, text, or dots alongside buttons, avatars, and navigation items."
+    },
+    "BlurText": {
+      "description": "Reveal headings and short passages letter by letter with blur, fade, and slight upward motion while preserving text layout."
+    },
+    "Breadcrumb": {
+      "description": "Show the current page hierarchy and provide paths back to parent pages."
+    },
+    "Card": {
+      "description": "Present related content on a consistent card surface with flexible text, media, actions, fixed items, and scrolling."
+    },
+    "Checkbox": {
+      "description": "Select independent options with checked, unchecked, and indeterminate states in forms or bulk selection."
+    },
+    "Chip": {
+      "description": "Display a category, status, or short detail as a compact inline label alongside text, icons, and lists."
+    },
+    "CircularChart": {
+      "description": "Show proportions as a ring or pie with segments, rounded ends, ring thickness, and hover emphasis."
+    },
+    "Dialog": {
+      "description": "Present focused content or actions in a modal with a backdrop, focus management, and background scroll lock."
+    },
+    "FlowText": {
+      "description": "Animate changes in text or numbers for dynamic copy, counters, timers, and countdowns."
+    },
+    "Frame": {
+      "description": "Coordinate layout, state, loading, and motion across components through explicit configuration."
+    },
+    "Gradient": {
+      "description": "Add soft layered gradients to backgrounds or placeholders with six palettes and scalable shape effects."
+    },
+    "GradientMotion": {
+      "description": "Create a flowing gradient sweep for backgrounds, avatar placeholders, or clipped media areas."
+    },
+    "Icon": {
+      "description": "Display SVG icons with consistent sizing and color in buttons, navigation, and content."
+    },
+    "IconProvider": {
+      "description": "Replace SnowUI functional icons for an application or subtree while retaining defaults for unconfigured icons."
+    },
+    "Image": {
+      "description": "Display images and placeholders with badges, actions, and preview entry points."
+    },
+    "ImageGroup": {
+      "description": "Arrange multiple images with consistent sizes and group preview for galleries and attachments."
+    },
+    "Indicator": {
+      "description": "Provide a draggable resize handle for panels and content areas, with mouse and keyboard support."
+    },
+    "Input": {
+      "description": "Provide single-line input for text, search, passwords, numbers, dates, times, and colors, with field feedback."
+    },
+    "Kbd": {
+      "description": "Display shortcuts or keyboard hints as compact keycaps."
+    },
+    "Link": {
+      "description": "Provide clear text links in content, descriptions, and navigation, with optional directional indicators."
+    },
+    "Listbox": {
+      "description": "Present selectable options in a popup with search filtering and keyboard support, including Select panels."
+    },
+    "LocaleProvider": {
+      "description": "Set the language of built-in SnowUI interface messages for an application or subtree, with custom overrides."
+    },
+    "MenuItem": {
+      "description": "Present an option in a list or quick-action menu with icon, selected, and disabled states."
+    },
+    "NumericText": {
+      "description": "Animate only the changing portions of short text or numbers while preserving unchanged content."
+    },
+    "OTPInput": {
+      "description": "Enter a configurable 4–8 digit one-time code with full-code paste, SMS autofill, and native form submission and reset."
+    },
+    "OverflowAction": {
+      "description": "Define an action in OverflowActions that moves between a toolbar and its More menu as space changes."
+    },
+    "Pagination": {
+      "description": "Navigate between pages of tabular data, lists, or search results."
+    },
+    "Popover": {
+      "description": "Show supplementary content or actions near a trigger with size and trigger options."
+    },
+    "Progress": {
+      "description": "Show determinate or indeterminate progress with a bar or circle for uploads, processing, and loading."
+    },
+    "Radio": {
+      "description": "Choose one option from a mutually exclusive group when all choices should remain visible."
+    },
+    "ScrambleText": {
+      "description": "Reveal a target heading, short sentence, or status through a progressive character scramble."
+    },
+    "ScrollArea": {
+      "description": "Provide scrollable content with a consistent scrollbar for long lists, panels, and constrained spaces."
+    },
+    "Select": {
+      "description": "Choose from a dropdown built from data or custom options, with search and keyboard support."
+    },
+    "SidebarItem": {
+      "description": "Show a Sidebar navigation item with active state, icon, hierarchy, and status hints."
+    },
+    "SidebarSection": {
+      "description": "Group Sidebar items under a heading with expand, collapse, and optional actions."
+    },
+    "Skeleton": {
+      "description": "Show a placeholder outline while content loads, previewing structure and keeping layout stable."
+    },
+    "Slider": {
+      "description": "Choose one value or a range by dragging, with horizontal, vertical, stepped, and filled styles."
+    },
+    "SlotText": {
+      "description": "Animate text changes character by character with vertical rolls for short labels, status, and counters."
+    },
+    "SnowUILogo": {
+      "description": "Display the SnowUI icon, wordmark, or combined mark in horizontal or vertical layouts."
+    },
+    "Spinner": {
+      "description": "Indicate ongoing loading with a rotating ring, spokes, or capsule shape."
+    },
+    "StyleButton": {
+      "description": "Switch between SnowUI and Apple visual styles."
+    },
+    "Switch": {
+      "description": "Toggle a setting or feature that takes effect immediately."
+    },
+    "Table": {
+      "description": "Display structured data in a semantic table with adaptive columns, local horizontal scrolling, and loading states."
+    },
+    "TableBody": {
+      "description": "Group Table data rows while preserving table body semantics."
+    },
+    "TableCell": {
+      "description": "Display text, components, or custom content in a Table cell, truncating long content by default."
+    },
+    "TableHead": {
+      "description": "Define a Table column heading with optional sorting and resizing."
+    },
+    "TableHeader": {
+      "description": "Group Table header rows and preserve native table header semantics."
+    },
+    "TableRow": {
+      "description": "Group header or data cells into one row with consistent hover and interaction feedback."
+    },
+    "Tag": {
+      "description": "Use an interactive label for markers, filters, or path segments."
+    },
+    "Text": {
+      "description": "Render text with typography and truncation options for content, labels, and constrained areas."
+    },
+    "Textarea": {
+      "description": "Enter multi-line descriptions, notes, or longer content with native form attributes and field feedback."
+    },
+    "Toast": {
+      "description": "Show brief feedback for results or status changes, with icons, actions, and rich content."
+    },
+    "Toaster": {
+      "description": "Display global toast() notifications in six positions with stacking motion and a visible-item limit."
+    },
+    "Tooltip": {
+      "description": "Show a short explanation on hover with collision handling and smooth switching."
     }
   }
 }

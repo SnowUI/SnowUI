@@ -68,12 +68,7 @@
 
 ---
 
-
-
-
 ## AI Zone
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -115,23 +110,4 @@
 #### 变更
 - 接入 Sidebar Context 的持久化折叠状态；Sidebar 在折叠前记忆 active item 的 Section 归属，分类内容继续按原有规则在折叠时卸载。
 
-### v1.2.0 (2026-07-28)
-
-#### 动效优化
-- Sidebar 整体折叠时先渐隐标题，渐隐结束后再收起标题高度、padding 与 Section gap，使 Item 延后上移。
-
-### v1.1.0 (2026-07-28)
-
-#### 变更
-- 明确有标题时默认可折叠，标题按钮不显示 Tooltip。
-- Section action Tooltip 统一显示在对应按钮右侧。
-
-### v1.0.1 (2026-07-28)
-
-#### 变更
-- SidebarSection 标题行默认增加左右 8px、上下 4px padding。
-
-### v1.0.0 (2026-07-23)
-
-#### 新功能
-- 初始版本：内置分类标题、下箭头折叠与 hover/focus 操作区。
+完整历史见 [更新日志归档](../../docs/history/changelogs/SidebarSection.history.md)。

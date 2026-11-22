@@ -1,4 +1,4 @@
-# tooltip-pointer-speed.ts
+# tooltip-pointer-speed
 
 > **版本**: v1.0.0
 > **职责**: 为可见共享 Tooltip 提供短时、平滑的鼠标速度样本。

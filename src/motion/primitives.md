@@ -1,4 +1,4 @@
-# primitives.ts
+# primitives
 
 > 版本：v1.0.0  
 > 职责：提供可组合的 Frame 原子动效构建器。

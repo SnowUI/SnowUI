@@ -1,4 +1,4 @@
-# frame-layout.svelte.ts 文档
+# frame-layout
 
 > **版本**: v1.0.0
 > **职责**: 管理组件的内部布局方向，支持基于内容适配的方向回退与旧断点兼容。
@@ -49,10 +49,10 @@
 **示例**:
 
 ```svelte
-<!-- 
-  默认 (xs): row
-  sm 及以上: column (覆盖 row)
-  lg 及以上: row (覆盖 column)
+<!--
+  Default (xs): row
+  sm and up: column (overrides row)
+  lg and up: row (overrides column)
 -->
 <Frame row sm="column" lg="row" />
 ```
@@ -77,12 +77,12 @@ import { createLayoutTransition } from "./frame-layout.svelte";
 
 const transition = createLayoutTransition();
 
-// 1. 记录初始状态 (First)
+// 1. Capture initial rect (First)
 transition.capture(element);
 
-// ... DOM 更新 ...
+// ... DOM update ...
 
-// 2. 播放过渡动画 (Last -> Invert -> Play)
+// 2. Play FLIP transition (Last -> Invert -> Play)
 transition.play(element, { duration: 300 });
 ```
 

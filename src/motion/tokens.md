@@ -1,4 +1,4 @@
-# motion/tokens.ts 文档
+# motion/tokens
 
 > **版本**: v1.19.0
 > **职责**: 保存 SnowUI 已转正动效 preset 共用的基础数值 token。
@@ -39,7 +39,9 @@
 | `MOTION_SCALE_ICON_SWAP_FROM` / `MOTION_SCALE_HOVER_*` / `MOTION_SCALE_BUTTON_HOVER_TO` | Icon 替换、通用 hover 与 Button 默认 / sm 背景层放大基线 |
 | `MOTION_SCALE_BUTTON_BORDERLESS_FROM` / `MOTION_BUTTON_REFERENCE_HEIGHT_PX` | Borderless 默认 / sm 隐藏起点；Button sm/md/lg 的 24/36/48 名义高度仅用于反比补偿，不设置实际布局，不测量自定义尺寸 |
 
-## 变更记录
+## 更新日志
+
+### v1.19.0 (2026-09-04)
 
 - v1.19.0 (2026-09-04): 增加 Button 标准高度校准与 Borderless 起点 token；通过 preset 对 md / lg 的整段背景行程做反比补偿，保留 sm 和既有时序。
 - v1.18.0 (2026-08-27): 恢复 Button 背景层 `1 → 1.06`、`200ms ease` token；移除固定 2px 增量和 Button 专属颜色 timing token，颜色回归 Frame 通用时间线。

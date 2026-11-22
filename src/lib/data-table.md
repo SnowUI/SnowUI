@@ -13,7 +13,9 @@
 
 `sortDataTableRows(rows, undefined, undefined)` 不会推导第一列或任何默认排序，而是返回保留输入顺序的 rows 浅拷贝。
 
-## Changelog
+## 更新日志
+
+### v1.1.1 (2026-06-22)
 
 - 2026-06-22：v1.1.1，明确无 sort 时保留输入 rows 顺序，不隐式按第一列升序。
 - 2026-06-19：v1.1.0，同名字段可由 DataTable 自动读取；日期格式化迁移到 基础共享能力。

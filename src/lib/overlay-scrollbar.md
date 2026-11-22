@@ -1,4 +1,4 @@
-# overlay-scrollbar.svelte.ts
+# overlay-scrollbar
 
 > **版本**: v1.3.0
 > **类型**: 通用运行时能力
@@ -49,6 +49,4 @@
 - 归口为基础共享能力。
 - 增加横向滚动轴、通用 `thumbSize` / `thumbOffset` 返回值。
 
-### v1.0.0
-
-- 提供纵向 Thumb 尺寸、位置同步和拖动。
+完整历史见 [更新日志归档](../../docs/history/changelogs/lib-overlay-scrollbar.history.md)。

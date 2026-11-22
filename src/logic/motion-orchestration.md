@@ -1,4 +1,4 @@
-# motion-orchestration.ts 文档
+# motion-orchestration
 
 > **版本**: v1.3.0
 > **职责**: 负责编排组的播放、反向播放和重置逻辑。它处理组件间的时序关系和联动控制。

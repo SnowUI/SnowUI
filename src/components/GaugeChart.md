@@ -186,13 +186,6 @@ interface GaugeChartItem {
 
 ### 动效
 
-| 场景 | 实现 | bridge 变量 |
-| :--- | :--- | :--- |
-| 顺序出现 | 与 CircularChart 一致，默认总时长固定为 `1000ms`，不随扇区数量变化；整张图表使用图表级缓出时间分配：前段时长接近，越靠后的扇区时长越长；单段内部线性填充；透明度跟随填充进度完成；反向进度沿同一公式回退 | 组件内部确定性时间轴 |
-| 滚动出现 | `scrollAppearance` 按锚点与视口触发线距离映射到 `appearanceProgress` | 组件内部滚动监听 |
-| 扇区 hover 强调 | 每个扇区从当前几何立即转向最新 hover / focus 目标，取消未完成的旧动画，不积压重播；进入时外半径从 `R` 缓动到 `R + hoverThicknessGrowth`，离开时缓动回 `R`；内半径不变，扇区不位移 | 组件内部 `requestAnimationFrame + cubicOut`，`300ms`；减少动效时直接到达最终状态 |
-| 扇区亮度反馈 | `filter: brightness(1.04)` | `--snowui-frame-color-motion-*` |
-| 中心标签进入 | `opacity + scale` | `--snowui-frame-appear-motion-*` / `--snowui-frame-control-motion-*` |
 
 ### 使用示例
 
@@ -250,115 +243,11 @@ interface GaugeChartItem {
 
 ---
 
-
-
 ## AI Zone
 
-### 内置文案与语言
-
-使用现有 `useLocale()`，key：`gaugeChart.name`。显式根 `aria-label` 保持优先；业务数据名、坐标标签与格式化数值不进入翻译表。
-
-
-### 5.1 ECharts 参考与 SnowUI 实现细则
-
-本组件与 CircularChart 共用同一套扇区几何。参考来源与职责分别是：
-
-- 官网 [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 示例用于确认目标视觉：半圆扇区同样需要同时保留清晰间隔和端部圆角。
-- ECharts 的 `src/chart/pie/pieLayout.ts` 用于确认间隔原则：ECharts 在布局阶段通过 `padAngle` 收缩实际扇区角度。
-- ECharts 的 `src/chart/helper/sectorHelper.ts` 用于确认圆角原则：`borderRadius` 属于扇区自身几何。
-- SnowUI 最终在共享 `components/src/lib/chart/arc-path.ts` 中使用 d3-shape 实现对应原则，没有直接复制 ECharts 渲染代码。
-
-落地规则：
-
-- `separatorWidth` 先按 GaugeChart 的 320px 宽基准缩放，再换算为 d3-shape 的 `padAngle`；`padRadius` 使内外圆弧共同收缩。
-- `cornerRadius` 在收缩后的扇区 path 上生效。间隔贯穿环厚后，端部圆角仍然保留。
-- base layer、fill layer 与 hit layer 复用同一套完整 padded path。
-- 圆环形态的 fill layer 绘制完整扇区并用局部 `revealPath` mask 揭示；内半径为 `0` 的实心半饼图直接绘制局部 `revealPath`，避免 Chromium 对动态嵌套 SVG mask 不重绘。两种形态共享相同时间轴。
-- hover / focus 只增加外半径，内半径和圆心不变；外扩后的 path 不受后置 gap mask 裁切。
-- 多扇区且 `separatorWidth=0` 时，base layer 与 fill layer 分别用白色 alpha mask 合并完整 path、`0.5px` seam cover 和只描边的 `blur(0.5px)` seam，再让颜色或渐变只绘制一次；半透明色不会因 fill 与 stroke 重叠而形成深色毛边。base layer 在 mask 合并后统一使用 `4%` 透明度；显式透明间隔不启用该补偿。
-
-### 5.2 本轮问题与解决方法
-
-| 问题 | 根因 | 最终解决方法 |
-| :--- | :--- | :--- |
-| 动效填充没有与下方占位扇区重合 | 局部圆角扇区会随扫描角度变化轮廓 | fill layer 固定使用完整 padded path；局部 `revealPath` mask 只负责揭示 |
-| 移除旧 mask 后透明间隔消失 | 间隔依赖后置 mask，没有进入几何 | 在共享 `arc-path.ts` 中使用 `separatorWidth → padAngle + padRadius` |
-| 间隔没有贯穿环厚，大圆角下短线分隔不稳定 | 径向短线 mask 需要根据圆角缩进，圆角越大越容易缩短 | 淘汰径向短线 mask；改用几何 padding |
-| 较大的圆角设置不生效，短扇区圆角消失 | 旧 path 有额外半径限制，并在短弧下退化 | 改用 d3-shape `arc().cornerRadius()`，只遵守真实几何上限 |
-| hover 扇区外扩后被裁切 | 旧 mask 或 SVG 范围没有覆盖外扩 path | 统一按外扩范围生成 path 与视口；不再让 gap mask 参与裁切 |
-| `separatorWidth={0}` 时仍出现约 1px 发丝缝，半透明色直接叠加同色描边又会形成深色毛边 | SVG 相邻 path 分别做抗锯齿，共边处可能透出背景；半透明 fill 与 stroke 分开绘制会在重叠边缘重复合成 alpha | 用包含完整 path、`0.5px` seam cover 与 `blur(0.5px)` seam 的白色 alpha mask 合并覆盖范围，再让颜色或渐变通过该 mask 只绘制一次；同时覆盖缝隙并避免同一扇区边缘重复叠色 |
-| 实心半饼图出现后只剩径向细线，DOM 中的进度却已完成 | Chromium 没有稳定重绘随进度变化的实心 `revealPath` 嵌套 mask | 实心形态直接以 `revealPath` 作为填充或单层 seam mask；圆环形态继续使用透明尾迹 mask |
-
----
-
-<a id="6-使用示例"></a>
-
-
-> **状态**: 已实现
-
-
-> **参考**: ECharts [`pie-borderRadius`](https://echarts.apache.org/examples/zh/editor.html?c=pie-borderRadius) 官方示例，以及本地 ECharts `src/chart/pie/pieLayout.ts`、`src/chart/helper/sectorHelper.ts` 源码。
-
-
-默认启用响应式，无需传入开关：容器无法完整容纳图表时（含 flex 并排布局扣除相邻内容后的剩余宽度），图表本体自动整体等比缩小，最小显示宽度由 `minWidth` 决定，默认 `"40px"`；容器不足下限时保持下限。将 `minWidth` 设为与图表宽度相同即可阻止自动缩小。恢复宽度后回到声明尺寸。环厚、透明间距、圆角、hover 增厚以及全部中心内容（含角色模板与静态 `center-label`）同比缩放；HoverPanel 保持原有大小。`enableResponsive={false}` 保留声明尺寸。尺寸字符串的既有单位解析限制不变，推荐数字尺寸。尺寸观察复用 `components/src/lib/chart/size.ts` 的 `watchSectorChartSize`，由 `resizeManager` 管理并在卸载时清理；无 ResizeObserver 时保留初次测量与核心交互。
-
----
-
-<a id="3-样式-token-详表"></a>
-
-### 样式 Token 详表
-
-| 属性 | 默认值 | Token / 变量 |
-| :--- | :--- | :--- |
-| 整体宽度 | 320px | `--snowui-gauge-chart-width` |
-| 整体高度 | 160px | `--snowui-gauge-chart-height` |
-| 圆环粗细 | 32px | `--snowui-gauge-chart-ring-thickness` |
-| 扇区圆角 | 320px 基准 4px | `--snowui-gauge-chart-corner-radius` |
-| 透明间隔粗细 | 320px 基准 2px | `--snowui-gauge-chart-separator-width` |
-| hover 外侧增厚 | 4px | `--snowui-gauge-chart-hover-thickness-growth` |
-| 中心标签数值 | 320px 宽基准下 18px / Bold / 100% 黑色 | `--snowui-gauge-chart-label-value-font-size` |
-| 中心标签名称 | 320px 宽基准下 14px / Regular / 40% 黑色 | `--snowui-gauge-chart-label-name-font-size` |
-| 中心标签行高 | `1` | 内置 `line-height: 1` |
-| 中心标签行间距 | 320px 宽基准下 2px，并随图表缩放 | `--snowui-gauge-chart-label-gap` |
-| 中心标签底部距离 | 图表高度的 20%；320x160 时等于 32px | `--snowui-gauge-chart-label-bottom-offset` |
-
-### 3.1 默认颜色序列
-
-| 序号 | Token |
-| :--- | :--- |
-| 1 | `var(--primary, #111111)` |
-| 2 | `var(--secondary-purple, #B899EB)` |
-| 3 | `var(--secondary-cyan, #A0BCE8)` |
-| 4 | `var(--secondary-mint, #6BE6D3)` |
-| 5 | `var(--secondary-green, #71DD8C)` |
-| 6 | `var(--secondary-indigo, #ADADFB)` |
-| 7 | `var(--secondary-blue, #7DBBFF)` |
-| 8 | `var(--secondary-yellow, #FFCC00)` |
-| 9 | `var(--secondary-orange, #FFB55B)` |
-| 10 | `var(--secondary-red, #FF4747)` |
-
-### 3.2 Override 入口
-
-| 变量 | 用途 |
-| :--- | :--- |
-| `--snowui-gauge-chart-width-override` | 整体宽度 |
-| `--snowui-gauge-chart-height-override` | 整体高度 |
-| `--snowui-gauge-chart-label-font-size-override` | 中心标签字号 |
-| `--snowui-gauge-chart-label-color-override` | 中心标签主色 |
-| `--snowui-gauge-chart-label-muted-color-override` | 中心标签次色 |
-| `--snowui-gauge-chart-label-font-weight-override` | 中心标签主行字重 |
-| `--snowui-gauge-chart-label-muted-font-weight-override` | 中心标签次行字重 |
-
-尺寸、环厚、圆角、隔断和 hover 外侧增厚优先通过 props 调整；props 会写入组件私有 CSS 变量。
-扇区 hover 提示不使用浏览器原生 SVG `title`，避免不可控灰底提示；结构化提示使用内置 Chart hover 面板。
-
-空闲中心内容使用 `centerTitle` / `centerSubtitle`，默认均为空。它们与 hover 文本使用同一个默认渲染器，字号、字重、颜色、行距和响应式缩放完全一致；hover 优先于 focus，所有交互结束后恢复空闲内容。标题变化会立即更新，无需重建组件；`labelFormatter` 只格式化活动数据项。动态角色模板同样接收空闲文字，静态 `center-label` 则优先保留调用方内容。
-
-中心常驻内容可通过 `<Frame as="center-label">...</Frame>` 声明。`center-label` 不套用默认中心 hover label 的字号和颜色；其自定义排版随图表本体响应式缩放；未写样式时继承父级容器文字样式。出现 `center-label` 时，默认中心 hover 信息转由 hover 面板承载。
-
-中心标签可传入直接子元素 `<Text as="segment-value" />` / `<Text as="segment-name" />` 自定义样式模板；组件会自动写入当前扇区的真实百分比和名称，出现任一角色子元素时不渲染默认中心标签。`showCenterLabel={false}` 会同时关闭默认标签和外部写入的中心标签角色内容。
-
----
+- **多语言与响应式尺寸**：通过 `useLocale()` 读取 `gaugeChart.name`（显式 `aria-label` 优先）；窄容器等比缩放复用 `components/src/lib/chart/size.ts` 的 `watchSectorChartSize`（接入 `resizeManager`，默认 `minWidth="40px"`，HoverPanel 保持原尺寸）。
+- **半圆扇区几何与动效（`lib/chart/arc-path.ts`）**：与 CircularChart 共用 d3-shape `arc().cornerRadius()` 与 `padAngle / padRadius`（按 `width / 320` 基准缩放）；圆环形态使用局部 `revealPath` mask 揭示，内半径为 `0` 的实心半饼图直接绘制 `revealPath` 规避 Chromium 嵌套 SVG mask 重绘缺陷；`separatorWidth=0` 多扇区时通过白色 alpha mask 合并 `0.5px` seam cover 与 `blur(0.5px)` seam。
+- **中心内容与公开覆盖变量**：空闲态显示 `centerTitle` / `centerSubtitle`，悬停或聚焦时切换为当前扇区数据并支持 `<Frame as="center-label">` 常驻内容或 `<Text as="segment-value" />` / `<Text as="segment-name" />` 样式模板。公开覆盖变量：`--snowui-gauge-chart-width-override`、`--snowui-gauge-chart-height-override`、`--snowui-gauge-chart-label-font-size-override`、`--snowui-gauge-chart-label-color-override`、`--snowui-gauge-chart-label-muted-color-override`、`--snowui-gauge-chart-label-font-weight-override`、`--snowui-gauge-chart-label-muted-font-weight-override`。
 
 ## 更新日志
 
@@ -377,72 +266,4 @@ interface GaugeChartItem {
 
 - 扇区 appearance 每帧改为一次线性时间表计算；HoverPanel pointer 与 cell 命中坐标按绘制帧共用一次根层测量。公开 API、半圆 path、动效时长、视觉和交互语义不变。
 
-### v1.7.1 (2026-09-04)
-
-- 零间隔扇区改为通过 alpha paint mask 单次绘制颜色，同时保留 seam cover，减少抗锯齿缝隙并消除半透明 fill / stroke 重叠造成的深色边缘。
-
-### v1.7.0 (2026-09-04)
-
-- 新增可选空闲中心标题与副标题，复用默认 hover 排版，hover / focus 临时替换、离开恢复。
-- 保留静态中心和动态角色模板的优先级，加载恢复及开关中心区域后同步角色内容。
-
-### v1.6.1 (2026-09-04)
-
-- 修复快速反复移入移出与切换扇区后 hover 动画积压重播；新目标从当前几何立即接管。
-- 鼠标离开后保留仍在焦点中的扇区强调；减少动效时直接显示最终几何。
-
-### v1.6.0 (2026-09-03)
-
-- 新增 `minWidth`，默认 `"40px"`；与图表宽度相同即可阻止响应式收缩，数字尺寸使用相同单位规则。
-
-### v1.5.1 (2026-09-03)
-
-- 默认响应式支持 flex 并排布局剩余宽度，最小显示宽度固定为 40px；无需手动开启，关闭时保留声明尺寸。
-
-### v1.5.0 (2026-09-03)
-
-- 默认随可用宽度等比缩小图表本体与全部中心内容，空间恢复后回到声明尺寸；`enableResponsive=false` 保留声明尺寸。
-- HoverPanel 保持大小，pointer / focus 定位与实际显示尺寸一致。
-
-### v1.4.1 (2026-09-03)
-
-- 审计全部公开属性，补齐 Frame 透传、数据空态、尺寸解析、格式优先级与受控动效边界。
-- Site 示例改为 12 个完整场景：文档准备度、半环/半饼、尺寸、配色、聚合、格式、提示、命中、播放、受控进度与报告状态。
-- 示例使用设计系统 Token 和组件默认中心文字；Code 与 Preview 从同一配方生成。
-
-### v1.4.0 (2026-09-03)
-
-- 新增 `showBaseLayer=false`，按需开启最终尺寸的同色轮廓；真实图形和出现动效保持原有行为。
-
-### 2026-09-02
-
-- HoverPanel 改为默认开启，默认外观保持 light。
-
-### v1.3.0 (2026-06-04)
-
-- 新增 Chart 通用 `colorMode`：`sequence`、`monochromeFade`、`monochrome`。
-- 新增 `color` 主色以及 `monochromeColor` / `mutedMonochromeColor` 细分入口；三种颜色模式均支持 `data[i].color` 与 `colors[i]` 指定扇区自定义颜色。
-
-### v1.2.0 (2026-05-31)
-
-- 间隔改为 path 几何阶段的 `padAngle + padRadius`，淘汰后置 gap mask 与径向短线 mask。
-- fill layer 改为完整 padded path 加局部 `revealPath` mask，修复动效填充与占位扇区不重合。
-- 圆角统一使用 d3-shape，修复大圆角无效、短弧圆角消失与 hover 裁切问题。
-- 补充 ECharts 官网示例、本地源码参考以及本轮问题与解决方法。
-- 零间隔多扇区的不透明色增加 `0.5px` 同色 seam cover 与只画描边的 `blur(0.5px)` seam。
-
-### v1.1.0 (2026-05-28)
-
-- 默认颜色序列同步 CircularChart。
-- 支持 `colors` 调色板、每扇区颜色、CSS 变量、`linear-gradient(...)` 字符串与渐变对象。
-- 圆角和透明间隔统一按 320px 基准等比缩放。
-- 新增 4% 同色占位层、真实填充层、透明命中层与透明间隔。
-- 新增出现动效、受控进度、滚动时间轴、重新填充与反向回退方法。
-- 抽离图表颜色、渐变、几何、圆环 path 与出现时间轴纯逻辑到 `components/src/lib/chart/`。
-
-### v1.0.0 (2026-05-22)
-
-- 初始实现 仪表图组件。
-- 支持整体宽高、环厚、圆角、隔断、hover 外侧增厚可调。
-- 支持中心 hover 标签、默认 10 项且可显式提高到 28 项、SnowUI `primary + secondary-*` 颜色序列。
-- 接入 Frame 根层、Skeleton、Test 示例与规范登记。
+完整历史见 [更新日志归档](../../docs/history/changelogs/GaugeChart.history.md)。

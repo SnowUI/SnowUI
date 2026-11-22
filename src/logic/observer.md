@@ -1,4 +1,4 @@
-# observer.svelte.ts 文档
+# observer
 
 > **版本**: v1.3.0
 > **职责**: 统一管理 ResizeObserver 实例。

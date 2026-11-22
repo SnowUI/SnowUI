@@ -1,4 +1,4 @@
-# frame-actions.svelte.ts 文档
+# frame-actions
 
 > **版本**: v1.1.0
 > **职责**: 统一组装与挂载 Frame action 列表。

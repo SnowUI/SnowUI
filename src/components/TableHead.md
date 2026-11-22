@@ -94,8 +94,6 @@ Table 与 DataTable 共用 TableHead，`children` 本身就是标题插槽，无
 - `parts.Checkbox`：配置 selection 表头的全选 Checkbox。
 - 排序、选择和列宽事件属于 TableHead 受控协议，parts 不得覆盖。
 
-> **版本**: v2.4.1
-> **职责**: `<th scope="col">`、排序触发器与列宽手柄宿主。
 
 | 属性 | 类型 | 默认值 | 说明 |
 | :--- | :--- | :--- | :--- |
@@ -185,30 +183,13 @@ TableHead **不声明内容类别**，也不公开 `sortType="text | number | da
 
 <a id="keyword"></a>
 
-### Keyword
-
-| Keyword | 说明 |
-| :--- | :--- |
-| component | 当前组件公开契约 |
-
-
-- 排序与列宽都通过 Table context 协调，不在组件内保存业务 Store。
-- DataTable 下 `as="selection"` / `as="actions"` 受 Context `isSelectionEnabled` / `isActionsEnabled` 控制；关闭时整列不渲染。
-- 默认 `font-weight: 400`，字号与行高消费 `--text-12 / --leading-12`。
-- 所有表头单元格与数据行使用相同的响应式左右 padding，范围为 4px 到 12px。
-- `resizable` 使用通用 Indicator；命中带沿用 line 全高协议（表头单元格右缘全高）；统一复用 Indicator 的 2px × 16px 常态与 4px hover 总厚度，整条右边缘均可激活和拖动。
-
-
-
 ### 2026-11-13 行为同步
 
 表头列在SSR渲染TableBody前注册，骨架直接使用最终列数与列布局，避免每个单元格独占一行。无数据或搜索结果为空时所有变体显示Black 20表头底线；它是Black 10通用分隔线规则的例外。
 
 ## AI Zone
 
-列宽手柄使用 `tableHead.resizeColumn`（传入显式 `label`）或 `tableHead.resizeColumnGeneric`（未传可读名称）；`label` 属于调用方业务文案，保留原文。`columnId` 仅供内部列识别及既有 TableToolbar 回退，不写入手柄的可访问名称。
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
+表头单元格默认保持常规字重（`font-weight: 400`），避免浏览器原生 `<th>` 默认加粗污染视觉层级。列宽手柄使用 `tableHead.resizeColumn`（传入显式 `label`）或 `tableHead.resizeColumnGeneric`（未传可读名称）；`label` 属于调用方业务文案，保留原文。`columnId` 仅供内部列识别及既有 TableToolbar 回退，不写入手柄的可访问名称。
 
 
 > `selection` / `actions` 角色仅在 DataTable Context 中生效；普通 Table 只提供普通表头与列宽 / 受控排序能力。

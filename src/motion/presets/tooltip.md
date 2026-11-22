@@ -1,4 +1,4 @@
-# tooltip.ts 文档
+# tooltip
 
 > **版本**: v1.8.1
 > **职责**: 提供 Tooltip 出现 / 消失 preset。
@@ -55,7 +55,9 @@
 - **验证方式**：Test Footer 三按钮冷启动和连续切换；首个可见帧 Backdrop 为 opacity `1` / blur `20px` / transform `none`，Foreground 从 opacity `0 → 1`、scale `0.98 → 1`。
 - **回退约束**：生命周期 opacity / transform 只能作用于 Foreground，不得上移到 Portal、size shell、Backdrop 或它们的共同祖先。
 
-## 变更记录
+## 更新日志
+
+### v1.8.1 (2026-08-21)
 
 - v1.7.0 (2026-08-21): 恢复快速重定向的专属时长、cubic ease-out 与内容滞后；新增默认开启的 `rapidRetarget` 开关，宽度回弹仍保持独立时间线。
 - v1.6.9 (2026-08-21): 删除快速重定向专属参数及宽度 retarget 兼容别名；运动中改目标改为与普通连续切换共用同一时间线。

@@ -73,16 +73,9 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 点击后立即更新方案；默认写入一年期主题 Cookie，`systemPreference={false}` 时不读写偏好；图标替换使用 150ms 动效，不对整页主题增加过渡。`applyToDocument={false}` 时组件只维护受控状态，适合由 Test、iframe 等宿主管理实际主题目标。
 
 
-> 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
-
 ---
 
-
-
-
 ## AI Zone
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -94,11 +87,15 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 - 多实例通过观察根节点 `theme` 属性同步；`applyToDocument={false}` 时由受控 `scheme` 同步。
 - 状态切换不接入 replacement preset、CSS transition 或 View Transition。
 
+### 状态按钮动效时长
+
+默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。
+
 ## 更新日志
 
-- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
 ### v1.0.2 (2026-09-02)
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
@@ -109,7 +106,3 @@ ColorSchemeButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。
 ### v1.0.0 (2026-08-11)
 
 - 从 ThemeButton 收敛命名为 ColorSchemeButton；修正内置图标按 Button 尺寸显示。
-
-### 状态按钮动效时长
-
-默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。

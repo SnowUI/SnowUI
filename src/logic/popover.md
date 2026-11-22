@@ -1,4 +1,4 @@
-# popover.svelte.ts
+# Popover 模版与触发控制
 
 > **版本**: v1.0.1
 > **职责**: Popover 模版注册 + 命令式 API + 声明式触发委托。
@@ -85,5 +85,8 @@ export const popoverStore: { active: ActivePopover[] }
 
 ## 更新日志
 
+### v1.0.1 (2026-08-20)
+- `POPOVER_HOVER_SHOW_DELAY_MS` 对齐 Tooltip 首次 hover 延迟为 `450ms`。
+
 ### v1.0.0 (2026-05-15)
-- 初始实现,配合 Popover.svelte v3.0.0 上线
+- 初始实现，配合 Popover.svelte v3.0.0 上线。

@@ -1,4 +1,4 @@
-# frame-state-value.ts
+# frame-state-value
 
 > **版本**: v1.0.0
 > **职责**: 为子组件提供只读的父 Frame 状态值解析能力。

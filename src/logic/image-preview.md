@@ -1,4 +1,4 @@
-# image-preview.ts 文档
+# image-preview
 
 > **职责**: 页面级图片预览事件总线，负责协调 `Image` / `ImageGroup` / `ImageViewer` 之间的打开指令。
 

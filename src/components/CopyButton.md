@@ -77,20 +77,15 @@
 
 其他兼容视觉、链接与事件入口参见 [Button](Button.md)。CopyButton 接管 children、onclick、disabled、currentState、stateContent、whileActive、Click 和 Active，不能用这些宿主字段替代复制状态。
 
-> 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
 ---
 
 
-
-
-## 提交与反馈
+### 提交与反馈
 
 设置 `skeleton={false}` 后，异步复制等待期间使用 Button 内置 Spinner 并禁止重复点击；完成或失败后恢复。
 
 ## AI Zone
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -109,11 +104,15 @@
 - Copy/Check 变化使用 Button → Frame 的 `stateContent`，与 CodeBlock 复制按钮采用同一协议。
 - pending / success 反馈期保持正常 Button 样式，但 `whileClick=false` 且业务点击被忽略，避免 Check 缩小和按钮闪动。
 
+### 状态按钮动效时长
+
+默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。复制成功的停留时间由 `feedbackDuration` 单独控制，不等于动效时长。
+
 ## 更新日志
 
-- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
 ### v1.0.2 (2026-09-02)
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
@@ -124,7 +123,3 @@
 ### v1.0.0 (2026-07-03)
 
 - 首次实现异步复制、成功/失败事件和反馈复位。
-
-### 状态按钮动效时长
-
-默认图标切换以及 Button 宿主的 hover / 点击缩放统一为 150ms，与 Checkbox、Switch 的默认主要状态切换时长对齐；遵守 reduced-motion。外置显式动效配置仍按既有公开入口生效。复制成功的停留时间由 `feedbackDuration` 单独控制，不等于动效时长。

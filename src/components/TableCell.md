@@ -67,8 +67,6 @@
 - `parts.Checkbox`：配置 selection 角色内置 Checkbox。
 - Skeleton 是加载基础设施，不作为公开 part。
 
-> **版本**: v1.13.0
-> **职责**: 接受任意 Svelte/HTML 内容的 `<td>`，默认单行截断。需要换行时显式传入 `nowrap={false} lines={false}`；声明 `lines={2}` / `lines={3}` 也视为显式开启多行，未指定 nowrap 时自动允许换行；横向图标与文字默认不换行。
 
 默认单元格高度为 40px，内边距上下保持 8px；左右 padding 根据最近 Table 容器宽度在 4px 到 12px 之间流动，常见窄屏宽度即收敛到每侧 4px，宽表恢复为 12px，首尾可见单元格朝向表格外缘的一侧至少 8px。Table 使用原生相邻列布局，列与列之间没有额外 gap；相邻单元格 padding 相加后的最小视觉间距为 8px。单元格内部内容默认 gap 为 8px，复合内容可直接通过 `row`、`gap`、`nowrap` 控制布局，不需要额外嵌套 Frame。横向内容在单元格内垂直居中，不保留行内文字基线的下行空间。`row` 与单行截断同时使用时仍保持横向布局；窄容器文本适配不得把该内容改为块级文字流、丢弃图文间距。
 
@@ -118,7 +116,6 @@ DataTable 增量加载的新行动效由普通 TableCell 消费：普通数据�
 - 默认单行截断登记到当前 Table 的 `TableTruncationManager`；同一表只观察 viewport / table，不允许恢复逐 Cell ResizeObserver。
 - 普通 Cell 未声明高级 Frame 能力时使用原生 td 快路径；高级能力存在时自动回退完整 Frame。
 - 子级 Text 显式声明 lines 时成为最近的截断 owner，Cell 不再重复生成 Tooltip。
-
 
 
 ### 响应式操作布局

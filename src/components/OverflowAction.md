@@ -71,13 +71,9 @@ OverflowAction 只能作为 `OverflowActions` 的直系子项使用。组件保�
 
 父级 `OverflowActions buttonProps` 为 Button 提供组级默认值；当前 `OverflowAction` 直接声明的 Button 兼容 Props 优先，子项 `parts.Button` 位于两者之间。
 
-> 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
 ---
 ---
-
-
-
 
 ## AI Zone
 
@@ -94,9 +90,9 @@ OverflowAction 只能作为 `OverflowActions` 的直系子项使用。组件保�
 
 ## 更新日志
 
-- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
 ### v1.0.1 (2026-09-02)
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 

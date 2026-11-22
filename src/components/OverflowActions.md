@@ -140,17 +140,11 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 `maxVisible?: number` 限制直出操作数量，不包含More与Separator；缺省不限制。有限数字向下取整并至少为0，NaN／Infinity按缺省处理。0时有操作只显示More，空组不显示More；数量上限同时约束full及compact，宽度可进一步收纳，`all`仍在需要收纳时全部进入菜单。菜单展开冻结，关闭再应用最新数量／宽度。数据action可用`buttonProps`配置当前项的直接Button Props、`parts.Button`配置该项owned Button，优先级为组默认→组parts→单项parts→单项buttonProps；不改变More默认。
 
-> 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
 
 ---
 ---
-
-
-
 
 ## AI Zone
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -194,11 +188,4 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 - 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
-### v1.0.1 (2026-08-29)
-
-- More 默认跟随组级 Button 样式，支持通过 `parts.SelectButton` 单独覆盖；显式外置 Action 的直接样式不反向影响 More。
-- More 的测量副本改为真实 SelectButton，确保单独样式覆盖后的响应式宽度准确。
-
-### v1.0.0 (2026-08-12)
-
-- 初始版本：支持完整、Icon-only、全部溢出、双向逐个溢出、结构 Separator、组级 `buttonProps` 与 DataTable 外部宽度驱动；More 默认使用 Button 默认样式。
+完整历史见 [更新日志归档](../../docs/history/changelogs/OverflowActions.history.md)。

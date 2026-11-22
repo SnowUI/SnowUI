@@ -29,7 +29,7 @@ test('选择两个实现导出保留完整许可、路径、原字节及来源�
  const manifest=JSON.parse(fs.readFileSync(path.join(out,'SOURCE_SELECTION.json')));
  assert.equal(manifest.licenseSha256,createHash('sha256').update(fs.readFileSync(path.join(out,'LICENSE'))).digest('hex'));
  for(const file of files){const relative=sourceNotice(file).match(/https:\/\/snowui\.dev\/LICENSE \(([^)]+)\)/)[1];assert.equal(path.resolve(out,path.dirname(file),relative),path.join(out,'LICENSE'));}
- assert.match(fs.readFileSync(path.join(out,'COPYING.md'),'utf8'),/未自动解析/);
+ assert.match(fs.readFileSync(path.join(out,'COPYING.md'),'utf8'),/not automatically resolved|未自动解析/);
 });
 test('选择 NumberFlow 导出保留其第三方作者与 MIT 授权全文',t=>{
  const out=path.join(temp(t),'vendor','snowui');

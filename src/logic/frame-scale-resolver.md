@@ -1,4 +1,4 @@
-# frame-scale-resolver.svelte.ts 文档
+# frame-scale-resolver
 
 > **版本**: v1.0.0
 > **职责**: 统一解析 Frame 的 Scale 配置，输出 observer 参数与 style 变量注入列表。
@@ -22,4 +22,3 @@
 ### v1.0.0 (2026-02-07)
 
 - 新增 Scale 配置解析器模块，降低 `Frame.svelte` 复杂度。
-

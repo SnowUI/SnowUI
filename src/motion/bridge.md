@@ -1,4 +1,4 @@
-# bridge.ts 文档
+# bridge
 
 > **版本**: v1.3.2
 > **职责**: 提供 Frame 通用动效桥接策略，将默认动效资源解析为可供组件消费的 CSS 变量。
@@ -34,7 +34,7 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.3.2 (2026-06-30)
 
@@ -55,19 +55,4 @@
 - `frame-inline-style.svelte.ts` 在 `activeConfig` 非空时自动注入 `--snowui-frame-size-motion-duration` / `--snowui-frame-size-motion-easing`。
 - 首批消费方:Tab / Segmented 的 `icon-toggle` variant 展开宽度过渡。
 
-### v1.2.0 (2026-04-15)
-
-#### 新功能
-- 新增 `FRAME_COLOR_MOTION_BRIDGE`，用于前景色/背景色的 CSS transition 时序桥接。
-- `MotionConfig` 新增 `color` 字段；`motionConfigToStyle` 支持将其映射为 `--su-motion-color`。
-- `while-hover.ts` 默认时序填充为 `{ duration: 150, easing: "easeOut" }`，Frame 在有 `Hover` 关键字时自动注入颜色过渡时序变量。
-
-### v1.1.0 (2026-03-06)
-
-#### 新功能
-- 新增 `loopMotion.preset` 解析与 `createLoopMotionPresetStyle()`，支持 `Frame` 根节点声明式启用完整连续旋转默认能力。
-
-### v1.0.0 (2026-03-06)
-
-#### 新功能
-- 新增 Frame 通用动效桥接默认策略模块，并从 `Frame.svelte` 中抽离桥接实现。
+完整历史见 [更新日志归档](../../docs/history/changelogs/motion-bridge.history.md)。

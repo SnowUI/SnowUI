@@ -243,16 +243,11 @@ Dialog 打开时遮罩与面板立即以完整透明度显示，使面板毛玻�
 
 ---
 
-
-
-
 ## AI Zone
 
 > **内置关闭图标（2026-09-11）**：由Button的size上下文控制，parts.Button.size可覆盖默认档位，图形比例遵循ComponentGuidelines §2.7。
 
-> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../docs/standards/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
-
-
+面板边框遵循共享浮层内描边规则（`var(--border-2)` `var(--surface-1)` inset 叠加）。
 
 
 Dialog 是通用模态容器。面板视觉复用 `.snowui-quick-action-panel`，打开时立即显示，关闭动效使用 `MODAL_DIALOG_DISAPPEAR_MOTION`，遮罩关闭使用 `DIALOG_BACKDROP_DISAPPEAR_MOTION`。具体 duration / easing / scale 以 motion preset catalog 为准，关闭时保留面板到 disappear preset 完成后再卸载。

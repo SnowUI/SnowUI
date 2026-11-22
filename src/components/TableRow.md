@@ -60,10 +60,7 @@
 | component | 当前组件公开契约 |
 
 
-
 - Row 的 active 是外部受控视觉，selected 仍只来自 Table Context；两者不相互推导。
-
-
 
 ## AI Zone
 
@@ -81,20 +78,17 @@
 
 ## 更新日志
 
-- 2026-10-07：v1.10.0，响应式隐藏后按可见首尾单元格计算圆角，单列同时保留左右圆角。
+### v1.10.0 (2026-10-07)
+
+- 响应式隐藏后按可见首尾单元格计算圆角，单列同时保留左右圆角。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
-- 2026-08-06：v1.9.0，默认普通 Row 使用保持同一 DOM 状态、事件与语义的原生 tr 快路径；声明高级 Frame 能力时自动回退完整路径。
-- 2026-08-06：v1.8.0，仅在 DataTable 开启 selection 时注册 `rowId`；只读、排序与行预览表不再维护无用的行选择集合。
-- 2026-08-03：v1.7.0，新增外部受控 `active` 激活态；默认使用 `--black-4` 持久背景，允许与 TableBody 连续 hover 层叠加，且不会改变 Checkbox / selected 状态。
-- 2026-08-03：v1.6.0，删除 TableRow 的单元格 hover 背景与背景过渡；颜色统一由 TableBody 的唯一连续移动层绘制。
-- 2026-07-08：v1.5.0，行内空白点击改为可选行预览协议；未配置 DataTable `onRowPreview` 时不响应，选择只由 selection 角色列触发。
-- 2026-06-30：v1.4.0，DataTable 内部新增行动效从 TableRow 迁移到普通 TableCell；TableRow 仅保留业务显式行级 whileAppear。
-- 2026-06-30：v1.3.2，TableRow 在存在 `whileAppear` 时同步进入 Frame `Appear` 状态，修复只传动效配置但状态仍为 Idle、实际不执行渐显的问题。
-- 2026-06-30：v1.3.1，将 DataTable 流式新增行的 opacity 渐显延长至 1000ms。
-- 2026-06-30：v1.3.0，通过 Table Context 自动消费 DataTable 流式新增行的 250ms Frame 渐显动效。
-- 2026-06-30：v1.2.1，striped 所有数据行固定保持 12px 外缘圆角；divided hover 背景改为只在进入时过渡、移出时立即退场，消除圆角变直角的可见残影。
-- 2026-06-30：v1.2.0，默认 divided 行改为静态无圆角、hover 时首尾形成 12px 圆角；补齐隐藏 hover 行上方分割线，与既有下方分割线隐藏规则组成完整悬浮表面。
-- 2026-06-23：v1.1.0，接入 Table 行注册与选择状态，输出 `data-selected` 供角色列显隐。
-- 2026-06-19：v1.0.0，首次发布。
+### v1.9.0 (2026-08-06)
+
+- 默认普通 Row 使用保持同一 DOM 状态、事件与语义的原生 tr 快路径；声明高级 Frame 能力时自动回退完整路径。
+### v1.8.0 (2026-08-06)
+
+- 仅在 DataTable 开启 selection 时注册 `rowId`；只读、排序与行预览表不再维护无用的行选择集合。
+
+完整历史见 [更新日志归档](../../docs/history/changelogs/TableRow.history.md)。

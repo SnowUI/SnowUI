@@ -1,4 +1,4 @@
-# frame-field-control.ts 文档
+# frame-field-control
 
 > **版本**: v1.0.0
 > **职责**: 为 `Input / Textarea / Select` 这类“外层 Frame + 内层原生表单宿主元素”的组件提供共享字段桥接逻辑。

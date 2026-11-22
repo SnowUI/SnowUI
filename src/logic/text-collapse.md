@@ -1,4 +1,4 @@
-# text-collapse.svelte.ts 文档
+# text-collapse
 
 > **版本**: v1.2.1
 > **职责**: 管理文本折叠/展开的测量和样式计算。

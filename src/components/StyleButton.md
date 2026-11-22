@@ -68,16 +68,9 @@ StyleButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。默认
 点击后立即切换，不写入 storage，也不增加图标替换、风格切换动效。`applyToDocument={false}` 时只维护受控状态，适合由 Test、iframe 等宿主管理实际风格目标。
 
 
-> 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
-
 ---
 
-
-
-
 ## AI Zone
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -92,9 +85,9 @@ StyleButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。默认
 
 ## 更新日志
 
-- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
 ### v1.0.4 (2026-09-02)
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
@@ -107,10 +100,4 @@ StyleButton 平铺 Button 的兼容 Props，支持全部变体与尺寸。默认
 - Apple 状态改用 Apple 品牌 Logo 矢量，不再使用资源 Icon。
 - 修复 SnowUI Logo 未被 Button 判定为 icon-only 导致两种状态左右 padding 不一致；两个状态现在统一使用 Button 原生 icon-only padding。
 
-### v1.0.1 (2026-08-11)
-
-- SnowUI / Apple 两个状态恢复为品牌 Logo；Logo 继续跟随 Button 图标尺寸上下文。
-
-### v1.0.0 (2026-08-11)
-
-- 首次实现 SnowUI / Apple 风格切换、SnowIcon / Apple Logo 内置图标及 Button 全变体兼容。
+完整历史见 [更新日志归档](../../docs/history/changelogs/StyleButton.history.md)。

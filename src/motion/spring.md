@@ -1,4 +1,4 @@
-# spring.ts 文档
+# spring
 
 > **版本**: v1.0.0
 > **职责**: 将 `MotionConfig` 的物理弹簧参数采样为浏览器可执行的 CSS `linear()` timing function。
@@ -14,6 +14,8 @@
 
 未显式提供参数时使用 `stiffness: 170`、`damping: 26`、`mass: 1`、`duration: 500ms`。
 
-## Changelog
+## 更新日志
+
+### v1.0.0 (2026-07-12)
 
 - v1.0.0 (2026-07-12): 新增 spring-to-CSS 共享采样能力。

@@ -1,4 +1,4 @@
-# generic.ts 文档
+# generic
 
 > **版本**: v1.2.0
 > **职责**: 提供 Frame fallback 使用的通用出现 / 消失 preset。
@@ -20,7 +20,9 @@
 - Tooltip
 - Dialog / Modal
 
-## 变更记录
+## 更新日志
+
+### v1.2.0 (2026-06-30)
 
 - v1.2.0 (2026-06-30): 新增 `GENERIC_SCALE_APPEAR_MOTION`，显式承接旧 generic opacity + scale 组合并用于组件无损迁移。
 - v1.1.0 (2026-06-30): generic appear 默认视觉收敛为仅 opacity，scale 改为显式 opt-in。

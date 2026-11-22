@@ -1,4 +1,4 @@
-# frame-truncation.svelte.ts 文档
+# frame-truncation
 
 > **版本**: v1.5.0
 > **职责**: 通过 `TruncationController` 管理 Text 与 Link 共用的文本截断和可展开能力（历史文件名保留）；密集 TableCell 使用表级批处理器。
@@ -36,12 +36,12 @@
 
 ```typescript
 interface TruncationContext {
-    isTruncated: boolean;    // 是否被截断
-    isCollapsed: boolean;    // 是否处于收起状态
-    isExpanded: boolean;     // 是否已展开
-    fullText: string;        // 完整文本
-    handleExpand: () => void;   // 展开方法
-    handleCollapse: () => void; // 收起方法
+    isTruncated: boolean;    // Whether currently truncated
+    isCollapsed: boolean;    // Whether currently collapsed
+    isExpanded: boolean;     // Whether currently expanded
+    fullText: string;        // Full text
+    handleExpand: () => void;   // Expand handler
+    handleCollapse: () => void; // Collapse handler
 }
 ```
 
@@ -81,7 +81,6 @@ interface TruncationContext {
 ---
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
 ## 开发者指南 (AI)
 
@@ -113,7 +112,7 @@ interface TruncationContext {
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.5.0 (2026-08-06)
 
@@ -128,20 +127,4 @@ interface TruncationContext {
 
 - Link 接入共享控制器；单行截断状态、完整文字与尺寸监听继续由同一通用入口管理。
 
-### v1.2.0 (2026-06-19)
-
-- 通用类名改为 `TruncationController`，保留 `TextTruncation` / `FrameTruncation` 兼容导出。
-- Text、Link 与 TableCell 共用控制器，单行尺寸监听统一使用 `resizeManager`。
-
-### v1.1.0 (2026-02-23)
-
-#### 架构重构
-- 截断能力从 `Frame` 迁移至 `Text`，模块职责改为服务 Text 组件。
-- 导出类名更新为 `TextTruncation`，并保留 `FrameTruncation` 兼容导出。
-
-### v1.0.0 (2026-01-21)
-
-#### 新功能
-- 初始版本，从 Text 组件独立出截断能力
-- 支持 lines=0/1/2/3 四种模式
-- 提供 TruncationContext 给子组件
+完整历史见 [更新日志归档](../../docs/history/changelogs/logic-frame-truncation.history.md)。

@@ -2,9 +2,23 @@
   "schemaVersion": 1,
   "package": "@snowui-design-system/components",
   "license": "LICENSE",
+  "delivery": {
+    "npmRuntime": [
+      "dist/client",
+      "dist/server",
+      "component-catalog.json"
+    ],
+    "sourceArchiveOnly": [
+      "source",
+      "documentation"
+    ],
+    "onlineDocumentation": "https://snowui.dev/llms-en.txt"
+  },
   "generatedFrom": [
     "src/index.ts",
+    "src/blocks/index.ts",
     "src/components/*.md",
+    "src/blocks/*.md",
     "component-discovery.json"
   ],
   "components": [
@@ -26,7 +40,7 @@
       "kind": "component",
       "source": "src/components/Accordion.svelte",
       "documentation": "src/components/Accordion.md",
-      "description": "将相关内容组织为可展开、收起的分组，适合常见问题、设置和分段说明，支持单项或多项同时展开。",
+      "description": "Organize related content into expandable sections for FAQs, settings, and step-by-step explanations, with single or multiple sections open.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -52,7 +66,7 @@
       "kind": "component",
       "source": "src/components/AccordionItem.svelte",
       "documentation": "src/components/AccordionItem.md",
-      "description": "定义 Accordion 中的一项折叠内容，将标题与正文组合起来，并随父级统一管理展开状态。",
+      "description": "Define one collapsible section within an Accordion, combining a heading and content under the parent expansion state.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -78,7 +92,7 @@
       "kind": "component",
       "source": "src/components/Avatar.svelte",
       "documentation": "src/components/Avatar.md",
-      "description": "展示用户或团队头像，支持图片、文字和渐变占位，让列表、评论与成员信息更易辨认。",
+      "description": "Display a person or team avatar with image, text, and gradient fallbacks for lists, comments, and member details.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -104,7 +118,7 @@
       "kind": "component",
       "source": "src/components/AvatarGroup.svelte",
       "documentation": "src/components/AvatarGroup.md",
-      "description": "将多个头像排列或叠放展示，并以数量提示收起的成员，适合团队、协作者与参与者列表。",
+      "description": "Arrange or stack multiple avatars and show the count of hidden members in team and collaborator lists.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -130,7 +144,7 @@
       "kind": "component",
       "source": "src/components/Badge.svelte",
       "documentation": "src/components/Badge.md",
-      "description": "用紧凑的数字、文字或圆点提示未读数量与状态，可搭配按钮、头像和导航项使用。",
+      "description": "Show unread counts and status with compact numbers, text, or dots alongside buttons, avatars, and navigation items.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -156,14 +170,15 @@
       "kind": "component",
       "source": "src/components/BarChart.svelte",
       "documentation": "src/components/BarChart.md",
-      "description": "用柱状图比较不同类别的数据，支持横向、纵向、分组与堆叠展示，以及坐标轴和交互提示。",
+      "description": "Compare categories with horizontal, vertical, grouped, or stacked bars, axes, and interactive details.",
       "intents": [
-        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+        "adaptive monochrome contrast for chart foreground on light and dark surfaces",
+        "categorical bar chart"
       ],
       "aliases": [
-        "图表反白",
-        "黑白自适应",
-        "adaptiveContrast"
+        "adaptiveContrast",
+        "chart adaptive contrast",
+        "grouped stacked bar chart"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -188,7 +203,7 @@
       "kind": "component",
       "source": "src/components/BlurText.svelte",
       "documentation": "src/components/BlurText.md",
-      "description": "通过逐字变清晰、淡入与轻微上移呈现标题和短段落，保持自然换行、字号、行高与文字基线，适合欢迎语、介绍文案和内容揭示。",
+      "description": "Reveal headings and short passages letter by letter with blur, fade, and slight upward motion while preserving text layout.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -214,7 +229,7 @@
       "kind": "component",
       "source": "src/components/Breadcrumb.svelte",
       "documentation": "src/components/Breadcrumb.md",
-      "description": "展示当前页面的层级路径，帮助用户理解所在位置并返回上级页面。",
+      "description": "Show the current page hierarchy and provide paths back to parent pages.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -240,23 +255,21 @@
       "kind": "component",
       "source": "src/components/Button.svelte",
       "documentation": "src/components/Button.md",
-      "description": "触发操作或导航，支持文字、图标、加载与禁用状态，适合从主要操作到轻量工具按钮的不同场景。",
+      "description": "Trigger actions or navigation with text, icons, loading, and disabled states, from primary actions to compact tools.",
       "intents": [
-        "触发操作",
-        "默认按钮",
-        "图标按钮",
-        "无背景按钮"
+        "trigger action",
+        "default button",
+        "icon button",
+        "borderless button"
       ],
       "aliases": [
-        "按钮默认样式",
-        "Icon 按钮",
-        "只有图标的按钮",
-        "bare并有hover",
-        "bare 并有 hover",
-        "bare 按钮要有 hover"
+        "button default style",
+        "icon-only button",
+        "bare button with hover",
+        "muted bare button"
       ],
-      "whenToUse": "触发即时操作；bare 且需要透明度 hover 时使用 emphasis=muted。",
-      "avoidWhen": "互斥参数选择使用 Segmented；内容面板切换使用 Tab。",
+      "whenToUse": "Trigger immediate actions; use bare with emphasis=\"muted\" when an unframed button needs opacity hover feedback.",
+      "avoidWhen": "Use Segmented for mutually exclusive parameter selection; use Tab to switch content panels.",
       "related": [
         "ButtonGroup",
         "OverflowActions",
@@ -282,14 +295,15 @@
       "kind": "component",
       "source": "src/components/ButtonGroup.svelte",
       "documentation": "src/components/ButtonGroup.md",
-      "description": "将相关按钮组合为统一的操作组，支持分割线，适合拆分按钮和紧凑工具栏。",
+      "description": "Combine related buttons into one action group, with optional dividers for split buttons and compact toolbars.",
       "intents": [
-        "按钮组合",
-        "相邻操作组"
+        "button group",
+        "adjacent action group"
       ],
       "aliases": [
-        "一组按钮",
-        "按钮之间带分隔"
+        "grouped buttons",
+        "buttons with dividers",
+        "split button"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -317,7 +331,7 @@
       "kind": "component",
       "source": "src/components/Card.svelte",
       "documentation": "src/components/Card.md",
-      "description": "为相关内容提供统一的卡片表面，可自由组合文字、媒体和操作，支持固定子项与内容滚动。",
+      "description": "Present related content on a consistent card surface with flexible text, media, actions, fixed items, and scrolling.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -343,14 +357,15 @@
       "kind": "component",
       "source": "src/components/ChartGroup.svelte",
       "documentation": "src/components/ChartGroup.md",
-      "description": "将多个图表组合在同一区域，协调分类悬停、叠加绘制与共享坐标轴，便于比较关联数据。",
+      "description": "Coordinate multiple charts in one area with shared category hover, layered rendering, and aligned axes.",
       "intents": [
-        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+        "adaptive monochrome contrast for chart foreground on light and dark surfaces",
+        "synchronized multi-chart group"
       ],
       "aliases": [
-        "图表反白",
-        "黑白自适应",
-        "adaptiveContrast"
+        "adaptiveContrast",
+        "chart adaptive contrast",
+        "composite chart"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -375,7 +390,7 @@
       "kind": "component",
       "source": "src/components/Checkbox.svelte",
       "documentation": "src/components/Checkbox.md",
-      "description": "选择一个或多个独立选项，支持选中、未选中和部分选中状态，适合表单与批量选择。",
+      "description": "Select independent options with checked, unchecked, and indeterminate states in forms or bulk selection.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -401,7 +416,7 @@
       "kind": "component",
       "source": "src/components/Chip.svelte",
       "documentation": "src/components/Chip.md",
-      "description": "以紧凑的行内标签展示分类、状态或简短信息，可与文字、图标和列表内容自然组合。",
+      "description": "Display a category, status, or short detail as a compact inline label alongside text, icons, and lists.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -427,7 +442,7 @@
       "kind": "component",
       "source": "src/components/CircularChart.svelte",
       "documentation": "src/components/CircularChart.md",
-      "description": "用圆环或饼图展示数据占比，支持分段、圆角、环厚与悬停强调，适合构成分析和比例概览。",
+      "description": "Show proportions as a ring or pie with segments, rounded ends, ring thickness, and hover emphasis.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -453,16 +468,17 @@
       "kind": "component",
       "source": "src/components/CodeBlock.svelte",
       "documentation": "src/components/CodeBlock.md",
-      "description": "清晰展示可复制的代码，支持语法着色、行号、全屏查看和尺寸调整，适合文档与开发工具。",
+      "description": "Display copyable code with syntax highlighting, line numbers, fullscreen viewing, and resizing.",
       "intents": [
-        "代码展示",
-        "代码复制",
-        "代码展开",
-        "代码格式化"
+        "code display",
+        "code copy",
+        "code fullscreen",
+        "code formatting"
       ],
       "aliases": [
-        "代码块",
-        "单行代码条"
+        "code snippet",
+        "single-line code strip",
+        "syntax highlighter"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -490,14 +506,14 @@
       "kind": "component",
       "source": "src/components/ColorSchemeButton.svelte",
       "documentation": "src/components/ColorSchemeButton.md",
-      "description": "在亮色与暗色主题之间切换，并以图标反馈当前方案，适合网站和应用的主题入口。",
+      "description": "Switch between light and dark themes with an icon that reflects the current scheme.",
       "intents": [
-        "明暗模式切换",
-        "主题方案切换"
+        "light dark mode toggle",
+        "color scheme switch"
       ],
       "aliases": [
-        "明暗切换按钮",
-        "主题按钮",
+        "theme toggle button",
+        "dark mode button",
         "ThemeButton"
       ],
       "whenToUse": null,
@@ -526,14 +542,14 @@
       "kind": "component",
       "source": "src/components/CopyButton.svelte",
       "documentation": "src/components/CopyButton.md",
-      "description": "将文字或代码复制到剪贴板，并提供短暂的成功反馈，适合链接、标识符和安装命令。",
+      "description": "Copy text or code to the clipboard and briefly confirm success, useful for links, identifiers, and install commands.",
       "intents": [
-        "复制内容",
-        "复制代码"
+        "copy content",
+        "copy code"
       ],
       "aliases": [
-        "复制按钮",
-        "复制代码按钮"
+        "copy button",
+        "copy to clipboard button"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -561,14 +577,14 @@
       "kind": "component",
       "source": "src/components/CopyLink.svelte",
       "documentation": "src/components/CopyLink.md",
-      "description": "展示可打开、可复制的链接地址，文字打开链接，其余区域复制地址。",
+      "description": "Show a link that opens from its text and copies its address from the rest of the control.",
       "intents": [
-        "展示并复制链接地址"
+        "display and copy link URL"
       ],
       "aliases": [
-        "链接输入框",
-        "链接 input",
-        "可复制链接"
+        "link copy field",
+        "copyable URL",
+        "share link control"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -597,24 +613,25 @@
       "kind": "component",
       "source": "src/components/DataTable.svelte",
       "documentation": "src/components/DataTable.md",
-      "description": "统一管理数据的查询、排序与分页状态，可自由组合工具栏、表格和分页器，构建完整的数据浏览界面。",
+      "description": "Coordinate querying, sorting, and pagination with composable toolbar, table, and pagination controls.",
       "intents": [
-        "数据表格",
-        "排序分页表格",
-        "带操作的数据列表",
-        "文件列表",
-        "文件管理",
-        "勾选",
-        "分页",
-        "搜索",
-        "批量操作"
+        "data table",
+        "sortable paginated table",
+        "actionable data list",
+        "file list",
+        "file management",
+        "selection",
+        "row selection",
+        "pagination",
+        "search",
+        "bulk actions"
       ],
       "aliases": [
-        "高级表格",
-        "数据表"
+        "advanced table",
+        "data grid"
       ],
-      "whenToUse": "数据列表需要搜索、排序、筛选、勾选、操作列或分页；组合 TableToolbar、Table 与 Pagination。",
-      "avoidWhen": "只展示表头和数据行时使用 Table。",
+      "whenToUse": "Display data lists requiring search, sorting, filtering, row selection, action columns, or pagination by composing TableToolbar, Table, and Pagination.",
+      "avoidWhen": "Use Table when only semantic headers and data rows are needed.",
       "related": [
         "TableToolbar",
         "Table",
@@ -645,7 +662,7 @@
       "kind": "component",
       "source": "src/components/Dialog.svelte",
       "documentation": "src/components/Dialog.md",
-      "description": "在模态对话框中呈现需要关注的内容或操作，提供遮罩、焦点管理与背景滚动锁定，适合确认和表单任务。",
+      "description": "Present focused content or actions in a modal with a backdrop, focus management, and background scroll lock.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -671,14 +688,14 @@
       "kind": "component",
       "source": "src/components/ExpandButton.svelte",
       "documentation": "src/components/ExpandButton.md",
-      "description": "在展开与收起之间切换，用一致的按钮反馈表达状态，适合折叠内容和详情入口。",
+      "description": "Switch between expanded and collapsed states with consistent button feedback.",
       "intents": [
-        "展开内容",
-        "全屏预览"
+        "expand content",
+        "fullscreen preview"
       ],
       "aliases": [
-        "展开按钮",
-        "全屏按钮"
+        "expand toggle button",
+        "fullscreen button"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -706,14 +723,14 @@
       "kind": "component",
       "source": "src/components/Field.svelte",
       "documentation": "src/components/Field.md",
-      "description": "将输入控件、标签、图标和校验反馈组织为完整的表单字段，统一外观与内容布局。",
+      "description": "Combine an input, label, icon, and validation feedback into a consistent form field.",
       "intents": [
-        "表单字段组合",
-        "标签帮助错误信息"
+        "form field composition",
+        "label helper and validation error"
       ],
       "aliases": [
-        "表单项",
-        "带 label 的输入"
+        "form item",
+        "labeled input field"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -742,7 +759,7 @@
       "kind": "component",
       "source": "src/components/FlowText.svelte",
       "documentation": "src/components/FlowText.md",
-      "description": "以流动过渡展示文字和数字变化，适合动态文案、计数、计时与倒计时。",
+      "description": "Animate changes in text or numbers for dynamic copy, counters, timers, and countdowns.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -768,7 +785,7 @@
       "kind": "component",
       "source": "src/components/Frame.svelte",
       "documentation": "src/components/Frame.md",
-      "description": "统一布局、状态、加载与动效，并通过显式配置支持多个组件的联动和样式编排。",
+      "description": "Coordinate layout, state, loading, and motion across components through explicit configuration.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -794,17 +811,18 @@
       "kind": "component",
       "source": "src/components/GaugeChart.svelte",
       "documentation": "src/components/GaugeChart.md",
-      "description": "用半环或半饼展示多项数据占比，支持分段、渐变、环厚与出现动效，适合比例概览。",
+      "description": "Show several proportions in a semicircle or half pie with segments, gradients, ring thickness, and reveal motion.",
       "intents": [
-        "半环比例图",
-        "半饼图",
-        "分段占比"
+        "semicircular proportion chart",
+        "half-pie chart",
+        "segmented ratio"
       ],
       "aliases": [
-        "半圆占比"
+        "half-donut chart",
+        "semicircle breakdown"
       ],
-      "whenToUse": "以半环或半饼展示多项正数占比，分母为实际显示项之和。",
-      "avoidWhen": "单指标 min/max 仪表没有对应公开 API；任务完成百分比用 Progress。",
+      "whenToUse": "Display multiple positive proportions in a semicircle or half-pie where the denominator is the sum of visible segments.",
+      "avoidWhen": "No public single-metric min/max speedometer API is provided; use Progress for task completion percentages.",
       "related": [
         "CircularChart",
         "Progress"
@@ -829,7 +847,7 @@
       "kind": "component",
       "source": "src/components/Gradient.svelte",
       "documentation": "src/components/Gradient.md",
-      "description": "以柔和的多层渐变丰富背景与占位画面，提供六种配色与可缩放的形变效果。",
+      "description": "Add soft layered gradients to backgrounds or placeholders with six palettes and scalable shape effects.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -855,7 +873,7 @@
       "kind": "component",
       "source": "src/components/GradientMotion.svelte",
       "documentation": "src/components/GradientMotion.md",
-      "description": "以流动扫光呈现动态渐变，可用于背景、头像占位或可裁切的媒体区域。",
+      "description": "Create a flowing gradient sweep for backgrounds, avatar placeholders, or clipped media areas.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -881,7 +899,7 @@
       "kind": "component",
       "source": "src/components/Icon.svelte",
       "documentation": "src/components/Icon.md",
-      "description": "展示 SVG 图标，并统一尺寸与颜色，适合按钮、导航和内容中的视觉标识。",
+      "description": "Display SVG icons with consistent sizing and color in buttons, navigation, and content.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -907,7 +925,7 @@
       "kind": "component",
       "source": "src/components/IconProvider.svelte",
       "documentation": "src/components/IconProvider.md",
-      "description": "为应用或局部区域统一替换 SnowUI 内置功能图标，未配置的图标继续使用组件默认样式。",
+      "description": "Replace SnowUI functional icons for an application or subtree while retaining defaults for unconfigured icons.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -933,7 +951,7 @@
       "kind": "component",
       "source": "src/components/Image.svelte",
       "documentation": "src/components/Image.md",
-      "description": "展示图片及其占位状态，支持组合角标、操作与预览入口，适合内容图片和媒体缩略图。",
+      "description": "Display images and placeholders with badges, actions, and preview entry points.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -959,7 +977,7 @@
       "kind": "component",
       "source": "src/components/ImageGroup.svelte",
       "documentation": "src/components/ImageGroup.md",
-      "description": "统一组织多张图片的尺寸与排列，并提供成组预览，适合图库、附件和图片集合。",
+      "description": "Arrange multiple images with consistent sizes and group preview for galleries and attachments.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -985,15 +1003,15 @@
       "kind": "component",
       "source": "src/components/ImageViewer.svelte",
       "documentation": "src/components/ImageViewer.md",
-      "description": "在页面级预览中查看图片或视频，提供前后切换与关闭操作，适合媒体详情浏览。",
+      "description": "Preview images or videos at page level with previous, next, and close controls.",
       "intents": [
-        "图片预览",
-        "图片全屏查看",
-        "图片组导航"
+        "image preview",
+        "fullscreen media viewer",
+        "gallery navigation"
       ],
       "aliases": [
-        "图片查看器",
-        "灯箱"
+        "lightbox",
+        "media viewer"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -1021,7 +1039,7 @@
       "kind": "component",
       "source": "src/components/Indicator.svelte",
       "documentation": "src/components/Indicator.md",
-      "description": "提供可拖动的尺寸调整手柄，支持鼠标与键盘操作，可用于面板和内容区域的大小调整。",
+      "description": "Provide a draggable resize handle for panels and content areas, with mouse and keyboard support.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1047,7 +1065,7 @@
       "kind": "component",
       "source": "src/components/Input.svelte",
       "documentation": "src/components/Input.md",
-      "description": "提供单行输入，支持文本、搜索、密码、数字、日期时间与颜色，可组合标签、图标和校验反馈。",
+      "description": "Provide single-line input for text, search, passwords, numbers, dates, times, and colors, with field feedback.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1073,7 +1091,7 @@
       "kind": "component",
       "source": "src/components/Kbd.svelte",
       "documentation": "src/components/Kbd.md",
-      "description": "以紧凑的按键标签展示快捷键或键盘操作提示，帮助用户快速识别可用操作。",
+      "description": "Display shortcuts or keyboard hints as compact keycaps.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1099,14 +1117,15 @@
       "kind": "component",
       "source": "src/components/LineChart.svelte",
       "documentation": "src/components/LineChart.md",
-      "description": "用折线展示数据变化趋势，支持多序列、面积填充、实线与虚线，以及坐标轴、网格和节点样式。",
+      "description": "Plot trends with multiple series, area fill, solid or dashed lines, axes, grids, and point styling.",
       "intents": [
-        "通过自适应黑白对比让图表前景在深浅表面上清晰可见"
+        "adaptive monochrome contrast for chart foreground on light and dark surfaces",
+        "trend line and area chart"
       ],
       "aliases": [
-        "图表反白",
-        "黑白自适应",
-        "adaptiveContrast"
+        "adaptiveContrast",
+        "chart adaptive contrast",
+        "multi-series line chart"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -1131,7 +1150,7 @@
       "kind": "component",
       "source": "src/components/Link.svelte",
       "documentation": "src/components/Link.md",
-      "description": "在正文、说明和导航中提供清晰的文字链接，支持箭头等视觉形式，表达可继续访问的内容。",
+      "description": "Provide clear text links in content, descriptions, and navigation, with optional directional indicators.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1157,7 +1176,7 @@
       "kind": "component",
       "source": "src/components/Listbox.svelte",
       "documentation": "src/components/Listbox.md",
-      "description": "在浮层中展示可选择的选项，支持搜索过滤与键盘操作，可作为 Select 的选择面板。",
+      "description": "Present selectable options in a popup with search filtering and keyboard support, including Select panels.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1183,7 +1202,7 @@
       "kind": "component",
       "source": "src/components/LocaleProvider.svelte",
       "documentation": "src/components/LocaleProvider.md",
-      "description": "为应用或局部区域统一设置 SnowUI 内置界面文案的语言，支持按需覆盖消息内容。",
+      "description": "Set the language of built-in SnowUI interface messages for an application or subtree, with custom overrides.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1209,7 +1228,7 @@
       "kind": "component",
       "source": "src/components/MenuItem.svelte",
       "documentation": "src/components/MenuItem.md",
-      "description": "在选项列表或快捷操作面板中呈现一项内容，支持图标、选中状态与禁用反馈。",
+      "description": "Present an option in a list or quick-action menu with icon, selected, and disabled states.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1235,15 +1254,16 @@
       "kind": "component",
       "source": "src/components/MetricCard.svelte",
       "documentation": "src/components/MetricCard.md",
-      "description": "用于展示仪表盘中的单项指标及可选变化信息。组件不获取数据或计算变化率。",
+      "description": "Display one dashboard metric and an optional change; the application supplies the data and calculates comparisons.",
       "intents": [
-        "展示仪表盘指标和变化"
+        "display dashboard metric and delta"
       ],
       "aliases": [
-        "指标卡"
+        "KPI card",
+        "stat card"
       ],
-      "whenToUse": "展示单项指标和变化",
-      "avoidWhen": "普通内容容器使用 Card",
+      "whenToUse": "Present a single KPI metric and optional period-over-period change.",
+      "avoidWhen": "Use Card for general-purpose content containers.",
       "related": [
         "Card"
       ],
@@ -1267,14 +1287,14 @@
       "kind": "component",
       "source": "src/components/NumberFlow.svelte",
       "documentation": "src/components/NumberFlow.md",
-      "description": "以逐位滚动和宽度过渡展示数字变化，保留金额、分组符与小数格式，适合计数器和实时指标。",
+      "description": "Animate changing numbers digit by digit with width transitions while preserving currency, grouping, and decimals.",
       "intents": [
-        "数字滚动",
-        "数值变化动画"
+        "rolling number counter",
+        "animated numeric value"
       ],
       "aliases": [
-        "数字流动",
-        "数字滚轮动画"
+        "number ticker",
+        "odometer number transition"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -1301,7 +1321,7 @@
       "kind": "component",
       "source": "src/components/NumericText.svelte",
       "documentation": "src/components/NumericText.md",
-      "description": "对文字或数字中发生变化的部分进行过渡，保留未变内容，适合简短状态、数值与计时信息。",
+      "description": "Animate only the changing portions of short text or numbers while preserving unchanged content.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1327,7 +1347,7 @@
       "kind": "component",
       "source": "src/components/OTPInput.svelte",
       "documentation": "src/components/OTPInput.md",
-      "description": "提供 4–8 位数字一次性验证码输入，支持整码粘贴、短信自动填充、原生表单提交与重置。",
+      "description": "Enter a configurable 4–8 digit one-time code with full-code paste, SMS autofill, and native form submission and reset.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1353,7 +1373,7 @@
       "kind": "component",
       "source": "src/components/OverflowAction.svelte",
       "documentation": "src/components/OverflowAction.md",
-      "description": "定义 OverflowActions 中的一项按钮操作，让它可随可用空间在工具栏与更多菜单之间切换。",
+      "description": "Define an action in OverflowActions that moves between a toolbar and its More menu as space changes.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1379,18 +1399,18 @@
       "kind": "component",
       "source": "src/components/OverflowActions.svelte",
       "documentation": "src/components/OverflowActions.md",
-      "description": "在有限宽度内优先展示操作按钮，并将放不下的操作收进更多菜单，保持工具栏紧凑可用。",
+      "description": "Keep actions accessible in limited space by moving those that do not fit into a More menu.",
       "intents": [
-        "响应式操作集合",
-        "操作溢出",
-        "更多菜单"
+        "responsive action bar",
+        "action overflow",
+        "more menu"
       ],
       "aliases": [
-        "宽度变窄时逐个隐藏",
-        "从左边开始逐个隐藏",
-        "放不下时收进 More"
+        "hide items one by one on narrow width",
+        "collapse from left into More",
+        "overflow toolbar"
       ],
-      "whenToUse": "一组操作需要从完整态退化为 icon-only，并把剩余操作逐项或全部转入 More。",
+      "whenToUse": "Collapse a row of actions to icon-only and move remaining items into a More menu when horizontal space shrinks.",
       "avoidWhen": null,
       "related": [
         "OverflowAction",
@@ -1417,7 +1437,7 @@
       "kind": "component",
       "source": "src/components/Pagination.svelte",
       "documentation": "src/components/Pagination.md",
-      "description": "提供页码导航，帮助用户在多页数据之间切换，适合表格、列表和搜索结果。",
+      "description": "Navigate between pages of tabular data, lists, or search results.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1443,15 +1463,16 @@
       "kind": "component",
       "source": "src/components/PasswordStrength.svelte",
       "documentation": "src/components/PasswordStrength.md",
-      "description": "即时评估密码并显示四段强度条及文字；不持久保存或发送密码，也不将密码放入 DOM 或事件结果。它不负责密码输入、账户政策校验或提交。",
+      "description": "Evaluate password strength locally with a four-segment indicator and labels; the component does not persist, send, or submit passwords.",
       "intents": [
-        "展示密码强度"
+        "display password strength"
       ],
       "aliases": [
-        "密码强度指示器"
+        "password meter",
+        "password complexity indicator"
       ],
-      "whenToUse": "评估并展示密码强度",
-      "avoidWhen": "任务进度使用 Progress",
+      "whenToUse": "Evaluate and display local password strength across four segments.",
+      "avoidWhen": "Use Progress for general task or upload completion.",
       "related": [
         "Input",
         "Progress"
@@ -1476,7 +1497,7 @@
       "kind": "component",
       "source": "src/components/Popover.svelte",
       "documentation": "src/components/Popover.md",
-      "description": "在触发器附近展示补充内容或操作，支持不同尺寸与触发方式，适合快捷操作和轻量交互面板。",
+      "description": "Show supplementary content or actions near a trigger with size and trigger options.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1502,7 +1523,7 @@
       "kind": "component",
       "source": "src/components/Progress.svelte",
       "documentation": "src/components/Progress.md",
-      "description": "以条形或圆形反馈任务进度，支持明确进度与不确定状态，适合上传、处理和加载过程。",
+      "description": "Show determinate or indeterminate progress with a bar or circle for uploads, processing, and loading.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1528,7 +1549,7 @@
       "kind": "component",
       "source": "src/components/Radio.svelte",
       "documentation": "src/components/Radio.md",
-      "description": "在一组互斥选项中选择一项，适合需要直接展示所有选项的表单设置。",
+      "description": "Choose one option from a mutually exclusive group when all choices should remain visible.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1554,7 +1575,7 @@
       "kind": "component",
       "source": "src/components/ScrambleText.svelte",
       "documentation": "src/components/ScrambleText.md",
-      "description": "通过字符扰动逐步呈现目标文字，适合标题、短句与状态文案的动态揭示。",
+      "description": "Reveal a target heading, short sentence, or status through a progressive character scramble.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1580,7 +1601,7 @@
       "kind": "component",
       "source": "src/components/ScrollArea.svelte",
       "documentation": "src/components/ScrollArea.md",
-      "description": "为内容提供可滚动区域与统一的滚动条，适合长列表、面板和受限空间中的正文。",
+      "description": "Provide scrollable content with a consistent scrollbar for long lists, panels, and constrained spaces.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1606,15 +1627,15 @@
       "kind": "component",
       "source": "src/components/SearchBox.svelte",
       "documentation": "src/components/SearchBox.md",
-      "description": "提供打开搜索浮层的入口，整块区域均可点击，可组合快捷键提示，适合全局搜索。",
+      "description": "Open a search popup from a fully clickable search entry, optionally with a shortcut hint.",
       "intents": [
-        "站点搜索",
-        "带快捷键的搜索框",
-        "响应式搜索框"
+        "site search trigger",
+        "search trigger with shortcut",
+        "responsive search button"
       ],
       "aliases": [
-        "顶部搜索",
-        "窄屏搜索按钮"
+        "header search box",
+        "narrow-screen search trigger"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -1643,14 +1664,14 @@
       "kind": "component",
       "source": "src/components/SearchInput.svelte",
       "documentation": "src/components/SearchInput.md",
-      "description": "提供带搜索图标的单行输入框，适合列表过滤、页面搜索和工具栏中的查询输入。",
+      "description": "Provide a single-line search field with an icon for filtering lists, pages, and toolbar content.",
       "intents": [
-        "搜索输入",
-        "可折叠搜索框"
+        "search input",
+        "collapsible search field"
       ],
       "aliases": [
-        "搜索输入框",
-        "窄屏只显示搜索图标"
+        "search bar",
+        "icon-only search on narrow width"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -1677,16 +1698,17 @@
       "kind": "block",
       "source": "src/blocks/SearchPopup.svelte",
       "documentation": "src/blocks/SearchPopup.md",
-      "description": "可组合的搜索面板，内置 SearchInput 和可选数据结果，支持无分组、分组标题与显式复杂内容。运行时依赖 @snowui-design-system/components 和 Components；不包含搜索算法、最近浏览、热度或业务路由规则。",
+      "description": "Compose a search panel with SearchInput and optional results, groups, and custom content; search logic and routing stay with the host.",
       "intents": [
-        "搜索面板",
-        "搜索结果分组"
+        "search panel",
+        "grouped search results"
       ],
       "aliases": [
-        "搜索弹窗"
+        "search dialog",
+        "command search panel"
       ],
-      "whenToUse": "需要统一搜索输入、分组标题和结果间距的产品区块。",
-      "avoidWhen": "纯浮层容器用 Popover；网站历史与热度由宿主提供。",
+      "whenToUse": "Provide a unified search input, group headings, and result spacing as a composable block.",
+      "avoidWhen": "Use Popover for generic floating surfaces; search ranking, history, and routing stay with the host.",
       "related": [
         "SearchBox",
         "SearchInput",
@@ -1715,19 +1737,19 @@
       "kind": "component",
       "source": "src/components/Segmented.svelte",
       "documentation": "src/components/Segmented.md",
-      "description": "将少量互斥选项并排展示，便于快速切换筛选条件或参数，并支持键盘与表单交互。",
+      "description": "Switch quickly among a small set of exclusive filters or parameters, with keyboard and form support.",
       "intents": [
-        "互斥参数选择",
-        "过滤器单选",
-        "响应式节点选择"
+        "mutually exclusive parameter switch",
+        "single-select filter",
+        "responsive breakpoint selector"
       ],
       "aliases": [
-        "节点选择",
-        "Mobile Tablet Desktop 选择",
-        "分段选择器"
+        "segmented control",
+        "Mobile Tablet Desktop switch",
+        "option pill switch"
       ],
-      "whenToUse": "多个互斥参数或过滤器之间单选，使用 radiogroup 语义。",
-      "avoidWhen": "切换内容面板时使用 Tab。",
+      "whenToUse": "Select one option among mutually exclusive parameters or filters using radiogroup semantics.",
+      "avoidWhen": "Use Tab when switching between distinct content panels.",
       "related": [
         "Tab",
         "Button"
@@ -1752,7 +1774,7 @@
       "kind": "component",
       "source": "src/components/Select.svelte",
       "documentation": "src/components/Select.md",
-      "description": "在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。",
+      "description": "Choose from a dropdown built from data or custom options, with search and keyboard support.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1778,14 +1800,14 @@
       "kind": "component",
       "source": "src/components/SelectButton.svelte",
       "documentation": "src/components/SelectButton.md",
-      "description": "以按钮形式提供单项下拉选择，适合工具栏、筛选入口和需要紧凑展示的选项切换。",
+      "description": "Choose one dropdown option from a button, suited to toolbars and compact filters.",
       "intents": [
-        "按钮触发选择菜单",
-        "按钮触发命令菜单"
+        "button dropdown menu",
+        "button command menu"
       ],
       "aliases": [
-        "下拉按钮",
-        "带菜单的按钮"
+        "dropdown button",
+        "menu button"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -1814,19 +1836,19 @@
       "kind": "component",
       "source": "src/components/Separator.svelte",
       "documentation": "src/components/Separator.md",
-      "description": "用水平或垂直分割线划分内容与操作区域，帮助建立清晰的信息层次。",
+      "description": "Separate content and actions horizontally or vertically to clarify information hierarchy.",
       "intents": [
-        "区域分割",
-        "横向分割线",
-        "纵向分割线"
+        "section divider",
+        "horizontal divider",
+        "vertical divider"
       ],
       "aliases": [
-        "分割线",
-        "竖向分隔线",
-        "横线"
+        "divider line",
+        "vertical rule",
+        "horizontal rule"
       ],
       "whenToUse": null,
-      "avoidWhen": "图表坐标线、网格线和路径不使用 Separator。",
+      "avoidWhen": "Do not use Separator for chart axis lines, grid lines, or breadcrumb paths.",
       "related": [],
       "deprecated": false
     },
@@ -1848,15 +1870,16 @@
       "kind": "block",
       "source": "src/blocks/Sidebar.svelte",
       "documentation": "src/blocks/Sidebar.md",
-      "description": "组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。",
+      "description": "Organize brand entry, grouped navigation, and footer actions with collapse and independent scrolling.",
       "intents": [
-        "文档侧边导航",
-        "可折叠侧栏",
-        "可调宽侧栏"
+        "app navigation sidebar",
+        "collapsible sidebar",
+        "resizable sidebar"
       ],
       "aliases": [
-        "左侧导航",
-        "侧边栏"
+        "left navigation",
+        "navigation drawer",
+        "side navigation"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -1884,7 +1907,7 @@
       "kind": "block",
       "source": "src/blocks/SidebarItem.svelte",
       "documentation": "src/blocks/SidebarItem.md",
-      "description": "在 Sidebar 中呈现导航入口，支持激活状态、图标、层级与状态提示，帮助识别当前位置。",
+      "description": "Show a Sidebar navigation item with active state, icon, hierarchy, and status hints.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1910,7 +1933,7 @@
       "kind": "block",
       "source": "src/blocks/SidebarSection.svelte",
       "documentation": "src/blocks/SidebarSection.md",
-      "description": "将 Sidebar 导航组织为带标题的分组，支持展开、收起与附加操作，便于浏览较长的导航列表。",
+      "description": "Group Sidebar items under a heading with expand, collapse, and optional actions.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1936,15 +1959,15 @@
       "kind": "component",
       "source": "src/components/SidePanel.svelte",
       "documentation": "src/components/SidePanel.md",
-      "description": "从页面右侧展示详情或辅助内容，支持浮层与内嵌两种形态，让用户保留主页面上下文。",
+      "description": "Show details or supporting content from the right in overlay or inline mode while retaining page context.",
       "intents": [
-        "侧边详情面板",
-        "行预览面板",
-        "浮动编辑面板"
+        "side detail panel",
+        "row preview drawer",
+        "floating inspector panel"
       ],
       "aliases": [
-        "右侧面板",
-        "详情抽屉"
+        "right drawer",
+        "detail sheet"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -1971,7 +1994,7 @@
       "kind": "component",
       "source": "src/components/Skeleton.svelte",
       "documentation": "src/components/Skeleton.md",
-      "description": "在内容加载时展示占位轮廓，帮助用户预先理解页面结构，并保持加载过程中的布局连续。",
+      "description": "Show a placeholder outline while content loads, previewing structure and keeping layout stable.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -1997,7 +2020,7 @@
       "kind": "component",
       "source": "src/components/Slider.svelte",
       "documentation": "src/components/Slider.md",
-      "description": "通过拖动选择单个数值或数值区间，支持水平、垂直、步进与填充式展示，适合范围和参数调整。",
+      "description": "Choose one value or a range by dragging, with horizontal, vertical, stepped, and filled styles.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2023,7 +2046,7 @@
       "kind": "component",
       "source": "src/components/SlotText.svelte",
       "documentation": "src/components/SlotText.md",
-      "description": "以逐字符的纵向滚动展示文字变化，适合短标题、状态、计数与计时信息。",
+      "description": "Animate text changes character by character with vertical rolls for short labels, status, and counters.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2049,7 +2072,7 @@
       "kind": "component",
       "source": "src/components/SnowUILogo.svelte",
       "documentation": "src/components/SnowUILogo.md",
-      "description": "展示 SnowUI 图标、字标或组合标识，支持横向与纵向排列，适合品牌入口和页面署名。",
+      "description": "Display the SnowUI icon, wordmark, or combined mark in horizontal or vertical layouts.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2075,7 +2098,7 @@
       "kind": "component",
       "source": "src/components/Spinner.svelte",
       "documentation": "src/components/Spinner.md",
-      "description": "以持续旋转的视觉提示表示加载中，提供圆环、辐条和胶囊三种形式，适合按钮与内容区域。",
+      "description": "Indicate ongoing loading with a rotating ring, spokes, or capsule shape.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2101,7 +2124,7 @@
       "kind": "component",
       "source": "src/components/StyleButton.svelte",
       "documentation": "src/components/StyleButton.md",
-      "description": "在 SnowUI 与 Apple 两种视觉风格之间切换，适合提供界面风格选择的入口。",
+      "description": "Switch between SnowUI and Apple visual styles.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2127,7 +2150,7 @@
       "kind": "component",
       "source": "src/components/Switch.svelte",
       "documentation": "src/components/Switch.md",
-      "description": "在开启与关闭之间切换，适合需要即时生效的设置和功能开关。",
+      "description": "Toggle a setting or feature that takes effect immediately.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2153,18 +2176,18 @@
       "kind": "component",
       "source": "src/components/Tab.svelte",
       "documentation": "src/components/Tab.md",
-      "description": "在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。",
+      "description": "Switch between views or content panels, with generated or custom tabs and keyboard navigation.",
       "intents": [
-        "内容面板切换",
-        "视图切换"
+        "content panel switch",
+        "view switcher"
       ],
       "aliases": [
-        "Tab 切换",
-        "Preview Code 切换",
-        "标签页"
+        "tabs",
+        "Preview Code switch",
+        "tab bar"
       ],
-      "whenToUse": "选项对应不同内容区域或视图。",
-      "avoidWhen": "只改变参数或过滤器时使用 Segmented。",
+      "whenToUse": "Switch between distinct content panels or views.",
+      "avoidWhen": "Use Segmented when changing a parameter or filter without switching panels.",
       "related": [
         "Segmented",
         "Button"
@@ -2189,7 +2212,7 @@
       "kind": "component",
       "source": "src/components/Table.svelte",
       "documentation": "src/components/Table.md",
-      "description": "以语义化表格展示结构化数据，支持自适应列宽、局部横向滚动与加载状态，可自由组合表头和单元格。",
+      "description": "Display structured data in a semantic table with adaptive columns, local horizontal scrolling, and loading states.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2215,7 +2238,7 @@
       "kind": "component",
       "source": "src/components/TableBody.svelte",
       "documentation": "src/components/TableBody.md",
-      "description": "组织 Table 的数据行，保留表格正文语义，适合组合列表记录和自定义行内容。",
+      "description": "Group Table data rows while preserving table body semantics.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2241,7 +2264,7 @@
       "kind": "component",
       "source": "src/components/TableCell.svelte",
       "documentation": "src/components/TableCell.md",
-      "description": "在 Table 的数据行中展示一个单元格，支持文字、组件与自定义内容，默认以单行截断控制长内容。",
+      "description": "Display text, components, or custom content in a Table cell, truncating long content by default.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2267,7 +2290,7 @@
       "kind": "component",
       "source": "src/components/TableHead.svelte",
       "documentation": "src/components/TableHead.md",
-      "description": "定义 Table 的列标题，可承载排序操作与列宽调整，帮助用户理解和组织表格数据。",
+      "description": "Define a Table column heading with optional sorting and resizing.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2293,7 +2316,7 @@
       "kind": "component",
       "source": "src/components/TableHeader.svelte",
       "documentation": "src/components/TableHeader.md",
-      "description": "组织 Table 的表头行，明确各列含义，并保留原生表格的表头语义。",
+      "description": "Group Table header rows and preserve native table header semantics.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2319,7 +2342,7 @@
       "kind": "component",
       "source": "src/components/TableRow.svelte",
       "documentation": "src/components/TableRow.md",
-      "description": "组织一行表头或数据单元格，统一行内的悬停与交互反馈，适合可浏览和可操作的数据记录。",
+      "description": "Group header or data cells into one row with consistent hover and interaction feedback.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2345,13 +2368,13 @@
       "kind": "component",
       "source": "src/components/TableToolbar.svelte",
       "documentation": "src/components/TableToolbar.md",
-      "description": "为 DataTable 提供搜索、排序、筛选和批量操作入口，并展示选择状态，适合数据管理界面。",
+      "description": "Add search, sort, filter, bulk actions, and selection status to DataTable.",
       "intents": [
-        "表格工具栏",
-        "表格搜索筛选操作"
+        "table toolbar",
+        "table search filter and bulk actions"
       ],
       "aliases": [
-        "Table 顶部操作区"
+        "table top action bar"
       ],
       "whenToUse": null,
       "avoidWhen": null,
@@ -2379,7 +2402,7 @@
       "kind": "component",
       "source": "src/components/Tag.svelte",
       "documentation": "src/components/Tag.md",
-      "description": "以可交互标签表达标记、筛选条件或路径片段，适合组织内容与收敛选择范围。",
+      "description": "Use an interactive label for markers, filters, or path segments.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2405,7 +2428,7 @@
       "kind": "component",
       "source": "src/components/Text.svelte",
       "documentation": "src/components/Text.md",
-      "description": "统一展示文本，支持排版与截断，适合正文、标签和受限空间中的信息表达。",
+      "description": "Render text with typography and truncation options for content, labels, and constrained areas.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2431,7 +2454,7 @@
       "kind": "component",
       "source": "src/components/Textarea.svelte",
       "documentation": "src/components/Textarea.md",
-      "description": "提供多行文本输入，可承接原生表单属性并组合字段反馈，适合描述、备注和较长内容的编辑。",
+      "description": "Enter multi-line descriptions, notes, or longer content with native form attributes and field feedback.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2457,14 +2480,19 @@
       "kind": "component",
       "source": "src/components/ColorSchemeButton.svelte",
       "documentation": "src/components/ColorSchemeButton.md",
-      "description": "在亮色与暗色主题之间切换，并以图标反馈当前方案，适合网站和应用的主题入口。",
-      "intents": [],
+      "description": "Switch between light and dark themes with an icon that reflects the current scheme.",
+      "intents": [
+        "legacy theme toggle"
+      ],
       "aliases": [
-        "旧主题按钮"
+        "legacy theme button"
       ],
       "whenToUse": null,
       "avoidWhen": null,
-      "related": [],
+      "related": [
+        "Button",
+        "StyleButton"
+      ],
       "deprecated": true
     },
     {
@@ -2485,7 +2513,7 @@
       "kind": "component",
       "source": "src/components/Toast.svelte",
       "documentation": "src/components/Toast.md",
-      "description": "用短暂通知反馈操作结果或状态变化，支持图标、操作和富内容，适合保存成功、错误与提醒。",
+      "description": "Show brief feedback for results or status changes, with icons, actions, and rich content.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2511,7 +2539,7 @@
       "kind": "component",
       "source": "src/components/Toaster.svelte",
       "documentation": "src/components/Toaster.md",
-      "description": "集中展示通过 toast() 触发的全局通知，支持六个屏幕位置、堆叠动效与可见数量控制，让连续反馈保持有序。",
+      "description": "Display global toast() notifications in six positions with stacking motion and a visible-item limit.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,
@@ -2537,7 +2565,7 @@
       "kind": "component",
       "source": "src/components/Tooltip.svelte",
       "documentation": "src/components/Tooltip.md",
-      "description": "在悬停时展示简短说明，支持位置避让与连续切换动效，适合图标按钮和需要补充解释的内容。",
+      "description": "Show a short explanation on hover with collision handling and smooth switching.",
       "intents": [],
       "aliases": [],
       "whenToUse": null,

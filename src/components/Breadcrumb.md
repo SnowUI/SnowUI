@@ -73,8 +73,6 @@
 <a id="api-参考"></a>
 
 
-
-
 ### 子级角色
 
 | 角色 | 推荐写法 | 描述 |
@@ -152,19 +150,8 @@ SnowUI 组件使用 `as="item"` / `as="separator"`；原生元素使用 `data-as
 
 布局变量链：
 
-| 变量 | 默认值 | 用途 |
-| :--- | :--- | :--- |
-| `--snowui-breadcrumb-row-gap` | `var(--gap-1)` | 换行时的行间距 |
-| `--snowui-breadcrumb-column-gap` | `var(--gap-1)` | item 与 separator 的列间距 |
-| `--snowui-breadcrumb-separator-font-size` | `var(--text-14)` | separator 字号 |
-| `--snowui-breadcrumb-separator-line-height` | `var(--leading-14)` | separator 行高 |
-| `--snowui-breadcrumb-separator-color` | `var(--black-10, rgba(0,0,0,0.1))` | separator 颜色 |
-| `--snowui-breadcrumb-inactive-opacity` | `0.4` | 非当前 item 默认透明度 |
-| `--snowui-breadcrumb-inactive-hover-opacity` | `1` | 非当前 item hover 透明度 |
 
 ---
-
-
 
 
 ### 2026-11-13 行为同步
@@ -226,12 +213,11 @@ Breadcrumb 支持两种模式：
 
 ---
 
-## 更新日志
-
 ### 2026-11-16
 
 - Owner 确认默认路径不换行；窄容器保持单行，宿主负责可用宽度和溢出安排。
 
+## 更新日志
 
 ### v1.2.0 (2026-10-23)
 
@@ -248,21 +234,4 @@ Breadcrumb 支持两种模式：
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
-### v1.1.1 (2026-09-02)
-
-- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
-
-### v1.1.0 (2026-08-19)
-
-- Breadcrumb item 作为复合导航项默认关闭 Button hover 放大，并允许子 Button 显式重新开启。
-
-### v1.0.1 (2026-08-16)
-
-- item 的透明度与 hover overlay 过渡不再受共享样式注入顺序影响。
-
-### v1.0.0 (2026-05-25)
-
-#### 新功能
-- 新增 Breadcrumb 组件，采用容器组合式 API。
-- 支持最后一个 item 自动作为当前页面。
-- 支持非当前 item 40% → hover 100% 透明度规则。
+完整历史见 [更新日志归档](../../docs/history/changelogs/Breadcrumb.history.md)。

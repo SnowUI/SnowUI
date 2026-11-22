@@ -1,4 +1,4 @@
-# frame-prop-filter.ts 文档
+# frame-prop-filter
 
 > **版本**: v1.1.0
 > **职责**: 统一维护 Frame 内部关键字识别规则，同时提供 DOM 过滤与复合组件 props 分发能力。

@@ -61,8 +61,6 @@
 - 组件无额外 wrapper，真实 `Input` 仍是根宿主；事件只由该宿主触发一次。
 - `Input` 自身隐藏生成的错误 `Text` 仍可通过平铺后的 `parts.Text` 配置。
 
-> **版本**: v1.3.1
-> **职责**: 提供与 `Input` 一致的 搜索输入框，默认内置 `Search`。
 
 `SearchInput` 是 `Input` 的搜索场景变体。除默认 `type="search"` 和默认 leading 图标为 `Search` 外，其颜色、hover/focus、清除 X、三槽位布局、Frame 能力与 `Input` 保持一致。
 
@@ -100,12 +98,12 @@
 ```
 
 ```svelte
-<!-- 容器收窄到 80px 以下时只保留搜索图标；点击或键盘聚焦后恢复输入 -->
+<!-- Collapse to icon below 80px; expand on click or focus -->
 <SearchInput collapseBelow={80} placeholder="Search" />
 ```
 
 ```svelte
-<!-- 外层容器已经提供完整表面时，显式使用无边框版本 -->
+<!-- Borderless variant inside an existing surface container -->
 <SearchInput variant="borderless" placeholder="Search" />
 ```
 
@@ -116,11 +114,7 @@
 ```
 
 
-> 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
-
 ---
-
-
 
 
 ### 2026-11-13 行为同步
@@ -128,8 +122,6 @@
 默认搜索图标静止opacity为0.2，focus时为0.4；颜色为不透明主题色，通过所属图标的公开style传入，避免Input通用leading附件的20%色再次叠加。外置leading图标不受此规则影响。`--snowui-search-input-icon-color-override`可覆盖默认图标颜色，应传入不透明颜色；透明度仍由组件状态控制。
 
 ## AI Zone
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -195,22 +187,4 @@
 - 修复 `borderless` 在 shrink-to-fit 宿主中输入内容时宽度变化：以 `width: auto; max-width: 100%` 取代循环参与固有尺寸计算的百分比宽度，Flex / Block 宿主中的填充行为保持不变。
 - `borderless` 有值时保持 Input control 原网格列，使预留的清除按钮列始终参与固有宽度计算；control 同时延伸覆盖 gap 与 X 列，维持文字贴近 X 的原有叠层和渐隐效果。
 
-### v1.2.0 (2026-07-05)
-
-- 改为 Input 宿主组件特化模式：兼容 Props 从 Input 类型推导并平铺，移除 `parts.Input`；DOM 与样式保持不变。
-
-### v1.1.0 (2026-06-20)
-
-- 新增 `variant="borderless"`，供 Toolbar、面板等已有表面的容器显式使用；组件默认填满剩余宽度，内部内容保持垂直居中。
-
-### v1.0.1 (2026-05-09)
-
-#### 调整
-
-- SearchInput 内置默认 `Search` 在激活态变为 Black/40；样式限定在 SearchInput 组件内，不影响通用 Icon 样式。
-
-### v1.0.0 (2026-05-08)
-
-#### 新功能
-
-- 新增简单搜索输入框，默认内置 `Search`，其余行为继承 `Input`。
+完整历史见 [更新日志归档](../../docs/history/changelogs/SearchInput.history.md)。

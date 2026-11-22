@@ -1,4 +1,4 @@
-# frame-motion.svelte.ts 文档
+# frame-motion
 
 > **版本**: v2.4.0
 > **职责**: 管理组件的动效注册与触发，作为组件与全局动效编排器之间的桥梁。
@@ -132,7 +132,7 @@
 `FrameMotion` 暴露了 `controller` 对象，允许通过组件实例直接控制动效，无需依赖全局 ID。
 
 ```typescript
-// 通过 Frame 组件实例调用 (bind:this)
+// Invoke via Frame component instance (bind:this)
 frameInstance.getController().play({ reverse: true });
 ```
 
@@ -147,7 +147,7 @@ frameInstance.getController().play({ reverse: true });
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v2.4.0 (2026-06-30)
 - 统一显式 `while*` 对象的完整视觉通道声明语义；默认视觉不再浅合并。
@@ -161,13 +161,4 @@ frameInstance.getController().play({ reverse: true });
 - 新增：记录 `src/motion/*.ts` 默认动效目录与 `frame-motion-defaults.ts` 管理关系
 - 新增：共享元素锚点 `itemId`（与 `layoutId` 并行语义）
 
-### v2.1.0 (2026-01-20)
-- **性能优化**: 合并 12 个独立 `$effect` 为单一差量更新 effect
-- **新增**: `orchestrateTrigger` 属性支持 `appear`/`hover`/`click`/`scroll`/`none`
-- **新增**: `orchestrateTarget` 属性支持 CSS 选择器指定编排目标
-- **新增**: `scroll.offset` 配置支持自定义滚动触发偏移量
-
-### v2.0.0
-- 新增物理弹簧 (Spring Physics) 支持
-- 新增滚动联动 (Scroll-Linked) 支持
-- 新增共享元素转场 (Shared Element) 支持
+完整历史见 [更新日志归档](../../docs/history/changelogs/logic-frame-motion.history.md)。

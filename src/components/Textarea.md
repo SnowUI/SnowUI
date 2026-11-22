@@ -78,15 +78,15 @@
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
 
-## 原生表单校验反馈
+## 使用边界与详细说明
+
+### 原生表单校验反馈
 
 原生校验失败时取消浏览器气泡，并保持无效提交拦截。空值必填只短暂闪动红边、不显示文字，结束恢复原态；非空类型、长度和格式错误将 `validationMessage` 显示在组件下方。首个无效字段获得焦点；输入修正后更新反馈，表单重置清除反馈。调用方业务校验继续使用 `invalid` 与 `error`，原生错误存在时优先显示原生反馈。原生消息语言由浏览器决定，不将校验状态等同服务端验证结果。
 
-## 尺寸边界
+### 尺寸边界
 
 默认布局最小宽度为 1em 加左右内边距，保留至少一个字符的编辑空间；拖拽尺寸限制是独立约束。父容器不足时需调整布局或提供横向滚动。
-
-## 使用边界与详细说明
 
 <a id="内置组件双模式"></a>
 
@@ -95,9 +95,6 @@
 - `parts.Indicator`：统一配置 resize 模式下的内置 Indicator。
 - Textarea value、invalid、disabled 与输入事件属于父组件受控协议。
 
-> **版本**: v1.0.2
-> **更新日志 (2026-04-28)**: 标注主布局模型为复合管理布局，并同步代码版本。
-> **职责**: 基础多行文本输入宿主，负责承接原生 `<textarea>` 能力与 Frame 通用能力。
 
 **2026-04-04 补充**: 参考 Figma `10109:19152`，`Textarea` 是表单系列里的单独例外：单独使用时默认内容留白为 `top 12 / right 16 / bottom 24 / left 16`。进入 `Field` 后，只看有没有 `as="segment"`；未标 `segment` 时由外层 `Field` 处理默认 `12 / 16` 与 `gap = 8`，`Textarea` 去掉组件自身 padding，但保留自身 gap；标了 `segment` 时保留 `Textarea` 自身的 padding 与 gap。右下角使用统一 `Indicator appearance="corner"`；字符计数器默认不显示，传入 `maxCount` 后在 hover 到组件时显示计数，超限时持续显示。
 **2026-04-09 补充**: `Textarea` 右下角保留区（含缩放图标与计数器）始终存在；默认要求是 `right = 16px`、`bottom = 0`，不得贴边。
@@ -191,19 +188,19 @@
 ### 使用示例
 
 ```svelte
-<!-- 推荐：放入 Field -->
+<!-- Recommended: compose inside Field -->
 <Field>
   <Textarea placeholder="请输入更多说明" />
 </Field>
 
-<!-- 带标题与错误提示 -->
+<!-- With label and error feedback -->
 <Field invalid>
   <Text as="label">问题描述</Text>
   <Textarea rows={6} placeholder="请详细描述问题" />
   <Text as="error">至少需要 20 个字符。</Text>
 </Field>
 
-<!-- 多行表单字段 -->
+<!-- Multi-line form field -->
 <Textarea
   name="description"
   rows={6}
@@ -213,7 +210,7 @@
   placeholder="请描述你的问题"
 />
 
-<!-- 继承 Frame 能力 -->
+<!-- Inherited Frame state and style capabilities -->
 <Textarea
   Click={{ Idle: "Active", Active: "Idle" }}
   stateStyle={{
@@ -236,9 +233,7 @@
 ---
 
 
-
-
-## 必填反馈
+### 必填反馈
 
 显式设置 `required` 时，空值提交只让首个无效字段聚焦并短暂闪动红色边框，外光圈保持原色；结束恢复原态，不显示空值错误文字。减少动效时仅聚焦。取消浏览器校验气泡但保留无效提交拦截；非空格式错误与业务错误继续显示文字，修正输入或重置清除提示。
 
@@ -278,31 +273,12 @@
 <a id="无障碍与表单建议"></a>
 
 
-
 <a id="样式规范-style-spec"></a>
 
 ### 样式规范 (Style Spec)
 
 ### 1. 基础几何
 
-| 项目 | 值 |
-| :--- | :--- |
-| 默认最小高度 | `calc(var(--snowui-textarea-padding-top) + var(--snowui-textarea-padding-bottom) + var(--snowui-textarea-line-height))`；readonly 时为 0，最终高度还受内容测量和手动缩放影响 |
-| 圆角 | `var(--radius-4)` |
-| 左侧内边距 | `var(--padding-4)` |
-| 右侧内边距 | `var(--padding-4)` |
-| 顶部内边距 | `var(--padding-3)` |
-| 底部内边距 | `var(--padding-6)` |
-| 字号 | `var(--text-14)` |
-| 行高 | `var(--leading-14)` |
-| 默认背景 | `var(--surface-1)` |
-| 默认边框 | `inset 0 0 0 var(--border-1) var(--black-20)` |
-| placeholder 颜色 | `var(--black-20)` |
-| 右下角尺寸手柄 | `Indicator appearance="corner"`，16px，随 footer 固定在右下角 |
-| 计数器右侧留白 | `var(--padding-4)` |
-| 计数器文本 | `Text 12/16`，设置 `maxCount` 后 hover 时显示，超出时变红并持续显示 |
-| 滚动条 | 自定义浮层滚动条，隐藏原生滚动条；默认 4px / hover 8px，右边缘距容器右边框 4px，透明轨道 |
-| 滚动渐隐 | `.snowui-scroll-mask` + `data-scroll-mask="top\|bottom\|both"`，默认 32px，可用 `--snowui-textarea-scroll-mask-size-override` 覆盖 |
 
 <a id="开发者指南-ai"></a>
 

@@ -63,12 +63,8 @@
 - `parts.Tooltip`：配置单行截断时的内置 Tooltip。
 - 自定义提示结构时使用外置 Tooltip 组合；显式 Props 高于 part。
 
-> **版本**: v1.5.0
-> **更新日志 (2026-08-15)**: Link 根节点显式移除原生下划线，不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；`underline` 仍由组件公开 Prop 控制。
-> **职责**: 提供正文、说明与导航中的文字链接样式。
-> **设计稿**: [Workshop / Link](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12417-11133&t=GYb3gHf9U5Ff6hcQ-4)
 
-Link 是独立的 文字链接组件。按钮外观但点击后跳转的场景继续使用 `<Button href>`；正文文字链接、带文字箭头链接与外链图标链接使用 `<Link>`。
+Link 是独立的 文字链接组件。按钮外观但点击后跳转的场景继续使用 `<Button href>`；正文文字链接、带文字箭头链接与外链图标链接使用 `<Link>`（设计基准见 [Figma Link](https://www.figma.com/design/391NQa4yf4NJIyuZ5vHbvc/Workshop?node-id=12417-11133&t=GYb3gHf9U5Ff6hcQ-4)）。
 
 <a id="功能概览"></a>
 
@@ -83,7 +79,6 @@ Link 是独立的 文字链接组件。按钮外观但点击后跳转的场景�
 - `external` 内置 trailing Icon 可由外置直系 `as="trailing"` 替换。
 
 <a id="api-参考"></a>
-
 
 
 <a id="文字截断"></a>
@@ -163,29 +158,15 @@ Link 复用 通用 `TruncationController` 与 `fitTextToElement()`，不自行�
 
 ### 布局变量链
 
-| 变量 | 默认来源 | 用途 |
-| :--- | :--- | :--- |
-| `--snowui-link-font-size` | `var(--text-14)` | 文字字号 |
-| `--snowui-link-line-height` | `var(--leading-14)` | 文字行高 |
-| `--snowui-link-gap` | `var(--gap-1)` | 内容与 leading / trailing 间距，实际至少4 CSS px，根字号缩小时仍保持下限 |
-| `--snowui-link-color` | color（默认 Black40） | 默认文字颜色 |
-| `--snowui-link-hover-color` | color 自动规则 / `hoverColor` | hover 文字颜色；trailing 箭头 / Icon 继承该颜色 |
-| `--snowui-link-icon-size` | `var(--size-3)` | 内置 `ArrowUpRight` / `ArrowSquareOut` 尺寸，默认 12px；不覆盖外置 Icon |
-| `--snowui-link-decoration-opacity` | `var(--snowui-state-opacity, 0.4)` | trailing 箭头 / Icon 常态透明度 |
-| `--snowui-link-decoration-hover-opacity` | `var(--snowui-state-opacity, 1)` | trailing 箭头 / Icon hover 透明度 |
 
 Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 column / stretch 父容器内仍保持 Hug，trailing 会随文字宽度移动。外部显式 width、`w-full` 或 inline style 可以覆盖。
 
 ---
 
-
-
-
 ## AI Zone
 
 外置 leading／trailing 槽位在客户端提升到宿主前，也保持横向对齐，避免首屏图标与文字换行错位。
 
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。
 
 <a id="开发者指南-ai"></a>
 
@@ -221,57 +202,4 @@ Link 根节点默认使用 `width: fit-content; max-width: 100%`，因此在 col
 - 新增 color；所有变体默认 Black40 → Black100，Black100 → Black40，其余常态颜色 → Black100。保留 hoverColor 的显式覆盖与 false，以及其他现有 Props。
 - hoverColor=false 保留通过颜色 override 设置的常态颜色。
 
-### v1.2.3 (2026-08-15)
-
-- Link 根节点显式声明 `text-decoration: none`，默认视觉不再依赖可选 `snowui-base.css` 的裸 `a` 初始化；公开 `underline` Prop 继续拥有下划线状态。
-
-### v1.2.2 (2026-07-02)
-
-- Link 默认内部 gap 恢复为 2px；修复 leading / trailing 投影残留格式空白；Link 根默认 `width: fit-content`，避免 column 父级 stretch 后 Grid 中间列扩张并把 trailing 推到最右侧。外置 Icon 继续保留自身默认尺寸。
-
-### v1.2.1 (2026-07-02)
-
-- Link 默认内部 gap 从 2px 调整为 4px；内置与外置 leading / trailing 统一生效。
-
-### v1.2.0 (2026-06-23)
-
-#### 优化
-- **LINK-Truncation.4** 接入通用 `fitTextToElement()`：英文等字母文字只在完整单词边界截断，单词整体放不下时只显示省略符；中日韩文字按 Unicode 字素边界降级，避免显示半个字符。
-- **LINK-Truncation.5** 使用 `measureTextForElement()` 将截断 Content 收缩到可见文字 + `…` 的真实宽度，使 trailing Icon 与省略符之间严格保持 Link 组件 gap，不残留 Content 轨道空白。
-
-### v1.1.1 (2026-06-23)
-
-#### 修复
-- **LINK-Truncation.3** 将文字测量层、显式 `…` 尾列与 Tooltip 触发宿主拆分，避免依赖浏览器对可聚焦链接的原生 ellipsis 绘制；Link 获得焦点、鼠标按下或 Tooltip 激活时省略符保持稳定，通用 `TruncationController` 状态与检测逻辑保持不变。
-
-### v1.1.0 (2026-06-23)
-
-#### 新功能
-- **LINK-Truncation.1** 新增 `lines={1}` 单行截断，文字真实溢出时默认通过 Tooltip 显示完整内容。
-- **LINK-Truncation.2** 新增 `tooltip` 与 `onTruncate`，截断检测复用 Text / TableCell 共用的 `TruncationController`。
-
-### v1.0.3 (2026-06-01)
-
-#### 修复
-- **LINK-Layout.4** 移除 Link 对外置 leading / trailing Icon 的尺寸覆写。内置 `ArrowUpRight` / `ArrowSquareOut` 保持 12px；外置 Icon 保留自身尺寸，未传 `size` 时使用 Icon 默认的 16px。
-
-### v1.0.2 (2026-06-01)
-
-#### 修复
-- **LINK-Layout.1** 外置 leading / trailing 槽位投影回 Link 根层，恢复 Frame 三槽位协议的直系槽位识别、水平居中与统一 gap。
-- **LINK-Layout.2** Link 的 `[data-auto-layout]` 根显式覆盖公共槽位 gap，保证内置 / 外置 Icon 与箭头统一使用 Link gap 变量。
-- **LINK-Layout.3** `arrow` 改用内置 `ArrowUpRight` Icon，消除字符箭头的字体侧边留白差异。
-
-### v1.0.1 (2026-06-01)
-
-#### 修复
-- **LINK-Hover.2** trailing 箭头、默认 Icon 与外置 trailing Icon 改为继承文字颜色，并按轻量 Icon 规范使用 `opacity: 0.4 -> 1` 表达 hover。
-
-### v1.0.0 (2026-06-01)
-
-#### 新功能
-- **LINK-Init.1** 新增独立 Link 组件，迁移原 Button Link 默认样式。
-- **LINK-Variant.1** 新增 `arrow` 与 `external` 变体，对齐 Workshop Link 样式 2 / 样式 3。
-- **LINK-Hover.1** 新增 `hoverColor`，支持自定义 hover 颜色与 hover 不变色。
-- **LINK-Underline.1** 新增 `underline`，支持 `none` / `always` / `hover`。
-- **LINK-Icon.1** `external` 内置 `ArrowSquareOut` trailing Icon，支持外置直系 trailing 替换。
+完整历史见 [更新日志归档](../../docs/history/changelogs/Link.history.md)。

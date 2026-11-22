@@ -7,9 +7,16 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 const discovery = JSON.parse(fs.readFileSync(path.join(root, "component-discovery.json"), "utf8"));
 const outputPath = path.join(root, "component-catalog.json");
+const hanPattern = /[\u3400-\u9fff]/u;
 
-function readDescription(documentation, name) {
-  return readComponentIntroduction(fs.readFileSync(documentation, "utf8"), name);
+function resolveDescription(documentationPath, name, metadata) {
+  // Validate that the source contract Markdown still provides a well-formed introduction.
+  readComponentIntroduction(fs.readFileSync(documentationPath, "utf8"), name);
+  const english = metadata.description?.trim();
+  if (!english) {
+    throw new Error(`${name}: component-discovery.json must provide an English description.`);
+  }
+  return english;
 }
 
 function collectExports(indexRelative, defaultKind) {
@@ -23,7 +30,9 @@ function collectExports(indexRelative, defaultKind) {
     const sourceRelative = path.posix.normalize(path.posix.join(path.posix.dirname(indexRelative), match[2]));
     const sourceFile = sourceRelative.endsWith(".svelte") ? sourceRelative : `${sourceRelative}.svelte`;
     const canonical = path.basename(sourceFile, ".svelte");
-    const metadata = discovery.components[name] ?? discovery.components[canonical] ?? {};
+    const ownMeta = discovery.components[name] ?? {};
+    const canonicalMeta = discovery.components[canonical] ?? {};
+    const metadata = name === canonical ? ownMeta : { ...canonicalMeta, ...ownMeta };
     const documentationRelative = metadata.documentation ?? sourceFile.replace(/\.svelte$/, ".md");
     const documentationPath = path.join(root, documentationRelative);
     entries.push({
@@ -37,7 +46,7 @@ function collectExports(indexRelative, defaultKind) {
       kind: sourceFile.includes("/blocks/") ? "block" : defaultKind,
       source: sourceFile,
       documentation: fs.existsSync(documentationPath) ? documentationRelative : null,
-      description: readDescription(documentationPath, name),
+      description: resolveDescription(documentationPath, name, metadata),
       intents: metadata.intents ?? [],
       aliases: metadata.aliases ?? [],
       whenToUse: metadata.whenToUse ?? null,
@@ -66,10 +75,19 @@ const catalog = {
   schemaVersion: 1,
   package: packageJson.name,
   license: "LICENSE",
-  generatedFrom: ["src/index.ts", "src/components/*.md", "component-discovery.json"],
+  delivery: {
+    npmRuntime: ["dist/client", "dist/server", "component-catalog.json"],
+    sourceArchiveOnly: ["source", "documentation"],
+    onlineDocumentation: "https://snowui.dev/llms-en.txt"
+  },
+  generatedFrom: ["src/index.ts", "src/blocks/index.ts", "src/components/*.md", "src/blocks/*.md", "component-discovery.json"],
   components
 };
 const next = `${JSON.stringify(catalog, null, 2)}\n`;
+if (hanPattern.test(next)) {
+  console.error("component-catalog.json must remain 100% English (found CJK characters).");
+  process.exit(1);
+}
 
 if (process.argv.includes("--check")) {
   const current = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, "utf8") : "";

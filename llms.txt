@@ -1,5 +1,8 @@
-# SnowUI
+# SnowUI Components
 
 - [AI entry](./AGENTS.md)
-- [Repository guide](./README.md)
-- [License](./LICENSE)
+- [Package guide](./README.md)
+- [Component catalog (JSON)](./component-catalog.json)
+- [Online AI documentation](https://snowui.dev/llms.txt)
+- [Online AI documentation (English)](https://snowui.dev/llms-en.txt)
+- [LICENSE](./LICENSE)

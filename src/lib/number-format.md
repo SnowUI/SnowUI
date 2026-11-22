@@ -28,7 +28,6 @@ mergeNumberFormatOptions(...options)
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
 ## 开发者指南 (AI)
 
@@ -36,7 +35,7 @@ mergeNumberFormatOptions(...options)
 - **规范**: [../../../docs/reference/NumberFormats.md](../../../docs/reference/NumberFormats.md)
 - Chart、Table、Metric 等数据展示组件不得平行维护默认小数位、空值兜底和 compact notation。
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.0.1 (2026-10-14)
 

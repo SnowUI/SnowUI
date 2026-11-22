@@ -55,7 +55,7 @@
 | align | `TextMotionAlign` | — | 对齐；默认继承父级 |
 | motionColor | `TextMotionColor` | — | 全部目标字符从左到右依次回落的临时颜色；支持语义色、CSS 色与逐字 resolver，默认不改变颜色 |
 
-未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+宿主继承说明：继承 [Frame](Frame.md) 的 `tag`（默认 `"span"`）、`class`、`style` 与通用状态／动效能力；本表仅列本组件源码具名公开属性。
 
 ## 使用边界与详细说明
 
@@ -84,7 +84,6 @@
 
 <a id="实现约束"></a>
 
-
 ## AI Zone
 
 以下章节保留源码维护约束，不属于应用接入步骤。
@@ -101,8 +100,6 @@
 - 排版、语意色、变化色与减少动效判断复用 `../lib/text-motion/`。
 - `cascadeSpeed`、`cascadeDelay`、`duration`、`settleDuration` 等时序不得公开。
 - `customSequence` 是内容语义，不是动效速度调参，可以保留。
-
-
 
 
 > **组件路径**: `components/src/components/ScrambleText.svelte`
@@ -131,25 +128,4 @@
 - `motionColor` 覆盖所有目标字符，保留字符和格式符号也参加统一的逐字颜色回落序列；完整时序遵循 [TextMotionSpec §2.1](../../../docs/standards/TextMotionSpec.md#21-motioncolor)。
 - 字符变化效果保持原有规则；未设置颜色、关闭动画（适用时）或减少动效生效时显示最终原色。连续更新重新编排颜色序列，卸载清理颜色动画。
 
-
-### v1.3.1 (2026-09-08)
-
-- 连续更新延续正在运行的字符进度；无颜色时复用文本节点；有颜色时复用逐字符节点，仅在实际换字时更新画面。
-
-### v1.3.0 (2026-06-15)
-
-- `motionColor` 默认改为 `undefined`，未显式设置时不改变文字颜色。
-
-### v1.2.0 (2026-06-14)
-
-- 根 `Frame` 默认启用 Frame 默认动效，内部扰动动画与组件级 `while*` / 父级编排并行工作。
-
-### v1.1.0 (2026-06-14)
-
-- 统一六项排版 Props 与 `motionColor`。
-- 将 cascade 时序完全内部化。
-- `respectMotionPreference` 默认 `false`。
-
-### v1.0.0 (2026-06-11)
-
-- 新增 ScrambleText 组件。
+完整历史见 [更新日志归档](../../docs/history/changelogs/ScrambleText.history.md)。

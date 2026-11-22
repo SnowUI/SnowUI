@@ -1,4 +1,4 @@
-# state.svelte.ts 文档
+# state
 
 > **版本**: v1.3.0
 > **职责**: 管理组件的交互状态、形态变化和用户交互事件，支持声明式状态机。
@@ -80,16 +80,16 @@
 | Scroll | `State \| LinkageControl` | 滚动时转变状态或控制其他组件 |
 
 ```svelte
-<!-- 状态转变 -->
+<!-- State transition -->
 <Button Click={Active} />
 
-<!-- 阻止冒泡 -->
+<!-- Stop event propagation -->
 <Button Click={{ run: handleClick, stop: true }} />
 
-<!-- 联动控制 -->
+<!-- Cross-component linkage -->
 <Button Click={{ target: 'chart', action: 'play' }} />
 
-<!-- 联动控制 (对象引用) -->
+<!-- Linkage control via target reference -->
 <script>
   let chartRef;
 </script>

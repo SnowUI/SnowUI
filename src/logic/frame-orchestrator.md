@@ -24,22 +24,22 @@
 <Frame
     id="root"
     styles={{
-        // 简单赋值 (覆盖默认 Props)
+        // Direct style overrides
         "#frame3": { padding: 8, radius: 4 },
 
-        // 嵌套组件定位
+        // Target nested component
         "#frame3_btn": { size: 32 },
 
-        // 依赖计算 (联动)
+        // Derived expression linkage
         "#frame3_icon": {
-            // 当 frame3_btn 变大时，icon 随之变大 (1.2倍)
+            // Scale icon to 1.2x of frame3_btn size
             size: "1.2 * $#frame3_btn.size",
-            // 逻辑判断
+            // Conditional expression
             opacity: "$#root.width > 500 ? 1 : 0"
         }
     }}
 >
-    <!-- ... 任意层级的子组件 ... -->
+    <!-- ... Descendant components at any depth ... -->
 </Frame>
 ```
 

@@ -1,4 +1,4 @@
-# tooltip-overlay.ts
+# tooltip-overlay
 
 > **版本**: v1.4.0
 > **职责**: 协调页面内非受控 Tooltip 共用一个 Portal 外框。
@@ -43,7 +43,9 @@
 - **验证方式**：Test Footer 先显示 StyleButton Tooltip，在 gap 停留 150ms 后进入 ColorSchemeButton，再进入刷新 Button；Portal 必须持续挂载、Foreground opacity 保持 1、内容和尺寸直接更新。离开全部按钮超过 300ms 后仍正常退出。
 - **回退约束**：共享外框保留窗口不得再次短于 skip-delay，也不得在定时器内忽略 `delayMs` 实参。若未来调整窗口，必须从 overlay trigger timing 单一来源同步，并复测不同 gap 与移动速度。
 
-## 变更记录
+## 更新日志
+
+### v1.4.0 (2026-08-21)
 
 - v1.4.0 (2026-08-21): 删除 180ms burst 直达判断；每个 warm 目标立即写入状态，由 Tooltip 有界、可打断的时间线从当前画面重定向。
 - v1.3.0 (2026-08-21): 连续裁切触发改为切换节奏判断；首次切换始终执行，180ms burst 内后续目标直达，并删除 pointermove 热路径。

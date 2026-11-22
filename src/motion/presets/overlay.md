@@ -1,4 +1,4 @@
-# overlay.ts 文档
+# overlay
 
 > **版本**: v1.0.0
 > **职责**: 提供 dropdown overlay 组件族出现 / 消失 preset。
@@ -15,7 +15,9 @@
 2. 组件不得复制本 preset 的 duration / easing / scale。
 3. 退出延迟卸载时间必须从 disappear preset 推导。
 
-## 变更记录
+## 更新日志
+
+### v1.0.0 (2026-07-01)
 
 - v1.1.0 (2026-07-01): Popover、Listbox、Menu dropdown 统一移除默认 scale 通道，仅保留 opacity。
 - v1.0.0 (2026-06-18): 新增 dropdown overlay preset。

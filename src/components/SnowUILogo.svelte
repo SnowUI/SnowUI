@@ -68,6 +68,8 @@
   let reducedMotion = $state(prefersReducedMotion());
   let pageVisible = $state(true);
 
+  // Idle motion is pure CSS from the server-rendered markup, so it runs on the compositor from first paint
+  // and hydration never restarts it; only hover or hidden tabs pause it.
   const idleMotionState = $derived(
     !idleMotion || reducedMotion
       ? "off"
@@ -96,7 +98,7 @@
   const compact = $derived(variant === "vertical" && Number.isFinite(compactProgress) ? Math.max(0, Math.min(1, compactProgress)) : 0);
   const greeting = $derived(greetingIndex === -1 ? null : greetings[greetingIndex][1]);
 
-  function iconTransition(_node: SVGElement) {
+  function iconTransition(_node: Element) {
     return { duration: prefersReducedMotion() ? 0 : 320, css: (t: number, u: number) => `opacity:${t};transform:scale(${1 - .55 * u});filter:blur(${3 * u}px)` };
   }
 
@@ -304,18 +306,13 @@
   {...rest}
 >
   {#if variant !== "text"}
-    <svg
-      class="snowui-snow-ui-logo-icon"
-      viewBox="0 0 32 32"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
+    <span class="snowui-snow-ui-logo-icon" aria-hidden="true">
       {#key iconIndex}
-      <g class="snowui-logo-icon-face" transition:iconTransition onintrostart={motionStarted} onoutrostart={motionStarted} onintroend={motionEnded} onoutroend={motionEnded}>
+      <span class="snowui-logo-icon-face" transition:iconTransition onintrostart={motionStarted} onoutrostart={motionStarted} onintroend={motionEnded} onoutroend={motionEnded}>
       {#if iconIndex === -1}
-      <g class="snowui-logo-idle-float">
-      <g class="snowui-logo-idle-spin">
+      <span class="snowui-logo-idle-float">
+      <span class="snowui-logo-idle-spin">
+      <svg class="snowui-snow-ui-logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <!-- 来自 resource-base/assets/logos/snow-logo.svg 的品牌矢量快照；非 hover 时保留原始图形。 -->
       <g class="snowui-snow-ui-logo-color">
         <path
@@ -568,14 +565,17 @@
           <stop offset="1" stop-color="#7482FF" />
         </linearGradient>
       </defs>
-      </g>
-      </g>
+      </svg>
+      </span>
+      </span>
       {:else}
-        <text x={emojiMetrics[iconIndex].x} y={emojiMetrics[iconIndex].y} font-family={LOGO_EMOJI_FONT} font-size={emojiMetrics[iconIndex].size} fill="currentColor">{greetings[iconIndex][0]}</text>
+        <svg class="snowui-snow-ui-logo-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <text x={emojiMetrics[iconIndex].x} y={emojiMetrics[iconIndex].y} font-family={LOGO_EMOJI_FONT} font-size={emojiMetrics[iconIndex].size} fill="currentColor">{greetings[iconIndex][0]}</text>
+        </svg>
       {/if}
-      </g>
+      </span>
       {/key}
-    </svg>
+    </span>
   {/if}
 
   {#if variant !== "icon"}
@@ -615,7 +615,7 @@
   }
 
   :global(:where(.snowui-snow-ui-logo-icon)) {
-    display: block;
+    display: inline-grid;
     flex: none;
     width: var(
       --snowui-snow-ui-logo-icon-size-override,
@@ -676,30 +676,51 @@
   :global(:where(.snowui-snow-ui-logo-icon)),
   :global(:where(.snowui-snow-ui-logo-wordmark)) { pointer-events: none; }
 
-  :global(:where(.snowui-logo-icon-face)) { transform-origin: 16px 16px; }
-
-  /* Compositor-friendly CSS transform idle motion avoids main-thread stalls during route transitions. */
-  @keyframes snowui-logo-idle-float {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    50% { transform: translate3d(0, -4.5714px, 0); }
+  :global(:where(.snowui-logo-icon-face)) {
+    grid-area: 1 / 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-origin: 50% 50%;
   }
 
-  @keyframes snowui-logo-idle-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  :global(:where(.snowui-logo-idle-float)),
+  :global(:where(.snowui-logo-idle-spin)),
+  :global(:where(.snowui-snow-ui-logo-svg)) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  /* Compositor-driven HTML layers: constant-speed spin and eased float run from first paint without main-thread stalls. */
+  @keyframes -global-snowui-logo-idle-float {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -14.285714%, 0); }
+  }
+
+  @keyframes -global-snowui-logo-idle-spin {
+    from { transform: rotate3d(0, 0, 1, 0deg); }
+    to { transform: rotate3d(0, 0, 1, 360deg); }
+  }
+
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="running"]) .snowui-logo-idle-float),
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-float),
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="running"]) .snowui-logo-idle-spin),
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-spin) {
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+    will-change: transform;
   }
 
   :global(:where(.snowui-snow-ui-logo[data-idle-motion="running"]) .snowui-logo-idle-float),
   :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-float) {
     animation: snowui-logo-idle-float 5.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-    will-change: transform;
   }
 
   :global(:where(.snowui-snow-ui-logo[data-idle-motion="running"]) .snowui-logo-idle-spin),
   :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-spin) {
-    transform-origin: 16px 16px;
     animation: snowui-logo-idle-spin 16s linear infinite;
-    will-change: transform;
   }
 
   :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-float),

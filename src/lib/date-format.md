@@ -22,7 +22,6 @@ mergeDateFormatOptions(...options)
 
 ---
 
-> **以下内容供 AI 阅读，用于维护代码与文档的关联**
 
 ## 开发者指南 (AI)
 
@@ -30,7 +29,7 @@ mergeDateFormatOptions(...options)
 - **规范**: [../../../docs/reference/DateFormats.md](../../../docs/reference/DateFormats.md)
 - Table、Calendar、Timeline 等组件不得平行维护日期格式规则。
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.0.0 (2026-06-19)
 

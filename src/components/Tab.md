@@ -61,11 +61,6 @@
 - 默认内置模式（推荐）：`items` 自动生成 `<Button as="item">`；item 可用 `icon` 声明图标，Tab 内置生成 `Icon + Text`，适用于 `icon-toggle`；`parts.Button / parts.Icon / parts.Text` 配置统一 Props。
 - 显式组合模式：显式书写 Button，用于 Icon、Text、复杂内容或逐项 Props 差异。
 
-> **版本**: v1.3.2
-> **状态**: 已实现
-> **职责**: 在多个互斥选项之间切换"视图/内容区"。子项使用 Button,激活态视觉
-> 由 Tab 容器通过 CSS override Button 的桥接变量接管。
-> **设计稿**: Figma node `11838-19967`
 
 ---
 
@@ -81,8 +76,6 @@
 ---
 
 <a id="2-api"></a>
-
-
 
 
 ### 2.2 子项约定
@@ -120,14 +113,6 @@
 
 Item 颜色、透明度继续消费 Frame 默认动效系统。Tab 根注入 `TAB_INDICATOR_MOTION_STYLE`；共享 indicator 的位移消费 Frame control bridge，宽高变化消费 Frame size bridge，两者统一使用 Tab indicator preset。icon-toggle 因文字显隐触发的重测也保持动效，不再被 ResizeObserver 瞬间贴位覆盖。
 
-| 场景 | 实现 | bridge 变量 |
-| :--- | :--- | :--- |
-| 激活 indicator 位移 | 共享 indicator 元素 `transform: translate(x, y)` 过渡 | `--snowui-frame-control-motion-*`（`TAB_INDICATOR_MOTION`） |
-| 激活 indicator 尺寸变化 | width/height 过渡 | `--snowui-frame-size-motion-*`（`TAB_INDICATOR_MOTION`） |
-| inactive / hover / active 前景切换 | opacity 过渡(Button opacity override) | `--snowui-frame-color-motion-*`(fallback 0.15s ease-out) |
-| icon-toggle 宽度展开 | Item width 过渡 | `--snowui-frame-size-motion-*` |
-| icon-toggle 文字渐显 | Text opacity 过渡 | `--snowui-frame-appear-motion-*`（生命周期进入时序桥接变量） |
-| underline 移动 | 同 indicator,仅高度固定 2px | Frame control / size bridge |
 
 Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_MOTION_STYLE` 将同一 preset 注入 Frame control / size 两组 bridge，禁止分别维护位移和尺寸数值。
 
@@ -167,31 +152,31 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
   let value = $state('web');
 </script>
 
-<!-- 样式1 默认 pill -->
+<!-- Variant 1: pill (default) -->
 <Tab bind:value variant="pill" size="sm">
   <Button as="item" value="web"><Icon><FourLeafClover /></Icon>Web</Button>
   <Button as="item" value="mobile"><Icon><Star /></Icon>Mobile</Button>
 </Tab>
 
-<!-- 样式2 solid -->
+<!-- Variant 2: solid -->
 <Tab variant="solid" size="md">
   <Button as="item" value="web"><Icon><FourLeafClover /></Icon>Web</Button>
   <Button as="item" value="mobile"><Icon><Star /></Icon>Mobile</Button>
 </Tab>
 
-<!-- 样式3 underline -->
+<!-- Variant 3: underline -->
 <Tab variant="underline" size="lg">
   <Button as="item" value="overview"><Icon><FourLeafClover /></Icon>Overview</Button>
   <Button as="item" value="details"><Icon><Star /></Icon>Details</Button>
 </Tab>
 
-<!-- 样式4 icon-toggle -->
+<!-- Variant 4: icon-toggle -->
 <Tab variant="icon-toggle">
   <Button as="item" value="web" aria-label="Web"><Icon><FourLeafClover /></Icon><Text>Web</Text></Button>
   <Button as="item" value="mobile" aria-label="Mobile"><Icon><Star /></Icon><Text>Mobile</Text></Button>
 </Tab>
 
-<!-- 样式4 icon-toggle：默认内置模式 -->
+<!-- Variant 4: icon-toggle with items prop -->
 <Tab
   variant="icon-toggle"
   value="web"
@@ -201,25 +186,25 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
   ]}
 />
 
-<!-- bare：文字、单 Icon、混合内容均可 -->
+<!-- Bare variant: text, single icon, or mixed content -->
 <Tab variant="bare" size="md" value="all">
   <Button as="item" value="all">All</Button>
   <Button as="item" value="random" iconOnly aria-label="收藏"><Icon><Star /></Icon></Button>
 </Tab>
 
-<!-- 纵向排列 -->
+<!-- Vertical orientation -->
 <Tab column variant="underline">
   <Button as="item" value="a">A</Button>
   <Button as="item" value="b">B</Button>
 </Tab>
 
-<!-- Figma fill 宽度:容器定宽后子项等宽 -->
+<!-- Fill width: equal-width items inside fixed-width container -->
 <Tab fill style="width: calc(var(--size-20) * 4)" value="web">
   <Button as="item" value="web">Web</Button>
   <Button as="item" value="mobile">Mobile</Button>
 </Tab>
 
-<!-- 无外壳 Tab：未激活 40%，激活 100% -->
+<!-- Bare Tab: 40% inactive, 100% active opacity -->
 <Tab variant="bare" value="random">
   <Button as="item" value="all">All</Button>
   <Button as="item" value="random">Random</Button>
@@ -227,7 +212,6 @@ Tab indicator 的具体时序以 `TAB_INDICATOR_MOTION` 为准；`TAB_INDICATOR_
 ```
 
 ---
-
 
 ## AI Zone
 
@@ -240,7 +224,6 @@ Tab indicator 的位置与尺寸监听统一通过 Components 的 `resizeManager
 ---
 
 <a id="7-使用示例"></a>
-
 
 
 <a id="3-样式-token-详表"></a>
@@ -262,15 +245,6 @@ Tab indicator 的位置与尺寸监听统一通过 Components 的 `resizeManager
 
 ### 3.2 容器(`.snowui-tab` 自身)
 
-| 维度 | SM | MD | LG | Token |
-| :--- | :--- | :--- | :--- | :--- |
-| 容器 padding(pill/icon-toggle) | `calc(var(--padding-1) / 2)` (2) | `--padding-1` (4) | `--padding-1` (4) | `--snowui-tab-padding` |
-| 容器 radius(pill/icon-toggle) | `--radius-4` (16) | `--radius-5` (20) | `--radius-6` (24) | `--snowui-tab-radius` |
-| 容器 gap(子项之间) | `calc(var(--gap-1) / 2)` (2) | `--gap-1` (4) | `--gap-1` (4) | `--snowui-tab-gap` |
-| underline 子项间距 | `--gap-3` (12) | `--gap-4` (16) | `--gap-5` (20) | `--snowui-tab-gap` |
-| underline 容器 radius | `0` | `0` | `0` | `--snowui-tab-radius` |
-| bare 子项间距 | `--gap-3` (12) | `--gap-4` (16) | `--gap-5` (20) | `--snowui-tab-gap` |
-| bare 容器 padding / radius | `0 / 0` | `0 / 0` | `0 / 0` | variant |
 
 > SM 档的 2px padding/gap 用 `calc()` 公式从现有 token 派生,不新增变量。
 
@@ -324,85 +298,4 @@ Tab indicator 的位置与尺寸监听统一通过 Components 的 `resizeManager
 
 - Tab 根尺寸监听迁入共享 `resizeManager`，统一 SSR、能力缺失、按帧交付与资源释放边界。
 
-### v1.2.2 (2026-08-14)
-
-- `icon-toggle` 变体同步启用与 pill、SearchBox 相同的 `blur(1.25rem)` 背景模糊。
-
-### v1.2.1 (2026-08-14)
-
-- 默认 `pill` 变体增加与 SearchBox 一致的 `backdrop-filter: blur(1.25rem)`，并同步 `-webkit-backdrop-filter`。
-- 新增 `--snowui-tab-background-blur-override` 公开覆盖入口；其他变体默认不启用背景模糊。
-
-### v1.2.0 (2026-07-06)
-
-- `TabItem` 新增可选 `icon`；默认内置模式可生成 `Button + Icon + Text`，完整支持 `variant="icon-toggle"`。
-
-### v1.1.1 (2026-06-23)
-
-#### Item 尺寸覆盖契约
-- 明确 Item 尺寸样式优先级：`style > class > Button size > Tab size`；Tab size 仅作为未显式指定时的组合默认值。
-
-### v1.1.0 (2026-06-23)
-
-#### 新功能与尺寸契约
-- 新增 `variant="bare"`：容器与 Item 均无外壳，不显示 indicator，支持文字、单 Icon 和混合内容，使用 12/16/20px gap 与 0.4→1 opacity 状态。
-- Tab `size` 通过显式 Button size context 传给直系 `Button as="item"`；Button 自身仍是尺寸定义唯一来源，实例显式 `size` 优先。
-
-### v1.0.8 (2026-06-22)
-
-#### 组合能力
-- 补充无外壳 Button Item 组合。Tab 的 `--snowui-button-opacity-override` 与 Button 的内部透明度变量属于同一根节点级联链，未激活仍为 0.4，不会叠乘为 0.16。
-
-### v1.0.7 (2026-06-21)
-
-#### 动效归口
-- 新增 `TAB_INDICATOR_MOTION` 组件族 preset，indicator 的 transform、width、height 统一恢复为 transitions.dev Tabs sliding 的 250ms smooth-out。
-- 位移改为消费真实存在的 Frame control bridge，移除不存在的 transform bridge 命名；Tab 不再误用通用 `RESIZE_MOTION`。
-
-### v1.0.6 (2026-06-21)
-
-#### 动效修复
-- 修复 `variant="icon-toggle"` 切换后 ResizeObserver 以无动画同步覆盖 indicator 移动的问题；初始化后所有尺寸重测继续播放移动效果。
-- Tab 根曾注入通用 resize preset；该方案已在 v1.0.7 被 Tab indicator 专属 preset 替代。
-
-### v1.0.5 (2026-06-18)
-
-#### 动效还原
-- 完整对齐 transitions.dev Tabs sliding：indicator 的 transform、width、height 统一为 250ms 与 `cubic-bezier(0.22, 1, 0.36, 1)`，消除原先位移 200ms、尺寸 300ms 造成的不同步。
-- 保留首次渲染与 resize 瞬间贴位，并补充 `prefers-reduced-motion` 关闭 indicator 过渡。
-
-### v1.0.4 (2026-06-13)
-
-#### 交互修正
-- 背景移动对齐 transitions.dev Tabs sliding：indicator 改为直接写入 DOM `transform / width / height`，初始定位与 resize 时临时关闭 transition 并强制 reflow 贴位，只有用户切换时才执行滑动动效。
-
-### v1.0.3 (2026-05-31)
-
-#### 样式调整
-- active Text / Icon 按 variant 拆分：pill / icon-toggle 保持 `--static-black-100`，underline 使用 `--primary`，solid 保持 Button 默认颜色链。
-- inactive Text / Icon 统一使用 `--black-100 × opacity: 0.4`。
-- 四种 variant 示例均补充 Icon，便于直接观察 Text / Icon 颜色继承。
-
-### v1.0.2 (2026-05-31)
-
-#### 样式调整
-- 修正 Item 两态颜色源：inactive Text / Icon 保持 Button 默认 `--black-100`，active Text / Icon 使用 `--static-black-100`。
-- inactive 的 40% 视觉仍只由整体 `opacity: 0.4` 表达；inactive hover 与 active 使用 `opacity: 1`。
-
-### v1.0.1 (2026-05-31)
-
-#### 样式调整
-- 移除 inactive Item 的 40% 颜色值路径，改用 `opacity: 0.4`，hover / active 恢复 `opacity: 1`，对齐 `StyleSpec.md §2.4.5`。
-- 新增 `--snowui-tab-inactive-opacity-override` / `--snowui-tab-hover-opacity-override` 外部覆盖入口。
-
-### v1.0.0 (2026-05-20)
-
-#### 新功能
-- 初始实现:4 variant(pill / solid / underline / icon-toggle)× 3 size(sm/md/lg)× 2 direction(row/column)
-- 共享 indicator 元素位置 / 尺寸过渡，消费 Frame control / size motion bridge 变量
-- Roving tabindex 键盘行为,支持 selectionFollowsFocus 模式开关
-- 支持 `fill` Figma fill 宽度,容器有显式宽度时横向子项等宽填满
-- 配套为 Frame 新增 `FRAME_SIZE_MOTION_BRIDGE`,详见 [bridge.md changelog v1.3.0](../motion/bridge.md)
-
-#### 修正
-- `variant="underline"` 容器默认圆角为 0;下划线 / 竖线尺寸由组件计算,不依赖 CSS 强制覆盖内联尺寸
+完整历史见 [更新日志归档](../../docs/history/changelogs/Tab.history.md)。

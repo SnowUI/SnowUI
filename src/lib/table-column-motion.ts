@@ -7,7 +7,9 @@ const contentSelector = ':scope > .snowui-table-cell-content, :scope > .snowui-t
 export function createTableColumnMotion(table: HTMLTableElement) {
     let animations: Animation[] = [];
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const cells = () => Array.from(table.rows).flatMap(row => Array.from(row.cells));
+    const cells = () => Array.from(table.rows)
+        .filter(row => row.dataset.empty !== 'true' && row.dataset.loadingSpinner !== 'true')
+        .flatMap(row => Array.from(row.cells));
     function capture() {
         const result = new Map<HTMLTableCellElement, Geometry>();
         for (const cell of cells()) {

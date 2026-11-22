@@ -116,7 +116,11 @@
 
 ---
 
-## 更新日志 (Changelog)
+## 更新日志
+
+### v1.2.0
+
+- 同步源码契约与版本说明。
 
 ### v1.3.0 (2026-06-18)
 
@@ -131,9 +135,4 @@
 - `whileAppear` 曾从 `replaceIn` 改为 `fadeIn + scaleIn`；自 2026-06-30 起 generic fallback 收敛为仅 fadeIn，scale 改为显式 opt-in。
 - 明确原子动效组合为并行播放，组合后的默认持续时间由当时的默认组合统一管理。
 
-### v1.1.0 (2026-05-12)
-
-#### 新功能
-- 新增 `primitives.ts`：将 `fade / scale / slide / stackTranslate` 作为 原子动效构建器纳入 `src/motion/`。
-- 明确 `move.ts` 中的 slide 预设由原子动效组合而成。
-- 明确跨 Frame 的动效编排由协调模块拥有；motion 目录只承载单 Frame 自身可复用的动效资源。
+完整历史见 [更新日志归档](../../docs/history/changelogs/motion-README.history.md)。

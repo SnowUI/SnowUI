@@ -1,4 +1,4 @@
-# responsive.svelte.ts 文档
+# responsive
 
 > **版本**: v1.4.0
 > **职责**: 管理组件的响应式能力和断点检测，支持断点触发布局和联动控制。
@@ -27,10 +27,10 @@
 **Layout 值**: `row` | `column` | `grid` | `row-reverse` | `column-reverse`
 
 ```svelte
-<!-- 布局变化 -->
+<!-- Layout transition -->
 <Button xs={column} sm={row} />
 
-<!-- 联动控制：进入 md 断点时触发其他组件 -->
+<!-- Trigger target when entering md breakpoint -->
 <Container md={{ target: 'sidebar', action: 'play' }} />
 ```
 

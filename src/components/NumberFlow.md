@@ -117,7 +117,6 @@ import { NumberFlow } from "@snowui-design-system/components";
 
 ---
 
-
 ## AI Zone
 
 以下章节保留源码维护约束，不属于应用接入步骤。
@@ -136,7 +135,6 @@ SnowUI 在原始逐位滚轮、`Intl.NumberFormat` parts、趋势方向和进退
 SnowUI 没有原样公开上游的 `plugins`、`NumberFlowGroup`、CSS parts / Shadow DOM、`prefix` / `suffix`、`willChange`、`animated`、事件和分离的 spin / transform / opacity timing。需要这些原始接口时直接使用上游包；SnowUI 只承诺本文 API。
 
 <a id="import"></a>
-
 
 
 <a id="ai-zone"></a>
@@ -181,9 +179,9 @@ SnowUI 没有原样公开上游的 `plugins`、`NumberFlowGroup`、CSS parts / S
 
 ## 更新日志
 
-- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
 ### v2.1.0 (2026-09-17)
+
+- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
 - 重新对照 `number-flow@0.6.2` 的旧布局测量、节点更新和动画启动顺序，保留 SnowUI 的连续更新与交错能力。
 - `chromatic()` 改为单一可见覆盖层：一位、三位或十位数字都覆盖完整彩谱，并直接过渡到最终文字色；不再通过透明 wheel viewport 绘制，也不会让黑色底字在彩色边缘形成黑边。

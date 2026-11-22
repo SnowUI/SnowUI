@@ -1,4 +1,4 @@
-# search-filter.ts 文档
+# search-filter
 
 > **版本**: v1.0.0
 > **日期**: 2026-04-21
@@ -54,12 +54,12 @@
 ```typescript
 import { matchesSearch, filterBySearch } from "../lib/search-filter";
 
-// 单项判断
-matchesSearch("United States", "us");    // true（首字母缩写）
-matchesSearch("United States", "state"); // true（子串）
+// Single-item match
+matchesSearch("United States", "us");    // true (initials match)
+matchesSearch("United States", "state"); // true (substring match)
 matchesSearch("United States", "xyz");   // false
 
-// 批量过滤（配合 Svelte $derived）
+// Filter items (pair with Svelte $derived)
 const filteredOptions = $derived.by(() =>
     filterBySearch(registeredOptions, filterText)
 );

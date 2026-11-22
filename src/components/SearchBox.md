@@ -91,8 +91,6 @@
 <a id="api-参考"></a>
 
 
-
-
 ### 使用示例
 
 ```svelte
@@ -102,7 +100,7 @@
 ```
 
 ```svelte
-<!-- 容器收窄到 80px 以下时只保留搜索图标 -->
+<!-- Collapse to search icon below 80px container width -->
 <SearchBox collapseBelow={80} placeholder="Search" />
 ```
 
@@ -119,11 +117,7 @@
 ```
 
 
-> 此区域的内容受保护。AI 在修改此区域前必须请求用户审查。
-
 ---
-
-
 
 
 ### 2026-11-13 行为同步
@@ -135,12 +129,6 @@
 ### 内置文案与语言
 
 使用现有 `useLocale()`，key：`searchBox.placeholder`、`searchBox.clear`。默认占位和清除名称随 LocaleProvider 切换；显式 placeholder（含空字符串）与 aria-label 优先，查询值保持原样。Provider messages 可覆盖缺省文案。
-
-
-> **内置图标统一（2026-09-11）**：功能图标的资源比例、尺寸优先级和按钮宿主遵循 [ComponentGuidelines §2.7](../../../docs/standards/ComponentGuidelines.md#27-组件内置-icon-规范)。内置无外壳操作复用 Button bare；有padding的纯图标操作使用 iconOnly。尺寸从所属宿主继承，显式覆盖优先。`parts.Button` 配置默认内置操作按钮（包含 size、class、style），功能事件、ARIA和角色仍由父组件控制。
-
-
-
 
 
 `SearchBox` 是搜索浮层的触发器，交互类似 `Select`。它不是原生输入框，整个组件都是可点击区域；视觉颜色、hover、focus、清除 X、内部布局参考 `Input`，并通过 `Frame` 接通 Frame 能力。
@@ -220,19 +208,4 @@
 
 - SearchBox 根组件默认增加与 Tooltip 一致的 `backdrop-filter: blur(1.25rem)`，并提供 `--snowui-search-box-background-blur-override`。
 
-### v1.1.0 (2026-08-10)
-
-- 新增 `collapseBelow`，可在自身宽度不足时退化为仅 leading 搜索图标；图标态最小宽度等于左右实际 padding + leading Icon 固有宽度。
-- 尺寸监听复用 Components 全局 `resizeManager`，页面只负责分配宽度与选择阈值。
-
-### v1.0.3 (2026-05-09)
-
-#### 修复
-
-- 屏蔽 SearchBox 根节点的全局 `focus-visible` outline，避免点击打开后按 Escape 重新出现灰色焦点外圈。
-
-### v1.0.0 (2026-05-08)
-
-#### 新功能
-
-- 新增 搜索框触发器，支持灰底和边框样式。
+完整历史见 [更新日志归档](../../docs/history/changelogs/SearchBox.history.md)。

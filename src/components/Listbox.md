@@ -71,10 +71,6 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 
 未设置 `maxHeight` 时，可用视口空间只改变完整可见的 Item 数量，不产生半项高度：面板在 2～10 项之间选择能够容纳的完整项数；即使触发器下方空间不足，也至少为现有选项中的前 2 项保留完整高度。少于 2 项时按实际项数 Hug。显式 `maxHeight` 继续按调用方给定的长度与视口可用高度取较小值。
 
-> **版本**: v1.4.0
-> **状态**: 已实现
-> **更新日志 (2026-04-28)**: 标注主布局模型为复合管理布局；补充关键字表格、用户定义区与更新日志，以满足组件开发链路检查。
-> **职责**: 浮层选项列表面板，作为 Select 的下拉面板。Portal 到 body，position:fixed 定位，选中项中心对齐 Trigger，遵循 Quick Action 视觉规范。支持内嵌 `<Input as="search">` 搜索/过滤。
 
 **2026-04-24 更新（v1.2.0）**: 滚动条间距规范化 — `.snowui-listbox` 使用 `overflow-y: scroll` + `scrollbar-width: none` 隐藏原生滚动条，并通过 `.snowui-listbox-body` 内的自定义浮层滚动条显示滚动位置。MenuItem 背景左右间距保持 8px；滚动条覆盖在右侧，不占布局宽度，右边缘距面板右边框 4px。带搜索 Input 时，滚动条只出现在 Input 下方的 MenuItem 滚动区域。Thumb 支持鼠标拖拽；打开定位用选中项相对 portal 的真实视觉中心计算，兼容有无顶部 Input 的结构。
 
@@ -211,7 +207,6 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 - 搜索框固定在 header；选项滚动区域单独承载 overlay scrollbar。
 
 
-
 <a id="连续-hover"></a>
 
 ### 连续 Hover
@@ -219,7 +214,6 @@ Select 默认提供 `search=false`；默认内置模式可用 `search` 开启、
 `continuousHover` 默认 `true`。开启时 Listbox 只使用一个容器级背景层在直接
 `MenuItem` 之间移动，键盘 active 项也复用该层；关闭后恢复 MenuItem 原有的即时
 hover / active 背景。disabled、filtered 项不会成为目标。
-
 
 ## AI Zone
 
@@ -292,10 +286,7 @@ Portal anchor div (position:fixed; width/max-height only)
 <a id="键盘交互"></a>
 
 
-
-> **内置图标统一（2026-09-11）**：复用Input与MenuItem的Button bare操作与图标规则。通过搜索新增的自定义选项由默认列表渲染，并支持hover删除；不重复注册为固定选项。
-
-> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../docs/standards/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+面板边框遵循共享浮层内描边规则（`var(--border-2)` `var(--surface-1)` inset 叠加）。
 
 <a id="样式规范"></a>
 
@@ -380,48 +371,4 @@ hover 自定义项（`data-custom="true"`）时，✔ 图标位置替换为 × �
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
-### v1.3.5（2026-09-17）
-
-- Listbox Portal 的最终水平位置使用共享浮层夹取能力限制在视口 8px 安全边距内，并限制面板最大宽度，修复靠近左右边缘时选项面板越出视口的问题。
-
-### v1.3.4（2026-09-12）
-
-- 打开期间跟随触发器状态动效更新定位和等宽尺寸，动效结束或取消时同步最终位置；关闭后取消跟踪。避免 Select 点击缩放恢复后，面板仍保留缩小时的宽度。
-
-### v1.3.3（2026-09-12）
-
-- 按用户要求移除横向取整，等宽 Listbox 总宽度增加固定 2px、左右各覆盖 1px；保留背景、模糊与内边框，固定 px 已登记规范例外。
-
-### v1.3.2 (2026-09-12)
-
-- 每次打开时记录选中项对齐位置；搜索、无匹配、清空与自定义项变化不再依据隐藏选项的零尺寸矩形重定位。
-- 初始对齐与 active 项滚动只读取当前可见选项，保留完整项高度与视口约束。
-
-
-### v1.3.1 (2026-09-03)
-
-- Quick Action 与 overlay scrollbar 共享默认进入已登记的低优先级 CSS layer，组件 padding / 轨道定位不再被后加载的共享样式覆盖。
-- 轨道定位抵消实际面板 padding；根字号缩放或公开 padding override 后，滚动条右缘仍距面板右缘 4px。
-
-### v1.3.0 (2026-09-01)
-
-#### 调整
-- 未显式设置 `maxHeight` 时，面板改为按实际可见 Item 高度完整显示最多 10 项；视口空间不足时按完整项数收窄，并至少保留 2 项高度，避免末项只显示一部分后在 hover / 键盘高亮时触发自动滚动。
-- 显式 `maxHeight` 与调用方 inline `max-height` 覆盖保持兼容。
-
-### v1.2.2 (2026-07-05)
-
-#### 修复
-- `matchTriggerWidth` 改为“至少与触发器等宽”；当触发器过窄时，Listbox 按最长选项文字、勾选槽、gap 与 padding 的完整宽度扩展，避免文字、勾选重叠或右侧间距消失。
-
-### v1.2.1 (2026-07-05)
-
-#### 修复
-- Portal 浮层隔离外层 Field Context，避免 Select 位于 Field 内时，搜索 Input 被误判为 embedded host 而丢失独立背景、边框、padding 与圆角。
-
-### v1.2.0 (2026-04-24)
-
-#### 调整
-- 滚动条间距规范化，Listbox 与 QuickAction 对齐 header + scroll body 区域结构。
-- 外部点击判断统一使用 `ListboxOwnerContext` 的 `triggerEl` / `anchorEl`，不再依赖 Select 私有 class，因此 Pagination 等其他 owner 也能复用同一套 Listbox。
-- 默认出现 / 消失动效与 Popover、Menu 共用 opacity-only dropdown preset，移除 scale 通道。
+完整历史见 [更新日志归档](../../docs/history/changelogs/Listbox.history.md)。

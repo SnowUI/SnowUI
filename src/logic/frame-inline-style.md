@@ -1,4 +1,4 @@
-# frame-inline-style.svelte.ts 文档
+# frame-inline-style
 
 > **版本**: v1.0.1
 > **类型**: 逻辑模块
@@ -42,7 +42,7 @@
 - **工具函数**: `frame-utils.ts`（@snowui-design-system/components）
 - **桥接层**: `motion/bridge.ts`（@snowui-design-system/components，路径 `motion/bridge.ts`）
 
-## 更新日志 (Changelog)
+## 更新日志
 
 ### v1.0.1 (2026-03-24)
 

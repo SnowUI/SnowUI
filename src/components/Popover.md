@@ -104,7 +104,7 @@ Popover 同时支持三种使用模式:**面板模式 (Panel)**、**内嵌模式
     </Popover>
 </Button>
 
-<!-- 任意宿主 -->
+<!-- Arbitrary host -->
 <Frame row class="p-8 bg-black-4">
     点击我
     <Popover as="popover" trigger="hover" size="md">
@@ -122,11 +122,11 @@ Popover 同时支持三种使用模式:**面板模式 (Panel)**、**内嵌模式
     <Text>Popover Content</Text>
 </Popover>
 
-<!-- 多个触发器共享同一份内容 -->
+<!-- Share one template across multiple triggers -->
 <Button data-popover-target="pop-01">触发器 1</Button>
 <Button data-popover-target="pop-01">触发器 2</Button>
 
-<!-- 或命令式触发 -->
+<!-- Imperative trigger -->
 <Button onclick={(e) => showPopover("pop-01", e.currentTarget)}>Click Me</Button>
 ```
 
@@ -222,9 +222,9 @@ Popover 与 Listbox 共用同一套 `header + scroll-body` 结构,所有浮层�
 ```ts
 import { showPopover, hidePopover, togglePopover } from "@snowui-design-system/components";
 
-showPopover("pop-01", buttonEl);   // 显示(hover 模式带 450ms 延迟)
-hidePopover("pop-01");             // 关闭(hover 模式带 80ms 延迟)
-togglePopover("pop-01", buttonEl); // 切换
+showPopover("pop-01", buttonEl);   // Show (450ms delay in hover mode)
+hidePopover("pop-01");             // Hide (80ms delay in hover mode)
+togglePopover("pop-01", buttonEl); // Toggle
 ```
 
 ---
@@ -322,14 +322,11 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 组件�
 菜单项之间连续移动；`false` 恢复 MenuItem 原有逐项 hover。嵌套 Listbox 使用自己
 最近的连续 hover 容器，不由 Popover 越界接管。
 
-
-
 ## AI Zone
 
-> **2026-09-10 浮层内边框**：面板复用共享浮层视觉，在原有投影上叠加 `var(--border-2)`（16px 根字号下 1px）、`var(--surface-1)` 的 inset 内边框，不占用布局尺寸。共享契约见 [StyleSpec §2.13](../../../docs/standards/StyleSpec.md#213-quick-action-共享浮层视觉强制)。
+面板边框遵循共享浮层内描边规则（`var(--border-2)` `var(--surface-1)` inset 叠加）。
 
 
-> **更新日志 (2026-05-15)**: 旧 Popover 定义全部废弃,合并 QuickAction(小尺寸)、取代 SearchPopup(中尺寸)。
 > **新增 (2026-05-15) v3.1.0**: 内嵌模式 `as="popover"`(Tooltip 风格):放入宿主子节点即自动绑定。
 
 
@@ -351,11 +348,12 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 组件�
 
 ## 更新日志
 
+### v3.1.1 (2026-06-02)
+
 - 2026-10-23：任意Frame宿主Test中的图标与短标签改用公开单行组合，保留4px间距与全文缩略；父宿主触发及Popover运行实现不变，仅文档与示例修订。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
 
-### v3.1.1 (2026-06-02)
 - Popover hover 显示延迟调整为 `450ms`,与 Tooltip 首次 hover 延迟统一。
 - Popover 直接复用 Tooltip 的首次延迟常量,但不参与 Tooltip 的 `300ms` 快速切换窗口。
 
@@ -373,8 +371,4 @@ QuickAction 与 SearchPopup 源码组件已删除;SP-02 示例迁移到 组件�
 - `closeOnOutsideClick` 重命名为 `closeOn: "outside" | "manual"` 更直观
 - 保留静态模式以承接 SP-02 风格自由组合
 
-### v2.0.0 (2026-05-15)(已废弃)
-- 改为 QuickAction 风格的通用浮层容器,触发器包裹模式
-
-### v1.1.1 (2026-02-03)
-- 初始版本
+完整历史见 [更新日志归档](../../docs/history/changelogs/Popover.history.md)。

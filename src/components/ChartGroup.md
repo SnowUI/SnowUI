@@ -31,13 +31,13 @@
 	const weeks = Array.from({ length: 12 }, (_, index) => `W${index + 1}`);
 	const previousQuarterVisits = [4000, 6000, 5200, 7600, 3600, 6600, 4500, 7200, 4800, 8000, 3400, 6400];
 	const currentQuarterVisits = [3250, 6875, 4125, 8750, 2625, 5750, 3250, 6875, 4125, 8750, 2625, 5750];
-	// 季度前 12 周按相同周序比较；折线每周两个采样点，奇数索引对齐柱体中心。
+	// Compare first 12 weeks; odd line indices align with bar centers.
 	const sampleLabels = Array.from({ length: 25 }, (_, index) =>
 	    index % 2 === 1 ? weeks[(index - 1) / 2] : `Week ${index / 2 + 1} start`
 	);
 	const organicSearch = [3510, 3990, 4440, 1360, 2020, 2680, 1750, 3190, 4500, 4290, 3980, 5970, 7910, 7700, 7550, 8630, 9690, 6380, 6950, 7550, 5070, 6080, 7100, 7310, 7550];
 	const referralForecast = [1660, 2630, 3550, 3490, 4590, 3780, 2920, 5710, 6100, 6470, 4040, 1650, 1680, 1730, 3220, 4680, 4120, 3560, 6150, 8740, 8270, 7820, 9030, 8810, 8550];
-	// 共享 hover 按周索引；折线使用对应周中心的采样点。
+	// Shared hover indexes by week; line series samples at week centers.
 	let activeWeek: number | null = $state(null);
 	function selectSample(index: number | null) {
 	    activeWeek = index === null ? null : Math.min(weeks.length - 1, Math.floor(index / 2));
@@ -192,14 +192,6 @@ HoverPanel 使用共享三列布局；圆点—名称优先 `--gap-1`，名称�
 <a id="2-api"></a>
 
 
-### 2.1 Props
-
-| 关键字 | 类型 | 默认值 | 描述 |
-| :--- | :--- | :--- | :--- |
-| `loading` | `boolean` | — | 数据等待状态。保留组合画布的最终尺寸、共享坐标和所有子图节点；子图读取该 loading 上下文后停在各自出现动效起点，解除加载时按当前视口条件播放。组合图不渲染 Skeleton。 |
-
-其余未声明属性会透传给根层 `Frame`。
-
 ### 2.2 子图表协议
 
 `ChartGroup` 通过 context 向后代 Chart 暴露：
@@ -295,7 +287,6 @@ interface ChartGroupContext {
 
 <a id="自适应黑白对比接入"></a>
 
-
 ## AI Zone
 
 ### 内置文案与语言
@@ -310,10 +301,7 @@ interface ChartGroupContext {
 使用 [Adaptive Contrast](../lib/adaptive-contrast.md) 共享入口。组件保留前景形状、数值和交互；ChartGroup 协调同原点表面数据。本组件默认开启 `adaptiveContrast`，可通过 `adaptiveContrast={false}` 关闭，不穿透私有 SVG。
 
 
-
-
 > **状态**: 已实现
-
 
 
 **继承**: 复用 Frame.svelte 的通用能力。
@@ -325,10 +313,6 @@ interface ChartGroupContext {
 
 ### 样式 Token 详表
 
-| 属性 | 默认值 | Token / 变量 |
-| :--- | :--- | :--- |
-| 整体宽度 | 800px | `--snowui-chart-group-width` |
-| 整体高度 | 400px | `--snowui-chart-group-height` |
 
 ### 3.1 Override 入口
 
@@ -353,6 +337,10 @@ interface ChartGroupContext {
   - `Frame`: 根层 Frame 能力继承。
 - **归属判断**: 复合组件。原因是 `ChartGroup` 协调多个 Chart 原子的 hover 与组合画布，属于跨组件协作能力。
 
+### 2026-09-02
+
+- HoverPanel 改为默认开启，默认外观保持 light。
+
 ## 更新日志
 
 ### v0.4.3 (2026-10-23)
@@ -370,39 +358,4 @@ interface ChartGroupContext {
 
 - 共享 pointer 跟随与 cell 解析改为每帧提交最新坐标，原始事件不再同步读取布局；反白表面列表改为响应式缓存。公开 API、命中范围、面板位置、视觉和交互语义不变。
 
-### v0.4.0 (2026-09-03)
-
-- `adaptiveContrast` 改为默认开启，保留显式关闭与子图覆盖。
-
-### v0.3.0 (2026-09-03)
-
-- `adaptiveContrast` 接入 自适应黑白对比共享能力；保留开关默认值、彩色前景、命中和节点状态语义，移除图表私有试验实现。
-
-### v0.2.3 (2026-09-02)
-
-- HoverPanel 默认定位改为 `pointer`，随鼠标移动；区域 hover 默认保持 `cell`，显式的 placement / hoverMode 配置继续优先。
-
-### 2026-09-02
-
-- HoverPanel 改为默认开启，默认外观保持 light。
-
-### v0.2.2 (2026-09-02)
-
-- 修复多个子图注册顶部安全区时相互触发 effect 重注册，导致页面忙循环的问题；注册与清理不订阅内部版本，动态安全区仍由子图的响应式 resolver 更新。
-- 补全全部具名 Property 的行为、优先级和限制，补充 showHoverLabel 与 alwaysShowHoverLabel；同步 Site 的拟真组合示例。
-
-### v0.2.1 (2026-09-02)
-
-- 共享顶部安全区不再因 hover 数值增高；子图表的数值 label 保持图形上方 `4px`，必要时可溢出统一绘图区顶边。
-
-### v0.1.2 (2026-08-31)
-
-- 顶部改为内容感知安全区，并收集所有 BarChart / LineChart 子图需求取最大值；共享命中层与叠加图层保持同一绘图区顶边。
-
-### v0.1.1 (2026-08-31)
-
-- 移除默认绘图区的额外上下留白；默认边界改为 `top: 0`、`bottom: 24`。
-
-### v0.1.0 (2026-06-09)
-
-- 新增 `ChartGroup`，支持共享分类 cell hover、叠加画布和 context 下发。
+完整历史见 [更新日志归档](../../docs/history/changelogs/ChartGroup.history.md)。
