@@ -7,6 +7,30 @@
  */
 export const examples = [
     {
+        name: "CB-12：全屏连续展开与收回动效（长代码滚动与窄屏）",
+        code: `CB-12
+<CodeBlock
+    language="ts"
+    showLineNumbers
+    visibleLines={6}
+    code={\`export function expandCodeBlock(source: DOMRect) {
+  const top = Math.max(0, source.top);
+  const left = Math.max(0, source.left);
+  const right = Math.max(0, window.innerWidth - source.right);
+  const bottom = Math.max(0, window.innerHeight - source.bottom);
+  return \\\`inset(\\\${top}px \\\${right}px \\\${bottom}px \\\${left}px round 16px)\\\`;
+}
+
+// Scroll down and click Expand to verify continuous clip-path morph,
+// synchronized scroll position, Esc close, and focus restoration.
+for (let line = 1; line <= 12; line += 1) {
+  console.log("Fullscreen continuity line", line);
+}\`}
+    style="width: min(100%, 26rem);"
+/>`,
+        logic: ["showExpandButton", "showLineNumbers", "visibleLines", "fullscreenMotion"],
+    },
+    {
         name: "CB-11：右上操作、长语言标签与窄宽度",
         code: `CB-11
 <CodeBlock

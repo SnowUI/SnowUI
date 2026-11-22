@@ -168,6 +168,16 @@
         min-height: 0;
     }
 
+    /* Keep keyboard scroll focusability without painting a full-viewport focus outline on blank-area clicks. */
+    :global(
+        :where(
+            .snowui-scroll-area-viewport:focus,
+            .snowui-scroll-area-viewport:focus-visible
+        )
+    ) {
+        outline: none;
+    }
+
     :global(:where(.snowui-scroll-area-viewport[data-scroll-axis="vertical"])) {
         overflow-x: hidden;
         overflow-y: auto;

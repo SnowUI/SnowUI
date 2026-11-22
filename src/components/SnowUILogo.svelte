@@ -62,22 +62,26 @@
     ["😄", "こんにちは"], ["🤗", "안녕하세요"], ["😉", "Ciao"], ["🤩", "Hallo"],
     ["😋", "Olá"], ["😺", "Привет"], ["🥳", "नमस्ते"], ["🙂", "مرحبا"],
   ] as const;
+  const HOVER_INTENT_DELAY_MS = 200;
+  const MOUNT_HOVER_GUARD_MS = 300;
   let greetingIndex = $state(-1);
-  let iconSvg = $state<SVGSVGElement>();
-  let reducedMotion = $state(true);
+  let reducedMotion = $state(prefersReducedMotion());
   let pageVisible = $state(true);
 
-  function startIdleMotion(node: SVGAnimateTransformElement) {
-    node.beginElement();
-  }
-  $effect(() => {
-    if (!iconSvg) return;
-    if (!idleMotion || reducedMotion || !pageVisible || greetingIndex !== -1) iconSvg.pauseAnimations();
-    else iconSvg.unpauseAnimations();
-  });
+  const idleMotionState = $derived(
+    !idleMotion || reducedMotion
+      ? "off"
+      : pageVisible && greetingIndex === -1
+        ? "running"
+        : "paused",
+  );
   const iconIndex = $derived(greetingIndex);
   let emojiMetrics = $state(greetings.map(() => ({ size: 32, x: 0, y: 28 })));
   let cycleTimer: ReturnType<typeof setTimeout> | undefined;
+  let hoverIntentTimer: ReturnType<typeof setTimeout> | undefined;
+  let warmTimer: ReturnType<typeof setTimeout> | undefined;
+  let warmIdleId: number | undefined;
+  let mountedAt = 0;
   let hovered = false;
   let transitioning = $state(false);
   let activeTransitions = 0;
@@ -124,7 +128,21 @@
     cycleTimer = undefined;
   }
 
-  // 减少动效、页面隐藏和卸载属于生命周期终止，不受 hover 的排队规则限制。
+  function clearHoverIntentTimer() {
+    if (hoverIntentTimer !== undefined) clearTimeout(hoverIntentTimer);
+    hoverIntentTimer = undefined;
+  }
+
+  function clearWarmSchedule() {
+    if (warmTimer !== undefined) clearTimeout(warmTimer);
+    warmTimer = undefined;
+    if (warmIdleId !== undefined && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+      window.cancelIdleCallback(warmIdleId);
+    }
+    warmIdleId = undefined;
+  }
+
+  // Reduced motion, hidden tabs, and unmount terminate the cycle immediately.
   function stopCycle() {
     generation++;
     hovered = false;
@@ -134,6 +152,7 @@
     lastNode = -1;
     resumeUntil = 0;
     resumeRequested = false;
+    clearHoverIntentTimer();
     clearCycleTimer();
     if (typeof window !== "undefined") cancelAnimationFrame(settleFrame);
     greetingIndex = -1;
@@ -198,22 +217,51 @@
 
   function handleMouseEnter(event: MouseEvent) {
     if (hoverMotion && !prefersReducedMotion()) {
-      hovered = true;
-      resumeRequested = performance.now() <= resumeUntil;
-      reconcileHover();
+      clearHoverIntentTimer();
+      // Require brief pointer dwell and a short post-mount guard to prevent accidental triggers during navigation.
+      const guardRemaining = mountedAt > 0 ? Math.max(0, MOUNT_HOVER_GUARD_MS - (performance.now() - mountedAt)) : 0;
+      const delay = Math.max(HOVER_INTENT_DELAY_MS, guardRemaining);
+      hoverIntentTimer = setTimeout(() => {
+        hoverIntentTimer = undefined;
+        if (disposed || !hoverMotion || prefersReducedMotion()) return;
+        hovered = true;
+        resumeRequested = performance.now() <= resumeUntil;
+        reconcileHover();
+      }, delay);
     }
     userOnMouseEnter?.(event);
   }
 
   function handleMouseLeave(event: MouseEvent) {
-    hovered = false;
-    resumeUntil = performance.now() + 10000;
-    clearCycleTimer();
-    reconcileHover();
+    clearHoverIntentTimer();
+    if (hovered) {
+      hovered = false;
+      resumeUntil = performance.now() + 10000;
+      clearCycleTimer();
+      reconcileHover();
+    }
     userOnMouseLeave?.(event);
   }
 
+  $effect(() => {
+    clearWarmSchedule();
+    if (!hoverMotion || reducedMotion || typeof window === "undefined") return;
+    // Pre-warm the first emoji canvas measurement while idle so the first hover does not stall the main thread.
+    const warm = () => {
+      warmTimer = undefined;
+      warmIdleId = undefined;
+      if (!disposed) measureLogoEmoji(greetings[0][0]);
+    };
+    if ("requestIdleCallback" in window) {
+      warmIdleId = window.requestIdleCallback(warm, { timeout: 1000 });
+    } else {
+      warmTimer = setTimeout(warm, 400);
+    }
+    return clearWarmSchedule;
+  });
+
   onMount(() => {
+    mountedAt = performance.now();
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     reducedMotion = preference.matches;
     const syncPreference = () => { reducedMotion = preference.matches; stopCycle(); };
@@ -226,7 +274,7 @@
       document.removeEventListener("visibilitychange", stopWhenHidden);
     };
   });
-  onDestroy(() => { disposed = true; stopCycle(); });
+  onDestroy(() => { disposed = true; clearWarmSchedule(); stopCycle(); });
 
 </script>
 
@@ -241,6 +289,7 @@
     .join(" ")}
   data-variant={variant}
   data-snow-ui-logo-cycle={greetingIndex !== -1 ? "active" : "idle"}
+  data-idle-motion={idleMotionState}
   data-logo-motion={transitioning ? "transitioning" : "settled"}
   data-logo-node={greetingIndex}
   data-text-motion={textMotion}
@@ -256,7 +305,6 @@
 >
   {#if variant !== "text"}
     <svg
-      bind:this={iconSvg}
       class="snowui-snow-ui-logo-icon"
       viewBox="0 0 32 32"
       fill="none"
@@ -267,13 +315,7 @@
       <g class="snowui-logo-icon-face" transition:iconTransition onintrostart={motionStarted} onoutrostart={motionStarted} onintroend={motionEnded} onoutroend={motionEnded}>
       {#if iconIndex === -1}
       <g class="snowui-logo-idle-float">
-      {#if idleMotion && !reducedMotion}
-        <animateTransform use:startIdleMotion attributeName="transform" type="translate" values="0 0; 0 -4.5714; 0 0" keyTimes="0; .5; 1" keySplines=".45 0 .55 1; .45 0 .55 1" calcMode="spline" dur="5.8s" repeatCount="indefinite" begin="indefinite" />
-      {/if}
       <g class="snowui-logo-idle-spin">
-      {#if idleMotion && !reducedMotion}
-        <animateTransform use:startIdleMotion attributeName="transform" type="rotate" from="0 16 16" to="360 16 16" dur="16s" repeatCount="indefinite" begin="indefinite" />
-      {/if}
       <!-- 来自 resource-base/assets/logos/snow-logo.svg 的品牌矢量快照；非 hover 时保留原始图形。 -->
       <g class="snowui-snow-ui-logo-color">
         <path
@@ -635,5 +677,42 @@
   :global(:where(.snowui-snow-ui-logo-wordmark)) { pointer-events: none; }
 
   :global(:where(.snowui-logo-icon-face)) { transform-origin: 16px 16px; }
+
+  /* Compositor-friendly CSS transform idle motion avoids main-thread stalls during route transitions. */
+  @keyframes snowui-logo-idle-float {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50% { transform: translate3d(0, -4.5714px, 0); }
+  }
+
+  @keyframes snowui-logo-idle-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="running"]) .snowui-logo-idle-float),
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-float) {
+    animation: snowui-logo-idle-float 5.8s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+    will-change: transform;
+  }
+
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="running"]) .snowui-logo-idle-spin),
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-spin) {
+    transform-origin: 16px 16px;
+    animation: snowui-logo-idle-spin 16s linear infinite;
+    will-change: transform;
+  }
+
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-float),
+  :global(:where(.snowui-snow-ui-logo[data-idle-motion="paused"]) .snowui-logo-idle-spin) {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(:where(.snowui-snow-ui-logo) .snowui-logo-idle-float),
+    :global(:where(.snowui-snow-ui-logo) .snowui-logo-idle-spin) {
+      animation: none;
+      will-change: auto;
+    }
+  }
 </style>
 <!--! @license SnowUI-Commercial-2.4.0 https://snowui.dev/LICENSE (../../LICENSE) -->

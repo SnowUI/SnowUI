@@ -8,9 +8,9 @@
   - 根层：enableDefaultMotion=true
   - 复制按钮：Frame stateContent 驱动 Copy ↔ Check 图标交叉淡化（内置 150ms crossfade）
   - 全屏按钮：内置 bare ExpandButton 负责图标与内容替换动效
-  - 全屏覆盖层：共享元素 layout 布局转场
-      进入：captureFlipRect 记录卡片位置，全屏层只过渡位置与尺寸，不缩放代码字形
-      退出：applyFlipExit 将全屏层缩回卡片位置后卸载
+  - 全屏覆盖层：基于 clip-path inset+round 的连续展开／收回动效（tokens.ts，参考 Caffeine Day）
+      进入：从原区块位置与圆角连续展开至视口，代码内容与右上角工具栏同步位移不缩放字形、不渐隐
+      退出：实时重新测量原区块位置与圆角收回，代码内容与右上角工具栏同步位移归位并恢复焦点；reduced-motion 降级为 150ms 淡入淡出
 
   外置 Icon 替换（ComponentGuidelines §2.7.1）：
   - singleLine 支持 as="leading" / data-as="leading" 前置配件
@@ -19,10 +19,6 @@
 
   文档: ./CodeBlock.md
 -->
-
-<script module lang="ts">
-    let codeBlockInstanceSeed = 0;
-</script>
 
 <script lang="ts">
     import { formatCodeBlock } from "../internal/code-block/format";
@@ -35,10 +31,11 @@
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
     import {
-        captureFlipRect,
-        beginFlipEnter,
-        applyFlipExit,
-    } from "../logic/layout-flip";
+        MOTION_DURATION_FULLSCREEN_COLLAPSE_MS,
+        MOTION_DURATION_FULLSCREEN_EXPAND_MS,
+        MOTION_DURATION_STANDARD_DISAPPEAR_MS,
+        MOTION_EASING_FULLSCREEN_MORPH,
+    } from "../motion/tokens";
     import ExpandButton from "./ExpandButton.svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import type { Snippet } from "svelte";
@@ -180,12 +177,17 @@
         ...rest
     }: Props = $props();
     /* ─── 内部状态 ─── */
-    const fullscreenMotionId = `code-block-fullscreen-${++codeBlockInstanceSeed}`;
     const localeContext = useLocale();
     let isFullscreen = $state(false);
     let isExitingFullscreen = $state(false);
-    /** 全屏层 DOM 元素，用于 FLIP 退出动效 */
+    /** Fullscreen overlay elements for continuous clip-path expand/collapse motion. */
+    let hostToolbarElement: HTMLElement | undefined = $state(undefined);
     let fullscreenElement: HTMLElement | undefined = $state(undefined);
+    let fullscreenToolbarElement: HTMLElement | undefined = $state(undefined);
+    let fullscreenContentElement: HTMLElement | undefined = $state(undefined);
+    let fullscreenAnimationGeneration = 0;
+    let returnFocusElement: HTMLElement | null = null;
+    let pendingExpandOrigin: { rect: DOMRect; clip: string; toolbarRect: DOMRect | null } | null = null;
     let codeViewportElement: HTMLElement | undefined = $state(undefined);
     let codeScrollbarElement: HTMLElement | undefined = $state(undefined);
     let codeHorizontalScrollbarElement: HTMLElement | undefined = $state(undefined);
@@ -406,28 +408,161 @@
         return tokens.length > 0 ? tokens : [{ text: " ", kind: "plain" }];
     }
 
-    /* ─── 全屏切换（layout-flip.ts 的 layout 策略驱动） ─── */
+    /* ─── Fullscreen clip-path morph (tokens: motion/tokens.ts, ref: Caffeine Day) ─── */
+    const FULLSCREEN_OPEN_CLIP = "inset(0px 0px 0px 0px round 0px)";
+
+    function prefersReducedMotion(): boolean {
+        return (
+            typeof window !== "undefined" &&
+            typeof window.matchMedia === "function" &&
+            window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        );
+    }
+
+    function readHostClipGeometry(host: HTMLElement): { rect: DOMRect; clip: string; toolbarRect: DOMRect | null } {
+        const rect = host.getBoundingClientRect();
+        const toolbarRect = hostToolbarElement ? hostToolbarElement.getBoundingClientRect() : null;
+        const rawRadius =
+            typeof window !== "undefined" ? getComputedStyle(host).borderRadius : "0px";
+        const radius = rawRadius ? rawRadius.split(/\s+/)[0] : "0px";
+        const vw = typeof window !== "undefined" ? window.innerWidth : rect.right;
+        const vh = typeof window !== "undefined" ? window.innerHeight : rect.bottom;
+        const top = Math.max(0, rect.top);
+        const right = Math.max(0, vw - rect.right);
+        const bottom = Math.max(0, vh - rect.bottom);
+        const left = Math.max(0, rect.left);
+        return {
+            rect,
+            clip: `inset(${top}px ${right}px ${bottom}px ${left}px round ${radius})`,
+            toolbarRect,
+        };
+    }
+
+    function computeToolbarOffset(
+        hostToolbarRect: DOMRect | null,
+        hostRect: DOMRect,
+        fullToolbar: HTMLElement,
+    ): { dx: number; dy: number } {
+        const fullRect = fullToolbar.getBoundingClientRect();
+        if (hostToolbarRect && hostToolbarRect.width > 0 && fullRect.width > 0) {
+            return {
+                dx: hostToolbarRect.right - fullRect.right,
+                dy: hostToolbarRect.top - fullRect.top,
+            };
+        }
+        const vw = typeof window !== "undefined" ? window.innerWidth : hostRect.right;
+        return {
+            dx: hostRect.right - vw,
+            dy: hostRect.top,
+        };
+    }
+
+    function cancelFullscreenAnimations(element: HTMLElement | undefined) {
+        if (!element || typeof element.getAnimations !== "function") return;
+        for (const anim of element.getAnimations({ subtree: true })) {
+            anim.cancel();
+        }
+    }
+
     function enterFullscreen() {
-        /* 捕获普通态矩形；全屏层挂载后只过渡实际位置与尺寸。 */
-        if (hostElement) captureFlipRect(fullscreenMotionId, hostElement);
+        if (isSingleLine) return;
+        if (isFullscreen && !isExitingFullscreen) return;
+        fullscreenAnimationGeneration += 1;
+        cancelFullscreenAnimations(fullscreenElement);
+        if (typeof document !== "undefined" && document.activeElement instanceof HTMLElement) {
+            returnFocusElement = document.activeElement;
+        }
+        pendingExpandOrigin = hostElement ? readHostClipGeometry(hostElement) : null;
+        isExitingFullscreen = false;
         isFullscreen = true;
     }
 
     function exitFullscreen() {
         if (!isFullscreen || isExitingFullscreen) return;
-        if (!fullscreenElement || !hostElement) {
-            isFullscreen = false;
-            return;
+        if (fullscreenViewportElement && codeViewportElement) {
+            codeViewportElement.scrollTop = fullscreenViewportElement.scrollTop;
+            codeViewportElement.scrollLeft = fullscreenViewportElement.scrollLeft;
         }
-        isExitingFullscreen = true;
-        const done = () => {
+        const element = fullscreenElement;
+        if (!element || !hostElement || typeof element.animate !== "function") {
             isFullscreen = false;
             isExitingFullscreen = false;
+            const target = returnFocusElement;
+            returnFocusElement = null;
+            target?.focus({ preventScroll: true });
+            return;
+        }
+
+        const generation = ++fullscreenAnimationGeneration;
+        isExitingFullscreen = true;
+        cancelFullscreenAnimations(element);
+
+        const finish = () => {
+            if (generation !== fullscreenAnimationGeneration) return;
+            cancelFullscreenAnimations(element);
+            isFullscreen = false;
+            isExitingFullscreen = false;
+            const target = returnFocusElement;
+            returnFocusElement = null;
+            requestAnimationFrame(() => {
+                target?.focus({ preventScroll: true });
+            });
         };
-        applyFlipExit(fullscreenElement, hostElement, {
-            strategy: "layout",
-            onComplete: done,
-        });
+
+        if (prefersReducedMotion()) {
+            const fadeOut = element.animate(
+                [{ opacity: 1 }, { opacity: 0 }],
+                {
+                    duration: MOTION_DURATION_STANDARD_DISAPPEAR_MS,
+                    easing: "ease-out",
+                    fill: "forwards",
+                },
+            );
+            fadeOut.finished.then(finish, finish);
+            return;
+        }
+
+        const target = readHostClipGeometry(hostElement);
+        if (fullscreenToolbarElement && typeof fullscreenToolbarElement.animate === "function") {
+            const { dx, dy } = computeToolbarOffset(
+                target.toolbarRect,
+                target.rect,
+                fullscreenToolbarElement,
+            );
+            fullscreenToolbarElement.animate(
+                [
+                    { transform: "translate3d(0, 0, 0)" },
+                    { transform: `translate3d(${dx}px, ${dy}px, 0)` },
+                ],
+                {
+                    duration: MOTION_DURATION_FULLSCREEN_COLLAPSE_MS,
+                    easing: MOTION_EASING_FULLSCREEN_MORPH,
+                    fill: "forwards",
+                },
+            );
+        }
+        if (fullscreenContentElement && typeof fullscreenContentElement.animate === "function") {
+            fullscreenContentElement.animate(
+                [
+                    { transform: "translate3d(0, 0, 0)" },
+                    { transform: `translate3d(${target.rect.left}px, ${target.rect.top}px, 0)` },
+                ],
+                {
+                    duration: MOTION_DURATION_FULLSCREEN_COLLAPSE_MS,
+                    easing: MOTION_EASING_FULLSCREEN_MORPH,
+                    fill: "forwards",
+                },
+            );
+        }
+        const closeAnim = element.animate(
+            [{ clipPath: FULLSCREEN_OPEN_CLIP }, { clipPath: target.clip }],
+            {
+                duration: MOTION_DURATION_FULLSCREEN_COLLAPSE_MS,
+                easing: MOTION_EASING_FULLSCREEN_MORPH,
+                fill: "forwards",
+            },
+        );
+        closeAnim.finished.then(finish, finish);
     }
 
     function toggleFullscreen() {
@@ -562,9 +697,76 @@
     $effect(() => {
         const element = fullscreenElement;
         if (!element || !isFullscreen || isExitingFullscreen) return;
-        beginFlipEnter(fullscreenMotionId, element, {
-            strategy: "layout",
-        });
+        if (fullscreenViewportElement && codeViewportElement) {
+            fullscreenViewportElement.scrollTop = codeViewportElement.scrollTop;
+            fullscreenViewportElement.scrollLeft = codeViewportElement.scrollLeft;
+            updateScrollFade();
+        }
+        const origin = pendingExpandOrigin;
+        pendingExpandOrigin = null;
+        const generation = fullscreenAnimationGeneration;
+        cancelFullscreenAnimations(element);
+
+        const settle = () => {
+            if (generation !== fullscreenAnimationGeneration) return;
+            element.focus({ preventScroll: true });
+            updateScrollFade();
+        };
+
+        if (!origin || typeof element.animate !== "function") {
+            settle();
+            return;
+        }
+
+        if (prefersReducedMotion()) {
+            const fadeIn = element.animate(
+                [{ opacity: 0 }, { opacity: 1 }],
+                {
+                    duration: MOTION_DURATION_STANDARD_DISAPPEAR_MS,
+                    easing: "ease-out",
+                },
+            );
+            fadeIn.finished.then(settle, settle);
+            return;
+        }
+
+        if (fullscreenContentElement && typeof fullscreenContentElement.animate === "function") {
+            fullscreenContentElement.animate(
+                [
+                    { transform: `translate3d(${origin.rect.left}px, ${origin.rect.top}px, 0)` },
+                    { transform: "translate3d(0, 0, 0)" },
+                ],
+                {
+                    duration: MOTION_DURATION_FULLSCREEN_EXPAND_MS,
+                    easing: MOTION_EASING_FULLSCREEN_MORPH,
+                },
+            );
+        }
+        if (fullscreenToolbarElement && typeof fullscreenToolbarElement.animate === "function") {
+            const { dx, dy } = computeToolbarOffset(
+                origin.toolbarRect,
+                origin.rect,
+                fullscreenToolbarElement,
+            );
+            fullscreenToolbarElement.animate(
+                [
+                    { transform: `translate3d(${dx}px, ${dy}px, 0)` },
+                    { transform: "translate3d(0, 0, 0)" },
+                ],
+                {
+                    duration: MOTION_DURATION_FULLSCREEN_EXPAND_MS,
+                    easing: MOTION_EASING_FULLSCREEN_MORPH,
+                },
+            );
+        }
+        const openAnim = element.animate(
+            [{ clipPath: origin.clip }, { clipPath: FULLSCREEN_OPEN_CLIP }],
+            {
+                duration: MOTION_DURATION_FULLSCREEN_EXPAND_MS,
+                easing: MOTION_EASING_FULLSCREEN_MORPH,
+            },
+        );
+        openAnim.finished.then(settle, settle);
     });
 
     $effect(() => {
@@ -722,6 +924,7 @@
     {:else}
     <!-- 工具栏 -->
     <div
+        bind:this={hostToolbarElement}
         class="snowui-code-block-toolbar snowui-code-block-default-pin-top-right"
         data-as="pin-top-right"
         style="--pin-offset-y: var(--padding-2); --pin-offset-x: var(--padding-1);"
@@ -869,6 +1072,7 @@
     >
         <!-- 全屏工具栏 -->
         <div
+            bind:this={fullscreenToolbarElement}
             class="snowui-code-block-toolbar snowui-code-block-toolbar-fullscreen"
             data-as="pin-top-right"
             style="--pin-offset-y: var(--padding-2); --pin-offset-x: var(--padding-1);"
@@ -919,6 +1123,7 @@
 
         <!-- 全屏代码区：与普通态共同遵循 showLineNumbers -->
         <div
+            bind:this={fullscreenContentElement}
             class="snowui-code-block-scroll-shell snowui-code-block-scroll-shell-fullscreen"
         >
             <div
