@@ -70,6 +70,8 @@
         "bottom-right",
     ];
     const EXIT_OPACITY_RATIO = 0.8;
+    const EXIT_DURATION_MS = 420;
+    const EXIT_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
 
     let mounted = $state(false);
     let portalEl = $state<HTMLDivElement | undefined>(undefined);
@@ -109,18 +111,18 @@
     function toastDisappearMotion(position: ToastPosition, stackOpacity: number): MotionConfig {
         return composeMotionConfigs(
             createSlideYMotion(position.startsWith("top") ? [0, "-100%"] : [0, "100%"]),
-            createFadeMotion([stackOpacity, EXIT_OPACITY_RATIO * stackOpacity]),
+            createFadeMotion([stackOpacity, 0]),
             createScaleMotion([1, 0.96]),
-            { duration: 300, easing: "ease" },
+            { duration: EXIT_DURATION_MS, easing: EXIT_EASING },
         );
     }
 
     function toastPushedOutMotion(position: ToastPosition, stackOpacity: number): MotionConfig {
         return composeMotionConfigs(
             createSlideYMotion(position.startsWith("top") ? [0, "-100%"] : [0, "100%"]),
-            createFadeMotion([stackOpacity, EXIT_OPACITY_RATIO * stackOpacity]),
+            createFadeMotion([stackOpacity, 0]),
             createScaleMotion([1, 0.96]),
-            { duration: 300, easing: "ease" },
+            { duration: EXIT_DURATION_MS, easing: EXIT_EASING },
         );
     }
 
@@ -276,8 +278,8 @@
         const isTop = position.startsWith("top");
         const direction = isTop ? 1 : -1; // top: 后一条向下偏移；bottom: 向上
         // 退场残影修复：内层 Frame 保持稳定的 ±100% 出入场动效；
-        // 外层 slot 先抵消当前堆叠层位移，再额外越过可视边缘 20px。
-        const exitDistance = indexFromFront * gap + offset + 20;
+        // 外层 slot 先抵消当前堆叠层位移，再越过可视边缘留出余量，与退场时长/缓动同步。
+        const exitDistance = indexFromFront * gap + offset + 8;
         const exitTranslate = item.exiting ? (isTop ? -exitDistance : exitDistance) : 0;
         const translate = direction * indexFromFront * gap + exitTranslate;
         const scale = Math.max(0, 1 - indexFromFront * scaleStep);
@@ -289,8 +291,9 @@
         const transitionName = item.id.replace(/[^a-zA-Z0-9]/g, "-");
         const widthStyle =
             width === undefined ? "" : ` width: ${typeof width === "number" ? `${width}px` : width};`;
-        const duration = item.exiting ? 300 : stackDuration;
-        return `view-transition-name: snowui-toast-${transitionName}; --snowui-toast-stack-translate-y: ${translate}px; --snowui-toast-stack-scale: ${scale}; --snowui-toast-stack-opacity: ${stackOpacity}; --snowui-toast-stack-duration: ${duration}ms; --snowui-toast-stack-easing: ${stackEasing};${pointerStyle}${widthStyle} z-index: ${zIndex};`;
+        const duration = item.exiting ? EXIT_DURATION_MS : stackDuration;
+        const easing = item.exiting ? EXIT_EASING : stackEasing;
+        return `view-transition-name: snowui-toast-${transitionName}; --snowui-toast-stack-translate-y: ${translate}px; --snowui-toast-stack-scale: ${scale}; --snowui-toast-stack-opacity: ${stackOpacity}; --snowui-toast-stack-duration: ${duration}ms; --snowui-toast-stack-easing: ${easing};${pointerStyle}${widthStyle} z-index: ${zIndex};`;
     }
 
     function regionStyle(position: ToastPosition): string {
@@ -332,7 +335,7 @@
                     {@const frontmost = indexFromFront === 0}
                     {@const state = visualState(item, indexFromFront)}
                     {@const stackOpacity = stackOpacityForIndex(indexFromFront)}
-                    {#key `${item.id}:${item.exiting ? item.exitKind ?? "dismiss" : "active"}`}
+                    <!-- Keep the Toast mounted across Appear -> Disappear so CSS stack translate transitions smoothly instead of snapping on remount. -->
                     <Toast
                         singleLine={item.children ? parts?.Toast?.singleLine : parts?.Toast?.singleLine ?? true}
                         class={`snowui-toaster-slot${item.class ? ` ${item.class}` : ""}`}
@@ -370,7 +373,6 @@
                         {/if}
                         {#if item.trailing}{@render item.trailing()}{/if}
                     </Toast>
-                    {/key}
                 {/each}
             </div>
         {/each}

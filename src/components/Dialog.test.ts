@@ -204,5 +204,23 @@ export const examples = [
             "Dialog",
             "SingleDialog"
         ]
+    },
+    {
+        "name": "DL-43:长内容固定头部滚动",
+        code: `DL-43
+<Dialog template id="dialog-long" size="md" title="长内容">
+    <Frame as="content">
+        <Text>第 1 段说明文字。</Text><Text>第 2 段说明文字。</Text><Text>第 3 段说明文字。</Text><Text>第 4 段说明文字。</Text><Text>第 5 段说明文字。</Text><Text>第 6 段说明文字。</Text><Text>第 7 段说明文字。</Text><Text>第 8 段说明文字。</Text><Text>第 9 段说明文字。</Text><Text>第 10 段说明文字。</Text><Text>第 11 段说明文字。</Text><Text>第 12 段说明文字。</Text><Text>第 13 段说明文字。</Text><Text>第 14 段说明文字。</Text><Text>第 15 段说明文字。</Text><Text>第 16 段说明文字。</Text><Text>第 17 段说明文字。</Text><Text>第 18 段说明文字。</Text><Text>第 19 段说明文字。</Text><Text>第 20 段说明文字。</Text><Text>第 21 段说明文字。</Text><Text>第 22 段说明文字。</Text><Text>第 23 段说明文字。</Text><Text>第 24 段说明文字。</Text><Text>第 25 段说明文字。</Text><Text>第 26 段说明文字。</Text><Text>第 27 段说明文字。</Text><Text>第 28 段说明文字。</Text><Text>第 29 段说明文字。</Text><Text>第 30 段说明文字。</Text><Text>第 31 段说明文字。</Text><Text>第 32 段说明文字。</Text><Text>第 33 段说明文字。</Text><Text>第 34 段说明文字。</Text><Text>第 35 段说明文字。</Text><Text>第 36 段说明文字。</Text><Text>第 37 段说明文字。</Text><Text>第 38 段说明文字。</Text><Text>第 39 段说明文字。</Text><Text>第 40 段说明文字。</Text>
+    </Frame>
+</Dialog>
+<Button data-dialog-target="dialog-long">打开长内容</Button>`,
+        "expected": {
+            "render": "标题、分割线与右上角 X 固定在面板顶部；正文超出时只在正文区域滚动，滚动条贴面板右侧且上下不超出面板 padding",
+            "interaction": "鼠标悬停面板时显示 overlay 滚动条，可拖动 Thumb；滚动正文时标题与 X 不移动；sm / md / lg 一致"
+        },
+        "logic": [
+            "Dialog",
+            "Scroll"
+        ]
     }
 ] as const;

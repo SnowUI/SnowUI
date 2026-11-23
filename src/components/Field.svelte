@@ -43,7 +43,14 @@
         ...rest
     }: Props = $props();
 
-    setContext(FIELD_CONTEXT_KEY, { present: true });
+    let fieldElement = $state<HTMLElement | undefined>(undefined);
+    let resizedWidth = $state<number | undefined>(undefined);
+
+    setContext(FIELD_CONTEXT_KEY, {
+        present: true,
+        get element() { return fieldElement; },
+        setWidth(width: number | undefined) { resizedWidth = width; },
+    });
 
     // 焦点转发：点击 Field 非可聚焦区域时，将焦点转发给内部第一个输入控件
     function fieldFocusForward(node: HTMLElement) {
@@ -72,13 +79,14 @@
 
 {#snippet fieldSurface()}
     <Frame
+        bind:element={fieldElement}
         class={`snowui-field snowui-rounded-rectangle snowui-field-bordered${userClass ? ` ${userClass}` : ""}`}
         enableAutoLayout={true}
         data-as={typeof rest.as === "string" ? rest.as : undefined}
         data-invalid={invalid ? "true" : undefined}
         data-readonly={readonly ? "true" : undefined}
         {disabled}
-        style={`${userStyle}${gap !== undefined ? `; --snowui-field-gap-override: ${contentLineGap(gap)}` : ""}`}
+        style={`${userStyle}${gap !== undefined ? `; --snowui-field-gap-override: ${contentLineGap(gap)}` : ""}${resizedWidth !== undefined ? `; width: ${resizedWidth}px` : ""}`}
         enableResponsive={enableResponsive}
         enableContext={enableContext}
         enableScaleObserver={enableScaleObserver}
@@ -284,7 +292,8 @@
                     .snowui-field > .snowui-textarea.snowui-field-host
                 )
         ) {
-        display: block;
+        display: flex;
+        flex-direction: column;
     }
 
     :global(
@@ -327,18 +336,13 @@
     :global(
             :where(
                     .snowui-field:not(:has(> [data-as="segment"])) > .snowui-input.snowui-field-host,
-                    .snowui-field:not(:has(> [data-as="segment"])) > .snowui-select.snowui-field-host
+                    .snowui-field:not(:has(> [data-as="segment"])) > .snowui-select.snowui-field-host,
+                    .snowui-field:not(:has(> [data-as="segment"])) > .snowui-textarea.snowui-field-host
                 )
         ) {
         --snowui-input-padding-override: 0;
         --snowui-select-padding-override: 0;
-    }
-    :global(
-            :where(
-                    .snowui-field:not(:has(> [data-as="segment"])) > .snowui-textarea.snowui-field-host
-                )
-        ) {
-        --snowui-textarea-padding-override: 0 0 var(--padding-6) 0;
+        --snowui-textarea-padding-override: 0;
     }
 
     /* segment 保留原生布局和 padding，仅去边框与容器基础 */

@@ -1,6 +1,6 @@
 # Dialog
 
-> **版本**: v1.2.0
+> **版本**: v1.3.0
 > **职责**: 在模态对话框中呈现需要关注的内容或操作，提供遮罩、焦点管理与背景滚动锁定，适合确认和表单任务。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-11-23
@@ -118,7 +118,7 @@ Backdrop(Portal 到 body)
 - gap 归属:Panel 内置 sm/md/lg 的 12/16/24px 间距；正文内为 8px，footer 内为 8/12/12px。
 - 标题通过 `title` 生成，正文由 `children` 承载；直系 `as="footer"` 提供操作区，`Button as="item"` 读取操作区尺寸默认值，显式 size 优先。
 - Pin 归属:Panel 透传 `pinOffset` / `pinOffsetX` / `pinOffsetY`,默认全部尺寸为 16px。
-- 滚动归属:Panel 自身限制 `max-height`,内容溢出时面板内部滚动。
+- 滚动归属:Panel 限制 `max-height`。有标题或关闭按钮时（全部尺寸与激活模式）标题、标题分割线与关闭按钮固定不滚动，只有正文视口滚动：普通 children 的视口为内置正文包装，使用外置角色时为直系 `as="content"`（外置标题请配合 `as="content"`，否则 Panel 整体滚动）。滚动条复用共享 overlay scrollbar，轨道贴 Panel 右侧，纵向只覆盖正文视口，始终位于 Panel 上下 padding 之内，hover 时显示。无标题且无关闭按钮时保持 Panel 整体滚动，以保留直系 Pin 组合。
 
 <a id="关键字-props"></a>
 
@@ -273,6 +273,10 @@ Dialog 是通用模态容器。面板视觉复用 `.snowui-quick-action-panel`�
 - 样式覆盖入口:`--snowui-dialog-padding-override`、`--snowui-dialog-radius-override`、`--snowui-dialog-font-size-override`、`--snowui-dialog-line-height-override`、`--snowui-dialog-max-width-override`、`--snowui-dialog-gap-override`、`--snowui-dialog-content-gap-override`、`--snowui-dialog-footer-gap-override`、`--snowui-dialog-text-padding-override`
 
 ## 更新日志
+
+### v1.3.0 (2026-11-23)
+
+- 固定头部滚动：有标题或关闭按钮时，标题、标题分割线与关闭按钮固定，仅正文视口滚动；滚动条改用共享 overlay scrollbar，纵向限定在 Panel 上下 padding 之内，视口外扩 4px 补偿内边距避免裁切内部输入控件（Textarea / Input / Button）的聚焦外环。全部尺寸与三种激活模式一致。
 
 ### v1.2.0 (2026-11-23)
 

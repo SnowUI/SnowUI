@@ -54,10 +54,10 @@ export interface ToastItem extends ToastOptions {
     exitFromIndex?: number;
 }
 
-/** 默认停留时长，单位 ms；对齐 HeroUI / Sonner 默认值 */
-export const DEFAULT_TOAST_DURATION = 4000;
-/** 退出动画时长，需与 Frame slide out 默认时序保持一致 */
-export const TOAST_EXIT_DURATION = 450;
+/** 默认停留时长，单位 ms（Owner 2026-11-23 调整为 6000ms） */
+export const DEFAULT_TOAST_DURATION = 6000;
+/** 退出动画时长，略长于 Toaster 退场过渡（420ms），确保动效播完再移除节点 */
+export const TOAST_EXIT_DURATION = 480;
 
 let counter = 0;
 function nextId(): string {

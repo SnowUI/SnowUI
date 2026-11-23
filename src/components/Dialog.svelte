@@ -1,12 +1,13 @@
 <!--
  Dialog 通用模态对话框
- v1.2.0
+ v1.3.0
 
  职责:
  - 面板模式: <Dialog bind:open>
  - 内嵌模式: <Button>...<Dialog as="dialog">...</Dialog></Button>
  - 模版模式: <Dialog template id="x">...</Dialog> + showDialog / data-dialog-target
  - 单弹窗保证: 任一 Dialog 打开时关闭页面上其它已打开的 Dialog(claimExclusiveDialog)
+ - 固定头部: 标题/分割线/关闭按钮固定,仅正文视口滚动(共享 overlay scrollbar)
 -->
 
 <script lang="ts">
@@ -39,6 +40,8 @@
     } from "../motion/presets/dialog";
     import { getMotionTotalDurationMs } from "../motion/presets/utils";
     import { getSize } from "../context";
+    import { useOverlayScrollbar } from "../lib/overlay-scrollbar.svelte";
+    import { resizeManager } from "../logic/observer.svelte";
 
     function portal(node: HTMLElement) {
         document.body.appendChild(node);
@@ -186,6 +189,43 @@
         },
     });
     const hasClose = $derived(showCloseButton || !!externalClose);
+
+    /* ── 固定头部 + 正文滚动(全部尺寸与激活模式) ─────────────────────
+     * 有标题或关闭按钮时,标题/分割线/关闭按钮固定在 Panel,只有正文视口滚动:
+     * 普通 children 的视口为 .snowui-dialog-content;使用外置角色时为直系 as="content"。
+     * 滚动条复用共享 overlay scrollbar,轨道贴 Panel 右侧 edge-gap,纵向只覆盖正文视口
+     * (位于 Panel 上下 padding 之内)。无标题且无关闭按钮时保持 Panel 整体滚动(直系 Pin 组合)。 */
+    const scrollFrame = $derived(!!children && (!!title || showCloseButton));
+    const scrollViewport = $derived(
+        scrollFrame ? (structuredChildren ? externalContent : contentEl) : undefined,
+    );
+    let scrollbarEl = $state<HTMLElement | undefined>(undefined);
+    let trackTop = $state(0);
+    let trackHeight = $state(0);
+    const scrollbar = useOverlayScrollbar(
+        () => scrollViewport,
+        () => scrollbarEl,
+    );
+    $effect(() => {
+        const viewport = scrollViewport;
+        const panel = panelEl;
+        if (!viewport || !panel) return;
+        viewport.classList.add("snowui-overlay-scrollbar-viewport", "snowui-dialog-scroll-viewport");
+        const measure = () => {
+            const bleed = Math.max(0, -parseFloat(getComputedStyle(viewport).marginTop) || 0);
+            trackTop = viewport.offsetTop + bleed;
+            trackHeight = Math.max(0, viewport.clientHeight - bleed * 2);
+            scrollbar.refresh();
+        };
+        measure();
+        const stopViewport = resizeManager.watch(viewport, measure);
+        const stopPanel = resizeManager.watch(panel, measure);
+        return () => {
+            stopViewport();
+            stopPanel();
+            viewport.classList.remove("snowui-overlay-scrollbar-viewport", "snowui-dialog-scroll-viewport");
+        };
+    });
 
     // 只识别调用方 children 的直系角色，正文包装不改变角色所有权。
     $effect(() => {
@@ -371,7 +411,7 @@
     });
 
     const panelClass = $derived(
-        ["snowui-dialog", "snowui-quick-action-panel", "snowui-rounded-rectangle", userClass]
+        ["snowui-dialog", "snowui-quick-action-panel", "snowui-rounded-rectangle", scrollViewport ? "snowui-overlay-scrollbar-host" : "", userClass]
             .filter(Boolean)
             .join(" "),
     );
@@ -408,6 +448,7 @@
                 aria-modal="true"
                 aria-labelledby={rest["aria-label"] ? undefined : externalTitle ? externalTitleId : title ? titleId : undefined}
                 data-has-close={hasClose ? "true" : undefined}
+                data-scroll={scrollViewport ? "content" : undefined}
                 data-size={resolvedSize}
                 data-open={presence.closing ? undefined : "true"}
                 data-closing={presence.closing ? "true" : undefined}
@@ -444,6 +485,14 @@
                     {:else}
                         <div bind:this={contentEl} class="snowui-dialog-content" data-structured={structuredChildren ? "true" : undefined} data-has-footer={externalFooter ? "true" : undefined} data-close-space={!hasTitle && hasClose ? "true" : undefined}>{@render children()}</div>
                     {/if}
+                {/if}
+                {#if scrollViewport}
+                    <div bind:this={scrollbarEl} class="snowui-dialog-scrollbar snowui-overlay-scrollbar"
+                        data-visible={scrollbar.hasOverflow ? "true" : undefined} aria-hidden="true"
+                        style="top: {trackTop}px; height: {trackHeight}px;">
+                        <div class="snowui-overlay-scrollbar-thumb"
+                            style="height: {scrollbar.thumbHeight}px; transform: translate3d(0, {scrollbar.thumbY}px, 0);"></div>
+                    </div>
                 {/if}
                 {#if showCloseButton && !externalClose}
                     <Button variant="borderless" iconOnly size={resolvedSize === "sm" ? "sm" : "md"} {...parts?.Button} type="button" as="close" data-dialog-builtin-close="true"
@@ -641,6 +690,33 @@
         .snowui-dialog > [data-as="separator"] ~ [data-as="separator"], .snowui-dialog > .snowui-dialog-content > [data-as="separator"] ~ [data-as="separator"],
         .snowui-dialog > [data-as="content"] ~ [data-as="content"], .snowui-dialog > .snowui-dialog-content > [data-as="content"] ~ [data-as="content"])) {
         display: none;
+    }
+
+    /* 固定头部:Panel 不再整体滚动,标题/分割线/操作区保持尺寸,仅正文视口收缩并滚动。 */
+    :global(:where(.snowui-dialog[data-scroll="content"])) {
+        overflow: hidden;
+    }
+    :global(:where(.snowui-dialog[data-scroll="content"] > .snowui-dialog-title, .snowui-dialog[data-scroll="content"] > .snowui-dialog-separator, .snowui-dialog[data-scroll="content"] > .snowui-dialog-content[data-structured="true"] > *)) {
+        flex-shrink: 0;
+    }
+    :global(:where(.snowui-dialog[data-scroll="content"] > .snowui-dialog-content:not([data-structured="true"]), .snowui-dialog[data-scroll="content"] > .snowui-dialog-content[data-structured="true"] > [data-as="content"])) {
+        flex: 0 1 auto;
+        min-height: 0;
+    }
+    /* Expand the scroll viewport by 4px with matching padding so 4px focus rings (Textarea/Input/Button) are not clipped, without shifting visual alignment. */
+    :global(:where(.snowui-dialog-scroll-viewport)) {
+        --snowui-dialog-scroll-bleed: var(--padding-1, 0.25rem);
+        margin-inline: calc(-1 * var(--snowui-dialog-scroll-bleed));
+        padding-inline: calc(var(--snowui-dialog-text-padding-override, var(--padding-1)) + var(--snowui-dialog-scroll-bleed));
+        margin-block: calc(-1 * var(--snowui-dialog-scroll-bleed));
+        padding-top: var(--snowui-dialog-scroll-bleed);
+        padding-bottom: var(--snowui-dialog-scroll-bleed);
+    }
+    :global(:where(.snowui-dialog-scroll-viewport[data-close-space="true"])) {
+        padding-top: calc(var(--snowui-dialog-close-size) + var(--padding-2) + var(--snowui-dialog-scroll-bleed));
+    }
+    :global(:where(.snowui-dialog-scrollbar)) {
+        z-index: 2;
     }
 
     :global(:where(.snowui-dialog-close)) {

@@ -1,6 +1,6 @@
 <!--
  Textarea 组件：基础多行文本输入框
- v1.0.2
+ v1.0.3
 
  文档: ./Textarea.md
 -->
@@ -200,9 +200,27 @@
               : "height",
     );
 
+    const resizeTarget = $derived(
+        isEmbedded && fieldContext?.element ? fieldContext.element : textareaHostEl,
+    );
+
     function handleIndicatorSize(next: number, axis: "width" | "height") {
-        if (axis === "width") resizeWidth = next;
-        else resizeHeight = next;
+        if (axis === "width") {
+            if (isEmbedded && fieldContext?.setWidth) {
+                fieldContext.setWidth(next);
+            } else {
+                resizeWidth = next;
+            }
+        } else if (isEmbedded && fieldContext?.element && textareaHostEl) {
+            const chrome = Math.max(
+                0,
+                fieldContext.element.getBoundingClientRect().height -
+                    textareaHostEl.getBoundingClientRect().height,
+            );
+            resizeHeight = Math.max(20, next - chrome);
+        } else {
+            resizeHeight = next;
+        }
         updateScrollFade();
     }
 
@@ -345,8 +363,8 @@
         {#if effectiveResize !== "none"}
             <Indicator
                 as="resize-handle"
-                target={textareaHostEl}
-                revealTarget={textareaHostEl}
+                target={resizeTarget}
+                revealTarget={resizeTarget}
                 axis={indicatorAxis}
                 appearance="corner"
                 value={indicatorAxis === "width" ? resizeWidth : resizeHeight}
@@ -360,7 +378,11 @@
     </div>
 </Frame>
 {/snippet}
-{#if error !== undefined || required || minlength !== undefined || maxlength !== undefined || nativeValidation.message}
+{#if isEmbedded}
+    <!-- Field owns control/accessory placement and full-width feedback rows. -->
+    {@render textareaSurface()}
+    {#if resolvedInvalid && (nativeValidation.message || error)}<Text id={validationErrorId} as="error" role="alert" class="snowui-field-error-message">{nativeValidation.message || error}</Text>{/if}
+{:else if error !== undefined || required || minlength !== undefined || maxlength !== undefined || nativeValidation.message}
 <div style="display: flex; flex-direction: column; min-width: 0; width: 100%; gap: var(--gap-2);">
     {@render textareaSurface()}
     {#if resolvedInvalid && (nativeValidation.message || error)}<Text id={validationErrorId} as="error" role="alert" class="snowui-field-error-message">{nativeValidation.message || error}</Text>{/if}
@@ -428,6 +450,7 @@
     }
 
     :global(:where(.snowui-textarea[data-embedded="true"])) {
+        min-height: 0;
         padding: 0;
         gap: 0;
         border-radius: 0;
@@ -636,7 +659,8 @@
         height: 0;
     }
 
-    :global(:where(.snowui-textarea-control::placeholder)) {
+    /* Pseudo-elements are invalid inside :where(); keep them outside so placeholder color applies. */
+    :global(:where(.snowui-textarea-control)::placeholder) {
         color: var(
             --snowui-textarea-placeholder-color-override,
             var(--snowui-textarea-placeholder-color)
@@ -648,7 +672,7 @@
         opacity: 1;
     }
 
-    :global(:where(.snowui-textarea-control::-webkit-input-placeholder)) {
+    :global(:where(.snowui-textarea-control)::-webkit-input-placeholder) {
         color: var(
             --snowui-textarea-placeholder-color-override,
             var(--snowui-textarea-placeholder-color)
@@ -660,7 +684,7 @@
         opacity: 1;
     }
 
-    :global(:where(.snowui-textarea-control::-moz-placeholder)) {
+    :global(:where(.snowui-textarea-control)::-moz-placeholder) {
         color: var(
             --snowui-textarea-placeholder-color-override,
             var(--snowui-textarea-placeholder-color)
@@ -668,7 +692,7 @@
         opacity: 1;
     }
 
-    :global(:where(.snowui-textarea-control:-ms-input-placeholder)) {
+    :global(:where(.snowui-textarea-control):-ms-input-placeholder) {
         color: var(
             --snowui-textarea-placeholder-color-override,
             var(--snowui-textarea-placeholder-color)
@@ -676,7 +700,7 @@
         opacity: 1;
     }
 
-    :global(:where(.snowui-textarea-control::-ms-input-placeholder)) {
+    :global(:where(.snowui-textarea-control)::-ms-input-placeholder) {
         color: var(
             --snowui-textarea-placeholder-color-override,
             var(--snowui-textarea-placeholder-color)

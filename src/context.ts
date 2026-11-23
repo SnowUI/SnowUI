@@ -263,6 +263,10 @@ export function getNumberFormat(): NumberFormatContext | undefined {
 
 export interface FieldContext {
     present: true;
+    /** Outer Field surface element; embedded resizable controls (Textarea) target it so resizing adjusts the outer border. */
+    readonly element?: HTMLElement;
+    /** Adjust the outer Field width in CSS px from an embedded resizable control (e.g. Textarea). */
+    setWidth?: (width: number | undefined) => void;
 }
 
 export function getField(): FieldContext | undefined {

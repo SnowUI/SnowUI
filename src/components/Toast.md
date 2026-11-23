@@ -82,7 +82,7 @@ Toast 是 SnowUI 的全局通知组件。整套能力由三件交付物组成：
 - 6 个固定位置：`top` / `top-left` / `top-right` / `bottom` / `bottom-left` / `bottom-right`，距视口边缘 16px，默认 `top`
 - 三槽位布局（Leading / Content / Trailing）；内置图标支持外置 Icon 替换
 - 默认变体（`default`）：深色 pill，并使用 `blur(var(--size-10))` 背景模糊；rich 变体：`Background/3` 玻璃卡片，复用 `.snowui-quick-action-panel` 的背景模糊
-- 自动消失：默认 4 秒；`duration: 0` 表示常驻
+- 自动消失：默认 6 秒；`duration: 0` 表示常驻
 - 自动消失计时在最上层 Toast hover 时暂停，离开 hover 后按剩余时间恢复
 - 多个同位置 Toast 自动堆叠（HeroUI 风格）：默认 `gap=8`、`maxVisible=3`、`scaleStep=0.05`、`stackOpacityStep=0.2`、宽度内容自适应（均可配置）
 - 出现、退出、堆叠前移与最后一层被挤出动效均在 Toast 根元素组合：生命周期使用 `transform + opacity`，堆叠使用独立 `translate + scale`，堆叠透明度直接合并进 Frame fade 数值；关闭时先进入 `Disappear`，动画完成后再从队列移除
@@ -132,7 +132,7 @@ showToast("saved-template");                          // Trigger <Toast template
 | `variant` | `"default" \| "rich"` | `"default"` | 视觉变体 |
 | `size` | `"sm" \| "md"` | `"md"` | 仅 default 变体生效；rich 固定 md |
 | `position` | `ToastPosition` | `"top"` | 6 个出现位置 |
-| `duration` | `number` | `4000` | 单位 ms；`0` 表示常驻 |
+| `duration` | `number` | `6000` | 单位 ms；`0` 表示常驻 |
 | `onDismiss` | `() => void` | — | 关闭回调 |
 
 辅助函数：
@@ -255,6 +255,7 @@ Toast 作为宿主子节点,点击宿主即触发,无需 id、无需手动 `show
 ### v2.3.4 (2026-11-23)
 
 - rich 关闭 X 新增最小 16×16 透明命中 host（参照 Sidebar 折叠按钮）：直接指向 X 位置（含超出 Toast 圆角的部分）即可显示并点击，不再必须先进入 Toast 本体。
+- 默认自动消失停留时间调整为 6 秒（`DEFAULT_TOAST_DURATION = 6000`）；`Toaster` 退场不再经 `{#key}` 重挂载节点，退场时长放缓至 420ms（`cubic-bezier(0.32, 0.72, 0, 1)`）并同步渐隐至 0，消除退场瞬移与过快问题。
 - 使用约定：重复触发同一提示时新建一条叠加在旧条之上，不先 dismiss 再重建。
 
 ### v2.3.3 (2026-10-23)

@@ -219,7 +219,9 @@
         }
         const update = () => {
             if (!hostElement) return;
-            errorLayoutWidth = `${hostElement.getBoundingClientRect().width}px`;
+            const width = hostElement.getBoundingClientRect().width;
+            // When hidden (e.g. display:none during an in-place dialog step), clear the lock so it does not collapse to min-width on reveal.
+            errorLayoutWidth = width > 0 ? `${width}px` : undefined;
         };
         update();
         return resizeManager.watch(hostElement, update);
