@@ -13,7 +13,7 @@
   - 单个 Toast 的视觉外壳, 三槽位 (Leading / Content / Trailing)
   - default 变体: 深色 pill + Quick Action 同档背景模糊; rich 变体: 复用 .snowui-quick-action-panel
   - 内置图标 success / warning, 支持外置 Icon 替换(参见 §2.7.1)
-  - rich 变体右上角内置 X 关闭按钮(hover 显示, 参考 Input clear-btn)
+  - rich 变体右上角内置 X 关闭按钮(hover Toast 或直接指向 X 的 16×16 透明命中区均显示)
   - Panel 模式显式使用 GENERIC_SCALE_APPEAR_MOTION 保留既有渐显 + 缩放;Toaster 队列的方向进入/退出由 Toaster 显式组合
 
   通常由 <Toaster /> 渲染并由 toast() 调度; 也可作为静态组件独立使用。
@@ -211,6 +211,9 @@
         {@render children?.()}
 
         {#if isRich}
+            <!-- Transparent 16x16 hit host (same pattern as Sidebar's collapse-button host): pointing straight at
+                 the X position reveals it even where it overhangs the rounded Toast edge. -->
+            <span class="snowui-toast-close-host">
             <Button bare emphasis="muted" size="sm" {...parts?.Button}
                 type="button"
                 class={`snowui-clear-icon-btn snowui-toast-close-btn${parts?.Button?.class ? ` ${parts.Button.class}` : ""}`}
@@ -221,6 +224,7 @@
             >
                 <ComponentIcon name="x-circle" weight="fill" aria-hidden="true" />
             </Button>
+            </span>
         {/if}
     </Frame>
 {/if}
@@ -309,10 +313,24 @@
     }
 
     /* ── 关闭 X(仅 rich 变体)───────────────────────────────────── */
-    :global(:where(.snowui-toast-close-btn)) {
+    /* 透明命中 host 常驻接收指针(最小 16×16),hover host 即 hover Toast,X 随之显形;
+     * 参照 Sidebar 折叠按钮的透明命中 host。 */
+    :global(:where(.snowui-toast-close-host)) {
         position: absolute;
         top: -0.25rem;          /* -4px, 与 Figma 一致 */
         right: -0.25rem;
+        z-index: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: var(--size-4);
+        min-height: var(--size-4);
+        pointer-events: auto;
+    }
+
+    :global(:where(.snowui-toast-close-btn)) {
+        min-width: var(--size-4);
+        min-height: var(--size-4);
         --snowui-button-opacity-override: 0;
         pointer-events: none;
     }
@@ -323,6 +341,7 @@
     }
 
     /* Toaster 只声明根状态；Toast 自己控制内部关闭按钮。 */
+    :global(:where(.snowui-toast[data-frontmost="false"] .snowui-toast-close-host)),
     :global(:where(.snowui-toast[data-frontmost="false"] .snowui-toast-close-btn)) {
         --snowui-button-opacity-override: 0;
         pointer-events: none;

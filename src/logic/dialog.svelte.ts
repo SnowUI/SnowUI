@@ -59,6 +59,27 @@ export function isDialogOpen(id: string): boolean {
     return dialogStore.active.some((item) => item.id === id);
 }
 
+/**
+ * Single-dialog guarantee (SnowUI rule, Owner 2026-11-23): at most one Dialog is open on the page.
+ * Every Dialog (panel / inline / template) claims exclusivity when it becomes open; any other open
+ * Dialog is closed through its own close path (fires onOpenChange(false) / hideDialog). Multi-step
+ * flows must swap content inside the same Dialog instead of stacking a second one.
+ * Contract: docs/standards/ComponentGuidelines.md §5.1.
+ */
+const exclusiveDialogs = new Map<string, () => void>();
+
+export function claimExclusiveDialog(token: string, close: () => void): () => void {
+    for (const [other, closeOther] of [...exclusiveDialogs]) {
+        if (other === token) continue;
+        exclusiveDialogs.delete(other);
+        closeOther();
+    }
+    exclusiveDialogs.set(token, close);
+    return () => {
+        if (exclusiveDialogs.get(token) === close) exclusiveDialogs.delete(token);
+    };
+}
+
 let delegateInitialized = false;
 
 function findDialogTrigger(target: EventTarget | null): HTMLElement | null {

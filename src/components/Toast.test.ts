@@ -37,7 +37,7 @@ export const examples = [
 </Toast>`,
         expected: {
             render: "白底毛玻璃，圆角 16px，drop-shadow；左侧 CheckCircle 20px，右侧关闭 X 默认隐藏，悬停 Toast 显示",
-            interaction: "悬停 Toast 时右上角 X 出现；hover X 自身颜色加深；点击 X 触发 onDismiss",
+            interaction: "悬停 Toast 或直接指向右上角 X 的位置（16×16 透明命中区，含超出圆角的部分）时 X 出现；hover X 自身颜色加深；点击 X 触发 onDismiss",
         },
         logic: ["Rich", "Close"],
     },

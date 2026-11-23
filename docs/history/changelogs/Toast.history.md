@@ -1,5 +1,15 @@
 # Toast 更新日志归档
 
+### v2.3.0 (2026-06-18)
+
+#### 样式调整
+
+- default 变体新增 `backdrop-filter: blur(var(--size-10))` 与 WebKit 前缀，背景模糊档位与共享浮层面板一致。
+- rich 变体在 Toaster 的 idle 层不再覆盖为不透明 `Background/1`，统一保留 `.snowui-quick-action-panel` 提供的 `Background/3 + blur(var(--size-10))`。该调整选择玻璃效果优先，允许堆叠后层内容通过半透明背景产生轻微透出。
+- Toaster 不再使用独立 slot / measure 包装层承接动效。Toast 根元素自身同时承接堆叠 `translate` / `scale`、生命周期 `transform`、组合 opacity、背景与 `backdrop-filter`，避免外置 blur plate 在内容淡入淡出时单独暴露为灰色层。
+- 单层结构中的透明度直接合并进 Frame fade 配置：appear 为 `[80% × stackOpacity, stackOpacity]`，disappear 为 `[stackOpacity, 80% × stackOpacity]`。默认第 2 层稳定态 `0.8`、第 3 层 `0.6`，退场终值分别为 `0.64 / 0.48`；不复用会与 Frame blur motion 冲突的 `filter` 属性。
+- 移除已无消费方的 `--snowui-toast-idle-background-override`。
+
 ### v2.2.0 (2026-05-15)
 
 #### 新增

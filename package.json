@@ -109,6 +109,7 @@
     "source:notice:sync": "node scripts/source-notices.mjs --write",
     "source:copy": "node scripts/copy-source.mjs",
     "source:test": "node --test scripts/source-retention.test.mjs",
+    "sync:impact": "node scripts/sync-impact.mjs",
     "test:number-format": "node --test scripts/number-format.test.mjs",
     "test:table-accessible-names": "node --test scripts/table-accessible-names.test.mjs"
   },

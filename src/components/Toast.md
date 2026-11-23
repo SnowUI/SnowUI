@@ -1,9 +1,9 @@
 # Toast
 
-> **版本**: v2.3.3
+> **版本**: v2.3.4
 > **职责**: 用短暂通知反馈操作结果或状态变化，支持图标、操作和富内容，适合保存成功、错误与提醒。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-09-21
+> **文档修订**: 2026-11-23
 
 简单通知默认使用 Frame `singleLine`；rich 通知保留复合多行正文布局，不将整张通知强制为单行。
 
@@ -100,6 +100,8 @@ Toast 是 SnowUI 的全局通知组件。整套能力由三件交付物组成：
 - 非 frontmost Toast 禁止交互，但仍保留真实 Toast 内容；叠层差异由位移、缩放、透明度三种动效组合给出
 - 单条 Toast 内部为槽位宿主布局（`Frame row` + 三槽位），Leading / Content / Trailing 标准结构
 - 关闭 X 按钮属于 rich 变体的内置 trailing 装饰；通过绝对定位浮在 Toast 右上角，不参与三槽位
+- 关闭 X 外层是常驻接收指针的透明命中 host（最小 16×16，参照 Sidebar 折叠按钮）：hover Toast 本体或直接指向 X 的位置（含超出 Toast 圆角的部分）都会显示 X，命中与点击区域至少 16×16；非最前层与退出中的 Toast 不响应
+- 重复触发同一提示时调用方应再次 `toast()` 新建一条叠加在旧条之上，不要先 `dismissToast` 再重建，以免旧条看起来“重新出现”
 
 ---
 
@@ -147,7 +149,7 @@ showToast("saved-template");                          // Trigger <Toast template
 - 退出额外越界距离直接合并进 `--snowui-toast-stack-translate-y`，与生命周期的百分比位移共同作用，确保深层 Toast 也能越过可视区域边缘。
 - 背景、阴影和 `backdrop-filter` 始终属于同一个 Toast 根元素，不创建独立 blur plate。
 - `maxVisible` 只限制可见层数，不限制 `toast()` 入队数量。超过可见层后，当前最后一层进入 `pushed-out`，不是丢弃新 Toast。
-- 自动消失计时在同位置任一可见层 hover 时暂停，离开后恢复；只有 `idle` 层 hover 显示关闭 X，后层不显示 X。
+- 自动消失计时在同位置任一可见层 hover 时暂停，离开后恢复；只有 `idle` 层 hover Toast 或其 X 命中区时显示关闭 X，后层不显示 X。
 
 ### `<Toast />`（视觉单元）
 
@@ -250,6 +252,11 @@ Toast 作为宿主子节点,点击宿主即触发,无需 id、无需手动 `show
 
 ## 更新日志
 
+### v2.3.4 (2026-11-23)
+
+- rich 关闭 X 新增最小 16×16 透明命中 host（参照 Sidebar 折叠按钮）：直接指向 X 位置（含超出 Toast 圆角的部分）即可显示并点击，不再必须先进入 Toast 本体。
+- 使用约定：重复触发同一提示时新建一条叠加在旧条之上，不先 dismiss 再重建。
+
 ### v2.3.3 (2026-10-23)
 
 - 通知内部图文和独立文字区域的有效间距至少4 CSS px，根字号及间距缩小时仍保留下限；已有更大间距保持。短标签组合可通过继承的 `singleLine` 与 `Text lines={1}` 保持单行并提供截断全文；rich 的复杂多行正文不自动转成单行。
@@ -261,15 +268,5 @@ Toast 作为宿主子节点,点击宿主即触发,无需 id、无需手动 `show
 #### 修复
 
 - 按外置 Icon 替换协议检测 Toast 的直系 `leading` 子项；存在外置 `as="leading"` 时不再渲染内置 CheckCircle / Warning，修复 TS-04 同时显示两个图标的问题。
-
-### v2.3.0 (2026-06-18)
-
-#### 样式调整
-
-- default 变体新增 `backdrop-filter: blur(var(--size-10))` 与 WebKit 前缀，背景模糊档位与共享浮层面板一致。
-- rich 变体在 Toaster 的 idle 层不再覆盖为不透明 `Background/1`，统一保留 `.snowui-quick-action-panel` 提供的 `Background/3 + blur(var(--size-10))`。该调整选择玻璃效果优先，允许堆叠后层内容通过半透明背景产生轻微透出。
-- Toaster 不再使用独立 slot / measure 包装层承接动效。Toast 根元素自身同时承接堆叠 `translate` / `scale`、生命周期 `transform`、组合 opacity、背景与 `backdrop-filter`，避免外置 blur plate 在内容淡入淡出时单独暴露为灰色层。
-- 单层结构中的透明度直接合并进 Frame fade 配置：appear 为 `[80% × stackOpacity, stackOpacity]`，disappear 为 `[stackOpacity, 80% × stackOpacity]`。默认第 2 层稳定态 `0.8`、第 3 层 `0.6`，退场终值分别为 `0.64 / 0.48`；不复用会与 Frame blur motion 冲突的 `filter` 属性。
-- 移除已无消费方的 `--snowui-toast-idle-background-override`。
 
 完整历史见 [更新日志归档](../../docs/history/changelogs/Toast.history.md)。

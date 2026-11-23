@@ -1,9 +1,9 @@
 # Dialog
 
-> **版本**: v1.1.1
+> **版本**: v1.2.0
 > **职责**: 在模态对话框中呈现需要关注的内容或操作，提供遮罩、焦点管理与背景滚动锁定，适合确认和表单任务。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-23
+> **文档修订**: 2026-11-23
 
 ## 组件介绍
 
@@ -15,6 +15,7 @@
 用于需要独立焦点和关闭流程的对话框。锚定某个按钮的小浮层用 Popover，短提示用 Tooltip；标题与按钮使用公开组合角色。
 
 - 用 `bind:open` 控制面板；默认支持外部点击和 Escape 关闭。
+- 页面任一时刻只打开一个 Dialog：打开新 Dialog 会自动关闭已打开的 Dialog；多步骤流程在同一 Dialog 内切换内容，X 或 Escape 关闭整个弹窗而不是返回上一步。
 - 通过公开 title / content / footer / close 角色组合内容；显式子项自行配置，parts 只影响默认标题、分隔线与关闭按钮。
 <!-- usage-guide:end -->
 
@@ -83,6 +84,16 @@
 | 面板模式 | `<Dialog bind:open={state}>...</Dialog>` | 本地状态控制打开关闭 |
 | 内嵌模式 | `<Button>打开<Dialog as="dialog">...</Dialog></Button>` | 自动绑定父元素点击触发 |
 | 模版模式 | `<Dialog template id="x">...</Dialog>` + `showDialog("x")` / `data-dialog-target="x"` | 跨组件触发或多触发器共享 |
+
+<a id="单弹窗保证"></a>
+
+### 单弹窗保证
+
+页面任一时刻只允许一个打开的 Dialog（SnowUI 交互规则，见 `ComponentGuidelines §5.1`）。任一模式的 Dialog 打开时，Dialog 会通过其它已打开 Dialog 自身的关闭链路将其关闭：面板模式触发 `onOpenChange(false)` 并同步 `bind:open`，内嵌与模版模式执行 `hideDialog`。关闭新 Dialog 后不会恢复旧 Dialog。
+
+- 多步骤流程（如确认身份后继续操作）在同一个 Dialog 内切换标题与正文，不叠加第二个 Dialog；切换时保留前一步需要的状态。
+- 任一步点 X、按 Escape 或点击遮罩（`closeOnOutside` 为 true 时）都关闭整个 Dialog，不作为“返回上一步”；需要返回时在正文内提供明确的返回操作。
+- 只单向传入 `open` 而不处理 `onOpenChange` 的调用方，被替换关闭后需在下次打开前把自身状态置为 false。
 
 <a id="布局模型"></a>
 
@@ -262,6 +273,10 @@ Dialog 是通用模态容器。面板视觉复用 `.snowui-quick-action-panel`�
 - 样式覆盖入口:`--snowui-dialog-padding-override`、`--snowui-dialog-radius-override`、`--snowui-dialog-font-size-override`、`--snowui-dialog-line-height-override`、`--snowui-dialog-max-width-override`、`--snowui-dialog-gap-override`、`--snowui-dialog-content-gap-override`、`--snowui-dialog-footer-gap-override`、`--snowui-dialog-text-padding-override`
 
 ## 更新日志
+
+### v1.2.0 (2026-11-23)
+
+- 新增单弹窗保证：任一 Dialog 打开时自动关闭页面上其它已打开的 Dialog（面板模式触发 `onOpenChange(false)`，内嵌／模版模式 `hideDialog`）；文档明确多步骤流程在同一 Dialog 内切换内容，X／Escape 关闭整个弹窗。
 
 ### v1.1.1 (2026-10-23)
 

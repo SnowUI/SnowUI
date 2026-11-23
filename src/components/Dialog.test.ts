@@ -185,5 +185,24 @@ export const examples = [
             "Dialog",
             "Defaults"
         ]
+    },
+    {
+        "name": "DL-42:单弹窗保证",
+        code: `DL-42
+<Dialog template id="dialog-single-a" size="sm" title="第一个弹窗">
+    <Button data-dialog-target="dialog-single-b">打开第二个</Button>
+</Dialog>
+<Dialog template id="dialog-single-b" size="sm" title="第二个弹窗">
+    第二个弹窗打开时第一个已自动关闭
+</Dialog>
+<Button data-dialog-target="dialog-single-a">打开第一个</Button>`,
+        "expected": {
+            "render": "页面任一时刻只显示一个 Dialog 与一层遮罩",
+            "interaction": "在第一个弹窗内打开第二个时，第一个经自身关闭链路关闭（模版模式 hideDialog，面板模式触发 onOpenChange(false)）；关闭第二个后不会回到第一个，X 或 Escape 关闭整个弹窗"
+        },
+        "logic": [
+            "Dialog",
+            "SingleDialog"
+        ]
     }
 ] as const;

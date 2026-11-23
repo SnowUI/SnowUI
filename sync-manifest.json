@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 1,
+  "scope": "snowui-components",
+  "language": "en",
+  "standaloneRepoOnly": true,
+  "updated": "2026-11-23",
+  "description": "Self-contained intra-repository linkage contracts for @snowui-design-system/components when cloned standalone from GitHub.",
+  "standaloneAllowlist": [
+    "sync-manifest.json",
+    "scripts/sync-impact.mjs",
+    "README.md",
+    "CLAUDE.md",
+    ".gitignore",
+    "docs/**",
+    "tests/**"
+  ],
+  "coverageProbes": [
+    "src/components/Button.svelte",
+    "src/components/Button.md",
+    "src/blocks/SearchPopup.svelte",
+    "src/index.ts",
+    "src/logic/frame-state-value.ts",
+    "src/styles/themes.css",
+    "src/styles/components.css",
+    "src/internal/component-icon/index.ts",
+    "package.json",
+    "component-discovery.json"
+  ],
+  "points": [
+    {
+      "id": "components.svelte.impl-and-api",
+      "title": "Public Component & Block Implementation (.svelte) <-> Co-located API Spec & Test Sync",
+      "tier": "L-Rule",
+      "propagation": "immediate",
+      "triggers": [
+        "src/components/*.svelte",
+        "src/blocks/*.svelte"
+      ],
+      "triggerSignal": "Added or changed public Props, Snippets, events, Context, slot roles, default styles, or observable runtime behavior",
+      "companions": [
+        "{dir}/{stem}.md",
+        "{dir}/{stem}.test.ts"
+      ],
+      "exemptWhen": "Internal-only refactoring or performance tuning that preserves all public Props, DOM contracts, and observable behavior",
+      "immediate": [
+        "Keep {dir}/{stem}.md API table, quick-start snippet, and top version header synchronized with the component implementation",
+        "Add or update runnable examples in {dir}/{stem}.test.ts covering the new or modified capability",
+        "Ensure every source file under src/ retains the single-line trailing @license notice via pnpm source:notice:check (or pnpm source:notice:sync)"
+      ],
+      "evaluated": [
+        {
+          "target": "component-discovery.json + component-catalog.json",
+          "rubric": "If natural-language intents, aliases, or usage boundaries changed, update component-discovery.json and run pnpm catalog:generate"
+        }
+      ],
+      "mergeMain": [],
+      "acceptanceGate": [
+        "pnpm catalog:check",
+        "pnpm check:boundaries",
+        "pnpm check"
+      ],
+      "authorityDoc": "AGENTS.md"
+    },
+    {
+      "id": "components.exports.public-entry",
+      "title": "Public Package Entrypoints (src/index.ts) <-> Discovery Catalog & Sandbox Prelude",
+      "tier": "L-Gen",
+      "propagation": "immediate",
+      "triggers": [
+        "src/index.ts",
+        "src/blocks/index.ts",
+        "src/compat.ts",
+        "component-discovery.json",
+        "scripts/generate-component-catalog.mjs"
+      ],
+      "triggerSignal": "Added, renamed, or deprecated a public component or block export, or updated discovery metadata",
+      "companions": [
+        "component-discovery.json",
+        "component-catalog.json",
+        "vite.config.ts"
+      ],
+      "exemptWhen": "Internal type re-export adjustments that do not change public component names or catalog fields",
+      "immediate": [
+        "Update English intents/aliases/whenToUse/avoidWhen in component-discovery.json and regenerate component-catalog.json via pnpm catalog:generate",
+        "Register newly exported public components in vite.config.ts sandboxPrelude"
+      ],
+      "evaluated": [],
+      "mergeMain": [],
+      "acceptanceGate": [
+        "pnpm catalog:check",
+        "pnpm pack:check"
+      ],
+      "authorityDoc": "AGENTS.md"
+    },
+    {
+      "id": "components.runtime.shared-and-styles",
+      "title": "Shared Runtime Logic, Motion, i18n, and Core Stylesheets Linkage",
+      "tier": "L-Rule",
+      "propagation": "immediate",
+      "triggers": [
+        "src/logic/**",
+        "src/lib/**",
+        "src/motion/**",
+        "src/i18n/**",
+        "src/internal/**",
+        "src/styles/**",
+        "src/*.ts",
+        "src/blocks/*.ts",
+        "src/components/*.md",
+        "src/blocks/*.md",
+        "src/components/*.test.ts",
+        "src/blocks/*.test.ts"
+      ],
+      "triggerSignal": "Modified shared state/layout/formatting/motion modules, CSS tokens/layers, or co-located component docs/tests",
+      "companions": [],
+      "exemptWhen": "Documentation-only clarifications that do not alter runtime exports or CSS custom properties",
+      "immediate": [
+        "Keep co-located module documentation synchronized and preserve SSR safety plus trailing @license notices on all src/ files",
+        "Ensure src/styles/index.css remains self-contained without external stylesheet path dependencies"
+      ],
+      "evaluated": [],
+      "mergeMain": [],
+      "acceptanceGate": [
+        "pnpm verify:styles",
+        "pnpm check:boundaries",
+        "pnpm check"
+      ],
+      "authorityDoc": "AGENTS.md"
+    },
+    {
+      "id": "components.icons.builtin-supply",
+      "title": "Built-in Semantic Icon Snapshots <-> Third-Party Attribution Sync",
+      "tier": "L-Gen",
+      "propagation": "immediate",
+      "triggers": [
+        "src/internal/component-icon/**",
+        "scripts/generate-builtin-icons.mjs"
+      ],
+      "triggerSignal": "Added, replaced, or regenerated built-in semantic icon SVG data",
+      "companions": [
+        "THIRD_PARTY_NOTICES.md"
+      ],
+      "exemptWhen": "Pure TypeScript comment tweaks with no SVG path or icon collection change",
+      "immediate": [
+        "Preserve original viewBox and stroke proportions and verify THIRD_PARTY_NOTICES.md retains full third-party attribution (such as Phosphor MIT notice)"
+      ],
+      "evaluated": [],
+      "mergeMain": [],
+      "acceptanceGate": [
+        "pnpm source:test"
+      ],
+      "authorityDoc": "THIRD_PARTY_NOTICES.md"
+    },
+    {
+      "id": "components.delivery.package-and-whitelist",
+      "title": "Runtime Package Allowlist, License Materials, and Build Scripts Integrity",
+      "tier": "L-Rule",
+      "propagation": "immediate",
+      "triggers": [
+        "package.json",
+        "AGENTS.md",
+        "llms.txt",
+        "LICENSE",
+        "THIRD_PARTY_NOTICES.md",
+        "owner-identity.public.json",
+        "svelte.config.js",
+        "tsconfig.json",
+        "tsconfig.node.json",
+        "vite.config.ts",
+        "scripts/*.mjs"
+      ],
+      "triggerSignal": "Modified package exports/files allowlist, AI entrypoints, license text, or build/packaging scripts",
+      "companions": [
+        "scripts/check-runtime-package.mjs"
+      ],
+      "exemptWhen": "Adding standalone maintenance scripts not included in the published npm files allowlist",
+      "immediate": [
+        "Keep package.json files allowlist aligned with scripts/check-runtime-package.mjs so raw .svelte/.ts sources and source maps never leak into npm tarballs",
+        "Keep (./LICENSE) links intact in AGENTS.md and llms.txt with zero machine-local paths"
+      ],
+      "evaluated": [],
+      "mergeMain": [],
+      "acceptanceGate": [
+        "pnpm source:test",
+        "pnpm build",
+        "pnpm pack:check"
+      ],
+      "authorityDoc": "AGENTS.md"
+    }
+  ]
+}

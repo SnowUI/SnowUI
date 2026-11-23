@@ -1,11 +1,12 @@
 <!--
  Dialog 通用模态对话框
- v1.1.1
+ v1.2.0
 
  职责:
  - 面板模式: <Dialog bind:open>
  - 内嵌模式: <Button>...<Dialog as="dialog">...</Dialog></Button>
  - 模版模式: <Dialog template id="x">...</Dialog> + showDialog / data-dialog-target
+ - 单弹窗保证: 任一 Dialog 打开时关闭页面上其它已打开的 Dialog(claimExclusiveDialog)
 -->
 
 <script lang="ts">
@@ -20,6 +21,7 @@
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import {
+        claimExclusiveDialog,
         dialogStore,
         hideDialog,
         registerDialogTemplate,
@@ -343,6 +345,12 @@
                 ? active
                 : (activeEntry?.triggerEl ?? inlineTrigger ?? null);
         tick().then(focusFirstElement);
+    });
+
+    // Single-dialog guarantee: opening this Dialog closes any other open Dialog (ComponentGuidelines §5.1).
+    $effect(() => {
+        if (!isOpen) return;
+        return claimExclusiveDialog(componentId, () => requestClose());
     });
 
     $effect(() => {
