@@ -22,7 +22,9 @@ export interface OverflowActionsContext {
     invoke: (id: string, event?: MouseEvent) => void;
     requestLayout: () => void;
     disabled: boolean;
+    tooltip?: boolean;
     buttonProps?: Record<string, any>;
+    tooltipPart?: Record<string, any>;
 }
 
 export const OVERFLOW_ACTIONS_CONTEXT_KEY = Symbol("snowui-overflow-actions");

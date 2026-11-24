@@ -145,4 +145,20 @@ export const examples = [
         },
         logic: ["Action", "ContentWidth", "MenuItem"],
     },
+    {
+        name: "SB-12: 继承 Button 的 Tooltip 与 parts.Tooltip",
+        code: `SB-12
+<Frame row class="gap-12 items-center">
+    <SelectButton selectionMode="action" showIndicator={false} iconOnly ariaLabel="默认关闭提示" variant="borderless" options={[{ value: "a", label: "选项 A" }]}>
+        {#snippet label()}<Icon><FourLeafClover /></Icon>{/snippet}
+    </SelectButton>
+    <SelectButton selectionMode="action" showIndicator={false} iconOnly ariaLabel="底部菜单提示" tooltip parts={{ Tooltip: { position: "bottom" } }} variant="borderless" options={[{ value: "a", label: "选项 A" }]}>
+        {#snippet label()}<Icon><FourLeafClover /></Icon>{/snippet}
+    </SelectButton>
+</Frame>`,
+        expected: {
+            interaction: "默认关闭 Tooltip；开启 tooltip 并通过 parts.Tooltip 指定底部定位后，悬停触发按钮弹出底部 SnowUI Tooltip。",
+        },
+        logic: ["Tooltip", "Parts", "HostSpecialization"],
+    },
 ] as const;

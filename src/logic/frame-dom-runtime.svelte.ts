@@ -175,102 +175,86 @@ export function createFrameDomRuntime(options: FrameDomRuntimeOptions) {
         };
     }
 
+    function wrapOptional(handler: any, internal: (e?: any) => void) {
+        return handler ? wrap(handler, internal) : undefined;
+    }
+
     const captureHandlers = $derived.by(() => {
         const access = options.getFrameProps().access;
+        if (access !== "readonly") {
+            return {
+                onclickcapture: undefined,
+                onmousedowncapture: undefined,
+                ontouchstartcapture: undefined,
+                onkeydowncapture: undefined,
+            };
+        }
+        const guard = createReadonlyHandler(access);
         return {
-            onclickcapture: createReadonlyHandler(access),
-            onmousedowncapture: createReadonlyHandler(access),
-            ontouchstartcapture: createReadonlyHandler(access),
-            onkeydowncapture: createReadonlyHandler(access),
+            onclickcapture: guard,
+            onmousedowncapture: guard,
+            ontouchstartcapture: guard,
+            onkeydowncapture: guard,
         };
     });
 
-    const nativeHandlers = $derived.by(() => ({
-        onclick: wrap(filteredProps.eventHandlers.onclick, options.frameState.handleClick),
-        ondblclick: wrap(
-            filteredProps.eventHandlers.ondblclick,
-            options.frameState.handleDblClick,
-        ),
-        oncontextmenu: wrap(
-            filteredProps.eventHandlers.oncontextmenu,
-            options.frameState.handleContextMenu,
-        ),
-        onmouseenter: wrap(
-            filteredProps.eventHandlers.onmouseenter,
-            options.frameState.handleMouseEnter,
-        ),
-        onmouseleave: wrap(
-            filteredProps.eventHandlers.onmouseleave,
-            options.frameState.handleMouseLeave,
-        ),
-        onmousemove: wrap(
-            filteredProps.eventHandlers.onmousemove,
-            options.frameState.handleMouseMove,
-        ),
-        onmousedown: wrap(
-            filteredProps.eventHandlers.onmousedown,
-            options.frameState.handleMouseDown,
-        ),
-        onmouseup: wrap(
-            filteredProps.eventHandlers.onmouseup,
-            options.frameState.handleMouseUp,
-        ),
-        ontouchstart: wrap(
-            filteredProps.eventHandlers.ontouchstart,
-            options.frameState.handleTouchStart,
-        ),
-        ontouchend: wrap(
-            filteredProps.eventHandlers.ontouchend,
-            options.frameState.handleTouchEnd,
-        ),
-        ontouchmove: wrap(
-            filteredProps.eventHandlers.ontouchmove,
-            options.frameState.handleTouchMove,
-        ),
-        ontouchcancel: wrap(
-            filteredProps.eventHandlers.ontouchcancel,
-            options.frameState.handleTouchCancel,
-        ),
-        onfocus: wrap(
-            filteredProps.eventHandlers.onfocus,
-            options.frameState.handleFocus,
-        ),
-        onblur: wrap(
-            filteredProps.eventHandlers.onblur,
-            options.frameState.handleBlur,
-        ),
-        onkeydown: wrap(
-            filteredProps.eventHandlers.onkeydown,
-            options.frameState.handleKeyDown,
-        ),
-        onkeyup: wrap(
-            filteredProps.eventHandlers.onkeyup,
-            options.frameState.handleKeyUp,
-        ),
-        onkeypress: wrap(
-            filteredProps.eventHandlers.onkeypress,
-            options.frameState.handleKeyPress,
-        ),
-        oninput: wrap(
-            filteredProps.eventHandlers.oninput,
-            options.frameState.handleInput,
-        ),
-        onchange: wrap(
-            filteredProps.eventHandlers.onchange,
-            options.frameState.handleChange,
-        ),
-        onsubmit: wrap(
-            filteredProps.eventHandlers.onsubmit,
-            options.frameState.handleSubmit,
-        ),
-        onscroll: wrap(
-            filteredProps.eventHandlers.onscroll,
-            options.frameState.handleScroll,
-        ),
-        ondragstart: options.frameState.handleDragStart,
-        ondrag: options.frameState.handleDrag,
-        ondragend: options.frameState.handleDragEnd,
-    }));
+    const nativeHandlers = $derived.by(() => {
+        const frameProps = options.getFrameProps();
+        const handlers = filteredProps.eventHandlers;
+        const tag = String(resolvedTag).toLowerCase();
+        const interactiveTag = tag === "button" || tag === "a" || tag === "input" || tag === "select" || tag === "textarea";
+        const needsPressTouch = Boolean(
+            interactiveTag ||
+            frameProps.Click ||
+            frameProps.whileClick ||
+            frameProps.whileIdle ||
+            handlers.onclick ||
+            handlers.onmousedown ||
+            handlers.ontouchstart ||
+            handlers.ontouchend ||
+            handlers.ontouchcancel,
+        );
+        const needsDrag = Boolean(
+            frameProps.Drag ||
+            frameProps.whileDrag ||
+            frameProps.draggable ||
+            handlers.ondragstart ||
+            handlers.ondragend,
+        );
+        return {
+            onclick: wrap(handlers.onclick, options.frameState.handleClick),
+            ondblclick: wrapOptional(handlers.ondblclick, options.frameState.handleDblClick),
+            oncontextmenu: wrapOptional(handlers.oncontextmenu, options.frameState.handleContextMenu),
+            onmouseenter: wrap(handlers.onmouseenter, options.frameState.handleMouseEnter),
+            onmouseleave: wrap(handlers.onmouseleave, options.frameState.handleMouseLeave),
+            onmousemove: wrapOptional(handlers.onmousemove, options.frameState.handleMouseMove),
+            onmousedown: wrap(handlers.onmousedown, options.frameState.handleMouseDown),
+            onmouseup: wrap(handlers.onmouseup, options.frameState.handleMouseUp),
+            // Avoid attaching non-passive touchstart/touchmove listeners to non-interactive Frames.
+            ontouchstart: needsPressTouch
+                ? wrap(handlers.ontouchstart, options.frameState.handleTouchStart)
+                : undefined,
+            ontouchend: needsPressTouch
+                ? wrap(handlers.ontouchend, options.frameState.handleTouchEnd)
+                : undefined,
+            ontouchmove: wrapOptional(handlers.ontouchmove, options.frameState.handleTouchMove),
+            ontouchcancel: needsPressTouch
+                ? wrap(handlers.ontouchcancel, options.frameState.handleTouchCancel)
+                : undefined,
+            onfocus: wrap(handlers.onfocus, options.frameState.handleFocus),
+            onblur: wrap(handlers.onblur, options.frameState.handleBlur),
+            onkeydown: wrap(handlers.onkeydown, options.frameState.handleKeyDown),
+            onkeyup: wrap(handlers.onkeyup, options.frameState.handleKeyUp),
+            onkeypress: wrapOptional(handlers.onkeypress, options.frameState.handleKeyPress),
+            oninput: wrapOptional(handlers.oninput, options.frameState.handleInput),
+            onchange: wrapOptional(handlers.onchange, options.frameState.handleChange),
+            onsubmit: wrapOptional(handlers.onsubmit, options.frameState.handleSubmit),
+            onscroll: wrapOptional(handlers.onscroll, options.frameState.handleScroll),
+            ondragstart: needsDrag ? (handlers.ondragstart ? wrap(handlers.ondragstart, options.frameState.handleDragStart) : options.frameState.handleDragStart) : undefined,
+            ondrag: wrapOptional(handlers.ondrag, options.frameState.handleDrag),
+            ondragend: needsDrag ? (handlers.ondragend ? wrap(handlers.ondragend, options.frameState.handleDragEnd) : options.frameState.handleDragEnd) : undefined,
+        };
+    });
 
     const dataAttrs = $derived.by(() => {
         const frameProps = options.getFrameProps();

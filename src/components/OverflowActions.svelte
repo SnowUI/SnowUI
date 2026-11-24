@@ -16,6 +16,8 @@
     import MenuItem from "./MenuItem.svelte";
     import Separator from "./Separator.svelte";
     import OverflowAction from "./OverflowAction.svelte";
+    import type Tooltip from "./Tooltip.svelte";
+    import type { TooltipProp } from "../logic/tooltip-prop";
     import { createOverflowActionsMotion } from "../lib/overflow-actions-motion";
     import { createResponsiveExit } from "../lib/responsive-exit";
     import { resizeManager } from "../logic/observer.svelte";
@@ -54,6 +56,7 @@
         href?: string;
         target?: string;
         rel?: string;
+        tooltip?: TooltipProp;
         onAction?: () => void;
         buttonProps?: GlobalButtonProps;
         parts?: ComponentProps<typeof OverflowAction>["parts"];
@@ -81,6 +84,7 @@
         Listbox: typeof Listbox;
         MenuItem: typeof MenuItem;
         Separator: typeof Separator;
+        Tooltip: typeof Tooltip;
     }>;
 
     interface Props extends Omit<FrameProps, "children"> {
@@ -93,6 +97,8 @@
         moreLabel?: string;
         align?: "start" | "end";
         disabled?: boolean;
+        /** Default tooltip toggle for child OverflowAction items and the overflow More button; disabled by default. */
+        tooltip?: boolean;
         buttonProps?: GlobalButtonProps;
         children?: Snippet;
         parts?: Parts;
@@ -110,6 +116,7 @@
         moreLabel = undefined,
         align = "end",
         disabled = false,
+        tooltip = undefined,
         buttonProps = undefined,
         children = undefined,
         parts = undefined,
@@ -190,10 +197,19 @@
         get disabled() {
             return disabled;
         },
+        get tooltip() {
+            return tooltip;
+        },
         get buttonProps() {
             return resolvedButtonProps;
         },
+        get tooltipPart() {
+            return parts?.Tooltip;
+        },
     };
+    const resolvedGroupTooltip = $derived(
+        tooltip ?? (typeof buttonProps?.tooltip === "boolean" ? buttonProps.tooltip : Boolean(buttonProps?.tooltip)),
+    );
 
     setContext(OVERFLOW_ACTIONS_CONTEXT_KEY, context);
     function runAction(
@@ -549,6 +565,7 @@
                     href={item.href}
                     target={item.target}
                     rel={item.rel}
+                    tooltip={item.tooltip}
                     onclick={item.onAction}
                 />
             {/if}
@@ -563,10 +580,10 @@
             showIndicator={false}
             selectionMode="action"
             ariaLabel={resolvedMoreLabel}
-            title={resolvedMoreLabel}
+            tooltip={resolvedGroupTooltip ? resolvedMoreLabel : false}
             disabled={disabled}
             onAction={handleMenuAction}
-            parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem }}
+            parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem, Tooltip: parts?.Tooltip }}
         >
             {#snippet label()}
                 <ComponentIcon name="three-dots" aria-hidden="true" />
@@ -602,6 +619,7 @@
                 showIndicator={false}
                 selectionMode="action"
                 ariaLabel={resolvedMoreLabel}
+                tooltip={false}
                 tabindex={-1}
                 parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem }}
             >

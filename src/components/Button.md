@@ -1,6 +1,6 @@
 # Button
 
-> **版本**: v2.20.0
+> **版本**: v2.21.0
 > **职责**: 触发操作或导航，支持文字、图标、加载与禁用状态，适合从主要操作到轻量工具按钮的不同场景。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-22
@@ -56,6 +56,8 @@
 | holdRepeat | `boolean` | `false` | 开启指针按住连发；仅对未禁用的 button 宿主主按钮按压生效。按下立即触发一次 click，等待后周期触发，松开或取消停止；不为链接或键盘增加连发。 |
 | holdRepeatDelay | `number` | `260` | 开始周期连发前的等待时间，单位 ms，负值按 0 处理；仅 holdRepeat=true 生效，第一次周期点击还需等待 holdRepeatInterval。 |
 | holdRepeatInterval | `number` | `80` | 按住期间相邻周期 click 的间隔，单位 ms，最小按 1 处理；仅 holdRepeat=true 生效。 |
+| tooltip | `TooltipProp` | — | 悬停／聚焦提示开关或配置（`boolean \| string \| Snippet \| TooltipConfig`）；默认关闭，为 `true` 时复用按钮的 `aria-label`，按需懒加载内置 `Tooltip`，支持消费父级 `ButtonTooltipContext` 并允许实例显式覆盖。 |
+| parts | `ComponentPartsOf<{ Tooltip: typeof Tooltip }>` | — | 配置内置 `Tooltip`（仅作用于由 `tooltip` 属性生成的内置提示，通过 `ComponentPartsBoundary` 与调用方显式 `children` 隔离）。 |
 | children | `Snippet` | — | 按钮内的文字、图标或其他内容；有外壳纯图标用法设置 iconOnly，无外壳用 bare；两者的纯图标用法均须提供可访问名称，组件不通过内容自动推断。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
@@ -353,28 +355,23 @@ Button 放入 Pagination 时使用角色模板：
 
 ## AI Zone
 
-- **宿主与上下文继承**：[Button.svelte](Button.svelte) 基于 [Frame.svelte](Frame.svelte) 构建（默认 `enableResponsive=false`、`enableContext=true`）。在 Dialog 直系 `as="footer"` 操作区内，直系 `Button as="item"` 接收 `sm / md / md` 尺寸上下文（对应 Dialog `sm / md / lg`），显式 `size` 优先。
-- **尺寸、颜色与圆角基准**：`sm / md / lg` 标准最小高度为 `24 / 36 / 48px`，常规 padding 为 `--padding-1 --padding-3` / `--padding-2 --padding-4` / `--padding-3 --padding-5`，圆角为 `--radius-3 / --radius-4 / --radius-5` 并挂 `.snowui-rounded-rectangle`。`filled` 使用 `--primary` 底配 `--static-white-100` 文字（hover 叠加 20% overlay）；`gray`（`--black-4` 底）、`outline`（`--black-10` 边框）、`borderless` 在 Light / Dark 下分别叠加 4% / 10% hover overlay（详见 [StyleGuide.md §7.4](../../../docs/reference/StyleGuide.md#74-hover-背景色规则)）。
-- **合成层性能约束**：有背景的 Button 将基础背景层与预计算 hover 颜色叠层分离，仅动画绝对定位层的 transform / opacity，避免逐帧重算 `color-mix()` 或触发布局重排；内容视觉层标记 `data-tooltip-anchor-decoration` 保持外层 Tooltip 锚点稳定。
+- **宿主与上下文**：[Button.svelte](Button.svelte) 基于 [Frame.svelte](Frame.svelte)（`enableResponsive=false`、`enableContext=true`）；Dialog `as="footer"` 直系 `as="item"` 继承 `sm/md/md` 尺寸（显式 `size` 优先）。
+- **尺寸与变体基准**：`sm/md/lg` 最小高度 `24/36/48px`，padding `--padding-1 --padding-3` / `--padding-2 --padding-4` / `--padding-3 --padding-5`，圆角 `--radius-3/4/5`（`.snowui-rounded-rectangle`）；变体配色与 hover overlay 见 [StyleGuide.md §7.4](../../../docs/reference/StyleGuide.md#74-hover-背景色规则)。
+- **性能**：分离基础背景与预计算 hover 叠层仅动画 transform/opacity；内容层挂 `data-tooltip-anchor-decoration` 稳定 Tooltip 锚点。
 
 ## 更新日志
 
+### v2.21.0 (2026-11-24)
+
+- 新增默认关闭的 `tooltip` 与 `parts.Tooltip`（显式 `children` 经 `ComponentPartsBoundary` 隔离），按需懒加载内置 `Tooltip` 并消费 `ButtonTooltipContext`；所有宿主特化按钮自动继承。
+- 悬停宽度缩放系数改为首次悬停／聚焦／点击懒测量，消除挂载期同步回流与默认 `ResizeObserver`。
+
 ### v2.20.0 (2026-10-22)
 
-- 内部内容复用共享单行间距下限；保留Hug、size／padding、图标尺寸、动效和事件，不要求调用方外包Frame。
-
-- 2026-10-05：原 Indigo 默认配色改为 Brand（`--brand`），保留原有透明度、状态与覆盖机制。
-
+- 复用共享单行间距下限，保留 Hug、size/padding、图标尺寸、动效和事件；2026-10-05 将默认激活色由 Indigo 调整为 Brand（`--brand`）。
 
 ### v2.19.0 (2026-09-27)
 
-- 新增 contentScaleOnHover，内容默认作为整体跟随背景 hover 与点击缩放；可独立关闭。背景不缩放时内容也不缩放，布局与命中区保持不变。
-- 修复 hover 缩放结束时文字重绘造成的视觉下移；sm / md / lg 覆盖动画尾帧与结束帧的像素一致性回归。
-
-- 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
-### v2.18.1 (2026-09-12)
-
-- 背景横向总外扩限制为 0.25rem，纵向保持原比例；Borderless 隐藏起点与点击缩回同步补偿，长按钮不再随宽度无限增加外扩量。复用共享尺寸监听，内容、布局和时序保持不变。
+- 新增 `contentScaleOnHover` 使内容整体跟随背景缩放并可独立关闭；修复缩放尾帧文字视觉下移；2026-09-21 统一文档与 API 表入口。
 
 完整历史见 [更新日志归档](../../docs/history/changelogs/Button.history.md)。

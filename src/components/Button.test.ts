@@ -451,6 +451,27 @@ export const examples = [
         logic: ["Tooltip"],
     },
     {
+        name: "C1B: tooltip 属性开关与 parts.Tooltip",
+        code: `C1B
+<div class="flex-row gap-8 items-center">
+    <Button iconOnly aria-label="默认关闭提示">
+        <Heart />
+    </Button>
+    <Button iconOnly aria-label="收藏项目" tooltip>
+        <Star />
+    </Button>
+    <Button iconOnly aria-label="底部提示" tooltip parts={{ Tooltip: { position: "bottom" } }}>
+        <Bell />
+    </Button>
+    <Button tooltip="自定义提示文案">悬停提示</Button>
+</div>`,
+        expected: {
+            interaction: "默认不渲染 Tooltip；tooltip=true 复用 aria-label；支持 parts.Tooltip 配置定位及自定义文案；仅启用 tooltip 的按钮按需懒加载内置 Tooltip。",
+            performance: "未开启 tooltip 的按钮保持零 Tooltip 运行时与包体负担。",
+        },
+        logic: ["Tooltip", "TooltipProp", "Parts"],
+    },
+    {
         name: "D1: 状态流 (State Flow)",
         code: `D1
 <Button

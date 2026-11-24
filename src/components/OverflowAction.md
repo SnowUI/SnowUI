@@ -1,6 +1,6 @@
 # OverflowAction
 
-> **版本**: v1.0.1
+> **版本**: v1.1.0
 > **职责**: 定义 OverflowActions 中的一项按钮操作，让它可随可用空间在工具栏与更多菜单之间切换。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-12
@@ -49,10 +49,11 @@
 | disabled | `boolean` | `false` | 禁用可见按钮与对应 MenuItem |
 | href | `string` | — | 可见状态渲染链接；菜单执行时导航到同一地址 |
 | iconOnly | `boolean` | `false` | 内建可见 Button 仅显示 icon，label 作为无障碍名称；菜单仍显示 label |
+| tooltip | `TooltipProp` | — | 内建按钮及 `control` 内后代 `Button` 控件的 Tooltip 开关或配置；默认关闭（未传时继承父级 `OverflowActions.tooltip`），对 `iconOnly` / `compact` 内建按钮生效，并通过共享 `ButtonTooltipContext` 向 `control` 内任意基于 `Button` 的子控件下发默认开关与配置（显式子组件 Props 优先）。 |
 | onclick | `(event?: MouseEvent) => void` | — | 可见按钮与菜单执行共享的操作函数 |
 | children | `Snippet` | — | 覆盖可见按钮内容；注册到菜单的 label / icon 仍取显式 Props 默认行为：自动 Icon + label。 |
 | control | `Snippet<[(event?: MouseEvent) => void, boolean]>` | — | 用专用控件替换可见 Button；参数依次为 run 回调与最终 disabled，须接入控件的实际 onclick / disabled。菜单仍通过 onclick 执行；组件直接测量专用控件，不复制带状态控件的隐藏实例。 |
-| parts | `ComponentPartsOf<{ Button: typeof Button }>` | — | 配置当前操作内建 Button；优先级低于直接 Button Props、高于父级组默认，父级不读取此配置来推断 More 按钮样式。 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Tooltip: typeof Tooltip }>` | — | 配置当前操作内建 Button 与内置 Tooltip（通过 `ComponentPartsBoundary` 与显式 `control` 子控件隔离）；优先级低于直接 Props、高于父级组默认，父级不读取此配置来推断 More 按钮样式。 |
 | as | `string` | — | 作为 OverflowActions 的直系子项时必须设置 "item"，以注册测量、溢出与菜单执行；未注册时不能参与父级响应式操作管理。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
@@ -89,6 +90,10 @@ OverflowAction 只能作为 `OverflowActions` 的直系子项使用。组件保�
 - 真实按钮使用独立视觉壳消费父级渐隐值，不干扰 Button 自身 hover、点击或 Frame 根视觉通道；减少动效时保持完全可见直到收纳。
 
 ## 更新日志
+
+### v1.1.0 (2026-11-24)
+
+- 新增 `tooltip` 公开开关（默认关闭，继承父级 `OverflowActions.tooltip`）与 `parts.Tooltip`，为 `iconOnly` 与 `compact` 内建按钮支持 SnowUI `Tooltip`（移除原生 `title`），并通过共享 `ButtonTooltipContext` 统一向 `control` 内任意基于 `Button` 的子控件下发默认开关与配置（显式子控件经 `ComponentPartsBoundary` 与父级 `parts` 隔离）。
 
 ### v1.0.1 (2026-09-02)
 

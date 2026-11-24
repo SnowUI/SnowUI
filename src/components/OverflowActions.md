@@ -1,6 +1,6 @@
 # OverflowActions
 
-> **版本**: v1.1.1
+> **版本**: v1.2.0
 > **职责**: 在有限宽度内优先展示操作按钮，并将放不下的操作收进更多菜单，保持工具栏紧凑可用。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-10-23
@@ -59,9 +59,10 @@
 | moreLabel | `string` | `LocaleProvider` | More 按钮的无障碍名称，未传时按当前语言显示。 |
 | align | `"start" \| "end"` | `"end"` | Listbox 水平对齐 |
 | disabled | `boolean` | `false` | 禁用全部操作 |
+| tooltip | `boolean` | `false` | 控制组内 `OverflowAction` 子项与 More 按钮的默认 Tooltip 开关；默认关闭，开启后通过上下文向子项及后代 `Button` 控件下发，子项或子控件显式传 `tooltip` 时优先。 |
 | buttonProps | `GlobalButtonProps` | — | 所有 Action、More 与隐藏测量副本共享的 Button 默认 Props；支持 variant/size/bare/emphasis/class/style，排除由操作组接管的内容、角色、点击、链接、禁用与名称字段。 |
 | children | `Snippet` | — | 声明直系 OverflowAction as="item" 与 Separator as="separator"；存在时替换 items 内建操作，结构项不作为独立溢出候选。 |
-| parts | `Parts` | — | 配置默认生成的 Button、SelectButton、Listbox、MenuItem、Separator；More 的 parts.SelectButton 高于组级 parts.Button。公开 Parts 结构与覆盖优先级见下文。 |
+| parts | `Parts` | — | 配置默认生成的 Button、SelectButton、Listbox、MenuItem、Separator、Tooltip；More 的 parts.SelectButton 高于组级 parts.Button，parts.Tooltip 统一下发至组内子项与 More 按钮。公开 Parts 结构与覆盖优先级见下文。 |
 | onAction | `(event: OverflowActionsActionEvent) => void` | — | 操作执行后回调：id 为稳定标识，source 为 "button" 或 "menu"；item 为匹配的内建数据（显式模式通常无），originalEvent 为可选鼠标事件。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
@@ -170,6 +171,10 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 
 ## 更新日志
 
+### v1.2.0 (2026-11-24)
+
+- 新增 `tooltip` 组级开关（默认 `false`）及 `parts.Tooltip` 支持，通过上下文向组内 `OverflowAction` 与后代 `Button` 控件下发默认配置，并同步透传至 More `SelectButton`。
+
 ### v1.1.1 (2026-10-23)
 
 - 自有动作组间距保留4 CSS px下限及较大覆盖，原computed gap参与同一宽度求解；不改变compact／progressive／all、菜单冻结、测量缓存与动作回调。
@@ -183,9 +188,5 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - 2026-10-07：接入共享宽度驱动渐隐与 1s 停留恢复；保留 compact、双向 progressive、all、菜单冻结及操作语义，焦点所在按钮收纳后移到 More。
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
-
-### v1.0.2 (2026-09-02)
-
-- 根据现有源码补齐逐属性说明、默认回退和使用边界；未改变组件运行时行为。
 
 完整历史见 [更新日志归档](../../docs/history/changelogs/OverflowActions.history.md)。

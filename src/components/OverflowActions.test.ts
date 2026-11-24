@@ -112,4 +112,34 @@ export const examples = [
         expected: { render: "三个显式外置 Action 各自使用 outline/md；父级未提供组级样式，因此 More 使用 Button 默认 gray/sm。", layout: "父组件不读取显式子项的直接 Props 推断 More 样式。", interaction: "外置 Action 与 More 保持各自的真实 Button 行为。", performance: "不增加对子项 DOM 或 Props 的反向扫描。", responsive: "More 使用默认样式的真实宽度参与溢出计算。" },
         logic: ["ExplicitComposition", "DirectProps", "MoreDefault", "NoReverseInference"],
     },
+    {
+        name: "OA-09:组级 Tooltip 开关与 parts.Tooltip",
+        code: `OA-09
+<Frame column class="gap-12">
+    <OverflowActions
+        availableWidth={120}
+        tooltip
+        parts={{ Tooltip: { position: "bottom" } }}
+        buttonProps={{ variant: "borderless", size: "sm" }}
+        items={[
+            { id: "edit", label: "编辑", icon: "pencil-simple" },
+            { id: "copy", label: "复制", icon: "copy" },
+            { id: "delete", label: "删除", icon: "trash" },
+        ]}
+    />
+    <OverflowActions
+        availableWidth={120}
+        buttonProps={{ variant: "borderless", size: "sm" }}
+        items={[
+            { id: "edit", label: "编辑", icon: "pencil-simple" },
+            { id: "copy", label: "复制", icon: "copy" },
+            { id: "delete", label: "删除", icon: "trash" },
+        ]}
+    />
+</Frame>`,
+        expected: {
+            interaction: "第一组显式开启 tooltip 后，子项与 More 按钮均按 parts.Tooltip 在下方弹出；第二组默认关闭，不渲染 Tooltip。",
+        },
+        logic: ["Tooltip", "TooltipPart", "Compact", "More"],
+    },
 ] as const;

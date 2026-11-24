@@ -1,6 +1,6 @@
 <!--
  Select 组件：自定义下拉选择框（Trigger + 外置 Listbox 组合架构）
- v3.3.0
+ v3.3.1
 
  文档: ./Select.md
 -->
@@ -17,6 +17,7 @@
     import Input from "./Input.svelte";
     import Listbox, { type ListboxItem } from "./Listbox.svelte";
     import MenuItem from "./MenuItem.svelte";
+    import type Tooltip from "./Tooltip.svelte";
     import {getField, type ListboxOwnerContext, type ListboxOptionRegistration} from "../context";
     import {LISTBOX_OWNER_CONTEXT_KEY} from "../keys";
     import {resolveFrameFieldInvalid, resolveFrameFieldValue} from "../logic/frame-field-control";
@@ -40,6 +41,7 @@
         Listbox: typeof Listbox;
         Input: typeof Input;
         MenuItem: typeof MenuItem;
+        Tooltip: typeof Tooltip;
     }> & {
         Button?: Omit<
             ComponentProps<typeof Button>,

@@ -1,13 +1,21 @@
 <!-- OverflowActions 的专用真实 Button 子项。文档：./OverflowAction.md -->
 <script lang="ts">
-    import { onMount, type ComponentProps, type Snippet } from "svelte";
+    import { onMount, setContext, type ComponentProps, type Snippet } from "svelte";
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame from "./Frame.svelte";
     import Button from "./Button.svelte";
+    import type Tooltip from "./Tooltip.svelte";
+    import type { TooltipProp } from "../logic/tooltip-prop";
     import {
         mergeComponentPartProps,
         type ComponentPartsOf,
     } from "../logic/component-parts.svelte";
+    import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
+    import {
+        getButtonTooltip,
+        type ButtonTooltipContext,
+    } from "../context";
+    import { BUTTON_TOOLTIP_CONTEXT_KEY } from "../keys";
     import {
         getOverflowActionsContext,
         type OverflowActionIcon,
@@ -22,7 +30,9 @@
         | "href"
         | "onclick"
         | "aria-label"
-        | "title";
+        | "title"
+        | "tooltip"
+        | "parts";
 
     interface Props extends Omit<ButtonProps, ControlledButtonKeys> {
         id: string;
@@ -31,10 +41,15 @@
         disabled?: boolean;
         href?: string;
         iconOnly?: boolean;
+        /** Tooltip toggle or config for the built-in Button and descendant Button controls; defaults to inherited or off. */
+        tooltip?: TooltipProp;
         onclick?: (event?: MouseEvent) => void;
         children?: Snippet;
         control?: Snippet<[(event?: MouseEvent) => void, boolean]>;
-        parts?: ComponentPartsOf<{ Button: typeof Button }>;
+        parts?: ComponentPartsOf<{
+            Button: typeof Button;
+            Tooltip: typeof Tooltip;
+        }>;
         as?: string;
         [key: string]: any;
     }
@@ -46,6 +61,7 @@
         disabled = false,
         href = undefined,
         iconOnly = false,
+        tooltip = undefined,
         onclick = undefined,
         children = undefined,
         control = undefined,
@@ -55,6 +71,7 @@
     }: Props = $props();
 
     const owner = getOverflowActionsContext();
+    const parentButtonTooltip = getButtonTooltip();
     const resolvedButtonProps = $derived(
         mergeComponentPartProps(
             mergeComponentPartProps(
@@ -64,6 +81,49 @@
             rest,
         ),
     );
+    const effectiveTooltip = $derived<TooltipProp | undefined>(
+        tooltip ?? parts?.Button?.tooltip ?? owner?.tooltip ?? owner?.buttonProps?.tooltip ?? parentButtonTooltip?.tooltip,
+    );
+    const resolvedFullButtonTooltip = $derived<TooltipProp | undefined>(
+        iconOnly
+            ? effectiveTooltip
+            : typeof effectiveTooltip === "boolean"
+              ? false
+              : effectiveTooltip,
+    );
+    const resolvedTooltipPart = $derived(
+        mergeComponentPartProps(
+            mergeComponentPartProps(
+                parentButtonTooltip?.tooltipPart,
+                owner?.tooltipPart ?? {},
+            ),
+            parts?.Tooltip ?? {},
+        ),
+    );
+    const resolvedBuiltInParts = $derived(
+        parts?.Button || Object.keys(resolvedTooltipPart).length > 0
+            ? {
+                  ...(parts?.Button ? { Button: parts.Button } : {}),
+                  ...(Object.keys(resolvedTooltipPart).length > 0
+                      ? { Tooltip: resolvedTooltipPart }
+                      : {}),
+              }
+            : undefined,
+    );
+
+    // Universal SnowUI Context propagation: descendant Button hosts (including ColorSchemeButton,
+    // StyleButton, CopyButton, ExpandButton, SelectButton, or custom wrappers inside `control`)
+    // inherit tooltip defaults while explicit child props keep highest priority.
+    setContext<ButtonTooltipContext>(BUTTON_TOOLTIP_CONTEXT_KEY, {
+        get tooltip() {
+            return effectiveTooltip;
+        },
+        get tooltipPart() {
+            return Object.keys(resolvedTooltipPart).length > 0
+                ? resolvedTooltipPart
+                : undefined;
+        },
+    });
     let rootElement = $state<HTMLElement | undefined>(undefined);
     let visualElement = $state<HTMLElement | undefined>(undefined);
     let fullMeasureElement = $state<HTMLElement | undefined>(undefined);
@@ -159,17 +219,18 @@
     enableContext={false}
     enableScaleObserver={false}
     enableDefaultMotion={false}
+    componentParts={resolvedBuiltInParts}
     {...frameRestProps}
 >
     <span bind:this={visualElement} class="snowui-overflow-action-visual" style:visibility={mode === "hidden" ? "hidden" : undefined}>
         {#if control}
-            {@render control(execute, resolvedDisabled)}
+            <ComponentPartsBoundary>{@render control(execute, resolvedDisabled)}</ComponentPartsBoundary>
         {:else if mode === "compact"}
             <Button
                 {...resolvedButtonProps}
                 iconOnly
                 aria-label={label}
-                title={label}
+                tooltip={effectiveTooltip}
                 disabled={resolvedDisabled}
                 {href}
                 onclick={execute}
@@ -181,6 +242,7 @@
                 {...resolvedButtonProps}
                 {iconOnly}
                 aria-label={iconOnly ? label : undefined}
+                tooltip={resolvedFullButtonTooltip}
                 disabled={resolvedDisabled}
                 {href}
                 onclick={execute}
@@ -193,13 +255,13 @@
 
     {#if !control}<span class="snowui-overflow-action-measure" aria-hidden="true" inert>
         <span bind:this={fullMeasureElement}>
-            <Button {...resolvedButtonProps} {iconOnly} aria-label={iconOnly ? label : undefined} tabindex={-1}>
+            <Button {...resolvedButtonProps} {iconOnly} aria-label={iconOnly ? label : undefined} tooltip={false} tabindex={-1}>
                 {@render renderFull()}
             </Button>
         </span>
         {#if icon}
             <span bind:this={compactMeasureElement}>
-                <Button {...resolvedButtonProps} iconOnly tabindex={-1} aria-label={label}>
+                <Button {...resolvedButtonProps} iconOnly tooltip={false} tabindex={-1} aria-label={label}>
                     {@render renderIcon()}
                 </Button>
             </span>

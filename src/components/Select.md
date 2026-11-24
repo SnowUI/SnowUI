@@ -1,6 +1,6 @@
 # Select
 
-> **版本**: v3.3.0
+> **版本**: v3.3.1
 > **职责**: 在下拉列表中选择选项，可由数据直接生成面板，也可自定义选项组合，支持搜索与键盘操作。
 > **包归属**: `@snowui-design-system/components`
 
@@ -63,7 +63,7 @@
 | buttonBare | `boolean` | `true` | 只在 buttonTrigger 模式生效，控制内置 Button 是否为无外壳 bare 外观。 |
 | selectionMode | `"persistent" \| "action"` | `"persistent"` | persistent 保存选择值；action 只执行 onAction、关闭面板并恢复触发器焦点，不保存本次选项。 |
 | onAction | `(value: string) => void` | — | action 模式选择选项后调用，参数为字符串选项值；此时面板已关闭，返回值不参与选择。 |
-| parts | `SelectParts` | — | 配置默认 Listbox、Input、MenuItem 与按钮触发器；显式 child 不消费父级 parts。 |
+| parts | `SelectParts` | — | 配置默认 Listbox、Input、MenuItem、Tooltip 与按钮触发器；显式 child 不消费父级 parts。 |
 | ariaLabel | `string` | — | 触发器的可访问名称；按钮触发模式无自定义内容时也作为后备显示内容。 |
 | onclick | `(event: MouseEvent) => void` | — | 非 disabled、非 readonly 的触发器点击切换展开状态后调用，接收原始 MouseEvent。 |
 | oninput | `(event: Event) => void` | — | persistent 模式选择了不同值时调用，接收隐藏表单输入派发的 change Event；实际新值从绑定 value 读取，不是原生文本输入过程。 |
@@ -166,6 +166,10 @@
 
 ## 更新日志
 
+### v3.3.1 (2026-11-24)
+
+- `SelectParts` 新增 `Tooltip`，支持为 `buttonTrigger` 内置 `Button` 的 `Tooltip` 透传配置（保持与显式 `children` / `triggerContent` 隔离）。
+
 ### v3.3.0 (2026-10-23)
 
 - 2026-10-23：复杂附件中的图形／短标签示例复用 Frame 单行与 Text 全文缩略；仅文档修订，宿主、清除和选择协议保持。
@@ -175,9 +179,5 @@
 ### v3.2.5 (2026-10-20)
 
 - 修复 buttonTrigger／SelectButton 列表关闭后向无视觉外壳恢复焦点，改为向共享 Listbox 提供真实触发按钮；定位锚点和选择协议保持不变。
-
-### v3.2.4 (2026-10-17)
-
-- 默认 `options` 模式在选项标签动态更新后立即使用当前数据，避免语言切换时触发器保留旧标签；显式 children 的注册协议不变。
 
 完整历史见 [更新日志归档](../../docs/history/changelogs/Select.history.md)。

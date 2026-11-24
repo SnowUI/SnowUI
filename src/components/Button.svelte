@@ -1,6 +1,6 @@
 <!--
   Button 组件：基础交互按钮
-  v2.20.0
+  v2.21.0
 
  1. 核心能力 (Capabilities):
     - 继承 Frame 组件的所有通用能力 (交互、动效、响应式等)
@@ -32,7 +32,9 @@
   import {
     mergeComponentPartProps,
     useComponentPart,
+    type ComponentPartsOf,
   } from "../logic/component-parts.svelte";
+  import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
   import {
     getImage,
     getImageViewer,
@@ -41,10 +43,15 @@
     getButtonGroup,
     getButtonCollection,
     getButtonSize,
+    getButtonTooltip,
     getBreadcrumb,
   } from "../context";
 
   import Spinner from "./Spinner.svelte";
+  import type TooltipType from "./Tooltip.svelte";
+  import { resolveTooltipProp, type TooltipProp } from "../logic/tooltip-prop";
+
+  let TooltipComponent = $state<typeof TooltipType>();
 
   interface Props extends Omit<FrameProps, "size"> {
     variant?: "gray" | "filled" | "outline" | "borderless";
@@ -73,6 +80,10 @@
     holdRepeat?: boolean;
     holdRepeatDelay?: number;
     holdRepeatInterval?: number;
+    /** Hover/focus tooltip toggle or config; disabled by default. When true, reuses the button's aria-label. */
+    tooltip?: TooltipProp;
+    /** Configure the built-in Tooltip rendered when `tooltip` is enabled. */
+    parts?: ComponentPartsOf<{ Tooltip: typeof TooltipType }>;
     children?: Snippet;
     [key: string]: any;
   }
@@ -84,6 +95,7 @@
   }
 
   const inheritedButtonPart = useComponentPart<Props>("Button");
+  const inheritedTooltipPart = useComponentPart<Record<string, any>>("Tooltip");
   let explicitProps: Props = $props();
   let {
     variant = undefined,
@@ -103,6 +115,8 @@
     holdRepeat = false,
     holdRepeatDelay = 260,
     holdRepeatInterval = 80,
+    tooltip = undefined,
+    parts = undefined,
     onclick: userOnClick,
     onpointerdown: userOnPointerDown,
     onpointerup: userOnPointerUp,
@@ -212,8 +226,10 @@
       backgroundWidthFactor = 1;
       return;
     }
+    let stopResize: (() => void) | undefined;
     const refresh = () => {
-      // computed width 不受祖先 transform 影响，并保留亚像素精度。
+      // Compute width factor lazily on first pointer/focus/click interaction instead of forcing
+      // synchronous getComputedStyle + ResizeObserver on every Button during initial page mount.
       const view = node.ownerDocument.defaultView;
       if (!view) return;
       const style = view.getComputedStyle(node);
@@ -223,15 +239,15 @@
       const backgroundWidth = style.boxSizing === "border-box" ? width - borderWidth : width + padding;
       const rootFontSize = parseFloat(view.getComputedStyle(node.ownerDocument.documentElement).fontSize);
       backgroundWidthFactor = getButtonBackgroundWidthFactor(hoverTo, backgroundWidth, rootFontSize);
+      if (!stopResize) {
+        stopResize = resizeManager.watch(node, refresh);
+      }
     };
-    refresh();
-    const stop = resizeManager.watch(node, refresh);
-    // 能力缺失时仍在交互开始刷新，也覆盖固定尺寸按钮的根字号变化。
-    node.addEventListener("pointerenter", refresh);
-    node.addEventListener("focus", refresh);
+    node.addEventListener("pointerenter", refresh, { passive: true });
+    node.addEventListener("focus", refresh, { passive: true });
     node.addEventListener("click", refresh, true);
     return () => {
-      stop();
+      stopResize?.();
       node.removeEventListener("pointerenter", refresh);
       node.removeEventListener("focus", refresh);
       node.removeEventListener("click", refresh, true);
@@ -646,6 +662,38 @@
     clearHoldSuppressResetTimer();
   }
 
+  const buttonTooltipCtx = getButtonTooltip();
+  const effectiveTooltipProp = $derived(tooltip ?? buttonTooltipCtx?.tooltip);
+  const resolvedTooltip = $derived(
+    resolveTooltipProp(
+      effectiveTooltipProp,
+      typeof rest["aria-label"] === "string"
+        ? rest["aria-label"]
+        : typeof rest.ariaLabel === "string"
+          ? rest.ariaLabel
+          : undefined,
+    ),
+  );
+  const mergedTooltipConfig = $derived(
+    mergeComponentPartProps(
+      mergeComponentPartProps(
+        mergeComponentPartProps(
+          buttonTooltipCtx?.tooltipPart,
+          inheritedTooltipPart.current ?? {},
+        ),
+        parts?.Tooltip ?? {},
+      ),
+      resolvedTooltip.config,
+    ),
+  );
+
+  $effect(() => {
+    if (!resolvedTooltip.enabled || TooltipComponent) return;
+    void import("./Tooltip.svelte").then((mod) => {
+      TooltipComponent = mod.default;
+    });
+  });
+
   onDestroy(() => {
     clearHoldTimers();
     clearHoldSuppressResetTimer();
@@ -714,6 +762,7 @@
   onpointercancel={handlePointerCancel}
   onanimationend={handleAnimationEnd}
   renderHints={buttonRenderHints}
+  componentParts={parts}
   {...toggleDefaults}
   {...clickProps}
   {...frameRestProps}
@@ -722,9 +771,18 @@
 
 {#snippet buttonChildren()}
   <Frame tag="span" bind:element={contentElement} singleLine enableAutoLayout={rest.enableAutoLayout !== false} enableResponsive={false} enableContext={false} enableScaleObserver={false} enableDefaultMotion={false} class="snowui-button-content" data-tooltip-anchor-decoration>
-    {@render children?.()}
+    <ComponentPartsBoundary>{@render children?.()}</ComponentPartsBoundary>
   </Frame>
   {#if spinnerLoading}<span class="snowui-button-spinner" aria-hidden="true"><Spinner size={16} loading={false} skeleton={false} /></span>{/if}
+  {#if resolvedTooltip.enabled && TooltipComponent}
+    <TooltipComponent as="tooltip" {...mergedTooltipConfig}>
+      {#if typeof resolvedTooltip.content === "string"}
+        {resolvedTooltip.content}
+      {:else if typeof resolvedTooltip.content === "function"}
+        {@render resolvedTooltip.content()}
+      {/if}
+    </TooltipComponent>
+  {/if}
 {/snippet}
 
 <style>

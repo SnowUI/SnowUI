@@ -1,6 +1,6 @@
 # SelectButton
 
-> **版本**: v1.0.2
+> **版本**: v1.1.0
 > **职责**: 以按钮形式提供单项下拉选择，适合工具栏、筛选入口和需要紧凑展示的选项切换。
 > **包归属**: `@snowui-design-system/components`
 > **文档修订**: 2026-09-21
@@ -63,7 +63,7 @@
 | label | `Snippet<[SelectButtonLabelContext]>` | — | 替换触发器文字；参数包含 value、option、label、placeholder，保留指示器和按钮交互。 |
 | indicator | `Snippet<[SelectButtonIndicatorContext]>` | — | 替换指示图形，参数为 open、disabled；仅 showIndicator=true 时渲染。 |
 | children | `Snippet` | — | 显式 Listbox/MenuItem 内容，替换默认列表；不作为按钮文字使用，文字定制请用 label。 |
-| parts | `ComponentPartsOf<{ Listbox: typeof Listbox; Input: typeof Input; MenuItem: typeof MenuItem; }>` | — | 配置默认内建列表、搜索输入和选项；不提供 parts.Button，按钮样式在根级传入。显式 children 自行配置所属子项。 |
+| parts | `ComponentPartsOf<{ Listbox: typeof Listbox; Input: typeof Input; MenuItem: typeof MenuItem; Tooltip: typeof Tooltip; }>` | — | 配置默认内建列表、搜索输入、选项与触发按钮内置 Tooltip；不提供 parts.Button，按钮样式与 `tooltip` 开关在根级传入。显式 children 自行配置所属子项。 |
 | onchange | `(event: Event) => void` | — | persistent 模式选中不同值后调用，参数为 change Event；用 bind:value 读取新值，重复选择与 action 模式不触发。 |
 | onAction | `(value: string) => void` | — | 仅 action 模式在执行选项后接收其 value；列表随后保持关闭，组件不保存选中值。 |
 | onclick | `(event: MouseEvent) => void` | — | 触发器完成打开或关闭后调用；disabled/readonly 时不调用，不能通过 preventDefault() 撤销已执行的切换。 |
@@ -140,6 +140,10 @@ SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默
 
 ## 更新日志
 
+### v1.1.0 (2026-11-24)
+
+- 继承宿主 `Button` 的 `tooltip` 能力，并在 `parts` 中新增 `Tooltip` 以透传至触发按钮内置 `Tooltip`。
+
 ### v1.0.2 (2026-09-02)
 
 - 2026-09-21：统一使用文档、源码属性表与 Site / LLM 阅读入口；仅文档修订，不改变组件行为。
@@ -151,6 +155,4 @@ SelectButton 默认不显示搜索框，使用 `search` 开启。其 Listbox 默
 - 移除按钮触发模式外层误命中的 Field 边框，恢复真实 Button 宿主对完整视觉的唯一所有权。
 - SelectButton 默认关闭 Button 宿主的 hover 背景放大，保留颜色反馈与 `scaleOnHover={true}` 显式开启能力。
 
-### v1.0.0 (2026-07-03)
-
-- 首次实现宿主组件特化、默认内置和显式组合模式。
+完整历史见 [更新日志归档](../../docs/history/changelogs/SelectButton.history.md)。

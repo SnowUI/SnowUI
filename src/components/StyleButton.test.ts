@@ -36,4 +36,17 @@ export const examples = [
         },
         logic: ["LocaleProvider", "ExplicitMode", "children"],
     },
+    {
+        name: "STB-04: 继承 Button 的 Tooltip 与 parts.Tooltip",
+        code: `STB-04
+<Frame row class="gap-12 items-center">
+    <StyleButton applyToDocument={false} variant="borderless" />
+    <StyleButton applyToDocument={false} variant="borderless" tooltip />
+    <StyleButton applyToDocument={false} variant="borderless" tooltip parts={{ Tooltip: { position: "bottom" } }} />
+</Frame>`,
+        expected: {
+            interaction: "默认关闭 Tooltip；继承宿主 Button 的 tooltip 开关与 parts.Tooltip 配置，开启后自动复用当前风格切换文案。",
+        },
+        logic: ["Tooltip", "HostSpecialization", "Parts"],
+    },
 ] as const;

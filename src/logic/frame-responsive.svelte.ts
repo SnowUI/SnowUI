@@ -108,6 +108,8 @@ export class FrameResponsive {
     #node: HTMLElement | null = null;
     #preferredWidth = 0;
     #originalStyles: Record<string, InlineStyleSnapshot> | null = null;
+    #hasModifiedStyles = false;
+    #hasFallbackAttrs = false;
 
     constructor(getProps: () => FrameProps = () => ({})) {
         this.#getProps = getProps;
@@ -162,7 +164,8 @@ export class FrameResponsive {
         return "2xl";
     }
 
-    #captureOriginalStyles(node: HTMLElement) {
+    #ensureOriginalStyles(node: HTMLElement) {
+        if (this.#originalStyles) return;
         this.#originalStyles = Object.fromEntries(
             ["gap", "padding", "padding-top", "padding-right", "padding-bottom", "padding-left"].map(
                 (property) => [property, snapshotStyle(node, property)],
@@ -171,7 +174,8 @@ export class FrameResponsive {
     }
 
     #restoreSpacing(node: HTMLElement) {
-        if (!this.#originalStyles) return;
+        if (!this.#hasModifiedStyles || !this.#originalStyles) return;
+        this.#hasModifiedStyles = false;
         restoreStyle(node, "gap", this.#originalStyles.gap);
 
         const paddingProperties = [
@@ -200,6 +204,8 @@ export class FrameResponsive {
     #applyFallbackAttributes(node: HTMLElement) {
         const config = this.config;
         if (!this.fitActive || !config || isSingleLineLayout(this.#getProps())) {
+            if (!this.#hasFallbackAttrs) return;
+            this.#hasFallbackAttrs = false;
             node.removeAttribute("data-responsive-layout");
             node.removeAttribute("data-responsive-align");
             node.removeAttribute("data-responsive-justify");
@@ -209,6 +215,7 @@ export class FrameResponsive {
             return;
         }
 
+        this.#hasFallbackAttrs = true;
         node.setAttribute("data-responsive-layout", "true");
         const attributes = [
             ["data-responsive-align", config.align],
@@ -235,7 +242,15 @@ export class FrameResponsive {
 
     #measure(node: HTMLElement, width: number) {
         if (width <= 0) return;
-        this.containerWidth = width;
+        if (Math.abs(this.containerWidth - width) >= 0.5) {
+            this.containerWidth = width;
+        }
+        if (node.children.length === 0) {
+            if (this.fitActive) this.fitActive = false;
+            this.#restoreSpacing(node);
+            this.#applyFallbackAttributes(node);
+            return;
+        }
 
         if (
             this.fitActive &&
@@ -246,9 +261,11 @@ export class FrameResponsive {
             const computed = getComputedStyle(node);
             const lineGapFloor = px(computed.getPropertyValue("--snowui-single-line-gap-floor") || "4px");
             let gap = px(computed.columnGap === "normal" ? "0" : computed.columnGap);
+            this.#ensureOriginalStyles(node);
             if (isSingleLineLayout(this.#getProps()) && gap < lineGapFloor) {
                 gap = lineGapFloor;
                 node.style.setProperty("gap", `${lineGapFloor}px`);
+                this.#hasModifiedStyles = true;
             }
             const gapFloor = isSingleLineLayout(this.#getProps())
                 ? Math.max(lineGapFloor, resolveFloor(gap, this.config?.minGap))
@@ -262,26 +279,43 @@ export class FrameResponsive {
                     `${resolvePaddingFloor(preferred, this.config?.minPadding, side)}px`,
                 );
             }
+            this.#hasModifiedStyles = true;
             this.#applyFallbackAttributes(node);
             return;
         }
 
-        this.fitActive = false;
+        if (this.fitActive) this.fitActive = false;
         this.#restoreSpacing(node);
         this.#applyFallbackAttributes(node);
 
+        const props = this.#getProps();
+        const singleLine = isSingleLineLayout(props);
         const computed = getComputedStyle(node);
-        const lineGapFloor = px(computed.getPropertyValue("--snowui-single-line-gap-floor") || "4px");
+        const lineGapFloor = singleLine
+            ? px(computed.getPropertyValue("--snowui-single-line-gap-floor") || "4px")
+            : 4;
         const direction = computed.flexDirection;
         const isFlex =
             computed.display === "flex" || computed.display === "inline-flex";
         const isRow =
             isFlex && (direction === "row" || direction === "row-reverse");
+        // Fast path: non-row containers do not compress children horizontally via flex-shrink,
+        // so when content fits within clientWidth we skip per-child getComputedStyle loops.
+        if (!isRow && !singleLine && !this.config && node.scrollWidth <= node.clientWidth + EPSILON) {
+            this.#preferredWidth = 0;
+            return;
+        }
         const children = Array.from(node.children).filter(isMeasurableChild);
         let gap = px(computed.columnGap === "normal" ? "0" : computed.columnGap);
-        if (isSingleLineLayout(this.#getProps()) && gap < lineGapFloor) {
+        if (singleLine && gap < lineGapFloor) {
+            this.#ensureOriginalStyles(node);
             gap = lineGapFloor;
             node.style.setProperty("gap", `${lineGapFloor}px`);
+            this.#hasModifiedStyles = true;
+        }
+        if (children.length === 0) {
+            this.#preferredWidth = 0;
+            return;
         }
         const padding = {
             top: px(computed.paddingTop),
@@ -306,7 +340,7 @@ export class FrameResponsive {
 
         if (preferredWidth <= width + EPSILON) return;
 
-        const gapFloor = isSingleLineLayout(this.#getProps())
+        const gapFloor = singleLine
             ? Math.max(lineGapFloor, resolveFloor(gap, this.config?.minGap))
             : resolveFloor(gap, this.config?.minGap);
         const paddingFloor = {
@@ -341,8 +375,10 @@ export class FrameResponsive {
             ? Math.min(1, shortage / horizontalCapacity)
             : 1;
 
+        this.#ensureOriginalStyles(node);
         if (gap > gapFloor) {
             node.style.setProperty("gap", `${lerpToFloor(gap, gapFloor, compressionRatio)}px`);
+            this.#hasModifiedStyles = true;
         }
         for (const side of ["top", "right", "bottom", "left"] as const) {
             if (padding[side] > paddingFloor[side]) {
@@ -350,6 +386,7 @@ export class FrameResponsive {
                     `padding-${side}`,
                     `${lerpToFloor(padding[side], paddingFloor[side], compressionRatio)}px`,
                 );
+                this.#hasModifiedStyles = true;
             }
         }
 
@@ -366,14 +403,22 @@ export class FrameResponsive {
 
     resizeObserver = (node: HTMLElement) => {
         this.#node = node;
-        this.#captureOriginalStyles(node);
-        const unwatch = resizeManager.watch(node, () => {
-            // 使用 border-box 与子项 + padding 的需求宽度保持同一口径。
-            this.#measure(node, node.getBoundingClientRect().width);
+        const unwatch = resizeManager.watch(node, (entry) => {
+            // Prefer ResizeObserverEntry borderBoxSize to avoid forced synchronous reflows on mount.
+            const borderSize = Array.isArray(entry.borderBoxSize)
+                ? entry.borderBoxSize[0]?.inlineSize
+                : (entry.borderBoxSize as unknown as ResizeObserverSize | undefined)?.inlineSize;
+            const width =
+                typeof borderSize === "number" && Number.isFinite(borderSize) && borderSize > 0
+                    ? borderSize
+                    : node.getBoundingClientRect().width;
+            this.#measure(node, width);
         });
 
-        // 初始化宽度
-        this.#measure(node, node.getBoundingClientRect().width);
+        // Only fall back to synchronous initial measure when ResizeObserver is unavailable.
+        if (typeof ResizeObserver === "undefined") {
+            this.#measure(node, node.getBoundingClientRect().width);
+        }
 
         return {
             destroy: () => {

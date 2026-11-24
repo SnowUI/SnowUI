@@ -11,6 +11,7 @@
     import Input from "./Input.svelte";
     import Listbox from "./Listbox.svelte";
     import MenuItem from "./MenuItem.svelte";
+    import type Tooltip from "./Tooltip.svelte";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
 
     export interface SelectButtonLabelContext {
@@ -64,6 +65,7 @@
             Listbox: typeof Listbox;
             Input: typeof Input;
             MenuItem: typeof MenuItem;
+            Tooltip: typeof Tooltip;
         }>;
         onchange?: (event: Event) => void;
         onAction?: (value: string) => void;

@@ -8,7 +8,8 @@
     import { getContext, setContext, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
-    import Tooltip from "./Tooltip.svelte";
+    import type TooltipType from "./Tooltip.svelte";
+    let TooltipComponent = $state<typeof TooltipType>();
     import { ComponentIcon } from "../internal/component-icon/index";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
@@ -58,7 +59,7 @@
         children?: Snippet<[any]>;
         parts?: ComponentPartsOf<{
             Button: typeof Button;
-            Tooltip: typeof Tooltip;
+            Tooltip: typeof TooltipType;
         }>;
         [key: string]: any;
     }
@@ -236,6 +237,12 @@
         if (typeof tooltipContent === "string")
             return tooltipContent.length > 0;
         return true;
+    });
+    $effect(() => {
+        if (!needTooltip || TooltipComponent) return;
+        void import("./Tooltip.svelte").then((mod) => {
+            TooltipComponent = mod.default;
+        });
     });
     const singleLineVisibleText = $derived.by(() => {
         if (!singleLineMeasureElement) return "";
@@ -662,14 +669,14 @@
             <ComponentPartsBoundary>{@render textChildren({ breakpoint })}</ComponentPartsBoundary>
         {/if}
 
-        {#if needTooltip}
-            <Tooltip {...tooltipConfig}>
+        {#if needTooltip && TooltipComponent}
+            <TooltipComponent {...tooltipConfig}>
                 {#if typeof tooltipContent === "string"}
                     {tooltipContent}
                 {:else if typeof tooltipContent === "function"}
                     {@render tooltipContent()}
                 {/if}
-            </Tooltip>
+            </TooltipComponent>
         {/if}
     {/snippet}
 </Frame>

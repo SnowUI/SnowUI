@@ -1,6 +1,6 @@
 # frame-dom-runtime
 
-> **版本**: v1.0.0
+> **版本**: v1.1.0
 > **职责**: 统一拼装 Frame 根节点的 DOM props、事件包装器与运行时 `data-*` 属性。
 
 `frame-dom-runtime.svelte.ts` 承接 `Frame.svelte` 中与根节点 DOM 运行时直接相关的组装逻辑，包括：
@@ -13,6 +13,10 @@
 ---
 
 ## 更新日志
+
+### v1.1.0 (2026-11-24)
+
+- **性能**: 仅在显式配置或传入处理器时挂载 `readonly` capture、空保留原生事件及非交互容器的 `touch*`/`drag*` 监听器，减少静态 `Frame` 节点监听与非 passive 触摸阻塞。
 
 ### v1.0.0 (2026-03-09)
 

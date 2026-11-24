@@ -14,6 +14,7 @@
 import { getContext, type Component } from "svelte";
 import type { PreviewMode } from "./logic/image-preview";
 import type { NumberFormatOptions } from "./lib/number-format";
+import type { TooltipProp } from "./logic/tooltip-prop";
 
 export * from "./keys";
 
@@ -36,6 +37,7 @@ import {
     BUTTON_GROUP_CONTEXT_KEY,
     BUTTON_COLLECTION_CONTEXT_KEY,
     BUTTON_SIZE_CONTEXT_KEY,
+    BUTTON_TOOLTIP_CONTEXT_KEY,
     BREADCRUMB_CONTEXT_KEY,
     ACCORDION_CONTEXT_KEY,
     LISTBOX_OWNER_CONTEXT_KEY,
@@ -314,6 +316,19 @@ export interface ButtonSizeContext {
 
 export function getButtonSize(): ButtonSizeContext | undefined {
     return getContext<ButtonSizeContext>(BUTTON_SIZE_CONTEXT_KEY);
+}
+
+// --- Button Tooltip Context ---
+
+export interface ButtonTooltipContext {
+    /** Default tooltip toggle or config inherited by descendant Button hosts unless overridden explicitly. */
+    readonly tooltip?: TooltipProp;
+    /** Default Tooltip part props inherited by descendant Button built-in Tooltips unless overridden explicitly. */
+    readonly tooltipPart?: Record<string, any>;
+}
+
+export function getButtonTooltip(): ButtonTooltipContext | undefined {
+    return getContext<ButtonTooltipContext>(BUTTON_TOOLTIP_CONTEXT_KEY);
 }
 
 // --- Breadcrumb Context ---

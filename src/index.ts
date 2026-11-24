@@ -86,6 +86,7 @@ export {
 
 export { default as Text } from './components/Text.svelte'
 export { default as Tooltip } from "./components/Tooltip.svelte";
+export type { TooltipProp } from "./logic/tooltip-prop";
 export { default as Badge } from "./components/Badge.svelte";
 export { default as Chip } from "./components/Chip.svelte";
 export { default as Link } from "./components/Link.svelte";

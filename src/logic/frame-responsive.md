@@ -57,6 +57,9 @@ const observedElements = new Set<Element>();
 
 ## 更新日志
 
+### v3.1.0 (2026-11-24)
+- **性能**: 取消挂载同步 `getBoundingClientRect()`，改由共享 `ResizeObserver` 首个 `borderBoxSize` 批量交付；无样式改动时跳过前置写操作，无子元素或非行容器未溢出时走快速路径，避免初始强制回流风暴。
+
 ### v3.0.0 (2026-09-02)
 - **新增**: 基于实际内容宽度的 gap / padding 压缩与结构回退
 - **新增**: `direction`、`align`、`justify`、`childrenWidth`、`childrenMinWidth`、`minGap`、`minPadding`
