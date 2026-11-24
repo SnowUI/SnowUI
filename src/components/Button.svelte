@@ -48,10 +48,10 @@
   } from "../context";
 
   import Spinner from "./Spinner.svelte";
-  import type TooltipType from "./Tooltip.svelte";
+  import type Tooltip from "./Tooltip.svelte";
   import { resolveTooltipProp, type TooltipProp } from "../logic/tooltip-prop";
 
-  let TooltipComponent = $state<typeof TooltipType>();
+  let TooltipComponent = $state<typeof Tooltip>();
 
   interface Props extends Omit<FrameProps, "size"> {
     variant?: "gray" | "filled" | "outline" | "borderless";
@@ -83,7 +83,7 @@
     /** Hover/focus tooltip toggle or config; disabled by default. When true, reuses the button's aria-label. */
     tooltip?: TooltipProp;
     /** Configure the built-in Tooltip rendered when `tooltip` is enabled. */
-    parts?: ComponentPartsOf<{ Tooltip: typeof TooltipType }>;
+    parts?: ComponentPartsOf<{ Tooltip: typeof Tooltip }>;
     children?: Snippet;
     [key: string]: any;
   }

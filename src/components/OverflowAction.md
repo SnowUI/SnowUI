@@ -53,7 +53,7 @@
 | onclick | `(event?: MouseEvent) => void` | — | 可见按钮与菜单执行共享的操作函数 |
 | children | `Snippet` | — | 覆盖可见按钮内容；注册到菜单的 label / icon 仍取显式 Props 默认行为：自动 Icon + label。 |
 | control | `Snippet<[(event?: MouseEvent) => void, boolean]>` | — | 用专用控件替换可见 Button；参数依次为 run 回调与最终 disabled，须接入控件的实际 onclick / disabled。菜单仍通过 onclick 执行；组件直接测量专用控件，不复制带状态控件的隐藏实例。 |
-| parts | `ComponentPartsOf<{ Button: typeof Button; Tooltip: typeof Tooltip }>` | — | 配置当前操作内建 Button 与内置 Tooltip（通过 `ComponentPartsBoundary` 与显式 `control` 子控件隔离）；优先级低于直接 Props、高于父级组默认，父级不读取此配置来推断 More 按钮样式。 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Tooltip: typeof Tooltip; }>` | — | 配置当前操作内建 Button 与内置 Tooltip（通过 `ComponentPartsBoundary` 与显式 `control` 子控件隔离）；优先级低于直接 Props、高于父级组默认，父级不读取此配置来推断 More 按钮样式。 |
 | as | `string` | — | 作为 OverflowActions 的直系子项时必须设置 "item"，以注册测量、溢出与菜单执行；未注册时不能参与父级响应式操作管理。 |
 
 未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。

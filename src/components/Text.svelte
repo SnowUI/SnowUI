@@ -8,8 +8,8 @@
     import { getContext, setContext, type Snippet } from "svelte";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
-    import type TooltipType from "./Tooltip.svelte";
-    let TooltipComponent = $state<typeof TooltipType>();
+    import type Tooltip from "./Tooltip.svelte";
+    let TooltipComponent = $state<typeof Tooltip>();
     import { ComponentIcon } from "../internal/component-icon/index";
     import type { ComponentPartsOf } from "../logic/component-parts.svelte";
     import ComponentPartsBoundary from "../logic/ComponentPartsBoundary.svelte";
@@ -59,7 +59,7 @@
         children?: Snippet<[any]>;
         parts?: ComponentPartsOf<{
             Button: typeof Button;
-            Tooltip: typeof TooltipType;
+            Tooltip: typeof Tooltip;
         }>;
         [key: string]: any;
     }
