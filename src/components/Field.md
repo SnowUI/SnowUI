@@ -1,9 +1,9 @@
 # Field
 
-> **版本**: v1.4.2
+> **版本**: v1.4.3
 > **职责**: 将输入控件、标签、图标和校验反馈组织为完整的表单字段，统一外观与内容布局。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-11-23
+> **文档修订**: 2026-11-25
 
 ## 组件介绍
 
@@ -331,6 +331,10 @@ Field 是字段表面的槽位宿主特化：
 - **附件与分割线边界**：非 `segment` 模式下 `as="leading" | "trailing"` 作为 Field 直系附件（默认 `--black-40`），不生成字段分割线；`segment` 模式下附件作为各段 Input / Select 的直系子项（Select 存在外部 trailing 时自动隐藏默认 Indicator；Input 进入 `invalid` 时优先显示内置警告图标并临时隐藏外部 trailing）。日期 Input 存在外部日期触发器时不重复显示原生触发图标。
 
 ## 更新日志
+
+### v1.4.3 (2026-11-25)
+
+- `fieldFocusForward` 排除浮层滚动条（`.snowui-overlay-scrollbar`）与尺寸手柄（`[data-resize-handle]`）点击，避免拖拽内嵌 `Textarea` 滚动条或尺寸手柄释放时重新聚焦输入域导致滚动跳回光标末尾。
 
 ### v1.4.2 (2026-11-23)
 

@@ -1,6 +1,6 @@
 <!--
  Field 组件：表单容器
- v1.4.1
+ v1.4.3
 
  文档: ./Field.md
 -->
@@ -57,7 +57,7 @@
         function handleClick(e: MouseEvent) {
             const target = e.target as HTMLElement;
             if (disabled) return;
-            if (target.closest('input:not([aria-hidden="true"]), textarea, button:not([tabindex="-1"])')) return;
+            if (target.closest('input:not([aria-hidden="true"]), textarea, button:not([tabindex="-1"]), .snowui-overlay-scrollbar, [data-resize-handle]')) return;
             const first = node.querySelector<HTMLElement>(
                 'input:not([type="hidden"]):not([aria-hidden="true"]):not([disabled]), ' +
                 'textarea:not([disabled]), ' +

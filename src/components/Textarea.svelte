@@ -1,6 +1,6 @@
 <!--
  Textarea 组件：基础多行文本输入框
- v1.0.3
+ v1.0.4
 
  文档: ./Textarea.md
 -->
@@ -203,6 +203,27 @@
     const resizeTarget = $derived(
         isEmbedded && fieldContext?.element ? fieldContext.element : textareaHostEl,
     );
+    let embeddedChromeHeight = $state(24);
+    const minTextareaHeight = $derived(
+        isEmbedded && rest.as !== "segment" ? 36 : 60,
+    );
+    const indicatorMinHeight = $derived(
+        isEmbedded && fieldContext?.element
+            ? minTextareaHeight + embeddedChromeHeight
+            : 60,
+    );
+
+    function syncEmbeddedChromeHeight() {
+        const fieldEl = isEmbedded ? fieldContext?.element : undefined;
+        if (!fieldEl || !textareaHostEl) return;
+        embeddedChromeHeight = Math.max(
+            0,
+            Math.round(
+                fieldEl.getBoundingClientRect().height -
+                    textareaHostEl.getBoundingClientRect().height,
+            ),
+        );
+    }
 
     function handleIndicatorSize(next: number, axis: "width" | "height") {
         if (axis === "width") {
@@ -217,7 +238,8 @@
                 fieldContext.element.getBoundingClientRect().height -
                     textareaHostEl.getBoundingClientRect().height,
             );
-            resizeHeight = Math.max(20, next - chrome);
+            embeddedChromeHeight = Math.round(chrome);
+            resizeHeight = Math.max(minTextareaHeight, next - chrome);
         } else {
             resizeHeight = next;
         }
@@ -250,6 +272,19 @@
         if (showBottom) return "bottom";
         return undefined;
     }
+
+    $effect(() => {
+        const fieldEl = isEmbedded ? fieldContext?.element : undefined;
+        const hostEl = textareaHostEl;
+        if (!fieldEl || !hostEl) return;
+        syncEmbeddedChromeHeight();
+        const unwatchField = resizeManager.watch(fieldEl, syncEmbeddedChromeHeight);
+        const unwatchHost = resizeManager.watch(hostEl, syncEmbeddedChromeHeight);
+        return () => {
+            unwatchField();
+            unwatchHost();
+        };
+    });
 
     $effect(() => {
         const el = textareaEl;
@@ -369,7 +404,7 @@
                 appearance="corner"
                 value={indicatorAxis === "width" ? resizeWidth : resizeHeight}
                 minWidth={120}
-                minHeight={60}
+                minHeight={indicatorMinHeight}
                 applySize={false}
                 ariaLabel={localeContext.t("textarea.resize")}
                 onSizeChange={handleIndicatorSize}

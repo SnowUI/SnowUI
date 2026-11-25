@@ -1,9 +1,9 @@
 # Sidebar
 
-> **版本**: v1.9.5
+> **版本**: v1.9.6
 > **职责**: 组织应用的品牌入口、分组导航与底部操作，支持折叠和独立滚动，适合多页面应用。
 > **包归属**: `@snowui-design-system/components`
-> **文档修订**: 2026-10-23
+> **文档修订**: 2026-11-25
 
 ## 组件介绍
 
@@ -82,7 +82,7 @@
 
 ### 尺寸边界
 
-默认 Logo 图形为 24×24（16px 根字号），字标与其他布局保持原值。
+默认 Logo 图形为 24×24、字标按 `10/12` 等比缩放（59×10）、图文间距 `5px`（16px 根字号，对应 Workshop `17244:26322`），其他布局保持原值。
 
 <a id="api-参考"></a>
 
@@ -116,7 +116,7 @@
 - 纵向滚动条轨道仅覆盖固定Header与可见Footer之间的导航区域，边界随两者实测高度更新，沿用ScrollArea的轨道测量与拖拽；内容遮罩保持不变。
 - Header 与 Footer 均为非滚动区；Footer 全宽贴底，`ScrollArea` 独立滚动并延伸至底部，在 Footer 区域内按设计渐隐。Sidebar 根的 Header / Body 默认 gap 为 `var(--gap-3)`（12px），即 Logo 区域与下方导航区域之间的默认间距；它与 Body 内相邻导航内容的 4px gap 是两个独立层级。
 - Body 纵向 overlay scrollbar 根据根横向 padding 自动外移，轨道右边缘始终距 Sidebar 右边框 `4px`；默认 12px 横向 padding 时其 `right` 偏移为 `-8px`。
-- Logo 所在 Header 区域使用 `4px` 上下 padding；滚动视口延伸到 Logo 区域背后，并以 Header 实测高度、顶部 padding 和 Header/Body gap 组成的固定区高度实现反向渐隐：从下往上进入区域 20% 时保留 20% 可见度，到 40% 时完全消失。Logo 本身不参与遮罩，列表顶部保留对应空间。
+- Logo 所在 Header 区域默认纵向 padding 为 `0px`（最小高度 `24px`），配合根容器上 `16px`、左 `12px` 与 Logo host 左 `4px` 使 Logo 实际距侧栏上边缘与左边缘均为 `16px`；滚动视口延伸到 Logo 区域背后，并以 Header 实测高度、顶部 padding 和 Header/Body gap 组成的固定区高度实现反向渐隐：从下往上进入区域 20% 时保留 20% 可见度，到 40% 时完全消失。Logo 本身不参与遮罩，列表顶部保留对应空间。
 - Body 导航内容默认使用 `var(--gap-1)`（4px）间距，直接组合的 SidebarItem 与 SidebarSection 内部列表保持一致。
 - `SidebarItemData.depth={1}` 与显式 `SidebarItem depth={1}` 使用同一二级导航视觉：组件在 leading 槽绘制等长双臂、1px Black/40% 密集点线、4px 圆角的 L 形层级连接线，并以该连接线替换普通 Icon。竖线中心与一级 Item Icon 中心同列，横线中心与二级文字中心同轴。
 - Sidebar 内所有横向 Separator 使用同一默认样式，不区分 SidebarSection 自动生成或调用方显式组合：上下与左右 padding 均为 `8px`（`var(--padding-2)`）、`line-height: 0`、分割线本体保持 Separator 默认 `0.5px` 与 Black/10%。节点自身使用 content-box 背景裁切表达 padding，不要求外部 wrapper 或 class；横向与纵向 padding 分别通过 `--snowui-sidebar-separator-padding-x-override`、`--snowui-sidebar-separator-padding-y-override` 覆盖。每个 SidebarSection 的分类内容末尾内置该 Separator，调用方无需为分类手动补分割线。
@@ -215,6 +215,10 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 ## 更新日志
 
+### v1.9.6 (2026-11-25)
+
+- 对齐 Workshop `17244:26322` 设计稿：Header 默认纵向 padding 改为 `0px`、最小高度 `24px`，默认 Logo 字标按 `10/12` 等比缩放（`59×10`）且间距为 `5px`，使展开态 Logo 实际距侧栏上边缘与左边缘均为 `16px`。
+
 ### v1.9.5 (2026-10-23)
 
 - 2026-10-23：既有Tags集合Test复用Frame单行与ScrollArea局部横向滚动，外部标签间距至少4px；不改Sidebar运行行为或Tag内部间距。
@@ -226,9 +230,5 @@ Sidebar 默认内置由 SnowUILogo `icon` / `text` 变体组成的 SnowUI Logo �
 
 ### v1.9.3 (2026-10-14)
 - 修复当前 active item 已在无分类位置时，旧存储的分类 ID 导致该分类刷新后被错误展开；外部 active item 优先于历史记录，分类折叠状态仍可恢复。
-
-### v1.9.2 (2026-10-12)
-- 折叠与宽度以本地响应状态承接可绑定输入及交互回传，修复非绑定和显式初值连续操作时的派生值停滞；外部绑定、默认折叠及键盘焦点恢复保持原有契约。
-- 通用纵向滚动遮罩降至共享回退层，Sidebar 的 Logo / Footer 实测渐隐曲线不再被样式注入顺序覆盖。
 
 完整历史见 [更新日志归档](../../docs/history/changelogs/Sidebar.history.md)。

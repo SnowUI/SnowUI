@@ -729,6 +729,7 @@
                     decorative
                 />
                 <SnowUILogo
+                    scale={10 / 12}
                     {...parts?.SnowUILogo}
                     as="logo-wordmark"
                     variant="text"
@@ -959,7 +960,7 @@
         flex-shrink: 0;
         display: flex;
         width: 100%;
-        min-height: 28px;
+        min-height: var(--size-6);
         box-sizing: border-box;
         align-items: center;
         justify-content: flex-start;
@@ -967,7 +968,7 @@
         overflow: visible;
         padding-block: var(
             --snowui-sidebar-logo-padding-y-override,
-            var(--padding-1)
+            0px
         );
     }
     :global(:where(.snowui-sidebar[data-collapsed="true"][data-navigation-variant="text"] .snowui-sidebar-header)) {
@@ -994,7 +995,7 @@
         align-items: center;
         gap: var(
             --snowui-sidebar-default-logo-gap-override,
-            calc(var(--gap-1) * 1.5)
+            calc(var(--gap-1) * 1.25)
         );
     }
     :global(:where(.snowui-sidebar-header > [data-as="logo"] > :not([data-as="logo-icon"]))) {

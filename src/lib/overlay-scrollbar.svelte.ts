@@ -154,11 +154,15 @@ export function useOverlayScrollbar(
         const handlePointerEnd = (event: PointerEvent) => {
             if (event.pointerId === activePointer) endDrag();
         };
+        const handleClick = (event: MouseEvent) => {
+            event.stopPropagation();
+        };
         track.addEventListener("pointerdown", handlePointerDown);
         track.addEventListener("pointermove", handlePointerMove);
         track.addEventListener("pointerup", handlePointerEnd);
         track.addEventListener("pointercancel", handlePointerEnd);
         track.addEventListener("lostpointercapture", handlePointerEnd);
+        track.addEventListener("click", handleClick);
         cleanupThumbDrag = () => {
             endDrag();
             track.removeEventListener("pointerdown", handlePointerDown);
@@ -166,6 +170,7 @@ export function useOverlayScrollbar(
             track.removeEventListener("pointerup", handlePointerEnd);
             track.removeEventListener("pointercancel", handlePointerEnd);
             track.removeEventListener("lostpointercapture", handlePointerEnd);
+            track.removeEventListener("click", handleClick);
         };
     }
 
