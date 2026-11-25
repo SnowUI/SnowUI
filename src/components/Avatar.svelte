@@ -27,10 +27,10 @@
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Skeleton from "./Skeleton.svelte";
-    import Gradient, {
+    import {
         getStaticGradientSource,
         type GradientVariant,
-    } from "./Gradient.svelte";
+    } from "../logic/gradient-static";
     import {
         AVATAR_CONTEXT_KEY,
         getSkeleton,
@@ -170,11 +170,27 @@
     const defaultGradientStaticSource = $derived(
         getStaticGradientSource(resolvedDefaultGradientSeed),
     );
+    const usesDefaultGradientFallback = $derived(
+        !fallback && variant === "default" && !hasExplicitFallbackText,
+    );
+    let DynamicGradient = $state<Component | undefined>(undefined);
+    let loadingDynamicGradient = false;
+    $effect(() => {
+        if (
+            !usesDefaultGradientFallback ||
+            (!gradientMotion && !gradientHoverMounted) ||
+            DynamicGradient ||
+            loadingDynamicGradient
+        ) {
+            return;
+        }
+        loadingDynamicGradient = true;
+        void import("./Gradient.svelte").then((mod) => {
+            DynamicGradient = mod.default;
+        });
+    });
     const resolvedFallback = $derived(
-        fallback ??
-            (variant === "default" && !hasExplicitFallbackText
-                ? Gradient
-                : undefined),
+        fallback ?? (usesDefaultGradientFallback ? DynamicGradient : undefined),
     );
 
     // State for Component Types
@@ -276,12 +292,15 @@
 
     // 判断是否显示彩色背景（图片或Initials）
     let hasComponentFallback = $derived(
-        !!resolvedFallback && !(imageStatus === "loaded" && src),
+        (!!resolvedFallback || usesDefaultGradientFallback) &&
+            !(imageStatus === "loaded" && src),
     );
     let isColored = $derived(!!(imageStatus === "loaded" && src) || hasComponentFallback);
     let isImageMode = $derived(!!(imageStatus === "loaded" && src));
     const hasGradientFallback = $derived(
-        hasComponentFallback && resolvedFallback === Gradient,
+        hasComponentFallback &&
+            (usesDefaultGradientFallback ||
+                (!!DynamicGradient && resolvedFallback === DynamicGradient)),
     );
 
     // Container Style (Background, Mask, etc.)
@@ -483,7 +502,7 @@
                         />
                     {/if}
                 </div>
-            {:else if hasComponentFallback && resolvedFallback}
+            {:else if hasComponentFallback && (hasGradientFallback || resolvedFallback)}
                 <div
                     class={[
                         "snowui-avatar-visual",
@@ -494,7 +513,7 @@
                         .filter(Boolean)
                         .join(" ")}
                 >
-                    {#if hasGradientFallback && !gradientMotion && !gradientHoverMounted}
+                    {#if hasGradientFallback && ((!gradientMotion && !gradientHoverMounted) || !resolvedFallback)}
                         <img
                             class="snowui-avatar-visual-media snowui-gradient-static-image"
                             src={defaultGradientStaticSource}
@@ -505,7 +524,7 @@
                             draggable="false"
                             aria-hidden="true"
                         />
-                    {:else}
+                    {:else if resolvedFallback}
                         <!-- svelte-ignore svelte_component_deprecated -->
                         <svelte:component
                             this={resolvedFallback}

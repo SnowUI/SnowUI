@@ -128,6 +128,7 @@
     let visualElement = $state<HTMLElement | undefined>(undefined);
     let fullMeasureElement = $state<HTMLElement | undefined>(undefined);
     let compactMeasureElement = $state<HTMLElement | undefined>(undefined);
+    let measureMounted = $state(false);
     const mode = $derived(owner?.getMode(id) ?? "full");
     const resolvedDisabled = $derived(disabled || owner?.disabled === true);
     // Button 仍接收完整兼容 Props；透明测量外壳只同步公开 data-* 标记，
@@ -143,6 +144,7 @@
     }
 
     onMount(() => {
+        measureMounted = true;
         if (as !== "item" || !owner) {
             if (import.meta.env.DEV && as === "item" && !owner) {
                 console.warn(
@@ -166,7 +168,11 @@
                 const hidden = rootElement?.dataset.overflowMode === "hidden";
                 if (hidden && rootElement) rootElement.style.display = "inline-flex";
                 try {
-                    const element = control ? visualElement : mode === "compact" ? compactMeasureElement : fullMeasureElement;
+                    const element = control
+                        ? visualElement
+                        : mode === "compact" && !iconOnly
+                          ? compactMeasureElement
+                          : fullMeasureElement;
                     return element?.getBoundingClientRect().width ?? 0;
                 } finally {
                     if (hidden && rootElement) rootElement.style.removeProperty("display");
@@ -253,13 +259,13 @@
 
     </span>
 
-    {#if !control}<span class="snowui-overflow-action-measure" aria-hidden="true" inert>
+    {#if !control && measureMounted}<span class="snowui-overflow-action-measure" aria-hidden="true" inert>
         <span bind:this={fullMeasureElement}>
             <Button {...resolvedButtonProps} {iconOnly} aria-label={iconOnly ? label : undefined} tooltip={false} tabindex={-1}>
                 {@render renderFull()}
             </Button>
         </span>
-        {#if icon}
+        {#if icon && !iconOnly}
             <span bind:this={compactMeasureElement}>
                 <Button {...resolvedButtonProps} iconOnly tooltip={false} tabindex={-1} aria-label={label}>
                     {@render renderIcon()}

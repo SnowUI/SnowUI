@@ -7,20 +7,19 @@
 -->
 
 <script module lang="ts">
-    import blueStaticSource from "../assets/gradient-avatar/blue.svg?url";
-    import cyanStaticSource from "../assets/gradient-avatar/cyan.svg?url";
-    import greenStaticSource from "../assets/gradient-avatar/green.svg?url";
-    import redStaticSource from "../assets/gradient-avatar/red.svg?url";
-    import orangeStaticSource from "../assets/gradient-avatar/orange.svg?url";
-    import purpleStaticSource from "../assets/gradient-avatar/purple.svg?url";
+    import {
+        GRADIENT_VARIANTS,
+        getStaticGradientSource,
+        resolveGradientVariant,
+        STATIC_GRADIENT_SOURCES,
+        type GradientVariant,
+    } from "../logic/gradient-static";
 
-    export type GradientVariant =
-        | "blue"
-        | "cyan"
-        | "green"
-        | "red"
-        | "orange"
-        | "purple";
+    export {
+        getStaticGradientSource,
+        resolveGradientVariant,
+        type GradientVariant,
+    };
 
     type GradientPalette = {
         background: string;
@@ -92,19 +91,6 @@
             center: "#F935FC",
         },
     };
-
-    const STATIC_GRADIENT_SOURCES: Record<GradientVariant, string> = {
-        blue: blueStaticSource,
-        cyan: cyanStaticSource,
-        green: greenStaticSource,
-        red: redStaticSource,
-        orange: orangeStaticSource,
-        purple: purpleStaticSource,
-    };
-
-    const GRADIENT_VARIANTS = Object.keys(
-        GRADIENT_PALETTES,
-    ) as GradientVariant[];
 
     const GRADIENT_MOTION_LAYER_SOURCE_CACHE = new Map<
         string,
@@ -203,30 +189,6 @@
         }));
         GRADIENT_MOTION_LAYER_SOURCE_CACHE.set(cacheKey, sources);
         return sources;
-    }
-
-    export function resolveGradientVariant(
-        seed: string | number | undefined,
-    ) {
-        const normalizedSeed = String(seed ?? "").trim().toLowerCase();
-        if (GRADIENT_VARIANTS.includes(normalizedSeed as GradientVariant)) {
-            return normalizedSeed as GradientVariant;
-        }
-
-        let hash = 0;
-        for (let index = 0; index < normalizedSeed.length; index += 1) {
-            hash = (hash * 31 + normalizedSeed.charCodeAt(index)) | 0;
-        }
-        return (
-            GRADIENT_VARIANTS[Math.abs(hash) % GRADIENT_VARIANTS.length] ??
-            "blue"
-        );
-    }
-
-    export function getStaticGradientSource(
-        seed: string | number | undefined,
-    ) {
-        return STATIC_GRADIENT_SOURCES[resolveGradientVariant(seed)];
     }
 
     function hashString(value: string) {

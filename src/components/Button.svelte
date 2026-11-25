@@ -687,11 +687,37 @@
     ),
   );
 
-  $effect(() => {
-    if (!resolvedTooltip.enabled || TooltipComponent) return;
+  let tooltipLoadRequested = false;
+  function ensureTooltipLoaded() {
+    if (TooltipComponent || tooltipLoadRequested) return;
+    tooltipLoadRequested = true;
     void import("./Tooltip.svelte").then((mod) => {
       TooltipComponent = mod.default;
     });
+  }
+
+  $effect(() => {
+    if (!resolvedTooltip.enabled || TooltipComponent) return;
+    const node = buttonElement;
+    node?.addEventListener("pointerenter", ensureTooltipLoaded, { once: true, passive: true });
+    node?.addEventListener("focusin", ensureTooltipLoaded, { once: true, passive: true });
+    const win =
+      typeof window !== "undefined"
+        ? (window as Window & {
+            requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+            cancelIdleCallback?: (id: number) => void;
+          })
+        : undefined;
+    const idleId = win?.requestIdleCallback
+      ? win.requestIdleCallback(ensureTooltipLoaded, { timeout: 1200 })
+      : undefined;
+    const timer = idleId === undefined ? setTimeout(ensureTooltipLoaded, 250) : undefined;
+    return () => {
+      node?.removeEventListener("pointerenter", ensureTooltipLoaded);
+      node?.removeEventListener("focusin", ensureTooltipLoaded);
+      if (idleId !== undefined) win?.cancelIdleCallback?.(idleId);
+      if (timer !== undefined) clearTimeout(timer);
+    };
   });
 
   onDestroy(() => {

@@ -30,793 +30,13 @@
 -->
 
 <script module lang="ts">
-    import type { RenderHints } from "../logic/frame-types";
-
-    export type SkeletonVariant =
-        | "line"
-        | "circle"
-        | "rect"
-        | "text"
-        | "circular"
-        | "rectangular";
-
-    export interface SkeletonItem {
-        shape: "line" | "circle" | "rect";
-        width?: string;
-        height?: string;
-        radius?: string;
-        className?: string;
-    }
-
-    export interface SkeletonLayout {
-        key: string;
-        known: boolean;
-        items: SkeletonItem[];
-    }
-
-    const COMPONENT_CLASS_MAPPING: Array<[RegExp, string]> = [
-        [/\bsnowui-accordion-item\b/, "accordion-item"],
-        [/\bsnowui-accordion\b/, "accordion"],
-        [/\bsnowui-field\b/, "field"],
-        [/\bsnowui-search-input\b/, "search-input"],
-        [/\bsnowui-search-box\b/, "search-box"],
-        [/\bsnowui-search-popup\b/, "search-popup"],
-        [/\bsnowui-input\b/, "input"],
-        [/\bsnowui-textarea\b/, "textarea"],
-        [/\bsnowui-select\b/, "select"],
-        [/\bsnowui-listbox\b/, "listbox"],
-        [/\bsnowui-image-viewer\b/, "image-viewer"],
-        [/\bsnowui-image-group\b/, "image-group"],
-        [/\bsnowui-image\b/, "image"],
-        [/\bsnowui-gradient\b/, "gradient"],
-        [/\bsnowui-snow-ui-logo\b/, "snow-uilogo"],
-        [/\bsnowui-avatar-group\b/, "avatar-group"],
-        [/\bsnowui-avatar\b/, "avatar"],
-        [/\bsnowui-flow-text\b/, "flow-text"],
-        [/\bsnowui-circular-chart\b/, "circular-chart"],
-        [/\bsnowui-gauge-chart\b/, "gauge-chart"],
-        [/\bsnowui-chart-group\b/, "chart-group"],
-        [/\bsnowui-line-chart\b/, "line-chart"],
-        [/\bsnowui-bar-chart\b/, "bar-chart"],
-        [/\bsnowui-button-group\b/, "button-group"],
-        [/\bsnowui-breadcrumb\b/, "breadcrumb"],
-        [/\bsnowui-card\b/, "card"],
-        [/\bsnowui-scroll-area\b/, "scroll-area"],
-        [/\bsnowui-pagination\b/, "pagination"],
-        [/\bsnowui-progress\b/, "progress"],
-        [/\bsnowui-separator\b/, "separator"],
-        [/\bsnowui-button\b/, "button"],
-        [/\bsnowui-text\b/, "text"],
-        [/\bsnowui-badge\b/, "badge"],
-        [/\bsnowui-chip\b/, "chip"],
-        [/\bsnowui-link\b/, "link"],
-        [/\bsnowui-tag\b/, "tag"],
-        [/\bsnowui-copy-link\b/, "copy-link"],
-        [/\bsnowui-code-block\b/, "code-block"],
-        [/\bsnowui-kbd\b/, "kbd"],
-        [/\bsnowui-switch\b/, "switch"],
-        [/\bsnowui-spinner\b/, "spinner"],
-        [/\bsnowui-radio\b/, "radio"],
-        [/\bsnowui-icon\b/, "icon"],
-        [/\bsnowui-checkbox\b/, "checkbox"],
-        [/\bsnowui-tooltip\b/, "tooltip"],
-        [/\bsnowui-popover\b/, "popover"],
-        [/\bsnowui-dialog\b/, "dialog"],
-        [/\bsnowui-menu-item\b/, "menu-item"],
-        [/\bsnowui-quick-action\b/, "quick-action"],
-        [/\bsnowui-toast\b/, "toast"],
-        [/\bsnowui-segmented\b/, "segmented"],
-        [/\bsnowui-tab\b/, "tab"],
-        [/\bsnowui-frame\b/, "frame"],
-        [/\bsnowui-test\b/, "test"],
-    ];
-
-    function toCssLength(value?: string | number): string | undefined {
-        if (value === undefined || value === null || value === "") {
-            return undefined;
-        }
-        if (typeof value === "number") {
-            return `${value / 16}rem`;
-        }
-        return value;
-    }
-
-    function fit(length: string): string {
-        return length; // min(100%, length) 会导致在 flex/auto 容器中宽度收缩为 0。改在 CSS 中加 max-width兜底
-    }
-
-    function normalizeVariant(
-        variant?: SkeletonVariant,
-    ): "line" | "circle" | "rect" {
-        if (variant === "text") return "line";
-        if (variant === "circular") return "circle";
-        if (variant === "rectangular") return "rect";
-        return variant ?? "rect";
-    }
-
-    export function getSkeletonComponentKey(
-        componentClass?: string,
-    ): string | undefined {
-        if (!componentClass) return undefined;
-        for (const [pattern, key] of COMPONENT_CLASS_MAPPING) {
-            if (pattern.test(componentClass)) {
-                return key;
-            }
-        }
-        return undefined;
-    }
-
-    function createSingleLayout(
-        key: string,
-        shape: "line" | "circle" | "rect",
-        width?: string,
-        height?: string,
-        radius?: string,
-    ): SkeletonLayout {
-        return {
-            key,
-            known: true,
-            items: [{ shape, width, height, radius }],
-        };
-    }
-
-    function createTextLayout(
-        key: string,
-        rows: number,
-        width?: string,
-        height?: string,
-        radius?: string,
-    ): SkeletonLayout {
-        const safeRows = Math.max(1, Math.floor(rows));
-        const fullWidth = width ?? "100%";
-        return {
-            key,
-            known: true,
-            items: Array.from({ length: safeRows }, (_, index) => ({
-                shape: "line" as const,
-                width:
-                    safeRows > 1 && index === safeRows - 1
-                        ? "30%"
-                        : fullWidth,
-                height,
-                radius,
-            })),
-        };
-    }
-
-    function applyRenderHints(
-        layout: SkeletonLayout,
-        hints?: RenderHints,
-        explicit?: {
-            variant?: SkeletonVariant;
-            width?: string | number;
-            height?: string | number;
-        },
-    ): SkeletonLayout {
-        const variant = explicit?.variant ?? hints?.variant;
-        const width = toCssLength(explicit?.width ?? hints?.width);
-        const height = toCssLength(explicit?.height ?? hints?.height);
-        const radius = toCssLength(hints?.radius);
-        const rows = hints?.rows;
-
-        if (!variant && !width && !height && !radius && rows === undefined) {
-            return layout;
-        }
-
-        return {
-            ...layout,
-            items:
-                rows !== undefined && rows > 1
-                    ? createTextLayout(
-                          layout.key,
-                          rows,
-                          width ?? layout.items[0]?.width,
-                          height ?? layout.items[0]?.height,
-                          radius ?? layout.items[0]?.radius,
-                      ).items
-                    : layout.items.map((item) => ({
-                          ...item,
-                          shape: variant
-                              ? normalizeVariant(variant)
-                              : item.shape,
-                          width: width ?? item.width,
-                          height: height ?? item.height,
-                          radius: radius ?? item.radius,
-                      })),
-        };
-    }
-
-    function createRegisteredLayout(options: {
-        renderHints: RenderHints;
-        variant?: SkeletonVariant;
-        width?: string | number;
-        height?: string | number;
-    }): SkeletonLayout {
-        const variant = options.variant ?? options.renderHints.variant;
-        const width = toCssLength(
-            options.width ?? options.renderHints.width,
-        );
-        const height = toCssLength(
-            options.height ?? options.renderHints.height,
-        );
-        const radius = toCssLength(options.renderHints.radius);
-        const rows = options.renderHints.rows;
-
-        if (rows !== undefined && rows > 1) {
-            return createTextLayout(
-                "registered",
-                rows,
-                width ?? "100%",
-                height ?? "1.25rem",
-                radius,
-            );
-        }
-
-        return createSingleLayout(
-            "registered",
-            normalizeVariant(variant),
-            width ?? "6rem",
-            height ?? "3rem",
-            radius,
-        );
-    }
-
-    export function resolveSkeletonLayout(
-        options: {
-            componentClass?: string;
-            renderHints?: RenderHints;
-            variant?: SkeletonVariant;
-            width?: string | number;
-            height?: string | number;
-        } = {},
-    ): SkeletonLayout {
-        if (options.renderHints) {
-            return createRegisteredLayout({
-                renderHints: options.renderHints,
-                variant: options.variant,
-                width: options.width,
-                height: options.height,
-            });
-        }
-
-        const componentKey = getSkeletonComponentKey(options.componentClass);
-        if (
-            !componentKey &&
-            (options.variant || options.width !== undefined || options.height !== undefined)
-        ) {
-            return createSingleLayout(
-                "explicit",
-                normalizeVariant(options.variant),
-                toCssLength(options.width),
-                toCssLength(options.height),
-            );
-        }
-
-        switch (componentKey) {
-            case "accordion":
-            case "accordion-item":
-                return applyRenderHints(
-                    createTextLayout(
-                        componentKey,
-                        3,
-                        fit("100%"),
-                        fit("var(--leading-14)"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "text":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("100%"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "card":
-            case "scroll-area":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("100%"),
-                        fit("6rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "flow-text":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("4rem"),
-                        fit("1rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "circular-chart":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "circle",
-                        fit("15rem"),
-                        fit("15rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "gauge-chart":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("20rem"),
-                        fit("10rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "line-chart":
-            case "bar-chart":
-            case "chart-group":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("50rem"),
-                        fit("25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "button":
-            case "button-group":
-            case "breadcrumb":
-            case "pagination":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("5rem"),
-                        fit("1rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "separator":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("100%"),
-                        fit("var(--border-1)"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "progress":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("100%"),
-                        fit("calc(var(--size-4) / 4)"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "input":
-            case "search-input":
-            case "search-box":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("100%"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "search-popup":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("37.5rem"),
-                        fit("48rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "field":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("100%"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "textarea":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("100%"),
-                        fit("calc((var(--leading-14) * 4) + var(--padding-3) + var(--padding-6))"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "select":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("100%"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "listbox":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("10rem"),
-                        fit("8rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "badge":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("2.5rem"),
-                        fit("1rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "chip":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("3rem"),
-                        fit("1rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "link":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("4rem"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "tag":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("3rem"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "copy-link":
-                return applyRenderHints(
-                    createSingleLayout(componentKey, "rect", fit("100%"), fit("2.75rem")),
-                    options.renderHints,
-                    options,
-                );
-            case "code-block":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("100%"),
-                        fit("12rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "kbd":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("3rem"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "switch":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("2.5rem"),
-                        fit("1.5rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "avatar":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "circle",
-                        fit("2.5rem"),
-                        fit("2.5rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "spinner":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "circle",
-                        fit("1.5rem"),
-                        fit("1.5rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "radio":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "circle",
-                        fit("1.25rem"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "icon":
-                return applyRenderHints(
-                    {
-                        key: componentKey,
-                        known: true,
-                        items: [
-                            {
-                                shape: "rect",
-                                width: fit("1.25rem"),
-                                height: fit("1.25rem"),
-                                radius: "50%",
-                            },
-                        ],
-                    },
-                    options.renderHints,
-                    options,
-                );
-            case "checkbox":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("1.25rem"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "tooltip":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("4.5rem"),
-                        fit("2rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "toast":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("12rem"),
-                        fit("2.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "tab":
-            case "segmented":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("12rem"),
-                        fit("1.5rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "popover":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("7rem"),
-                        fit("5rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "dialog":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("20rem"),
-                        fit("10rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "frame":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("100%"),
-                        fit("1.25rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "test":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("5rem"),
-                        fit("2rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "anchor":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("4rem"),
-                        fit("1rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "avatar-group":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "circle",
-                        fit("1rem"),
-                        fit("1rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "image":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("2.5rem"),
-                        fit("2.5rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "gradient":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("calc(var(--size-4) * 45 / 2)"),
-                        fit("calc(var(--size-4) * 45 / 2)"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "snow-uilogo":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("calc(var(--size-4) * 105 / 16)"),
-                        fit("calc(var(--size-4) * 28 / 16)"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "image-group":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("5rem"),
-                        fit("2.5rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "image-viewer":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("7rem"),
-                        fit("5rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "quick-action":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "rect",
-                        fit("10rem"),
-                        fit("6rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            case "menu-item":
-                return applyRenderHints(
-                    createSingleLayout(
-                        componentKey,
-                        "line",
-                        fit("100%"),
-                        fit("2rem"),
-                    ),
-                    options.renderHints,
-                    options,
-                );
-            default:
-                return applyRenderHints(
-                    {
-                        key: "fallback",
-                        known: false,
-                        items: [
-                            {
-                                shape: "rect",
-                                width: fit("6rem"),
-                                height: fit("3rem"),
-                            },
-                        ],
-                    },
-                    options.renderHints,
-                    options,
-                );
-        }
-    }
+    export {
+        getSkeletonComponentKey,
+        resolveSkeletonLayout,
+        type SkeletonItem,
+        type SkeletonLayout,
+        type SkeletonVariant,
+    } from "../logic/skeleton-layouts";
 </script>
 
 <script lang="ts">
@@ -826,6 +46,13 @@
         ResponsiveController,
         type ResponsiveConfig,
     } from "../logic/responsive.svelte";
+    import {
+        EMPTY_SKELETON_LAYOUT,
+        resolveSkeletonLayout,
+        toCssLength,
+        type SkeletonItem,
+        type SkeletonVariant,
+    } from "../logic/skeleton-layouts";
 
     interface Props {
         variant?: SkeletonVariant;
@@ -858,42 +85,56 @@
         ...rest
     }: Props = $props();
 
-    function createResponsiveController() {
-        return new ResponsiveController(responsive ?? {});
-    }
-
-    const responsiveController = createResponsiveController();
+    let skeletonElement = $state<HTMLElement | undefined>(undefined);
+    let responsiveController = $state<ResponsiveController | undefined>(undefined);
 
     $effect(() => {
-        responsiveController.updateConfig(responsive ?? {});
+        if (!responsive) return;
+        const ctrl = (responsiveController ??= new ResponsiveController(responsive));
+        ctrl.updateConfig(responsive);
+        const node = skeletonElement;
+        if (!node) return;
+        const handle = ctrl.connect(node);
+        return () => handle?.destroy();
     });
 
+    const responsiveStyle = $derived(responsive ? responsiveController?.style : undefined);
     const responsiveWidth = $derived(
-        responsiveController.props?.width ?? width,
+        (responsive ? responsiveController?.props?.width : undefined) ?? width,
     );
     const responsiveHeight = $derived(
-        responsiveController.props?.height ?? height,
+        (responsive ? responsiveController?.props?.height : undefined) ?? height,
     );
     const layout = $derived(
-        resolveSkeletonLayout({
-            componentClass,
-            renderHints,
-            variant,
-            width: responsiveWidth,
-            height: responsiveHeight,
-        }),
+        !group && loading
+            ? resolveSkeletonLayout({
+                  componentClass,
+                  renderHints,
+                  variant,
+                  width: responsiveWidth,
+                  height: responsiveHeight,
+              })
+            : EMPTY_SKELETON_LAYOUT,
     );
 
-    const groupStyle = $derived([
-        `width: ${toCssLength(responsiveWidth ?? renderHints?.width) ?? "100%"}`,
-        responsiveHeight !== undefined || renderHints?.height !== undefined
-            ? `height: ${toCssLength(responsiveHeight ?? renderHints?.height)}` : "",
-        `border-radius: ${toCssLength(renderHints?.radius) ?? "var(--radius-3, 0.75rem)"}`,
-        responsiveController.style,
-        style,
-    ].filter(Boolean).join(";"));
+    const groupStyle = $derived(
+        group
+            ? [
+                  `width: ${toCssLength(responsiveWidth ?? renderHints?.width) ?? "100%"}`,
+                  responsiveHeight !== undefined || renderHints?.height !== undefined
+                      ? `height: ${toCssLength(responsiveHeight ?? renderHints?.height)}`
+                      : "",
+                  `border-radius: ${toCssLength(renderHints?.radius) ?? "var(--radius-3, 0.75rem)"}`,
+                  responsiveStyle,
+                  style,
+              ]
+                  .filter(Boolean)
+                  .join(";")
+            : undefined,
+    );
 
     const containerClass = $derived.by(() => {
+        if (group || !loading) return "";
         return [
             "snowui-skeleton-layout",
             `snowui-skeleton-layout-${layout.key}`,
@@ -906,13 +147,18 @@
     });
 
     const containerStyle = $derived.by(() => {
+        if (group || !loading) return undefined;
         if (layout.items.length === 1) {
             // Percentage hints need a containing block inside flex hosts.
             const item = layout.items[0];
-            return [
-                item.width?.includes("%") ? "width: 100%;" : "",
-                item.height?.includes("%") ? "height: 100%;" : "",
-            ].filter(Boolean).join(" ") || undefined;
+            return (
+                [
+                    item.width?.includes("%") ? "width: 100%;" : "",
+                    item.height?.includes("%") ? "height: 100%;" : "",
+                ]
+                    .filter(Boolean)
+                    .join(" ") || undefined
+            );
         }
         return (
             [
@@ -920,11 +166,10 @@
                     ? `--snowui-skeleton-layout-width: ${layout.items[0].width}`
                     : "",
                 style,
-                responsiveController.style,
+                responsiveStyle,
             ]
                 .filter(Boolean)
-                .join(";") ||
-            undefined
+                .join(";") || undefined
         );
     });
 
@@ -938,7 +183,7 @@
                 item.height ? `--snowui-skeleton-height: ${item.height}` : "",
                 item.radius ? `--snowui-skeleton-radius: ${item.radius}` : "",
                 isSingle ? style : "",
-                isSingle ? responsiveController.style : "",
+                isSingle ? responsiveStyle : "",
             ]
                 .filter(Boolean)
                 .join(";") || undefined
@@ -961,7 +206,7 @@
 {#if group}
     <div
         {...rest}
-        use:responsiveController.connect
+        bind:this={skeletonElement}
         class={`snowui-skeleton-group ${className}`}
         style={groupStyle}
         data-skeleton-group="true"
@@ -983,7 +228,7 @@
 {:else if loading}
     <div
         {...rest}
-        use:responsiveController.connect
+        bind:this={skeletonElement}
         class={containerClass}
         style={containerStyle}
         data-skeleton-registered={renderHints !== undefined ? "true" : undefined}

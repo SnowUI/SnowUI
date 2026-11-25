@@ -233,7 +233,10 @@
 
         function place(nextEnabled: boolean) {
             if (nextEnabled) {
-                document.body.appendChild(node);
+                const container =
+                    marker.parentElement?.closest("[data-snowui-overlay-root]") ??
+                    document.body;
+                container.appendChild(node);
                 return;
             }
             marker.parentNode?.insertBefore(node, marker.nextSibling);

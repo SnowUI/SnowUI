@@ -11,9 +11,9 @@
     import { ComponentIcon } from "../internal/component-icon/index";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Button from "./Button.svelte";
-    import SelectButton from "./SelectButton.svelte";
-    import Listbox from "./Listbox.svelte";
-    import MenuItem from "./MenuItem.svelte";
+    import type SelectButtonType from "./SelectButton.svelte";
+    import type ListboxType from "./Listbox.svelte";
+    import type MenuItemType from "./MenuItem.svelte";
     import Separator from "./Separator.svelte";
     import OverflowAction from "./OverflowAction.svelte";
     import type Tooltip from "./Tooltip.svelte";
@@ -80,9 +80,9 @@
 
     type Parts = ComponentPartsOf<{
         Button: typeof Button;
-        SelectButton: typeof SelectButton;
-        Listbox: typeof Listbox;
-        MenuItem: typeof MenuItem;
+        SelectButton: typeof SelectButtonType;
+        Listbox: typeof ListboxType;
+        MenuItem: typeof MenuItemType;
         Separator: typeof Separator;
         Tooltip: typeof Tooltip;
     }>;
@@ -139,8 +139,9 @@
     const resolvedMoreLabel = $derived(moreLabel ?? locale.t("overflowActions.more"));
 
     let rootElement = $state<HTMLElement | undefined>(undefined);
+    let moreVisualElement = $state<HTMLElement | undefined>(undefined);
     let moreMeasureElement = $state<HTMLElement | undefined>(undefined);
-    let fadeMeasureElement: HTMLElement | undefined;
+    let fadeMeasureElement = $state<HTMLElement | undefined>(undefined);
     const separatorWidths = new Map<HTMLElement, number>();
     const actionWidths = new Map<string, { full: number; compact: number }>();
     let modes = $state<Record<string, OverflowActionMode>>({});
@@ -154,7 +155,7 @@
     let movement: ReturnType<typeof createOverflowActionsMotion> | undefined;
     let layoutKey: string | undefined;
     let layoutRevision = 0;
-    let isMounted = false;
+    let isMounted = $state(false);
     const registrations = new Map<string, OverflowActionRegistration>();
 
     type LayoutEntry =
@@ -170,6 +171,38 @@
             parts?.SelectButton ?? {},
         ),
     );
+    const resolvedMoreMeasureButtonProps = $derived.by(() => {
+        const {
+            value: _value,
+            defaultValue: _defaultValue,
+            options: _options,
+            placeholder: _placeholder,
+            name: _name,
+            form: _form,
+            required: _required,
+            readonly: _readonly,
+            invalid: _invalid,
+            ariaLabel: _ariaLabel,
+            showIndicator: _showIndicator,
+            search: _search,
+            selectionMode: _selectionMode,
+            label: _label,
+            indicator: _indicator,
+            parts: _parts,
+            onchange: _onchange,
+            onAction: _onAction,
+            ...restButtonProps
+        } = resolvedMoreButtonProps as Record<string, any>;
+        return restButtonProps;
+    });
+    let OverflowMenuParts = $state<{
+        SelectButton: typeof SelectButtonType;
+        Listbox: typeof ListboxType;
+        MenuItem: typeof MenuItemType;
+    } | undefined>(undefined);
+    let overflowMenuLoading = false;
+    let pendingMoreFocus = false;
+    let pendingMoreOpen = false;
 
     const context: OverflowActionsContext = {
         register(action) {
@@ -455,10 +488,16 @@
                 entry.type === "action",
         );
         hasOverflow = menuEntries.length > 0;
+        if (!hasOverflow) {
+            pendingMoreFocus = false;
+            pendingMoreOpen = false;
+        } else if (moveFocus && !OverflowMenuParts) {
+            pendingMoreFocus = true;
+        }
         if (before || moveFocus) void tick().then(() => {
             if (!isMounted || revision !== layoutRevision) return;
             if (before) movement?.play(before);
-            if (moveFocus) rootElement?.querySelector<HTMLElement>('.snowui-select-button-trigger')?.focus({preventScroll:true});
+            if (moveFocus) moreVisualElement?.querySelector<HTMLElement>('button')?.focus({preventScroll:true});
         });
     }
 
@@ -522,6 +561,39 @@
         // 外部列宽也可能逐帧变化；只更新预算，不使固有宽度缓存失效。
         if (isMounted) void flushLayout();
     });
+
+    $effect(() => {
+        if (!hasOverflow || OverflowMenuParts || overflowMenuLoading) return;
+        overflowMenuLoading = true;
+        void Promise.all([
+            import("./SelectButton.svelte"),
+            import("./Listbox.svelte"),
+            import("./MenuItem.svelte"),
+        ]).then(async ([selectButtonMod, listboxMod, menuItemMod]) => {
+            const shouldFocus =
+                pendingMoreFocus ||
+                Boolean(
+                    typeof document !== "undefined" &&
+                        moreVisualElement?.contains(document.activeElement),
+                );
+            const shouldOpen = pendingMoreOpen;
+            pendingMoreFocus = false;
+            pendingMoreOpen = false;
+            OverflowMenuParts = {
+                SelectButton: selectButtonMod.default,
+                Listbox: listboxMod.default,
+                MenuItem: menuItemMod.default,
+            };
+            if (!isMounted || !hasOverflow || (!shouldFocus && !shouldOpen)) return;
+            await tick();
+            if (!isMounted || !hasOverflow) return;
+            const trigger = moreVisualElement?.querySelector<HTMLElement>("button");
+            if (shouldFocus) trigger?.focus({ preventScroll: true });
+            if (shouldOpen && trigger?.getAttribute("aria-expanded") !== "true") {
+                trigger?.click();
+            }
+        });
+    });
 </script>
 
 {#snippet renderMenuIcon(icon: OverflowActionIcon | undefined)}
@@ -573,62 +645,81 @@
     {/if}
 
     {#if hasOverflow}
-        <span class="snowui-overflow-actions-more-visual">
-        <SelectButton
-            {...resolvedMoreButtonProps}
-            iconOnly
-            showIndicator={false}
-            selectionMode="action"
-            ariaLabel={resolvedMoreLabel}
-            tooltip={resolvedGroupTooltip ? resolvedMoreLabel : false}
-            disabled={disabled}
-            onAction={handleMenuAction}
-            parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem, Tooltip: parts?.Tooltip }}
-        >
-            {#snippet label()}
-                <ComponentIcon name="three-dots" aria-hidden="true" />
-            {/snippet}
-            <Listbox search={false} showCheck={false} placementMode="bottom" {align}>
-                {#each menuEntries as entry}
-                    <MenuItem
-                        as="item"
-                        value={entry.action.id}
-                        disabled={disabled || entry.action.disabled}
-                    >
-                        {#if entry.action.icon}
-                            <span data-as="leading">
-                                {@render renderMenuIcon(entry.action.icon)}
-                            </span>
-                        {/if}
-                        <span class="snowui-menu-item-label">
-                            {entry.action.label}
-                        </span>
-                    </MenuItem>
-                {/each}
-            </Listbox>
-        </SelectButton>
-        </span>
-    {/if}
-
-    <span bind:this={fadeMeasureElement} class="snowui-overflow-actions-fade-measure" aria-hidden="true" inert></span>
-    <span class="snowui-overflow-actions-more-measure" aria-hidden="true" inert>
-        <span bind:this={moreMeasureElement}>
-            <SelectButton
+        <span bind:this={moreVisualElement} class="snowui-overflow-actions-more-visual">
+        {#if OverflowMenuParts}
+            {@const OverflowSelectButton = OverflowMenuParts.SelectButton}
+            {@const OverflowListbox = OverflowMenuParts.Listbox}
+            {@const OverflowMenuItem = OverflowMenuParts.MenuItem}
+            <OverflowSelectButton
                 {...resolvedMoreButtonProps}
                 iconOnly
                 showIndicator={false}
                 selectionMode="action"
                 ariaLabel={resolvedMoreLabel}
-                tooltip={false}
-                tabindex={-1}
-                parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem }}
+                tooltip={resolvedGroupTooltip ? resolvedMoreLabel : false}
+                disabled={disabled}
+                onAction={handleMenuAction}
+                parts={{ Listbox: parts?.Listbox, MenuItem: parts?.MenuItem, Tooltip: parts?.Tooltip }}
             >
                 {#snippet label()}
                     <ComponentIcon name="three-dots" aria-hidden="true" />
                 {/snippet}
-            </SelectButton>
+                <OverflowListbox search={false} showCheck={false} placementMode="bottom" {align}>
+                    {#each menuEntries as entry}
+                        <OverflowMenuItem
+                            as="item"
+                            value={entry.action.id}
+                            disabled={disabled || entry.action.disabled}
+                        >
+                            {#if entry.action.icon}
+                                <span data-as="leading">
+                                    {@render renderMenuIcon(entry.action.icon)}
+                                </span>
+                            {/if}
+                            <span class="snowui-menu-item-label">
+                                {entry.action.label}
+                            </span>
+                        </OverflowMenuItem>
+                    {/each}
+                </OverflowListbox>
+            </OverflowSelectButton>
+        {:else}
+            <Button
+                {...resolvedMoreMeasureButtonProps}
+                scaleOnHover={resolvedMoreMeasureButtonProps.scaleOnHover ?? false}
+                iconOnly
+                aria-label={resolvedMoreLabel}
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                tooltip={false}
+                {disabled}
+                onclick={() => {
+                    pendingMoreOpen = true;
+                }}
+            >
+                <ComponentIcon name="three-dots" aria-hidden="true" />
+            </Button>
+        {/if}
+        </span>
+    {/if}
+
+    {#if isMounted}
+    <span bind:this={fadeMeasureElement} class="snowui-overflow-actions-fade-measure" aria-hidden="true" inert></span>
+    <span class="snowui-overflow-actions-more-measure" aria-hidden="true" inert>
+        <span bind:this={moreMeasureElement}>
+            <Button
+                {...resolvedMoreMeasureButtonProps}
+                scaleOnHover={resolvedMoreMeasureButtonProps.scaleOnHover ?? false}
+                iconOnly
+                aria-label={resolvedMoreLabel}
+                tooltip={false}
+                tabindex={-1}
+            >
+                <ComponentIcon name="three-dots" aria-hidden="true" />
+            </Button>
         </span>
     </span>
+    {/if}
 </Frame>
 
 <style>
