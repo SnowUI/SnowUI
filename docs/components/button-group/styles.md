@@ -1,0 +1,24 @@
+# ButtonGroup style overrides
+
+Read the [styling guide](../../guides/styling.md) before overriding a component. The entries below come from the reviewed component reference; verify the scope of each public variable.
+
+<a id="buttongroup-样式覆盖"></a>
+
+# ButtonGroup style overlay
+
+First use public component Props to match the desired appearance, preserving the existing look where possible. If changes are necessary, follow the [style selection and override order](../../guides/styling.md#%E6%A0%B7%E5%BC%8F%E9%80%89%E6%8B%A9%E4%B8%8E%E6%94%B9%E5%86%99%E9%A1%BA%E5%BA%8F): use your own class (including Tailwind already in the project) or an instance style. The names below are public overrides actually consumed by source; check their scope and do not modify private DOM. Choose the correct SnowUI token family. External apps need not install SnowUI website utilities.
+
+| Variable | Purpose and default reference |
+| --- | --- |
+| `--snowui-button-group-background-override` | Backdrop |
+| `--snowui-button-group-border-color-override` | Border color |
+| `--snowui-button-group-border-width-override` | Width of the border |
+| `--snowui-button-group-color-override` | color |
+| `--snowui-button-group-font-size-override` | font-size |
+| `--snowui-button-group-gap-override` | The spacing between cell content and Separator; default sm 8 / md 12 / lg 16 |
+| `--snowui-button-group-line-height-override` | line-height |
+| `--snowui-button-group-radius-override` | border-radius |
+
+[Design Guide](../../guides/design-system.md) · [Token](../../reference/tokens.md) · [Combination boundary](./reference.md)
+
+[Full reference](./reference.md) · [Tokens](../../reference/tokens.md)

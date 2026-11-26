@@ -1,0 +1,19 @@
+# SidePanel 样式覆盖
+
+优先用组件公开 Props 匹配合适样式，尽可能保留原有视觉。确需改写时按 [样式选择与改写顺序](../../guides/styling.md#%E6%A0%B7%E5%BC%8F%E9%80%89%E6%8B%A9%E4%B8%8E%E6%94%B9%E5%86%99%E9%A1%BA%E5%BA%8F) 使用自己的 class（含项目已有 Tailwind）或实例 style。以下名称来自源码实际消费的公开 override；先核对目标作用域，不修改私有 DOM。采用 SnowUI Token 时选择正确类别，外部应用不被要求安装一方 utilities。
+
+| 变量 | 用途与默认参考 |
+| --- | --- |
+| `--snowui-scroll-mask-bottom-size-override` | 通用滚动遮罩下遮罩带高度（默认 16px；有底部工具栏时 56px） |
+| `--snowui-scroll-mask-bottom-solid-ratio-override` | 通用滚动遮罩下侧实心占比（默认 0.8） |
+| `--snowui-scroll-mask-top-size-override` | 通用滚动遮罩上遮罩带高度（默认跟随顶部工具栏高度） |
+| `--snowui-scroll-mask-top-solid-ratio-override` | 通用滚动遮罩上侧实心占比（默认 0.8） |
+| `--snowui-side-panel-font-size-override` | font-size（默认 var(--text-14) = 14px） |
+| `--snowui-side-panel-height-override` | 仅内嵌模式高度（默认 100dvh - 32px） |
+| `--snowui-side-panel-line-height-override` | line-height（默认 var(--leading-14)） |
+| `--snowui-side-panel-radius-override` | 圆角（默认 20px = var(--radius-5)） |
+| `--snowui-side-panel-scroll-mask-bottom-size-override` | 下遮罩带高度（默认 56px；solid-ratio 0.8） |
+| `--snowui-side-panel-scroll-mask-top-size-override` | 上遮罩带高度（默认 48px；solid-ratio 0.8） |
+| `--snowui-side-panel-z-index-override` | 浮层 z-index（默认 50） |
+
+[设计指南](../../guides/design-system.md) · [Token](../../reference/tokens.md) · [组合边界](./reference.md)

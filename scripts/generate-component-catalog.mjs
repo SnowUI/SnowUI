@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const siblingDocsContracts = path.resolve(root, "../docs/contracts");
 const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"));
 const discovery = JSON.parse(fs.readFileSync(path.join(root, "component-discovery.json"), "utf8"));
 const licenseBytes = fs.readFileSync(path.join(root, "LICENSE"));
@@ -15,9 +16,22 @@ const ownerPublic = fs.existsSync(ownerPublicPath) ? JSON.parse(fs.readFileSync(
 const outputPath = path.join(root, "component-catalog.json");
 const hanPattern = /[\u3400-\u9fff]/u;
 
-function resolveDescription(documentationPath, name, metadata) {
-  // Validate that the source contract Markdown still provides a well-formed introduction.
-  readComponentIntroduction(fs.readFileSync(documentationPath, "utf8"), name);
+function slugify(value) {
+  return value
+    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1-$2")
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .toLowerCase();
+}
+
+function resolveDescription(sourceFile, publicDocPath, name, metadata) {
+  // When running in the full maintainer workspace, also validate the authoritative contract introduction.
+  if (fs.existsSync(siblingDocsContracts)) {
+    const contractPath = path.resolve(root, "../docs", sourceFile.replace(/^src\//, "contracts/").replace(/\.svelte$/, ".md"));
+    readComponentIntroduction(fs.readFileSync(contractPath, "utf8"), name);
+  } else if (!fs.existsSync(publicDocPath) || !fs.readFileSync(publicDocPath, "utf8").trim()) {
+    throw new Error(`${name}: missing public component documentation at ${path.relative(root, publicDocPath)}`);
+  }
   const english = metadata.description?.trim();
   if (!english) {
     throw new Error(`${name}: component-discovery.json must provide an English description.`);
@@ -39,11 +53,12 @@ function collectExports(indexRelative, defaultKind) {
     const ownMeta = discovery.components[name] ?? {};
     const canonicalMeta = discovery.components[canonical] ?? {};
     const metadata = name === canonical ? ownMeta : { ...canonicalMeta, ...ownMeta };
-    const documentationRelative = metadata.documentation ?? sourceFile.replace(/\.svelte$/, ".md");
+    const resolvedCanonical = metadata.canonical ?? (name === canonical ? name : canonical);
+    const documentationRelative = metadata.documentation ?? `docs/components/${slugify(resolvedCanonical)}.md`;
     const documentationPath = path.join(root, documentationRelative);
     entries.push({
       name,
-      canonical: metadata.canonical ?? (name === canonical ? name : canonical),
+      canonical: resolvedCanonical,
       package: packageJson.name,
       import: `import { ${name} } from '${packageJson.name}';`,
       runtime: "free-download",
@@ -52,7 +67,7 @@ function collectExports(indexRelative, defaultKind) {
       kind: sourceFile.includes("/blocks/") ? "block" : defaultKind,
       source: sourceFile,
       documentation: fs.existsSync(documentationPath) ? documentationRelative : null,
-      description: resolveDescription(documentationPath, name, metadata),
+      description: resolveDescription(sourceFile, documentationPath, name, metadata),
       intents: metadata.intents ?? [],
       aliases: metadata.aliases ?? [],
       whenToUse: metadata.whenToUse ?? null,
@@ -91,11 +106,15 @@ const catalog = {
     ...(ownerPublic ? { ownerId: ownerPublic.ownerId, ownerPublicKeyFingerprint: ownerPublic.fingerprint } : {})
   },
   delivery: {
-    npmRuntime: ["dist/client", "dist/server", "component-catalog.json"],
+    npmRuntime: ["dist/client", "dist/server", "component-catalog.json", "AGENTS.md", "llms.txt", "README.md", "LICENSE", "THIRD_PARTY_NOTICES.md"],
     sourceArchiveOnly: ["source", "documentation"],
-    onlineDocumentation: "https://snowui.dev/llms-en.txt"
+    githubDocumentation: "https://github.com/SnowUI/SnowUI/blob/main/docs/README.md",
+    onlineDocumentation: "https://snowui.dev/llms-en.txt",
+    onlineDocumentationZh: "https://snowui.dev/llms.txt",
+    mcpEndpoint: "https://snowui.dev/mcp",
+    cliScript: "https://snowui.dev/snowui.mjs"
   },
-  generatedFrom: ["src/index.ts", "src/blocks/index.ts", "src/components/*.md", "src/blocks/*.md", "component-discovery.json"],
+  generatedFrom: ["src/index.ts", "src/blocks/index.ts", "docs/components/*.md", "component-discovery.json"],
   components
 };
 const next = `${JSON.stringify(catalog, null, 2)}\n`;

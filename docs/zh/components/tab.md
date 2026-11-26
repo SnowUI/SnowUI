@@ -1,0 +1,35 @@
+# Tab
+
+在同一区域的多个视图或内容面板之间切换，支持数据生成或自定义按钮组合，并提供键盘导航。
+
+
+
+包：@snowui-design-system/components；类别：component；运行：全部可免费使用；来源指纹：9830ea5089274bd5
+
+## 使用选择
+
+用于同一区域的内容面板或视图切换；截图中的下划线标签页可选 underline 变体。只改变过滤参数时使用 Segmented。
+
+- items 提供唯一 value 与 label；显式 Button as="item" 替换 items。
+- bind:value 同步当前项；缺失或不匹配时仅视觉回退，不写回值。内容面板按当前值由页面展示。
+
+## Import
+
+```ts
+import { Tab } from '@snowui-design-system/components';
+```
+
+## 按需读取
+
+- [快速开始代码](https://snowui.dev/llms/components/tab/quick-start.svelte)
+- [API](./tab/api.md)：公开属性、默认值、事件和 Snippet
+- [类型与状态](./tab/types.md)：必填项、可绑定属性、继承与数据结构
+- [完整使用边界](./tab/reference.md)：使用复杂组合前读取相应章节
+- [样式覆盖](./tab/styles.md)：本组件实际消费的公开变量
+- [示例与变体](./tab/examples.md)
+- [本组件截图索引](https://snowui.dev/llms/components/tab/images.json)：只在外观不确定时读取对应图片
+- [AI 截图命令与索引说明](../reference/screenshots.md)：生成命令、路径与有效性检查
+- [设计使用指南](../guides/design-system.md)：按任务还原设计与查找参数
+- [样式选择与改写顺序](../guides/styling.md#%E6%A0%B7%E5%BC%8F%E9%80%89%E6%8B%A9%E4%B8%8E%E6%94%B9%E5%86%99%E9%A1%BA%E5%BA%8F)：首次采用时阅读，优先 Props、尽量保留原样；同任务复用
+
+相关组件：[Segmented](./segmented.md)、[Button](./button.md)

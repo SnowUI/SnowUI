@@ -1,0 +1,190 @@
+# OverflowActions types and states
+
+These declarations come from the reviewed component reference for this source version. Check the installed version before using them.
+
+<a id="overflowactions-类型与状态"></a>
+
+# OverflowActions Type and Status
+
+Required Props: no named required Props.
+
+Bindable Props: this component declares no named two-way binding; handle state updates through public callbacks or its host.
+
+Inheritance: `Omit<FrameProps, "children">`. Consult the base class public documentation; fields excluded by Omit cannot be passed through unchanged.
+
+[Share Frame API](../frame/reference.md#api) · [Return API](../overflow-actions.md)
+
+The following type declarations are actually referenced by public Props and come from source. A Svelte Snippet denotes a content fragment; ComponentProps denotes the Props of the corresponding component.
+
+<a id="overflowactionsitem"></a>
+
+## OverflowActionsItem
+
+Source: src/components/OverflowActions.svelte
+
+```ts
+export type OverflowActionsItem =
+        | OverflowActionsActionItem
+        | OverflowActionsSeparatorItem;
+```
+
+<a id="overflowactionsactionitem"></a>
+
+## OverflowActionsActionItem
+
+Source: src/components/OverflowActions.svelte
+
+```ts
+export interface OverflowActionsActionItem {
+        type?: "action";
+        id: string;
+        label: string;
+        icon?: OverflowActionIcon;
+        disabled?: boolean;
+        href?: string;
+        target?: string;
+        rel?: string;
+        tooltip?: TooltipProp;
+        onAction?: () => void;
+        buttonProps?: GlobalButtonProps;
+        parts?: ComponentProps<typeof OverflowAction>["parts"];
+    }
+```
+
+<a id="overflowactionicon"></a>
+
+## OverflowActionIcon
+
+Source: src/logic/overflow-actions.svelte.ts
+
+```ts
+export type OverflowActionIcon = string | Snippet;
+```
+
+<a id="tooltipprop"></a>
+
+## TooltipProp
+
+Source: src/logic/tooltip-prop.ts
+
+```ts
+export type TooltipProp = boolean | string | Snippet | Record<string, any>;
+```
+
+<a id="globalbuttonprops"></a>
+
+## GlobalButtonProps
+
+Source: src/components/OverflowActions.svelte
+
+```ts
+export type GlobalButtonProps = Omit<ButtonProps, ControlledGlobalButtonKeys>;
+```
+
+<a id="buttonprops"></a>
+
+## ButtonProps
+
+Source: src/components/OverflowActions.svelte
+
+```ts
+type ButtonProps = ComponentProps<typeof Button>;
+```
+
+<a id="controlledglobalbuttonkeys"></a>
+
+## ControlledGlobalButtonKeys
+
+Source: src/components/OverflowActions.svelte
+
+```ts
+type ControlledGlobalButtonKeys =
+        | "children"
+        | "as"
+        | "iconOnly"
+        | "disabled"
+        | "href"
+        | "onclick"
+        | "aria-label"
+        | "title";
+```
+
+<a id="overflowactionsseparatoritem"></a>
+
+## OverflowActionsSeparatorItem
+
+Source: src/components/OverflowActions.svelte
+
+```ts
+export interface OverflowActionsSeparatorItem {
+        type: "separator";
+        id: string;
+    }
+```
+
+<a id="parts"></a>
+
+## Parts
+
+Source: src/components/OverflowActions.svelte
+
+```ts
+type Parts = ComponentPartsOf<{
+        Button: typeof Button;
+        SelectButton: typeof SelectButtonType;
+        Listbox: typeof ListboxType;
+        MenuItem: typeof MenuItemType;
+        Separator: typeof Separator;
+        Tooltip: typeof Tooltip;
+    }>;
+```
+
+<a id="componentpartsof"></a>
+
+## ComponentPartsOf
+
+Source: src/logic/component-parts.svelte.ts
+
+```ts
+export type ComponentPartsOf<
+    T extends Record<string, Component<any>>,
+> = {
+    [K in keyof T]?: ConfigurableComponentPartProps<T[K]>;
+};
+```
+
+<a id="configurablecomponentpartprops"></a>
+
+## ConfigurableComponentPartProps
+
+Source: src/logic/component-parts.svelte.ts
+
+```ts
+export type ConfigurableComponentPartProps<C extends Component<any>> = Partial<
+    Omit<ComponentProps<C>, ComponentPartControlledKey>
+>;
+```
+
+<a id="componentpartcontrolledkey"></a>
+
+## ComponentPartControlledKey
+
+Source: src/logic/component-parts.svelte.ts
+
+```ts
+export type ComponentPartControlledKey =
+    | "children"
+    | "as"
+    | "value"
+    | "defaultValue"
+    | "open"
+    | "selected"
+    | "checked"
+    | "disabled"
+    | "readonly"
+    | "id"
+    | `on${string}`
+    | `aria-${string}`;
+```
+
+[API](./api.md) · [Full reference](./reference.md)

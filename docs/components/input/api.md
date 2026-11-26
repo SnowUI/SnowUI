@@ -1,0 +1,55 @@
+# Input API
+
+These are named public Props; inherited capabilities belong to their own public API.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `element` | `HTMLElement` | — | Reference to the outer Frame root, available through bind:element. It is not a native input reference. |
+| `gap` | `number` | — | Inherited Frame gap token index. Omit it to retain the original preferred gap. Explicit values override the preference; effective graphics/text spacing remains at least 4 CSS px, including zero, root font scaling and gap scaling. |
+| `type` | `HTMLInputAttributes["type"]` | "text" | One-line input type. Supports text, search, email, password, url, tel, number, date, time, datetime-local, month, week, and color. Date, time, and color have a component display layer backed by a native value host. file and range fall back to text; they do not provide upload or slider behavior. |
+| `value` | `InputValue` | — | Current value; supports two-way bind:value. An explicit value takes priority over defaultValue. Native editing and the built-in clear action synchronize the input.value string. number accepts a numeric initial value, but application calculations must convert the edited string. |
+| `defaultValue` | `InputValue` | — | Initial value when value is not provided. The component manages later edits. To restore a business initial value on form reset, explicitly restore the binding in onreset. |
+| `placeholder` | `string` | — | Hint shown for an empty input, not a replacement for an accessible label. Date and time inputs keep segmented placeholders. |
+| `name` | `string` | — | Native form field name used by FormData to collect the value. |
+| `disabled` | `boolean` | false | Prevent user editing and interaction. Native disabled fields are omitted from form submission. |
+| `readonly` | `boolean` | false | Prevent editing while retaining focus, selection, and form submission. Hides the clear control. Custom trailing content remains after focus and uses read-only visuals. |
+| `clearable` | `boolean` | true | Whether the built-in clear X can be shown. false omits it without changing editing, validation, or custom trailing content. Password inputs instead offer a visibility toggle and no clear X. Works for standalone Input and Input inside Field. |
+| `required` | `boolean` | false | Participates in native required validation. Empty submission briefly pulses the red border without text, then restores the original state and keeps the focus ring color. |
+| `autocomplete` | `HTMLInputAttributes["autocomplete"]` | — | Browser autofill field meaning, such as username, email, or new-password. Suggestions come from browser-saved data. |
+| `minlength` | `number` | — | Minimum character length for applicable text inputs, enforced by the browser during relevant user edits and form validation. |
+| `maxlength` | `number` | — | Maximum character length for applicable text inputs. In a floating as="search" layer, defaults to 100 when not explicitly set. |
+| `pattern` | `string` | — | Native validation regular expression for applicable text inputs, without surrounding slashes. It must match the whole value; required determines whether empty input is valid. |
+| `min` | `number \| string` | — | Minimum value for number or date/time inputs, expressed as a number or in the native date/time format respectively. |
+| `max` | `number \| string` | — | Maximum value for number or date/time inputs, expressed as a number or in the native date/time format respectively. |
+| `step` | `number \| string` | — | Native step constraint. number uses numeric units; date/time types use their browser-defined units. |
+| `inputmode` | `HTMLInputAttributes["inputmode"]` | — | Soft-keyboard hint, such as numeric, decimal, or tel. It does not filter or validate input. |
+| `enterkeyhint` | `HTMLInputAttributes["enterkeyhint"]` | — | Soft-keyboard Enter action hint, such as next, search, or done. It does not navigate or submit automatically. |
+| `spellcheck` | `boolean` | — | Browser spellcheck switch. When omitted, browser and inherited settings apply. |
+| `list` | `string` | — | id of a native datalist. The caller provides candidates and the browser renders them. |
+| `accept` | `string` | — | Preserved native attribute pass-through. Input does not support file, so this cannot provide file-type restrictions or upload behavior. |
+| `multiple` | `boolean` | — | Native multiple-value hint, such as multiple email addresses where the browser supports them. Input does not support multiple file uploads. |
+| `capture` | `boolean \| "user" \| "environment"` | — | Preserved native capture attribute. Because file falls back to text, it does not provide camera or file capture in Input. |
+| `form` | `string` | — | Associate an external form by id. Native submission and reset include this field even when it is outside the form element. |
+| `autofocus` | `boolean` | — | Native autofocus hint for ordinary inputs; the browser may keep an existing focus. Date/time display layers focus the first segment when first mounted. Avoid stealing focus on page load. |
+| `tabindex` | `number` | — | Native focus order. 0 follows natural order, -1 removes sequential focus, and positive numbers set an explicit order. Natural order is recommended for ordinary forms. |
+| `title` | `string` | — | Native hint text. Also supplies the display layer for date/time and color inputs; it is not a replacement for a label. |
+| `id` | `string` | — | Native input identifier for label for and other native associations. |
+| `invalid` | `boolean` | false | Combine with aria-invalid for invalid visual state. Standalone Input shows its own error feedback; Field owns the summary when Input is embedded. |
+| `error` | `string \| Snippet` | — | Generate a built-in error Text below the input when invalid. A string provides copy; a parameterless Snippet provides custom content. Native validation errors generate feedback automatically. |
+| `parts` | `ComponentPartsOf<{ Text: typeof Text; Button: typeof Button }>` | — | Configure public Props of generated error Text or action Button by key. Applies only to generated Text; explicit children set their own Props. |
+| `onclick` | `(event: MouseEvent) => void` | — | Called on click on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `ondblclick` | `(event: MouseEvent) => void` | — | Called on double-click on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `oninput` | `(event: Event) => void` | — | Called when user input or a built-in clear or step action synchronizes the value on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `onchange` | `(event: Event) => void` | — | Called when the native submitted value changes or the component synchronizes a change on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `onfocus` | `(event: FocusEvent) => void` | — | Called on focus on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `onblur` | `(event: FocusEvent) => void` | — | Called on blur on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `onkeydown` | `(event: KeyboardEvent) => void` | — | Called on keydown on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `onkeyup` | `(event: KeyboardEvent) => void` | — | Called on keyup on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `onkeypress` | `(event: KeyboardEvent) => void` | — | Called on the deprecated keypress event; prefer onkeydown in new code on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `onpaste` | `(event: ClipboardEvent) => void` | — | Called on paste on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `oncopy` | `(event: ClipboardEvent) => void` | — | Called on copy on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `oncut` | `(event: ClipboardEvent) => void` | — | Called on cut on the native input or its display layer. Receives the corresponding event and returns no value. Use event.preventDefault() to cancel a cancelable browser default action; the callback cannot undo a component value update that has already run. |
+| `children` | `Snippet` | — | Explicit content snippet with no parameters. Compose leading or trailing icons and attachments with as="leading" or as="trailing". The visible clear control takes over the trailing position. |
+| `allowCustomValue` | `boolean` | false | Only applies when as="search" is inside Listbox. When there is no match, Enter adds and selects the input as a custom item. Custom items can also be removed. |
+
+[Types](./types.md) · [Full reference](./reference.md) · [Styles](./styles.md)

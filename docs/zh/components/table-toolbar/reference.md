@@ -1,0 +1,135 @@
+# TableToolbar
+
+> **版本**: v3.0.1
+> **职责**: 为 DataTable 提供搜索、排序、筛选和批量操作入口，并展示选择状态，适合数据管理界面。
+> **包归属**: `@snowui-design-system/components`
+> **文档修订**: 2026-09-21
+
+工具栏及内部图文操作复用 Frame `singleLine`。搜索框外层（含错误布局包装）占据剩余宽度，筛选等操作靠右，避免占位文案被不必要压缩。
+
+## 组件介绍
+
+为 DataTable 提供搜索、排序、筛选和批量操作入口，并展示选择状态，适合数据管理界面。
+
+## 使用选择
+
+
+仅用于 DataTable 的搜索、排序、筛选与批量操作，不独立搭配普通 Table。使用默认内置项或公开 as 角色替换；复制、删除实际业务由回调处理。
+
+- 需要 DataTable 状态；search / sort / filter 控制默认工具，sortOptions 明确排序项。
+- 直接 as="search" / "bulk" / "sort" / "filter" 替换对应区域；onCopy / onDelete 由业务实现。
+
+
+## 快速开始
+
+以下示例展示推荐的基本组合。更多场景与组合限制见后文。
+
+
+```svelte
+<script lang="ts">
+	import { DataTable, TableToolbar, type DataTableRenderState } from '@snowui-design-system/components';
+	import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@snowui-design-system/components';
+	type DocRow = { id: number; component: string; category: 'Basic' | 'Composite'; status: string };
+	const docs: DocRow[] = [
+		{ id: 1, component: 'Button', category: 'Basic', status: 'Published' },
+		{ id: 2, component: 'DataTable', category: 'Composite', status: 'Review' },
+		{ id: 3, component: 'Tooltip', category: 'Basic', status: 'Published' }
+	];
+	let tableState = $state<DataTableRenderState<DocRow>>();
+	let selectedRowIds = $state<(string | number)[]>([2]);
+	function getRowKey(row: DocRow) { return row.id; }
+	function copySelection() { /* Copy selected component names. */ }
+	function clearSelection() { selectedRowIds = []; }
+</script>
+
+<DataTable rows={docs} rowKey={getRowKey} selection bind:state={tableState} bind:selectedRowIds>
+	<TableToolbar
+		ariaLabel="Component documentation controls"
+		search
+		sort
+		filter
+		searchPlaceholder="Search component docs…"
+		searchAriaLabel="Search component documentation"
+		filterKey="category"
+		filterOptions={[{ label: 'Basic', value: 'Basic' }, { label: 'Composite', value: 'Composite' }]}
+		copyLabel="Copy component names"
+		deleteLabel="Remove from review queue"
+		onCopy={copySelection}
+		onDelete={clearSelection}
+	/>
+	<Table ariaLabel="Filtered component documentation">
+		<TableHeader><TableRow><TableHead as="selection" /><TableHead columnId="component">Component</TableHead><TableHead columnId="category">Category</TableHead><TableHead columnId="status">Status</TableHead></TableRow></TableHeader>
+		<TableBody>{#each tableState?.rows ?? [] as row}<TableRow rowId={row.id}><TableCell as="selection" /><TableCell columnId="component">{row.component}</TableCell><TableCell columnId="category">{row.category}</TableCell><TableCell columnId="status">{row.status}</TableCell></TableRow>{/each}</TableBody>
+	</Table>
+</DataTable>
+```
+
+
+## API
+
+| 关键字 | 类型 | 默认值 | 描述 |
+| --- | --- | --- | --- |
+| ariaLabel | `string` | `LocaleProvider` | 工具栏 role=toolbar 的可访问名称，未传时按当前语言显示；多工具栏场景使用不同名称。 |
+| search | `boolean` | `true` | 显示默认 SearchInput，并将输入写入 DataTable query；显式 as=search 可替换。 |
+| bulkActionsEnabled | `boolean` | `true` | 存在已选行时显示默认选择计数与批量操作区域；关闭不清除选择状态。 |
+| sort | `boolean` | `true` | 显示默认排序选择入口；排序字段来自 sortOptions 或可排序表头。 |
+| sortOptions | `TableToolbarSortOption[]` | — | 自定义内置排序菜单字段和顺序，可包含未展示为表格列的数据字段；显式列表替换自动表头列表，空数组仅保留默认排序。 默认行为：未指定。 |
+| filter | `boolean` | `true` | 显示默认筛选入口；实际筛选需要 filterKey 和 filterOptions。 |
+| searchPlaceholder | `string` | `LocaleProvider` | 默认搜索输入的占位文本，未传时按当前语言显示。 |
+| searchAriaLabel | `string` | `LocaleProvider` | 默认搜索输入的可访问名称，未传时按当前语言显示。 |
+| sortLabel | `string` | `LocaleProvider` | 排序入口的可访问名称及提示文字，未传时按当前语言显示。 |
+| filterLabel | `string` | `LocaleProvider` | 筛选入口的可访问名称及提示文字，未传时按当前语言显示。 |
+| filterKey | `string` | — | 写入 DataTable filters 的字段名；未配置时选择筛选项不会修改数据过滤条件。 |
+| filterOptions | `TableToolbarFilterOption[]` | `[]` | 筛选选项，每项包含 label 和 value；值为 string、number 或 undefined，通过字符串形式匹配所选项，再写回原始值。 |
+| selectedCount | `number` | — | 显式选择数量；未传时读取 DataTable 当前选中 id 数量，只覆盖展示与回调参数，不改选中集合。 |
+| showClearAction | `boolean` | `true` | 在批量操作区显示清除选择按钮。 |
+| showCopyAction | `boolean` | `true` | 在批量操作区显示内置 CopyButton；具体复制由 onCopy 执行。 |
+| showDeleteAction | `boolean` | `true` | 在批量操作区显示删除按钮；具体删除由 onDelete 执行。 |
+| clearLabel | `string` | `LocaleProvider` | 清除选择按钮的文字，未传时按当前语言显示。 |
+| copyLabel | `string` | `LocaleProvider` | 复制操作的可访问名称及提示文字，未传时按当前语言显示。 |
+| deleteLabel | `string` | `LocaleProvider` | 删除操作的可访问名称及提示文字，未传时按当前语言显示。 |
+| selectionLabel | `(count: number) => string` | `LocaleProvider` | 接收已选数量并返回选择计数文案；未传时按当前语言显示，仅用于展示。 |
+| onClearSelection | `(count: number) => void` | — | 清除按钮点击时接收当前选择数量；提供回调后替换默认 clearSelection，调用方需自行清除。 |
+| onCopy | `(count: number) => void \| Promise<void>` | — | 复制操作接收选择数量，可返回 Promise；由回调执行实际复制，成功后 resolve，失败 reject，执行期间防止重复批量操作。 |
+| onDelete | `(count: number) => void \| Promise<void>` | — | 删除操作接收选择数量，可返回 Promise；由回调执行实际删除，等待时显示加载反馈并阻止重复批量操作。 |
+| bulkActions | `Snippet<[number]>` | — | 自定义附加批量操作，接收选择数量；只在有选择且批量操作区启用时显示，执行默认操作时暂不可交互。 |
+| children | `Snippet` | — | 显式工具栏内容，无参数；直接 as=search/bulk/sort/filter 可替换对应默认区，其余作为操作内容。 |
+| parts | `ComponentPartsOf<{ Button: typeof Button; Separator: typeof Separator; Spinner: typeof Spinner; SearchInput: typeof SearchInput; Select: typeof Select; Listbox: typeof Listbox; MenuItem: typeof MenuItem; }>` | — | 配置工具栏直接拥有的默认 Button、Separator、Spinner、SearchInput、Select、Listbox、MenuItem；不递归接管显式子组件。 |
+
+未重新声明的继承能力请查所属基础组件文档；本表只列本组件源码具名公开属性。
+
+## 使用边界与详细说明
+
+<a id="组合模式"></a>
+
+### 组合模式
+
+- 默认内置模式：由 Props 生成 SearchInput、Select、Listbox、MenuItem、Button、CopyButton、Separator 与 Spinner。
+- 显式组合模式：通过 `children` 和 `as="search|bulk|sort|filter|action"` 替换直接子项。
+- `parts` 只配置直接内置子组件，不递归配置子组件内部。
+- 内置 copy、delete、sort、filter 的 icon-only 触发器由工具栏内部嵌入 Tooltip，提示文案分别复用对应 label Props。
+- 内置清除、复制、删除、排序与筛选均显式使用 `Button bare emphasis="muted"`，保留次级工具操作的 40% → hover 100% 视觉；调用方可通过 `parts.Button.emphasis` 统一覆盖。
+
+选择计数与批量操作的内部间距至少4 CSS px。工具栏保持单行；空间不足时复用局部横向滚动，轨道单独预留空间，不覆盖控件命中区域；恢复宽度或清除选择后自动收起轨道。直接角色子项仍直接放在TableToolbar中。
+
+内置复制复用 `CopyButton bare`，通过 `writeText` 执行已有 `onCopy` 回调；成功反馈默认保留 1600ms，期间忽略重复复制。回调应在复制完成后 resolve，失败时 reject，避免错误显示为成功。
+
+排序选择器读取 DataTable 的当前排序，仅在用户选择新选项时写回；表头排序不被工具栏旧值覆盖。
+
+<a id="排序选项"></a>
+
+### 排序选项
+
+未配置 `sortOptions` 时自动读取可排序表头。配置后，每项生成升序、降序两个选项，名称缺省使用 `columnId`；字段标识应唯一。普通字段由 DataTable 读取 `row[columnId]`，派生值由 DataTable 的 `sorters[columnId]` 提供。配置菜单不会创建表格列，也不会改变当前排序；菜单始终保留“默认排序”用于恢复 DataTable 默认顺序。server 模式仍由调用方处理排序请求。
+
+```svelte
+<TableToolbar sortOptions={[
+  { columnId: 'component', label: 'Component' },
+  { columnId: 'priority', label: 'Priority' }
+]} />
+```
+
+
+### 2026-11-13 行为同步
+
+搜索与筛选直接响应所属DataTable状态，外部更新query/filters后同步显示。搜索占据可用空间，筛选等工具保持右侧排列；不在页面重复查询、刷新或计数控件。

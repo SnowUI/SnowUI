@@ -1,13 +1,14 @@
-# 第三方声明
-运行依赖保留各自许可；SnowUI 的商业许可不替代以下条款。
+# Third-Party Notices
 
-## 历史 npm 交付说明
+Runtime dependencies and referenced upstream designs retain their respective licenses; the SnowUI commercial license does not replace the notices below.
 
-2026-10-31 核对公开 Registry 时，`@snowui-design-system/components` 的 `0.1.0` 与 `0.2.0-alpha.3` 至 `0.2.0-alpha.9` 这八个历史包，其包内元数据未声明 `license`，文件清单也未发现名称含 license、notice 或 copyright 的文件。此说明仅记录当时可读取包的文件清单与元数据，不排除其他正文中有声明，也不判断具体法律义务。以下第三方来源和许可说明供现在的读者查阅，不改变已发布包的字节或追溯改变历史授权；使用旧版本时应核对当时适用的许可和实际授权。
+## Historical npm Package Note
 
-## Phosphor Icons（内置功能图标快照；MIT）
+During a public npm Registry review on 2026-10-31, eight historical pre-1.0 versions of `@snowui-design-system/components` (`0.1.0` and `0.2.0-alpha.3` through `0.2.0-alpha.9`) did not declare a `license` field in package metadata and did not include files named with `license`, `notice`, or `copyright` in their published file lists. This note records the observable metadata and file lists of those historical artifacts without modifying previously published tarballs or retroactively altering historical terms; consult the applicable license and grant when using older versions.
 
-本包内置的部分功能图标由 `@snowui-design-system/resource-svelte@1.0.29` 的 Phosphor collection 生成，具体图标在 `src/internal/component-icon/builtin-icon-data.ts` 标为 `sourceCollection: "phosphor"`。原始项目：[Phosphor Icons](https://github.com/phosphor-icons/core)。以下 MIT 声明适用于这些图形，不改变 SnowUI 自有代码和图形的许可。
+## Phosphor Icons (Built-in Functional Icon Snapshots; MIT)
+
+Portions of the built-in functional icons bundled with this package are generated from the Phosphor collection in `@snowui-design-system/resource-svelte@1.0.29` and marked with `sourceCollection: "phosphor"` in `src/internal/component-icon/builtin-icon-data.ts`. Upstream project: [Phosphor Icons](https://github.com/phosphor-icons/core). The MIT notice below applies to those icon graphics and does not alter the license governing SnowUI's own code and graphics.
 
 MIT License
 
@@ -43,7 +44,7 @@ REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
 FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
 INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
 OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
-TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+TORTOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 THIS SOFTWARE.
 
 
@@ -83,9 +84,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-## UI Lab OTPInput（交互与动效参考；MIT）
+## UI Lab OTPInput (Interaction & Motion Reference; MIT)
 
-参考本地 UI Lab 的 `src/lab/components/otp-input.tsx`（https://lab.xevrion.dev/lab/otp-input），按 SnowUI 公开 API、共享样式与动效规范重新实现；不依赖其 React 运行时。
+OTPInput references the interaction and motion design of UI Lab's `src/lab/components/otp-input.tsx` (https://lab.xevrion.dev/lab/otp-input), reimplemented independently in Svelte 5 using SnowUI public APIs, shared tokens, and motion primitives without its React runtime.
 
 MIT License
 
@@ -110,9 +111,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-## Number Flow 0.6.2（NumberFlow / FlowText 动效参考；MIT）
+## Number Flow 0.6.2 (NumberFlow / FlowText Motion Reference; MIT)
 
-NumberFlow 和 FlowText 参考 [Number Flow](https://github.com/barvian/number-flow) 的数字与字符动效，SnowUI 使用自身的 Svelte 实现。以下为本地参考源码所附许可。
+NumberFlow and FlowText reference the numeric and character motion model of [Number Flow](https://github.com/barvian/number-flow), implemented natively in Svelte 5 by SnowUI. Upstream license notice:
 
 MIT License
 
@@ -137,9 +138,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-## ProgressiveBlur（渐进模糊效果参考；MIT）
+## ProgressiveBlur (Progressive Blur Effect Reference; MIT)
 
-SnowUI 渐进模糊参考 [ProgressiveBlur](https://github.com/usagimaru/ProgressiveBlur) 的原生效果，Web 版本使用多层 backdrop-filter 与遮罩实现。以下为本地参考源码所附许可。
+SnowUI's progressive blur effect references [ProgressiveBlur](https://github.com/usagimaru/ProgressiveBlur), implemented on the web with layered `backdrop-filter` and CSS masks. Upstream license notice:
 
 MIT License
 
@@ -164,9 +165,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
-## Svelte Animations（Blur Reveal 效果参考；MIT）
+## Svelte Animations (Blur Reveal Effect Reference; MIT)
 
-BlurText 参考 [Svelte Animations](https://github.com/SikandarJODD/animations) 的 Blur Reveal 效果，以 SnowUI 公共能力重新实现，不依赖其运行时。以下为本地参考源码所附许可。
+BlurText references the Blur Reveal effect from [Svelte Animations](https://github.com/SikandarJODD/animations), reimplemented using SnowUI shared motion capabilities without depending on its runtime. Upstream license notice:
 
 MIT License
 

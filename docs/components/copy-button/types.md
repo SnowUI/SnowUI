@@ -1,0 +1,29 @@
+# CopyButton types and states
+
+These declarations come from the reviewed component reference for this source version. Check the installed version before using them.
+
+<a id="copybutton-类型与状态"></a>
+
+# CopyButton types and states
+
+Required Props: no named required Props.
+
+Bindable Props: this component declares no named two-way binding; handle state updates through public callbacks or its host.
+
+Inherited declaration: `Omit< ButtonProps, | "children" | "onclick" | "disabled" | "currentState" | "stateContent" | "whileActive" | "Click" | "Active" >`. Consult the base component’s public documentation for inherited capabilities; fields excluded by `Omit` cannot be used as if inherited unchanged.
+
+[Shared Frame API](../frame/reference.md#api) · [Back to API](../copy-button.md)
+
+The following type declarations are actually referenced by public Props and come from source. A Svelte Snippet denotes a content fragment; ComponentProps denotes the Props of the corresponding component.
+
+<a id="buttonprops"></a>
+
+## ButtonProps
+
+Source: src/components/CopyButton.svelte
+
+```ts
+type ButtonProps = ComponentProps<typeof Button>;
+```
+
+[API](./api.md) · [Full reference](./reference.md)

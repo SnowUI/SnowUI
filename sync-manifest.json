@@ -3,7 +3,7 @@
   "scope": "snowui-components",
   "language": "en",
   "standaloneRepoOnly": true,
-  "updated": "2026-11-23",
+  "updated": "2026-11-26",
   "description": "Self-contained intra-repository linkage contracts for @snowui-design-system/components when cloned standalone from GitHub.",
   "standaloneAllowlist": [
     "sync-manifest.json",
@@ -16,7 +16,7 @@
   ],
   "coverageProbes": [
     "src/components/Button.svelte",
-    "src/components/Button.md",
+    "docs/components/button.md",
     "src/blocks/SearchPopup.svelte",
     "src/index.ts",
     "src/logic/frame-state-value.ts",
@@ -29,7 +29,7 @@
   "points": [
     {
       "id": "components.svelte.impl-and-api",
-      "title": "Public Component & Block Implementation (.svelte) <-> Co-located API Spec & Test Sync",
+      "title": "Public Component & Block Implementation (.svelte) <-> Public Docs & Test Sync",
       "tier": "L-Rule",
       "propagation": "immediate",
       "triggers": [
@@ -38,13 +38,12 @@
       ],
       "triggerSignal": "Added or changed public Props, Snippets, events, Context, slot roles, default styles, or observable runtime behavior",
       "companions": [
-        "{dir}/{stem}.md",
         "{dir}/{stem}.test.ts"
       ],
       "exemptWhen": "Internal-only refactoring or performance tuning that preserves all public Props, DOM contracts, and observable behavior",
       "immediate": [
-        "Keep {dir}/{stem}.md API table, quick-start snippet, and top version header synchronized with the component implementation",
         "Add or update runnable examples in {dir}/{stem}.test.ts covering the new or modified capability",
+        "Keep exported public documentation under docs/components/ synchronized with public Props and defaults",
         "Ensure every source file under src/ retains the single-line trailing @license notice via pnpm source:notice:check (or pnpm source:notice:sync)"
       ],
       "evaluated": [
@@ -63,7 +62,7 @@
     },
     {
       "id": "components.exports.public-entry",
-      "title": "Public Package Entrypoints (src/index.ts) <-> Discovery Catalog & Sandbox Prelude",
+      "title": "Public Package Entrypoints (src/index.ts) <-> Discovery Catalog, Public Docs & Sandbox Prelude",
       "tier": "L-Gen",
       "propagation": "immediate",
       "triggers": [
@@ -81,7 +80,7 @@
       ],
       "exemptWhen": "Internal type re-export adjustments that do not change public component names or catalog fields",
       "immediate": [
-        "Update English intents/aliases/whenToUse/avoidWhen in component-discovery.json and regenerate component-catalog.json via pnpm catalog:generate",
+        "Ensure docs/components/<slug>.md exists for every public component export, update English metadata in component-discovery.json, and regenerate component-catalog.json via pnpm catalog:generate",
         "Register newly exported public components in vite.config.ts sandboxPrelude"
       ],
       "evaluated": [],
@@ -94,7 +93,7 @@
     },
     {
       "id": "components.runtime.shared-and-styles",
-      "title": "Shared Runtime Logic, Motion, i18n, and Core Stylesheets Linkage",
+      "title": "Shared Runtime Logic, Motion, i18n, Core Stylesheets, and Public Docs Linkage",
       "tier": "L-Rule",
       "propagation": "immediate",
       "triggers": [
@@ -106,16 +105,15 @@
         "src/styles/**",
         "src/*.ts",
         "src/blocks/*.ts",
-        "src/components/*.md",
-        "src/blocks/*.md",
         "src/components/*.test.ts",
-        "src/blocks/*.test.ts"
+        "src/blocks/*.test.ts",
+        "docs/**"
       ],
-      "triggerSignal": "Modified shared state/layout/formatting/motion modules, CSS tokens/layers, or co-located component docs/tests",
+      "triggerSignal": "Modified shared state/layout/formatting/motion modules, CSS tokens/layers, public docs, or component tests",
       "companions": [],
       "exemptWhen": "Documentation-only clarifications that do not alter runtime exports or CSS custom properties",
       "immediate": [
-        "Keep co-located module documentation synchronized and preserve SSR safety plus trailing @license notices on all src/ files",
+        "Preserve SSR safety plus trailing @license notices on all src/ files, and keep docs/ links self-contained inside the repository",
         "Ensure src/styles/index.css remains self-contained without external stylesheet path dependencies"
       ],
       "evaluated": [],

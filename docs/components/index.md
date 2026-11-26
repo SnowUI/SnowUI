@@ -1,0 +1,90 @@
+# SnowUI component directory
+
+Read the [English AI entry](../README.md) first. The entries below use reviewed English introductions; open only the component documents needed for the task.
+
+- [Accordion](./accordion.md): Organize related content into expandable sections for FAQs, settings, and step-by-step explanations, with single or multiple sections open.
+- [AccordionItem](./accordion-item.md): Define one collapsible section within an Accordion, combining a heading and content under the parent expansion state.
+- [Avatar](./avatar.md): Display a person or team avatar with image, text, and gradient fallbacks for lists, comments, and member details.
+- [AvatarGroup](./avatar-group.md): Arrange or stack multiple avatars and show the count of hidden members in team and collaborator lists.
+- [Badge](./badge.md): Show unread counts and status with compact numbers, text, or dots alongside buttons, avatars, and navigation items.
+- [BarChart](./bar-chart.md): Compare categories with horizontal, vertical, grouped, or stacked bars, axes, and interactive details.
+- [BlurText](./blur-text.md): Reveal headings and short passages letter by letter with blur, fade, and slight upward motion while preserving text layout.
+- [Breadcrumb](./breadcrumb.md): Show the current page hierarchy and provide paths back to parent pages.
+- [Button](./button.md): Trigger actions or navigation with text, icons, loading, and disabled states, from primary actions to compact tools.
+- [ButtonGroup](./button-group.md): Combine related buttons into one action group, with optional dividers for split buttons and compact toolbars.
+- [Card](./card.md): Present related content on a consistent card surface with flexible text, media, actions, fixed items, and scrolling.
+- [ChartGroup](./chart-group.md): Coordinate multiple charts in one area with shared category hover, layered rendering, and aligned axes.
+- [Checkbox](./checkbox.md): Select independent options with checked, unchecked, and indeterminate states in forms or bulk selection.
+- [Chip](./chip.md): Display a category, status, or short detail as a compact inline label alongside text, icons, and lists.
+- [CircularChart](./circular-chart.md): Show proportions as a ring or pie with segments, rounded ends, ring thickness, and hover emphasis.
+- [CodeBlock](./code-block.md): Display copyable code with syntax highlighting, line numbers, fullscreen viewing, and resizing.
+- [ColorSchemeButton](./color-scheme-button.md): Switch between light and dark themes with an icon that reflects the current scheme.
+- [CopyButton](./copy-button.md): Copy text or code to the clipboard and briefly confirm success, useful for links, identifiers, and install commands.
+- [CopyLink](./copy-link.md): Show a link that opens from its text and copies its address from the rest of the control.
+- [DataTable](./data-table.md): Coordinate querying, sorting, and pagination with composable toolbar, table, and pagination controls.
+- [Dialog](./dialog.md): Present focused content or actions in a modal with a backdrop, focus management, and background scroll lock.
+- [ExpandButton](./expand-button.md): Switch between expanded and collapsed states with consistent button feedback.
+- [Field](./field.md): Combine an input, label, icon, and validation feedback into a consistent form field.
+- [FlowText](./flow-text.md): Animate changes in text or numbers for dynamic copy, counters, timers, and countdowns.
+- [Frame](./frame.md): Coordinate layout, state, loading, and motion across components through explicit configuration.
+- [GaugeChart](./gauge-chart.md): Show several proportions in a semicircle or half pie with segments, gradients, ring thickness, and reveal motion.
+- [Gradient](./gradient.md): Add soft layered gradients to backgrounds or placeholders with six palettes and scalable shape effects.
+- [GradientMotion](./gradient-motion.md): Create a flowing gradient sweep for backgrounds, avatar placeholders, or clipped media areas.
+- [Icon](./icon.md): Display SVG icons with consistent sizing and color in buttons, navigation, and content.
+- [IconProvider](./icon-provider.md): Replace SnowUI functional icons for an application or subtree while retaining defaults for unconfigured icons.
+- [Image](./image.md): Display images and placeholders with badges, actions, and preview entry points.
+- [ImageGroup](./image-group.md): Arrange multiple images with consistent sizes and group preview for galleries and attachments.
+- [ImageViewer](./image-viewer.md): Preview images or videos at page level with previous, next, and close controls.
+- [Indicator](./indicator.md): Provide a draggable resize handle for panels and content areas, with mouse and keyboard support.
+- [Input](./input.md): Provide single-line input for text, search, passwords, numbers, dates, times, and colors, with field feedback.
+- [Kbd](./kbd.md): Display shortcuts or keyboard hints as compact keycaps.
+- [LineChart](./line-chart.md): Plot trends with multiple series, area fill, solid or dashed lines, axes, grids, and point styling.
+- [Link](./link.md): Provide clear text links in content, descriptions, and navigation, with optional directional indicators.
+- [Listbox](./listbox.md): Present selectable options in a popup with search filtering and keyboard support, including Select panels.
+- [LocaleProvider](./locale-provider.md): Set the language of built-in SnowUI interface messages for an application or subtree, with custom overrides.
+- [MenuItem](./menu-item.md): Present an option in a list or quick-action menu with icon, selected, and disabled states.
+- [MetricCard](./metric-card.md): Display one dashboard metric and an optional change; the application supplies the data and calculates comparisons.
+- [NumberFlow](./number-flow.md): Animate changing numbers digit by digit with width transitions while preserving currency, grouping, and decimals.
+- [NumericText](./numeric-text.md): Animate only the changing portions of short text or numbers while preserving unchanged content.
+- [OTPInput](./otp-input.md): Enter a configurable 4–8 digit one-time code with full-code paste, SMS autofill, and native form submission and reset.
+- [OverflowAction](./overflow-action.md): Define an action in OverflowActions that moves between a toolbar and its More menu as space changes.
+- [OverflowActions](./overflow-actions.md): Keep actions accessible in limited space by moving those that do not fit into a More menu.
+- [Pagination](./pagination.md): Navigate between pages of tabular data, lists, or search results.
+- [PasswordStrength](./password-strength.md): Evaluate password strength locally with a four-segment indicator and labels; the component does not persist, send, or submit passwords.
+- [Popover](./popover.md): Show supplementary content or actions near a trigger with size and trigger options.
+- [Progress](./progress.md): Show determinate or indeterminate progress with a bar or circle for uploads, processing, and loading.
+- [Radio](./radio.md): Choose one option from a mutually exclusive group when all choices should remain visible.
+- [ScrambleText](./scramble-text.md): Reveal a target heading, short sentence, or status through a progressive character scramble.
+- [ScrollArea](./scroll-area.md): Provide scrollable content with a consistent scrollbar for long lists, panels, and constrained spaces.
+- [SearchBox](./search-box.md): Open a search popup from a fully clickable search entry, optionally with a shortcut hint.
+- [SearchInput](./search-input.md): Provide a single-line search field with an icon for filtering lists, pages, and toolbar content.
+- [SearchPopup](./search-popup.md): Compose a search panel with SearchInput and optional results, groups, and custom content; search logic and routing stay with the host.
+- [Segmented](./segmented.md): Switch quickly among a small set of exclusive filters or parameters, with keyboard and form support.
+- [Select](./select.md): Choose from a dropdown built from data or custom options, with search and keyboard support.
+- [SelectButton](./select-button.md): Choose one dropdown option from a button, suited to toolbars and compact filters.
+- [Separator](./separator.md): Separate content and actions horizontally or vertically to clarify information hierarchy.
+- [Sidebar](./sidebar.md): Organize brand entry, grouped navigation, and footer actions with collapse and independent scrolling.
+- [SidebarItem](./sidebar-item.md): Show a Sidebar navigation item with active state, icon, hierarchy, and status hints.
+- [SidebarSection](./sidebar-section.md): Group Sidebar items under a heading with expand, collapse, and optional actions.
+- [SidePanel](./side-panel.md): Show details or supporting content from the right in overlay or inline mode while retaining page context.
+- [Skeleton](./skeleton.md): Show a placeholder outline while content loads, previewing structure and keeping layout stable.
+- [Slider](./slider.md): Choose one value or a range by dragging, with horizontal, vertical, stepped, and filled styles.
+- [SlotText](./slot-text.md): Animate text changes character by character with vertical rolls for short labels, status, and counters.
+- [SnowUILogo](./snow-ui-logo.md): Display the SnowUI icon, wordmark, or combined mark in horizontal or vertical layouts.
+- [Spinner](./spinner.md): Indicate ongoing loading with a rotating ring, spokes, or capsule shape.
+- [StyleButton](./style-button.md): Switch between SnowUI and Apple visual styles.
+- [Switch](./switch.md): Toggle a setting or feature that takes effect immediately.
+- [Tab](./tab.md): Switch between views or content panels, with generated or custom tabs and keyboard navigation.
+- [Table](./table.md): Display structured data in a semantic table with adaptive columns, local horizontal scrolling, and loading states.
+- [TableBody](./table-body.md): Group Table data rows while preserving table body semantics.
+- [TableCell](./table-cell.md): Display text, components, or custom content in a Table cell, truncating long content by default.
+- [TableHead](./table-head.md): Define a Table column heading with optional sorting and resizing.
+- [TableHeader](./table-header.md): Group Table header rows and preserve native table header semantics.
+- [TableRow](./table-row.md): Group header or data cells into one row with consistent hover and interaction feedback.
+- [TableToolbar](./table-toolbar.md): Add search, sort, filter, bulk actions, and selection status to DataTable.
+- [Tag](./tag.md): Use an interactive label for markers, filters, or path segments.
+- [Text](./text.md): Render text with typography and truncation options for content, labels, and constrained areas.
+- [Textarea](./textarea.md): Enter multi-line descriptions, notes, or longer content with native form attributes and field feedback.
+- [Toast](./toast.md): Show brief feedback for results or status changes, with icons, actions, and rich content.
+- [Toaster](./toaster.md): Display global toast() notifications in six positions with stacking motion and a visible-item limit.
+- [Tooltip](./tooltip.md): Show a short explanation on hover with collision handling and smooth switching.

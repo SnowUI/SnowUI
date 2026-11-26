@@ -1,9 +1,17 @@
 {
   "license": "SEE LICENSE IN LICENSE",
   "name": "@snowui-design-system/components",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "private": false,
   "type": "module",
+  "homepage": "https://snowui.dev/components",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SnowUI/SnowUI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SnowUI/SnowUI/issues"
+  },
   "exports": {
     ".": {
       "types": "./dist/client/index.d.ts",

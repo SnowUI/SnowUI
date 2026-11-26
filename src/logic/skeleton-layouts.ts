@@ -28,7 +28,7 @@ export const EMPTY_SKELETON_LAYOUT: SkeletonLayout = {
     items: [],
 };
 
-// Shared capability: Skeleton geometry resolution and legacy class fallback; contract: components/src/components/Skeleton.md.
+// Shared capability: Skeleton geometry resolution and legacy class fallback; contract: docs/contracts/components/Skeleton.md.
 const LEGACY_CLASS_ENTRIES: ReadonlyArray<string | readonly [string, string]> = [
     "accordion-item",
     "accordion",

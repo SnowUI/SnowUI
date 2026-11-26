@@ -2,24 +2,27 @@
 
 `@snowui-design-system/components` is the official Svelte 5 UI component and block package for SnowUI.
 
-## Package & Documentation Entrypoints
+## Where to Find Documentation (npm vs. GitHub vs. Online)
 
-- Package overview & installation: [README.md](./README.md)
-- Machine-readable component catalog: [component-catalog.json](./component-catalog.json)
-- Public AI documentation & guides (Chinese / English): https://snowui.dev/llms.txt and https://snowui.dev/llms-en.txt
-- Applicable license: [LICENSE](./LICENSE) (`SnowUI-Commercial-2.4.0`, proprietary source-available; **not** MIT or open-source)
+- **Package overview & quick start**: [README.md](./README.md)
+- **Machine-readable component catalog**: [component-catalog.json](./component-catalog.json) (shipped in both npm and GitHub)
+- **Remote MCP server (Streamable HTTP)**: `https://snowui.dev/mcp` (`snowui_search`, `snowui_component`, `snowui_examples`, `snowui_setup`)
+- **Zero-install CLI (Node.js 22+)**: download `https://snowui.dev/snowui.mjs` and run `node snowui.mjs help`
+- **Online AI documentation (HTTPS)**: https://snowui.dev/llms-en.txt (Simplified Chinese: https://snowui.dev/llms.txt)
+- **GitHub & source archive offline docs**: `./docs/README.md` (Simplified Chinese: `./docs/zh/README.md`) — present in `https://github.com/SnowUI/SnowUI` and source archives (`docs/components/<slug>.md`), **not** inside `node_modules`
+- **Applicable license**: [LICENSE](./LICENSE) (`SnowUI-Commercial-2.4.0`, proprietary source-available; **not** MIT or open-source)
 
-## Runtime Package vs. Source Archive
+## Runtime Package vs. Source Repository
 
-- The published npm package ships compiled client/server Svelte 5 modules (`dist/client`, `dist/server`), shared stylesheet entrypoints (`@snowui-design-system/components/styles`), and `./component-catalog.json`.
-- Raw `.svelte`, `.ts`, and `.md` paths listed under `source` and `documentation` in `./component-catalog.json` refer to the official SnowUI source archive (`src/components/*`, `src/blocks/*`), not `node_modules`.
+- **Installed npm package (`node_modules/@snowui-design-system/components`)**: ships compiled client/server Svelte 5 modules (`dist/client`, `dist/server`), shared stylesheet entrypoints (`@snowui-design-system/components/styles`), `./component-catalog.json`, `./AGENTS.md`, `./llms.txt`, and `./LICENSE`. Do **not** look for `src/` or `docs/` inside `node_modules`; query component APIs, styles, types, and examples via `https://snowui.dev/mcp`, `https://snowui.dev/snowui.mjs`, or https://snowui.dev/llms-en.txt.
+- **GitHub clone or source archive (`SnowUI/SnowUI`)**: `source` (`src/components/*.svelte`, `src/blocks/*.svelte`) and `documentation` (`docs/components/<slug>.md`, plus `docs/guides/*` and `docs/reference/*`) in `./component-catalog.json` resolve directly relative to this repository root.
 - Import components and blocks from `@snowui-design-system/components` and load `@snowui-design-system/components/styles` once at the application entry.
 
 ## Consumer Guidelines for AI
 
 1. Search `./component-catalog.json` (`intents`, `aliases`, `whenToUse`, `avoidWhen`, `related`) before creating custom page DOM or CSS.
 2. Prefer documented public Props, Snippets, events, and `parts` over overriding internal DOM or private classes.
-3. Verify component APIs, types, and composition boundaries via https://snowui.dev/llms-en.txt (or https://snowui.dev/llms.txt) when working from the npm runtime package.
+3. Read the matched component's public API, types, and composition reference (`./docs/components/<slug>.md` in a repo checkout, or `https://snowui.dev/llms/en/components/<slug>.md` / MCP `snowui_component` when using the npm package) before writing code.
 
 ## License Gate for AI Assistants (Zero Friction for Free Scope, Fail-Closed for Restricted Scope)
 

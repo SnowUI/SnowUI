@@ -1,0 +1,91 @@
+# SnowUI 组件目录
+
+已知组件名时查此表；按场景选型优先使用 [检索](https://snowui.dev/llms/find?q=button)。返回 [AI 主入口](../README.md)。
+
+- [Accordion](./accordion.md) [component]：Organize related content into expandable sections for FAQs, settings, and step-by-step explanations, with single or multiple sections open.
+- [AccordionItem](./accordion-item.md) [component]：Define one collapsible section within an Accordion, combining a heading and content under the parent expansion state.
+- [Avatar](./avatar.md) [component]：Display a person or team avatar with image, text, and gradient fallbacks for lists, comments, and member details.
+- [AvatarGroup](./avatar-group.md) [component]：Arrange or stack multiple avatars and show the count of hidden members in team and collaborator lists.
+- [Badge](./badge.md) [component]：Show unread counts and status with compact numbers, text, or dots alongside buttons, avatars, and navigation items.
+- [BarChart](./bar-chart.md) [component]：Compare categories with horizontal, vertical, grouped, or stacked bars, axes, and interactive details.
+- [BlurText](./blur-text.md) [component]：Reveal headings and short passages letter by letter with blur, fade, and slight upward motion while preserving text layout.
+- [Breadcrumb](./breadcrumb.md) [component]：Show the current page hierarchy and provide paths back to parent pages.
+- [Button](./button.md) [component]：Trigger immediate actions; use bare with emphasis="muted" when an unframed button needs opacity hover feedback.
+- [ButtonGroup](./button-group.md) [component]：Combine related buttons into one action group, with optional dividers for split buttons and compact toolbars.
+- [Card](./card.md) [component]：Present related content on a consistent card surface with flexible text, media, actions, fixed items, and scrolling.
+- [ChartGroup](./chart-group.md) [component]：Coordinate multiple charts in one area with shared category hover, layered rendering, and aligned axes.
+- [Checkbox](./checkbox.md) [component]：Select independent options with checked, unchecked, and indeterminate states in forms or bulk selection.
+- [Chip](./chip.md) [component]：Display a category, status, or short detail as a compact inline label alongside text, icons, and lists.
+- [CircularChart](./circular-chart.md) [component]：Show proportions as a ring or pie with segments, rounded ends, ring thickness, and hover emphasis.
+- [CodeBlock](./code-block.md) [component]：Display copyable code with syntax highlighting, line numbers, fullscreen viewing, and resizing.
+- [ColorSchemeButton](./color-scheme-button.md) [component]：Switch between light and dark themes with an icon that reflects the current scheme.
+- [CopyButton](./copy-button.md) [component]：Copy text or code to the clipboard and briefly confirm success, useful for links, identifiers, and install commands.
+- [CopyLink](./copy-link.md) [component]：Show a link that opens from its text and copies its address from the rest of the control.
+- [DataTable](./data-table.md) [component]：Display data lists requiring search, sorting, filtering, row selection, action columns, or pagination by composing TableToolbar, Table, and Pagination.
+- [Dialog](./dialog.md) [component]：Present focused content or actions in a modal with a backdrop, focus management, and background scroll lock.
+- [ExpandButton](./expand-button.md) [component]：Switch between expanded and collapsed states with consistent button feedback.
+- [Field](./field.md) [component]：Combine an input, label, icon, and validation feedback into a consistent form field.
+- [FlowText](./flow-text.md) [component]：Animate changes in text or numbers for dynamic copy, counters, timers, and countdowns.
+- [Frame](./frame.md) [component]：Coordinate layout, state, loading, and motion across components through explicit configuration.
+- [GaugeChart](./gauge-chart.md) [component]：Display multiple positive proportions in a semicircle or half-pie where the denominator is the sum of visible segments.
+- [Gradient](./gradient.md) [component]：Add soft layered gradients to backgrounds or placeholders with six palettes and scalable shape effects.
+- [GradientMotion](./gradient-motion.md) [component]：Create a flowing gradient sweep for backgrounds, avatar placeholders, or clipped media areas.
+- [Icon](./icon.md) [component]：Display SVG icons with consistent sizing and color in buttons, navigation, and content.
+- [IconProvider](./icon-provider.md) [component]：Replace SnowUI functional icons for an application or subtree while retaining defaults for unconfigured icons.
+- [Image](./image.md) [component]：Display images and placeholders with badges, actions, and preview entry points.
+- [ImageGroup](./image-group.md) [component]：Arrange multiple images with consistent sizes and group preview for galleries and attachments.
+- [ImageViewer](./image-viewer.md) [component]：Preview images or videos at page level with previous, next, and close controls.
+- [Indicator](./indicator.md) [component]：Provide a draggable resize handle for panels and content areas, with mouse and keyboard support.
+- [Input](./input.md) [component]：Provide single-line input for text, search, passwords, numbers, dates, times, and colors, with field feedback.
+- [Kbd](./kbd.md) [component]：Display shortcuts or keyboard hints as compact keycaps.
+- [LineChart](./line-chart.md) [component]：Plot trends with multiple series, area fill, solid or dashed lines, axes, grids, and point styling.
+- [Link](./link.md) [component]：Provide clear text links in content, descriptions, and navigation, with optional directional indicators.
+- [Listbox](./listbox.md) [component]：Present selectable options in a popup with search filtering and keyboard support, including Select panels.
+- [LocaleProvider](./locale-provider.md) [component]：Set the language of built-in SnowUI interface messages for an application or subtree, with custom overrides.
+- [MenuItem](./menu-item.md) [component]：Present an option in a list or quick-action menu with icon, selected, and disabled states.
+- [MetricCard](./metric-card.md) [component]：Present a single KPI metric and optional period-over-period change.
+- [NumberFlow](./number-flow.md) [component]：Animate changing numbers digit by digit with width transitions while preserving currency, grouping, and decimals.
+- [NumericText](./numeric-text.md) [component]：Animate only the changing portions of short text or numbers while preserving unchanged content.
+- [OTPInput](./otp-input.md) [component]：Enter a configurable 4–8 digit one-time code with full-code paste, SMS autofill, and native form submission and reset.
+- [OverflowAction](./overflow-action.md) [component]：Define an action in OverflowActions that moves between a toolbar and its More menu as space changes.
+- [OverflowActions](./overflow-actions.md) [component]：Collapse a row of actions to icon-only and move remaining items into a More menu when horizontal space shrinks.
+- [Pagination](./pagination.md) [component]：Navigate between pages of tabular data, lists, or search results.
+- [PasswordStrength](./password-strength.md) [component]：Evaluate and display local password strength across four segments.
+- [Popover](./popover.md) [component]：Show supplementary content or actions near a trigger with size and trigger options.
+- [Progress](./progress.md) [component]：Show determinate or indeterminate progress with a bar or circle for uploads, processing, and loading.
+- [Radio](./radio.md) [component]：Choose one option from a mutually exclusive group when all choices should remain visible.
+- [ScrambleText](./scramble-text.md) [component]：Reveal a target heading, short sentence, or status through a progressive character scramble.
+- [ScrollArea](./scroll-area.md) [component]：Provide scrollable content with a consistent scrollbar for long lists, panels, and constrained spaces.
+- [SearchBox](./search-box.md) [component]：Open a search popup from a fully clickable search entry, optionally with a shortcut hint.
+- [SearchInput](./search-input.md) [component]：Provide a single-line search field with an icon for filtering lists, pages, and toolbar content.
+- [SearchPopup](./search-popup.md) [block]：Provide a unified search input, group headings, and result spacing as a composable block.
+- [Segmented](./segmented.md) [component]：Select one option among mutually exclusive parameters or filters using radiogroup semantics.
+- [Select](./select.md) [component]：Choose from a dropdown built from data or custom options, with search and keyboard support.
+- [SelectButton](./select-button.md) [component]：Choose one dropdown option from a button, suited to toolbars and compact filters.
+- [Separator](./separator.md) [component]：Separate content and actions horizontally or vertically to clarify information hierarchy.
+- [Sidebar](./sidebar.md) [block]：Organize brand entry, grouped navigation, and footer actions with collapse and independent scrolling.
+- [SidebarItem](./sidebar-item.md) [block]：Show a Sidebar navigation item with active state, icon, hierarchy, and status hints.
+- [SidebarSection](./sidebar-section.md) [block]：Group Sidebar items under a heading with expand, collapse, and optional actions.
+- [SidePanel](./side-panel.md) [component]：Show details or supporting content from the right in overlay or inline mode while retaining page context.
+- [Skeleton](./skeleton.md) [component]：Show a placeholder outline while content loads, previewing structure and keeping layout stable.
+- [Slider](./slider.md) [component]：Choose one value or a range by dragging, with horizontal, vertical, stepped, and filled styles.
+- [SlotText](./slot-text.md) [component]：Animate text changes character by character with vertical rolls for short labels, status, and counters.
+- [SnowUILogo](./snow-ui-logo.md) [component]：Display the SnowUI icon, wordmark, or combined mark in horizontal or vertical layouts.
+- [Spinner](./spinner.md) [component]：Indicate ongoing loading with a rotating ring, spokes, or capsule shape.
+- [StyleButton](./style-button.md) [component]：Switch between SnowUI and Apple visual styles.
+- [Switch](./switch.md) [component]：Toggle a setting or feature that takes effect immediately.
+- [Tab](./tab.md) [component]：Switch between distinct content panels or views.
+- [Table](./table.md) [component]：Display structured data in a semantic table with adaptive columns, local horizontal scrolling, and loading states.
+- [TableBody](./table-body.md) [component]：Group Table data rows while preserving table body semantics.
+- [TableCell](./table-cell.md) [component]：Display text, components, or custom content in a Table cell, truncating long content by default.
+- [TableHead](./table-head.md) [component]：Define a Table column heading with optional sorting and resizing.
+- [TableHeader](./table-header.md) [component]：Group Table header rows and preserve native table header semantics.
+- [TableRow](./table-row.md) [component]：Group header or data cells into one row with consistent hover and interaction feedback.
+- [TableToolbar](./table-toolbar.md) [component]：Add search, sort, filter, bulk actions, and selection status to DataTable.
+- [Tag](./tag.md) [component]：Use an interactive label for markers, filters, or path segments.
+- [Text](./text.md) [component]：Render text with typography and truncation options for content, labels, and constrained areas.
+- [Textarea](./textarea.md) [component]：Enter multi-line descriptions, notes, or longer content with native form attributes and field feedback.
+- [ThemeButton](./color-scheme-button.md) [component]：Switch between light and dark themes with an icon that reflects the current scheme.
+- [Toast](./toast.md) [component]：Show brief feedback for results or status changes, with icons, actions, and rich content.
+- [Toaster](./toaster.md) [component]：Display global toast() notifications in six positions with stacking motion and a visible-item limit.
+- [Tooltip](./tooltip.md) [component]：Show a short explanation on hover with collision handling and smooth switching.

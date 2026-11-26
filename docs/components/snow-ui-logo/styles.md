@@ -1,0 +1,20 @@
+# SnowUILogo style overrides
+
+Read the [styling guide](../../guides/styling.md) before overriding a component. The entries below come from the reviewed component reference; verify the scope of each public variable.
+
+<a id="snowuilogo-样式覆盖"></a>
+
+# SnowUILogo style overlay
+
+First use public component Props to match the desired appearance, preserving the existing look where possible. If changes are necessary, follow the [style selection and override order](../../guides/styling.md#%E6%A0%B7%E5%BC%8F%E9%80%89%E6%8B%A9%E4%B8%8E%E6%94%B9%E5%86%99%E9%A1%BA%E5%BA%8F): use your own class (including Tailwind already in the project) or an instance style. The names below are public overrides actually consumed by source; check their scope and do not modify private DOM. Choose the correct SnowUI token family. External apps need not install SnowUI website utilities.
+
+| Variable | Purpose and default reference |
+| --- | --- |
+| `--snowui-snow-ui-logo-gap-override` | Combination spacing (default horizontal 6px, vertical 15px) |
+| `--snowui-snow-ui-logo-icon-size-override` | Icon size (default horizontal/icon 28px, vertical 60px) |
+| `--snowui-snow-ui-logo-wordmark-height-override` | Character height (default 12px, vertical 20px) |
+| `--snowui-snow-ui-logo-wordmark-width-override` | Mark width (default 71px, vertical 119px) |
+
+[Design Guide](../../guides/design-system.md) · [Token](../../reference/tokens.md) · [Combination Boundary](./reference.md)
+
+[Full reference](./reference.md) · [Tokens](../../reference/tokens.md)

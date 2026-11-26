@@ -151,10 +151,8 @@ function discoverUpstreamContext(primaryBaseDir, primaryData) {
   } else if (primaryData.standaloneRepoOnly) {
     const parentWs = path.resolve(primaryBaseDir, '../sync-manifest.json');
     const grandBrain = path.resolve(primaryBaseDir, '../../brain/sync-manifest.json');
-    const grandLegacy = path.resolve(primaryBaseDir, '../../linkage/sync-manifest.json');
     if (fs.existsSync(parentWs)) hints.parentWorkspaceRel = '../sync-manifest.json';
     if (fs.existsSync(grandBrain)) hints.upstreamHubRel = '../../brain/sync-manifest.json';
-    else if (fs.existsSync(grandLegacy)) hints.upstreamHubRel = '../../linkage/sync-manifest.json';
   }
 
   return hints;
@@ -458,7 +456,7 @@ function collectDirtyFiles(rootDir, gitRepos) {
     const dir = repo === '.' ? rootDir : path.join(rootDir, repo);
     let out = '';
     try {
-      out = execFileSync('git', ['-C', dir, 'status', '--porcelain', '--untracked-files=normal'], {
+      out = execFileSync('git', ['-c', 'core.quotepath=false', '-C', dir, 'status', '--porcelain', '--untracked-files=normal'], {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'ignore'],
       });
@@ -715,8 +713,8 @@ function analyze(rootDir, files, manifests, gitRepos, isHub, scopeFilter, lang) 
   const uncoveredFiles = scopedFiles.filter(f => {
     if (coveredFiles.has(f) || isGenerated(f)) return false;
     if (allowRegexes.some(rx => rx.test(f))) return false;
-    if (f === 'scripts/trace.mjs' || f.endsWith('/scripts/trace.mjs') || f === 'scripts/sync-impact.mjs' || f.endsWith('/scripts/sync-impact.mjs')) return false;
-    if (/\/docs\/history\//.test(f) || /^docs\/history\//.test(f)) return false;
+    if (f === 'scripts/sync-impact.mjs' || f.endsWith('/scripts/sync-impact.mjs')) return false;
+    if (/(?:^|\/)(?:docs\/)?(?:history|research|logs)\//.test(f)) return false;
     return true;
   });
 
@@ -754,9 +752,9 @@ function analyze(rootDir, files, manifests, gitRepos, isHub, scopeFilter, lang) 
           .filter(f => !isGenerated(f) && f.includes('/'))
           .map(f => repoOwnerOf(f, gitRepos).split('/')[0])
       ),
-    ].filter(s => s && s !== '.' && s !== 'docs' && s !== 'brain' && s !== 'linkage');
+    ].filter(s => s && s !== '.' && s !== 'docs' && s !== 'brain');
     const hasCrossProjectHit = [...hitsByPoint.values()].some(
-      h => (h.point.scope === 'brain' || h.point.scope === 'linkage') && (h.point.id.startsWith('root.cross.') || h.point.id.startsWith('root.topology.'))
+      h => h.point.scope === 'brain' && (h.point.id.startsWith('root.cross.') || h.point.id.startsWith('root.topology.'))
     );
     if (touchedTopScopes.length >= 2 && !hasCrossProjectHit) {
       evolveSignals.push({
@@ -987,7 +985,7 @@ function formatReport(report, modeLabel, lang, upstreamHints = {}) {
         lines.push(
           en
             ? `  Revert / Cleanup Action: ${d.cancelledCleanup || 'Revert prior changes from this cancelled rule and mark target aligned/reverted.'}`
-            : `  顺路回退要求：${d.cancelledCleanup || '清理并撤回此前按旧版规则写入的逻辑，完成后运行 linkage-state.mjs align 标记 reverted'}`
+            : `  顺路回退要求：${d.cancelledCleanup || '清理并撤回此前按旧版规则写入的逻辑，完成后运行 brain.mjs state align 标记 reverted'}`
         );
       }
       if (d.authorityDoc) {
@@ -995,8 +993,8 @@ function formatReport(report, modeLabel, lang, upstreamHints = {}) {
       }
       lines.push(
         en
-          ? `  After completion: run linkage-state.mjs align --manifest ${d.manifestPath} --rule ${d.ruleId} --target "${d.targetName}" (if current task is a tiny doc/hotfix edit and scope is too large, ask Owner before skipping).`
-          : `  核销方式：与当前任务一并完成后运行 linkage-state.mjs align --manifest ${d.manifestPath} --rule ${d.ruleId} --target "${d.targetName}"（若本次仅为纯文档修改或紧急微调不宜夹带大改，须先向 Owner 说明并请示是否继续挂起）。`
+          ? `  After completion: run rule-state.mjs align --manifest ${d.manifestPath} --rule ${d.ruleId} --target "${d.targetName}" (if current task is a tiny doc/hotfix edit and scope is too large, ask Owner before skipping).`
+          : `  核销方式：与当前任务一并完成后运行 brain.mjs state align --manifest ${d.manifestPath} --rule ${d.ruleId} --target "${d.targetName}"（若本次仅为纯文档修改或紧急微调不宜夹带大改，须先向 Owner 说明并请示是否继续挂起）。`
       );
     }
 
@@ -1117,13 +1115,13 @@ function formatReport(report, modeLabel, lang, upstreamHints = {}) {
       `- Checked ${report.hitPoints.length} matched contract(s)${debtCount ? ` and ${debtCount} on-touch item(s)` : ''}; uncovered alerts: ${report.evolveSignals.length}.`
     );
     lines.push(
-      '- When replying to the user, explain linkage outcomes in 1-2 short, natural sentences without pasting internal point IDs, enum tags, or bureaucratic receipt headers (record exact IDs only in task logs).'
+      '- When replying to the user, explain linkage outcomes in 1-2 short, natural sentences without pasting internal point IDs, enum tags, or bureaucratic receipt headers (record exact details via centralized worklog).'
     );
   } else {
     lines.push('- 防通配符遮蔽人工复核（即使命中通用路由通配符，出现以下任一情况仍须同任务更新注册表）：');
     lines.push('  1) 新建了跨前后端／跨脚本／跨数据库触发器共用的数值、枚举、端口、环境变量或摘要绑定（优先改 L-Code 单源导入，无法单源则入表）；');
     lines.push('  2) 修复了“改 A 漏改 B”型缺陷，且现有命中的联动点 immediate/evaluated 未点名 B 文件；');
-    lines.push('  3) 修改了 on-touch 型通用规则（新增、覆盖升版或废止取消），须同步通过 linkage-state.mjs 更新 ruleStates[] 各实例状态。');
+    lines.push('  3) 修改了 on-touch 型通用规则（新增、覆盖升版或废止取消），须同步通过 brain.mjs state 更新 ruleStates[] 各实例状态。');
     if ((report.targetManifests ?? []).length) {
       lines.push(`- 当前生效的注册表入口：${report.targetManifests.join(', ')}（查看实例状态矩阵运行 --status，覆盖率自检运行 --coverage）`);
     }
@@ -1135,7 +1133,7 @@ function formatReport(report, modeLabel, lang, upstreamHints = {}) {
     }
     lines.push('\n## 三、给用户的收尾汇报提示（必须用简洁自然的口语）');
     lines.push(
-      `- 本次内部核对结果：命中 ${report.hitPoints.length} 项契约${debtCount ? `、唤醒 ${debtCount} 项顺路规则` : ''}，盲区告警 ${report.evolveSignals.length} 项（精确 ID 仅记入任务日志）。`
+      `- 本次内部核对结果：命中 ${report.hitPoints.length} 项契约${debtCount ? `、唤醒 ${debtCount} 项顺路规则` : ''}，盲区告警 ${report.evolveSignals.length} 项（精确改动统一通过 brain.mjs done 记入 brain/records/）。`
     );
     lines.push(
       '- 回复用户时：请用 1～2 句自然的日常口语顺带交代联动情况（如哪些关联文件已一并改好、哪些按约定留到下次碰对应项目时再改、有无遗漏关联处）；严禁照抄点位 ID、propagation 枚举、“联动核销回执”标题或 L-Evolve 等内部术语！'

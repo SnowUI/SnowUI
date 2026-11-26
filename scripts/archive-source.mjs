@@ -39,7 +39,7 @@ if(taggedRelease){
 fs.mkdirSync(out,{recursive:true});
 const archiveName=`snowui-source-${pkg.version}-license-${licenseVersion}`;
 const stage=fs.mkdtempSync(path.join(out,'.source-'));const folder=path.join(stage,archiveName);fs.mkdirSync(folder);
-const allowed=['src','tests','scripts','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','tsconfig.json','tsconfig.node.json','svelte.config.js','vite.config.ts','LICENSE','THIRD_PARTY_NOTICES.md','README.md','AGENTS.md','llms.txt','component-discovery.json','component-catalog.json'];
+const allowed=['src','tests','scripts','package.json','pnpm-lock.yaml','pnpm-workspace.yaml','tsconfig.json','tsconfig.node.json','svelte.config.js','vite.config.ts','LICENSE','THIRD_PARTY_NOTICES.md','README.md','AGENTS.md','llms.txt','component-discovery.json','component-catalog.json',...(fs.existsSync(path.join(root,'docs'))?['docs']:[])];
 // 允许清单中包含递归源码目录；其中的本机所有者材料仍须独立拒绝。
 const privateOwnerPath=/(?:^|\/)(?:(?:\.snowui|snowui-owner|\.?owner[._-](?:private|secret|recovery|mnemonic|backup|challenge|proof|session|state|key)|(?:challenge|proof|session)[._-]state)(?:[._-]|\/|$)|(?:owner|challenges)(?:\/|$))/i;
 const privateKeyContent=/-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----/;

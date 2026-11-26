@@ -18,7 +18,7 @@ test('内置 Phosphor 图标的独立版权与许可随源码复制材料保留'
  const icons=fs.readFileSync(path.join(root,'src/internal/component-icon/builtin-icon-data.ts'),'utf8');
  assert.match(icons,/"sourceCollection": "phosphor"/);
  const notice=fs.readFileSync(path.join(root,'THIRD_PARTY_NOTICES.md'),'utf8');
- assert.match(notice,/## Phosphor Icons（内置功能图标快照；MIT）/);
+ assert.match(notice,/## Phosphor Icons \((?:Built-in Functional Icon Snapshots; MIT)|## Phosphor Icons（内置功能图标快照；MIT）/);
  assert.match(notice,/Copyright \(c\) 2023 Phosphor Icons/);
  assert.match(notice,/The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software\./);
 });

@@ -1,0 +1,24 @@
+# Pagination 样式覆盖
+
+优先用组件公开 Props 匹配合适样式，尽可能保留原有视觉。确需改写时按 [样式选择与改写顺序](../../guides/styling.md#%E6%A0%B7%E5%BC%8F%E9%80%89%E6%8B%A9%E4%B8%8E%E6%94%B9%E5%86%99%E9%A1%BA%E5%BA%8F) 使用自己的 class（含项目已有 Tailwind）或实例 style。以下名称来自源码实际消费的公开 override；先核对目标作用域，不修改私有 DOM。采用 SnowUI Token 时选择正确类别，外部应用不被要求安装一方 utilities。
+
+| 变量 | 用途与默认参考 |
+| --- | --- |
+| `--snowui-icon-height-override` | 高度（默认值见组件源码） |
+| `--snowui-icon-min-height-override` | 最小高度（默认值见组件源码） |
+| `--snowui-icon-min-width-override` | 最小宽度（默认值见组件源码） |
+| `--snowui-icon-width-override` | 宽度（默认值见组件源码） |
+| `--snowui-pagination-color-override` | 默认文字 / Icon 颜色（默认 var(--black-100)） |
+| `--snowui-pagination-column-gap-override` | 列间距（默认 var(--gap-1) = 4px） |
+| `--snowui-pagination-ellipsis-color-override` | 省略符颜色（默认 var(--black-40)） |
+| `--snowui-pagination-font-size-override` | 默认文字 font-size（默认 var(--text-12) = 12px） |
+| `--snowui-pagination-hover-opacity-override` | 默认非当前文字 / Icon hover 透明度（默认 1） |
+| `--snowui-pagination-icon-size-override` | 默认箭头 Icon 尺寸（默认 var(--size-4) = 16px） |
+| `--snowui-pagination-idle-opacity-override` | 默认非当前文字 / Icon 透明度（默认 0.4） |
+| `--snowui-pagination-line-height-override` | 默认文字 line-height（默认 var(--leading-12) = 16px） |
+| `--snowui-pagination-padding-x-override` | 默认文字 / Icon 左右 padding（默认 var(--padding-2) = 8px） |
+| `--snowui-pagination-padding-y-override` | 默认文字 / Icon 上下 padding（默认 var(--padding-1) = 4px） |
+| `--snowui-pagination-radius-override` | 默认项 border-radius（默认 var(--radius-3) = 12px） |
+| `--snowui-pagination-row-gap-override` | 换行行距（默认 var(--gap-1) = 4px） |
+
+[设计指南](../../guides/design-system.md) · [Token](../../reference/tokens.md) · [组合边界](./reference.md)
