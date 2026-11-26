@@ -156,7 +156,7 @@ Action 的优先级为 `buttonProps` → `parts.Button` → 子项 `parts.Button
 - `OverflowAction` 通过专用 Context 注册 id / label / icon / disabled / href / 执行函数与测量节点；父组件不得读取任意 Button 内部结构推断语义。
 - 自测量模式复用全局 `resizeManager`；传入 `availableWidth` 时不注册 ResizeObserver。
 - 布局计算统一读取完整、Icon-only、Separator 与 More 的测量宽度；内容或 Props 变化后刷新固有宽度缓存，连续拖动复用缓存，不反复恢复隐藏项测量。自测量读取小数 CSS 布局宽度，并在共享 ResizeObserver 的交付帧直接求解，避免临界点取整和额外一帧引起抖动。
-- DataTable 应从列宽上下文传入 `availableWidth`，禁止为每个 actions 单元格新增 Observer。
+- DataTable 应从列宽上下文传入 `availableWidth`，禁止为每个 actions 单元格新增 Observer 或全局 `window.resize` 监听；`compact="none"` 时子项跳过隐藏 Icon-only 测量副本挂载，`maxVisible={0}` 时整组跳过宽度测量克隆节点。
 - More 菜单由 SelectButton / Listbox / MenuItem 承担打开、Portal、焦点、键盘与关闭行为。
 
 <a id="模块索引"></a>

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Portable zero-dependency linkage impact analyzer, on-touch rule state reconciler, and uncovered-coupling detector.
-// Canonical source lives in linkage/bin/sync-impact.mjs and is distributed verbatim to standalone projects.
+// Canonical source lives in brain/bin/sync-impact.mjs and is distributed verbatim to standalone projects.
 // Read-only by design: executes zero tests, zero builds, and zero file writes.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -139,7 +139,7 @@ function discoverUpstreamContext(primaryBaseDir, primaryData) {
               basePrefix: '',
               isUpstreamMounted: true,
               data: {
-                scope: hubData.scope ?? 'linkage',
+                scope: hubData.scope ?? 'brain',
                 language: primaryData.language ?? 'zh',
                 points: mappedPoints,
               },
@@ -150,9 +150,11 @@ function discoverUpstreamContext(primaryBaseDir, primaryData) {
     }
   } else if (primaryData.standaloneRepoOnly) {
     const parentWs = path.resolve(primaryBaseDir, '../sync-manifest.json');
-    const grandHub = path.resolve(primaryBaseDir, '../../linkage/sync-manifest.json');
+    const grandBrain = path.resolve(primaryBaseDir, '../../brain/sync-manifest.json');
+    const grandLegacy = path.resolve(primaryBaseDir, '../../linkage/sync-manifest.json');
     if (fs.existsSync(parentWs)) hints.parentWorkspaceRel = '../sync-manifest.json';
-    if (fs.existsSync(grandHub)) hints.upstreamHubRel = '../../linkage/sync-manifest.json';
+    if (fs.existsSync(grandBrain)) hints.upstreamHubRel = '../../brain/sync-manifest.json';
+    else if (fs.existsSync(grandLegacy)) hints.upstreamHubRel = '../../linkage/sync-manifest.json';
   }
 
   return hints;
@@ -301,6 +303,7 @@ function compileManifests(manifestSpecs) {
       path: manifestRel,
       scope: data.scope,
       language: data.language ?? 'zh',
+      standaloneRepoOnly: Boolean(data.standaloneRepoOnly),
       isUpstreamMounted: Boolean(spec.isUpstreamMounted),
       ownerDir,
       basePrefix,
@@ -604,6 +607,59 @@ function collectOnTouchReconciliations(rootDir, scopedFiles, manifests) {
   return { ruleDebts, mirrorDebts };
 }
 
+function collectHistoricalTraceHints(rootDir, scopedFiles, manifests, isHub) {
+  if (!scopedFiles.length) return [];
+  if (!isHub && manifests[0]?.standaloneRepoOnly) return [];
+
+  const centralTraceFile = isHub
+    ? path.join(rootDir, 'brain/records/traces.jsonl')
+    : path.resolve(rootDir, '../brain/records/traces.jsonl');
+  if (!fs.existsSync(centralTraceFile)) return [];
+
+  let lines = [];
+  try {
+    lines = fs.readFileSync(centralTraceFile, 'utf8').split('\n');
+  } catch {
+    return [];
+  }
+
+  const localProjectName = isHub ? '' : path.basename(rootDir);
+  const localScopeName = isHub ? '' : (manifests[0]?.scope ?? '');
+  const hits = [];
+  const seenIds = new Set();
+
+  for (const raw of lines) {
+    const trimmed = raw.trim();
+    if (!trimmed) continue;
+    let entry;
+    try {
+      entry = JSON.parse(trimmed);
+    } catch {
+      continue;
+    }
+    if (!entry?.id || seenIds.has(entry.id) || !Array.isArray(entry.files)) continue;
+    const entryProj = entry.project ?? '';
+    if (!isHub && entryProj && entryProj !== localProjectName && entryProj !== localScopeName) continue;
+    const basePrefix = isHub && entryProj && entryProj !== '.' ? entryProj : '';
+    const compiled = entry.files.map(p => globToRegExp(prefixPattern(p, basePrefix)));
+    const matched = scopedFiles.filter(f => compiled.some(rx => rx.test(f)));
+    if (matched.length) {
+      seenIds.add(entry.id);
+      hits.push({
+        id: entry.id,
+        date: entry.date ?? '',
+        category: entry.category ?? 'change',
+        title: entry.title ?? '',
+        why: entry.why ?? '',
+        invariants: entry.invariants ?? '',
+        rollback: entry.rollback ?? '',
+        matchedFiles: matched.slice(0, 5),
+      });
+    }
+  }
+  return hits.reverse();
+}
+
 function analyze(rootDir, files, manifests, gitRepos, isHub, scopeFilter, lang) {
   const en = lang === 'en';
   const scopedFiles = scopeFilter
@@ -642,6 +698,7 @@ function analyze(rootDir, files, manifests, gitRepos, isHub, scopeFilter, lang) 
   }
 
   const onTouch = collectOnTouchReconciliations(rootDir, scopedFiles, manifests);
+  const traceHints = collectHistoricalTraceHints(rootDir, scopedFiles, manifests, isHub);
 
   const evolveSignals = [];
   const staleRefs = auditStaleManifestPaths(rootDir, manifests, scopeFilter);
@@ -658,6 +715,7 @@ function analyze(rootDir, files, manifests, gitRepos, isHub, scopeFilter, lang) 
   const uncoveredFiles = scopedFiles.filter(f => {
     if (coveredFiles.has(f) || isGenerated(f)) return false;
     if (allowRegexes.some(rx => rx.test(f))) return false;
+    if (f === 'scripts/trace.mjs' || f.endsWith('/scripts/trace.mjs') || f === 'scripts/sync-impact.mjs' || f.endsWith('/scripts/sync-impact.mjs')) return false;
     if (/\/docs\/history\//.test(f) || /^docs\/history\//.test(f)) return false;
     return true;
   });
@@ -696,17 +754,17 @@ function analyze(rootDir, files, manifests, gitRepos, isHub, scopeFilter, lang) 
           .filter(f => !isGenerated(f) && f.includes('/'))
           .map(f => repoOwnerOf(f, gitRepos).split('/')[0])
       ),
-    ].filter(s => s && s !== '.' && s !== 'docs' && s !== 'linkage');
+    ].filter(s => s && s !== '.' && s !== 'docs' && s !== 'brain' && s !== 'linkage');
     const hasCrossProjectHit = [...hitsByPoint.values()].some(
-      h => h.point.scope === 'linkage' && (h.point.id.startsWith('root.cross.') || h.point.id.startsWith('root.topology.'))
+      h => (h.point.scope === 'brain' || h.point.scope === 'linkage') && (h.point.id.startsWith('root.cross.') || h.point.id.startsWith('root.topology.'))
     );
     if (touchedTopScopes.length >= 2 && !hasCrossProjectHit) {
       evolveSignals.push({
         code: 'CROSS_PARTITION_COCHANGE',
         partitions: touchedTopScopes,
         guidance: en
-          ? `Multiple top-level partitions (${touchedTopScopes.join(', ')}) changed without matching a cross-project contract. Register new cross-project dependencies in linkage/sync-manifest.json if applicable.`
-          : `当前同时改动了多个顶层项目分区（${touchedTopScopes.join(', ')}）且未命中跨项目联动契约：请核查是否诞生了新的跨项目依赖，若是请补入 linkage/sync-manifest.json。`,
+          ? `Multiple top-level partitions (${touchedTopScopes.join(', ')}) changed without matching a cross-project contract. Register new cross-project dependencies in brain/sync-manifest.json if applicable.`
+          : `当前同时改动了多个顶层项目分区（${touchedTopScopes.join(', ')}）且未命中跨项目联动契约：请核查是否诞生了新的跨项目依赖，若是请补入 brain/sync-manifest.json。`,
       });
     }
   }
@@ -718,6 +776,7 @@ function analyze(rootDir, files, manifests, gitRepos, isHub, scopeFilter, lang) 
     gitRepoCount: gitRepos.length,
     targetManifests,
     onTouch,
+    traceHints,
     hitPoints: [...hitsByPoint.values()],
     evolveSignals,
   };
@@ -852,6 +911,7 @@ function formatReport(report, modeLabel, lang, upstreamHints = {}) {
   const en = lang === 'en';
   const lines = [];
   const debtCount = (report.onTouch?.ruleDebts?.length ?? 0) + (report.onTouch?.mirrorDebts?.length ?? 0);
+  const traceCount = report.traceHints?.length ?? 0;
 
   lines.push(
     en
@@ -867,7 +927,7 @@ function formatReport(report, modeLabel, lang, upstreamHints = {}) {
     );
   }
 
-  if (!report.hitPoints.length && !report.evolveSignals.length && debtCount === 0) {
+  if (!report.hitPoints.length && !report.evolveSignals.length && debtCount === 0 && traceCount === 0) {
     if (en) {
       lines.push('\n- Matched Linkage Points: None (no tracked cross-file changes or only allowlisted standalone/history files)');
       lines.push('- Blind-Spot & New Mechanism (L-Evolve): 0 uncovered couplings');
@@ -946,6 +1006,24 @@ function formatReport(report, modeLabel, lang, upstreamHints = {}) {
           ? `- [MIRROR_DRIFT · ${md.id}] (${md.targetName}): Shared source ${md.sourceDir} has newer changes than ${md.destDir} [${md.driftedFiles.join(', ')}]${md.syncCommand ? ` -> Run: ${md.syncCommand}` : ''}`
           : `- [共享镜像待同步 · ${md.id}]（目标：${md.targetName}）：共享源 ${md.sourceDir} 已有更新尚未同步至 ${md.destDir} [${md.driftedFiles.join(', ')}]${md.syncCommand ? ` → 请顺路执行：${md.syncCommand}` : ''}`
       );
+    }
+  }
+
+  if (traceCount > 0) {
+    lines.push(
+      en
+        ? `\n## Historical Optimization & Root-Cause Invariants (${traceCount} matched trace records)`
+        : `\n## 既往关键改动与防退化不变量提醒（命中 ${traceCount} 条 brain/records/traces.jsonl 记录）`
+    );
+    for (const tr of report.traceHints) {
+      lines.push(
+        en
+          ? `- [${tr.id}] ${tr.title} (${tr.date} · ${tr.category}) -> ${tr.matchedFiles.join(', ')}`
+          : `- [${tr.id}] ${tr.title}（${tr.date} · ${tr.category}）→ ${tr.matchedFiles.join(', ')}`
+      );
+      if (tr.why) lines.push(en ? `  Why: ${tr.why}` : `  历史改动背景：${tr.why}`);
+      if (tr.invariants) lines.push(en ? `  Must Preserve: ${tr.invariants}` : `  严禁破坏的不变量：${tr.invariants}`);
+      if (tr.rollback) lines.push(en ? `  Rollback / Isolate: ${tr.rollback}` : `  异常回退提示：${tr.rollback}`);
     }
   }
 

@@ -22,6 +22,8 @@ export interface OverflowActionsContext {
     invoke: (id: string, event?: MouseEvent) => void;
     requestLayout: () => void;
     disabled: boolean;
+    compact: "auto" | "none";
+    maxVisible: number;
     tooltip?: boolean;
     buttonProps?: Record<string, any>;
     tooltipPart?: Record<string, any>;

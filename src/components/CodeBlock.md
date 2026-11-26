@@ -352,6 +352,8 @@ pnpm build`}
 
 ## AI Zone
 
+- **空闲分片与零依赖快路径**：`format={false}`、`variant="singleLine"`、`language="prompt"` 或空源码时跳过动态导入 `internal/code-block/format.ts`，确保已构建期预格式化的宿主零 Prettier 包体加载；开启 `format={true}` 时通过 `requestIdleCallback`（含 `setTimeout` 回退）在浏览器空闲时间片异步加载并格式化，首帧直接可读可复制原文，不阻塞主线程与滚动帧。
+
 ## 更新日志
 
 ### v1.8.2 (2026-10-23)

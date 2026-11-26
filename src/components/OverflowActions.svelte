@@ -230,6 +230,12 @@
         get disabled() {
             return disabled;
         },
+        get compact() {
+            return compact;
+        },
+        get maxVisible() {
+            return resolvedMaxVisible;
+        },
         get tooltip() {
             return tooltip;
         },
@@ -356,7 +362,7 @@
 
     function updateLayout() {
         if (!rootElement) return;
-        if (rootElement.querySelector('.snowui-select-button-trigger[aria-expanded="true"]')) return;
+        if (OverflowMenuParts && moreVisualElement?.querySelector('.snowui-select-button-trigger[aria-expanded="true"]')) return;
 
         const entries = directEntries();
         const actions = entries
@@ -518,14 +524,12 @@
     onMount(() => {
         isMounted = true;
         if (rootElement) movement = createOverflowActionsMotion(rootElement);
-        window.addEventListener('resize', handleViewportResize);
         document.fonts?.addEventListener('loadingdone', requestLayout);
         requestLayout();
     });
 
     onDestroy(() => {
         isMounted = false;
-        if (typeof window !== 'undefined') window.removeEventListener('resize', handleViewportResize);
         if (typeof document !== 'undefined') document.fonts?.removeEventListener('loadingdone', requestLayout);
         movement?.destroy();
         exit.destroy();
@@ -535,12 +539,17 @@
     $effect(() => {
         const node = rootElement;
         if (resolvedAvailableWidth !== undefined || !node) return;
-        return resizeManager.watch(node, () => {
+        window.addEventListener('resize', handleViewportResize);
+        const unwatch = resizeManager.watch(node, () => {
             // 观察器已在动画帧交付，直接求解，避免额外一帧的旧位置与新位置叠画。
             if (layoutFrame) cancelAnimationFrame(layoutFrame);
             layoutFrame = 0;
             updateLayout();
         });
+        return () => {
+            window.removeEventListener('resize', handleViewportResize);
+            unwatch();
+        };
     });
 
     $effect(() => {
@@ -703,7 +712,7 @@
         </span>
     {/if}
 
-    {#if isMounted}
+    {#if isMounted && resolvedMaxVisible > 0}
     <span bind:this={fadeMeasureElement} class="snowui-overflow-actions-fade-measure" aria-hidden="true" inert></span>
     <span class="snowui-overflow-actions-more-measure" aria-hidden="true" inert>
         <span bind:this={moreMeasureElement}>

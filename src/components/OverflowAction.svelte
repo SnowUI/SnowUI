@@ -259,13 +259,13 @@
 
     </span>
 
-    {#if !control && measureMounted}<span class="snowui-overflow-action-measure" aria-hidden="true" inert>
+    {#if !control && measureMounted && (owner?.maxVisible ?? Infinity) > 0}<span class="snowui-overflow-action-measure" aria-hidden="true" inert>
         <span bind:this={fullMeasureElement}>
             <Button {...resolvedButtonProps} {iconOnly} aria-label={iconOnly ? label : undefined} tooltip={false} tabindex={-1}>
                 {@render renderFull()}
             </Button>
         </span>
-        {#if icon && !iconOnly}
+        {#if icon && !iconOnly && owner?.compact !== "none"}
             <span bind:this={compactMeasureElement}>
                 <Button {...resolvedButtonProps} iconOnly tooltip={false} tabindex={-1} aria-label={label}>
                     {@render renderIcon()}

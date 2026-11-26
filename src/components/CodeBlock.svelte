@@ -21,7 +21,6 @@
 -->
 
 <script lang="ts">
-    import { formatCodeBlock } from "../internal/code-block/format";
     import Frame, { type FrameProps } from "./Frame.svelte";
     import Indicator from "./Indicator.svelte";
     import CopyButton from "./CopyButton.svelte";
@@ -231,12 +230,34 @@
     $effect(() => {
         const source = rawCode;
         const currentLanguage = language;
-        if (!format || isPrompt || isSingleLine) return;
+        if (!format || isPrompt || isSingleLine || !source.trim()) return;
         let disposed = false;
-        void formatCodeBlock(source, currentLanguage).then((output) => {
-            if (!disposed) formatted = { source, language: currentLanguage, output };
-        });
-        return () => { disposed = true; };
+        const win = typeof window !== "undefined"
+            ? (window as Window & {
+                  requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+                  cancelIdleCallback?: (id: number) => void;
+              })
+            : undefined;
+        let idleId: number | undefined;
+        let timerId: ReturnType<typeof setTimeout> | undefined;
+        const runFormat = () => {
+            if (disposed) return;
+            void import("../internal/code-block/format")
+                .then(({ formatCodeBlock }) => formatCodeBlock(source, currentLanguage))
+                .then((output) => {
+                    if (!disposed) formatted = { source, language: currentLanguage, output };
+                });
+        };
+        if (win?.requestIdleCallback) {
+            idleId = win.requestIdleCallback(runFormat, { timeout: 100 });
+        } else {
+            timerId = setTimeout(runFormat, 0);
+        }
+        return () => {
+            disposed = true;
+            if (idleId !== undefined) win?.cancelIdleCallback?.(idleId);
+            if (timerId !== undefined) clearTimeout(timerId);
+        };
     });
     const lines = $derived(resolvedCode ? resolvedCode.split("\n") : []);
     const resolvedVisibleLines = $derived(Math.max(1, visibleLines || 15));
