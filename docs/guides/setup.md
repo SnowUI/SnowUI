@@ -20,16 +20,16 @@ After downloading the CLI, run `node snowui.mjs --help` for search, docs, exampl
 
 ## Download and install
 
-The current Site baseline uses Components `1.2.2` and Resource Svelte `1.0.33`. This is a verified installation baseline, not a claim about npm's latest tag. Re-read the [machine setup](https://snowui.dev/llms/setup.json), verify exact Registry availability, and reuse a compatible existing installation instead of upgrading unconditionally.
+The current Site baseline uses Components `1.2.3` and Resource Svelte `1.0.33`. This is a verified installation baseline, not a claim about npm's latest tag. Re-read the [machine setup](https://snowui.dev/llms/setup.json), verify exact Registry availability, and reuse a compatible existing installation instead of upgrading unconditionally.
 
 Use the existing package manager; choose one:
 
 ```sh
-pnpm add --save-exact @snowui-design-system/components@1.2.2 @snowui-design-system/resource-svelte@1.0.33
+pnpm add --save-exact @snowui-design-system/components@1.2.3 @snowui-design-system/resource-svelte@1.0.33
 ```
 
 ```sh
-npm install --save-exact @snowui-design-system/components@1.2.2 @snowui-design-system/resource-svelte@1.0.33
+npm install --save-exact @snowui-design-system/components@1.2.3 @snowui-design-system/resource-svelte@1.0.33
 ```
 
 The package manager downloads the runtime packages; resource-svelte installs resource-base transitively. Note that `node_modules/@snowui-design-system/components` ships compiled `dist/`, `component-catalog.json`, and `AGENTS.md` (not `src/` or `docs/` — query full component APIs and guides via `/mcp`, `/snowui.mjs`, or `/llms-en.txt` rather than looking for `.md` component manuals inside `node_modules`). Never depend on a maintainer's local directory, sibling checkout, or temporary GitHub source. If source or offline documentation is required, use the [official GitHub repository](https://github.com/SnowUI/SnowUI) (offline public docs live under `docs/README.md`), verify its checksum, read the bundled build instructions, and resolve dependencies separately.

@@ -1,6 +1,6 @@
 # SnowUI Figma to component and token mapping
 
-Source: the reviewed public-map section of FigmaComponentMap; fingerprint: `bb1afc337ca397c2`. Component source baseline: `1.2.2`. Regenerate and check mappings and download links when the component package version changes. The original file IDs identify only the original design file; use the user-provided copy URL and relocate by page or collection, name, type, mode, and current value. Similar names do not prove identical variants or Code Connect inheritance.
+Source: the reviewed public-map section of FigmaComponentMap; fingerprint: `bb1afc337ca397c2`. Component source baseline: `1.2.3`. Regenerate and check mappings and download links when the component package version changes. The original file IDs identify only the original design file; use the user-provided copy URL and relocate by page or collection, name, type, mode, and current value. Similar names do not prove identical variants or Code Connect inheritance.
 
 [Get the SnowUI Design System on Figma Community](https://www.figma.com/community/file/1388431032861751537) · [Detailed Chinese source mapping](../zh/reference/figma-map.md) · [Machine-readable mapping](https://snowui.dev/llms/figma-map.json). Check current Community acquisition and copying terms there.
 

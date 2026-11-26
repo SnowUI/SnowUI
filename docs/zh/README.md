@@ -18,10 +18,10 @@
 
 ## 快速开始
 
-当前已核对安装基线：`@snowui-design-system/components@1.2.2` 与 `@snowui-design-system/resource-svelte@1.0.33`。
+当前已核对安装基线：`@snowui-design-system/components@1.2.3` 与 `@snowui-design-system/resource-svelte@1.0.33`。
 
 ```sh
-pnpm add --save-exact @snowui-design-system/components@1.2.2 @snowui-design-system/resource-svelte@1.0.33
+pnpm add --save-exact @snowui-design-system/components@1.2.3 @snowui-design-system/resource-svelte@1.0.33
 ```
 
 在应用入口只加载一次组件包样式：
