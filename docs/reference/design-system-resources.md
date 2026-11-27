@@ -1,6 +1,6 @@
 # SnowUI design-system resources and relationships
 
-Relationship fingerprint: `23fc53ec2f9d89b3`; component source baseline: `1.2.3`. Regenerate and check this directory, mappings, and source download links whenever the component package version changes. Source fingerprints identify the authoritative source; summary pages may include only consumer-facing excerpts.
+Relationship fingerprint: `1c7a4e5f30a33836`; component source baseline: `1.2.3`. Regenerate and check this directory, mappings, and source download links whenever the component package version changes. Source fingerprints identify the authoritative source; summary pages may include only consumer-facing excerpts.
 
 ## Resource directory
 
@@ -12,8 +12,8 @@ Relationship fingerprint: `23fc53ec2f9d89b3`; component source baseline: `1.2.3`
 | Style recommendations | Consumer summary of optional style suggestions; exact values remain in CSS and the design input. | consumer summary | [Read](../guides/styling.md) | `0ed39937b70372c3` |
 | Page utilities CSS | Actual optional page utility declarations; active only when imported by the application. | CSS implementation | [Read](https://snowui.dev/design-system/snowui-utilities.d5a8d46f5bc18b9b.css) | `d5a8d46f5bc18b9b` |
 | Responsive utilities CSS | Actual optional responsive declarations; import separately when needed. | CSS implementation | [Read](https://snowui.dev/design-system/snowui-responsive.55c150e2bf51516d.css) | `55c150e2bf51516d` |
-| Component tokens and themes | Component declarations and theme conditions; the versioned source ZIP contains the original CSS. | CSS implementation | [Read](./tokens.md) · [JSON](https://snowui.dev/llms/tokens.json) · [Source ZIP](https://snowui.dev/downloads/source/v1.2.3/snowui-source-1.2.3-license-2.4.0.zip) | `19ed73082ccdf58e` |
-| Public component APIs | Component directory, APIs, composition, and styles; verify against the installed version. | public API | [Read](../components/index.md) · [JSON](https://snowui.dev/component-catalog.json) · [Source ZIP](https://snowui.dev/downloads/source/v1.2.3/snowui-source-1.2.3-license-2.4.0.zip) | `33c20cf8ef28fda7` |
+| Component tokens and themes | Component declarations and theme conditions; the versioned source ZIP contains the original CSS. | CSS implementation | [Read](./tokens.md) · [JSON](https://snowui.dev/llms/tokens.json) · [Source ZIP](https://snowui.dev/downloads/source/v1.2.3/snowui-source-1.2.3-license-2.4.0.zip) | `2a6eba2ca0cc2df3` |
+| Public component APIs | Component directory, APIs, composition, and styles; verify against the installed version. | public API | [Read](../components/index.md) · [JSON](https://snowui.dev/component-catalog.json) · [Source ZIP](https://snowui.dev/downloads/source/v1.2.3/snowui-source-1.2.3-license-2.4.0.zip) | `1a300982b9e398b9` |
 | Figma Community resource | Obtain design resources from Figma Community. | external resource | [Read](https://www.figma.com/community/file/1388431032861751537) | `external` |
 
 ## Relationship and change path
