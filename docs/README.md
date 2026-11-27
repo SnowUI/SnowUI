@@ -18,10 +18,10 @@ Official public consumer and AI documentation for `@snowui-design-system/compone
 
 ## Quick Start
 
-Current verified baseline: `@snowui-design-system/components@1.2.3` and `@snowui-design-system/resource-svelte@1.0.33`.
+Current verified baseline: `@snowui-design-system/components@1.2.4` and `@snowui-design-system/resource-svelte@1.0.33`.
 
 ```sh
-pnpm add --save-exact @snowui-design-system/components@1.2.3 @snowui-design-system/resource-svelte@1.0.33
+pnpm add --save-exact @snowui-design-system/components@1.2.4 @snowui-design-system/resource-svelte@1.0.33
 ```
 
 Load the component stylesheet once at your application entry:

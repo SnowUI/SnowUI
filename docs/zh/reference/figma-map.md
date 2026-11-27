@@ -1,6 +1,6 @@
 # SnowUI Figma 与组件、Token 公开对照
 
-来源：FigmaComponentMap 的 public-map 区；来源指纹：`bb1afc337ca397c2`。当前代码包版本：`1.2.3`。每次组件包版本变化都须重新生成并检查映射与源码下载链接。映射更新时间以正文记录为准；使用者副本即使出现相同节点 ID，也须在副本内重新核对目标，不直接套用原文件链接。
+来源：FigmaComponentMap 的 public-map 区；来源指纹：`bb1afc337ca397c2`。当前代码包版本：`1.2.4`。每次组件包版本变化都须重新生成并检查映射与源码下载链接。映射更新时间以正文记录为准；使用者副本即使出现相同节点 ID，也须在副本内重新核对目标，不直接套用原文件链接。
 
 ## 文件入口与双向使用
 
@@ -9,7 +9,7 @@
 | SnowUI 维护的 Design System 原文件 | [SnowUI Design System](https://www.figma.com/design/eDqeDtsitne9fCi9yA0ltz)（file key：`eDqeDtsitne9fCi9yA0ltz`） | 下方组件节点链接与变量 ID 均属于此文件。 |
 | 用户获取入口 | [Figma 社区中的 SnowUI Design System](https://www.figma.com/community/file/1388431032861751537) | 由使用者按社区页面和实际订单条件获取／复制；本轮未验证社区页面的实时价格或可用性。 |
 | 用户自己的副本 | 由用户提供 `https://www.figma.com/design/<用户的 file key>/...` | 不把原文件节点 ID、变量 ID 或 Code Connect 绑定直接当成副本 ID。 |
-| SnowUI 代码与组件目录 | [组件目录](https://snowui.dev/component-catalog.json)、[组件包入口](https://snowui.dev/downloads/source/v1.2.3/snowui-source-1.2.3-license-2.4.0.zip)、[Token](./tokens.md)、[主题变量](./tokens.md) | 组件官网链接见下表；应用主题由应用维护；组件主题声明以当前版本源码包为准。 |
+| SnowUI 代码与组件目录 | [组件目录](https://snowui.dev/component-catalog.json)、[组件包入口](https://snowui.dev/downloads/source/v1.2.4/snowui-source-1.2.4-license-2.4.0.zip)、[Token](./tokens.md)、[主题变量](./tokens.md) | 组件官网链接见下表；应用主题由应用维护；组件主题声明以当前版本源码包为准。 |
 
 **从 Figma 找代码**：先确定文件，再按页面、组件名、类型与变体查下方组件表；变量按集合、名称、类型、mode 查变量表。组件官网链接提供公开用法，源码导出以组件目录和包入口为准。**从代码找 Figma**：从组件导出名或 CSS Token 查本表相应行，打开原文件节点；不得只因名称相同就重写 Figma 值或代码值。
 

@@ -20,16 +20,16 @@ CLI 下载后可用 `node snowui.mjs --help` 查看 search、docs、examples、s
 
 ## 下载与安装
 
-当前网站采用的精确版本为 Components `1.2.3`、Resource Svelte `1.0.33`。它们是已核对的安装基线，不宣称 npm latest 指向这个组合。采用时再次读取 [机器配置](https://snowui.dev/llms/setup.json) 并核对 Registry 中精确版本可取得，已有兼容版本时先复用，不无条件升级。
+当前网站采用的精确版本为 Components `1.2.4`、Resource Svelte `1.0.33`。它们是已核对的安装基线，不宣称 npm latest 指向这个组合。采用时再次读取 [机器配置](https://snowui.dev/llms/setup.json) 并核对 Registry 中精确版本可取得，已有兼容版本时先复用，不无条件升级。
 
 沿用现有包管理器，二选一：
 
 ```sh
-pnpm add --save-exact @snowui-design-system/components@1.2.3 @snowui-design-system/resource-svelte@1.0.33
+pnpm add --save-exact @snowui-design-system/components@1.2.4 @snowui-design-system/resource-svelte@1.0.33
 ```
 
 ```sh
-npm install --save-exact @snowui-design-system/components@1.2.3 @snowui-design-system/resource-svelte@1.0.33
+npm install --save-exact @snowui-design-system/components@1.2.4 @snowui-design-system/resource-svelte@1.0.33
 ```
 
 npm／pnpm 会下载运行包；`resource-base` 由 resource-svelte 的依赖自动安装。注意已安装的 `node_modules/@snowui-design-system/components` 内含编译产物 `dist/`、`component-catalog.json` 与 `AGENTS.md`，不含 `src/` 或 `docs/`（切勿在 `node_modules` 中寻找 `.md` 组件源码文档；组件详情请通过上方 `/mcp`、`/snowui.mjs` 或 `/llms.txt` 查询）。不要引用维护者本机目录，也不要把 GitHub 临时源码或本地兄弟目录当作用户的发布依赖。需要源码或离线公开文档时，从 [官方 GitHub 仓库](https://github.com/SnowUI/SnowUI) 获取对应版本与校验文件（公开文档位于仓库内 `docs/zh/README.md` 与 `docs/README.md`），阅读归档内构建说明并单独核对依赖。
