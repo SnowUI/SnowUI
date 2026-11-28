@@ -174,7 +174,7 @@
       "exemptWhen": "Adding standalone maintenance scripts not included in the published npm files allowlist",
       "immediate": [
         "Keep package.json files allowlist aligned with scripts/check-runtime-package.mjs so raw .svelte/.ts sources and source maps never leak into npm tarballs",
-        "Keep (./LICENSE) links intact in AGENTS.md and llms.txt with zero machine-local paths"
+        "Keep (./LICENSE) links and explicit @license stripping protection intact in AGENTS.md, llms.txt, and component-catalog.json with zero machine-local paths"
       ],
       "evaluated": [],
       "mergeMain": [],

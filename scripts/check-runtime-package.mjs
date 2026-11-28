@@ -45,7 +45,12 @@ for(const {path:file} of pack.files){
  }
 }
 if(pkg.license!=='SEE LICENSE IN LICENSE'||pkg.exports['./LICENSE']!=='./LICENSE')errors.push('许可声明或公开定位入口缺失');
-for(const file of ['AGENTS.md','llms.txt'])if(!fs.readFileSync(file,'utf8').includes('(./LICENSE)'))errors.push(file+' 缺少随包完整许可链接');
+for(const file of ['AGENTS.md','llms.txt']){
+ const txt=fs.readFileSync(file,'utf8');
+ if(!txt.includes('(./LICENSE)'))errors.push(file+' 缺少随包完整许可链接');
+ if(!txt.includes('@license'))errors.push(file+' 缺少 @license 防剥离门禁');
+}
+if(!fs.readFileSync('component-catalog.json','utf8').includes('@license'))errors.push('component-catalog.json 缺少 @license 防剥离门禁');
 if(!fs.readFileSync('LICENSE','utf8').includes('不要求注册、登录、公钥、签名许可、激活码或中心登记'))errors.push('Free 无认证门槛条款缺失');
 if(errors.length)throw Error('运行包门禁失败:\n'+errors.join('\n'));
 console.log(`运行包允许清单通过：${pack.files.length} 个文件；无原始 Svelte、实现 TS、测试或 source map。`);
